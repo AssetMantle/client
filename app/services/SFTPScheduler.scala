@@ -5,19 +5,17 @@ import java.net.InetAddress
 
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
-import akka.stream.alpakka.ftp.scaladsl.{Sftp, SftpApi}
+import akka.stream.alpakka.ftp.scaladsl.Sftp
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
-
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import java.nio.file.{Files, Paths}
-
 import scala.io
-import akka.{Done, NotUsed}
+import akka.Done
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, IOResult}
-import akka.stream.alpakka.ftp.{FtpCredentials, FtpFile, SftpIdentity, SftpSettings}
-import akka.stream.scaladsl.{Compression, FileIO, RunnableGraph}
+import akka.stream.ActorMaterializer
+import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
+import akka.stream.scaladsl.FileIO
 import models.masterTransaction.{WUSFTPFileTransaction, WUSFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
@@ -72,8 +70,8 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
         PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
         val bufferedSource = io.Source.fromFile(storagePathSFTPFiles + tempFileName)
         for (line <- bufferedSource.getLines.drop(1)) {
-          val Array(payerID,invoiceNumber,customerFirstName,customerLastName,customerEmailAddress,settlementDate,clientReceivedAmount,transactionType,productType,transactionReference) = line.split(",").map(_.trim)
-          wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID,invoiceNumber,customerFirstName,customerLastName,customerEmailAddress,settlementDate,clientReceivedAmount,transactionType,productType,transactionReference))
+          val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
+          wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
         }
         bufferedSource.close()
 

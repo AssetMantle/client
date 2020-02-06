@@ -3,7 +3,6 @@ package utilities
 import java.io._
 import java.security.{NoSuchProviderException, Security, SignatureException}
 import java.util.Iterator
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openpgp.operator.bc.{BcKeyFingerprintCalculator, BcPBESecretKeyDecryptorBuilder, BcPGPDigestCalculatorProvider, BcPublicKeyDataDecryptorFactory}
 import org.bouncycastle.openpgp.operator.jcajce.{JcaKeyFingerprintCalculator, JcaPGPContentVerifierBuilderProvider}
@@ -13,12 +12,12 @@ import org.bouncycastle.util.io.Streams
 object PGP {
   @throws[IOException]
   @throws[NoSuchProviderException]
-  def decryptFile(inputFileName: String, defaultFileName: String, signerPublicKeyFileName: String, decryptorPrivateKeyLocation: String, decryptorPrivateKeyPassword: String): Unit = {
+  def decryptFile(inputFileName: String, fileOutputName: String, signerPublicKeyFileName: String, decryptorPrivateKeyLocation: String, decryptorPrivateKeyPassword: String): Unit = {
     val inputBytes = new BufferedInputStream(new FileInputStream(new File(inputFileName)))
-    val keyFileBytes = new BufferedInputStream(new FileInputStream(new File(signerPublicKeyFileName)))
-    val fOut = new FileOutputStream(new File(defaultFileName))
-    decryptAndVerify(inputBytes, fOut, keyFileBytes, decryptorPrivateKeyLocation, decryptorPrivateKeyPassword)
-    keyFileBytes.close
+    val publicKeyFileBites = new BufferedInputStream(new FileInputStream(new File(signerPublicKeyFileName)))
+    val fileOutput = new FileOutputStream(new File(fileOutputName))
+    decryptAndVerify(inputBytes, fileOutput, publicKeyFileBites, decryptorPrivateKeyLocation, decryptorPrivateKeyPassword)
+    publicKeyFileBites.close
     inputBytes.close
 
   }
@@ -26,37 +25,37 @@ object PGP {
   @throws[IOException]
   @throws[SignatureException]
   @throws[PGPException]
-  def decryptAndVerify(input: InputStream, fOut: FileOutputStream, publicKeyIn: InputStream, decryptorPrivateKeyLocation: String, decryptorPrivateKeyPassword: String): Unit = {
+  def decryptAndVerify(input: InputStream, fileOutput: FileOutputStream, publicKeyIn: InputStream, decryptorPrivateKeyLocation: String, decryptorPrivateKeyPassword: String): Unit = {
 
     Security.addProvider(new BouncyCastleProvider)
-    val in = PGPUtil.getDecoderStream(input)
-    val pgpF = new PGPObjectFactory(in, new BcKeyFingerprintCalculator)
-    var enc: PGPEncryptedDataList = null
-    val o = pgpF.nextObject
+    val inputStream = PGPUtil.getDecoderStream(input)
+    val pGPObjectFactory = new PGPObjectFactory(inputStream, new BcKeyFingerprintCalculator)
+    var pGPEncryptedDataList: PGPEncryptedDataList = null
+    val pgpFactoryNextObject = pGPObjectFactory.nextObject
     //
     // the first object might be a PGP marker packet.
-    if (o.isInstanceOf[PGPEncryptedDataList]) enc = o.asInstanceOf[PGPEncryptedDataList]
-    else enc = pgpF.nextObject.asInstanceOf[PGPEncryptedDataList]
+    if (pgpFactoryNextObject.isInstanceOf[PGPEncryptedDataList]) pGPEncryptedDataList = pgpFactoryNextObject.asInstanceOf[PGPEncryptedDataList]
+    else pGPEncryptedDataList = pGPObjectFactory.nextObject.asInstanceOf[PGPEncryptedDataList]
     // find the secret key
-    val it: Iterator[_] = enc.getEncryptedDataObjects
-    var sKey: PGPPrivateKey = null
-    var pbe: PGPPublicKeyEncryptedData = null
+    val iterator: Iterator[_] = pGPEncryptedDataList.getEncryptedDataObjects
+    var pGPPrivateKey: PGPPrivateKey = null
+    var pGPPublicKeyEncryptedData: PGPPublicKeyEncryptedData = null
 
 
     val privateKeyStream = new BufferedInputStream(new FileInputStream(new File(decryptorPrivateKeyLocation)))
-    val pgpSec: PGPSecretKeyRingCollection = new PGPSecretKeyRingCollection(
+    val pGPSecretKeyRingCollection: PGPSecretKeyRingCollection = new PGPSecretKeyRingCollection(
       PGPUtil.getDecoderStream(privateKeyStream), new JcaKeyFingerprintCalculator())
     while ( {
-      sKey == null && it.hasNext
+      pGPPrivateKey == null && iterator.hasNext
     }) {
-      pbe = it.next.asInstanceOf[PGPPublicKeyEncryptedData]
+      pGPPublicKeyEncryptedData = iterator.next.asInstanceOf[PGPPublicKeyEncryptedData]
       val decryptor = new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider).build(decryptorPrivateKeyPassword.toCharArray)
       //      val psKey: PGPSecretKey = INSTANCE._secretKeyRingCollection.getSecretKey(pbe.getKeyID)
-      val psKey: PGPSecretKey = pgpSec.getSecretKey(pbe.getKeyID)
-      if (psKey != null) sKey = psKey.extractPrivateKey(decryptor)
+      val pGPSecretKey: PGPSecretKey = pGPSecretKeyRingCollection.getSecretKey(pGPPublicKeyEncryptedData.getKeyID)
+      if (pGPSecretKey != null) pGPPrivateKey = pGPSecretKey.extractPrivateKey(decryptor)
     }
-    if (sKey == null) throw new IllegalArgumentException("Unable to find secret key to decrypt the message")
-    val clear = pbe.getDataStream(new BcPublicKeyDataDecryptorFactory(sKey))
+    if (pGPPrivateKey == null) throw new IllegalArgumentException("Unable to find secret key to decrypt the message")
+    val clear = pGPPublicKeyEncryptedData.getDataStream(new BcPublicKeyDataDecryptorFactory(pGPPrivateKey))
     var plainFact = new PGPObjectFactory(clear, new JcaKeyFingerprintCalculator())
     var message: Object = null
     var onePassSignatureList: PGPOnePassSignatureList = null
@@ -72,7 +71,7 @@ object PGP {
         plainFact = new PGPObjectFactory(compressedData.getDataStream, new JcaKeyFingerprintCalculator)
         message = plainFact.nextObject
       }
-      if (message.isInstanceOf[PGPLiteralData]) { // have to read it and keep it somewhere.
+      if (message.isInstanceOf[PGPLiteralData]) {
         Streams.pipeAll(message.asInstanceOf[PGPLiteralData].getInputStream, actualOutput)
       }
       else if (message.isInstanceOf[PGPOnePassSignatureList]) onePassSignatureList = message.asInstanceOf[PGPOnePassSignatureList]
@@ -85,14 +84,14 @@ object PGP {
     val output = actualOutput.toByteArray
     if (onePassSignatureList == null || signatureList == null) throw new PGPException("Poor PGP. Signatures not found.")
     else for (i <- 0 until onePassSignatureList.size) {
-      val ops = onePassSignatureList.get(0)
+      val pGPOnePassSignature = onePassSignatureList.get(0)
       val pgpRing = new PGPPublicKeyRingCollection(PGPUtil.getDecoderStream(publicKeyIn), new JcaKeyFingerprintCalculator)
-      publicKey = pgpRing.getPublicKey(ops.getKeyID)
+      publicKey = pgpRing.getPublicKey(pGPOnePassSignature.getKeyID)
       if (publicKey != null) {
-        ops.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"), publicKey)
-        ops.update(output)
+        pGPOnePassSignature.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"), publicKey)
+        pGPOnePassSignature.update(output)
         val signature = signatureList.get(i)
-        if (ops.verify(signature)) {
+        if (pGPOnePassSignature.verify(signature)) {
           val userIds = publicKey.getUserIDs
           while ( {
             userIds.hasNext
@@ -103,12 +102,12 @@ object PGP {
         else throw new SignatureException("Signature verification failed")
       }
     }
-    if (pbe.isIntegrityProtected && !pbe.verify) throw new PGPException("Data is integrity protected but integrity is lost.")
+    if (pGPPublicKeyEncryptedData.isIntegrityProtected && !pGPPublicKeyEncryptedData.verify) throw new PGPException("Data is integrity protected but integrity is lost.")
     else if (publicKey == null) throw new SignatureException("Signature not found")
     else {
-      fOut.write(output)
-      fOut.flush
-      fOut.close
+      fileOutput.write(output)
+      fileOutput.flush
+      fileOutput.close
     }
     privateKeyStream.close()
   }
