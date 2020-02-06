@@ -2,6 +2,7 @@ package views.companion.master
 
 import play.api.libs.json.{Json, OWrites, Reads}
 import scala.xml.Elem
+import constants.Form
 
 object WesternUnionRTCB {
 
@@ -48,10 +49,10 @@ object WesternUnionRTCB {
   implicit val westernUnionRTCBWrites: OWrites[Request] = Json.writes[Request]
 
   def fromXml(xmlRequest: scala.xml.NodeSeq): Request = {
-    Request((xmlRequest \ "id").text.trim, (xmlRequest \ "reference").text.trim, (xmlRequest \ "externalReference").text.trim,
-      (xmlRequest \ "invoiceNumber").text.trim, (xmlRequest \ "buyerBusinessId").text.trim, (xmlRequest \ "buyerFirstName").text.trim,
-      (xmlRequest \ "buyerLastName").text.trim, (xmlRequest \ "createdDate").text.trim, (xmlRequest \ "lastUpdatedDate").text.trim,
-      (xmlRequest \ "status").text.trim, (xmlRequest \ "dealType").text.trim, (xmlRequest \ "paymentTypeId").text.trim,
-      (xmlRequest \ "paidOutAmount").text.trim, (xmlRequest \ "requestSignature").text.trim)
+    Request((xmlRequest \ Form.WU_RTCB_ID).text.trim, (xmlRequest \ Form.REFERENCE).text.trim, (xmlRequest \ Form.EXTERNAL_REFERENCE).text.trim,
+      (xmlRequest \ Form.INVOICE_NUMBER).text.trim, (xmlRequest \ Form.BUYER_BUSINESS_ID).text.trim, (xmlRequest \ Form.BUYER_FIRST_NAME).text.trim,
+      (xmlRequest \ Form.BUYER_LAST_NAME).text.trim, (xmlRequest \ Form.CREATED_DATE).text.trim, (xmlRequest \ Form.LAST_UPDATED_DATE).text.trim,
+      (xmlRequest \ Form.WU_RTCB_STATUS).text.trim, (xmlRequest \ Form.DEAL_TYPE).text.trim, (xmlRequest \ Form.PAYMENT_TYPE_ID).text.trim,
+      (xmlRequest \ Form.PAID_OUT_AMOUNT).text.trim, (xmlRequest \ Form.REQUEST_SIGNATURE).text.trim)
   }
 }

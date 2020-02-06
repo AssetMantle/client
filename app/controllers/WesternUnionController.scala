@@ -1,6 +1,7 @@
 package controllers
 
 
+import constants.Form
 import controllers.actions.WithTraderLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -84,12 +85,12 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
             traderDetails <- traderDetails
             organizationDetails <- organizationDetails(traderDetails.organizationID)
           } yield {
-            val queryString = Map("clientId" -> Seq(wuClientID), "clientReference" -> Seq(issueFiatRequestData.transactionID),
-              "buyer.id" -> Seq(traderDetails.id), "buyer.firstName" -> Seq(traderDetails.name), "buyer.lastName" -> Seq(""),
-              "buyer.address" -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
-              "buyer.city" -> Seq(organizationDetails.postalAddress.city), "buyer.zip" -> Seq(organizationDetails.postalAddress.zipCode),
-              "buyer.email" -> Seq(emailAddress), "service1.id" -> Seq(wuServiceID),
-              "service1.amount" -> Seq(issueFiatRequestData.transactionAmount.toString))
+            val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(issueFiatRequestData.transactionID),
+              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(traderDetails.name), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(""),
+              Form.BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
+              Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
+              Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
+              Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
             val fullURL = utilities.String.queryURLGenerator(wuURL, queryString)
             Status(302)(fullURL)
           }
