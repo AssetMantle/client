@@ -1,7 +1,6 @@
 package views.companion.master
 
-import constants.XMLTag._
-
+import play.api.libs.json.{Json, OWrites, Reads}
 import scala.xml.Elem
 
 object WesternUnionRTCB {
@@ -44,15 +43,15 @@ object WesternUnionRTCB {
     }
   }
 
-  object Request {
+  implicit val westernUnionRTCBReads: Reads[Request] = Json.reads[Request]
 
-    def fromXml(xmlRequest: scala.xml.NodeSeq): Request = {
-      new Request((xmlRequest \ "id").text.trim, (xmlRequest \ "reference").text.trim, (xmlRequest \ "externalReference").text.trim,
-        (xmlRequest \ "invoiceNumber").text.trim, (xmlRequest \ "buyerBusinessId").text.trim, (xmlRequest \ "buyerFirstName").text.trim,
-        (xmlRequest \ "buyerLastName").text.trim, (xmlRequest \ "createdDate").text.trim, (xmlRequest \ "lastUpdatedDate").text.trim,
-        (xmlRequest \ "status").text.trim, (xmlRequest \ "dealType").text.trim, (xmlRequest \ "paymentTypeId").text.trim,
-        (xmlRequest \ "paidOutAmount").text.trim, (xmlRequest \ "requestSignature").text.trim)
-    }
+  implicit val westernUnionRTCBWrites: OWrites[Request] = Json.writes[Request]
 
+  def fromXml(xmlRequest: scala.xml.NodeSeq): Request = {
+    Request((xmlRequest \ "id").text.trim, (xmlRequest \ "reference").text.trim, (xmlRequest \ "externalReference").text.trim,
+      (xmlRequest \ "invoiceNumber").text.trim, (xmlRequest \ "buyerBusinessId").text.trim, (xmlRequest \ "buyerFirstName").text.trim,
+      (xmlRequest \ "buyerLastName").text.trim, (xmlRequest \ "createdDate").text.trim, (xmlRequest \ "lastUpdatedDate").text.trim,
+      (xmlRequest \ "status").text.trim, (xmlRequest \ "dealType").text.trim, (xmlRequest \ "paymentTypeId").text.trim,
+      (xmlRequest \ "paidOutAmount").text.trim, (xmlRequest \ "requestSignature").text.trim)
   }
 }

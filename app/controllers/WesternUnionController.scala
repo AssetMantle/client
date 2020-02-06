@@ -11,6 +11,8 @@ import play.api.{Configuration, Logger}
 import controllers.results.WithUsernameToken
 import models.master.{Contacts, Organization, Organizations, Traders}
 import models.masterTransaction.IssueFiatRequests
+import play.api.libs.json
+import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -41,13 +43,13 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
   def westernUnionRTCB: Action[NodeSeq] = Action.async(parse.xml) {
     request =>
 
-      val requestBody = views.companion.master.WesternUnionRTCB.Request.fromXml(request.body)
+      val requestBody = views.companion.master.WesternUnionRTCB.fromXml(request.body)
       val hash = rtcbSecretKey + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
         requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
 
       (if (requestBody.requestSignature == utilities.String.sha256Hash(hash)) {
-        val create = masterTransactionWURTCBRequests.Service.create((request.body \\ "request").mkString.replaceAll("[\\s\\n]+", ""))
+        val create = masterTransactionWURTCBRequests.Service.create(requestBody.id, Json.toJson(requestBody).toString())
         val updateIssueFiatRequestRTCBStatus = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference)
         for {
           _ <- create
