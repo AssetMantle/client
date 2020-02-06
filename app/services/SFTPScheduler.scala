@@ -2,25 +2,27 @@ package services
 
 import java.io.File
 import java.net.InetAddress
-
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import akka.stream.alpakka.ftp.scaladsl.Sftp
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import java.nio.file.{Files, Paths}
 import scala.io
 import akka.Done
 import akka.stream.scaladsl.Source
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, IOResult}
 import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
 import akka.stream.scaladsl.FileIO
+import exceptions.BaseException
 import models.masterTransaction.{WUSFTPFileTransaction, WUSFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
 import utilities.PGP
+import scala.io.BufferedSource
+
 
 @Singleton
 class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: WUSFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -46,37 +48,65 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
   private val comdexPGPPrivateKeyPassword = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPassword")
   private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
-  def scheduler: Future[Done] = {
-    val sftpSettings = SftpSettings
-      .create(InetAddress.getByName(sftpSite))
-      .withPort(sftpPort)
-      .withCredentials(FtpCredentials.create(wuSFTPUsername, wuSFTPPassword))
-      .withStrictHostKeyChecking(false)
-      .withSftpIdentity(SftpIdentity.createRawSftpIdentity(Files.readAllBytes(Paths.get(sshPrivateKeyPath))))
+  def scheduler: Done = {
+    try {
+      val sftpSettings = SftpSettings
+        .create(InetAddress.getByName(sftpSite))
+        .withPort(sftpPort)
+        .withCredentials(FtpCredentials.create(wuSFTPUsername, wuSFTPPassword))
+        .withStrictHostKeyChecking(false)
+        .withSftpIdentity(SftpIdentity.createRawSftpIdentity(Files.readAllBytes(Paths.get(sshPrivateKeyPath))))
 
-    val sshClient = new SSHClient(new DefaultConfig)
-    sshClient.addHostKeyVerifier(new PromiscuousVerifier())
-    val _ = Sftp(sshClient)
+      val sshClient = new SSHClient(new DefaultConfig)
+      sshClient.addHostKeyVerifier(new PromiscuousVerifier())
+      val _ = Sftp(sshClient)
 
-    Sftp
-      .ls(basePathSFTPFiles, sftpSettings)
-      .flatMapConcat(ftpFile => Sftp.fromPath(ftpFile.path, sftpSettings).map((_, ftpFile)))
-      .runForeach { ftpFile =>
-        val newFilePath = storagePathSFTPFiles + ftpFile._2.name
-        val fileCreate = new File(newFilePath)
-        fileCreate.createNewFile()
-        Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
+      val sftpProcess = Sftp
+        .ls(basePathSFTPFiles, sftpSettings)
+        .flatMapConcat(ftpFile => Sftp.fromPath(ftpFile.path, sftpSettings).map((_, ftpFile)))
+        .runForeach { ftpFile =>
+          val newFilePath = storagePathSFTPFiles + ftpFile._2.name
+          val fileCreate = new File(newFilePath)
+          fileCreate.createNewFile()
+          val writeEncryptedData = Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
 
-        PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
-        val bufferedSource = io.Source.fromFile(storagePathSFTPFiles + tempFileName)
-        for (line <- bufferedSource.getLines.drop(1)) {
-          val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
-          wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
+          def decryptAndReadCSV: Future[BufferedSource] = {
+            PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
+            val csvFileContentBuffer = io.Source.fromFile(storagePathSFTPFiles + tempFileName)
+            val csvFileContentProcessor = Future.sequence {
+              csvFileContentBuffer.getLines.drop(1).map { line =>
+                val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
+                wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
+              }
+            }
+            for {
+              _ <- csvFileContentProcessor
+            } yield csvFileContentBuffer
+          }
+
+          def csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer: BufferedSource): Future[IOResult] = {
+            csvFileContentBuffer.close()
+            Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
+          }
+
+          val complete=for {
+            _ <- writeEncryptedData
+            csvFileContentBuffer <- decryptAndReadCSV
+            _ <- csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer)
+          } yield {}
+          Await.result(complete,Duration.Inf)
         }
-        bufferedSource.close()
 
-        Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
-      }
+      Await.result(sftpProcess, Duration.Inf)
+    }
+    catch {
+      case baseException: BaseException=>
+        logger.error(baseException.failure.message, baseException)
+        Done
+      case e: Exception =>
+        logger.error(e.getMessage,e)
+        Done
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime) {

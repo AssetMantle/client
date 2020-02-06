@@ -116,6 +116,7 @@ object Response {
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
+  val SFTP_SCHEDULER_FAILED = new Failure("SFTP_SCHEDULER_FAILED")
 
   //XmlResponses
   val TRANSACTION_UPDATE_SUCCESSFUL = new XmlResponse(200,"SUCCESS","Transaction update successful.")
