@@ -78,6 +78,9 @@ object Form {
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
 
+  //ProfileController
+  val IDENTIFICATION = new Form("IDENTIFICATION", routes.ProfileController.identification())
+
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset())
@@ -215,9 +218,11 @@ object Form {
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
   val HOME = "HOME"
   val COINS = "COINS"
-  val ASSETS_OWNED = "ASSETS OWNED"
-  val FIATS_OWNED = "FIATS OWNED"
-  val FIATS_TOTAL_VALUE = "FIATS TOTAL VALUE"
+  val ASSETS_OWNED = "ASSETS_OWNED"
+  val FIATS_OWNED = "FIATS_OWNED"
+  val FIATS_TOTAL_VALUE = "FIATS_TOTAL_VALUE"
+  val ID_TYPE = "ID_TYPE"
+  val ID_NUMBER = "ID_NUMBER"
 
   //File Upload
   val BROWSE = "BROWSE"
@@ -375,6 +380,7 @@ object Form {
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
   val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
+  val FULL_ADDRESS="FULL_ADDRESS"
 
   //MasterTransaction
   val COUPON = "COUPON"
@@ -489,8 +495,9 @@ object Form {
   val PLEASE_BACKUP_THIS_MNEMONIC = "PLEASE_BACKUP_THIS_MNEMONIC"
   val INVALID_INPUT = "INVALID_INPUT"
   val MNEMONIC_NOTED = "MNEMONIC_NOTED"
-  val EDIT= "EDIT"
+  val EDIT = "EDIT"
   val TABLE = "TABLE"
   val CARD = "CARD"
+  val FOOTER_LOGO = "FOOTER_LOGO"
 
 }

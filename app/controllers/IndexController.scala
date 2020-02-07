@@ -66,8 +66,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
             (zone, organization) <- getZoneAndOrganization(aclAccount)
             result<-withUsernameToken.Ok(views.html.traderIndex(totalFiat = totalFiat.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization))
           } yield result
-        case constants.User.USER => withUsernameToken.Ok(views.html.dashboard())
-        case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.dashboard())
+        case constants.User.USER => withUsernameToken.Ok(views.html.userIndex())
+        case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex())
         case constants.User.WITHOUT_LOGIN =>
           val updateUserType = masterAccounts.Service.updateUserType(loginState.username, constants.User.UNKNOWN)
           for {

@@ -1,17 +1,19 @@
 @import helper._
 
 @(formTemplate: constants.Form, formData: Form[_])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+
 @form(action = formTemplate.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         <legend class="cmuk-legend">
         @Messages(formTemplate.legend)
         </legend>
+        <hr>
         @CSRF.formField
         @fieldset
         @if(formData.hasGlobalErrors) {
-            <ul>
+            <ul class="signupErrorList">
             @for(error <- formData.globalErrors) {
-                <li>@error.format</li>
+                <li class="error">@error.format</li>
             }
             </ul>
         }

@@ -1,61 +1,56 @@
 @import controllers.actions.LoginState
 @import models.master.Organization
 @(organization: Organization, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
+@import views.html.base._
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 @center = {
     <div id="commonHome"></div>
         <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div class="cmuk-card cmuk-card-default">
-                    <div class="cmuk-card-header cmuk-flex" style="align-items: center ; justify-content: space-between;">
-                        <div>
-                        <span class="heading">@Messages(constants.Form.ORGANIZATION):</span>
-                        </div>
-                        <div class="cmuk-inline">
-                            <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
-                            <div id="Edit"  cmuk-dropdown="mode: click">
-                                <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
-                                <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
-                            </div>
+                @commonCard() {
+                    <div>
+                        <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ORGANIZATION)</span>
+                    </div>
+                    <div class="cmuk-inline">
+                        <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
+                        <div id="Edit" class="Editdropdown">
+                            <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
+                            <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
                         </div>
                     </div>
-                    <div class="cmuk-card-body">
-                        <div id="organization"></div>
-                    </div>
-                </div>
+                }{
+                <div id="organization"></div>
+                }
             </div>
             <div class="cmuk-width-expand@@m">
-                <div class="cmuk-card cmuk-card-default">
-                    <div class="cmuk-card-header cmuk-flex" style="align-items: center ; justify-content: space-between;">
+                @commonCard() {
                         <div>
-                            <span class="heading">@Messages(constants.Form.ZONE):</span>
+                            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ZONE)</span>
                         </div>
                         <div  class="cmuk-inline">
                             <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
-                            <div id="Edit"  cmuk-dropdown="mode: click">
+                            <div id="Edit"  class="Editdropdown">
                                 <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
                                 <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
                             </div>
                         </div>
-                    </div>
-                    <div class="cmuk-card-body">
+                    }{
                         <div id="zone"></div>
-                    </div>
+                    }
                 </div>
-            </div>
         </div>
+
     <div class="cmuk-margin-top cmuk-margin-bottom">
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
     </div>
-        <div class="cmuk-card cmuk-card-default">
-            <div class="cmuk-card-header">
-                <span class="heading">@Messages(constants.Form.TEAM)</span>
-            </div>
-            <div class="cmuk-card-body">
-                <div id="organizationTraders"></div>
-            </div>
+
+        @commonCard() {
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.TEAM)</span>
         </div>
+        }{
+        <div id="organizationTraders"></div>
+        }
 
 
     <script>

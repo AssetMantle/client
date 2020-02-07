@@ -10,14 +10,13 @@ function validateForm(form) {
             const inputElement = dlElement.find("input")[0];
 
             const inputValue = inputElement.value;
-            inputElement.style.borderColor = "transparent";
+             inputElement.classList.remove("errorInput");
             try {
                 dlElement.find(".error").remove();
             } catch {
             }
 
             let errorStatement = "";
-            //TODO box disappears for required false
             if (inputElement.type === "date" || inputElement.type === "checkbox" || (inputElement.getAttribute("required") === "false" && inputValue === "")) {
                 return;
             }
@@ -77,8 +76,7 @@ function validateForm(form) {
             );
             if (errorStatement !== "") {
                 formValidationBoolean = false;
-                //TODO do by add class
-                inputElement.style.borderColor = "red";
+                inputElement.classList.add("errorInput");
                 dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>")
             }
         }
