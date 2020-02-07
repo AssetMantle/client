@@ -33,14 +33,38 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           Future (BadRequest(views.html.component.master.updateContact(formWithErrors)))
         },
         updateContactData => {
-          val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
 
-          def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+          val emailPresent=masterContacts.Service.emailPresent(updateContactData.emailAddress,loginState.username)
+
+          val mobilePresent=masterContacts.Service.mobileNumberPresent(updateContactData.countryCode+updateContactData.mobileNumber,loginState.username)
+
+          def getResult(emailPresent:Boolean,mobilePresent:Boolean)={
+            if(mobilePresent && emailPresent){
+              Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value= views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.EMAIL_ADDRESS.name,constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE.message).withError(constants.FormField.MOBILE_NUMBER.name,constants.Response.MOBILE_NUMBER_ALREADY_IN_USE.message))))
+            }
+            else if(mobilePresent){
+              Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value= views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.MOBILE_NUMBER.name,constants.Response.MOBILE_NUMBER_ALREADY_IN_USE.message))))
+            }
+            else if(emailPresent){
+              Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value= views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.EMAIL_ADDRESS.name,constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE.message))))
+            }
+            else{
+              val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
+
+              def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+
+              for{
+                _ <- insertOrUpdateContact
+                _ <- updateStatusUnverifiedContact
+                result<-withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
+              }yield result
+            }
+          }
 
           (for {
-            _ <- insertOrUpdateContact
-            _ <- updateStatusUnverifiedContact
-            result<-withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
+            emailPresent <- emailPresent
+            mobilePresent <- mobilePresent
+            result<-getResult(emailPresent,mobilePresent)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

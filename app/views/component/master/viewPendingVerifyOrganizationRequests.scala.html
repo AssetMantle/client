@@ -51,11 +51,6 @@
                         }
                 </div>
                 <br>
-                @Messages(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
-                <div id = "organizationBankAccountDetail@organizationVerificationRequest.accountID">
-                    <script>componentResource('organizationBankAccountDetail@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail('@organizationVerificationRequest.id'))</script>
-                </div>
-                <br>
                 @Messages(constants.Form.DOCUMENTS): <br>
                 <div id = "kycDocuments@organizationVerificationRequest.accountID">
                     <script>componentResource('kycDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKYCDocuments('@organizationVerificationRequest.id'))</script>

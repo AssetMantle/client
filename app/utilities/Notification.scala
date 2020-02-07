@@ -87,6 +87,22 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
+  def sendTraderInvite(accountID:String,toEmail:String, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID)))=sendTraderInviteEmail(toEmail,messageParameters = messageParameters: _*)
+
+  def sendTraderInviteEmail(toEmail:String, messageParameters: String*)(implicit lang: Lang)={
+    val email= constants.Notification.TRADER_INVITATION.email.get
+
+    mailerClient.send(Email(
+      subject = messagesApi(email.subject),
+      from = emailFromAddress,
+      to = Seq(toEmail),
+      bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
+      charset = Option(emailCharset),
+      replyTo = Seq(emailReplyTo),
+      bounceAddress = Option(emailBounceAddress),
+    ))
+  }
+
   private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
 
     val title=Future(messagesApi(pushNotification.title))

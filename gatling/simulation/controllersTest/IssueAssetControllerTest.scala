@@ -163,7 +163,7 @@ object issueAssetControllerTest {
     .pause(1)
     .exec(http("Issue_Asset_Request_Form")
       .get(session => routes.IssueAssetController.issueAssetRequestForm(session(Test.TEST_REQUEST_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.ISSUE_ASSET_REQUEST.legend)).exists)
+      .check(css("legend:contains(%s)".format("Issue Asset Request")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(1)
