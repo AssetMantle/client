@@ -69,7 +69,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     case Success(result) => if (result > 0) {
       result
     } else {
-        logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED"))
+        logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = "+ transactionID))
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
     case Failure(exception) => exception match {
