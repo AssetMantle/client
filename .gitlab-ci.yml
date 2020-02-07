@@ -71,21 +71,22 @@ build_local:
 #    paths:
 #      - build/
 
-dev:
-  stage: deploy
-  script:
-    - sbt clean dist exit
-    - sbt clean dist exit
-    - ls
-    - cd /builds/deepanshutr/commitCentral/target/universal/
-    - mv /builds/deepanshutr/commitCentral/target/universal/samplecicd-1.0.zip /root/
-    - cd /root/
-    - unzip samplecicd-1.0.zip
-    - cp -r /builds/mkoijn6/samplecicd/public /root/samplecicd-1.0/
-    - scp -i $SERVER_PEM -o StrictHostKeyChecking=no -r /root/samplecicd-1.0/ $SERVER_IP_WITH_NAME:/home/ubuntu/
-    - ssh -o StrictHostKeyChecking=no -i $SERVER_PEM $SERVER_IP_WITH_NAME
-    - cd samplecicd-1.0/bin/
-    - ./samplecicd &
-
-  only:
-    - patch-1
+#dev:
+#  stage: deploy
+#  script:
+#    - sbt clean dist exit
+#    - sbt clean dist exit
+#    - ls
+#    - cd /builds/deepanshutr/commitCentral/target/universal/
+#    - mv /builds/deepanshutr/commitCentral/target/universal/samplecicd-1.0.zip /root/
+#    - cd /root/
+#    - unzip samplecicd-1.0.zip
+#    - cp -r /builds/deepanshutr/commitCentral/public /root/samplecicd-1.0/
+#    - scp -i $SERVER_PEM -o StrictHostKeyChecking=no -r /root/samplecicd-1.0/ $SERVER_IP_WITH_NAME:/home/ubuntu/
+#    - ssh -o StrictHostKeyChecking=no -i $SERVER_PEM $SERVER_IP_WITH_NAME
+#    - cd samplecicd-1.0/bin/
+#    - ./samplecicd &
+#    - exit
+#
+#  only:
+#    - patch-1

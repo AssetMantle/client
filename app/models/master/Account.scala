@@ -159,6 +159,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def getStatusByID(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.status).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
     def * = (id, secretHash, accountAddress, language, userType, status) <> (Account.tupled, Account.unapply)
@@ -234,6 +244,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def updateStatusUnverifiedEmail(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.EMAIL_ADDRESS_UNVERIFIED)
 
     def updateStatusComplete(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.COMPLETE)
+
+    def getStatus(id: String): Future[String] = getStatusByID(id)
   }
 
 }

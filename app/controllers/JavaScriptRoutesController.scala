@@ -178,6 +178,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.identificationDetails,
         routes.javascript.ProfileController.identificationForm,
         routes.javascript.ProfileController.identificationDocument,
+        routes.javascript.ProfileController.organizationDetails,
 
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,

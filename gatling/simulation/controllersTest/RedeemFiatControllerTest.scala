@@ -21,7 +21,7 @@ object redeemFiatControllerTest {
     .feed(GasFeeder.gasFeed)
     .exec(http("Redeem_Fiat_GET")
       .get(session=> routes.RedeemFiatController.redeemFiatForm(session(Test.TEST_SELLER_USERNAME).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.REDEEM_FIAT.legend)).exists)
+      .check(css("legend:contains(%s)".format("Redeem Fiat")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Redeem_Fiat_POST")

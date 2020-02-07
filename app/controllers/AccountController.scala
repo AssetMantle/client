@@ -168,7 +168,7 @@ class AccountController @Inject()(
               } yield result
             case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
             case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
-            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
+            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.USER)
               for {
                 _ <- updateUserType
                 result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))

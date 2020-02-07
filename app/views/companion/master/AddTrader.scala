@@ -8,12 +8,10 @@ object AddTrader {
 
   val form = Form(
     mapping(
-      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
       constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
-      constants.FormField.NAME.name -> constants.FormField.NAME.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(zoneID: String, organizationID: String, name: String)
+  case class Data(organizationID: String)
 
 }

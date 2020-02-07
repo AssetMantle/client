@@ -39,11 +39,15 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.acraPath")
 
+  private val uploadOrganizationKYCIncorporationDocumentPath = configuration.get[String]("upload.organization.incorporationDocument")
+
   private val uploadOrganizationKYCShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
   private val uploadTraderKYCIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
 
   private val uploadTraderAgreementPath = configuration.get[String]("upload.trader.agreementPath")
+
+  private val uploadTraderEmploymentProofPath = configuration.get[String]("upload.trader.employmentProofPath")
 
   private val uploadTraderAssetContractPath: String = configuration.get[String]("upload.asset.contract")
 
@@ -93,6 +97,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.ACRA => uploadOrganizationKYCACRAPath
       case constants.File.SHARE_STRUCTURE => uploadOrganizationKYCShareStructurePath
       case constants.File.ORGANIZATION_AGREEMENT => uploadOrganizationAgreementPath
+      case constants.File.INCORPORATION_DOCUMENT => uploadOrganizationKYCIncorporationDocumentPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
@@ -101,6 +106,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     documentType match {
       case constants.File.TRADER_IDENTIFICATION => uploadTraderKYCIdentificationPath
       case constants.File.TRADER_AGREEMENT => uploadTraderAgreementPath
+      case constants.File.EMPLOYMENT_PROOF => uploadTraderEmploymentProofPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

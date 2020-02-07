@@ -32,7 +32,7 @@ object PGP {
     val pGPObjectFactory = new PGPObjectFactory(inputStream, new BcKeyFingerprintCalculator)
     var pGPEncryptedDataList: PGPEncryptedDataList = null
     val pgpFactoryNextObject = pGPObjectFactory.nextObject
-    //
+
     // the first object might be a PGP marker packet.
     if (pgpFactoryNextObject.isInstanceOf[PGPEncryptedDataList]) pGPEncryptedDataList = pgpFactoryNextObject.asInstanceOf[PGPEncryptedDataList]
     else pGPEncryptedDataList = pGPObjectFactory.nextObject.asInstanceOf[PGPEncryptedDataList]
@@ -50,7 +50,6 @@ object PGP {
     }) {
       pGPPublicKeyEncryptedData = iterator.next.asInstanceOf[PGPPublicKeyEncryptedData]
       val decryptor = new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider).build(decryptorPrivateKeyPassword.toCharArray)
-      //      val psKey: PGPSecretKey = INSTANCE._secretKeyRingCollection.getSecretKey(pbe.getKeyID)
       val pGPSecretKey: PGPSecretKey = pGPSecretKeyRingCollection.getSecretKey(pGPPublicKeyEncryptedData.getKeyID)
       if (pGPSecretKey != null) pGPPrivateKey = pGPSecretKey.extractPrivateKey(decryptor)
     }

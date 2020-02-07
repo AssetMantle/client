@@ -43,20 +43,15 @@ class OneCompleteTransactionModerated extends Simulation {
 
 }
 
-
 object CreateZone {
 
   val createZone = scenario("CREATE ZONE")
     .feed(ZoneLoginFeeder.zoneLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
-    .exec{session=> println(session)
-    session}
     .exec(signUpControllerTest.signUpScenario)
     .exec(loginControllerTest.loginScenario)
-    .exec(sendCoinControllerTest.FaucetRequestScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec(sendCoinControllerTest.approveFaucetRequestScenario)
-    .exec(loginControllerTest.loginScenario)
+    .exec(updateContactControllerTest.updateContactScenario)
+    .exec(profileControllerTest.addIdentification)
     .exec(addZoneControllerTest.addZoneRequestScenario)
     .exec(logoutControllerTest.logoutScenario)
    // .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID("${%s}".format(Test.TEST_ZONE_ACCOUNT_ID))) }
@@ -86,10 +81,8 @@ object CreateOrganization {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ORGANIZATION_PASSWORD).as[String]))
     .exec(signUpControllerTest.signUpScenario)
     .exec(loginControllerTest.loginScenario)
-    .exec(sendCoinControllerTest.FaucetRequestScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec(sendCoinControllerTest.approveFaucetRequestScenario)
-    .exec(loginControllerTest.loginScenario)
+    .exec(updateContactControllerTest.updateContactScenario)
+    .exec(profileControllerTest.addIdentification)
     .exec(addOrganizationControllerTest.addOrganizationRequestScenario)
     .exec(logoutControllerTest.logoutScenario)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
@@ -119,10 +112,8 @@ object CreateSeller {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(signUpControllerTest.signUpScenario)
     .exec(loginControllerTest.loginScenario)
-    .exec(sendCoinControllerTest.FaucetRequestScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec(sendCoinControllerTest.approveFaucetRequestScenario)
-    .exec(loginControllerTest.loginScenario)
+    .exec(updateContactControllerTest.updateContactScenario)
+    .exec(profileControllerTest.addIdentification)
     .exec(setACLControllerTest.addTraderRequest)
     .exec(logoutControllerTest.logoutScenario)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
@@ -158,10 +149,8 @@ object CreateBuyer {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(signUpControllerTest.signUpScenario)
     .exec(loginControllerTest.loginScenario)
-    .exec(sendCoinControllerTest.FaucetRequestScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec(sendCoinControllerTest.approveFaucetRequestScenario)
-    .exec(loginControllerTest.loginScenario)
+    .exec(updateContactControllerTest.updateContactScenario)
+    .exec(profileControllerTest.addIdentification)
     .exec(setACLControllerTest.addTraderRequest)
     .exec(logoutControllerTest.logoutScenario)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
