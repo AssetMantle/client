@@ -95,6 +95,7 @@ object FormField {
   val ID_TYPE = new StringFormField("ID_TYPE", 2, 100)
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
+  val OTHER_DOCUMENTS = new StringFormField("OTHER_DOCUMENTS", 0, 1000)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -105,6 +106,7 @@ object FormField {
   val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldOptions.PAYMENT_TERMS)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
+  val REFRENCE= new SelectFormField("REFRENCE",constants.SelectFieldOptions.REFRENCE_DATES)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
@@ -116,15 +118,19 @@ object FormField {
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
+  val SHIPPING_PERIOD= new IntFormField("SHIPPING_PERIOD", 0, 1000)
+  val TENURE= new IntFormField("TENURE",0,500)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
   val DATE_OF_BIRTH= new DateFormField("DATE_OF_BIRTH")
+  val TENTATIVE_DATE= new DateFormField("TENTATIVE_DATE")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
+  val ADVANCE_PERCENTAGE= new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -148,6 +154,12 @@ object FormField {
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_MNEMONIC_NOTED = new BooleanFormField("CONFIRM_MNEMONIC_NOTED")
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
+  val ADVANCE_PAYMENT= new BooleanFormField("ADVANCE_PAYMENT")
+  val CREDIT= new BooleanFormField("CREDIT")
+  val OBL= new BooleanFormField("OBL")
+  val INVOICE= new BooleanFormField("INVOICE")
+  val COO= new BooleanFormField("COO")
+  val COA= new BooleanFormField("COA")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

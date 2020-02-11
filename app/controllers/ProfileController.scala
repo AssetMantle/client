@@ -174,7 +174,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
   def viewTraderRequests()=withLoginAction.authenticated{implicit loginState =>
     implicit request =>
     val allTraderRequests = masterTransactionAddTraderRequests.Service.getAllTraderRequests(loginState.username)
-    def getContacts(emailIDs:Seq[String]) = masterContacts.Service.getContactsByEmailID()
+    def getContacts(emailIDs:Seq[String]) = masterContacts.Service.getContactsByEmailID(emailIDs)
     for{
       allTraderRequests<-allTraderRequests
       contacts<- getContacts(allTraderRequests.map(_.emailAddress))

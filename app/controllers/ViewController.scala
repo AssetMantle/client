@@ -89,4 +89,31 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+  def account: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future {
+        Ok(views.html.account())
+      }.recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def dashboard: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future {
+        Ok(views.html.dashboard())
+      }.recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def trades: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future {
+        Ok(views.html.trades())
+      }.recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
 }

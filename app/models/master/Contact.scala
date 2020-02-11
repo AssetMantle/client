@@ -160,7 +160,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def contactByEmailId(email:String)=getContactByEmailId(email)
 
-    def getContactsByEmailID(emailAddresses:Seq[String])=getContactsByEmailAddresses(email)
+    def getContactsByEmailID(emailAddresses:Seq[String])=getContactsByEmailAddresses(emailAddresses)
   }
 
 }

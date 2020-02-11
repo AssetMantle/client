@@ -93,6 +93,12 @@ object Form {
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset())
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset())
 
+  //SalesQuoteController
+  val COMMODITY_DETAILS = new Form("COMMODITY_DETAILS", routes.SalesQuoteController.commodityDetails())
+  val SHIPPING_DETAILS = new Form("SHIPPING_DETAILS", routes.SalesQuoteController.shippingDetails())
+  val PAYMENT_TERMS = new Form("PAYMENT_TERMS", routes.SalesQuoteController.paymentTerms())
+  val SALES_QUOTE_DOCUMENTS = new Form("SALES_QUOTE_DOCUMENTS", routes.SalesQuoteController.salesQuoteDocuments())
+
   //SellerExecuteOrderController
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder())
   val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.moderatedSellerExecuteOrder())
@@ -144,6 +150,7 @@ object Form {
   val PROFILE = "PROFILE"
   val MARKET = "MARKET"
   val ACCOUNT = "ACCOUNT"
+  val TRADES = "TRADES"
   val REQUEST = "REQUEST"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
@@ -224,9 +231,10 @@ object Form {
   val FIATS_TOTAL_VALUE = "FIATS TOTAL VALUE"
   val ID_TYPE = "ID_TYPE"
   val ID_NUMBER = "ID_NUMBER"
-  val FIRST_NAME="FIRST_NAME"
-  val LAST_NAME="LAST_NAME"
-  val DATE_OF_BIRTH="DATE_OF_BIRTH"
+  val FIRST_NAME = "FIRST_NAME"
+  val LAST_NAME = "LAST_NAME"
+  val DATE_OF_BIRTH = "DATE_OF_BIRTH"
+  val CREATE_SALES_QUOTE = "CREATE_SALES_QUOTE"
 
   //File Upload
   val BROWSE = "BROWSE"

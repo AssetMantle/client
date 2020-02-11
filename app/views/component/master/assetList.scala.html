@@ -8,7 +8,6 @@
 @for(asset <- assetPegWallet) {
     <div class="flexItem box thirdBox lightBlue">
     @asset.pegHash match {
-
         case Some(peghash) => {
             @for(masterAsset <- masterAssetList) {
                 @if(masterAsset.pegHash == peghash) {

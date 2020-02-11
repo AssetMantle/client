@@ -187,7 +187,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def create(file: AssetFile): Future[String] = add(serialize(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)))
 
-    def getOrEmpty(id: String, documentType: String): Future[AssetFile] = findByIdDocumentType(id = id, documentType = documentType).map { documentType => documentType.getOrElse(AssetFileSerialized("", "", "", None, None, None)).deserialize }
+    def getOrEmpty(id: String, documentType: String): Future[AssetFile] = findByIdDocumentType(id = id, documentType = documentType).map { assetFile => assetFile.getOrElse(AssetFileSerialized("", "", "", None, None, None)).deserialize }
 
     def getOrNone(id: String, documentType: String): Future[Option[AssetFile]] = findByIdDocumentType(id = id, documentType = documentType).map { assetFile => if (assetFile.isDefined) Option(assetFile.get.deserialize) else None }
 

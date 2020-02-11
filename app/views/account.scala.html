@@ -1,0 +1,17 @@
+@import controllers.actions.LoginState
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.Form.ACCOUNT), failures, warnings, successes, infos)(left)(center)(Html(""))
+
+@left={
+
+}
+
+@center = {
+
+    <div class="cmuk-margin-top cmuk-margin-bottom">
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
+    </div>
+    <h2>Account PageUnderConstruction</h2>
+
+}
