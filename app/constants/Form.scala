@@ -73,7 +73,7 @@ object Form {
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset())
 
   //IssueFiatController
-  val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.IssueFiatController.issueFiatRequest())
+  val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect())
   val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest())
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
@@ -395,6 +395,30 @@ object Form {
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"
   val ONLY_BUYER = "ONLY_BUYER"
   val BOTH_PARTIES = "BOTH_PARTIES"
+  val WU_RTCB_ID = "id"
+  val REFERENCE = "reference"
+  val EXTERNAL_REFERENCE = "externalReference"
+  val INVOICE_NUMBER = "invoiceNumber"
+  val BUYER_BUSINESS_ID = "buyerBusinessId"
+  val BUYER_FIRST_NAME = "buyerFirstName"
+  val BUYER_LAST_NAME = "buyerLastName"
+  val CREATED_DATE = "createdDate"
+  val LAST_UPDATED_DATE = "lastUpdatedDate"
+  val WU_RTCB_STATUS = "status"
+  val DEAL_TYPE = "dealType"
+  val PAYMENT_TYPE_ID = "paymentTypeId"
+  val PAID_OUT_AMOUNT = "paidOutAmount"
+  val REQUEST_SIGNATURE = "requestSignature"
+  val CLIENT_ID = "clientID"
+  val CLIENT_REFERENCE = "clientReference"
+  val WU_SFTP_BUYER_ID = "buyer.id"
+  val WU_SFTP_BUYER_FIRST_NAME = "buyer.firstName"
+  val WU_SFTP_BUYER_LAST_NAME = "buyer.lastName"
+  val BUYER_CITY = "buyer.city"
+  val BUYER_ZIP = "buyer.zip"
+  val BUYER_EMAIL = "buyer.email"
+  val SERVICE_ID = "service1.id"
+  val SERVICE_AMOUNT = "service1.amount"
 
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"

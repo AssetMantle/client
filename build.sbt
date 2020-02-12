@@ -50,3 +50,6 @@ libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.8"
 
 libraryDependencies += "commons-codec" % "commons-codec" % "1.11"
 
+libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "1.1.2"
+
+libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.64"

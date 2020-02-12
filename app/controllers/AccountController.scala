@@ -12,6 +12,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import services.SFTPScheduler
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,6 +43,7 @@ class AccountController @Inject()(
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
+                                   sftpScheduler: SFTPScheduler,
                                    messagesControllerComponents: MessagesControllerComponents,
                                  )
                                  (implicit
