@@ -49,20 +49,20 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
 
-      (if (requestBody.requestSignature == utilities.String.sha256Hash(hash)) {
+      (if (requestBody.requestSignature == utilities.String.sha256Sum(hash)) {
         val create = masterTransactionWURTCBRequests.Service.create(requestBody.id, Json.toJson(requestBody).toString())
         val updateIssueFiatRequestRTCBStatus = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference)
         for {
           _ <- create
           _ <- updateIssueFiatRequestRTCBStatus
-        } yield constants.Response.TRANSACTION_UPDATE_SUCCESSFUL.result
+        } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else {
         Future {
-          constants.Response.INVALID_REQUEST_SIGNATURE.result
+          utilities.XMLRestResponse.INVALID_REQUEST_SIGNATURE.result
         }
       }
         ).recover {
-        case _: Exception => constants.Response.COMDEX_VALIDATION_FAILURE.result
+        case _: Exception => utilities.XMLRestResponse.COMDEX_VALIDATION_FAILURE.result
       }
   }
 

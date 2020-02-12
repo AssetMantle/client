@@ -22,7 +22,7 @@ object String {
 
   def nestedFormField(fieldName: String)(implicit prefix: String): String = Seq(prefix, fieldName).mkString(".")
 
-  def sha256Hash(text: String) : String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(text.getBytes("UTF-8"))))
+  def sha256Sum(text: String) : String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(text.getBytes("UTF-8"))))
 
   def queryURLGenerator(baseURL: String, parameters: Map[String, Seq[String]]): String = {
     baseURL + Option(parameters)
