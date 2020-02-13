@@ -1,37 +1,38 @@
-function validateForm(form) {
+function validateForm2(form) {
 
     let formValidationBoolean = true;
 
     form.find("dl").each(function () {
-            const dlElement = $(this);
-            if (dlElement.find(("select"))[0] !== undefined) {
-                let selectElement=dlElement.find(("select"))[0];
-                console.log(selectElement.value);
-                console.log(selectElement.disabled);
+
+        const dlElement = $(this);
+        let errorStatement = "";
+        try {
+            dlElement.find(".error").remove();
+        } catch {
+        }
+
+        if (dlElement.find(("select"))[0] !== undefined) {
+
+            let selectElement=dlElement.find(("select"))[0];
+            selectElement.classList.remove("errorInput");
+            if(selectElement.disabled){
+                return;
+            }else if(selectElement.value ===""){
+                errorStatement="No Input";
+                formValidationBoolean = false;
+                selectElement.classList.add("errorInput");
+                dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>");
+                return;
+            }else{
                 return;
             }
+        }else{
             const inputElement = dlElement.find("input")[0];
-
             const inputValue = inputElement.value;
-             inputElement.classList.remove("errorInput");
-            try {
-                dlElement.find(".error").remove();
-            } catch {
-            }
-
-            let errorStatement = "";
-
-            if(inputElement.type === "date"){
-                if(inputValue !== "") return;
-                else {
-                    errorStatement="No Input";
-                }
-            }
-
-            if (inputElement.type === "checkbox" || (inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled === true) {
+            inputElement.classList.remove("errorInput");
+            if(inputElement.type === "checkbox" || (inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled === true){
                 return;
             }
-
             dlElement.find(".info").each(function () {
 
                     if (errorStatement !== "") {
@@ -39,7 +40,7 @@ function validateForm(form) {
                     }
                     const ddInfoElement = $(this)[0];
                     const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
-
+                    console.log(ddValidationInfo[0]);
                     switch (ddValidationInfo[0]) {
                         case "Numeric":
                             if (inputValue === "" || isNaN(inputValue)) {
@@ -81,6 +82,11 @@ function validateForm(form) {
 
                             }
                             break;
+                        case "Date ('yyyy-MM-dd')":
+                            if(inputValue === ""){
+                                errorStatement="Invalid Input";
+                            }
+                            break;
                         default :
                             const newRegEx = new RegExp(ddInfoElement.innerHTML);
                             if (!(newRegEx.test(inputValue))) {
@@ -95,6 +101,6 @@ function validateForm(form) {
                 dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>")
             }
         }
-    );
+    });
     return formValidationBoolean;
 }

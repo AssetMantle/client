@@ -1,4 +1,6 @@
 @import controllers.actions.LoginState
+@import views.html.base.common
+
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.ACCOUNT), failures, warnings, successes, infos)(left)(center)(Html(""))
@@ -9,9 +11,254 @@
 
 @center = {
 
-    <div class="cmuk-margin-top cmuk-margin-bottom">
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
-    </div>
     <h2>Account PageUnderConstruction</h2>
+
+    <html>
+
+        <div class="accountTabSection cmuk-flex">
+            <div class="accountOrganization cmuk-card cmuk-card-default">
+                <div class="cmuk-card-header cmuk-flex">
+                    <h3>Organization Details</h3>
+                    <button class="cmuk-button">Edit</button>
+                </div>
+                <div class="cmuk-card-body">
+                    <table class="cmuk-table cmuk-table-divider">
+                        <tbody>
+                            <tr>
+                                <th>NAME</th>
+                                <td>ABC Traders Pvt. Ltd.</td>
+                            </tr>
+                            <tr>
+                                <th>NAME</th>
+                                <td>445 Mount Eden Road, Mount Eden, Auckland.</td>
+                            </tr>
+                            <tr>
+                                <th>Country</th>
+                                <td>Singapore</td>
+                            </tr>
+                            <tr>
+                                <th>City:</th>
+                                <td>Jurong East</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="accountUbo cmuk-card cmuk-card-default">
+                <div class="cmuk-card-header cmuk-flex">
+                    <h3>UBO Details</h3>
+                    <div>
+                        <button class="cmuk-button">Edit</button>
+                        <button class="cmuk-button">Add</button>
+                    </div>
+                </div>
+                <div class="cmuk-card-body">
+                    <table class="cmuk-table cmuk-table-divider">
+                        <thead>
+                            <tr>
+                                <th>UBO NAME</th>
+                                <th>TYPE</th>
+                                <th>ORG. NAME</th>
+                                <th>% SHARE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>AJocelyn Mayer</td>
+                                <td>Individual</td>
+                                <td>ABC Traders Pvt. Ltd.</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td>AJocelyn Mayer</td>
+                                <td>Individual</td>
+                                <td>ABC Traders Pvt. Ltd.</td>
+                                <td>25%</td>
+                            </tr> <tr>
+                            <td>AJocelyn Mayer</td>
+                            <td>Individual</td>
+                            <td>ABC Traders Pvt. Ltd.</td>
+                            <td>25%</td>
+                        </tr> <tr>
+                            <td>AJocelyn Mayer</td>
+                            <td>Individual</td>
+                            <td>ABC Traders Pvt. Ltd.</td>
+                            <td>25%</td>
+                        </tr>
+
+                            <tr>
+                                <td>AJocelyn Mayer</td>
+                                <td>Individual</td>
+                                <td>ABC Traders Pvt. Ltd.</td>
+                                <td>25%</td>
+                            </tr> <tr>
+                            <td>AJocelyn Mayer</td>
+                            <td>Individual</td>
+                            <td>ABC Traders Pvt. Ltd.</td>
+                            <td>25%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accountTabDeclaration cmuk-flex">
+            <div class="declaration cmuk-card cmuk-card-default">
+                <div class="cmuk-card-header cmuk-flex">
+                    <h3>Organization Details</h3>
+                    <button class="cmuk-button">Edit</button>
+                </div>
+                <div class="cmuk-card-body">
+                    <div class="cmuk-flex">
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Does your company abide by anti-corruption and anti-money
+                                    laundering laws in your countries of business?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Does your company trade, or contract with any party /
+                                    individual that has dealings with an OFAC restricted
+                                    country?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cmuk-flex">
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Is your company related to the buyers that are insured
+                                    under the Sellers trade credit insurance policy?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Has your company made claims under Trade Credit Insurance
+                                    that were rejected?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cmuk-flex">
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Is your company or owners party to claim or lawsuit?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Is your company currently in default of any finance
+                                    facilities or supplier credit financing arrangements?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cmuk-flex">
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Does your company have a Cyber Security Policy?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Does your company have a Trading/Operations Policy?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cmuk-flex">
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Does your company have a Risk/VAR Policy?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                        <div class="declarationContent cmuk-flex">
+                            <div class="declarationText">
+                                <span>Does your company have a Credit Policy?
+                                </span>
+                            </div>
+                            <div class="declarationButton cmuk-flex">
+                                <label class="switch">
+                                    <input type="checkbox" id="check_id">
+                                    <span class="slider round"></span>
+                                </label> <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </html>
 
 }

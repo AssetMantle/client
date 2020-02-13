@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import models.Trait.Document
 
+
 @(documents: Seq[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(document <- documents) {

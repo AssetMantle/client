@@ -1,6 +1,6 @@
 function submitForm(source, target = '#commonModalContent') {
     const form = $(source).closest("form");
-    if (validateForm(form)) {
+    if (validateForm2(form)) {
         const result = $(target);
         $.ajax({
             type: 'POST',

@@ -4,7 +4,7 @@
 
 @(salesQuoteDocumentsForm: Form[SalesQuoteDocuments.Data] = SalesQuoteDocuments.form, requestID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SALES_QUOTE_DOCUMENTS, salesQuoteDocumentsForm) {
-    @commonInputText(salesQuoteDocumentsForm, constants.FormField.REQUEST_ID, 'value ->requestID,'class -> "hidden", 'readonly -> true, 'required -> false)
+    @commonInputText(salesQuoteDocumentsForm, constants.FormField.REQUEST_ID, 'value ->requestID,'class -> "hidden", 'readonly -> true)
     @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.OBL)
     @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.INVOICE)
     @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.COO)

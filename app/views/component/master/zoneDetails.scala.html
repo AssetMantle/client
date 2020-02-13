@@ -3,7 +3,9 @@
 @import models.master.Zone
 
 @(zone: Zone)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-@commonTable() {
+@commonTable(){
+    @Messages(constants.Form.ZONE_DETAILS)
+} {
     <tr>
         <th>@Messages(constants.Form.NAME)</th>
         <th>@Messages(constants.Form.ZONE_ID)</th>

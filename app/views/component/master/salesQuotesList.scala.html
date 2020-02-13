@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.SalesQuote
+@import views.html.base._
+
+@(salesQuotes: Seq[SalesQuote])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonTable(){
+        @Messages(constants.View.SALES_QUOTE_LIST)
+    }{
+        <tr>
+            <th>@Messages(constants.Form.ASSET_TYPE)</th>
+            <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
+            <th>@Messages(constants.Form.ASSET_PRICE)</th>
+        </tr>
+        @for(salesQuote <- salesQuotes) {
+            <tr>
+                <td>@salesQuote.assetType</td>
+                <td>@salesQuote.assetQuantity </td>
+                <td>@salesQuote.assetPrice</td>
+            </tr>
+        }
+    }
+</div>
+
+
+
+
+
+

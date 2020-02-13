@@ -47,8 +47,8 @@ object FormField {
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 500)
   val FROM = new StringFormField("FROM", 45, 45)
-  val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
-  val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 0, 100)
+  val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 3, 100)
+  val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 3, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("BILL_OF_LADING_NUMBER", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
@@ -130,7 +130,7 @@ object FormField {
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
-  val ADVANCE_PERCENTAGE= new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
+  val ADVANCE_PERCENTAGE= new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.5)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")

@@ -178,10 +178,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def create(file: NegotiationFile): Future[String] = add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
-    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map{ negotiationFile=> negotiationFile match {
-      case Some(negotiation) => negotiation
-      case None => NegotiationFile("", "", "", None, None, None)
-    }
+    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map { negotiationFile =>
+      negotiationFile match {
+        case Some(negotiation) => negotiation
+        case None => NegotiationFile("", "", "", None, None, None)
+      }
     }
 
     def get(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType)
@@ -194,7 +195,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def insertOrUpdateContext(file: NegotiationFile): Future[String] = upsertContext(file).map(_.toString)
 
-    def updateFileStatus(id: String, documentType: String, status: Boolean): Future[Int] =updateStatus(id, documentType, status)
+    def updateFileStatus(id: String, documentType: String, status: Boolean): Future[Int] = updateStatus(id, documentType, status)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 

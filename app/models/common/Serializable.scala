@@ -31,7 +31,7 @@ object Serializable {
 
   implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
 
-  case class ShippingDetails(shipmentPeriod:Int, portOfLoading: String, portOfDischarge: String)
+  case class ShippingDetails(shippingPeriod:Int, portOfLoading: String, portOfDischarge: String)
 
   implicit val shippingDetailsReads: Reads[ShippingDetails] = Json.reads[ShippingDetails]
 

@@ -22,7 +22,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_SALES_QUOTE
 
-  def commodityDetailsForm(id: Option[String]) = withTraderLoginAction.authenticated { implicit loginState =>
+  def commodityDetailsForm(id: Option[String]): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       (id match {
         case Some(requestID) => {
@@ -47,7 +47,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def commodityDetails() = withTraderLoginAction.authenticated { implicit loginState =>
+  def commodityDetails(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.CommodityDetails.form.bindFromRequest().fold(
         formWithErrors => {
@@ -55,14 +55,14 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         },
         commodityDetailsData => {
 
-          commodityDetailsData.requestID match {
+          (commodityDetailsData.requestID match {
             case Some(id) => {
               val updateCommodityDetails = masterTransactionSalesQuotes.Service.updateCommodityDetails(id = id, assetType = commodityDetailsData.assetType, assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice)
               val salesQuote = masterTransactionSalesQuotes.Service.get(id)
 
               def getResult(salesQuote: SalesQuote) = {
                 salesQuote.shippingDetails match {
-                  case Some(shippingDetails) => withUsernameToken.PartialContent(views.html.component.master.shippingDetails(views.companion.master.ShippingDetails.form.fill(views.companion.master.ShippingDetails.Data(salesQuote.id, shippingDetails.shipmentPeriod, shippingDetails.portOfLoading, shippingDetails.portOfDischarge)), id))
+                  case Some(shippingDetails) => withUsernameToken.PartialContent(views.html.component.master.shippingDetails(views.companion.master.ShippingDetails.form.fill(views.companion.master.ShippingDetails.Data(salesQuote.id, shippingDetails.shippingPeriod, shippingDetails.portOfLoading, shippingDetails.portOfDischarge)), id))
                   case None => withUsernameToken.PartialContent(views.html.component.master.shippingDetails(requestID = salesQuote.id))
                 }
               }
@@ -82,29 +82,34 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
                 result <- withUsernameToken.PartialContent(views.html.component.master.shippingDetails(requestID = requestID))
               } yield result
             }
+          }).recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
   }
 
-  def shippingDetailsForm(id: String) = withTraderLoginAction.authenticated { implicit loginState =>
+  def shippingDetailsForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val salesQuote = masterTransactionSalesQuotes.Service.get(id)
 
       def getResult(salesQuote: SalesQuote) = {
         salesQuote.shippingDetails match {
-          case Some(shippingDetails: Serializable.ShippingDetails) => withUsernameToken.Ok(views.html.component.master.shippingDetails(views.companion.master.ShippingDetails.form.fill(views.companion.master.ShippingDetails.Data(id, shippingDetails.shipmentPeriod, shippingDetails.portOfLoading, shippingDetails.portOfDischarge)), requestID = id))
+          case Some(shippingDetails: Serializable.ShippingDetails) => withUsernameToken.Ok(views.html.component.master.shippingDetails(views.companion.master.ShippingDetails.form.fill(views.companion.master.ShippingDetails.Data(id, shippingDetails.shippingPeriod, shippingDetails.portOfLoading, shippingDetails.portOfDischarge)), requestID = id))
           case None => withUsernameToken.Ok(views.html.component.master.shippingDetails(requestID = id))
         }
       }
 
-      for {
+      (for {
         salesQuote <- salesQuote
         result <- getResult(salesQuote)
       } yield result
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
-  def shippingDetails = withTraderLoginAction.authenticated { implicit loginState =>
+  def shippingDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ShippingDetails.form.bindFromRequest().fold(
         formWithErrors => {
@@ -121,15 +126,18 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             }
           }
 
-          for {
+          (for {
             _ <- updateShippingDetails
             salesQuote <- salesQuote
             result <- getResult(salesQuote)
           } yield result
+            ).recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         })
   }
 
-  def paymentTermsForm(id: String) = withTraderLoginAction.authenticated { implicit loginState =>
+  def paymentTermsForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val salesQuote = masterTransactionSalesQuotes.Service.get(id)
 
@@ -140,13 +148,16 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         }
       }
 
-      for {
+      (for {
         salesQuote <- salesQuote
         result <- getResult(salesQuote)
       } yield result
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
-  def paymentTerms = withTraderLoginAction.authenticated { implicit loginState =>
+  def paymentTerms: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.PaymentTerms.form.bindFromRequest().fold(
         formWithErrors => {
@@ -163,15 +174,18 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             }
           }
 
-          for {
+          (for {
             _ <- updatePaymentTerms
             salesQuote <- salesQuote
             result <- getResult(salesQuote)
           } yield result
+            ).recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         })
   }
 
-  def salesQuoteDocumentsForm(id: String) = withTraderLoginAction.authenticated { implicit loginState =>
+  def salesQuoteDocumentsForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val salesQuote = masterTransactionSalesQuotes.Service.get(id)
 
@@ -182,26 +196,89 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         }
       }
 
-      for {
+      (for {
         salesQuote <- salesQuote
         result <- getResult(salesQuote)
       } yield result
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
-  def salesQuoteDocuments = withTraderLoginAction.authenticated { implicit loginState =>
+  def salesQuoteDocuments: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SalesQuoteDocuments.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.salesQuoteDocuments(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name))))
         },
         salesQuoteDocumentsData => {
-          val updateShippingDetails = masterTransactionSalesQuotes.Service.updateSalesQuoteDocuments(salesQuoteDocumentsData.requestID, Serializable.SalesQuoteDocuments(salesQuoteDocumentsData.obl, salesQuoteDocumentsData.invoice, salesQuoteDocumentsData.COA, salesQuoteDocumentsData.COO, salesQuoteDocumentsData.otherDocuments))
-
-          for {
-            _ <- updateShippingDetails
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SALES_QUOTE_CREATED)))
+          val updateSalesQuoteDocuments = masterTransactionSalesQuotes.Service.updateSalesQuoteDocuments(salesQuoteDocumentsData.requestID, Serializable.SalesQuoteDocuments(salesQuoteDocumentsData.obl, salesQuoteDocumentsData.invoice, salesQuoteDocumentsData.COA, salesQuoteDocumentsData.COO, salesQuoteDocumentsData.otherDocuments))
+          def salesQuote: Future[SalesQuote]= masterTransactionSalesQuotes.Service.get(salesQuoteDocumentsData.requestID)
+          (for {
+            _ <- updateSalesQuoteDocuments
+            salesQuote<-salesQuote
+            result <- withUsernameToken.PartialContent(views.html.component.master.traderReviewSalesQuoteDetails(requestID = salesQuoteDocumentsData.requestID, salesQuote= salesQuote))
           } yield result
+            ).recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
+  }
+
+  def traderReviewSalesQuoteDetailsForm(id:String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val salesQuote = masterTransactionSalesQuotes.Service.get(id)
+      (for{
+        salesQuote<-salesQuote
+        result<-withUsernameToken.Ok(views.html.component.master.traderReviewSalesQuoteDetails(requestID = id, salesQuote= salesQuote))
+      }yield result
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+  def traderReviewSalesQuoteDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.TraderReviewSalesQuoteDetails.form.bindFromRequest().fold(
+        formWithErrors => {
+
+          val salesQuote= masterTransactionSalesQuotes.Service.get(formWithErrors.data(constants.FormField.REQUEST_ID.name))
+          (for{
+            salesQuote<-salesQuote
+          }yield BadRequest(views.html.component.master.traderReviewSalesQuoteDetails(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name),salesQuote))
+            ).recover{
+            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+          }
+        },
+        traderReviewSalesQuoteDetailsData => {
+          (if(traderReviewSalesQuoteDetailsData.completion){
+              val updateCompletionStatus: Future[Int] = masterTransactionSalesQuotes.Service.updateCompletionStatus(traderReviewSalesQuoteDetailsData.requestID)
+              for{
+                _<-updateCompletionStatus
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SALES_QUOTE_CREATED)))
+              }yield result
+            }else{
+              val salesQuote= masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
+              for{
+                salesQuote<-salesQuote
+              }yield BadRequest(views.html.component.master.traderReviewSalesQuoteDetails(requestID=traderReviewSalesQuoteDetailsData.requestID,salesQuote=salesQuote))
+            }).recover{
+            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def salesQuoteList: Action[AnyContent]= withTraderLoginAction.authenticated{implicit loginState =>
+    implicit request =>
+    val salesQuotes= masterTransactionSalesQuotes.Service.getSalesQuotes(loginState.username)
+      (for{
+      salesQuotes<-salesQuotes
+    }yield Ok(views.html.component.master.salesQuotesList(salesQuotes))
+        ).recover{
+        case baseException: BaseException =>
+          println(baseException.failure.message)
+          InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 }

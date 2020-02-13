@@ -55,92 +55,6 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  /*private def findByTicketID(id: String): Future[SalesQuoteSerialized] = db.run(salesQuoteTable.filter(_.ticketID === id).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateCompletionStatusByID(id: String, completionStatus: Option[Boolean]): Future[Int] = db.run(salesQuoteTable.filter(_.id === id).map(salesQuote => (salesQuote.completionStatus.?)).update((completionStatus)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateVerificationStatusByID(ticketID: String, pegHash: Option[String], verificationStatus: Option[Boolean]): Future[Int] = db.run(salesQuoteTable.filter(_.ticketID === ticketID).map(salesQuote => (salesQuote.verificationStatus.?, salesQuote.pegHash ?)).update((verificationStatus, pegHash)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateVerificationStatusByTicketID(ticketID: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(salesQuoteTable.filter(_.ticketID === ticketID).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusAndCommentByID(id: String, verificationStatus: Option[Boolean], comment: Option[String]) = db.run(salesQuoteTable.filter(_.id === id).map(salesQuote => (salesQuote.verificationStatus.?, salesQuote.comment.?)).update((verificationStatus, comment)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateDocumentHashByID(id: String, documentHash: Option[String]) = db.run(salesQuoteTable.filter(_.id === id).map(_.documentHash.?).update(documentHash).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }*/
-
-  /*private def updateTicketIDByID(id: String, ticketID: String) = db.run(salesQuoteTable.filter(_.id === id).map(_.ticketID).update(ticketID).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def unapprovedAssets(accountID: String): Future[Seq[SalesQuoteSerialized]] = db.run(salesQuoteTable.filter(_.accountID === accountID).filter(issueAsset => issueAsset.verificationStatus.?.isEmpty).result)
-
-  private def traderAssetList(accountID: String, bool: Option[Boolean]) = db.run(salesQuoteTable.filter(_.accountID === accountID).filter(issueAsset => issueAsset.verificationStatus.?.isEmpty || issueAsset.verificationStatus === Option(true)).result)
-
-  private def getIssueAssetsByAccountIds(accountIDs: Seq[String]): Future[Seq[SalesQuoteSerialized]] = db.run(salesQuoteTable.filter(_.accountID inSet accountIDs).result)
-
-  private def getIssueAssetsByPegHashes(pegHashes: Seq[String]): Future[Seq[SalesQuoteSerialized]] = db.run(salesQuoteTable.filter(_.pegHash inSet pegHashes).result)
-
-  private def deleteByID(id: String) = db.run(salesQuoteTable.filter(_.id === id).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }*/
-
   private def getAccountIDByID(id: String): Future[String] = db.run(salesQuoteTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -199,6 +113,8 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
+  private def getSalesQuotesByAccountID(accountID:String)=db.run(salesQuoteTable.filter(_.accountID === accountID).result)
+
   case class SalesQuoteSerialized(id: String, accountID: String, assetType: String, assetQuantity: Int, assetPrice: Int, shippingDetails: Option[String], paymentTerms: Option[String], salesQuoteDocuments: Option[String], completionStatus: Boolean) {
     def deSerialize: SalesQuote = SalesQuote(id, accountID, assetType, assetQuantity, assetPrice, if(shippingDetails.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.ShippingDetails](shippingDetails.get)) else None, if(paymentTerms.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.PaymentTerms](paymentTerms.get)) else None , if(salesQuoteDocuments.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.SalesQuoteDocuments](salesQuoteDocuments.get)) else None ,completionStatus)
   }
@@ -244,6 +160,8 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     def updateSalesQuoteDocuments(id:String, salesQuoteDocuments: Serializable.SalesQuoteDocuments)=updateSalesQuoteDocumentsByID(id,Some(Json.toJson(salesQuoteDocuments).toString))
 
     def updateCompletionStatus(id:String)=updateCompletionStatusByID(id, true)
+
+    def getSalesQuotes(accountID:String)=getSalesQuotesByAccountID(accountID).map(_.map(_.deSerialize))
   }
 
 }

@@ -5,6 +5,8 @@
 @(requestStates: Seq[requestState])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @commonTable(){
+        @Messages(constants.Form.TRADERS)
+    }{
         <tr>
             <th>@Messages(constants.Form.NAME)</th>
             <th>@Messages(constants.Form.EMAIL)</th>

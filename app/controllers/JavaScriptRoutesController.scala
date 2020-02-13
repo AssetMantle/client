@@ -194,6 +194,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SalesQuoteController.commodityDetailsForm,
         routes.javascript.SalesQuoteController.paymentTermsForm,
         routes.javascript.SalesQuoteController.salesQuoteDocumentsForm,
+        routes.javascript.SalesQuoteController.salesQuoteList,
 
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderList,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderDocument,
