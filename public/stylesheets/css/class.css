@@ -476,8 +476,12 @@ rightText {
   background-color: #5eaf50; }
 
 .profilePicture {
-  height: 200px;
-  width: 200px; }
+  height: 130px;
+  width: 130px; }
+
+.profilePictureContainer {
+  border-radius: 50%;
+  border: 2px solid #cccccc; }
 
 dl .info {
   background-color: #dadada;
@@ -969,7 +973,12 @@ input:checked + .slider {
 .cmuk-table th, .cmuk-button {
   text-transform: capitalize !important; }
 
-select .blank {
-  color: Red; }
+.countryCode {
+  margin-top: 24px;
+  width: 80px;
+  margin-right: 10px; }
+
+.mobileNumber {
+  width: 100%; }
 
 /*# sourceMappingURL=class.css.map */
