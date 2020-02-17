@@ -609,7 +609,6 @@ rightText {
 }
 .profilePictureContainer{
   border-radius: 50%;
-  border:2px solid #cccccc;
 }
 dl .info {
   background-color: #dadada;
@@ -1208,6 +1207,18 @@ input:checked+.slider {
   border-radius: $buttonBorderRadius;
   padding: 10px;
   margin: 10px;
+  .documentContentTop{
+  font-size: $paragraphFontSizeSmall;
+    margin-bottom: 5px;
+  }
+  .documentThumbnail img{
+    width: 100px;
+    height: 80px;
+  }
+  .documentContentBottom{
+    margin-top: 5px;
+    font-size: $paragraphFontSizeSmall;
+  }
 }
 
 .profileDocuments{
@@ -1218,13 +1229,51 @@ input:checked+.slider {
 .cmuk-table th, .cmuk-button{
   text-transform: capitalize !important;
 }
-
-.countryCode{
-  margin-top: 24px;
-  width: 80px;
-  margin-right: 10px;
+.mobileNumberUpdate {
+  .countryCode {
+    margin-top: 24px;
+    width: 80px;
+    margin-right: 10px;
+  }
+  .mobileNumber{
+    width:100%;
+  }
+  .mobileNumber label{
+    margin-left: -75px;
+   }
 }
 
-.mobileNumber{
-  width:100%;
+.commonHomeData{
+  font-size: $paragraphFontSizeMedium;
+  p, h3{
+    margin:5px 0px;
+  }
+}
+
+.inputField{
+  display: flex;
+  .inputFieldIcon{
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: #ebebeb;
+    margin-top: 23px;
+    padding: 0px 10px;
+  }
+  .inputFieldBody{
+    width: 100%;
+  }
+  .inputFieldBody input{
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
+
+.connectionError{
+  height: 100px;
+  padding: 40px;
+  border-radius: $buttonBorderRadius;
+  background: #e6e6e6;
+  width: 100px;
+  color: red;
 }

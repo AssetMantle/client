@@ -3,9 +3,10 @@
 
 @(document: Document[_])(documentLink: Html = Html(""))(documentContentTop: Html = Html(""))(documentContentBottom: Html = Html(""))(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="centerText documentItem">
-    <div id="documentContentTop">
+    <div id="documentContentTop" class="documentContentTop">
         @documentContentTop
     </div>
+    <div class="documentThumbnail">
     @if(document.documentType != constants.File.PROFILE_PICTURE) {
         @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
@@ -16,7 +17,8 @@
             }
         }
     }
-    <div id="documentContentBottom">
+    </div>
+    <div id="documentContentBottom" class="documentContentBottom">
     @documentContentBottom
     </div>
 </div>

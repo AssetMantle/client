@@ -480,8 +480,7 @@ rightText {
   width: 130px; }
 
 .profilePictureContainer {
-  border-radius: 50%;
-  border: 2px solid #cccccc; }
+  border-radius: 50%; }
 
 dl .info {
   background-color: #dadada;
@@ -964,6 +963,15 @@ input:checked + .slider {
   border-radius: 3px;
   padding: 10px;
   margin: 10px; }
+  .documentItem .documentContentTop {
+    font-size: 12px;
+    margin-bottom: 5px; }
+  .documentItem .documentThumbnail img {
+    width: 100px;
+    height: 80px; }
+  .documentItem .documentContentBottom {
+    margin-top: 5px;
+    font-size: 12px; }
 
 .profileDocuments {
   display: flex;
@@ -973,12 +981,41 @@ input:checked + .slider {
 .cmuk-table th, .cmuk-button {
   text-transform: capitalize !important; }
 
-.countryCode {
+.mobileNumberUpdate .countryCode {
   margin-top: 24px;
   width: 80px;
   margin-right: 10px; }
-
-.mobileNumber {
+.mobileNumberUpdate .mobileNumber {
   width: 100%; }
+.mobileNumberUpdate .mobileNumber label {
+  margin-left: -75px; }
+
+.commonHomeData {
+  font-size: 14px; }
+  .commonHomeData p, .commonHomeData h3 {
+    margin: 5px 0px; }
+
+.inputField {
+  display: flex; }
+  .inputField .inputFieldIcon {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: #ebebeb;
+    margin-top: 23px;
+    padding: 0px 10px; }
+  .inputField .inputFieldBody {
+    width: 100%; }
+  .inputField .inputFieldBody input {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px; }
+
+.connectionError {
+  height: 100px;
+  padding: 40px;
+  border-radius: 3px;
+  background: #e6e6e6;
+  width: 100px;
+  color: red; }
 
 /*# sourceMappingURL=class.css.map */

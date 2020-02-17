@@ -15,10 +15,9 @@
                </div>
            </div>
            <div class="cmuk-width-1-1 cmuk-width-expand@@m">
-               <div>
-                   <h3>@loginState.username</h3>
+               <div class="commonHomeData">
+                   <h3>@loginState.username <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN.legend)</button></h3>
                    <p> @Messages(constants.Form.COINS): @coins</p>
-                   <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN.legend)</button>
                    <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
                    <p> @Messages(constants.Form.BLOCKCHAIN_ADDRESS): <span id="blockchainAddress" class="hashCode" title="@loginState.address">@loginState.address</span>
                        <a class="toolTip"  onclick="copyToClipboard('blockchainAddress')"><span class="toolTipText" id="toolTip">Copy to clipboard</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy()"></span></a>
