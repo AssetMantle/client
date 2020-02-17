@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int] = None, status: Option[Boolean] = None, ticketID: Option[String] = None, comment: Option[String] = None)
+case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int] = None, status: Option[Boolean] = None, rtcbStatus: Boolean = false, ticketID: Option[String] = None, comment: Option[String] = None)
 
 @Singleton
 class IssueFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -65,9 +65,22 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getIssueFiatRequestsWithNullStatus(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result)
+  private def updateRTCBStatusByTransactionID(transactionID: String, rtcbStatus: Boolean): Future[Int] = db.run(issueFiatRequestTable.filter(_.transactionID === transactionID).map(_.rtcbStatus).update(rtcbStatus).asTry).map {
+    case Success(result) => if (result > 0) {
+      result
+    } else {
+        logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = "+ transactionID))
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
 
-  private def deleteByID(id: String) = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
+  private def getIssueFiatRequestsWithNullStatusAndTrueRTCBStatus(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).filter(_.rtcbStatus === true).result)
+
+  private def deleteByID(id: String): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +101,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class IssueFiatRequestTable(tag: Tag) extends Table[IssueFiatRequest](tag, "IssueFiatRequest") {
 
-    def * = (id, accountID, transactionID, transactionAmount, gas.?, status.?, ticketID.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
+    def * = (id, accountID, transactionID, transactionAmount, gas.?, status.?, rtcbStatus, ticketID.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -101,6 +114,8 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
+
+    def rtcbStatus = column[Boolean]("rtcbStatus")
 
     def ticketID = column[String]("ticketID")
 
@@ -116,12 +131,13 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
     def accept(requestID: String, ticketID: String, gas: Int): Future[Int] = updateTicketIDGasAndStatusByID(requestID, ticketID, gas = Option(gas), status = Option(true))
 
-    def getPendingIssueFiatRequests(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = getIssueFiatRequestsWithNullStatus(accountIDs)
+    def getPendingIssueFiatRequests(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = getIssueFiatRequestsWithNullStatusAndTrueRTCBStatus(accountIDs)
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
     def getStatus(id: String): Future[Option[Boolean]] = getStatusByID(id)
 
+    def markRTCBReceived(transactionID: String): Future[Int] = updateRTCBStatusByTransactionID(transactionID, rtcbStatus = true)
   }
 
 }

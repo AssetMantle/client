@@ -56,6 +56,7 @@ GET         /master/identification                                       control
 POST        /master/identification                                       controllers.ProfileController.identification
 GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
 GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
+GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
@@ -135,7 +136,6 @@ POST        /master/verifyEmailAddress                                   control
 
 GET         /master/inviteTrader                                         controllers.SetACLController.inviteTraderForm
 POST        /master/inviteTrader                                         controllers.SetACLController.inviteTrader
-GET         /master/addTraderRequest                                     controllers.SetACLController.addTraderRequestForm(requestID: String)
 GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                            controllers.SetACLController.addTrader
 GET         /master/userUploadOrUpdateTraderKYCView                      controllers.SetACLController.userUploadOrUpdateTraderKYCView
@@ -293,7 +293,6 @@ GET         /master/negotiationComet                                     control
 GET         /master/orderComet                                           controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequestForm
-POST        /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequest
 
 GET         /master/viewPendingIssueFiatRequests                         controllers.IssueFiatController.viewPendingIssueFiatRequests
 GET         /master/rejectIssueFiatRequest                               controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
@@ -344,8 +343,8 @@ POST        /master/setBuyerFeedback                                     control
 GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
-GET         /wurtcb                                                      controllers.WesternUnionController.westernUnionForm
-POST        /wurtcb                                                      controllers.WesternUnionController.westernUnion
+POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
+POST        /wuRedirect                                                  controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKeyForm
 POST        /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKey

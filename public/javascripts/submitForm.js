@@ -27,6 +27,10 @@ function submitForm(source, target = '#commonModalContent') {
                 206: function (data) {
                     $(target).html(data);
                 },
+                302: function (data) {
+                    $('#commonModal').fadeOut();
+                    window.open(data.responseText);
+                },
             }
         }).fail(function (XMLHttpRequest) {
             if (XMLHttpRequest.readyState === 0) {

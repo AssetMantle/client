@@ -12,6 +12,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import services.SFTPScheduler
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,6 +43,7 @@ class AccountController @Inject()(
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
+                                   sftpScheduler: SFTPScheduler,
                                    messagesControllerComponents: MessagesControllerComponents,
                                  )
                                  (implicit
@@ -166,7 +168,7 @@ class AccountController @Inject()(
               } yield result
             case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
             case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
-            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
+            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.USER)
               for {
                 _ <- updateUserType
                 result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))

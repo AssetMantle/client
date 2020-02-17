@@ -23,13 +23,15 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val otp = emailOTPs.Service.sendOTP(loginState.username)
-      def sendNotificationAndGetResult(otp:String)={
+
+      def sendNotificationAndGetResult(otp: String) = {
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
       }
+
       (for {
         otp <- otp
-        result<-sendNotificationAndGetResult(otp)
+        result <- sendNotificationAndGetResult(otp)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -39,10 +41,11 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors)))
+          Future(BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors)))
         },
         verifyEmailAddressData => {
           val verifyOTP = emailOTPs.Service.verifyOTP(loginState.username, verifyEmailAddressData.otp)
+
           def verifyEmailAddress = masterContacts.Service.verifyEmailAddress(loginState.username)
 
           def contact: Future[Contact] = masterContacts.Service.getContact(loginState.username).map { contact => contact.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
@@ -60,10 +63,10 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
             _ <- verifyEmailAddress
             contact <- contact
             _ <- updateStatus(contact)
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
           } yield result
-            ).recoverWith {
-            case baseException: BaseException =>if(baseException.failure==constants.Response.INVALID_OTP) withUsernameToken.PartialContent(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form.withError(constants.FormField.OTP.name,constants.Response.INVALID_OTP.message))) else Future(InternalServerError(views.html.index(failures = Seq(baseException.failure))))
+            ).recover {
+            case baseException: BaseException => if (baseException.failure == constants.Response.INVALID_OTP) BadRequest(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form.withError(constants.FormField.OTP.name, constants.Response.INVALID_OTP.message))) else InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

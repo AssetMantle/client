@@ -121,6 +121,7 @@ object FormField {
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
+  val DATE_OF_BIRTH= new DateFormField("DATE_OF_BIRTH")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)

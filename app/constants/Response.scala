@@ -3,6 +3,7 @@ package constants
 
 import controllers.routes
 import play.api.routing.JavaScriptReverseRoute
+import play.api.mvc.Results
 
 
 object Response {
@@ -89,6 +90,8 @@ object Response {
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
+  val EMAIL_ADDRESS_ALREADY_IN_USE = new Failure("EMAIL_ADDRESS_ALREADY_IN_USE")
+  val MOBILE_NUMBER_ALREADY_IN_USE = new Failure("MOBILE_NUMBER_ALREADY_IN_USE")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")
@@ -116,6 +119,15 @@ object Response {
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
+  val UNVERIFIED_IDENTIFICATION = new Failure("UNVERIFIED_IDENTIFICATION")
+  val SFTP_SCHEDULER_FAILED = new Failure("SFTP_SCHEDULER_FAILED")
+
+  //XmlResponses
+  val TRANSACTION_UPDATE_SUCCESSFUL = new XmlResponse(200,"SUCCESS","Transaction update successful.")
+
+  val REQUEST_NOT_WELL_FORMED = new XmlResponse(400, "BAD_REQUEST", "Request is not well-formed and cannot be understood.")
+  val INVALID_REQUEST_SIGNATURE = new XmlResponse(403,"FORBIDDEN","Comdex validation failure – invalid request signature")
+  val COMDEX_VALIDATION_FAILURE = new XmlResponse(500, "INTERVAL_SERVER_ERROR", "Comdex validation failure")
 
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
@@ -136,6 +148,16 @@ object Response {
   class Info(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + INFO_PREFIX + response
     val action: String = utilities.String.getJsRouteString(actionController)
+  }
+
+  class XmlResponse(code: Int, status: String, message: String) {
+     val response = <response>
+      <code>{code}</code>
+      <status>{status}</status>
+      <message>{message}</message>
+    </response>
+
+    def result = Results.Status(code)(response).as("application/xml")
   }
 
 }

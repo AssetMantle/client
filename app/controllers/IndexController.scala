@@ -69,7 +69,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case constants.User.USER => withUsernameToken.Ok(views.html.userIndex())
         case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex())
         case constants.User.WITHOUT_LOGIN =>
-          val updateUserType = masterAccounts.Service.updateUserType(loginState.username, constants.User.UNKNOWN)
+          val updateUserType = masterAccounts.Service.updateUserType(loginState.username, constants.User.USER)
           for {
             _ <- updateUserType
             result<-withUsernameToken.Ok(views.html.dashboard())

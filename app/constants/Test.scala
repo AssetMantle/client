@@ -5,7 +5,7 @@ object Test {
 
   val BASE_URL = "http://localhost:9000"
 
-  val IMAGE_FILE_FEED="/home/persistence-1/testImages/"
+  val IMAGE_FILE_FEED="/root/testImages/"
   val TEST_NAME = "TEST_NAME"
   val TEST_MNEMONIC = "TEST_MNEMONIC"
 
@@ -154,6 +154,11 @@ object Test {
   val TEST_STREET_ADDRESS="TEST_STREET_ADDRESS"
   val TEST_BANK_NAME="TEST_BANK_NAME"
   val TEST_CONFIRM_BID="TEST_CONFIRM_BID"
+
+  val TEST_FIRST_NAME="TEST_FIRST_NAME"
+  val TEST_LAST_NAME="TEST_LAST_NAME"
+  val TEST_ID_TYPE="TEST_ID_TYPE"
+  val TEST_ID_NUMBER="TEST_ID_NUMBER"
 
 
 }

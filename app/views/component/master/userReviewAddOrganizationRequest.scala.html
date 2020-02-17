@@ -4,7 +4,7 @@
 @import play.api.Logger
 @import views.companion.master.UserReviewAddOrganizationRequest
 
-@(userReviewAddOrganizationRequestForm: Form[UserReviewAddOrganizationRequest.Data] = UserReviewAddOrganizationRequest.form, organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@(userReviewAddOrganizationRequestForm: Form[UserReviewAddOrganizationRequest.Data] = UserReviewAddOrganizationRequest.form, organization: Organization, zone: Zone, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST, userReviewAddOrganizationRequestForm) {
     <div>@Messages(constants.Form.ZONE_DETAILS): <br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
@@ -37,26 +37,6 @@
         <span class="red">@Messages(constants.FormField.COUNTRY.name)</span>: @organization.postalAddress.country <br>
         <span class="red">@Messages(constants.FormField.ZIP_CODE.name)</span>: @organization.postalAddress.zipCode <br>
         <span class="red">@Messages(constants.Form.PHONE)</span>: @organization.postalAddress.phone
-    </div>
-    <br>
-    <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
-        @for(ubo <- organization.ubos.data) {
-            <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
-            <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span>: @ubo.sharePercentage <br>
-            <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
-            <span class="red">@Messages(constants.Form.TITLE)</span>: @ubo.title <br>
-            }
-    </div>
-    <br>
-    <div class="leftText">@Messages(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
-        <span class="red">@Messages(constants.Form.ACCOUNT_HOLDER_NAME)</span>: @organizationBankAccountDetail.accountHolder <br>
-        <span class="red">@Messages(constants.Form.NICK_NAME)</span>: @organizationBankAccountDetail.nickName <br>
-        <span class="red">@Messages(constants.Form.ACCOUNT_NUMBER)</span>: @organizationBankAccountDetail.accountNumber <br>
-        <span class="red">@Messages(constants.Form.BANK_NAME)</span>: @organizationBankAccountDetail.bankName <br>
-        <span class="red">@Messages(constants.Form.SWIFT_CODE)</span>: @organizationBankAccountDetail.swiftAddress <br>
-        <span class="red">@Messages(constants.Form.BANK_ADDRESS)</span>: @organizationBankAccountDetail.swiftAddress <br>
-        <span class="red">@Messages(constants.FormField.COUNTRY.name)</span>: @organizationBankAccountDetail.country <br>
-        <span class="red">@Messages(constants.FormField.ZIP_CODE.name)</span>: @organizationBankAccountDetail.zipCode <br>
     </div>
     <br>
     <div id="organizationKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>
