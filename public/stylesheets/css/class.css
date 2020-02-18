@@ -1005,7 +1005,7 @@ input:checked + .slider {
     align-items: center;
     height: 40px;
     background: #ebebeb;
-    margin-top: 23px;
+    margin-top: 24px;
     padding: 0px 10px; }
   .inputField .inputFieldBody {
     width: 100%; }
