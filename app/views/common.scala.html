@@ -80,7 +80,7 @@
                                 </li>
 
                                 <li class="userList">
-                                    <a href="#">@loginState.username</a>
+                                    <a >@loginState.username</a>
                                     <div class="cmuk-navbar-dropdown">
                                         <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
                                             <li>
@@ -265,7 +265,16 @@
             </div>
         </div>
         @* End of Footer *@
+        <script>
+                $(document).ready(function () {
+                    $('nav a').filter(function(idx, elem) {
+                        if(elem.pathname !== null && elem.pathname === window.location.pathname){
+                            $(elem).addClass('active');
+                        }
+                    });
+                });
 
+        </script>
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>

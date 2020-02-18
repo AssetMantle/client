@@ -1018,4 +1018,8 @@ input:checked + .slider {
   width: 100px;
   color: red; }
 
+.cmuk-navbar-nav > li > a.active {
+  background-color: #f4f7fb;
+  color: #343C44; }
+
 /*# sourceMappingURL=class.css.map */
