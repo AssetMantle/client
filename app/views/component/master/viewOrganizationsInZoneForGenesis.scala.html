@@ -5,6 +5,9 @@
 @(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match">
+        @if(organizations.length == 0){
+            <spa>No Organizations</spa>
+        }
     @for(organization <- organizations) {
         @commonCard() {
             @organization.id

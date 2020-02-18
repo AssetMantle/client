@@ -6,7 +6,11 @@
 @(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
+        @if(organizationVerificationRequests.length == 0){
+            <spa>No Requests Found</spa>
+        }
         @for(organizationVerificationRequest <- organizationVerificationRequests) {
+            <div>
             @commonCard() {
                 @organizationVerificationRequest.id
             } {
@@ -52,7 +56,7 @@
                 </div>
                 <br>
                 @Messages(constants.Form.DOCUMENTS): <br>
-                <div id = "kycDocuments@organizationVerificationRequest.accountID">
+                <div id = "kycDocuments@organizationVerificationRequest.accountID" class="kycDocumentsView">
                     <script>componentResource('kycDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKYCDocuments('@organizationVerificationRequest.id'))</script>
                 </div>
                 <br>
@@ -60,6 +64,7 @@
                 <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
                 <br>
                 }
+            </div>
         }
     </div>
 </div>

@@ -4,6 +4,10 @@
 @(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-grid-expand cmuk-width-auto cmuk-grid-match" cmuk-grid>
+        @if(traders.length == 0){
+
+                <span>no traders</span>
+        }
 @for(trader <- traders) {
     <div>
         @commonCard(){
@@ -25,7 +29,7 @@
         }
         }
     </div>
-    
+
 }
     </div>
 </div>

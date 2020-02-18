@@ -5,10 +5,14 @@
 @(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
-@for(issueAssetRequest <- issueAssetRequests) {
-    @commonCard() {
-        @issueAssetRequest.id
-    }{
+        @if(issueAssetRequests.length == 0){
+            <spa>No Requests Found</spa>
+        }
+        @for(issueAssetRequest <- issueAssetRequests) {
+            <div>
+            @commonCard() {
+                @issueAssetRequest.id
+            }{
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@issueAssetRequest.accountID <br>
             <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span>: @issueAssetRequest.documentHash <br>
             <span class="red">@Messages(constants.Form.ASSET_TYPE)</span>: @issueAssetRequest.assetType <br>
@@ -33,6 +37,7 @@
         <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
     </div>
         }
+    </div>
 }
     </div>
 </div>

@@ -67,9 +67,13 @@ dl{
   text-align: left;
 }
 
+.modalBody{
+  form{
+    width: 500px;
+    text-align: center;
+  }
+}
 form{
-  width: 500px;
-  text-align: center;
   hr{
     margin-top: 10px;
   }

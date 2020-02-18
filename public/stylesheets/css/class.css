@@ -61,7 +61,7 @@
   height: auto;
   min-height: 100%;
   background: #F4F7FB;
-  margin: 0 auto -171px; }
+  margin: 0 auto -172px; }
 
 .pageContainer {
   padding-bottom: 171px; }
@@ -110,6 +110,9 @@
   .pageContent {
     display: flex;
     margin: 20px; } }
+@media (min-width: 500px) {
+  .kycDocumentsView {
+    display: flex; } }
 @media (min-width: 960px) {
   .bannerText h2 {
     font-size: 48px; }
