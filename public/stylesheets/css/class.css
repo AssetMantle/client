@@ -314,16 +314,24 @@
 
 .notification {
   word-break: break-all;
-  border-bottom: 1px solid #053C75;
   transition: all 1s ease-in-out;
-  list-style: none; }
+  list-style: none;
+  margin-bottom: 1px; }
+  .notification .read {
+    background-color: #fff2e8; }
+  .notification .notificationTime {
+    font-size: 10px; }
 
-.notification > div {
-  padding: 10px 15px; }
+.notification > div, .NotificationButton {
+  padding: 15px 25px; }
 
 .NotificationButton {
   border-bottom: none; }
 
+.notificationDropdown .cmuk-dropdown {
+  height: 500px;
+  padding: 0px;
+  overflow: scroll; }
 .notificationDropdown .dropdownHeader p {
   justify-content: center;
   text-align: center;
@@ -708,10 +716,6 @@ dl .info:after {
 .cmuk-accordion-title:hover {
   color: #373E46 !important; }
 
-.cmuk-accordion-title:before {
-  border-radius: 50%;
-  border: 1px solid #373E46; }
-
 .cmuk-accordion-buttons {
   background: #fff;
   padding: 10px; }
@@ -1024,5 +1028,33 @@ input:checked + .slider {
 .cmuk-navbar-nav > li > a.active {
   background-color: #f4f7fb;
   color: #343C44; }
+
+.infoRow {
+  line-height: 1.8;
+  align-items: flex-start;
+  word-break: break-all;
+  font-size: 14px; }
+
+.infoRowLabel {
+  width: 110px;
+  height: min-content;
+  word-break: break-word; }
+
+.infoRowValue {
+  flex: 1 1;
+  color: #767f8d;
+  font-weight: 400;
+  height: min-content;
+  line-height: 1.6; }
+
+.cmuk-accordion-title::before {
+  background-image: url("../../images/chevron-up.svg") !important; }
+
+.cmuk-open > .cmuk-accordion-title::before {
+  background-image: url("../../images/chevron-down.svg") !important; }
+
+.commonCheckBox dt {
+  width: 200px;
+  word-break: break-word; }
 
 /*# sourceMappingURL=class.css.map */

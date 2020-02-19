@@ -72,11 +72,18 @@
                                     }
                                     case _ => {}
                                 }
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">
+                                <li class="notificationDropdown">
+                                    <a onclick="componentResource('noter', jsRoutes.controllers.NotificationController.notificationPage(0))">
                                         @Messages(constants.Form.INBOX)
                                     <span class="cmuk-badge" id="notificationBadge">0</span>
                                     </a>
+                                    <div cmuk-dropdown="boundary: .bodyContainer; mode: click">
+                                        <ul class="cmuk-nav cmuk-dropdown-nav">
+                                            <div id="noter">
+
+                                            </div>
+                                        </ul>
+                                    </div>
                                 </li>
 
                                 <li class="userList">

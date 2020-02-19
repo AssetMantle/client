@@ -3,22 +3,50 @@
 @(asset: masterTransaction.IssueAssetRequest, files: Seq[masterTransaction.AssetFile],status:String="")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div>
-    <span class="red">@Messages(constants.FormField.ASSET_TYPE.name)</span> : @asset.assetType <br>
-    <span class="red">@Messages(constants.FormField.QUANTITY_UNIT.name)</span> : @asset.quantityUnit <br>
-    <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @asset.assetQuantity <br>
-    <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @asset.assetPrice <br>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.ASSET_TYPE.name)</div>
+        <div class="infoRowValue">@asset.assetType</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.QUANTITY_UNIT.name)</div>
+        <div class="infoRowValue"> @asset.quantityUnit</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.ASSET_QUANTITY.name)</div>
+        <div class="infoRowValue"> @asset.assetQuantity</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.ASSET_PRICE.name)</div>
+        <div class="infoRowValue">@asset.assetPrice</div>
+    </div>
+
     @if(status != "") {
-        <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
-        <span class="red">@Messages(constants.Form.STATUS)</span> : @status <br>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.PEG_HASH)</div>
+            <div class="infoRowValue">@asset.pegHash</div>
+        </div>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.STATUS)</div>
+            <div class="infoRowValue">@status</div>
+        </div>
     }else{
         @if(asset.completionStatus) {
             @if(asset.verificationStatus.isEmpty){
-                <span class="red">@Messages(constants.Form.STATUS)</span> : @Messages(constants.Status.Asset.REQUESTED) <br>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.STATUS)</div>
+                    <div class="infoRowValue">@Messages(constants.Status.Asset.REQUESTED)</div>
+                </div>
             }else{
-                <span class="red">@Messages(constants.Form.STATUS)</span> : @Messages(constants.Status.Asset.FAILED) <br>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.STATUS)</div>
+                    <div class="infoRowValue">@Messages(constants.Status.Asset.FAILED)</div>
+                </div>
             }
         } else{
-            <span class="red">@Messages(constants.Form.STATUS)</span> : @Messages(constants.Status.Asset.INCOMPLETE_DETAILS) <br>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel red">@Messages(constants.Form.STATUS)</div>
+                <div class="infoRowValue">@Messages(constants.Status.Asset.INCOMPLETE_DETAILS)</div>
+            </div>
         }
     }
     <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small showHide">@Messages(constants.Form.SHOW_HIDE)</button>
@@ -26,21 +54,50 @@
 <div class="hidden">
     @asset.takerAddress match{
      case Some(takerAddress) => {
-        <span class="red">@Messages(constants.FormField.TAKER_ADDRESS.name)</span> : @asset.takerAddress <br>
+         <div class="cmuk-flex infoRow">
+             <div class="infoRowLabel red">@Messages(constants.FormField.TAKER_ADDRESS.name)</div>
+             <div class="infoRowValue">@asset.takerAddress</div>
+         </div>
      }
     case None => {}
     }
-    <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @asset.physicalDocumentsHandledVia <br>
-    <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @asset.paymentTerms <br>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</div>
+        <div class="infoRowValue">@asset.physicalDocumentsHandledVia</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</div>
+        <div class="infoRowValue">@asset.paymentTerms</div>
+    </div>
     <span class="red">@Messages(constants.Form.SHIPMENT_DETAILS)</span> <br>
-    <span class="red">@Messages(constants.FormField.COMMODITY_NAME.name)</span> : @asset.shipmentDetails.commodityName <br>
-    <span class="red">@Messages(constants.FormField.QUALITY.name)</span> : @asset.shipmentDetails.quality <br>
-    <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @asset.shipmentDetails.deliveryTerm <br>
-    <span class="red">@Messages(constants.FormField.TRADE_TYPE.name)</span> : @asset.shipmentDetails.tradeType <br>
-    <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @asset.shipmentDetails.portOfLoading <br>
-    <span class="red">@Messages(constants.FormField.PORT_OF_DISCHARGE.name)</span> : @asset.shipmentDetails.portOfDischarge <br>
-    <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @asset.shipmentDetails.shipmentDate <br>
-
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.COMMODITY_NAME.name)</div>
+        <div class="infoRowValue"> @asset.shipmentDetails.commodityName</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.QUALITY.name)</div>
+        <div class="infoRowValue"> @asset.shipmentDetails.quality</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.DELIVERY_TERM.name)</div>
+        <div class="infoRowValue"> @asset.shipmentDetails.deliveryTerm</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.TRADE_TYPE.name)</div>
+        <div class="infoRowValue"> @asset.shipmentDetails.tradeType</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.PORT_OF_LOADING.name)</div>
+        <div class="infoRowValue"> @asset.shipmentDetails.portOfLoading</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.PORT_OF_DISCHARGE.name)</div>
+        <div class="infoRowValue"> @asset.shipmentDetails.portOfDischarge</div>
+    </div>
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel red">@Messages(constants.FormField.SHIPMENT_DATE.name)</div>
+        <div class="infoRowValue">@asset.shipmentDetails.shipmentDate</div>
+    </div>
 
     @for(file <- files) {
         @component.master.commonDocumentViewer(file) {
@@ -50,20 +107,52 @@
         } {
             @file.documentContent match {
                 case Some(oblContent :OBL) => {
-                    <span class="red">@Messages(constants.FormField.BILL_OF_LADING_NUMBER.name)</span> : @oblContent.billOfLadingID <br>
-                    <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @oblContent.portOfLoading <br>
-                    <span class="red">@Messages(constants.FormField.SHIPPER_NAME.name)</span> : @oblContent.shipperName <br>
-                    <span class="red">@Messages(constants.FormField.SHIPPER_ADDRESS.name)</span> : @oblContent.shipperAddress <br>
-                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</span> : @oblContent.notifyPartyName <br>
-                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name)</span> : @oblContent.notifyPartyAddress <br>
-                    <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @oblContent.dateOfShipping <br>
-                    <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @oblContent.deliveryTerm <br>
-                    <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @oblContent.weightOfConsignment <br>
-                    <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @oblContent.declaredAssetValue <br>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.BILL_OF_LADING_NUMBER.name)</div>
+                        <div class="infoRowValue">@oblContent.billOfLadingID</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.PORT_OF_LOADING.name)</div>
+                        <div class="infoRowValue">@oblContent.portOfLoading</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.SHIPPER_NAME.name)</div>
+                        <div class="infoRowValue">@oblContent.shipperName</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.SHIPPER_ADDRESS.name)</div>
+                        <div class="infoRowValue"> @oblContent.shipperAddress</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</div>
+                        <div class="infoRowValue"> @oblContent.notifyPartyName</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.SHIPMENT_DATE.name)</div>
+                        <div class="infoRowValue"> @oblContent.dateOfShipping</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.DELIVERY_TERM.name)</div>
+                        <div class="infoRowValue">@oblContent.deliveryTerm</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.ASSET_QUANTITY.name)</div>
+                        <div class="infoRowValue">@oblContent.weightOfConsignment</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.ASSET_PRICE.name)</div>
+                        <div class="infoRowValue">@oblContent.declaredAssetValue</div>
+                    </div>
                 }
                 case Some(invoiceContent :Invoice) => {
-                    <span class="red">@Messages(constants.FormField.INVOICE_NUMBER.name)</span> : @invoiceContent.invoiceNumber <br>
-                    <span class="red">@Messages(constants.FormField.INVOICE_DATE.name)</span> : @invoiceContent.invoiceDate <br>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.INVOICE_NUMBER.name)</div>
+                        <div class="infoRowValue">@invoiceContent.invoiceNumber</div>
+                    </div>
+                    <div class="cmuk-flex infoRow">
+                        <div class="infoRowLabel red">@Messages(constants.FormField.INVOICE_DATE.name)</div>
+                        <div class="infoRowValue">@invoiceContent.invoiceDate</div>
+                    </div>
                 }
                 case Some(content) => {
                     <span>content</span>
