@@ -329,7 +329,7 @@
   border-bottom: none; }
 
 .notificationDropdown .cmuk-dropdown {
-  height: 500px;
+  max-height: 500px;
   padding: 0px;
   overflow: scroll; }
 .notificationDropdown .dropdownHeader p {
