@@ -134,7 +134,7 @@ $paragraphFontSizeSmall:12px;
   }
 }
 // Media Queries
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .leftSide {
     width: 0%;
     margin-right: 1vw;
@@ -150,11 +150,52 @@ $paragraphFontSizeSmall:12px;
     display: flex;
     margin: 20px;
   }
-}
-
-@media (min-width: 500px) {
   .kycDocumentsView{
     display: flex;
+  }
+  .MnemonicQuiz{
+    max-width: 500px;
+  }
+  .bannerText{
+    width: 100%;
+  }
+  .header {
+    .cmuk-navbar-container {
+      padding: 0px;
+    }
+
+    .cmuk-navbar-nav > li > a {
+      font-size: 12px;
+    }
+
+    .cmuk-navbar-nav > li > a button {
+      font-size: 12px;
+      line-height: 10px;
+      padding: 10px ;
+    }
+  }
+  .mobile .cmuk-offcanvas-bar{
+    padding: 30px;
+  }
+  .mobile .cmuk-button{
+    background-color: $colorPrimary;
+  }
+}
+@media (min-width: 600px) {
+  .modalBody{
+    form{
+      width: 500px;
+      text-align: center;
+    }
+  }
+  form{
+    hr{
+      margin-top: 10px;
+    }
+  }
+  .MnemonicQuiz {
+    text-align: center;
+    width: 500px;
   }
 }
 @media (min-width: 960px) {
@@ -461,8 +502,6 @@ $paragraphFontSizeSmall:12px;
 }
 
 .MnemonicQuiz {
-  text-align: center;
-  width: 500px;
   .titleMnemonic {
     font-weight: bold;
   }

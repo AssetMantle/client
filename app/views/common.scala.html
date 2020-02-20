@@ -51,7 +51,6 @@
                                         <button class="cmuk-button">@Messages(constants.Form.LOGIN.legend)</button>
                                     </a>
                                 </li>
-                                <a class="cmuk-navbar-toggle cmuk-hidden@@m" cmuk-toggle="target: #offcanvas-flip" cmuk-navbar-toggle-icon href="#"></a>
                             }
                             case default => {
                                 @loginState.userType match {
@@ -73,13 +72,13 @@
                                     case _ => {}
                                 }
                                 <li class="notificationDropdown">
-                                    <a onclick="componentResource('noter', jsRoutes.controllers.NotificationController.notificationPage(0))">
+                                    <a onclick="componentResource('notificationSection', jsRoutes.controllers.NotificationController.notificationPage(0))">
                                         @Messages(constants.Form.INBOX)
                                     <span class="cmuk-badge" id="notificationBadge">0</span>
                                     </a>
                                     <div cmuk-dropdown="boundary: .bodyContainer; mode: click">
                                         <ul class="cmuk-nav cmuk-dropdown-nav">
-                                            <div id="noter">
+                                            <div id="notificationSection">
 
                                             </div>
                                         </ul>
@@ -108,6 +107,81 @@
                             }
                         }
                         </ul>
+                        @*  mobile Navigationbar *@
+                        <a class="cmuk-navbar-toggle cmuk-hidden@@m" cmuk-toggle="target: #offcanvas-flip" cmuk-navbar-toggle-icon href="#"></a>
+                        <div id="offcanvas-flip" cmuk-offcanvas="overlay: true" class="mobile">
+                            <div class="cmuk-offcanvas-bar">
+                                <ul class="cmuk-nav cmuk-nav-default">
+                                @loginState match {
+                                    case null => {
+                                        <li>
+                                            <a onclick="getForm(jsRoutes.controllers.AccountController.noteAndVerifyMnemonic())">
+                                            @Messages(constants.Form.SIGN_UP.legend)
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
+                                                <button class="cmuk-button">@Messages(constants.Form.LOGIN.legend)</button>
+                                            </a>
+                                        </li>
+                                    }
+                                    case default => {
+                                        @loginState.userType match {
+                                            case constants.User.TRADER => {
+                                                <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                            }
+                                            case constants.User.ZONE => {
+                                                <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                                <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                            }
+                                            case constants.User.ORGANIZATION => {
+                                                <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                                <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                            }
+                                            case constants.User.GENESIS => {
+                                                <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                                <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                            }
+                                            case _ => {}
+                                        }
+                                        <li class="notificationDropdown">
+                                            <a onclick="componentResource('mobileNotificationSection', jsRoutes.controllers.NotificationController.notificationPage(0))">
+                                                @Messages(constants.Form.INBOX)
+                                            <span class="cmuk-badge" id="notificationBadge">0</span>
+                                            </a>
+                                            <div cmuk-dropdown="mode: click">
+                                                <ul class="cmuk-nav cmuk-dropdown-nav">
+                                                    <div id="mobileNotificationSection">
+                                                    </div>
+                                                </ul>
+                                            </div>
+                                        </li>
+
+                                        <li class="userList">
+                                            <a >@loginState.username</a>
+                                            <div class="cmuk-navbar-dropdown" cmuk-dropdown="mode: click">
+                                                <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
+                                                    <li>
+                                                        <a href="@controllers.routes.ViewController.profile()">
+                                                            <span cmuk-icon="user"></span>
+                                                            @Messages(constants.Form.PROFILE)
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
+                                                            <span cmuk-icon="sign-out"></span>
+                                                            @Messages(constants.Form.LOGOUT.legend)
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                                </ul>
+                            </div>
+                        </div>
+                        @*End of  mobile Navigationbar *@
                     </div>
 
                 </nav>
@@ -159,7 +233,7 @@
                                             <button class="cmuk-button cmuk-button-default">BUY</button>
                                         </div>
                                     </div>
-                                    <div class="bannerImage">
+                                    <div class="bannerImage cmuk-visible@@m">
                                         <img src="@routes.Assets.versioned("images/bannerImage.svg")">
                                     </div>
                                 </div>
