@@ -52,7 +52,9 @@ $paragraphFontSizeSmall:12px;
     }
   }
 }
-
+.wordBreak{
+  word-break: break-all;
+}
 .centerScreen {
   display: flex;
   flex-direction: column;
@@ -150,9 +152,6 @@ $paragraphFontSizeSmall:12px;
     display: flex;
     margin: 20px;
   }
-  .kycDocumentsView{
-    display: flex;
-  }
   .MnemonicQuiz{
     max-width: 500px;
   }
@@ -180,6 +179,10 @@ $paragraphFontSizeSmall:12px;
   .mobile .cmuk-button{
     background-color: $colorPrimary;
   }
+  .modal .modalContent{
+    top:10%;
+    max-height: 400px;
+  }
 }
 @media (min-width: 600px) {
   .modalBody{
@@ -196,6 +199,9 @@ $paragraphFontSizeSmall:12px;
   .MnemonicQuiz {
     text-align: center;
     width: 500px;
+  }
+  .kycDocumentsView{
+    display: flex;
   }
 }
 @media (min-width: 960px) {

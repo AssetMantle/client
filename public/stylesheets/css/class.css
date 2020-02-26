@@ -34,6 +34,9 @@
       padding: 20px;
       text-align: left; }
 
+.wordBreak {
+  word-break: break-all; }
+
 .centerScreen {
   display: flex;
   flex-direction: column;
@@ -111,9 +114,6 @@
     display: flex;
     margin: 20px; }
 
-  .kycDocumentsView {
-    display: flex; }
-
   .MnemonicQuiz {
     max-width: 500px; }
 
@@ -133,7 +133,11 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #0862BE; } }
+    background-color: #0862BE; }
+
+  .modal .modalContent {
+    top: 10%;
+    max-height: 400px; } }
 @media (min-width: 600px) {
   .modalBody form {
     width: 500px;
@@ -144,7 +148,10 @@
 
   .MnemonicQuiz {
     text-align: center;
-    width: 500px; } }
+    width: 500px; }
+
+  .kycDocumentsView {
+    display: flex; } }
 @media (min-width: 960px) {
   .bannerText h2 {
     font-size: 48px; }
