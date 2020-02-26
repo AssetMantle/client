@@ -2,7 +2,9 @@
 @import models.masterTransaction.IssueFiatRequest
 @import views.html.base._
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
+@if(issueFiatRequests.length == 0){
+    <spa>No Requests Found</spa>
+}
 @for(issueFiatRequest <- issueFiatRequests) {
     <div>
     @commonCard(){

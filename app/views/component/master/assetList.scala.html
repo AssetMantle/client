@@ -2,48 +2,56 @@
 @import models.master.Asset
 @import models.masterTransaction.IssueAssetRequest
 @import models.masterTransaction.AssetFile
-
+@import views.html.base._
 @(assetPegWallet: Seq[IssueAssetRequest], masterAssetList: Seq[Asset], assetFiles: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
+<div class="cmuk-container">
+    <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(asset <- assetPegWallet) {
-    <div class="flexItem box thirdBox lightBlue">
-    @asset.pegHash match {
+    <div>
+    @commonCard() {
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ASSET_DETAILS)</span>
+        </div>
+    } {
+        @asset.pegHash match {
+            case Some(peghash) => {
+                @for(masterAsset <- masterAssetList) {
+                    @if(masterAsset.pegHash == peghash) {
+                        <div class="leftText">
+                        @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id), masterAsset.status)
+                        </div>
+                        @masterAsset.status match {
+                            case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION | constants.Status.Asset.COMPLETED_TRADE => {
+                                <div class="centerText" >
+                                @loginState.acl match {
+                                    case Some(acl) => {
+                                        @if(acl.redeemAsset) {
+                                            <button class="cmuk-button  cmuk-button-primary" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@loginState.username', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET.legend)</button>
+                                            <br>
+                                            }
+                                    }
+                                    case _ => {}
 
-        case Some(peghash) => {
-            @for(masterAsset <- masterAssetList) {
-                @if(masterAsset.pegHash == peghash) {
-                    <div class="leftText">
-                    @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id), masterAsset.status)
-                    </div>
-                    @masterAsset.status match {
-                        case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION | constants.Status.Asset.COMPLETED_TRADE => {
-                            <div class="centerText" >
-                            @loginState.acl match {
-                                case Some(acl) => {
-                                    @if(acl.redeemAsset) {
-                                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@loginState.username', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET.legend)</button>
-                                        <br>
-                                        }
                                 }
-                                case _ => {}
-
+                                </div>
                             }
-                            </div>
-                        }
-                        case _ => {}
+                            case _ => {}
 
+                        }
                     }
                 }
             }
-        }
-        case None => {
-            <div class="leftText">
-            @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id))
-            </div>
-            @if(!asset.completionStatus) {
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
+            case None => {
+                <div class="leftText">
+                @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id))
+                </div>
+                @if(!asset.completionStatus) {
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
+                }
             }
         }
     }
     </div>
 }
+    </div>
+</div>

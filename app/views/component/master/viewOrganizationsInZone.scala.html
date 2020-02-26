@@ -5,22 +5,40 @@
 @(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
 <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
+    @if(organizations.length == 0){
+        <spa>No Organizations</spa>
+    }
 @for(organization <- organizations) {
     <div>
     @commonCard() {
         @organization.id
     }{
-        <span class="red">@Messages(constants.Form.ID)</span> :@organization.id <br>
-      <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@organization.accountID <br>
-      <span class="red">@Messages(constants.Form.NAME)</span> :@organization.name <br>
-                <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>:@organization.establishmentDate <br>
-      <span class="red">@Messages(constants.Form.EMAIL)</span> :@organization.email <br>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.ID)</div>
+            <div class="infoRowValue">@organization.id</div>
+        </div>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.ACCOUNT_ID)</div>
+            <div class="infoRowValue">@organization.accountID</div>
+        </div>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
+            <div class="infoRowValue">@organization.name</div>
+        </div>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.ESTABLISHMENT_DATE)</div>
+            <div class="infoRowValue">@organization.establishmentDate</div>
+        </div>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel red">@Messages(constants.Form.EMAIL)</div>
+            <div class="infoRowValue">@organization.email</div>
+        </div>
+        <div>
             <div>
-                <div>
-                    <h4 class="showHide toggleElement text-center" onclick="fetchOrShowHide('@organization.id', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForZone('@organization.id'), this)">@Messages(constants.Form.TRADERS)</h4>
-                </div>
-                <div id="@organization.id" class="flexContainer scrollableThird"></div>
+                <h4 class="showHide toggleElement text-center" onclick="fetchOrShowHide('@organization.id', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForZone('@organization.id'), this)">@Messages(constants.Form.TRADERS)</h4>
             </div>
+            <div id="@organization.id" class="flexContainer scrollableThird"></div>
+        </div>
     }
     </div>
 }

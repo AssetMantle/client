@@ -1,10 +1,16 @@
 @import controllers.actions.LoginState
 @import models.master.Trader
 @(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import views.html.base._
+@if(traderVerificationRequests.length == 0){
+    <spa>No Requests Found</spa>
+}
 @for(traderVerificationRequest <- traderVerificationRequests) {
-    <div class="col-md-12">
-        <br>
-        <div class="flexItem card-body leftText lightBlue dblock lightBlue document_details_card">
+    <div>
+    @commonCard() {
+        @traderVerificationRequest.zoneID
+    }{
+    <div>
             <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @traderVerificationRequest.zoneID <br>
             <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @traderVerificationRequest.organizationID <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @traderVerificationRequest.accountID <br>
@@ -15,6 +21,7 @@
             </span><br>
           <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.zoneVerifyTraderForm('@traderVerificationRequest.accountID', '@traderVerificationRequest.organizationID'))">@Messages(constants.Form.APPROVE)</button>
           <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.zoneRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
-        </div>
+    </div>
+}
     </div>
 }

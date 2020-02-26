@@ -1,13 +1,25 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Fiat
-
+@import views.html.base._
 @(fiatPegWallet: Seq[Fiat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
+<div class="cmuk-container">
+    <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(fiat <- fiatPegWallet) {
-    <div class="flexItem box thirdBox leftText lightBlue">
-        <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @fiat.pegHash <br>
-        <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span>: @fiat.transactionID <br>
-        <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span>: @fiat.transactionAmount <br>
-        <span class="red">@Messages(constants.Form.REDEEM_AMOUNT)</span>: @fiat.redeemedAmount
+    <div>
+    @commonCard() {
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@fiat.transactionID</span>
+        </div>
+    } {
+        <div>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @fiat.pegHash <br>
+            <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span>: @fiat.transactionID <br>
+            <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span>: @fiat.transactionAmount <br>
+            <span class="red">@Messages(constants.Form.REDEEM_AMOUNT)</span>: @fiat.redeemedAmount
+        </div>
+    }
     </div>
+
 }
+    </div>
+</div>

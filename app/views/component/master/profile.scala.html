@@ -5,7 +5,7 @@
 @views.html.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
-    <div class="cmuk-container">
+    <div class="cmuk-container cmuk-margin-bottom">
     @commonCard() {
         <div>
             <span class="headerFontSize cmuk-text-bold">@loginState.username</span>
@@ -33,9 +33,8 @@
         </div>
     }
     </div>
-    <section class="cmuk-section cmuk-section-small">
-        <div class="cmuk-container">
-             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+        <div class="cmuk-container cmuk-margin-bottom">
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
                 @commonCard() {
                     <div>
@@ -47,20 +46,18 @@
                 }
                 </div>
                 <div class="cmuk-width-expand@@m">
-                    @commonCard(){
-                        <div>
-                            <span>@Messages(constants.View.ID_PROOF)</span>
-                        </div>
-                    }{
-                        <div id="identificationDetails">
-                        </div>
-                    }
+                @commonCard(){
+                    <div>
+                        <span>@Messages(constants.View.ID_PROOF)</span>
+                    </div>
+                }{
+                    <div id="identificationDetails">
+                    </div>
+                }
                 </div>
             </div>
         </div>
-    </section>
-    <section class="cmuk-section cmuk-section-small">
-        <div class="cmuk-container">
+        <div class="cmuk-container cmuk-margin-bottom">
         @commonCard() {
 
         }{
@@ -214,7 +211,6 @@
             </div>
         }
         </div>
-    </section>
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments());

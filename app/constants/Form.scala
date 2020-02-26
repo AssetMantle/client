@@ -503,5 +503,6 @@ object Form {
   val TABLE = "TABLE"
   val CARD = "CARD"
   val FOOTER_LOGO = "FOOTER_LOGO"
+  val ASSET_DETAILS="ASSET_DETAILS"
 
 }

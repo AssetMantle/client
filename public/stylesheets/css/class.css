@@ -31,7 +31,11 @@
     max-height: 600px;
     display: inline-block; }
     .modal .modalContent .modalBody {
-      padding: 20px; }
+      padding: 20px;
+      text-align: left; }
+
+.wordBreak {
+  word-break: break-all; }
 
 .centerScreen {
   display: flex;
@@ -60,7 +64,7 @@
   height: auto;
   min-height: 100%;
   background: #F4F7FB;
-  margin: 0 auto -171px; }
+  margin: 0 auto -172px; }
 
 .pageContainer {
   padding-bottom: 171px; }
@@ -94,7 +98,7 @@
     max-height: 30px;
     max-width: 130px; }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .leftSide {
     width: 0%;
     margin-right: 1vw; }
@@ -108,7 +112,46 @@
 
   .pageContent {
     display: flex;
-    margin: 20px; } }
+    margin: 20px; }
+
+  .MnemonicQuiz {
+    max-width: 500px; }
+
+  .bannerText {
+    width: 100%; }
+
+  .header .cmuk-navbar-container {
+    padding: 0px; }
+  .header .cmuk-navbar-nav > li > a {
+    font-size: 12px; }
+  .header .cmuk-navbar-nav > li > a button {
+    font-size: 12px;
+    line-height: 10px;
+    padding: 10px; }
+
+  .mobile .cmuk-offcanvas-bar {
+    padding: 30px; }
+
+  .mobile .cmuk-button {
+    background-color: #0862BE; }
+
+  .modal .modalContent {
+    top: 10%;
+    max-height: 400px; } }
+@media (min-width: 600px) {
+  .modalBody form {
+    width: 500px;
+    text-align: center; }
+
+  form hr {
+    margin-top: 10px; }
+
+  .MnemonicQuiz {
+    text-align: center;
+    width: 500px; }
+
+  .kycDocumentsView {
+    display: flex; } }
 @media (min-width: 960px) {
   .bannerText h2 {
     font-size: 48px; }
@@ -310,16 +353,24 @@
 
 .notification {
   word-break: break-all;
-  border-bottom: 1px solid #053C75;
   transition: all 1s ease-in-out;
-  list-style: none; }
+  list-style: none;
+  margin-bottom: 1px; }
+  .notification .read {
+    background-color: #fff2e8; }
+  .notification .notificationTime {
+    font-size: 10px; }
 
-.notification > div {
-  padding: 10px 15px; }
+.notification > div, .NotificationButton {
+  padding: 15px 25px; }
 
 .NotificationButton {
   border-bottom: none; }
 
+.notificationDropdown .cmuk-dropdown {
+  max-height: 500px;
+  padding: 0px;
+  overflow: scroll; }
 .notificationDropdown .dropdownHeader p {
   justify-content: center;
   text-align: center;
@@ -342,36 +393,34 @@
 .hidden {
   display: none; }
 
-.MnemonicQuiz {
-  width: 500px; }
-  .MnemonicQuiz .titleMnemonic {
-    font-weight: bold; }
-  .MnemonicQuiz .errorMnemonicInput {
-    display: none;
-    color: red;
-    padding: 10px; }
-  .MnemonicQuiz .verifyMnemonic {
-    flex-wrap: wrap;
-    justify-content: center; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
-      width: 114px;
-      height: 38px;
-      text-align: center;
-      line-height: 38px;
-      position: relative;
-      font-size: 14px;
-      float: left;
-      margin-right: 10px;
-      margin-bottom: 10px;
-      font-weight: 600;
-      border-radius: 3px; }
-      .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .index {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        color: #848e9c;
-        font-size: 12px;
-        line-height: 12px; }
+.MnemonicQuiz .titleMnemonic {
+  font-weight: bold; }
+.MnemonicQuiz .errorMnemonicInput {
+  display: none;
+  color: red;
+  padding: 10px; }
+.MnemonicQuiz .verifyMnemonic {
+  flex-wrap: wrap;
+  justify-content: center; }
+  .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
+    width: 114px;
+    height: 38px;
+    text-align: center;
+    line-height: 38px;
+    position: relative;
+    font-size: 14px;
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    border-radius: 3px; }
+    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .index {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      color: #848e9c;
+      font-size: 12px;
+      line-height: 12px; }
 
 .flexContainer {
   display: flex;
@@ -428,7 +477,7 @@
   color: #FFFFFF; }
 
 .showToggleElement {
-  background-color: #149f98;
+  background-color: #0862BE;
   cursor: pointer;
   color: #10292e; }
 
@@ -474,8 +523,11 @@ rightText {
   background-color: #5eaf50; }
 
 .profilePicture {
-  height: 200px;
-  width: 200px; }
+  height: 130px;
+  width: 130px; }
+
+.profilePictureContainer {
+  border-radius: 50%; }
 
 dl .info {
   background-color: #dadada;
@@ -646,7 +698,10 @@ dl .info:after {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
 
 .cmuk-tab > .cmuk-active > a {
-  background: #149f98; }
+  background: #0862BE;
+  color: #FFFFFF !important;
+  font-weight: bold;
+  font-size: 16px; }
   .cmuk-tab > .cmuk-active > a:before {
     content: ' ';
     position: absolute;
@@ -657,7 +712,7 @@ dl .info:after {
     top: 38%;
     bottom: -19px;
     border: 8px solid;
-    border-color: transparent transparent transparent #149f98;
+    border-color: transparent transparent transparent #0862BE;
     animation-fill-mode: forwards; }
 
 .cmuk-tab > li > a {
@@ -696,10 +751,6 @@ dl .info:after {
 .cmuk-accordion-title:focus,
 .cmuk-accordion-title:hover {
   color: #373E46 !important; }
-
-.cmuk-accordion-title:before {
-  border-radius: 50%;
-  border: 1px solid #373E46; }
 
 .cmuk-accordion-buttons {
   background: #fff;
@@ -955,6 +1006,15 @@ input:checked + .slider {
   border-radius: 3px;
   padding: 10px;
   margin: 10px; }
+  .documentItem .documentContentTop {
+    font-size: 12px;
+    margin-bottom: 5px; }
+  .documentItem .documentThumbnail img {
+    width: 100px;
+    height: 80px; }
+  .documentItem .documentContentBottom {
+    margin-top: 5px;
+    font-size: 12px; }
 
 .profileDocuments {
   display: flex;
@@ -964,7 +1024,73 @@ input:checked + .slider {
 .cmuk-table th, .cmuk-button {
   text-transform: capitalize !important; }
 
-select .blank {
-  color: Red; }
+.mobileNumberUpdate .countryCode {
+  margin-top: 24px;
+  width: 80px;
+  margin-right: 10px; }
+.mobileNumberUpdate .mobileNumber {
+  width: 100%; }
+.mobileNumberUpdate .mobileNumber label {
+  margin-left: -75px; }
+
+.commonHomeData {
+  font-size: 14px; }
+  .commonHomeData p, .commonHomeData h3 {
+    margin: 5px 0px; }
+
+.inputField {
+  display: flex; }
+  .inputField .inputFieldIcon {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: #ebebeb;
+    margin-top: 24px;
+    padding: 0px 10px; }
+  .inputField .inputFieldBody {
+    width: 100%; }
+  .inputField .inputFieldBody input {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px; }
+
+.connectionError {
+  height: 100px;
+  padding: 40px;
+  border-radius: 3px;
+  background: #e6e6e6;
+  width: 100px;
+  color: red; }
+
+.cmuk-navbar-nav > li > a.active {
+  background-color: #f4f7fb;
+  color: #343C44; }
+
+.infoRow {
+  line-height: 1.8;
+  align-items: flex-start;
+  word-break: break-all;
+  font-size: 14px; }
+
+.infoRowLabel {
+  width: 110px;
+  height: min-content;
+  word-break: break-word; }
+
+.infoRowValue {
+  flex: 1 1;
+  color: #767f8d;
+  font-weight: 400;
+  height: min-content;
+  line-height: 1.6; }
+
+.cmuk-accordion-title::before {
+  background-image: url("../../images/chevron-up.svg") !important; }
+
+.cmuk-open > .cmuk-accordion-title::before {
+  background-image: url("../../images/chevron-down.svg") !important; }
+
+.commonCheckBox dt {
+  width: 200px;
+  word-break: break-word; }
 
 /*# sourceMappingURL=class.css.map */
