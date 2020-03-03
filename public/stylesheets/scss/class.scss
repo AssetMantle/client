@@ -883,7 +883,7 @@ dl .info {
   background: $colorPrimary;
   color:#FFFFFF !important;
   font-weight: bold;
-  font-size: $paragraphFontSizeLarge;
+  font-size: $paragraphFontSizeSmall;
   &:before {
     content: ' ';
     position: absolute;
@@ -900,7 +900,7 @@ dl .info {
 }
 
 .cmuk-tab>li>a{
-  padding: 15px;
+  padding: 10px;
 }
 
 .tableName{

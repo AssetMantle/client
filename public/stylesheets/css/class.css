@@ -701,7 +701,7 @@ dl .info:after {
   background: #0862BE;
   color: #FFFFFF !important;
   font-weight: bold;
-  font-size: 16px; }
+  font-size: 12px; }
   .cmuk-tab > .cmuk-active > a:before {
     content: ' ';
     position: absolute;
@@ -716,7 +716,7 @@ dl .info:after {
     animation-fill-mode: forwards; }
 
 .cmuk-tab > li > a {
-  padding: 15px; }
+  padding: 10px; }
 
 .tableName {
   background: #d2edef; }
