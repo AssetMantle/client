@@ -1,10 +1,8 @@
 package controllers.responses
 
-import constants.Response
 import javax.inject.{Singleton, _}
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
-import play.api.mvc.Results._
 import play.api.mvc._
 import play.api.routing.Router
 
@@ -19,9 +17,9 @@ class XmlHttpRequestHandler @Inject()(
                                      ) extends DefaultHttpErrorHandler(environment, configuration, sourceMapper, router) {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
-    println(Response.REQUEST_NOT_WELL_FORMED)
+    println(utilities.XMLRestResponse.REQUEST_NOT_WELL_FORMED)
     Future.successful(
-            Response.REQUEST_NOT_WELL_FORMED.result
+      utilities.XMLRestResponse.REQUEST_NOT_WELL_FORMED.result
     )
   }
 

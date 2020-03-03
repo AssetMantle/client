@@ -13,7 +13,7 @@ before_script:
   - apt-get -y install git
   - apt-get -y install --reinstall build-essential
   - apt-get install openssh-client
-## install go 1.13 and install blockchain #note: bash lines should be appended before sdkman lines
+  ## install go 1.13 and install blockchain #note: bash lines should be appended before sdkman lines
   - echo 'export GO111MODULE=on' >> ~/.bashrc
   - echo 'export GOPATH=$HOME/go/path' >> ~/.bashrc
   - echo 'export GOBIN=$HOME/go/bin' >> ~/.bashrc
@@ -22,23 +22,6 @@ before_script:
   - cd $HOME
   - wget https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
   - tar -xzvf go1.13.5.linux-amd64.tar.gz
-#  - mkdir -p go/path/src/github.com/commitHub/
-#  - cd $HOME/go/path/src/github.com/commitHub/
-#  - git clone https://github.com/commitHub/commitBlockchain.git
-#  - cd $HOME/go/path/src/github.com/commitHub/commitBlockchain/
-#  - ls
-#  - make all
-#  #run kafka
-#  - ./kafkaStartup.sh &
-#  #run blockchain
-#  - maind init main --chain-id crust-2
-#  - echo "$MAIN_PASSWORD" | maincli keys add main
-#  - maind add-genesis-account main 10000000000ucommit
-#  - echo "$MAIN_PASSWORD" | maind gentx --amount 100000000ucommit --name main
-#  - maind collect-gentxs
-#  - maind start &
-#  - sleep 7
-#  - maincli rest-server --laddr tcp://0.0.0.0:31118 --chain-id crust-2 &
 
   ## installation of sbt to run comdex scala app
   - curl -s "https://get.sdkman.io" | bash
@@ -47,7 +30,7 @@ before_script:
   - sdk install sbt
   - echo 'export function cd {builtin cd "$@" && ls}' >> ~/.bashrc
 
-## postgres installation and running 0.sql
+  ## postgres installation and running 0.sql
   - sudo apt-get install -y postgresql postgresql-client libpq-dev
   - ls
   - pwd
@@ -66,27 +49,3 @@ build_local:
   script:
     - sbt clean dist exit
     - sbt clean dist exit
-
-#  artifacts:
-#    paths:
-#      - build/
-
-#dev:
-#  stage: deploy
-#  script:
-#    - sbt clean dist exit
-#    - sbt clean dist exit
-#    - ls
-#    - cd /builds/deepanshutr/commitCentral/target/universal/
-#    - mv /builds/deepanshutr/commitCentral/target/universal/samplecicd-1.0.zip /root/
-#    - cd /root/
-#    - unzip samplecicd-1.0.zip
-#    - cp -r /builds/deepanshutr/commitCentral/public /root/samplecicd-1.0/
-#    - scp -i $SERVER_PEM -o StrictHostKeyChecking=no -r /root/samplecicd-1.0/ $SERVER_IP_WITH_NAME:/home/ubuntu/
-#    - ssh -o StrictHostKeyChecking=no -i $SERVER_PEM $SERVER_IP_WITH_NAME
-#    - cd samplecicd-1.0/bin/
-#    - ./samplecicd &
-#    - exit
-#
-#  only:
-#    - patch-1
