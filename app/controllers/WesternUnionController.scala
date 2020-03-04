@@ -87,7 +87,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           } yield {
             val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(issueFiatRequestData.transactionID),
               Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(traderDetails.name), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(""),
-              Form.BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
+              Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
               Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
               Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
