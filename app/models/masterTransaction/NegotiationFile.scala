@@ -113,10 +113,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case _: NoSuchElementException => None
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 

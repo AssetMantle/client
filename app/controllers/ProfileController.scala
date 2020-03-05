@@ -32,18 +32,21 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
 
   def identificationForm = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identification = masterIdentifications.Service.getOrNoneAccountID(loginState.username)
+      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
 
-      def getResult(identification: Option[Identification]) = identification match {
-        case Some(identification) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(value = views.companion.master.Identification.Data(firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = identification.dateOfBirth, idNumber = identification.idNumber, idType = identification.idType))))
-        case None => withUsernameToken.Ok(views.html.component.master.identification())
+      def getResult(identification: Option[Identification]) = {
+        identification match {
+          case Some(identification) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(value = views.companion.master.Identification.Data(firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identification.dateOfBirth), idNumber = identification.idNumber, idType = identification.idType))))
+          case None => withUsernameToken.Ok(views.html.component.master.identification())
+        }
       }
-
-      for {
+      (for {
         identification <- identification
         result <- getResult(identification)
       } yield result
-
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def identification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -68,15 +71,14 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
   def identificationDetails = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
-      val identification = masterIdentifications.Service.getOrNoneAccountID(loginState.username)
-      for {
+      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      (for {
         accountKYC <- accountKYC
         identification <- identification
       } yield Ok(views.html.component.master.identificationDetails(accountKYC, identification))
-  }
-
-  def addTraderNewForm = Action { implicit request =>
-    Ok(views.html.component.master.addTrader())
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def organizationDetails = withLoginAction.authenticated { implicit loginState =>
