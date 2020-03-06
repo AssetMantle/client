@@ -1,0 +1,32 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.SendChat
+@import models.masterTransaction.ChatRoom
+@import views.html.component.master.sendChat
+
+@(sendChatForm: Form[SendChat.Data] = SendChat.form, chats: Seq[ChatRoom])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+<div id="chatCointainer" class="chatContainer">
+    @for(chat <- chats) {
+        <li class="chat">
+        @chat.chatContent
+        @if(chat.deleteStatus) {
+            This chat has been deleted
+            @* recover button*@
+        } else {
+            @* delete button *@
+        }
+        @if(chat.financierVisibility) {
+            @* hide for financier *@
+        } else {
+            @* show financier *@
+        }
+        </li>
+    }
+<div class = "chat loadMoreButton"> <a onclick="loadMoreChats()">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+
+</div>
+<div class="chatform">
+@sendChat(sendChatForm)
+</div>
+<script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>

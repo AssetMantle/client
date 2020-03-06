@@ -254,6 +254,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.sellerFeedbackList,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
+        routes.javascript.TradeRoomController.chatRoom,
+        routes.javascript.TradeRoomController.sendChat,
+
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
 
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,

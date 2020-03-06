@@ -95,6 +95,8 @@ object FormField {
   val ID_TYPE = new StringFormField("ID_TYPE", 2, 100)
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
+  val TRADE_ROOM_ID = new StringFormField("TRADE_ROOM_ID", 2, 100)
+  val CHAT_CONTENT = new StringFormField("CHAT_CONTENT", 0, 100)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -148,6 +150,7 @@ object FormField {
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_MNEMONIC_NOTED = new BooleanFormField("CONFIRM_MNEMONIC_NOTED")
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
+  val FINANCIER_VISIBILITY = new BooleanFormField("FINANCIER_VISIBILITY")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

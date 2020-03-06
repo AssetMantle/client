@@ -25,7 +25,7 @@ object issueFiatControllerTest {
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Issue_Fiat_Request_POST")
-      .post(routes.IssueFiatController.issueFiatRequest().url)
+      .post(routes.WesternUnionController.westernUnionPortalRedirect().url)
       .formParamMap(Map(
         Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
         Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
@@ -63,7 +63,7 @@ object issueFiatControllerTest {
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("RejectIssueFiat_POST")
-      .post(routes.IssueFiatController.issueFiatRequest().url)
+      .post(routes.WesternUnionController.westernUnionPortalRedirect().url)
       .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))

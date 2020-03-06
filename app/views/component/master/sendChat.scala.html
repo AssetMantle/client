@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.SendChat
+
+@import views.html.helper.form
+@import views.html.helper.CSRF
+@(sendChatForm: Form[SendChat.Data] = SendChat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+
+@form(action = constants.Form.CONFIRM_BUYER_BID_DETAIL.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    <fieldset class="cmuk-fieldset cmuk-form-stacked">
+        <legend class="cmuk-legend">
+        @Messages(constants.Form.CONFIRM_BUYER_BID_DETAIL.legend)
+        </legend>
+        <hr>
+        @CSRF.formField
+
+        @commonInputText(sendChatForm, constants.FormField.TRADE_ROOM_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
+        @commonInputText(sendChatForm, constants.FormField.CHAT_CONTENT)
+        @commonCheckbox(sendChatForm, constants.FormField.FINANCIER_VISIBILITY)
+
+        @if(sendChatForm.hasGlobalErrors) {
+            <ul class="signupErrorList">
+            @for(error <- sendChatForm.globalErrors) {
+                <li class="error">@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID_DETAIL.submit)</button>
+    </fieldset>
+}
