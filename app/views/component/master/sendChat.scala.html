@@ -7,10 +7,10 @@
 @(sendChatForm: Form[SendChat.Data] = SendChat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 
-@form(action = constants.Form.CONFIRM_BUYER_BID_DETAIL.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
+@form(action = constants.Form.SEND_CHAT.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         <legend class="cmuk-legend">
-        @Messages(constants.Form.CONFIRM_BUYER_BID_DETAIL.legend)
+        @Messages(constants.Form.SEND_CHAT.legend)
         </legend>
         <hr>
         @CSRF.formField
@@ -26,6 +26,6 @@
             }
             </ul>
         }
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID_DETAIL.submit)</button>
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitChat(this)">@Messages(constants.Form.SEND_CHAT.submit)</button>
     </fieldset>
 }

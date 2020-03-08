@@ -28,8 +28,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   private val chatsPerPage = configuration.get[Int]("chatRoom.chatsPerPage")
 
   // tradeRoom main view page skeleton
-  def tradeRoom: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.tradeRoom())
+  def tradeRoom: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.tradeRoom()))
   }
 
   // populates the trade Financials in the tradeRoom page, position- left top
@@ -80,7 +81,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.SendChat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest("REQUEST NOT WELL FORMED"))
+          Future(BadRequest("REQUEST NOT WELL FORMED"))
         },
         chatRoomData => {
           // check for buyer or seller sending message to mark read..

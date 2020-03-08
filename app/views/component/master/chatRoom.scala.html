@@ -8,8 +8,8 @@
 
 <div id="chatCointainer" class="chatContainer">
     @for(chat <- chats) {
-        <li class="chat">
-        @chat.chatContent
+        <li id="@chat.id" class="chat">
+        @chat.fromAccountID : @chat.chatContent
         @if(chat.deleteStatus) {
             This chat has been deleted
             @* recover button*@

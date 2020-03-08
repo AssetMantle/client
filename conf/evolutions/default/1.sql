@@ -582,27 +582,27 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 
 CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
-    "pegHash"                     VARCHAR NOT NULL,
-    "status"                      VARCHAR NOT NULL,
+    "pegHash" VARCHAR NOT NULL,
+    "status"  VARCHAR NOT NULL,
     PRIMARY KEY ("pegHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Identification"
 (
-    "accountID"              VARCHAR NOT NULL,
-    "firstName"              VARCHAR NOT NULL,
-    "lastName"               VARCHAR NOT NULL,
-    "dateOfBirth"            DATE    NOT NULL,
-    "idNumber"               VARCHAR NOT NULL,
-    "idType"                 VARCHAR NOT NULL,
-    "status"                 BOOLEAN,
+    "accountID"   VARCHAR NOT NULL,
+    "firstName"   VARCHAR NOT NULL,
+    "lastName"    VARCHAR NOT NULL,
+    "dateOfBirth" DATE    NOT NULL,
+    "idNumber"    VARCHAR NOT NULL,
+    "idType"      VARCHAR NOT NULL,
+    "status"      BOOLEAN,
     PRIMARY KEY ("accountID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
 (
-    "id"             VARCHAR NOT NULL,
-    "accountID"      VARCHAR NOT NULL,
+    "id"           VARCHAR NOT NULL,
+    "accountID"    VARCHAR NOT NULL,
     "emailAddress" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -729,30 +729,66 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ChatRoom"
-(
-    "id"                  VARCHAR NOT NULL,
-    "fromAccountID"       VARCHAR NOT NULL,
-    "tradeRoomID"         VARCHAR NOT NULL,
-    "chatContent"         VARCHAR NOT NULL,
-    "time"                TIMESTAMP NOT NULL,
-    "buyerRead"           BOOLEAN NOT NULL,
-    "sellerRead"          BOOLEAN NOT NULL,
-    "financierVisibility" BOOLEAN NOT NULL,
-    "financierRead"       BOOLEAN NOT NULL,
-    "deleteStatus"        BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeRoom"
 (
     "id"           VARCHAR NOT NULL,
     "salesQuoteID" VARCHAR NOT NULL,
-    "buyerID"      VARCHAR NOT NULL,
-    "sellerID"     VARCHAR NOT NULL,
-    "financierID"   VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeRoomParticipant"
+(
+    "accountID"   VARCHAR NOT NULL,
+    "tradeRoomID" VARCHAR NOT NULL,
+    PRIMARY KEY ("accountID", "tradeRoomID")
+);
+ALTER TABLE MASTER_TRANSACTION."TradeRoomParticipant"
+    ADD CONSTRAINT TradeRoomParticipant_Trader_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Trader" ("accountID");
+ALTER TABLE MASTER_TRANSACTION."TradeRoomParticipant"
+    ADD CONSTRAINT TradeRoomParticipant_TradeRoom_tradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER_TRANSACTION."TradeRoom" ("id");
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ChatWindow"
+(
+    "id"          VARCHAR NOT NULL,
+    "tradeRoomID" VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+ALTER TABLE MASTER_TRANSACTION."ChatWindow"
+    ADD CONSTRAINT ChatWindow_TradeRoom_tradeRoom FOREIGN KEY ("tradeRoomID") REFERENCES MASTER_TRANSACTION."TradeRoom"("id");
+
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ChatWindowParticipant"
+(
+    "accountID"    VARCHAR NOT NULL,
+    "chatWindowID" VARCHAR NOT NULL,
+    PRIMARY KEY ("accountID", "chatWindowID")
+);
+ALTER TABLE MASTER_TRANSACTION."ChatWindowParticipant"
+    ADD CONSTRAINT ChatWindowParticipant_ChatWindow_chatWindowID FOREIGN KEY ("chatWindowID") REFERENCES MASTER_TRANSACTION."ChatWindow"("id");
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
+(
+    "id"            VARCHAR   NOT NULL,
+    "fromAccountID" VARCHAR   NOT NULL,
+    "chatWindowID"  VARCHAR   NOT NULL,
+    "replyToID"     VARCHAR,
+    "createdAt"     TIMESTAMP NOT NULL,
+    PRIMARY KEY ("id")
+);
+ALTER TABLE MASTER_TRANSACTION."Chat"
+    ADD CONSTRAINT Chat_ChatWindowParticipant_accountIDchatWindowID FOREIGN KEY ("fromAccountID","chatWindowID") REFERENCES MASTER_TRANSACTION."ChatWindowParticipant"("accountID","chatWindowID");
+ALTER TABLE MASTER_TRANSACTION."Chat"
+    ADD CONSTRAINT Chat_Chat_replyToID FOREIGN KEY ("replyToID") REFERENCES MASTER_TRANSACTION."Chat"("id");
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ChatReceived"
+(
+    "chatID"      VARCHAR   NOT NULL,
+    "toAccountID" VARCHAR   NOT NULL,
+    "readAt"      TIMESTAMP NOT NULL,
+    PRIMARY KEY ("chatID", "toAccountID")
+);
+ALTER TABLE MASTER_TRANSACTION."ChatReceived"
+    ADD CONSTRAINT ChatReceived_Chat_chatID FOREIGN KEY ("chatID") REFERENCES MASTER_TRANSACTION."Chat"("id");
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
 (
@@ -763,15 +799,15 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction"
 (
-    "payerID"      VARCHAR NOT NULL,
-    "invoiceNumber" VARCHAR NOT NULL,
-    "customerFirstName" VARCHAR NOT NULL,
-    "customerLastName" VARCHAR NOT NULL,
+    "payerID"              VARCHAR NOT NULL,
+    "invoiceNumber"        VARCHAR NOT NULL,
+    "customerFirstName"    VARCHAR NOT NULL,
+    "customerLastName"     VARCHAR NOT NULL,
     "customerEmailAddress" VARCHAR NOT NULL,
-    "settlementDate" VARCHAR NOT NULL,
+    "settlementDate"       VARCHAR NOT NULL,
     "clientReceivedAmount" VARCHAR NOT NULL,
-    "transactionType" VARCHAR NOT NULL,
-    "productType" VARCHAR NOT NULL,
+    "transactionType"      VARCHAR NOT NULL,
+    "productType"          VARCHAR NOT NULL,
     "transactionReference" VARCHAR NOT NULL,
     PRIMARY KEY ("transactionReference")
 );

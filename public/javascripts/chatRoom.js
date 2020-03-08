@@ -34,7 +34,7 @@
 // }
 
 function loadMoreChats() {
-    const route = jsRoutes.controllers.TradeRoomController.chatRoom(($(".chatContainer").length));
+    const route = jsRoutes.controllers.TradeRoomController.chatRoom("chatRoomData.tradeRoomID",($(".chatContainer").length));
     $.ajax({
         url: route.url,
         type: route.type,
@@ -47,6 +47,13 @@ function loadMoreChats() {
             }
         }
     });
+}
+
+function submitChatOnEnter(event, source) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        submitChat(source);
+    }
 }
 
 function submitChat(source, target = '#chatContainer') {
@@ -67,7 +74,10 @@ function submitChat(source, target = '#chatContainer') {
                     result.prepend(data.responseText);
                 },
                 200: function (data) {
-                    result.prepend(data.responseText);
+                    const loadMore = $(".chatContainer .chat:first");
+                    loadMore.before(data);
+                    loadMore.remove();
+                    $('#CHAT_CONTENT').empty();
                 },
             }
         }).fail(function (XMLHttpRequest) {
