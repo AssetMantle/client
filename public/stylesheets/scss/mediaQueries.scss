@@ -1,0 +1,43 @@
+@import "variables.scss";
+@media screen and (min-width:1600px){
+  .comdex .cmuk-container{
+    max-width: 1600px;
+  }
+    .leftSide{
+      width: 390px;
+    }
+    .middle{
+      width:800px;
+    }
+    .rightSide{
+      width: 390px;
+    }
+  }
+@media screen and (min-width:1360px) and (max-width:1600px){
+  .comdex .cmuk-container{
+    max-width: 1400px;
+  }
+    .leftSide{
+      width: 340px;
+    }
+    .middle{
+      width:700px;
+    }
+    .rightSide{
+      width: 340px;
+    }
+}
+@media screen and (min-width:1200px) and (max-width:1360px){
+  .comdex .cmuk-container{
+    max-width: 1200px;
+  }
+    .leftSide{
+      width: 290px;
+    }
+    .middle{
+      width:600px;
+    }
+    .rightSide{
+      width: 290px;
+    }
+}
