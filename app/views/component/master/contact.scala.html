@@ -3,12 +3,6 @@
 @import views.html.base._
 
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-<div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-    <div class="cmuk-width-2-3@@m">
-    @commonCard() {
-        <h>@Messages(constants.View.CONTACT_DETAILS)</h>
-    }{
         @userContact match {
             case Some(contact) => {
                 <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
@@ -28,11 +22,14 @@
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
             }
             case _ => {
-                <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
-                <p>@Messages(constants.Form.MOBILE_NUMBER): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.EMAIL_ADDRESS)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.MOBILE_NUMBER)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
             }
         }
-    }
-    </div>
-</div>

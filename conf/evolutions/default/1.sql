@@ -684,6 +684,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
     "transactionAmount" INT     NOT NULL,
     "gas"               INT,
     "status"            BOOLEAN,
+    "rtcbStatus"        BOOLEAN NOT NULL,
     "ticketID"          VARCHAR,
     "comment"           VARCHAR,
     PRIMARY KEY ("id")
@@ -713,7 +714,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
 (
-    "id"                VARCHAR NOT NULL,
+    "id"    VARCHAR NOT NULL,
     "token" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -741,6 +742,28 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
     "id"         VARCHAR NOT NULL,
     "secretHash" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
+(
+    "id"      VARCHAR NOT NULL,
+    "request" VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction"
+(
+    "payerID"      VARCHAR NOT NULL,
+    "invoiceNumber" VARCHAR NOT NULL,
+    "customerFirstName" VARCHAR NOT NULL,
+    "customerLastName" VARCHAR NOT NULL,
+    "customerEmailAddress" VARCHAR NOT NULL,
+    "settlementDate" VARCHAR NOT NULL,
+    "clientReceivedAmount" VARCHAR NOT NULL,
+    "transactionType" VARCHAR NOT NULL,
+    "productType" VARCHAR NOT NULL,
+    "transactionReference" VARCHAR NOT NULL,
+    PRIMARY KEY ("transactionReference")
 );
 
 ALTER TABLE BLOCKCHAIN."Asset_BC"

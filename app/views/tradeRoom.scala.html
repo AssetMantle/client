@@ -8,14 +8,15 @@
 
 
 @left={
+    <div class="left cmuk-flex">
     <div>
-        <span uk-icon="arrow-left" class="backIcon"></span>
+        <span cmuk-icon="arrow-left" class="backIcon"></span>
     </div>
     <div>
         <span class="quoteIdTtitle secondaryFont">Sales Quote ID:</span><span class="quoteId secondaryFont"> COM478454</span>
     </div>
-
-    <div class="userIcons uk-flex secondaryFont">
+    </div>
+    <div class="userIcons cmuk-flex secondaryFont">
         <span class="buyerIcon userIcon">B</span>
         <span class="sellerIcon userIcon">S</span>
         <span class="financierIcon userIcon">F</span>
@@ -35,13 +36,13 @@
         </ul>
     </div>
 
-    <ul id="component-tab-left" class="uk-switcher">
+    <ul id="component-tab-left" class="cmuk-switcher">
         <li class="tradeTerms">
             <div  id="tradeTerms">
             </div>
         </li>
         <li>
-            <div class="documentcontainer" id="documentContainer" class="uk-animation-fade">
+            <div class="documentcontainer" id="documentContainer" class="cmuk-animation-fade">
 
             </div>
         </li>
@@ -49,10 +50,10 @@
 }
 
 @right={
-    <div class="right uk-flex">
+    <div class="right cmuk-flex">
         <button class="refresh"><img src="./images/icons/amendIcon.svg">Amend</button>
         <button class="refresh "><img src="./images/icons/refreshIcon.svg">Refresh</button>
-        <div class="uk-flex live">
+        <div class="cmuk-flex live">
             <span class="liveText secondaryFont">Live Trade Room </span>
             <div class="liveIcon"></div>
         </div>
@@ -73,8 +74,5 @@
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView());
     componentResource('recentActivity', jsRoutes.controllers.TradeRoomController.recentActivity());
     componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom());
-
-
-
 
 </script>

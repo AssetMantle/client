@@ -1,34 +1,50 @@
 @import controllers.actions.LoginState
 @import models.master.Trader
-
+@import views.html.base._
 @(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-grid-expand cmuk-width-auto cmuk-grid-match" cmuk-grid>
+        @if(traders.length == 0){
+
+                <span>no traders</span>
+        }
 @for(trader <- traders) {
     <div>
-        <div class="cmuk-card cmuk-card-default cmuk-card-body lightBlue">
-        <span class="red">@Messages(constants.Form.TRADER_ID)</span>: @trader.id<br>
-            <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name<br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @trader.accountID<br>
-            @if(!trader.completionStatus){
-                <span class="red">@Messages(constants.Form.STATUS)</span>: @Messages(constants.Status.TraderStatus.ADD_TRADER_FORM_INCOMPLETE)<br>
-            }else{
-                @if(trader.verificationStatus.isDefined && trader.verificationStatus.get){
-                    <span class="red">@Messages(constants.Form.STATUS)</span>: @Messages(constants.Status.TraderStatus.APPROVED)<br>
-                }
-            }
-           @* <span class="red">@Messages(constants.Form.COMPLETION_STATUS)</span>: @trader.completionStatus<br>
-            <span class="red">@Messages(constants.Form.VERIFIED_STATUS)</span>: @trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))<br>
-*@
+        @commonCard(){
+            <div>
+                <span class="headerFontSize cmuk-text-bold">@trader.name</span>
+            </div>
+        }{
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel red">@Messages(constants.Form.TRADER_ID)</div>
+                <div class="infoRowValue">@trader.id</div>
+            </div>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
+                <div class="infoRowValue">@trader.name</div>
+            </div>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel red">@Messages(constants.Form.ACCOUNT_ID)</div>
+                <div class="infoRowValue">@trader.accountID</div>
+            </div>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel red">@Messages(constants.Form.COMPLETION_STATUS)</div>
+                <div class="infoRowValue">@trader.completionStatus</div>
+            </div>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel red">@Messages(constants.Form.VERIFIED_STATUS)</div>
+                <div class="infoRowValue">@trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))</div>
+            </div>
+
         @if(trader.verificationStatus.getOrElse(false)) {
-            <div class="centerText">
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER.legend)</button>
+            <div class="centerText ">
+                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>
+                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER.legend)</button>
             </div>
         }
-        </div>
+        }
     </div>
-    
+
 }
     </div>
 </div>

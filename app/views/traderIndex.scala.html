@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.{Organization, Zone}
 @import views.html.base.common
-
+@import views.html.base.commonCard
 @(totalFiat: Int, zone: Zone, organization: Organization, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
@@ -10,22 +10,41 @@
     <div>
         <div id="commonHome"></div>
     </div>
-    <ul cmuk-accordion="multiple: true" class="flexContainer">
-        <li>
-            <a class="cmuk-accordion-title" href="#">@Messages(constants.Form.ZONE):</a>
-            <div class="cmuk-accordion-content">
-                <div id="organization">
-                </div>
-              </div>
-        </li>
-        <li>
-            <a class="cmuk-accordion-title" href="#">@Messages(constants.Form.ORGANIZATION):</a>
-            <div class="cmuk-accordion-content">
-                <div id="zone">
+
+    <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+        @commonCard() {
+            <div>
+                <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ORGANIZATION)</span>
+            </div>
+            <div class="cmuk-inline">
+                <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
+                <div id="Edit" class="Editdropdown">
+                    <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
+                    <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
                 </div>
             </div>
-        </li>
-    </ul>
+        }{
+            <div id="organization"></div>
+        }
+        </div>
+        <div class="cmuk-width-expand@@m">
+        @commonCard() {
+            <div>
+                <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ZONE)</span>
+            </div>
+            <div  class="cmuk-inline">
+                <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
+                <div id="Edit"  class="Editdropdown">
+                    <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
+                    <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
+                </div>
+            </div>
+        }{
+            <div id="zone"></div>
+        }
+        </div>
+    </div>
      <ul cmuk-accordion class="flexContainer">
          <li>
              <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.Form.ASSETS_OWNED)</a>
@@ -33,7 +52,7 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.issueAsset) {
-                                <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
+                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
                             }
                         }
                         case _ => {}

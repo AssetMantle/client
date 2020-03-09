@@ -1,6 +1,9 @@
 @(mnemonic: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="MnemonicQuiz">
-    <span class="titleMnemonic">@Messages(constants.Form.PLEASE_BACKUP_THIS_MNEMONIC)</span><br/>
+    <legend class="cmuk-legend cmuk-text-center">
+        @Messages(constants.Form.PLEASE_BACKUP_THIS_MNEMONIC)
+    </legend>
+    <hr>
     <div class="cmuk-flex verifyMnemonic">@for((str, i) <- mnemonic.split(" ").zipWithIndex) {
         <div class="verifyMnemonicbutton">
             <input type="text" id="mnemonicElement-@i" name="mnemonicElement-@i" placeholder="Fill this..." class="cmuk-input" value="@str" readonly>

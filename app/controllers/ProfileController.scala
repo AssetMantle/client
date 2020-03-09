@@ -21,7 +21,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val module: String = constants.Module.CONTROLLERS_PROFILE
 
-  def identificationDocument = withLoginAction.authenticated { implicit loginState =>
+  def identificationDocument: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       for {
@@ -30,7 +30,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       } yield result
   }
 
-  def identificationForm = withLoginAction.authenticated { implicit loginState =>
+  def identificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
 
@@ -68,7 +68,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def identificationDetails = withLoginAction.authenticated { implicit loginState =>
+  def identificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)

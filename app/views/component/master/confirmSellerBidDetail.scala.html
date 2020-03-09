@@ -4,7 +4,7 @@
 
 @(confirmSellerBidDetailForm: Form[ConfirmSellerBidDetail.Data] = ConfirmSellerBidDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_SELLER_BID_DETAIL, confirmSellerBidDetailForm) {
-    @commonInputText(confirmSellerBidDetailForm, constants.FormField.REQUEST_ID, 'class -> "hidden", 'readonly -> true, 'required -> false)
+    @commonInputText(confirmSellerBidDetailForm, constants.FormField.REQUEST_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> false)
     @commonInputText(confirmSellerBidDetailForm, constants.FormField.BUYER_ADDRESS)
     @commonInputInt(confirmSellerBidDetailForm, constants.FormField.BID)
     @commonInputText(confirmSellerBidDetailForm, constants.FormField.PEG_HASH)

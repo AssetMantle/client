@@ -3,6 +3,7 @@ package constants
 
 import controllers.routes
 import play.api.routing.JavaScriptReverseRoute
+import play.api.mvc.Results
 
 
 object Response {
@@ -120,6 +121,7 @@ object Response {
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
   val UNVERIFIED_IDENTIFICATION = new Failure("UNVERIFIED_IDENTIFICATION")
+  val SFTP_SCHEDULER_FAILED = new Failure("SFTP_SCHEDULER_FAILED")
   val INVITATION_EMAIL_ALREADY_SENT =  new Failure("INVITATION_EMAIL_ALREADY_SENT")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
@@ -141,5 +143,4 @@ object Response {
     val message: String = PREFIX + INFO_PREFIX + response
     val action: String = utilities.String.getJsRouteString(actionController)
   }
-
 }

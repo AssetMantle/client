@@ -9,28 +9,12 @@
     <tr>
         <th>@Messages(constants.Form.NAME)</th>
         <th>@Messages(constants.Form.ZONE_ID)</th>
-        <th>@Messages(constants.Form.CURRENCY)</th>
-        <th>@Messages(constants.FormField.ADDRESS_LINE_1.name)</th>
-        <th>@Messages(constants.FormField.ADDRESS_LINE_2.name)</th>
-        <th>@Messages(constants.FormField.LANDMARK.name)</th>
-        <th>@Messages(constants.FormField.CITY.name)</th>
-        <th>@Messages(constants.FormField.COUNTRY.name)</th>
-        <th>@Messages(constants.FormField.ZIP_CODE.name)</th>
-        <th>@Messages(constants.Form.PHONE)</th>
         <th>@Messages(constants.Form.COMPLETION_STATUS)</th>
         <th>@Messages(constants.Form.VERIFIED_STATUS)</th>
     </tr>
     <tr>
         <td> @zone.name</td>
         <td> @zone.id </td>
-        <td>@zone.currency</td>
-        <td>@zone.address.addressLine1</td>
-        <td>@zone.address.addressLine2</td>
-        <td>@zone.address.landmark.getOrElse("")</td>
-        <td>@zone.address.city</td>
-        <td>@zone.address.country</td>
-        <td>@zone.address.zipCode</td>
-        <td>@zone.address.phone </td>
         <td>@zone.completionStatus</td>
         <td>@zone.verificationStatus.getOrElse(false)</td>
     </tr>

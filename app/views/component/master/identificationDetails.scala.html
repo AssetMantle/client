@@ -5,22 +5,43 @@
 
 @import models.master.Identification
 @(accountKYC: Option[AccountKYC],identification: Option[Identification])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div>
-    @commonCard() {
-        <h>@Messages(constants.View.ID_PROOF)</h>
-    }{
+
         @identification match{
             case Some(identification)=>{
-                <p>@Messages(constants.Form.NAME): <span>@identification.firstName @identification.lastName</span></p>
-                <p>@Messages(constants.Form.DATE_OF_BIRTH): <span>@identification.dateOfBirth</span></p>
-                <p>@Messages(constants.Form.ID_NUMBER): <span>@identification.idNumber</span></p>
-                <p>@Messages(constants.Form.ID_TYPE): <span>@identification.idType</span></p>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
+                    <div class="infoRowValue">@identification.firstName @identification.lastName</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.DATE_OF_BIRTH)</div>
+                    <div class="infoRowValue">@identification.dateOfBirth</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_NUMBER)</div>
+                    <div class="infoRowValue">@identification.idNumber</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_TYPE)</div>
+                    <div class="infoRowValue">@identification.idType</div>
+                </div>
             }
             case None=>{
-                <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
-                <p>@Messages(constants.Form.DATE_OF_BIRTH): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
-                <p>@Messages(constants.Form.ID_NUMBER): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
-                <p>@Messages(constants.Form.ID_TYPE): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.DATE_OF_BIRTH)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_NUMBER)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_TYPE)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
             }
         }
 
@@ -31,15 +52,12 @@
                 } {
                     <a href="@routes.FileController.getAccountKYCFile(file.fileName,file.documentType)">@Messages(file.documentType)</a>
                 } {
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPDATE_IDENTIFICATION) </button>
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPDATE_IDENTIFICATION) </button>
                 }
             }
             case None=>{
-                <div class="centerText">
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
+                <div>
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
                 </div>
             }
         }
-
-    }
-</div>

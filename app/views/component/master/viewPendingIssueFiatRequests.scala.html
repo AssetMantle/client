@@ -1,18 +1,25 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.IssueFiatRequest
-
+@import views.html.base._
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
+@if(issueFiatRequests.length == 0){
+    <spa>No Requests Found</spa>
+}
 @for(issueFiatRequest <- issueFiatRequests) {
-    <div class="col-md-4">
-        <br>
-        <div class="flexItem card-body leftText lightBlue">
+    <div>
+    @commonCard(){
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@issueFiatRequest.accountID</span>
+        </div>
+    }{
+        <div>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @issueFiatRequest.accountID <br>
             <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span>: @issueFiatRequest.transactionID <br>
             <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span>: @issueFiatRequest.transactionAmount <br>
-          <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
-          <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
+            <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
+    }
+
     </div>
-    <br>
 }

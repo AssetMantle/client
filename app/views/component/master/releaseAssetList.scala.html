@@ -1,17 +1,18 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Asset
-
+@import views.html.base._
 @(releaseAssetList: Seq[Asset])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(releaseAsset <- releaseAssetList) {
-    <div class="col-md-3">
-        <br>
-        <div class="flexItem card-body lightBlue">
-            <div class="leftText">
-                <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span>: @releaseAsset.ownerAddress <br>
-                <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @releaseAsset.pegHash <br>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
-            </div>
-        </div>
-    </div>
+   <div>
+   @commonCard(){
+       <div>
+           <span class="headerFontSize cmuk-text-bold">@releaseAsset.ownerAddress</span>
+       </div>
+   }{
+           <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span>: @releaseAsset.ownerAddress <br>
+           <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @releaseAsset.pegHash <br>
+           <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
+   }
+   </div>
 }

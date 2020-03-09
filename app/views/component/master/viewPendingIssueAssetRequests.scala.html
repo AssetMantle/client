@@ -5,10 +5,14 @@
 @(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
-@for(issueAssetRequest <- issueAssetRequests) {
-    @commonCard() {
-        @issueAssetRequest.id
-    }{
+        @if(issueAssetRequests.length == 0){
+            <spa>No Requests Found</spa>
+        }
+        @for(issueAssetRequest <- issueAssetRequests) {
+            <div>
+            @commonCard() {
+                @issueAssetRequest.id
+            }{
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@issueAssetRequest.accountID <br>
             <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span>: @issueAssetRequest.documentHash <br>
             <span class="red">@Messages(constants.Form.ASSET_TYPE)</span>: @issueAssetRequest.assetType <br>
@@ -29,10 +33,11 @@
             <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @issueAssetRequest.shipmentDetails.shipmentDate <br>
           <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity, '@issueAssetRequest.takerAddress'))">@Messages(constants.Form.APPROVE)</button>
           <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
-    <div id = "assetDocuments@issueAssetRequest.id">
-        <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
-    </div>
+            <div id = "assetDocuments@issueAssetRequest.id">
+                <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
+            </div>
         }
+    </div>
 }
     </div>
 </div>

@@ -4,17 +4,17 @@
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard() {
-    <ul uk-tab="connect: #component-tab-doc; animation: uk-animation-fade">
-        <li class="uk-active first"><a href="#">documents</a></li>
+    <ul cmuk-tab="connect: #component-tab-doc; animation: cmuk-animation-fade">
+        <li class="cmuk-active first"><a href="#">documents</a></li>
         <li><a href="#">Upload History</a></li>
     </ul>
 } {
-        <ul id="component-tab-doc" class="uk-switcher">
+        <ul id="component-tab-doc" class="cmuk-switcher">
             <li>
                 <ul class="documentlist">
                     <li class="documetnone">
 
-                        <table class="table-scroll small-first-col uk-table uk-table-divider">
+                        <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
 
                             <tbody>
 
@@ -24,10 +24,10 @@
                                     </td>
                                     <td class="seenIcon"><img src="./images/icons/seenIcon.svg"></td>
                                     <td class="preview">
-                                        <a class="uk-text-bold uk-text-success" href="./pdfs/1.pdf" target="iframe_a">E-Signed
+                                        <a class="cmuk-text-bold cmuk-text-success" href="./pdfs/1.pdf" target="iframe_a">E-Signed
                                         </a>
                                     </td>
-                                    <td class="moreIcon"><span uk-icon="more-vertical"></span></td>
+                                    <td class="moreIcon"><span cmuk-icon="more-vertical"></span></td>
                                 </tr>
 
                             </tbody>

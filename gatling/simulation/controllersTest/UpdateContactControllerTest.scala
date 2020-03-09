@@ -21,7 +21,7 @@ object updateContactControllerTest {
     .feed(CountryCodeFeeder.countryCodeFeed)
     .exec(http("UpdateContact_GET")
       .get(routes.ContactController.updateContactForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.UPDATE_CONTACT.legend)).exists)
+      .check(css("legend:contains(%s)".format("Update Contact")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("UpdateContact_POST")
