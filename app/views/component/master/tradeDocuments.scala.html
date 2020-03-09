@@ -1,0 +1,40 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard() {
+    <ul uk-tab="connect: #component-tab-doc; animation: uk-animation-fade">
+        <li class="uk-active first"><a href="#">documents</a></li>
+        <li><a href="#">Upload History</a></li>
+    </ul>
+} {
+        <ul id="component-tab-doc" class="uk-switcher">
+            <li>
+                <ul class="documentlist">
+                    <li class="documetnone">
+
+                        <table class="table-scroll small-first-col uk-table uk-table-divider">
+
+                            <tbody>
+
+                                <tr>
+                                    <td class="docIcon"> <img src="./images/icons/docIcon.svg">
+                                        Contract.pdf
+                                    </td>
+                                    <td class="seenIcon"><img src="./images/icons/seenIcon.svg"></td>
+                                    <td class="preview">
+                                        <a class="uk-text-bold uk-text-success" href="./pdfs/1.pdf" target="iframe_a">E-Signed
+                                        </a>
+                                    </td>
+                                    <td class="moreIcon"><span uk-icon="more-vertical"></span></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </li>
+                </ul>
+            </li>
+            <li>Empty</li>
+        </ul>
+}

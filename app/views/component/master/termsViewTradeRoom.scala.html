@@ -1,0 +1,129 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.SalesQuote
+
+@(salesQuote:SalesQuote)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+                <div class="traderCommodity">
+                    <span class="commodityImage"><img src="./images/icons/ironIcon.svg"></span><span class="tradeName">@salesQuote.assetType</span>
+                </div>
+                <div class="cmuk-flex tradeTermsData">
+                    <p class="cmuk-margin-remove">TRADE TERMS</p>
+                    <p class="cmuk-margin-remove">BUYER ACCEPTENCE</p>
+                </div>
+                <div class="terms">
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">1</span><span class="termIcon">&#x2637;</span><span class="termName">DESCRIPTION</span>
+                        </div>
+                        <div>
+                            <span class="termValue">“Commodity Description goes here”</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">2</span><span class="termIcon">&#x2637;</span><span class="termName">QUANTITY</span>
+                        </div>
+                        <div>
+                            <span class="termValue">@salesQuote.assetQuantity</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">3</span><span class="termIcon">&#x2637;</span><span class="termName">CONTRACT PRICE</span>
+                        </div>
+                        <div>
+                            <span class="termValue">$@salesQuote.assetPrice</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">4</span><span class="termIcon">&#x2637;</span><span class="termName">SHIPMENT PERIOD</span>
+                        </div>
+                        <div>
+                            <span class="termValue">@salesQuote.shippingDetails.get.shippingPeriod Days</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">5</span><span class="termIcon">&#x2637;</span><span class="termName">LOAD PORT</span>
+                        </div>
+                        <div>
+                            <span class="termValue">@salesQuote.shippingDetails.get.portOfLoading</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">6</span><span class="termIcon">&#x2637;</span><span class="termName">DISCHARGE PORT</span>
+                        </div>
+                        <div>
+                            <span class="termValue">@salesQuote.shippingDetails.get.portOfDischarge</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">7</span><span class="termIcon">&#x2637;</span><span class="termName">ADVANCE PAYMENT?</span>
+                        </div>
+                        <div>
+                            <span class="termValue">
+                                @if(salesQuote.paymentTerms.get.advancePayment){
+                                    YES (@salesQuote.paymentTerms.get.advancePercentage %)
+                                }else{
+                                    NO
+                                }
+                              </span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <div class="term">
+                        <div >
+                            <div>
+                                <span class="serialNumber">8</span><span class="termIcon">&#x2637;</span><span class="termName">CREDIT TERMS</span>
+                            </div>
+                            <div class="creditTerms">
+                                @if(salesQuote.paymentTerms.get.tentativeDate.isEmpty){
+                                    <p>Tenure days - <span class="cmuk-text-bold">@salesQuote.paymentTerms.get.tenure Days</span></p>
+                                    <p>Refrence - <span class="cmuk-text-bold">@salesQuote.paymentTerms.get.refrence</span></p>
+                                }else{
+                                    <p>Tentative Date - <span class="cmuk-text-bold">@salesQuote.paymentTerms.get.tentativeDate</span></p>
+                                }
+                                <p>Tenure days - <span class="cmuk-text-bold">30 Days</span></p>
+                                <p>Refrence - <span class="cmuk-text-bold">30 Days</span></p>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="termValue">Financed</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="term">
+                        <div>
+                            <span class="serialNumber">9</span><span class="termIcon">&#x2637;</span><span class="termName">BILL OF EXCHANGE REQUIRED? </span>
+                        </div>
+                        <div>
+                            <span class="termValue">YES</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <div class="term">
+                        <div>
+                            <div>
+                                <span class="serialNumber">10</span><span class="termIcon">&#x2637;</span><span class="termName">PRIMARY DOCUMENTS</span>
+                            </div>
+
+                            <div class="creditTerms">
+                                <p>INSURANCE POLICY<span>(Insurance_policy.pdf)</span></p>
+                                <p>BL <span>(BL_doc.pdf)</span></p>
+                                <p>INVOICE <span>(Invoice_doc.pdf)</span></p>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="termValue"></span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+
+

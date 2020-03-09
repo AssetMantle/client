@@ -858,4 +858,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+  def getTradeDocument(fileName:String, documentType:String)=withTraderLoginAction.authenticated{implicit loginState =>
+    implicit request =>
+    val path= fileResourceManager.getTraderKYCFilePath(documentType)
+    Future(Ok.sendFile(utilities.FileOperations.fetchFile(path=path, fileName = fileName)))
+  }
 }

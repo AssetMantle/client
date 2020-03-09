@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+
+@(fileName:String,documentType:String)
+
+<iframe src="@routes.FileController.getTradeDocument(fileName, documentType)" style="width: 100%;height: 100%;border: none;"></iframe>
+
+<li>
+    <div class="documentcontainer" id="documentcontainer" class="cmuk-animation-fade">
+        <div class="documentcontainerbutton">
+            <button class="cmuk-button-default cmuk-button">Shared with Buyer</button>
+        </div>
+        <iframe src="https://research.google.com/pubs/archive/44678.pdf" name="iframe_a" width="100%" height="600px"></iframe>
+    </div>
+</li>

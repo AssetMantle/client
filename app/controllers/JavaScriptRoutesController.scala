@@ -256,6 +256,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.sellerFeedbackList,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
+        routes.javascript.TradeRoomController.tradeTerms,
+        routes.javascript.TradeRoomController.tradeFinancials,
+        routes.javascript.TradeRoomController.documentList,
+        routes.javascript.TradeRoomController.documentView,
+        routes.javascript.TradeRoomController.recentActivity,
+
+
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
 
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,

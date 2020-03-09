@@ -1,0 +1,57 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard{
+    <span>Recent Activity</span>
+
+}{
+    <div id="timeline">
+        <div class="timeline-item">
+            <div class="timeline-icon">
+                <img src="./images/icons/contractIcon.svg" alt="">
+            </div>
+            <div class="timeline-content right">
+                <p class="uk-margin-remove">Seller generated Contract document
+                </p>
+                <span>5 hours ago</span>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-icon">
+                <img src="./images/icons/acceptIcon.svg" alt="">
+            </div>
+            <div class="timeline-content right">
+                <p class="uk-margin-remove">
+                    Buyer Accepted all Trade Terms
+                </p>
+                <span>5 hours ago</span>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-icon">
+                <img src="./images/icons/contractIcon.svg" alt="">
+            </div>
+            <div class="timeline-content right">
+                <p class="uk-margin-remove">Seller generated Contract document
+                </p>
+                <span>5 hours ago</span>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-icon">
+                <img src="./images/icons/acceptIcon.svg" alt="">
+            </div>
+            <div class="timeline-content right">
+                <p class="uk-margin-remove">
+                    Buyer Accepted all Trade Terms
+                </p>
+                <span>5 hours ago</span>
+            </div>
+        </div>
+    </div>
+
+}
