@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class TradeRoom(id: String, salesQuoteID: String, buyerID: String, sellerID: String, financierID: String)
+case class TradeRoom(id: String, salesQuoteID: String)
 
 @Singleton
 class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -63,21 +63,15 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class TradeRoomTable(tag: Tag) extends Table[TradeRoom](tag, "TradeRoom") {
 
-    def * = (id, salesQuoteID, buyerID, sellerID, financierID) <> (TradeRoom.tupled, TradeRoom.unapply)
+    def * = (id, salesQuoteID) <> (TradeRoom.tupled, TradeRoom.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def salesQuoteID = column[String]("salesQuoteID")
-
-    def buyerID = column[String]("buyerID")
-
-    def sellerID = column[String]("sellerID")
-
-    def financierID = column[String]("financierID")
   }
 
   object Service {
-    def create(salesQuoteID: String, buyerID: String, sellerID: String, financierID: String): Future[String] = {add(TradeRoom(id = utilities.IDGenerator.hexadecimal, salesQuoteID = salesQuoteID, buyerID = buyerID, sellerID = sellerID, financierID = financierID))}
+    def create(salesQuoteID: String): Future[String] = {add(TradeRoom(id = utilities.IDGenerator.hexadecimal, salesQuoteID = salesQuoteID))}
 
   //    def get()
   }

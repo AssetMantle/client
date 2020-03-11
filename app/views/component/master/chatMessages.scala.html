@@ -1,0 +1,45 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.SendChat
+@import models.masterTransaction.Chat
+@import models.masterTransaction.ChatReceive
+@import views.html.component.master.sendChat
+
+@(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+<div id="chatCointainer" class="chatContainer">
+    @for(chat <- chats) {
+
+        @if(chat.fromAccountID == loginState.username) {
+            <li class="chat sender cmuk-text-right">
+                @chat.replyToID match {
+                    case Some(replyToChatID) => {
+                        <a onclick="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))">here</a>
+                    }
+                    case None => {}
+                }
+                @chat.fromAccountID : @chat.message
+            </li>
+        } else {
+            @* unread bar for viewer logic here _.chatid == chatid, to account == loginstate, read at time ==nondefining, show unread messages.*@
+            <li class="chat receiver cmuk-text-left">
+            @chat.replyToID match {
+                case Some(replyToChatID) => {
+                    @Messages("This is reply to some chat")
+                    <li onload="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))"></li>
+                }
+                case None => {}
+            }
+            @chat.fromAccountID : @chat.message
+            @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0){
+                <span class="unreadMessage">@Messages("UNREAD")</span>
+            }
+            </li>
+        }
+        <button onclick="replyButton('@chat.id')">@Messages("REPLY")</button>
+    }
+    @if(chats.length > 0) {
+        <div class = "chat loadMoreButton"> <a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+    }
+
+</div>

@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(tradeRoomID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
@@ -8,16 +8,18 @@
 
 }
 
-@center = {
-@*    terms view and docs view go here *@
+@right = {
+    @*    recent activity and chat go here*@
+
 }
 
-@right = {
-@*    recent activity and chat go here*@
+@center = {
+    @*    terms view and docs view go here *@
+
     <div>
         <div id="chatRoom"></div>
     </div>
     <script>
-            componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom("chatRoomData.tradeRoomID", 0));
+            componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom('@tradeRoomID'));
     </script>
 }

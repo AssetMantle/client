@@ -1,40 +1,5 @@
-// $('#notificationBadge').ready(function () {
-//     const route = jsRoutes.controllers.NotificationController.unreadNotificationCount();
-//     const notificationBadge = $('#notificationBadge');
-//     notificationBadge.html('0');
-//     $.ajax({
-//         url: route.url,
-//         type: route.type,
-//         async: true,
-//         statusCode: {
-//             200: function (data) {
-//                 notificationBadge.html(data);
-//             },
-//             204: function (data) {
-//             },
-//             401: function (data) {
-//             }
-//         }
-//     });
-// });
-//
-// function markNotificationRead(target, accountID) {
-//     let route = jsRoutes.controllers.NotificationController.markNotificationRead(accountID);
-//     $.ajax({
-//         url: route.url,
-//         type: route.type,
-//         async: true,
-//         statusCode: {
-//             200: function (data) {
-//                 $(target).addClass("read");
-//                 $('#notificationBadge').html(data);
-//             }
-//         }
-//     });
-// }
-
-function loadMoreChats() {
-    const route = jsRoutes.controllers.TradeRoomController.chatRoom("chatRoomData.tradeRoomID",($(".chatContainer").length));
+function loadMoreChats(chatWindowID) {
+    const route = jsRoutes.controllers.TradeRoomController.chatWindow(chatWindowID, ($(".chatContainer").length));
     $.ajax({
         url: route.url,
         type: route.type,
@@ -75,9 +40,11 @@ function submitChat(source, target = '#chatContainer') {
                 },
                 200: function (data) {
                     const loadMore = $(".chatContainer .chat:first");
-                    loadMore.before(data);
+                    console.log(data);
+                    loadMore.before('<li class="chat sender cmuk-text-right">' + data.fromAccountID + ':' + data.message + '</li>');
                     loadMore.remove();
-                    $('#CHAT_CONTENT').empty();
+                    $("#MESSAGE").val("");
+
                 },
             }
         }).fail(function (XMLHttpRequest) {
@@ -86,4 +53,51 @@ function submitChat(source, target = '#chatContainer') {
             }
         });
     }
+}
+
+function replyButton(replyToChatID) {
+    // the animation login here
+    $("#REPLY_TO_CHAT").val(replyToChatID);
+}
+
+function markChatRead(route) {
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                //add the persons name in read list
+            },
+            401: function (data) {
+                replaceDocument(data.responseText);
+
+            },
+            500: function (data) {
+                replaceDocument(data.responseText);
+            }
+        }
+    });
+}
+
+function replyMessage(source, route) {
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                //add the reply data..
+                console.log(data.message);
+                $(source).html(data.message);
+            },
+            401: function (data) {
+                replaceDocument(data.responseText);
+
+            },
+            500: function (data) {
+                replaceDocument(data.responseText);
+            }
+        }
+    });
 }

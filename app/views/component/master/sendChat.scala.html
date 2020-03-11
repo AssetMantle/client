@@ -6,7 +6,6 @@
 @import views.html.helper.CSRF
 @(sendChatForm: Form[SendChat.Data] = SendChat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-
 @form(action = constants.Form.SEND_CHAT.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         <legend class="cmuk-legend">
@@ -15,9 +14,9 @@
         <hr>
         @CSRF.formField
 
-        @commonInputText(sendChatForm, constants.FormField.TRADE_ROOM_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
-        @commonInputText(sendChatForm, constants.FormField.CHAT_CONTENT)
-        @commonCheckbox(sendChatForm, constants.FormField.FINANCIER_VISIBILITY)
+        @commonInputText(sendChatForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
+        @commonInputText(sendChatForm, constants.FormField.MESSAGE)
+        @commonInputText(sendChatForm, constants.FormField.REPLY_TO_CHAT,'containerDivClass -> "hidden", 'required -> false)
 
         @if(sendChatForm.hasGlobalErrors) {
             <ul class="signupErrorList">

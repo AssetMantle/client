@@ -96,7 +96,10 @@ object FormField {
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
   val TRADE_ROOM_ID = new StringFormField("TRADE_ROOM_ID", 2, 100)
-  val CHAT_CONTENT = new StringFormField("CHAT_CONTENT", 0, 100)
+  val MESSAGE = new StringFormField("MESSAGE", 1, 160)
+  val REPLY_TO_CHAT = new StringFormField("REPLY_TO_CHAT", 2, 100)
+  val CHAT_WINDOW_ID = new StringFormField("CHAT_WINDOW_ID", 2, 100)
+
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)

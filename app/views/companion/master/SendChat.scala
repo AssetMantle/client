@@ -1,17 +1,18 @@
 package views.companion.master
 
+import constants.FormField
 import play.api.data.Form
 import play.api.data.Forms._
 
 object SendChat {
   val form = Form(
     mapping(
-      constants.FormField.TRADE_ROOM_ID.name -> constants.FormField.TRADE_ROOM_ID.field,
-      constants.FormField.CHAT_CONTENT.name -> constants.FormField.CHAT_CONTENT.field,
-      constants.FormField.FINANCIER_VISIBILITY.name -> constants.FormField.FINANCIER_VISIBILITY.field,
+      constants.FormField.CHAT_WINDOW_ID.name -> constants.FormField.CHAT_WINDOW_ID.field,
+      constants.FormField.MESSAGE.name -> constants.FormField.MESSAGE.field,
+      constants.FormField.REPLY_TO_CHAT.name -> optional(FormField.REPLY_TO_CHAT.field),
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(tradeRoomID: String, chatContent:String, financierVisibility: Boolean)
+  case class Data(chatWindowID: String, message:String, replyToID: Option[String])
 
 }
