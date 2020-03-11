@@ -1,12 +1,12 @@
 function loadMoreChats(chatWindowID) {
-    const route = jsRoutes.controllers.TradeRoomController.chatWindow(chatWindowID, ($(".chatContainer").length));
+    const route = jsRoutes.controllers.TradeRoomController.loadMoreChats(chatWindowID, ($(".chatContainer").length));
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
-                const loadMore = $(".chatContainer .chat:last");
+                const loadMore = $(".chatContainer .chat:first");
                 loadMore.before(data);
                 loadMore.remove();
             }
@@ -39,9 +39,9 @@ function submitChat(source, target = '#chatContainer') {
                     result.prepend(data.responseText);
                 },
                 200: function (data) {
-                    const loadMore = $(".chatContainer .chat:first");
+                    const loadMore = $(".chatContainer .chat:last");
                     console.log(data);
-                    loadMore.before('<li class="chat sender cmuk-text-right">' + data.fromAccountID + ':' + data.message + '</li>');
+                    loadMore.after('<li class="chat sender cmuk-text-right">' + data.fromAccountID + ':' + data.message + '</li>');
                     loadMore.remove();
                     $("#MESSAGE").val("");
 

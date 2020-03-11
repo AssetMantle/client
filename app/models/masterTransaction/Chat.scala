@@ -3,28 +3,47 @@ package models.masterTransaction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 
-import play.api.libs.json.{Json, OWrites, Reads}
+import scala.concurrent.duration._
+import actors.{MainChatActor, ShutdownActor}
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
+import play.api.libs.json.{JsString, JsValue, Json, OWrites, Reads, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Chat(id: String, fromAccountID: String, chatWindowID: String, message: String, replyToID: Option[String], createdAt: Timestamp)
 
+case class ChatCometMessage(username: String, message: JsValue)
+
 @Singleton
-class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_CHAT
+  private val logger: Logger = Logger(this.getClass)
+
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  implicit val timeWrites = new Writes[Timestamp] {
+    override def writes(t: Timestamp): JsValue = JsString(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(t))
+  }
+  implicit val chatWrites: OWrites[Chat] = Json.writes[Chat]
+
+  val mainChatActor: ActorRef = actorSystem.actorOf(props = MainChatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_CHAT)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -121,6 +140,15 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getChatIDs(chatWindowID: String): Future[Seq[String]] = findAllChatIDsByChatWindowID(chatWindowID)
 
+    def chatCometSource(username: String) = {
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_CHAT, username)
+      Thread.sleep(cometActorSleepTime)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainChatActor ! actors.CreateChatChildActorMessage(username = username, actorRef = systemUserActor)
+      source
+    }
+
+    def sendMessageToChatActors(participants: Seq[String], chat: Chat): Unit = participants.foreach(x => mainChatActor ! ChatCometMessage(x, Json.toJson(chat)))
   }
 
 }

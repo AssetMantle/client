@@ -4,58 +4,27 @@
 @import models.masterTransaction.Chat
 @import models.masterTransaction.ChatReceive
 @import views.html.component.master.sendChat
+@import views.html.component.master.chatMessages
 
 @(sendChatForm: Form[SendChat.Data] = SendChat.form, chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-<div id="chatCointainer" class="chatContainer">
-    @for(chat <- chats) {
-
-        @if(chat.fromAccountID == loginState.username) {
-            <li class="chat sender cmuk-text-right">
-                @chat.replyToID match {
-                    case Some(replyToChatID) => {
-                        <a onclick="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))">here</a>
-                    }
-                    case None => {}
-                }
-                @chat.fromAccountID : @chat.message
-            </li>
-        } else {
-            @* unread bar for viewer logic here _.chatid == chatid, to account == loginstate, read at time ==nondefining, show unread messages.*@
-            <li class="chat receiver cmuk-text-left">
-            @chat.replyToID match {
-                case Some(replyToChatID) => {
-                    @Messages("This is reply to some chat")
-                    <li onload="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))"></li>
-                }
-                case None => {}
-            }
-            @chat.fromAccountID : @chat.message
-             @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0){
-                <span class="unreadMessage">@Messages("UNREAD")</span>
-            }
-            </li>
-        }
-        <button onclick="replyButton('@chat.id')">@Messages("REPLY")</button>
-    }
-    @if(chats.length > 0) {
-        @* write the markchat read logic here*@
-        @if(readChats.filter(x => x.chatID != chats.head.id && x.toAccountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username){
+@chatMessages(chats, readChats, chatWindowID)
+@if(chats.length > 0) {
+    @* write the markchat read logic here*@
+    @if(readChats.filter(x => x.chatID != chats.head.id && x.toAccountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
         <a onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatWindowID'))">@Messages("MARK_AS_READ")</a>
-        }
-        <div>@Messages("READ_BY") : @readChats.filter(_.chatID == chats.head.id).map(_.toAccountID).mkString</div>
-        <div class = "chat loadMoreButton"> <a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
     }
+    <div>@Messages("READ_BY") : @readChats.filter(_.chatID == chats.head.id).map(_.toAccountID).mkString</div>
+}
 
-</div>
 <div class="chatform">
 @sendChat(sendChatForm)
 </div>
 <script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>
 <script type="text/javascript">
-        var cometMessage = function (event) {
+        var chatCometMessage = function (event) {
             console.log('Received event: ' + event);
-
+            componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatWindowID', 0));
         }
 </script>
 

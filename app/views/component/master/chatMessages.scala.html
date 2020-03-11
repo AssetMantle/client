@@ -8,7 +8,8 @@
 @(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 <div id="chatCointainer" class="chatContainer">
-    @for(chat <- chats) {
+    <div class = "chat loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+    @for(chat <- chats.reverse) {
 
         @if(chat.fromAccountID == loginState.username) {
             <li class="chat sender cmuk-text-right">
@@ -31,15 +32,11 @@
                 case None => {}
             }
             @chat.fromAccountID : @chat.message
-            @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0){
+            @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
                 <span class="unreadMessage">@Messages("UNREAD")</span>
             }
             </li>
         }
         <button onclick="replyButton('@chat.id')">@Messages("REPLY")</button>
     }
-    @if(chats.length > 0) {
-        <div class = "chat loadMoreButton"> <a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
-    }
-
 </div>

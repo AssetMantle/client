@@ -346,10 +346,11 @@ POST        /master/setSellerFeedback                                    control
 GET         /master/tradeRoom                                            controllers.TradeRoomController.tradeRoom
 GET         /master/tradeRoom/chatRoom                                   controllers.TradeRoomController.chatRoom(tradeRoomID: String)
 GET         /master/tradeRoom/chatWindow                                 controllers.TradeRoomController.chatWindow(chatWindowID: String ,pageNumber: Int)
+GET         /master/tradeRoom/loadMoreChats                              controllers.TradeRoomController.loadMoreChats(chatWindowID: String ,pageNumber: Int)
 POST        /master/tradeRoom/sendChat                                   controllers.TradeRoomController.sendChat
-GET        /master/tradeRoom/markChatAsRead                                   controllers.TradeRoomController.markChatAsRead(chatWindowID: String)
-GET        /master/tradeRoom/replyToChat                                   controllers.TradeRoomController.replyToChat(chatWindowID: String, chatID: String)
-GET        /master/tradeRoom/chatComet                                   controllers.TradeRoomController.sendChatComet(chatWindowID: String)
+GET         /master/tradeRoom/markChatAsRead                             controllers.TradeRoomController.markChatAsRead(chatWindowID: String)
+GET         /master/tradeRoom/replyToChat                                controllers.TradeRoomController.replyToChat(chatWindowID: String, chatID: String)
+GET         /master/tradeRoom/chatComet                                  controllers.TradeRoomController.sendChatComet(chatWindowID: String)
 
 POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
 POST        /wuRedirect                                                  controllers.WesternUnionController.westernUnionPortalRedirect

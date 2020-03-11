@@ -10,14 +10,15 @@ import models.master._
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import akka.actor.ActorSystem
+import actors.MainChatActor
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Source
 import play.api.http.ContentTypes
 import play.api.libs.Comet
 import play.api.libs.json._
 import play.api.mvc._
-import models.masterTransaction.{Chat, ChatReceive, ChatReceives, ChatWindow, ChatWindowParticipant, ChatWindowParticipants, ChatWindows, Chats}
+import models.masterTransaction.{Chat, ChatCometMessage, ChatReceive, ChatReceives, ChatWindow, ChatWindowParticipant, ChatWindowParticipants, ChatWindows, Chats}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.json.{JsString, JsValue, Json, OWrites, Reads, Writes}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -25,6 +26,7 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
 @Singleton
 class TradeRoomController @Inject()(messagesControllerComponents: MessagesControllerComponents,
@@ -135,6 +137,37 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       }
   }
 
+  // populates chatWindow in chatroom
+  //TODO: change LOGIN ACTIONS
+  def loadMoreChats(chatWindowID: String, pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val userIsParticipant = chatWindowParticipants.Service.checkUserInChatWindow(loginState.username, chatWindowID)
+
+      def getResult(userIsParticipant: Boolean): Future[Result] = {
+        if (userIsParticipant) {
+          val chatsInWindow = chats.Service.get(chatWindowID, pageNumber * chatsPerPage, chatsPerPage)
+
+          def readChats(chatIDs: Seq[String]): Future[Seq[ChatReceive]] = chatReceives.Service.getAllRead(chatIDs)
+
+          for {
+            chatsInWindow <- chatsInWindow
+            readChats <- readChats(chatsInWindow.map(_.id))
+            result <- withUsernameToken.Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatWindowID))
+          } yield result
+        } else {
+          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+        }
+      }
+
+      (for {
+        userIsParticipant <- userIsParticipant
+        result <- getResult(userIsParticipant)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   //send chat form
   //TODO: change LOGIN ACTIONS
   def sendChat(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -148,28 +181,21 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
           val chat = chats.Service.create(loginState.username, sendChatData.chatWindowID, sendChatData.message, sendChatData.replyToID)
           val participants = chatWindowParticipants.Service.getParticipants(sendChatData.chatWindowID)
 
-          def chatReceive(participants: Seq[String], chatID: String): Future[Unit] = {
+          def chatReceive(participants: Seq[String], chat: Chat): Future[Unit] = {
             Future(
               for (participant <- participants) {
-                val create = chatReceives.Service.create(chatID, participant)
-                def a(b: String) = Future(println(b))
-
-                for{
-                  create <- create
-                  _ <- a(create)
-                  _ <- a("lodalasun")
-                } yield Unit
+                val create = chatReceives.Service.create(chat.id, participant)
+                for {
+                  _ <- create
+                } yield chats.Service.sendMessageToChatActors(participants, chat)
               }
             )
           }
 
-          def a(b: String) = Future(println(b))
           (for {
             chat <- chat
             participants <- participants
-            _ <- a(chat.toString)
-            _<- a(participants.filter(_.accountID != loginState.username).map(_.accountID).mkString)
-            _ <- chatReceive(participants.filter(_.accountID != loginState.username).map(_.accountID), chat.id)
+            _ <- chatReceive(participants.filter(_.accountID != loginState.username).map(_.accountID), chat)
             result <- withUsernameToken.Ok(Json.toJson(chat))
           } yield result
             ).recover {
@@ -216,11 +242,11 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   //TODO: change LOGIN ACTIONS
   def sendChatComet(chatWindowID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+//      implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
-      def stringSource: Source[String, _] = Source(List("kiki", "foo", "bar"))
+//      def jsonSource: Source[JsValue, _] = Source(List(JsString("jsonString")))
 
-      Future(Ok.chunked(stringSource.via(Comet.string("parent.cometMessage"))).as(ContentTypes.HTML))
+      Future(Ok.chunked(chats.Service.chatCometSource(loginState.username).via(Comet.json("parent.chatCometMessage"))).as(ContentTypes.HTML))
   }
 
 }
