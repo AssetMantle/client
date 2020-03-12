@@ -31,7 +31,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       (for {
         tradeTerms <- tradeTerms
       } yield Ok(views.html.component.master.termsView(tradeTerms))
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -46,9 +46,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       Future(Ok(views.html.component.master.tradeDocumentList()))
   }
 
-  def documentView(fileName:String, documentType:String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def documentView(fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.tradeDocumentView(fileName,documentType)))
+      Future(Ok(views.html.component.master.tradeDocumentView(fileName, documentType)))
   }
 
   def recentActivity: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -61,25 +61,25 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       Future(Ok(views.html.component.master.chatRoom()))
   }
 
-  def updateTermStatus(tradeID:String,element:String,value:Boolean): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateTermStatus(tradeID: String, element: String, value: Boolean): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-     val updateStatus= element match {
-        case constants.View.DESCRIPTION=>masterTransactionTradeTerms.Service.updateAssetDescriptionStatus(tradeID,value)
-        case constants.View.QUANTITY=>masterTransactionTradeTerms.Service.updateAssetQuantityStatus(tradeID,value)
-        case constants.View.CONTRACT_PRICE=>masterTransactionTradeTerms.Service.updateAssetPriceStatus(tradeID,value)
-        case constants.View.SHIPMENT_PERIOD=>masterTransactionTradeTerms.Service.updateShipmentPeriodStatus(tradeID,value)
-        case constants.View.LOAD_PORT=>masterTransactionTradeTerms.Service.updatePortOfLoadingStatus(tradeID,value)
-        case constants.View.DISCHARGE_PORT=>masterTransactionTradeTerms.Service.updatePortOfDischargeStatus(tradeID,value)
-        case constants.View.ADVANCE_PAYMENT=>masterTransactionTradeTerms.Service.updateAdvancePaymentStatus(tradeID,value)
-        case constants.View.CREDIT_TERMS=>masterTransactionTradeTerms.Service.updateCreditTermsStatus(tradeID,value)
-        case constants.View.BILL_OF_EXCHANGE_REQUIRED=>masterTransactionTradeTerms.Service.updateBillOfExchangeRequiredStatus(tradeID,value)
-        case constants.View.PRIMARY_DOCUMENTS=>masterTransactionTradeTerms.Service.updatePrimaryDocumentsStatus(tradeID,value)
+      val updateStatus = element match {
+        case constants.View.DESCRIPTION => masterTransactionTradeTerms.Service.updateAssetDescriptionStatus(tradeID, value)
+        case constants.View.QUANTITY => masterTransactionTradeTerms.Service.updateAssetQuantityStatus(tradeID, value)
+        case constants.View.CONTRACT_PRICE => masterTransactionTradeTerms.Service.updateAssetPriceStatus(tradeID, value)
+        case constants.View.SHIPMENT_PERIOD => masterTransactionTradeTerms.Service.updateShipmentPeriodStatus(tradeID, value)
+        case constants.View.LOAD_PORT => masterTransactionTradeTerms.Service.updatePortOfLoadingStatus(tradeID, value)
+        case constants.View.DISCHARGE_PORT => masterTransactionTradeTerms.Service.updatePortOfDischargeStatus(tradeID, value)
+        case constants.View.ADVANCE_PAYMENT => masterTransactionTradeTerms.Service.updateAdvancePaymentStatus(tradeID, value)
+        case constants.View.CREDIT_TERMS => masterTransactionTradeTerms.Service.updateCreditTermsStatus(tradeID, value)
+        case constants.View.BILL_OF_EXCHANGE_REQUIRED => masterTransactionTradeTerms.Service.updateBillOfExchangeRequiredStatus(tradeID, value)
+        case constants.View.PRIMARY_DOCUMENTS => masterTransactionTradeTerms.Service.updatePrimaryDocumentsStatus(tradeID, value)
       }
-      (for{
-        _<-updateStatus
+      (for {
+        _ <- updateStatus
       } yield Ok
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

@@ -10,7 +10,7 @@ import java.sql.Date
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class TradeTerm(id: String, assetType:String, assetDescription: AssetDescription, assetQuantity: AssetQuantity, assetPrice:AssetPrice, shipmentPeriod: ShipmentPeriod, portOfLoading: PortOfLoading, portOfDischarge: PortOfDischarge, advancePayment: AdvancePayment, creditTerms:CreditTerms, billOfExchangeRequired:BillOfExchangeRequired, primaryDocuments: PrimaryDocuments)
+case class TradeTerm(id: String, assetType: String, assetDescription: AssetDescription, assetQuantity: AssetQuantity, assetPrice: AssetPrice, shipmentPeriod: ShipmentPeriod, portOfLoading: PortOfLoading, portOfDischarge: PortOfDischarge, advancePayment: AdvancePayment, creditTerms: CreditTerms, billOfExchangeRequired: BillOfExchangeRequired, primaryDocuments: PrimaryDocuments)
 
 case class AssetDescription(assetDescriptionValue: String, assetDescriptionStatus: Boolean)
 
@@ -24,13 +24,13 @@ case class PortOfLoading(portOfLoadingValue: String, portOfLoadingStatus: Boolea
 
 case class PortOfDischarge(portOfDischargeValue: String, portOfDischargeStatus: Boolean)
 
-case class AdvancePayment(advancePaymentValue: Boolean, advancePercentage:Option[Double],advancePaymentStatus: Boolean)
+case class AdvancePayment(advancePaymentValue: Boolean, advancePercentage: Option[Double], advancePaymentStatus: Boolean)
 
-case class CreditTerms(creditTermsValue:Boolean, tenure:Option[Int], tentativeDate:Option[Date], refrence:Option[String], creditTermsStatus:Boolean)
+case class CreditTerms(creditTermsValue: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String], creditTermsStatus: Boolean)
 
-case class BillOfExchangeRequired(billOfExchangeRequiredValue:Boolean, billOfExchangeRequiredStatus:Boolean)
+case class BillOfExchangeRequired(billOfExchangeRequiredValue: Boolean, billOfExchangeRequiredStatus: Boolean)
 
-case class PrimaryDocuments(obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String, primaryDocumentsStatus:Boolean)
+case class PrimaryDocuments(obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String, primaryDocumentsStatus: Boolean)
 
 @Singleton
 class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -70,7 +70,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateAssetDescriptionStatusByID(id: String,assetDescriptionStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetDescriptionStatus).update(assetDescriptionStatus).asTry).map {
+  private def updateAssetDescriptionStatusByID(id: String, assetDescriptionStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetDescriptionStatus).update(assetDescriptionStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -78,7 +78,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateAssetQuantityStatusByID(id: String,assetQuantityStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetQuantityStatus).update(assetQuantityStatus).asTry).map {
+  private def updateAssetQuantityStatusByID(id: String, assetQuantityStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetQuantityStatus).update(assetQuantityStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -86,7 +86,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateAssetPriceStatusByID(id: String,assetPriceStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetPriceStatus).update(assetPriceStatus).asTry).map {
+  private def updateAssetPriceStatusByID(id: String, assetPriceStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetPriceStatus).update(assetPriceStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -94,7 +94,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateShipmentPeriodStatusByID(id: String,shipmentPeriodStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.shipmentPeriodStatus).update(shipmentPeriodStatus).asTry).map {
+  private def updateShipmentPeriodStatusByID(id: String, shipmentPeriodStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.shipmentPeriodStatus).update(shipmentPeriodStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -102,7 +102,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updatePortOfLoadingStatusByID(id: String,portOfLoadingStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.portOfLoadingStatus).update(portOfLoadingStatus).asTry).map {
+  private def updatePortOfLoadingStatusByID(id: String, portOfLoadingStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.portOfLoadingStatus).update(portOfLoadingStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -110,7 +110,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updatePortOfDischargeStatusByID(id: String,portOfDischargeStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.portOfDischargeStatus).update(portOfDischargeStatus).asTry).map {
+  private def updatePortOfDischargeStatusByID(id: String, portOfDischargeStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.portOfDischargeStatus).update(portOfDischargeStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -118,7 +118,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateAdvancePaymentStatusByID(id: String,advancePaymentStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.advancePaymentStatus).update(advancePaymentStatus).asTry).map {
+  private def updateAdvancePaymentStatusByID(id: String, advancePaymentStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.advancePaymentStatus).update(advancePaymentStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -126,7 +126,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateCreditTermsStatusByID(id: String,creditTermsStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.creditTermsStatus).update(creditTermsStatus).asTry).map {
+  private def updateCreditTermsStatusByID(id: String, creditTermsStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.creditTermsStatus).update(creditTermsStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -134,7 +134,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateBillOfExchangeRequiredStatusByID(id: String,billOfExchangeRequiredStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.billOfExchangeRequiredStatus).update(billOfExchangeRequiredStatus).asTry).map {
+  private def updateBillOfExchangeRequiredStatusByID(id: String, billOfExchangeRequiredStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.billOfExchangeRequiredStatus).update(billOfExchangeRequiredStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -142,7 +142,7 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updatePrimaryDocumentsStatusByID(id: String,primaryDocumentsStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.primaryDocumentsStatus).update(primaryDocumentsStatus).asTry).map {
+  private def updatePrimaryDocumentsStatusByID(id: String, primaryDocumentsStatus: Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.primaryDocumentsStatus).update(primaryDocumentsStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -162,14 +162,14 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class TradeTermTable(tag: Tag) extends Table[TradeTerm](tag, "TradeTerm") {
 
-    def * = (id, assetType, (assetDescriptionValue, assetDescriptionStatus), (assetQuantityValue, assetQuantityStatus), (assetPriceValue, assetPriceStatus), (shipmentPeriodValue, shipmentPeriodStatus), (portOfLoadingValue, portOfLoadingStatus), (portOfDischargeValue, portOfDischargeStatus), (advancePaymentValue, advancePercentage, advancePaymentStatus), (creditTermsValue,tenure,tentativeDate,refrence, creditTermsStatus), (billOfExchangeRequiredValue, billOfExchangeRequiredStatus), (obl,invoice,coo,coa,otherDocuments, primaryDocumentsStatus)).shaped <> ( {
-      case (id, assetType, assetDescription, assetQuantity, assetPrice, shipmentPeriod, portOfLoading, portOfDischarge, advancePayment, creditTerms, billOfExchangeRequired, primaryDocuments) => TradeTerm(id, assetType, AssetDescription.tupled.apply(assetDescription), AssetQuantity.tupled.apply(assetQuantity), AssetPrice.tupled.apply(assetPrice), ShipmentPeriod.tupled.apply(shipmentPeriod), PortOfLoading.tupled.apply(portOfLoading), PortOfDischarge.tupled.apply(portOfDischarge),AdvancePayment.tupled.apply(advancePayment), CreditTerms.tupled.apply(creditTerms), BillOfExchangeRequired.tupled.apply(billOfExchangeRequired), PrimaryDocuments.tupled.apply(primaryDocuments))
+    def * = (id, assetType, (assetDescriptionValue, assetDescriptionStatus), (assetQuantityValue, assetQuantityStatus), (assetPriceValue, assetPriceStatus), (shipmentPeriodValue, shipmentPeriodStatus), (portOfLoadingValue, portOfLoadingStatus), (portOfDischargeValue, portOfDischargeStatus), (advancePaymentValue, advancePercentage, advancePaymentStatus), (creditTermsValue, tenure, tentativeDate, refrence, creditTermsStatus), (billOfExchangeRequiredValue, billOfExchangeRequiredStatus), (obl, invoice, coo, coa, otherDocuments, primaryDocumentsStatus)).shaped <> ( {
+      case (id, assetType, assetDescription, assetQuantity, assetPrice, shipmentPeriod, portOfLoading, portOfDischarge, advancePayment, creditTerms, billOfExchangeRequired, primaryDocuments) => TradeTerm(id, assetType, AssetDescription.tupled.apply(assetDescription), AssetQuantity.tupled.apply(assetQuantity), AssetPrice.tupled.apply(assetPrice), ShipmentPeriod.tupled.apply(shipmentPeriod), PortOfLoading.tupled.apply(portOfLoading), PortOfDischarge.tupled.apply(portOfDischarge), AdvancePayment.tupled.apply(advancePayment), CreditTerms.tupled.apply(creditTerms), BillOfExchangeRequired.tupled.apply(billOfExchangeRequired), PrimaryDocuments.tupled.apply(primaryDocuments))
     }, { tradeTerm: TradeTerm =>
       def f1(assetDescription: AssetDescription) = AssetDescription.unapply(assetDescription).get
 
       def f2(assetQuantity: AssetQuantity) = AssetQuantity.unapply(assetQuantity).get
 
-      def f3(assetPrice:AssetPrice) = AssetPrice.unapply(assetPrice).get
+      def f3(assetPrice: AssetPrice) = AssetPrice.unapply(assetPrice).get
 
       def f4(shipmentPeriod: ShipmentPeriod) = ShipmentPeriod.unapply(shipmentPeriod).get
 
@@ -179,13 +179,13 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
       def f7(advancePayment: AdvancePayment) = AdvancePayment.unapply(advancePayment).get
 
-      def f8(creditTerms:CreditTerms) = CreditTerms.unapply(creditTerms).get
+      def f8(creditTerms: CreditTerms) = CreditTerms.unapply(creditTerms).get
 
-      def f9(billOfExchangeRequired:BillOfExchangeRequired) = BillOfExchangeRequired.unapply(billOfExchangeRequired).get
+      def f9(billOfExchangeRequired: BillOfExchangeRequired) = BillOfExchangeRequired.unapply(billOfExchangeRequired).get
 
       def f10(primaryDocuments: PrimaryDocuments) = PrimaryDocuments.unapply(primaryDocuments).get
 
-      Some((tradeTerm.id, tradeTerm.assetType, f1(tradeTerm.assetDescription), f2(tradeTerm.assetQuantity), f3(tradeTerm.assetPrice), f4(tradeTerm.shipmentPeriod), f5(tradeTerm.portOfLoading), f6(tradeTerm.portOfDischarge), f7(tradeTerm.advancePayment), f8(tradeTerm.creditTerms), f9(tradeTerm.billOfExchangeRequired), f10(tradeTerm.primaryDocuments) ))
+      Some((tradeTerm.id, tradeTerm.assetType, f1(tradeTerm.assetDescription), f2(tradeTerm.assetQuantity), f3(tradeTerm.assetPrice), f4(tradeTerm.shipmentPeriod), f5(tradeTerm.portOfLoading), f6(tradeTerm.portOfDischarge), f7(tradeTerm.advancePayment), f8(tradeTerm.creditTerms), f9(tradeTerm.billOfExchangeRequired), f10(tradeTerm.primaryDocuments)))
     })
 
     def id = column[String]("id", O.PrimaryKey)
@@ -252,29 +252,29 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(id: String, assetType:String,assetDescription: String, assetQuantity: Int, assetPrice: Int, shipmentPeriod: Int, portOfLoading: String, portOfDischarge: String, advancePaymentValue:Boolean,advancePercentage:Option[Double] , creditTermsValue:Boolean,tenure:Option[Int], tentativeDate:Option[Date], refrence:Option[String],  billOfExchangeRequired: Boolean, obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String): Future[String] = add(TradeTerm(id = id,assetType=assetType,AssetDescription(assetDescription,false), AssetQuantity(assetQuantity,false),AssetPrice(assetPrice,false), ShipmentPeriod(shipmentPeriod,false),PortOfLoading(portOfLoading,false),PortOfDischarge(portOfDischarge,false),AdvancePayment(advancePaymentValue,advancePercentage,false), CreditTerms(creditTermsValue, tenure,tentativeDate,refrence,false), BillOfExchangeRequired(billOfExchangeRequired,false), PrimaryDocuments(obl,invoice,coo,coa,otherDocuments,false)))
+    def create(id: String, assetType: String, assetDescription: String, assetQuantity: Int, assetPrice: Int, shipmentPeriod: Int, portOfLoading: String, portOfDischarge: String, advancePaymentValue: Boolean, advancePercentage: Option[Double], creditTermsValue: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String], billOfExchangeRequired: Boolean, obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String): Future[String] = add(TradeTerm(id = id, assetType = assetType, AssetDescription(assetDescription, false), AssetQuantity(assetQuantity, false), AssetPrice(assetPrice, false), ShipmentPeriod(shipmentPeriod, false), PortOfLoading(portOfLoading, false), PortOfDischarge(portOfDischarge, false), AdvancePayment(advancePaymentValue, advancePercentage, false), CreditTerms(creditTermsValue, tenure, tentativeDate, refrence, false), BillOfExchangeRequired(billOfExchangeRequired, false), PrimaryDocuments(obl, invoice, coo, coa, otherDocuments, false)))
 
     def get(id: String) = findById(id)
 
-    def updateAssetDescriptionStatus(id:String,assetDescriptionStatus:Boolean)=updateAssetDescriptionStatusByID(id,assetDescriptionStatus)
+    def updateAssetDescriptionStatus(id: String, assetDescriptionStatus: Boolean) = updateAssetDescriptionStatusByID(id, assetDescriptionStatus)
 
-    def updateAssetQuantityStatus(id:String,assetQuantityStatus:Boolean)=updateAssetQuantityStatusByID(id,assetQuantityStatus)
+    def updateAssetQuantityStatus(id: String, assetQuantityStatus: Boolean) = updateAssetQuantityStatusByID(id, assetQuantityStatus)
 
-    def updateAssetPriceStatus(id:String,assetPriceStatus:Boolean)=updateAssetPriceStatusByID(id,assetPriceStatus)
+    def updateAssetPriceStatus(id: String, assetPriceStatus: Boolean) = updateAssetPriceStatusByID(id, assetPriceStatus)
 
-    def updateShipmentPeriodStatus(id:String, shipmentPeriodStatus:Boolean)=updateShipmentPeriodStatusByID(id,shipmentPeriodStatus)
+    def updateShipmentPeriodStatus(id: String, shipmentPeriodStatus: Boolean) = updateShipmentPeriodStatusByID(id, shipmentPeriodStatus)
 
-    def updatePortOfLoadingStatus(id:String,portOfLoadingStatus:Boolean)=updatePortOfLoadingStatusByID(id,portOfLoadingStatus)
+    def updatePortOfLoadingStatus(id: String, portOfLoadingStatus: Boolean) = updatePortOfLoadingStatusByID(id, portOfLoadingStatus)
 
-    def updatePortOfDischargeStatus(id:String,portOfDischargeStatus:Boolean)=updatePortOfDischargeStatusByID(id,portOfDischargeStatus)
+    def updatePortOfDischargeStatus(id: String, portOfDischargeStatus: Boolean) = updatePortOfDischargeStatusByID(id, portOfDischargeStatus)
 
-    def updateAdvancePaymentStatus(id:String,advancePaymentStatus:Boolean)=updateAdvancePaymentStatusByID(id,advancePaymentStatus)
+    def updateAdvancePaymentStatus(id: String, advancePaymentStatus: Boolean) = updateAdvancePaymentStatusByID(id, advancePaymentStatus)
 
-    def updateCreditTermsStatus(id:String,updateCreditTerms:Boolean)=updateCreditTermsStatusByID(id,updateCreditTerms)
+    def updateCreditTermsStatus(id: String, updateCreditTerms: Boolean) = updateCreditTermsStatusByID(id, updateCreditTerms)
 
-    def updateBillOfExchangeRequiredStatus(id:String,billOfExchangeRequiredStatus:Boolean)=updateBillOfExchangeRequiredStatusByID(id,billOfExchangeRequiredStatus)
+    def updateBillOfExchangeRequiredStatus(id: String, billOfExchangeRequiredStatus: Boolean) = updateBillOfExchangeRequiredStatusByID(id, billOfExchangeRequiredStatus)
 
-    def updatePrimaryDocumentsStatus(id:String,primaryDocumentsStatus:Boolean)=updatePrimaryDocumentsStatusByID(id,primaryDocumentsStatus)
+    def updatePrimaryDocumentsStatus(id: String, primaryDocumentsStatus: Boolean) = updatePrimaryDocumentsStatusByID(id, primaryDocumentsStatus)
   }
 
 }

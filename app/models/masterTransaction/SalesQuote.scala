@@ -23,7 +23,7 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
   val db = databaseConfig.db
   private[models] val salesQuoteTable = TableQuery[SalesQuoteTable]
 
-  private def serialize(salesQuote: SalesQuote): SalesQuoteSerialized = SalesQuoteSerialized(salesQuote.id, salesQuote.accountID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, if(salesQuote.shippingDetails.isDefined) Some(Json.toJson(salesQuote.shippingDetails.get).toString) else None,if(salesQuote.paymentTerms.isDefined) Some(Json.toJson(salesQuote.paymentTerms.get).toString) else None ,if(salesQuote.salesQuoteDocuments.isDefined) Some(Json.toJson(salesQuote.salesQuoteDocuments.get).toString) else None, salesQuote.completionStatus)
+  private def serialize(salesQuote: SalesQuote): SalesQuoteSerialized = SalesQuoteSerialized(salesQuote.id, salesQuote.accountID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, if (salesQuote.shippingDetails.isDefined) Some(Json.toJson(salesQuote.shippingDetails.get).toString) else None, if (salesQuote.paymentTerms.isDefined) Some(Json.toJson(salesQuote.paymentTerms.get).toString) else None, if (salesQuote.salesQuoteDocuments.isDefined) Some(Json.toJson(salesQuote.salesQuoteDocuments.get).toString) else None, salesQuote.completionStatus)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -63,7 +63,7 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updateCommodityDetailsByID(id:String, assetType:String, assetDescription:String, assetPrice:Int, assetQuantity:Int)=db.run(salesQuoteTable.filter(_.id === id).map(x => (x.assetType, x.assetPrice, x.assetQuantity)).update((assetType, assetPrice, assetQuantity)).asTry).map {
+  private def updateCommodityDetailsByID(id: String, assetType: String, assetDescription: String, assetPrice: Int, assetQuantity: Int) = db.run(salesQuoteTable.filter(_.id === id).map(x => (x.assetType, x.assetPrice, x.assetQuantity)).update((assetType, assetPrice, assetQuantity)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -73,7 +73,7 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updateShippingDetailsByID(id:String, shippingDetailsSerialized:Option[String])=db.run(salesQuoteTable.filter(_.id === id).map(x => x.shippingDetails.?).update(shippingDetailsSerialized).asTry).map {
+  private def updateShippingDetailsByID(id: String, shippingDetailsSerialized: Option[String]) = db.run(salesQuoteTable.filter(_.id === id).map(x => x.shippingDetails.?).update(shippingDetailsSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -83,7 +83,7 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updatePaymentTermsByID(id:String, paymentTermsSerialized:Option[String])=db.run(salesQuoteTable.filter(_.id === id).map(x => x.paymentTerms.?).update(paymentTermsSerialized).asTry).map {
+  private def updatePaymentTermsByID(id: String, paymentTermsSerialized: Option[String]) = db.run(salesQuoteTable.filter(_.id === id).map(x => x.paymentTerms.?).update(paymentTermsSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -93,7 +93,7 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updateSalesQuoteDocumentsByID(id:String, salesQuoteDocumentsSerialized:Option[String])=db.run(salesQuoteTable.filter(_.id === id).map(x => x.salesQuoteDocuments.?).update(salesQuoteDocumentsSerialized).asTry).map {
+  private def updateSalesQuoteDocumentsByID(id: String, salesQuoteDocumentsSerialized: Option[String]) = db.run(salesQuoteTable.filter(_.id === id).map(x => x.salesQuoteDocuments.?).update(salesQuoteDocumentsSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -103,7 +103,7 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updateCompletionStatusByID(id:String, completionStatus:Boolean)=db.run(salesQuoteTable.filter(_.id === id).map(x => x.completionStatus).update(completionStatus).asTry).map {
+  private def updateCompletionStatusByID(id: String, completionStatus: Boolean) = db.run(salesQuoteTable.filter(_.id === id).map(x => x.completionStatus).update(completionStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -113,10 +113,10 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def getSalesQuotesByAccountID(accountID:String)=db.run(salesQuoteTable.filter(_.accountID === accountID).result)
+  private def getSalesQuotesByAccountID(accountID: String) = db.run(salesQuoteTable.filter(_.accountID === accountID).result)
 
-  case class SalesQuoteSerialized(id: String, accountID: String, assetType: String, assetDescription:String,assetQuantity: Int, assetPrice: Int, shippingDetails: Option[String], paymentTerms: Option[String], salesQuoteDocuments: Option[String], completionStatus: Boolean) {
-    def deSerialize: SalesQuote = SalesQuote(id, accountID, assetType, assetDescription, assetQuantity, assetPrice, if(shippingDetails.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.ShippingDetails](shippingDetails.get)) else None, if(paymentTerms.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.PaymentTerms](paymentTerms.get)) else None , if(salesQuoteDocuments.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.SalesQuoteDocuments](salesQuoteDocuments.get)) else None ,completionStatus)
+  case class SalesQuoteSerialized(id: String, accountID: String, assetType: String, assetDescription: String, assetQuantity: Int, assetPrice: Int, shippingDetails: Option[String], paymentTerms: Option[String], salesQuoteDocuments: Option[String], completionStatus: Boolean) {
+    def deSerialize: SalesQuote = SalesQuote(id, accountID, assetType, assetDescription, assetQuantity, assetPrice, if (shippingDetails.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.ShippingDetails](shippingDetails.get)) else None, if (paymentTerms.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.PaymentTerms](paymentTerms.get)) else None, if (salesQuoteDocuments.isDefined) Option(utilities.JSON.convertJsonStringToObject[Serializable.SalesQuoteDocuments](salesQuoteDocuments.get)) else None, completionStatus)
   }
 
   private[models] class SalesQuoteTable(tag: Tag) extends Table[SalesQuoteSerialized](tag, "SalesQuote") {
@@ -146,24 +146,24 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-  /*  def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shippingDetails: Serializable.ShippingDetails, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[String] =
-      add(serialize(SalesQuote(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shippingDetails = shippingDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, completionStatus = completionStatus, verificationStatus = verificationStatus, comment = null)))
-*/
-    def insertOrUpdate(id: String, accountID: String, assetType: String, assetDescription:String, assetPrice: Int, assetQuantity: Int, shippingDetails: Option[Serializable.ShippingDetails], paymentTerms: Option[Serializable.PaymentTerms], salesQuoteDocuments: Option[Serializable.SalesQuoteDocuments], completionStatus: Boolean) = upsert(serialize(SalesQuote(id = id, accountID = accountID, assetType = assetType, assetDescription=assetDescription,assetQuantity = assetQuantity, assetPrice = assetPrice, shippingDetails = shippingDetails, paymentTerms = paymentTerms, salesQuoteDocuments = salesQuoteDocuments, completionStatus = completionStatus)))
+    /*  def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shippingDetails: Serializable.ShippingDetails, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[String] =
+        add(serialize(SalesQuote(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shippingDetails = shippingDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, completionStatus = completionStatus, verificationStatus = verificationStatus, comment = null)))
+  */
+    def insertOrUpdate(id: String, accountID: String, assetType: String, assetDescription: String, assetPrice: Int, assetQuantity: Int, shippingDetails: Option[Serializable.ShippingDetails], paymentTerms: Option[Serializable.PaymentTerms], salesQuoteDocuments: Option[Serializable.SalesQuoteDocuments], completionStatus: Boolean) = upsert(serialize(SalesQuote(id = id, accountID = accountID, assetType = assetType, assetDescription = assetDescription, assetQuantity = assetQuantity, assetPrice = assetPrice, shippingDetails = shippingDetails, paymentTerms = paymentTerms, salesQuoteDocuments = salesQuoteDocuments, completionStatus = completionStatus)))
 
-    def get(id:String)=findByID(id).map(_.deSerialize)
+    def get(id: String) = findByID(id).map(_.deSerialize)
 
-    def updateCommodityDetails(id:String, assetType:String, assetDescription:String,assetPrice:Int, assetQuantity:Int)=updateCommodityDetailsByID(id,assetType,assetDescription,assetPrice,assetQuantity)
+    def updateCommodityDetails(id: String, assetType: String, assetDescription: String, assetPrice: Int, assetQuantity: Int) = updateCommodityDetailsByID(id, assetType, assetDescription, assetPrice, assetQuantity)
 
-    def updateShippingDetails(id:String, shippingDetails: Serializable.ShippingDetails)=updateShippingDetailsByID(id,Some(Json.toJson(shippingDetails).toString))
+    def updateShippingDetails(id: String, shippingDetails: Serializable.ShippingDetails) = updateShippingDetailsByID(id, Some(Json.toJson(shippingDetails).toString))
 
-    def updatePaymentTerms(id:String, paymentTerms: Serializable.PaymentTerms)= updatePaymentTermsByID(id, Some(Json.toJson(paymentTerms).toString))
+    def updatePaymentTerms(id: String, paymentTerms: Serializable.PaymentTerms) = updatePaymentTermsByID(id, Some(Json.toJson(paymentTerms).toString))
 
-    def updateSalesQuoteDocuments(id:String, salesQuoteDocuments: Serializable.SalesQuoteDocuments)=updateSalesQuoteDocumentsByID(id,Some(Json.toJson(salesQuoteDocuments).toString))
+    def updateSalesQuoteDocuments(id: String, salesQuoteDocuments: Serializable.SalesQuoteDocuments) = updateSalesQuoteDocumentsByID(id, Some(Json.toJson(salesQuoteDocuments).toString))
 
-    def updateCompletionStatus(id:String)=updateCompletionStatusByID(id, true)
+    def updateCompletionStatus(id: String) = updateCompletionStatusByID(id, true)
 
-    def getSalesQuotes(accountID:String)=getSalesQuotesByAccountID(accountID).map(_.map(_.deSerialize))
+    def getSalesQuotes(accountID: String) = getSalesQuotesByAccountID(accountID).map(_.map(_.deSerialize))
   }
 
 }
