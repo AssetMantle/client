@@ -1,24 +1,24 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.masterTransaction.SalesQuote
+@import models.masterTransaction.TradeTerm
 
-@(salesQuote:SalesQuote)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(tradeTerm:TradeTerm)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 
                 <div class="traderCommodity">
-                    <span class="commodityImage"><img src="./images/icons/ironIcon.svg"></span><span class="tradeName">@salesQuote.assetType</span>
+                    <span class="commodityImage"><img src="./images/icons/ironIcon.svg"></span><span class="tradeName">@tradeTerm.assetType</span>
                 </div>
                 <div class="cmuk-flex tradeTermsData">
-                    <p class="cmuk-margin-remove">TRADE TERMS</p>
-                    <p class="cmuk-margin-remove">BUYER ACCEPTENCE</p>
+                    <p class="cmuk-margin-remove">@Messages(constants.View.TRADE_TERMS)</p>
+                    <p class="cmuk-margin-remove">@Messages(constants.View.BUYER_ACCEPTANCE)</p>
                 </div>
                 <div class="terms">
                     <div class="term">
                         <div>
-                            <span class="serialNumber">1</span><span class="termIcon">&#x2637;</span><span class="termName">DESCRIPTION</span>
+                            <span class="serialNumber">1</span><span class="termIcon">&#x2637;</span><span class="termName">@Messages(constants.View.DESCRIPTION)</span>
                         </div>
                         <div>
-                            <span class="termValue">“Commodity Description goes here”</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                            <span class="termValue">“Commodity Description goes here”</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox" value="true"></span>
                         </div>
                     </div>
                     <div class="term">
@@ -26,7 +26,7 @@
                             <span class="serialNumber">2</span><span class="termIcon">&#x2637;</span><span class="termName">QUANTITY</span>
                         </div>
                         <div>
-                            <span class="termValue">@salesQuote.assetQuantity</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                            <span class="termValue">@tradeTerm.assetQuantity.assetQuantityValue</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
                         </div>
                     </div>
                     <div class="term">
@@ -34,7 +34,7 @@
                             <span class="serialNumber">3</span><span class="termIcon">&#x2637;</span><span class="termName">CONTRACT PRICE</span>
                         </div>
                         <div>
-                            <span class="termValue">$@salesQuote.assetPrice</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                            <span class="termValue">$@tradeTerm.assetPrice.assetPriceValue</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
                         </div>
                     </div>
                     <hr>
@@ -43,7 +43,7 @@
                             <span class="serialNumber">4</span><span class="termIcon">&#x2637;</span><span class="termName">SHIPMENT PERIOD</span>
                         </div>
                         <div>
-                            <span class="termValue">@salesQuote.shippingDetails.get.shippingPeriod Days</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                            <span class="termValue">@tradeTerm.shipmentPeriod.shipmentPeriodValue Days</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
                         </div>
                     </div>
                     <div class="term">
@@ -51,7 +51,7 @@
                             <span class="serialNumber">5</span><span class="termIcon">&#x2637;</span><span class="termName">LOAD PORT</span>
                         </div>
                         <div>
-                            <span class="termValue">@salesQuote.shippingDetails.get.portOfLoading</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                            <span class="termValue">@tradeTerm.portOfLoading.portOfLoadingValue</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
                         </div>
                     </div>
                     <div class="term">
@@ -59,7 +59,7 @@
                             <span class="serialNumber">6</span><span class="termIcon">&#x2637;</span><span class="termName">DISCHARGE PORT</span>
                         </div>
                         <div>
-                            <span class="termValue">@salesQuote.shippingDetails.get.portOfDischarge</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
+                            <span class="termValue">@tradeTerm.portOfDischarge.portOfDischargeValue</span><span class="termAction"><input type="checkbox" class="cmuk-checkbox"></span>
                         </div>
                     </div>
                     <hr>
@@ -69,8 +69,8 @@
                         </div>
                         <div>
                             <span class="termValue">
-                                @if(salesQuote.paymentTerms.get.advancePayment){
-                                    YES (@salesQuote.paymentTerms.get.advancePercentage %)
+                                @if(tradeTerm.advancePayment.advancePaymentValue){
+                                    YES (@tradeTerm.advancePayment.advancePercentage %)
                                 }else{
                                     NO
                                 }
@@ -83,14 +83,12 @@
                                 <span class="serialNumber">8</span><span class="termIcon">&#x2637;</span><span class="termName">CREDIT TERMS</span>
                             </div>
                             <div class="creditTerms">
-                                @if(salesQuote.paymentTerms.get.tentativeDate.isEmpty){
-                                    <p>Tenure days - <span class="cmuk-text-bold">@salesQuote.paymentTerms.get.tenure Days</span></p>
-                                    <p>Refrence - <span class="cmuk-text-bold">@salesQuote.paymentTerms.get.refrence</span></p>
+                                @if(tradeTerm.creditTerms.tentativeDate.isEmpty){
+                                    <p>Tenure days - <span class="cmuk-text-bold">@tradeTerm.creditTerms.tenure Days</span></p>
+                                    <p>Refrence - <span class="cmuk-text-bold">@tradeTerm.creditTerms.refrence</span></p>
                                 }else{
-                                    <p>Tentative Date - <span class="cmuk-text-bold">@salesQuote.paymentTerms.get.tentativeDate</span></p>
+                                    <p>Tentative Date - <span class="cmuk-text-bold">@tradeTerm.creditTerms.tentativeDate</span></p>
                                 }
-                                <p>Tenure days - <span class="cmuk-text-bold">30 Days</span></p>
-                                <p>Refrence - <span class="cmuk-text-bold">30 Days</span></p>
                             </div>
                         </div>
                         <div>

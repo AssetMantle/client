@@ -64,7 +64,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getStatusByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).map(_.status).result.headOption.asTry).map {
+  private def getStatusByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)

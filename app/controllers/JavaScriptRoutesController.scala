@@ -174,7 +174,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.identificationForm,
         routes.javascript.ProfileController.identificationDocument,
         routes.javascript.ProfileController.organizationDetails,
-        routes.javascript.ProfileController.organizationViewAllTraderList,
 
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,

@@ -80,9 +80,6 @@ html, body{
 }
 .mainContainer{
   .leftSide{
-    width: 290px;
-    height: 100%;
-    float: left;
     left: 0;
     margin-right: 10px;
     .left{
@@ -154,10 +151,8 @@ html, body{
       justify-content: center;
     }
   }
-  .centerContainer{
-    width: 600px;
+  .middle{
     height: calc(100% - 128px);
-    float: left;
     .notifications{
       min-height: 60px;
       display: flex;
@@ -319,12 +314,8 @@ html, body{
   }
 
 
-  .rightContainer{
-    width: 290px;
-    height: 100%;
-    float: left;
+  .rightSide{
     margin-left: 10px;
-    right: 0;
     .right{
       padding: 15px 0px;
       justify-content: flex-end;

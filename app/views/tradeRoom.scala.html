@@ -2,10 +2,9 @@
 @import models.master.{Organization, Zone}
 @import views.html.base.common
 
-@(salesQuoteID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(tradeRoomID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
-
 
 @left={
     <div class="left cmuk-flex">
@@ -13,13 +12,14 @@
         <span cmuk-icon="arrow-left" class="backIcon"></span>
     </div>
     <div>
-        <span class="quoteIdTtitle secondaryFont">Sales Quote ID:</span><span class="quoteId secondaryFont"> COM478454</span>
+        <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID)</span><span class="quoteId secondaryFont"> @tradeRoomID</span>
     </div>
-    </div>
+
     <div class="userIcons cmuk-flex secondaryFont">
         <span class="buyerIcon userIcon">B</span>
         <span class="sellerIcon userIcon">S</span>
         <span class="financierIcon userIcon">F</span>
+    </div>
     </div>
 
     <div id="tradeFinancials"></div>
@@ -28,14 +28,14 @@
 }
 
 @center = {
-
+    <div class="cmuk-card cmuk-card-default mainTabs">
     <div class="cmuk-card-header">
         <ul cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
             <li class="cmuk-active first"><a href="#">Terms View</a></li>
             <li class="docViewList"><a href="#">Docs View</a></li>
         </ul>
     </div>
-
+    <div class="cmuk-card-body">
     <ul id="component-tab-left" class="cmuk-switcher">
         <li class="tradeTerms">
             <div  id="tradeTerms">
@@ -47,6 +47,8 @@
             </div>
         </li>
     </ul>
+    </div>
+    </div>
 }
 
 @right={
@@ -70,7 +72,7 @@
 
     componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
     componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
-    componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@salesQuoteID'));
+    componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView());
     componentResource('recentActivity', jsRoutes.controllers.TradeRoomController.recentActivity());
     componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom());

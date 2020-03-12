@@ -54,17 +54,14 @@ html, body {
       margin-right: 5px;
       width: 10px; }
 
-.mainContainer .leftContainer {
-  width: 290px;
-  height: 100%;
-  float: left;
+.mainContainer .leftSide {
   left: 0;
   margin-right: 10px; }
-  .mainContainer .leftContainer .left {
+  .mainContainer .leftSide .left {
     align-items: center;
     padding: 15px 0px;
     justify-content: space-between; }
-    .mainContainer .leftContainer .left .backIcon {
+    .mainContainer .leftSide .left .backIcon {
       width: 31px;
       height: 31px;
       background: #E4E4E4;
@@ -73,17 +70,17 @@ html, body {
       border-radius: 50%;
       color: #053C75;
       font-weight: bold; }
-    .mainContainer .leftContainer .left .quoteIdTtitle {
+    .mainContainer .leftSide .left .quoteIdTtitle {
       color: #6C7883;
       font-weight: bold;
       font-size: 12px; }
-    .mainContainer .leftContainer .left .quoteId {
+    .mainContainer .leftSide .left .quoteId {
       color: #053C75;
       font-weight: bold;
       font-size: 12px; }
-  .mainContainer .leftContainer .userIcon {
+  .mainContainer .leftSide .userIcon {
     margin-left: -5px; }
-  .mainContainer .leftContainer .userIcons .buyerIcon {
+  .mainContainer .leftSide .userIcons .buyerIcon {
     background: #FFD5D7;
     color: #061728;
     display: inline-flex;
@@ -96,7 +93,7 @@ html, body {
     font-size: 12px;
     align-items: center;
     justify-content: center; }
-  .mainContainer .leftContainer .userIcons .sellerIcon {
+  .mainContainer .leftSide .userIcons .sellerIcon {
     background: #9ECCFB;
     display: inline-flex;
     height: 25px;
@@ -108,7 +105,7 @@ html, body {
     font-size: 12px;
     align-items: center;
     justify-content: center; }
-  .mainContainer .leftContainer .userIcons .financierIcon {
+  .mainContainer .leftSide .userIcons .financierIcon {
     background: #A7FFC0;
     display: inline-flex;
     height: 25px;
@@ -120,52 +117,50 @@ html, body {
     font-size: 12px;
     align-items: center;
     justify-content: center; }
-.mainContainer .centerContainer {
-  width: 600px;
-  height: calc(100% - 128px);
-  float: left; }
-  .mainContainer .centerContainer .notifications {
+.mainContainer .middle {
+  height: calc(100% - 128px); }
+  .mainContainer .middle .notifications {
     min-height: 60px;
     display: flex;
     align-items: center; }
-    .mainContainer .centerContainer .notifications .uk-alert {
+    .mainContainer .middle .notifications .uk-alert {
       width: 250px;
       padding: 10px 25px 10px 10px;
       margin: 0px; }
-    .mainContainer .centerContainer .notifications .uk-alert-close {
+    .mainContainer .middle .notifications .uk-alert-close {
       top: 15px; }
-  .mainContainer .centerContainer .uk-card-default {
+  .mainContainer .middle .uk-card-default {
     background: #FAFAFA;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 3px; }
-  .mainContainer .centerContainer .mainTabs .uk-card-header {
+  .mainContainer .middle .mainTabs .uk-card-header {
     padding: 0px; }
-    .mainContainer .centerContainer .mainTabs .uk-card-header ul {
+    .mainContainer .middle .mainTabs .uk-card-header ul {
       margin: 0px; }
-    .mainContainer .centerContainer .mainTabs .uk-card-header ul li {
+    .mainContainer .middle .mainTabs .uk-card-header ul li {
       padding: 0px;
       width: 49%; }
-      .mainContainer .centerContainer .mainTabs .uk-card-header ul li:first-child {
+      .mainContainer .middle .mainTabs .uk-card-header ul li:first-child {
         border-right: 1px solid #cccccc; }
-      .mainContainer .centerContainer .mainTabs .uk-card-header ul li a {
+      .mainContainer .middle .mainTabs .uk-card-header ul li a {
         padding: 15px 0px;
         font-family: "Oxygen", sans-serif;
         text-transform: capitalize; }
-    .mainContainer .centerContainer .mainTabs .uk-card-header .uk-tab::before {
+    .mainContainer .middle .mainTabs .uk-card-header .uk-tab::before {
       border: none; }
-    .mainContainer .centerContainer .mainTabs .uk-card-header .uk-tab > .uk-active > a {
+    .mainContainer .middle .mainTabs .uk-card-header .uk-tab > .uk-active > a {
       font-family: "Oxygen", sans-serif;
       color: #061728;
       font-weight: bold;
       border-bottom: 2px solid #0862BE; }
-  .mainContainer .centerContainer .mainTabs .uk-card-body {
+  .mainContainer .middle .mainTabs .uk-card-body {
     padding: 15px 30px; }
-  .mainContainer .centerContainer .mainTabs .docViewList a {
+  .mainContainer .middle .mainTabs .docViewList a {
     margin-right: -11px; }
-  .mainContainer .centerContainer .mainTabs .tradeTerms .traderCommodity {
+  .mainContainer .middle .mainTabs .tradeTerms .traderCommodity {
     display: flex;
     align-items: center; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .traderCommodity .commodityImage {
+    .mainContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage {
       width: 30px;
       height: 30px;
       display: inline-block;
@@ -173,19 +168,19 @@ html, body {
       position: relative;
       border-radius: 50%;
       margin-right: 15px; }
-      .mainContainer .centerContainer .mainTabs .tradeTerms .traderCommodity .commodityImage img {
+      .mainContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage img {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         margin: auto; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .traderCommodity .tradeName {
+    .mainContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
       color: #4B4B4B;
       font-weight: bold;
       font-family: "Oxygen", sans-serif;
       font-size: 14px; }
-  .mainContainer .centerContainer .mainTabs .tradeTerms .tradeTermsData {
+  .mainContainer .middle .mainTabs .tradeTerms .tradeTermsData {
     justify-content: space-between;
     border-bottom: 1px solid #E8E8E8;
     padding: 25px 0px 15px 0px;
@@ -194,7 +189,7 @@ html, body {
     color: #848A91;
     font-size: 12px;
     font-weight: bold; }
-  .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term {
+  .mainContainer .middle .mainTabs .tradeTerms .terms .term {
     display: flex;
     justify-content: space-between;
     padding: 15px 10px;
@@ -204,53 +199,49 @@ html, body {
     border-radius: 3px;
     margin: 10px 0px;
     align-items: center; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .serialNumber {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
       color: #859EB9;
       font-family: "Oxygen", sans-serif;
       font-size: 14px;
       margin-right: 10px; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termIcon {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
       margin-right: 10px; }
-      .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termIcon img {
+      .mainContainer .middle .mainTabs .tradeTerms .terms .term .termIcon img {
         margin-top: -2px; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termName {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .termName {
       color: #0862BE;
       font-family: "Oxygen", sans-serif;
       font-size: 12px;
       font-weight: bold; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termValue {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
       color: #061728;
       font-family: "Oxygen", sans-serif;
       font-size: 14px;
       margin-right: 10px; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox {
       height: 20px;
       width: 20px; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox:focus, .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termAction .uk-radio:focus {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox:focus, .mainContainer .middle .mainTabs .tradeTerms .terms .term .termAction .uk-radio:focus {
       border-color: #5EB55C; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox:checked, .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox:indeterminate, .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .termAction .uk-radio:checked {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox:checked, .mainContainer .middle .mainTabs .tradeTerms .terms .term .termAction .uk-checkbox:indeterminate, .mainContainer .middle .mainTabs .tradeTerms .terms .term .termAction .uk-radio:checked {
       background-color: #5EB55C; }
-    .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .creditTerms {
+    .mainContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
       text-indent: 40px;
       margin-top: 5px; }
-      .mainContainer .centerContainer .mainTabs .tradeTerms .terms .term .creditTerms p {
+      .mainContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
         font-family: "Oxygen", sans-serif;
         font-size: 14px;
         color: #061728;
         margin: 0px;
         margin-bottom: 5px; }
-  .mainContainer .centerContainer .mainTabs .tradeTerms .terms hr {
+  .mainContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0px; }
-.mainContainer .rightContainer {
-  width: 290px;
-  height: 100%;
-  float: left;
-  margin-left: 10px;
-  right: 0; }
-  .mainContainer .rightContainer .right {
+.mainContainer .rightSide {
+  margin-left: 10px; }
+  .mainContainer .rightSide .right {
     padding: 15px 0px;
     justify-content: flex-end; }
-    .mainContainer .rightContainer .right .refresh {
+    .mainContainer .rightSide .right .refresh {
       font-family: "Oxygen", sans-serif;
       padding: 5px 10px;
       border-radius: 20px;
@@ -265,16 +256,16 @@ html, body {
       transition: .1s ease-in-out;
       transition-property: color,background-color,border-color;
       outline: none; }
-      .mainContainer .rightContainer .right .refresh img {
+      .mainContainer .rightSide .right .refresh img {
         padding: 0px 5px; }
-    .mainContainer .rightContainer .right .live {
+    .mainContainer .rightSide .right .live {
       align-items: center; }
-    .mainContainer .rightContainer .right .liveText {
+    .mainContainer .rightSide .right .liveText {
       font-weight: bold;
       margin-right: 10px;
       font-size: 12px;
       color: #272829; }
-    .mainContainer .rightContainer .right .liveIcon {
+    .mainContainer .rightSide .right .liveIcon {
       width: 6px;
       height: 6px;
       background-color: #5EB55C;

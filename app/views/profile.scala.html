@@ -60,6 +60,9 @@
             <div id="organizationTraders">
 
             </div>
+            <div id="organizationDetails">
+
+            </div>
             @if(loginState.userType == constants.User.ORGANIZATION){
                 <div class="cmuk-margin-top cmuk-margin-bottom">
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
