@@ -97,6 +97,7 @@ object FormField {
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
   val OTHER_DOCUMENTS = new StringFormField("OTHER_DOCUMENTS", 0, 1000)
+  val ASSET_DESCRIPTION= new StringFormField("ASSET_DESCRIPTION",1,1000)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -131,7 +132,7 @@ object FormField {
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
-  val ADVANCE_PERCENTAGE= new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.5)
+  val ADVANCE_PERCENTAGE= new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -161,6 +162,7 @@ object FormField {
   val INVOICE= new BooleanFormField("INVOICE")
   val COO= new BooleanFormField("COO")
   val COA= new BooleanFormField("COA")
+  val BILL_OF_EXCHANGE_REQUIRED= new BooleanFormField("BILL_OF_EXCHANGE_REQUIRED")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

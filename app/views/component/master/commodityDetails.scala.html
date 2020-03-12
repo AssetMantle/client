@@ -6,6 +6,7 @@
 @commonForm(constants.Form.COMMODITY_DETAILS, commodityDetailsForm) {
     @commonInputText(commodityDetailsForm, constants.FormField.REQUEST_ID, 'class -> "hidden", 'readonly -> true, 'required -> false)
     @commonSelect(commodityDetailsForm, constants.FormField.ASSET_TYPE)
+    @commonInputText(commodityDetailsForm, constants.FormField.ASSET_DESCRIPTION)
     @commonInputInt(commodityDetailsForm, constants.FormField.ASSET_PRICE)
     @commonInputInt(commodityDetailsForm, constants.FormField.ASSET_QUANTITY)
 }

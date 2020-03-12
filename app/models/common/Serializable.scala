@@ -43,7 +43,7 @@ object Serializable {
 
   implicit val paymentTermsWrites: OWrites[PaymentTerms] = Json.writes[PaymentTerms]
 
-  case class SalesQuoteDocuments(obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String)
+  case class SalesQuoteDocuments(billOfExchangeRequired:Boolean,obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String)
 
   implicit val salesQuoteDocumentsReads: Reads[SalesQuoteDocuments] = Json.reads[SalesQuoteDocuments]
 

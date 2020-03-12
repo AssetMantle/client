@@ -29,6 +29,7 @@
     </div>
     <br>
     <div>@Messages(constants.View.SALES_QUOTE_DOCUMENTS) : <br>
+        <span class="red">@Messages(constants.FormField.BILL_OF_EXCHANGE_REQUIRED.name)</span>: @salesQuote.salesQuoteDocuments.get.billOfExchangeRequired <br>
         <span class="red">@Messages(constants.FormField.OBL.name)</span>: @salesQuote.salesQuoteDocuments.get.obl <br>
         <span class="red">@Messages(constants.FormField.INVOICE.name)</span>: @salesQuote.salesQuoteDocuments.get.invoice <br>
         <span class="red">@Messages(constants.FormField.COA.name)</span>: @salesQuote.salesQuoteDocuments.get.coa <br>

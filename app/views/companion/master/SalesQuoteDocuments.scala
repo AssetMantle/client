@@ -7,6 +7,7 @@ object SalesQuoteDocuments {
   val form = Form(
     mapping(
       constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.BILL_OF_EXCHANGE_REQUIRED.name -> constants.FormField.BILL_OF_EXCHANGE_REQUIRED.field,
       constants.FormField.OBL.name -> constants.FormField.OBL.field,
       constants.FormField.INVOICE.name -> constants.FormField.INVOICE.field,
       constants.FormField.COO.name -> constants.FormField.COO.field,
@@ -15,6 +16,6 @@ object SalesQuoteDocuments {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, obl: Boolean, invoice: Boolean, COO: Boolean, COA: Boolean, otherDocuments: String)
+  case class Data(requestID: String, billOfExchangeRequired: Boolean,obl: Boolean, invoice: Boolean, COO: Boolean, COA: Boolean, otherDocuments: String)
 
 }

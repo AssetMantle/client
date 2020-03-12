@@ -695,6 +695,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
     "id"                          VARCHAR NOT NULL,
     "accountID"                   VARCHAR NOT NULL,
     "assetType"                   VARCHAR NOT NULL,
+    "assetDescription"            VARCHAR NOT NULL,
     "assetQuantity"               INT     NOT NULL,
     "assetPrice"                  INT     NOT NULL,
     "shippingDetails"             VARCHAR,

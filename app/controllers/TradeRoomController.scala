@@ -53,9 +53,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       Future(Ok(views.html.component.master.tradeDocuments()))
   }
 
-  def documentView: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def documentView(fileName:String, documentType:String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.tradeDocumentView("SDfg", "sdfg")))
+      Future(Ok(views.html.component.master.tradeDocumentView(fileName,documentType)))
   }
 
   def recentActivity: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

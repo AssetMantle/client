@@ -30,7 +30,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
           def getResult(salesQuote: SalesQuote) = {
             if (salesQuote.accountID == loginState.username) {
-              withUsernameToken.Ok(views.html.component.master.commodityDetails(views.companion.master.CommodityDetails.form.fill(views.companion.master.CommodityDetails.Data(Option(salesQuote.id), salesQuote.assetType, salesQuote.assetPrice, salesQuote.assetQuantity))))
+              withUsernameToken.Ok(views.html.component.master.commodityDetails(views.companion.master.CommodityDetails.form.fill(views.companion.master.CommodityDetails.Data(Option(salesQuote.id), salesQuote.assetType, salesQuote.assetDescription,salesQuote.assetPrice, salesQuote.assetQuantity))))
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
@@ -57,7 +57,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
           (commodityDetailsData.requestID match {
             case Some(id) => {
-              val updateCommodityDetails = masterTransactionSalesQuotes.Service.updateCommodityDetails(id = id, assetType = commodityDetailsData.assetType, assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice)
+              val updateCommodityDetails = masterTransactionSalesQuotes.Service.updateCommodityDetails(id = id, assetType = commodityDetailsData.assetType, assetDescription = commodityDetailsData.assetDescription,assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice)
               val salesQuote = masterTransactionSalesQuotes.Service.get(id)
 
               def getResult(salesQuote: SalesQuote) = {
@@ -76,7 +76,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             }
             case None => {
               val requestID = utilities.IDGenerator.requestID()
-              val insertOrUpdate = masterTransactionSalesQuotes.Service.insertOrUpdate(requestID, accountID = loginState.username, assetType = commodityDetailsData.assetType, assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice, shippingDetails = None, paymentTerms = None, salesQuoteDocuments = None, completionStatus = false)
+              val insertOrUpdate = masterTransactionSalesQuotes.Service.insertOrUpdate(requestID, accountID = loginState.username, assetType = commodityDetailsData.assetType, assetDescription = commodityDetailsData.assetDescription,assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice, shippingDetails = None, paymentTerms = None, salesQuoteDocuments = None, completionStatus = false)
               for {
                 _ <- insertOrUpdate
                 result <- withUsernameToken.PartialContent(views.html.component.master.shippingDetails(requestID = requestID))
@@ -169,7 +169,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
           def getResult(salesQuote: SalesQuote) = {
             salesQuote.salesQuoteDocuments match {
-              case Some(salesQuoteDocuments: Serializable.SalesQuoteDocuments) => withUsernameToken.PartialContent(views.html.component.master.salesQuoteDocuments(views.companion.master.SalesQuoteDocuments.form.fill(views.companion.master.SalesQuoteDocuments.Data(paymentTermsData.requestID, salesQuoteDocuments.obl, salesQuoteDocuments.invoice, salesQuoteDocuments.coa, salesQuoteDocuments.coo, salesQuoteDocuments.otherDocuments)), requestID = paymentTermsData.requestID))
+              case Some(salesQuoteDocuments: Serializable.SalesQuoteDocuments) => withUsernameToken.PartialContent(views.html.component.master.salesQuoteDocuments(views.companion.master.SalesQuoteDocuments.form.fill(views.companion.master.SalesQuoteDocuments.Data(paymentTermsData.requestID,salesQuoteDocuments.billOfExchangeRequired, salesQuoteDocuments.obl, salesQuoteDocuments.invoice, salesQuoteDocuments.coa, salesQuoteDocuments.coo, salesQuoteDocuments.otherDocuments)), requestID = paymentTermsData.requestID))
               case None => withUsernameToken.PartialContent(views.html.component.master.salesQuoteDocuments(requestID = paymentTermsData.requestID))
             }
           }
@@ -191,7 +191,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
       def getResult(salesQuote: SalesQuote) = {
         salesQuote.salesQuoteDocuments match {
-          case Some(salesQuoteDocuments: Serializable.SalesQuoteDocuments) => withUsernameToken.Ok(views.html.component.master.salesQuoteDocuments(views.companion.master.SalesQuoteDocuments.form.fill(views.companion.master.SalesQuoteDocuments.Data(id, salesQuoteDocuments.obl, salesQuoteDocuments.invoice, salesQuoteDocuments.coa, salesQuoteDocuments.coo, salesQuoteDocuments.otherDocuments)), requestID = id))
+          case Some(salesQuoteDocuments: Serializable.SalesQuoteDocuments) => withUsernameToken.Ok(views.html.component.master.salesQuoteDocuments(views.companion.master.SalesQuoteDocuments.form.fill(views.companion.master.SalesQuoteDocuments.Data(id, salesQuoteDocuments.billOfExchangeRequired, salesQuoteDocuments.obl, salesQuoteDocuments.invoice, salesQuoteDocuments.coa, salesQuoteDocuments.coo, salesQuoteDocuments.otherDocuments)), requestID = id))
           case None => withUsernameToken.Ok(views.html.component.master.shippingDetails(requestID = id))
         }
       }
@@ -212,7 +212,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
           Future(BadRequest(views.html.component.master.salesQuoteDocuments(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name))))
         },
         salesQuoteDocumentsData => {
-          val updateSalesQuoteDocuments = masterTransactionSalesQuotes.Service.updateSalesQuoteDocuments(salesQuoteDocumentsData.requestID, Serializable.SalesQuoteDocuments(salesQuoteDocumentsData.obl, salesQuoteDocumentsData.invoice, salesQuoteDocumentsData.COA, salesQuoteDocumentsData.COO, salesQuoteDocumentsData.otherDocuments))
+          val updateSalesQuoteDocuments = masterTransactionSalesQuotes.Service.updateSalesQuoteDocuments(salesQuoteDocumentsData.requestID, Serializable.SalesQuoteDocuments(salesQuoteDocumentsData.billOfExchangeRequired, salesQuoteDocumentsData.obl, salesQuoteDocumentsData.invoice, salesQuoteDocumentsData.COA, salesQuoteDocumentsData.COO, salesQuoteDocumentsData.otherDocuments))
           def salesQuote: Future[SalesQuote]= masterTransactionSalesQuotes.Service.get(salesQuoteDocumentsData.requestID)
           (for {
             _ <- updateSalesQuoteDocuments
@@ -283,7 +283,6 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
     }yield Ok(views.html.component.master.salesQuotesList(salesQuotes))
         ).recover{
         case baseException: BaseException =>
-          println(baseException.failure.message)
           InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

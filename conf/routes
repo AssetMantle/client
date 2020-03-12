@@ -422,5 +422,5 @@ GET         /master/tradeTerms                                           control
 GET         /master/recentActivity                                       controllers.TradeRoomController.recentActivity
 GET         /master/tradeFinancials                                      controllers.TradeRoomController.tradeFinancials
 GET         /master/tradeDocumentList                                    controllers.TradeRoomController.documentList
-GET         /master/tradeDocumentView                                    controllers.TradeRoomController.documentView
+GET         /master/tradeDocumentView                                    controllers.TradeRoomController.documentView(fileName:String, documentType:String)
 GET         /master/chatRoom                                             controllers.TradeRoomController.chatRoom
