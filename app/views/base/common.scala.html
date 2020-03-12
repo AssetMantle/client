@@ -38,6 +38,7 @@
                     <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
                         <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                     </a>
+                    <ul class="cmuk-navbar-nav">
                     @loginState match {
                         case null => {}
                         case default => {
@@ -47,7 +48,7 @@
                             <li><a href="@controllers.routes.ViewController.profile()">@Messages(constants.Form.PROFILE)</a></li>
                         }
                     }
-
+                </ul>
                 </div>
                 <div class="cmuk-navbar-right">
                     <ul class="cmuk-navbar-nav">
@@ -97,7 +98,7 @@
                                 </div>
                             </li>
                             <li class="userList">
-                                <a href="#">@loginState.username</a>
+                                <a >@loginState.username</a>
                                 <div class="cmuk-navbar-dropdown">
                                     <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
                                         <li>
@@ -115,6 +116,7 @@
                                     </ul>
                                 </div>
                             </li>
+
                         }
                     }
                     </ul>

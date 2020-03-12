@@ -147,6 +147,9 @@ html, body{
     font-size: $paragraphFontSizeSmall  ;
   }
 }
+.userIcons .userIcon{
+margin-right: -5px;
+}
 .userIcons .buyerIcon{
   background: #FFD5D7;
   color: #061728;
@@ -224,11 +227,13 @@ html, body{
     margin-right: 1%;
     width: 24%;
     margin-bottom: 5px;
+    padding-top: 10px;
   }
   .middle{
     width:50%;
     height: calc(100% - 128px);
     float: left;
+    padding-top: 10px;
     // padding-bottom: 185px;
 
     .cmuk-card-default{
@@ -387,6 +392,7 @@ html, body{
     right: 0;
     margin-left: 1%;
     margin-bottom: 5px;
+    padding-top: 10px;
   }
 }
 

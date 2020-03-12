@@ -62,11 +62,11 @@
   height:auto;
   min-height: 100%;
   background: #F4F7FB;
-  margin: 0 auto -157px;
+  margin: 0 auto -165px;
 }
 
 .pageContainer{
-  padding-bottom: 157px;
+  padding-bottom: 165px;
 }
 .pageContainer,
 .dataContainer,
@@ -1185,7 +1185,7 @@ input:checked+.slider {
     margin:5px 0px;
   }
 }
-.comdex .cmuk-input{
+.comdex .cmuk-input, .cmuk-card-default, button, a,  p{
   font-size: 1.2rem;
 }
 .inputField{
@@ -1220,6 +1220,7 @@ input:checked+.slider {
 .cmuk-navbar-nav>li>a.active{
   background-color: #f4f7fb;
   color: #343C44;
+  border-bottom: 2px solid #053C75;
 }
 
 .infoRow{

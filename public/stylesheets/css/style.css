@@ -185,6 +185,9 @@ html, body {
   .left .quoteId {
     font-size: 1.2rem; }
 
+.userIcons .userIcon {
+  margin-right: -5px; }
+
 .userIcons .buyerIcon {
   background: #FFD5D7;
   color: #061728; }
@@ -249,11 +252,13 @@ html, body {
   left: 0;
   margin-right: 1%;
   width: 24%;
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  padding-top: 10px; }
 .pageContainer .middle {
   width: 50%;
   height: calc(100% - 128px);
-  float: left; }
+  float: left;
+  padding-top: 10px; }
   .pageContainer .middle .cmuk-card-default {
     background: #FAFAFA;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -368,7 +373,8 @@ html, body {
   float: left;
   right: 0;
   margin-left: 1%;
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  padding-top: 10px; }
 
 .leftTradeFinancial .financial {
   margin-bottom: 20px; }
