@@ -1,23 +1,4 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-  background: #F4F7FB;
-}
-
-body::-webkit-scrollbar {
-  width: 10px;
-}
-
-body::-webkit-scrollbar * {
-  background: transparent;
-}
-
-body::-webkit-scrollbar-thumb {
-  background: #cccccc !important;
-  border-radius: 6px;
-}
-
+@import "variables.scss";
 input, select {
   width: 100%;
 }
@@ -67,6 +48,9 @@ dl{
   text-align: left;
 }
 
+label{
+  font-size: $paragraphFontSizeMedium;
+}
 
 // Media Queries
 @media (max-width: 600px) {
