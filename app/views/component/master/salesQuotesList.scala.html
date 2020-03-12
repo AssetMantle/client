@@ -11,12 +11,14 @@
             <th>@Messages(constants.Form.ASSET_TYPE)</th>
             <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
             <th>@Messages(constants.Form.ASSET_PRICE)</th>
+            <th>@Messages(constants.Form.COMPLETION_STATUS)</th>
         </tr>
         @for(salesQuote <- salesQuotes) {
             <tr>
                 <td>@salesQuote.assetType</td>
                 <td>@salesQuote.assetQuantity </td>
                 <td>@salesQuote.assetPrice</td>
+                <td>@salesQuote.completionStatus</td>
             </tr>
         }
     }

@@ -70,6 +70,86 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
+  private def updateAssetDescriptionStatusByID(id: String,assetDescriptionStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetDescriptionStatus).update(assetDescriptionStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateAssetQuantityStatusByID(id: String,assetQuantityStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetQuantityStatus).update(assetQuantityStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateAssetPriceStatusByID(id: String,assetPriceStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.assetPriceStatus).update(assetPriceStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateShipmentPeriodStatusByID(id: String,shipmentPeriodStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.shipmentPeriodStatus).update(shipmentPeriodStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updatePortOfLoadingStatusByID(id: String,portOfLoadingStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.portOfLoadingStatus).update(portOfLoadingStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updatePortOfDischargeStatusByID(id: String,portOfDischargeStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.portOfDischargeStatus).update(portOfDischargeStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateAdvancePaymentStatusByID(id: String,advancePaymentStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.advancePaymentStatus).update(advancePaymentStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateCreditTermsStatusByID(id: String,creditTermsStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.creditTermsStatus).update(creditTermsStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateBillOfExchangeRequiredStatusByID(id: String,billOfExchangeRequiredStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.billOfExchangeRequiredStatus).update(billOfExchangeRequiredStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updatePrimaryDocumentsStatusByID(id: String,primaryDocumentsStatus:Boolean): Future[Int] = db.run(tradeTermTable.filter(_.id === id).map(_.primaryDocumentsStatus).update(primaryDocumentsStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteById(id: String) = db.run(tradeTermTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -175,6 +255,26 @@ class TradeTerms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def create(id: String, assetType:String,assetDescription: String, assetQuantity: Int, assetPrice: Int, shipmentPeriod: Int, portOfLoading: String, portOfDischarge: String, advancePaymentValue:Boolean,advancePercentage:Option[Double] , creditTermsValue:Boolean,tenure:Option[Int], tentativeDate:Option[Date], refrence:Option[String],  billOfExchangeRequired: Boolean, obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String): Future[String] = add(TradeTerm(id = id,assetType=assetType,AssetDescription(assetDescription,false), AssetQuantity(assetQuantity,false),AssetPrice(assetPrice,false), ShipmentPeriod(shipmentPeriod,false),PortOfLoading(portOfLoading,false),PortOfDischarge(portOfDischarge,false),AdvancePayment(advancePaymentValue,advancePercentage,false), CreditTerms(creditTermsValue, tenure,tentativeDate,refrence,false), BillOfExchangeRequired(billOfExchangeRequired,false), PrimaryDocuments(obl,invoice,coo,coa,otherDocuments,false)))
 
     def get(id: String) = findById(id)
+
+    def updateAssetDescriptionStatus(id:String,assetDescriptionStatus:Boolean)=updateAssetDescriptionStatusByID(id,assetDescriptionStatus)
+
+    def updateAssetQuantityStatus(id:String,assetQuantityStatus:Boolean)=updateAssetQuantityStatusByID(id,assetQuantityStatus)
+
+    def updateAssetPriceStatus(id:String,assetPriceStatus:Boolean)=updateAssetPriceStatusByID(id,assetPriceStatus)
+
+    def updateShipmentPeriodStatus(id:String, shipmentPeriodStatus:Boolean)=updateShipmentPeriodStatusByID(id,shipmentPeriodStatus)
+
+    def updatePortOfLoadingStatus(id:String,portOfLoadingStatus:Boolean)=updatePortOfLoadingStatusByID(id,portOfLoadingStatus)
+
+    def updatePortOfDischargeStatus(id:String,portOfDischargeStatus:Boolean)=updatePortOfDischargeStatusByID(id,portOfDischargeStatus)
+
+    def updateAdvancePaymentStatus(id:String,advancePaymentStatus:Boolean)=updateAdvancePaymentStatusByID(id,advancePaymentStatus)
+
+    def updateCreditTermsStatus(id:String,updateCreditTerms:Boolean)=updateCreditTermsStatusByID(id,updateCreditTerms)
+
+    def updateBillOfExchangeRequiredStatus(id:String,billOfExchangeRequiredStatus:Boolean)=updateBillOfExchangeRequiredStatusByID(id,billOfExchangeRequiredStatus)
+
+    def updatePrimaryDocumentsStatus(id:String,primaryDocumentsStatus:Boolean)=updatePrimaryDocumentsStatusByID(id,primaryDocumentsStatus)
   }
 
 }
