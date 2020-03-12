@@ -26,8 +26,7 @@
             <li class="chat receiver cmuk-text-left">
             @chat.replyToID match {
                 case Some(replyToChatID) => {
-                    @Messages("This is reply to some chat")
-                    <li onload="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))"></li>
+                    <a onclick="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))">here</a>
                 }
                 case None => {}
             }
