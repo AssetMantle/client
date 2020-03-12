@@ -28,7 +28,7 @@
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
 
     </head>
-    <body>
+    <body class="comdex">
         <div class="bodyContainer">
         @* Header *@
         <div class="header">
@@ -84,17 +84,15 @@
                                 case _ => {}
                             }
                             <li class="notificationDropdown">
-                                <a href="#" onclick="componentResource('notificationContainer', jsRoutes.controllers.NotificationController.notificationPage(0))">
-                                @Messages(constants.Form.INBOX)
+                                <a onclick="componentResource('mobileNotificationSection', jsRoutes.controllers.NotificationController.notificationPage(0))">
+                                    @Messages(constants.Form.INBOX)
+                                <span class="cmuk-badge" id="notificationBadge">0</span>
                                 </a>
-                                <div class="cmuk-navbar-dropdown cmuk-navbar-dropdown-bottom-right" cmuk-dropdown="mode: click">
-                                    <div class="dropdownHeader">
-                                        <p class="cmuk-text-bold">Notifications <span class="cmuk-badge" id="notificationBadge">0</span></p>
-                                    </div>
-                                    <div class="dropdownBody">
-                                        <ul id="notificationContainer" class="cmuk-nav cmuk-navbar-dropdown-nav notificationContainer">
-                                            </ul>
-                                    </div>
+                                <div cmuk-dropdown="mode: click">
+                                    <ul class="cmuk-nav cmuk-dropdown-nav">
+                                        <div id="mobileNotificationSection">
+                                        </div>
+                                    </ul>
                                 </div>
                             </li>
                             <li class="userList">
@@ -262,25 +260,28 @@
                 <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
                 <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
             </div>
+        </div>
+            @* End of MainContainer *@
+        </div>
 
-
-
-            @* Footer *@
-            <div class="footer">
-                <div class="container">
-                    <div class="copyright float-right">
-                                &copy;
-                        <script>document.write(new Date().getFullYear())</script>
-                        <a href="" target="_blank">Commit</a>
+        @* Footer *@
+        <div class="footer">
+            <div class="cmuk-container">
+                <div>
+                    <div class="footerLogo">
+                        <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.Form.FOOTER_LOGO)"/>
                     </div>
                 </div>
+                <hr>
+                <div class="copyright">
+                            &copy;
+                    <script>document.write(new Date().getFullYear())</script>
+                    <a href="" target="_blank">Comdex — All Rights Reserved</a>
+                </div>
             </div>
-            @* End of Footer *@
-
         </div>
-        </div>
-        @* End of MainContainer *@
 
+        @* End of Footer *@
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
