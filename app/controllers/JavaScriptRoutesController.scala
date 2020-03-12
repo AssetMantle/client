@@ -174,7 +174,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.identificationForm,
         routes.javascript.ProfileController.identificationDocument,
         routes.javascript.ProfileController.organizationDetails,
-        routes.javascript.ProfileController.organizationViewAllTraderList,
 
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
@@ -261,6 +260,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.TradeRoomController.documentList,
         routes.javascript.TradeRoomController.documentView,
         routes.javascript.TradeRoomController.recentActivity,
+        routes.javascript.TradeRoomController.chatRoom,
 
 
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,

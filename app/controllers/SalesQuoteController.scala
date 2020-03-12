@@ -16,7 +16,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTransactionTradeRooms: masterTransaction.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -253,8 +253,14 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         traderReviewSalesQuoteDetailsData => {
           (if(traderReviewSalesQuoteDetailsData.completion){
               val updateCompletionStatus: Future[Int] = masterTransactionSalesQuotes.Service.updateCompletionStatus(traderReviewSalesQuoteDetailsData.requestID)
-              for{
+              val createTradeRoom= masterTransactionTradeRooms.Service.create(traderReviewSalesQuoteDetailsData.requestID,"BUY10SdMxOf96",loginState.username,"None","UnderNegotiation")
+            val salesQuote= masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
+            def createTradeTerms(tradeRoomID:String,salesQuote: SalesQuote)= masterTransactionTradeTerms.Service.create(tradeRoomID,salesQuote.assetType,"",salesQuote.assetQuantity,salesQuote.assetPrice,salesQuote.shippingDetails.get.shippingPeriod,salesQuote.shippingDetails.get.portOfLoading,salesQuote.shippingDetails.get.portOfDischarge,salesQuote.paymentTerms.get.advancePayment,salesQuote.paymentTerms.get.advancePercentage,salesQuote.paymentTerms.get.credit,salesQuote.paymentTerms.get.tenure,if(salesQuote.paymentTerms.get.tentativeDate.isDefined)   Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get))  else None,salesQuote.paymentTerms.get.refrence,true,salesQuote.salesQuoteDocuments.get.obl,salesQuote.salesQuoteDocuments.get.invoice,salesQuote.salesQuoteDocuments.get.coo,salesQuote.salesQuoteDocuments.get.coa,salesQuote.salesQuoteDocuments.get.otherDocuments)
+            for{
                 _<-updateCompletionStatus
+                tradeRoomID<-createTradeRoom
+                salesQuote<-salesQuote
+                _<-createTradeTerms(tradeRoomID,salesQuote)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SALES_QUOTE_CREATED)))
               }yield result
             }else{

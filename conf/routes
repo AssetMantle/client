@@ -60,7 +60,6 @@ POST        /master/identification                                       control
 GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
 GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
 GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
-GET         /master/organizationAllTradersList                           controllers.ProfileController.organizationViewAllTraderList()
 
 GET         /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
 POST        /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetails

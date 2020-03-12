@@ -59,7 +59,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
           val add = masterIdentifications.Service.insertOrUpdate(loginState.username, identificationData.firstName, identificationData.lastName, utilities.Date.utilDateToSQLDate(identificationData.dateOfBirth), identificationData.idNumber, identificationData.idType, None)
           (for {
             _ <- add
-            result <- withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -84,8 +84,8 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
   def organizationDetails = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       if (loginState.userType == constants.User.ZONE) Future(Ok) else {
-        val identificationStatus = masterIdentifications.Service.getVerificationStatus(loginState.username).map { status => if (status.isEmpty) throw new BaseException(constants.Response.UNVERIFIED_IDENTIFICATION) else status.get }
-        val contact = masterContacts.Service.getContact(loginState.username).map { contact => contact.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+        val identificationStatus = masterIdentifications.Service.getVerificationStatus(loginState.username).map { _.getOrElse(throw new BaseException(constants.Response.UNVERIFIED_IDENTIFICATION))}
+        val contact = masterContacts.Service.getContact(loginState.username).map { _.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))}
 
         def getResult(contact: models.master.Contact, identificationStatus: Boolean): Future[Result] = {
           if (!contact.emailAddressVerified || !contact.mobileNumberVerified || !identificationStatus) {
@@ -106,6 +106,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
                 } yield Option(org)
                   ).recover {
                   case _: BaseException => None
+
                 }
             }
 
@@ -126,71 +127,4 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
         }
       }
   }
-
-  def organizationViewAllTraderList() = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationID = masterOrganizations.Service.getID(loginState.username)
-
-      val allTraderRequests = masterTransactionAddTraderRequests.Service.getAllTraderRequests(loginState.username)
-
-      def allTraders(organizationID: String) = masterTraders.Service.getTradersListInOrganization(organizationID)
-
-      def allTraderContacts(accountIDs: Seq[String]) = masterContacts.Service.getContacts(accountIDs)
-
-      def requestedStatuses(traderEmails: Seq[String], traderRequests: Seq[models.masterTransaction.AddTraderRequest]) = Future.sequence {
-        traderRequests.filterNot(traderRequest => traderEmails.contains(traderRequest.emailAddress)).map { traderRequest =>
-          val contact = masterContacts.Service.contactByEmailId(traderRequest.emailAddress)
-          (for {
-            _ <- contact
-          } yield requestState(traderRequest.emailAddress, traderRequest.name, constants.Status.TraderStatus.SIGNED_UP)
-            ).recover {
-            case _: BaseException => requestState(traderRequest.emailAddress, traderRequest.name,  constants.Status.TraderStatus.NOT_SIGNED_UP)
-          }
-        }
-      }
-
-      for {
-        organizationID <- organizationID
-        allTraders <- allTraders(organizationID)
-        allTraderRequests <- allTraderRequests
-        allTraderContacts <- allTraderContacts(allTraders.map(_.accountID))
-        requestedStatuses <- requestedStatuses(allTraderContacts.map(_.emailAddress), allTraderRequests)
-      } yield {
-        val traderStatuses: Seq[requestState] = allTraders.map { trader =>
-          val contact = allTraderContacts.find(_.id == trader.accountID).get
-          if (!trader.completionStatus) {
-            requestState(contact.emailAddress, trader.name,  constants.Status.TraderStatus.ADD_TRADER_FORM_INCOMPLETE)
-          } else if (trader.completionStatus && trader.verificationStatus.isEmpty) {
-            requestState(contact.emailAddress, trader.name,  constants.Status.TraderStatus.REQUESTED)
-          } else if (trader.completionStatus && trader.verificationStatus.get) {
-            requestState(contact.emailAddress, trader.name,  constants.Status.TraderStatus.APPROVED)
-          } else {
-            requestState(contact.emailAddress, trader.name,  constants.Status.TraderStatus.REJECTED)
-          }
-        }
-
-        Ok(views.html.component.master.organizationTraderList(traderStatuses ++ requestedStatuses))
-      }
-  }
-
-  def viewTraderRequests()=withLoginAction.authenticated{implicit loginState =>
-    implicit request =>
-    val allTraderRequests = masterTransactionAddTraderRequests.Service.getAllTraderRequests(loginState.username)
-    def getContacts(emailIDs:Seq[String]) = masterContacts.Service.getContactsByEmailID(emailIDs)
-    for{
-      allTraderRequests<-allTraderRequests
-      contacts<- getContacts(allTraderRequests.map(_.emailAddress))
-    }yield {
-
-      val statuses=allTraderRequests.map{traderRequest=> if(contacts.map(_.emailAddress) contains  traderRequest.emailAddress) {
-        requestState(traderRequest.emailAddress, traderRequest.name, constants.Status.TraderStatus.SIGNED_UP)
-      }
-      else {
-        requestState(traderRequest.emailAddress, traderRequest.name, constants.Status.TraderStatus.NOT_SIGNED_UP)
-      }
-      }
-      Ok(views.html.component.master.organizationTraderList(statuses))
-    }
-  }
-
 }

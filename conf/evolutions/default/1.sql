@@ -704,6 +704,66 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeRoom"
+(
+    "id"                          VARCHAR NOT NULL,
+    "salesQuoteID"                VARCHAR NOT NULL,
+    "buyerAccountID"              VARCHAR NOT NULL,
+    "sellerAccountID"             VARCHAR NOT NULL,
+    "financierAccountID"          VARCHAR NOT NULL,
+    "status"                      VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
+(
+    "id"                              VARCHAR NOT NULL,
+    "assetType"                       VARCHAR NOT NULL,
+    "assetDescriptionValue"           VARCHAR NOT NULL,
+    "assetDescriptionStatus"          BOOLEAN NOT NULL,
+    "assetQuantityValue"              INT NOT NULL,
+    "assetQuantityStatus"             BOOLEAN NOT NULL,
+    "assetPriceValue"                 INT NOT NULL,
+    "assetPriceStatus"                BOOLEAN NOT NULL,
+    "shipmentPeriodValue"             INT NOT NULL,
+    "shipmentPeriodStatus"            BOOLEAN NOT NULL,
+    "portOfLoadingValue"              VARCHAR NOT NULL,
+    "portOfLoadingStatus"             BOOLEAN NOT NULL,
+    "portOfDischargeValue"            VARCHAR NOT NULL,
+    "portOfDischargeStatus"           BOOLEAN NOT NULL,
+    "advancePaymentValue"             BOOLEAN NOT NULL,
+    "advancePercentage"               NUMERIC NOT NULL,
+    "advancePaymentStatus"            BOOLEAN NOT NULL,
+    "creditTermsValue"                BOOLEAN NOT NULL,
+    "tenure"                          VARCHAR,
+    "tentativeDate"                   DATE,
+    "refrence"                        VARCHAR,
+    "creditTermsStatus"               BOOLEAN NOT NULL,
+    "billOfExchangeRequiredValue"     BOOLEAN NOT NULL,
+    "billOfExchangeRequiredStatus"    BOOLEAN NOT NULL,
+    "obl"                             BOOLEAN NOT NULL,
+    "invoice"                         BOOLEAN NOT NULL,
+    "coo"                             BOOLEAN NOT NULL,
+    "coa"                             BOOLEAN NOT NULL,
+    "otherDocuments"                  VARCHAR NOT NULL,
+    "primaryDocumentsStatus"          BOOLEAN NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
+(
+    "id"                          VARCHAR NOT NULL,
+    "accountID"                   VARCHAR NOT NULL,
+    "assetType"                   VARCHAR NOT NULL,
+    "assetQuantity"               INT     NOT NULL,
+    "assetPrice"                  INT     NOT NULL,
+    "shippingDetails"             VARCHAR,
+    "paymentTerms"                VARCHAR,
+    "documents"                   VARCHAR,
+    "completionStatus"            BOOLEAN NOT NULL,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 (
     "id"               VARCHAR NOT NULL,

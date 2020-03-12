@@ -67,7 +67,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
               for{
                 _ <- insertOrUpdateContact
                 _ <- updateStatusUnverifiedContact
-                result<-withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
+                result<-withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
               }yield result
             }
           }

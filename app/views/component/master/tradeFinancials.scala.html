@@ -2,15 +2,14 @@
 @import views.html.base._
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-
+<div class="financial">
 @commonCard() {
-   <span>Trade Financials</span>
+    <p>Financials</p>
 } {
     <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
-                <span >&#xf555;</span>
+                <span class="walletIcon"><img src="./images/icons/walletIcon.svg"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
@@ -22,7 +21,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex payable">
-                <span >&#xf124;</span>
+                <span class="payableIcon"><img src="./images/icons/payableIcon.svg"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
@@ -34,7 +33,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex leftDays">
-                <span >&#xe425;</span>
+                <span class="leftDaysIcon"><img src="./images/icons/daysleftIcon.svg"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">Days Left</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">60 Days</p>
@@ -43,4 +42,8 @@
 
         </li>
     </ul>
+    <div class="refresh">
+        <span>refresh</span>
+    </div>
 }
+</div>

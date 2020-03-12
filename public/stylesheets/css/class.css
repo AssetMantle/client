@@ -65,7 +65,6 @@
 
 @media (max-width: 600px) {
   .pageContent {
-    display: flex;
     margin: 20px; }
 
   .MnemonicQuiz {
@@ -546,10 +545,6 @@ dl .info:after {
   white-space: nowrap;
   height: 1.2em; }
 
-.pageContent {
-  display: flex;
-  padding-top: 20px; }
-
 .searchForm {
   width: 95%;
   border: 1px solid #e7eaf3;
@@ -638,30 +633,6 @@ dl .info:after {
 
 .leftSide .leftSideMenuIcon {
   color: #fff; }
-
-.cmuk-tab {
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
-
-.cmuk-tab > .cmuk-active > a {
-  background: #0862BE;
-  color: #FFFFFF !important;
-  font-weight: bold;
-  font-size: 1rem; }
-  .cmuk-tab > .cmuk-active > a:before {
-    content: ' ';
-    position: absolute;
-    width: 0;
-    height: 0;
-    left: auto;
-    right: -15px;
-    top: 38%;
-    bottom: -19px;
-    border: 8px solid;
-    border-color: transparent transparent transparent #0862BE;
-    animation-fill-mode: forwards; }
-
-.cmuk-tab > li > a {
-  padding: 15px; }
 
 .tableName {
   background: #d2edef; }

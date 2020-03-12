@@ -84,7 +84,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def profile: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        Ok(views.html.component.master.profile())
+        Ok(views.html.profile())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
