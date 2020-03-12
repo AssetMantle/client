@@ -1,0 +1,5 @@
+@import controllers.actions.LoginState
+
+@(fileName:String,documentType:String)
+
+<iframe src="@routes.FileController.getTradeDocument(fileName, documentType)" style="width: 100%;height: 100%;border: none;"></iframe>

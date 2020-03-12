@@ -1,0 +1,46 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+@commonCard() {
+   <span>Trade Financials</span>
+} {
+    <ul class="">
+        <li class="cmuk-flex">
+            <div class="cmuk-flex wallet">
+                <span >&#xf555;</span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
+                </div>
+            </div>
+            <div>
+                <button class="cmuk-button cmuk-button-default addBalanceButton">+ Add Balance</button>
+            </div>
+        </li>
+        <li class="cmuk-flex">
+            <div class="cmuk-flex payable">
+                <span >&#xf124;</span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
+                </div>
+            </div>
+            <div>
+                <button class="cmuk-button cmuk-button-default addBalanceButton cmuk-text-danger primaryFont">Pay</button>
+            </div>
+        </li>
+        <li class="cmuk-flex">
+            <div class="cmuk-flex leftDays">
+                <span >&#xe425;</span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">Days Left</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">60 Days</p>
+                </div>
+            </div>
+
+        </li>
+    </ul>
+}

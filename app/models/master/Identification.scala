@@ -16,7 +16,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Identification(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean] = None)
+case class Identification(accountID: String, firstName: String, lastName: String, dateOfBirth:Date, idNumber: String, idType: String, status: Option[Boolean] = None)
 
 @Singleton
 class Identifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -46,11 +46,9 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getIdentificationOrNoneByAccountID(accountID: String): Future[Option[Identification]] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def getIdentificationOrNoneByAccountID(accountID: String): Future[Option[Identification]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
@@ -66,7 +64,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(identificationTable.filter(_.accountID === accountID).map(_.status.?).result.head.asTry).map {
+  private def getStatusByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).map(_.status).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -103,7 +101,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def insertOrUpdate(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean]): Future[Int] = upsert(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, status))
 
-    def getOrNoneAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID)
+    def getOrNoneByAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID)
 
     def getName(accountID: String): Future[String] = getIdentificationByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 

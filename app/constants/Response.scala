@@ -74,6 +74,7 @@ object Response {
   val OTP_SENT = new Success("OTP_SENT")
   val INVITATION_EMAIL_SENT = new Success("INVITATION_EMAIL_SENT")
   val IDENTIFICATION_ADDED=  new Success("IDENTIFICATION_ADDED")
+  val SALES_QUOTE_CREATED= new Success("SALES_QUOTE_CREATED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -121,6 +122,7 @@ object Response {
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
   val UNVERIFIED_IDENTIFICATION = new Failure("UNVERIFIED_IDENTIFICATION")
   val SFTP_SCHEDULER_FAILED = new Failure("SFTP_SCHEDULER_FAILED")
+  val INVITATION_EMAIL_ALREADY_SENT =  new Failure("INVITATION_EMAIL_ALREADY_SENT")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -16,7 +16,7 @@ object signUpControllerTest {
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
     .exec(http("Verify_Mnemonic")
         .get(routes.AccountController.noteAndVerifyMnemonic().url)
-      .check(substring("Please Backup This Mnemonic").exists)
+      .check(substring("PLEASE_BACKUP_THIS_MNEMONIC").exists)
       .check(css("[id=%s]".format("getMnemonic"), "onclick").saveAs(Form.MNEMONIC))
       .check(regex("""onclick="getMnemonic([^#]*)""").saveAs(Test.TEST_BLOCKCHAIN_ADDRESS))
     )

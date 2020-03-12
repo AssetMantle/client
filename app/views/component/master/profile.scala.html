@@ -1,8 +1,9 @@
 @import controllers.actions.LoginState
+@import views.html.base.{common,commonCard}
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@import views.html.base._
-@views.html.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+
+@common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom">
@@ -56,6 +57,14 @@
                 }
                 </div>
             </div>
+            <div id="organizationTraders">
+
+            </div>
+            @if(loginState.userType == constants.User.ORGANIZATION){
+                <div class="cmuk-margin-top cmuk-margin-bottom">
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
+                </div>
+            }
         </div>
         <div class="cmuk-container cmuk-margin-bottom">
         @commonCard() {
@@ -212,6 +221,9 @@
         }
         </div>
     <script>
+            @if(loginState.userType == constants.User.ORGANIZATION){
+                componentResource('organizationTraders', jsRoutes.controllers.ProfileController.organizationViewAllTraderList());
+            }
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments());
             componentResource('contactDetails', jsRoutes.controllers.ContactController.contact());

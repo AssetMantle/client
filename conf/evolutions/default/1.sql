@@ -603,7 +603,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
 (
     "id"             VARCHAR NOT NULL,
     "accountID"      VARCHAR NOT NULL,
-    "emailAddress" VARCHAR NOT NULL,
+    "name"           VARCHAR NOT NULL,
+    "emailAddress"   VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -686,6 +687,20 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
     "rtcbStatus"        BOOLEAN NOT NULL,
     "ticketID"          VARCHAR,
     "comment"           VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
+(
+    "id"                          VARCHAR NOT NULL,
+    "accountID"                   VARCHAR NOT NULL,
+    "assetType"                   VARCHAR NOT NULL,
+    "assetQuantity"               INT     NOT NULL,
+    "assetPrice"                  INT     NOT NULL,
+    "shippingDetails"             VARCHAR,
+    "paymentTerms"                VARCHAR,
+    "documents"                   VARCHAR,
+    "completionStatus"            BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 

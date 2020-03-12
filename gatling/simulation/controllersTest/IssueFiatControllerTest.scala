@@ -24,14 +24,14 @@ object issueFiatControllerTest {
       .check(css("legend:contains(%s)".format("Issue Fiat Request")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
-    .exec(http("Issue_Fiat_Request_POST")
+   /* .exec(http("Issue_Fiat_Request_POST")
       .post(routes.IssueFiatController.issueFiatRequest().url)
       .formParamMap(Map(
         Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
         Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
       .check(substring("SUCCESS ISSUE_FIAT_REQUEST_SENT").exists)
-    )
+    )*/
     .pause(3)
 
   val issueFiatScenario: ScenarioBuilder = scenario("IssueFiat")
@@ -62,15 +62,14 @@ object issueFiatControllerTest {
       .check(css("legend:contains(%s)".format(constants.Form.REJECT_ISSUE_FIAT_REQUEST.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
-    .exec(http("RejectIssueFiat_POST")
+    /*.exec(http("RejectIssueFiat_POST")
       .post(routes.IssueFiatController.issueFiatRequest().url)
       .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
       .check(substring("SUCCESS ISSUE_FIAT_REQUEST_REJECTED").exists)
-    )
+    )*/
      .pause(2)
-
 
   val blockchainIssueFiatScenario: ScenarioBuilder = scenario("BlockchainIssueFiat")
     .feed(FromFeeder.fromFeed)

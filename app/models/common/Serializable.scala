@@ -31,6 +31,24 @@ object Serializable {
 
   implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
 
+  case class ShippingDetails(shippingPeriod:Int, portOfLoading: String, portOfDischarge: String)
+
+  implicit val shippingDetailsReads: Reads[ShippingDetails] = Json.reads[ShippingDetails]
+
+  implicit val shippingDetailsWrites: OWrites[ShippingDetails] = Json.writes[ShippingDetails]
+
+  case class PaymentTerms(advancePayment:Boolean,advancePercentage:Option[Double], credit:Boolean,tenure: Option[Int], tentativeDate:Option[Date], refrence: Option[String])
+
+  implicit val paymentTermsReads: Reads[PaymentTerms] = Json.reads[PaymentTerms]
+
+  implicit val paymentTermsWrites: OWrites[PaymentTerms] = Json.writes[PaymentTerms]
+
+  case class SalesQuoteDocuments(obl: Boolean, invoice: Boolean, coo: Boolean, coa: Boolean, otherDocuments: String)
+
+  implicit val salesQuoteDocumentsReads: Reads[SalesQuoteDocuments] = Json.reads[SalesQuoteDocuments]
+
+  implicit val salesQuoteDocumentsWrites: OWrites[SalesQuoteDocuments] = Json.writes[SalesQuoteDocuments]
+
   case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 
   case class Invoice(invoiceNumber: String, invoiceDate: Date) extends DocumentContent
