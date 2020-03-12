@@ -1,0 +1,90 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="chatContainer">
+@commonCard() {
+    <p>chat</p>
+}{
+    <div class="chat" title="You have chat with">
+        <div class="chat_history">
+            <ul class="list-unstyled scroller">
+                <li class="self">
+                    <div class="patner">
+                        <span class="messageInfo">Unknow 2019-12-18 16:29:14</span>
+                        <div class="messageContent cmuk-text-right">
+                            hello
+                        </div>
+                    </div>
+                    <span class="chatName">s</span>
+                </li>
+
+                <li class="other">
+                    <span class="chatName">x</span>
+                    <div class="you">
+                        <span><small style="font-size:11px">You 2019-12-18 16:29:14</small><br>
+                            <div class="messageContent cmuk-text-left">
+                                hi
+                            </div>
+                        </span>
+                    </div>
+                </li>
+                <li class="self">
+                    <div class="patner">
+                        <span><small style="font-size:11px">Unknow 2019-12-18 16:29:14</small><br>
+                            <div class="messageContent cmuk-text-right">
+                                hello
+                            </div>
+                        </span>
+                    </div>
+                    <span class="chatName">s</span>
+                </li>
+
+                <li class="other">
+                    <span class="chatName">p</span>
+                    <div class="you">
+                        <span><small style="font-size:11px">You 2019-12-18 16:29:14</small><br>
+                            <div class="messageContent cmuk-text-left">
+                                hi
+                            </div>
+                        </span>
+                    </div>
+                </li>
+                <li class="self">
+                    <div class="patner">
+                        <span><small style="font-size:11px">Unknow 2019-12-18 16:29:14</small><br>
+                            <div class="selftime cmuk-text-right">
+                                hello
+                            </div>
+                        </span>
+                    </div>
+                    <span class="chatName">s</span>
+                </li>
+
+                <li class="other">
+                    <span class="chatName">p</span>
+                    <div class="you">
+                        <span><small style="font-size:11px">You 2019-12-18 16:29:14</small><br>
+                            <div class="messageContent cmuk-text-left">
+                                hi
+                            </div>
+                        </span>
+                    </div>
+                </li>
+                <div class="cover-bar"></div>
+            </ul>
+
+        </div>
+        <div class="cmuk-inline chatSubmit">
+            <form>
+                <a class="cmuk-form-icon send_chat" name="send_chat" href="#"><img
+                src="./images/icons/shareIcon.svg"> </a>
+                <input class="cmuk-input inputor" name="" type="text" id="myInput">
+                <a class="cmuk-form-icon cmuk-form-icon-flip" href="#"><img
+                src="./images/icons/sendIcon.svg"> </a>
+                <input type="submit" hidden="true" id="submitButton">
+            </form>
+        </div>
+    </div>
+}
+</div>

@@ -2,39 +2,73 @@
 @import views.html.base._
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="docView">
 @commonCard() {
     <ul cmuk-tab="connect: #component-tab-doc; animation: cmuk-animation-fade">
         <li class="cmuk-active first"><a href="#">documents</a></li>
         <li><a href="#">Upload History</a></li>
     </ul>
 } {
-        <ul id="component-tab-doc" class="cmuk-switcher">
-            <li>
-                <ul class="documentlist">
-                    <li class="documetnone">
+    <ul id="component-tab-doc" class="cmuk-switcher">
+        <li>
+            <ul class="documentlist scroller">
+                <li class="documetnone">
 
-                        <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
+                    <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
 
-                            <tbody>
+                        <tbody>
 
-                                <tr>
-                                    <td class="docIcon"> <img src="./images/icons/docIcon.svg">
-                                        Contract.pdf
-                                    </td>
-                                    <td class="seenIcon"><img src="./images/icons/seenIcon.svg"></td>
-                                    <td class="preview">
-                                        <a class="cmuk-text-bold cmuk-text-success" href="./pdfs/1.pdf" target="iframe_a">E-Signed
-                                        </a>
-                                    </td>
-                                    <td class="moreIcon"><span cmuk-icon="more-vertical"></span></td>
-                                </tr>
+                            <tr>
+                                <td class="docIcon"> <img src="./images/icons/docIcon.svg">
+                                    Contract.pdf
+                                </td>
+                                <td class="seenIcon"><img src="./images/icons/seenIcon.svg"></td>
+                                <td class="preview">
+                                    <a class="cmuk-text-bold cmuk-text-success" href="./pdfs/1.pdf" target="iframe_a">E-Signed
+                                    </a>
+                                </td>
+                                <td class="moreIcon"><span cmuk-icon="more-vertical"></span></td>
+                            </tr>
+                            <tr><td class="primayDocs">Primary documents</td></tr>
+                            <tr>
+                                <td class="docIcon"> <img src="./images/icons/docIcon.svg">
+                                    insurence.pdf
+                                </td>
+                                <td class="seenIcon"><img src="./images/icons/seenIcon.svg"></td>
+                                <td class="preview">
+                                    <a class="cmuk-text-bold cmuk-text-success" href="./pdfs/5.pdf" target="iframe_a">E-Signed
+                                    </a>
+                                </td>
+                                <td class="moreIcon"><span cmuk-icon="more-vertical"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="docIcon"> <img src="./images/icons/docIcon.svg">
+                                    BL.pdf
+                                </td>
+                                <td class="seenIcon"><img src="./images/icons/seenIcon.svg"></td>
+                                <td class="preview">
+                                    <a class="cmuk-text-bold cmuk-text-success" href="./pdfs/6.pdf" target="iframe_a">E-Signed
+                                    </a>
+                                </td>
+                                <td class="moreIcon"><span cmuk-icon="more-vertical"></span></td>
+                            </tr>
 
-                            </tbody>
-                        </table>
-                    </li>
-                </ul>
-            </li>
-            <li>Empty</li>
-        </ul>
+
+                        </tbody>
+                    </table>
+                </li>
+                <div class="cover-bar"></div>
+            </ul>
+        </li>
+        <li>Empty</li>
+    </ul>
+    <div class="uploadDoc">
+        <div class="js-upload" cmuk-form-custom>
+            <input type="file" multiple>
+            <button class="cmuk-button cmuk-button-default" type="button" tabindex="-1">
+                <span cmuk-icon="icon: cloud-upload"></span>
+                Click or Drag files here</button>
+        </div>
+    </div>
 }
+</div>

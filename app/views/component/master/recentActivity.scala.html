@@ -2,17 +2,17 @@
 @import views.html.base._
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="recentActivityContainer">
 @commonCard() {
-    <span>Recent Activity</span>
+    <p>Recent Activity</p>
 }{
-    <div id="timeline">
+    <div class="timeline">
         <div class="timeline-item">
             <div class="timeline-icon">
                 <img src="./images/icons/contractIcon.svg" alt="">
             </div>
             <div class="timeline-content right">
-                <p class="uk-margin-remove">Seller generated Contract document
+                <p class="cmuk-margin-remove">Seller generated Contract document
                 </p>
                 <span>5 hours ago</span>
             </div>
@@ -23,7 +23,7 @@
                 <img src="./images/icons/acceptIcon.svg" alt="">
             </div>
             <div class="timeline-content right">
-                <p class="uk-margin-remove">
+                <p class="cmuk-margin-remove">
                     Buyer Accepted all Trade Terms
                 </p>
                 <span>5 hours ago</span>
@@ -34,7 +34,7 @@
                 <img src="./images/icons/contractIcon.svg" alt="">
             </div>
             <div class="timeline-content right">
-                <p class="uk-margin-remove">Seller generated Contract document
+                <p class="cmuk-margin-remove">Seller generated Contract document
                 </p>
                 <span>5 hours ago</span>
             </div>
@@ -45,12 +45,13 @@
                 <img src="./images/icons/acceptIcon.svg" alt="">
             </div>
             <div class="timeline-content right">
-                <p class="uk-margin-remove">
+                <p class="cmuk-margin-remove">
                     Buyer Accepted all Trade Terms
                 </p>
                 <span>5 hours ago</span>
             </div>
         </div>
     </div>
-
+    <div class="cover-bar"></div>
 }
+</div>

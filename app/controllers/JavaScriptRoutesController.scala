@@ -260,6 +260,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.TradeRoomController.documentList,
         routes.javascript.TradeRoomController.documentView,
         routes.javascript.TradeRoomController.recentActivity,
+        routes.javascript.TradeRoomController.chatRoom,
 
 
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,

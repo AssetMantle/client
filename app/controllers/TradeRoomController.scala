@@ -20,16 +20,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def tradeRoom(salesQuoteID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeRoom(tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val tradeRoomID = masterTransactionTradeRooms.Service.tradeRoomIDBySalesQuoteID(salesQuoteID)
-      (for {
-        tradeRoomID <- tradeRoomID
-        result <- withUsernameToken.Ok(views.html.tradeRoom(tradeRoomID = tradeRoomID))
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+      withUsernameToken.Ok(views.html.tradeRoom(tradeRoomID = tradeRoomID))
   }
 
   def tradeTerms(tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -37,7 +30,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       val tradeTerms = masterTransactionTradeTerms.Service.get(tradeRoomID)
       (for {
         tradeTerms <- tradeTerms
-      } yield Ok(views.html.component.master.termsViewTradeRoom(tradeTerms))
+      } yield Ok(views.html.component.master.termsView(tradeTerms))
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
