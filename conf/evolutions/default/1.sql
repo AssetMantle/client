@@ -751,20 +751,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
-(
-    "id"                          VARCHAR NOT NULL,
-    "accountID"                   VARCHAR NOT NULL,
-    "assetType"                   VARCHAR NOT NULL,
-    "assetQuantity"               INT     NOT NULL,
-    "assetPrice"                  INT     NOT NULL,
-    "shippingDetails"             VARCHAR,
-    "paymentTerms"                VARCHAR,
-    "documents"                   VARCHAR,
-    "completionStatus"            BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 (
     "id"               VARCHAR NOT NULL,

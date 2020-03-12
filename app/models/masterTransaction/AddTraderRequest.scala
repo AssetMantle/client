@@ -10,8 +10,6 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class requestState(email:String, name:String, status:String)
-
 case class AddTraderRequest(id: String, accountID: String, name: String, emailAddress: String)
 
 @Singleton
