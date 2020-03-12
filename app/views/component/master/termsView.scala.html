@@ -34,7 +34,7 @@
                             <span class="serialNumber">3</span><span class="termIcon">&#x2637;</span><span class="termName">@Messages(constants.View.CONTRACT_PRICE)</span>
                         </div>
                         <div>
-                            <span class="termValue">$@tradeTerm.assetPrice.assetPriceValue</span><span class="termAction"><input type="checkbox" id="@constants.View.CONTRACT_PRICE" class="cmuk-checkbox tradeTerm" ></span>
+                            <span class="termValue">$@tradeTerm.assetPrice.assetPriceValue</span><span class="termAction"><input type="checkbox" id="@constants.View.CONTRACT_PRICE" class="cmuk-checkbox tradeTerm" @if(tradeTerm.assetPrice.assetPriceStatus) {checked="true"}></span>
                         </div>
                     </div>
                     <hr>
