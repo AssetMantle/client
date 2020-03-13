@@ -55,9 +55,13 @@ function submitChat(source, target = '#chatContainer') {
     }
 }
 
-function replyButton(replyToChatID) {
+function replyButton(replyToChatID,replyMessage,fromAccount) {
     // the animation login here
+    console.log(replyMessage);
     $("#REPLY_TO_CHAT").val(replyToChatID);
+    $("#replyBox").fadeIn();
+    document.getElementById("replyAccount").innerHTML = fromAccount;
+    document.getElementById("replymessage").innerHTML =  replyMessage;
 }
 
 function markChatRead(route) {
@@ -88,12 +92,11 @@ function replyMessage(source, route) {
         statusCode: {
             200: function (data) {
                 //add the reply data..
-                console.log(data.message);
+                console.log("reply message",data.message);
                 $(source).html(data.message);
             },
             401: function (data) {
                 replaceDocument(data.responseText);
-
             },
             500: function (data) {
                 replaceDocument(data.responseText);

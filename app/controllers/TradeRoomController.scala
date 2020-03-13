@@ -102,7 +102,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         result <- withUsernameToken.Ok(views.html.component.master.chatRoom(allChatWindows, allChatWindowsParticipants))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -124,7 +124,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
             result <- withUsernameToken.Ok(views.html.component.master.chatWindow(views.companion.master.SendChat.form.fill(views.companion.master.SendChat.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID))
           } yield result
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(constants.Response.UNAUTHORIZED.message))
         }
       }
 
@@ -133,7 +133,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -155,7 +155,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
             result <- withUsernameToken.Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatWindowID))
           } yield result
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(constants.Response.UNAUTHORIZED.message))
         }
       }
 
@@ -164,7 +164,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 

@@ -10,5 +10,7 @@
         <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatWindow.id', 0))">@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString</button>
     </div>
 }
-<div id="chatWindow">
+<div class="cmuk-card cmuk-card-default">
+        <div id="chatWindow">
+        </div>
 </div>

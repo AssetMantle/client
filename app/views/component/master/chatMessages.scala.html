@@ -10,16 +10,17 @@
 <div id="chatCointainer" class="chatContainer">
     <div class = "chat loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
     @for(chat <- chats.reverse) {
-
         @if(chat.fromAccountID == loginState.username) {
             <li class="chat sender cmuk-text-right">
                 @chat.replyToID match {
                     case Some(replyToChatID) => {
-                        <a onclick="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))">here</a>
+                        <script>
+                                 replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))
+                        </script>
                     }
                     case None => {}
                 }
-                @chat.fromAccountID : @chat.message
+                <p onclick="replyButton('@chat.id','@chat.message','@chat.fromAccountID')">@chat.fromAccountID : @chat.message</p>
             </li>
         } else {
             @* unread bar for viewer logic here _.chatid == chatid, to account == loginstate, read at time ==nondefining, show unread messages.*@
@@ -30,12 +31,11 @@
                 }
                 case None => {}
             }
-            @chat.fromAccountID : @chat.message
+                <p onclick="replyButton('@chat.id','@chat.message','@chat.fromAccountID')">@chat.fromAccountID : @chat.message</p>
             @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
                 <span class="unreadMessage">@Messages("UNREAD")</span>
             }
             </li>
         }
-        <button onclick="replyButton('@chat.id')">@Messages("REPLY")</button>
     }
 </div>

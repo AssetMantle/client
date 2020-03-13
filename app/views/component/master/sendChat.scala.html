@@ -8,16 +8,17 @@
 
 @form(action = constants.Form.SEND_CHAT.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
-        <legend class="cmuk-legend">
-        @Messages(constants.Form.SEND_CHAT.legend)
-        </legend>
-        <hr>
         @CSRF.formField
-
+        <div style="position: relative">
+        <div id="replyBox" style="display:none;background-color: #FFffff;position: absolute;left:0;right:0;top:-68px;padding: 10px 1px" class="cmuk-flex">
+            <div><span cmuk-icon="icon: forward"></span></div><div><div id="replyAccount" class="replyAccount"></div><div id="replymessage" class="replyMessage"></div></div>
+        </div>
         @commonInputText(sendChatForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
+        <div class="hiddenLabel">
         @commonInputText(sendChatForm, constants.FormField.MESSAGE)
+        </div>
         @commonInputText(sendChatForm, constants.FormField.REPLY_TO_CHAT,'containerDivClass -> "hidden", 'required -> false)
-
+        </div>
         @if(sendChatForm.hasGlobalErrors) {
             <ul class="signupErrorList">
             @for(error <- sendChatForm.globalErrors) {
@@ -25,6 +26,7 @@
             }
             </ul>
         }
+
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitChat(this)">@Messages(constants.Form.SEND_CHAT.submit)</button>
     </fieldset>
 }

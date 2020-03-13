@@ -1093,4 +1093,21 @@ input:checked + .slider {
   width: 200px;
   word-break: break-word; }
 
+.replyAccount {
+  font-size: 12px;
+  font-weight: bold;
+  color: #3f7fc9; }
+
+.replyMessage {
+  width: 100px;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px; }
+
+.chatMessages {
+  height: 300px;
+  overflow: scroll; }
+
 /*# sourceMappingURL=class.css.map */

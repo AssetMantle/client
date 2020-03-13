@@ -7,8 +7,8 @@
 @import views.html.component.master.chatMessages
 
 @(sendChatForm: Form[SendChat.Data] = SendChat.form, chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-
-<div id="chatMessages">
+<div class="cmuk-card-body">
+<div id="chatMessages" class="chatMessages">
     <script>
             componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatWindowID', 0))
     </script>
@@ -24,6 +24,7 @@
 </div>
 <div class="chatform">
 @sendChat(sendChatForm)
+</div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>
 <script type="text/javascript">
