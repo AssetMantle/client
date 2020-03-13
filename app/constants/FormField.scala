@@ -95,6 +95,7 @@ object FormField {
   val ID_TYPE = new StringFormField("ID_TYPE", 2, 100)
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
+  val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -121,7 +122,7 @@ object FormField {
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
-  val DATE_OF_BIRTH= new DateFormField("DATE_OF_BIRTH")
+  val DATE_OF_BIRTH = new DateFormField("DATE_OF_BIRTH")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)

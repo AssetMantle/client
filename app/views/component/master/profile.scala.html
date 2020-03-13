@@ -56,7 +56,22 @@
                 }
                 </div>
             </div>
+
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                @commonCard(){
+                    <div>
+                        <span>@Messages("TO_BE_FILLED")</span>
+                    </div>
+                }{
+                    To be Filled
+                }
+                </div>
+                <div id="userTypeDetails"></div>
+            </div>
+
         </div>
+
         <div class="cmuk-container cmuk-margin-bottom">
         @commonCard() {
 
@@ -70,7 +85,7 @@
                         </ul>
                     </div>
                     <div class="cmuk-width-expand@@m">
-                        <ul id="component-tab-left" class="cmuk-switcher">
+                        <ul id="cmuk-tab-left" class="cmuk-switcher">
                             <li>
                                 <div id="profileDocuments" class="profileDocuments"></div>
                             </li>
@@ -216,6 +231,6 @@
             componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments());
             componentResource('contactDetails', jsRoutes.controllers.ContactController.contact());
             componentResource('identificationDetails', jsRoutes.controllers.ProfileController.identificationDetails());
-            componentResource('organizationDetails', jsRoutes.controllers.ProfileController.organizationDetails());
+            componentResource('userTypeDetails', jsRoutes.controllers.ProfileController.userTypeDetails());
     </script>
 }

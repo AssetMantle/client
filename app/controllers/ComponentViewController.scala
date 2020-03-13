@@ -86,28 +86,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
   }
 
-  def organizationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      (loginState.userType match {
-        case constants.User.ORGANIZATION =>
-          val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-          for {
-            organization <- organization
-          } yield Ok(views.html.component.master.organizationDetails(organization))
-        case constants.User.TRADER =>
-          val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
-
-          def organization(organizationID: String): Future[models.master.Organization] = masterOrganizations.Service.get(organizationID)
-
-          for {
-            organizationID <- organizationID
-            organization <- organization(organizationID)
-          } yield Ok(views.html.component.master.organizationDetails(organization))
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
 

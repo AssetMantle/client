@@ -7,7 +7,6 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Organization, Trader, TraderKYC}
-import models.masterTransaction.AddTraderRequest
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
@@ -17,7 +16,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTransactionAddTraderRequests: masterTransaction.AddTraderRequests, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterIdentifications: master.Identifications, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, masterTransactionTraderInvitations: masterTransaction.TraderInvitations, masterContacts: master.Contacts, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterIdentifications: master.Identifications, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -37,21 +36,35 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           Future(BadRequest(views.html.component.master.inviteTrader(formWithErrors)))
         },
         addTraderRequestData => {
-          val organizationID = masterOrganizations.Service.getID(loginState.username)
-          val organizationName = masterOrganizations.Service.nameByID(loginState.username)
 
-          def createTraderRequest(organizationID: String) = masterTransactionAddTraderRequests.Service.create(accountID = loginState.username, emailAddress = addTraderRequestData.emailAddress)
+          val checkEmailPresence = masterContacts.Service.checkEmailPresence(addTraderRequestData.emailAddress)
 
-          def sendNotificationAndGetResult(organizationID: String, organizationName: String) = {
-            utilitiesNotification.sendTraderInvite(loginState.username, addTraderRequestData.emailAddress, organizationName, organizationID)
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+          def createSendInvitationAndGetResult(checkEmailPresence: Boolean) = {
+            if (false) {
+              Future(BadRequest(views.html.index(failures = Seq(constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE))))
+            } else {
+
+              val organization = masterOrganizations.Service.getByAccountID(loginState.username)
+
+              def createInvitation(_organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = _organization.id, inviteeEmail = addTraderRequestData.emailAddress)
+
+              def sendEmailAndGetResult(organizationName: String, organizationID: String): Future[Result] = {
+                utilitiesNotification.sendEmailViaAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, constants.Notification.TRADER_INVITATION.email.get, organizationName, organizationID)
+                withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+              }
+
+              for {
+                organization <- organization
+                _ <- createInvitation(organization)
+                result <- sendEmailAndGetResult(organization.name, organization.id)
+              } yield result
+            }
+
           }
 
           (for {
-            organizationID <- organizationID
-            organizationName <- organizationName
-            _ <- createTraderRequest(organizationID)
-            result <- sendNotificationAndGetResult(organizationID, organizationName)
+            checkEmailPresence <- checkEmailPresence
+            result <- createSendInvitationAndGetResult(checkEmailPresence)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -59,7 +72,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  //TODO Change form it should only contain organization ID
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.getByAccountID(loginState.username)
@@ -79,14 +91,22 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           Future(BadRequest(views.html.component.master.addTrader(formWithErrors)))
         },
         addTraderData => {
-          val verificationStatus = masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)
+          val status = masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)
 
-          def insertOrUpdateAndGetResult(verificationStatus: Boolean): Future[Result] = {
-            if (verificationStatus) {
+          def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
+            if (status) {
               val name = masterIdentifications.Service.getName(loginState.username)
               val zoneID = masterOrganizations.Service.getZoneID(addTraderData.organizationID)
 
-              def addTrader(name: String, zoneID: String) = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
+              def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
+
+              val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
+
+              def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
+                masterTransactionTraderInvitations.Service.updateStatusByEmail(inviteeEmail = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
+              } else {
+                Future(0)
+              }
 
               def getTraderKYCs(id: String): Future[Seq[TraderKYC]] = masterTraderKYCs.Service.getAllDocuments(id)
 
@@ -94,17 +114,19 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 name <- name
                 zoneID <- zoneID
                 id <- addTrader(name, zoneID)
+                emailAddress <- emailAddress
+                _ <- updateInvitationStatus(emailAddress)
                 traderKYCs <- getTraderKYCs(id)
                 result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(traderKYCs))
               } yield result
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION))))
+              throw new BaseException(constants.Response.UNVERIFIED_ORGANIZATION)
             }
           }
 
           (for {
-            verificationStatus <- verificationStatus
-            result <- insertOrUpdateAndGetResult(verificationStatus)
+            status <- status
+            result <- insertOrUpdateAndGetResult(status)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -268,8 +290,19 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           def getResult(id: String, allKYCFileTypesExists: Boolean): Future[Result] = {
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(id)
+
+              val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
+
+              def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
+                masterTransactionTraderInvitations.Service.updateStatusByEmail(inviteeEmail = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
+              } else {
+                Future(0)
+              }
+
               for {
                 _ <- markTraderFormCompleted
+                emailAddress <- emailAddress
+                _ <- updateInvitationStatus(emailAddress)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {

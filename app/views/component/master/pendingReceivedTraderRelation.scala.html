@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.html.component.master.acceptOrRejectTraderRelation
+@import models.master.TraderRelation
+
+@(traderRelation: TraderRelation, traderName: String, organizationName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div>
+    @commonTextInfo(key = constants.View.ACCOUNT_ID, traderRelation.toID)
+    @commonTextInfo(key = constants.View.TRADER_NAME, traderName)
+    @commonTextInfo(key = constants.View.ORGANIZATION_NAME, organizationName)
+    @acceptOrRejectTraderRelation(traderRelation = traderRelation)
+</div>

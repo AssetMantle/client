@@ -195,7 +195,7 @@ EMAIL.LOGIN.MESSAGE = You have logged in {0}
 EMAIL.VERIFY_EMAIL.SUBJECT = Verify Email
 EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP is {0}
 EMAIL.TRADER_INVITATION.SUBJECT = Invitation to become Trader.
-EMAIL.TRADER_INVITATION.MESSAGE = Click on <a href="localhost:9000{0}">Trader</a>.
+EMAIL.TRADER_INVITATION.MESSAGE = You have been invited by {0} to join Comdex platform. Please enter the following code\n {1} \n in form Add Organization/ Add Trader.
 
 LATEST_BLOCK_HEIGHT=Latest block height
 AVERAGE_BLOCK_TIME=Average block time
@@ -324,9 +324,13 @@ ON_GOING_SELL_NEGOTIATIONS=On Going Sell Negotiations
 ON_GOING_BUY_ORDERS=On Going Buy Orders
 ON_GOING_SELL_ORDERS=On Going Sell Orders
 VIEW=View
+OR=or
 NOT_SPECIFIED=Not Specified
 DATE_OF_BIRTH=Date Of Birth
 FORM.VERIFY_MOBILE_NUMBER.LEGEND=Verify Mobile Number
 FORM.VERIFY_MOBILE_NUMBER.SUBMIT=Submit
 FORM.VERIFY_EMAIL_ADDRESS.LEGEND=Verify Email Address
 FORM.VERIFY_EMAIL_ADDRESS.SUBMIT=Submit
+INDEX_FINANCIER = The Comdex platform provides access to a large global portfolio of potential customers to increase their customer base. The robust KYC process and transparency of the trades give the funders the perfect platform for verification of origin. The participation of underwriters on the platform provides avenues to mitigate risk and gives investors the ability to bring their customers onto a trusted platform.
+INDEX_TRADERS = Comdex is more than just a service with multiple products and advanced technology. It is a platform connecting all the parties of the commodity trading ecosystem. It is a one stop shop for a company’s funding requirements connecting global partners on one single platform. These partnerships provide companies with access to working capital funding at a lower cost, which has been a traditional constraint for SMEs. The platform’s promise of greater transparency means processes become more streamlined and efficient which also equate to cost savings.
+INDEX_UNDERWRITERS = Insurance plays a significant role in risk mitigation in trade finance and with the participation of major underwriters on the platform; investors have the peace of mind of credit insured sales and purchases. Insurance is crucial when providing trade credit solutions and securing a credit insurance can be the difference between missing an opportunity and gaining a lucrative deal that bolsters the bottom line.

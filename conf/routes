@@ -44,6 +44,20 @@ POST        /account/forgotPassword                                      control
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
 
+GET         /account/traderRelationRequest                               controllers.AccountController.traderRelationRequestForm
+POST        /account/traderRelationRequest                               controllers.AccountController.traderRelationRequest
+
+GET         /account/acceptOrRejectTraderRelation                        controllers.AccountController.acceptOrRejectTraderRelationForm(fromID: String, toID: String)
+POST        /account/acceptOrRejectTraderRelation                        controllers.AccountController.acceptOrRejectTraderRelation
+
+GET         /account/traderRelationList                                  controllers.AccountController.traderRelationList
+GET         /account/acceptedTraderRelationList                          controllers.AccountController.acceptedTraderRelationList
+GET         /account/pendingTraderRelationList                           controllers.AccountController.pendingTraderRelationList
+GET         /account/acceptedTraderRelation                              controllers.AccountController.acceptedTraderRelation(toID: String)
+GET         /account/pendingSentTraderRelation                           controllers.AccountController.pendingSentTraderRelation(toID: String)
+GET         /account/pendingReceivedTraderRelation                       controllers.AccountController.pendingReceivedTraderRelation(toID: String)
+
+
 GET         /contact                                                     controllers.ContactController.contact
 
 GET         /master/notifications                                        controllers.NotificationController.notificationPage(pageNumber:Int)
@@ -54,14 +68,15 @@ GET         /master/queryConfigurationVariable:query                     control
 
 GET         /master/identification                                       controllers.ProfileController.identificationForm
 POST        /master/identification                                       controllers.ProfileController.identification
-GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
+GET         /master/userUploadOrUpdateIdentificationView                 controllers.ProfileController.userUploadOrUpdateIdentificationView
 GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
-GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
+GET         /master/userTypeDetails                                      controllers.ProfileController.userTypeDetails
+GET         /master/userReviewIdentificationDetails                      controllers.ProfileController.userReviewIdentificationDetailsForm
+POST        /master/userReviewIdentificationDetails                      controllers.ProfileController.userReviewIdentificationDetails
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
 GET         /master/component/zoneDetails                                controllers.ComponentViewController.zoneDetails
-GET         /master/component/organizationDetails                        controllers.ComponentViewController.organizationDetails
 GET         /master/component/assetList                                  controllers.ComponentViewController.assetList
 GET         /master/component/fiatList                                   controllers.ComponentViewController.fiatList
 GET         /master/component/buyNegotiationList                         controllers.ComponentViewController.buyNegotiationList

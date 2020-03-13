@@ -1,12 +1,12 @@
 package controllers
 
 import actors.ShutdownActor
-import controllers.actions.{LoginState, WithLoginAction}
+import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.{ACL, ACLAccount}
-import models.master.{Organization, Zone}
+import models.master.{Organization, TraderRelation, Zone}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
@@ -45,6 +45,10 @@ class AccountController @Inject()(
                                    transactionChangePassword: transactions.ChangePassword,
                                    sftpScheduler: SFTPScheduler,
                                    messagesControllerComponents: MessagesControllerComponents,
+                                   withTraderLoginAction: WithTraderLoginAction,
+                                   masterTraderRelations: master.TraderRelations,
+                                   masterContacts: master.Contacts,
+                                   masterTraders: master.Traders,
                                  )
                                  (implicit
                                   executionContext: ExecutionContext,
@@ -56,14 +60,14 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm(mnemonic:String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form,mnemonic))
+  def signUpForm(mnemonic: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form, mnemonic))
   }
 
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.signUp(formWithErrors,formWithErrors.data(constants.FormField.MNEMONIC.name))))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors, formWithErrors.data(constants.FormField.MNEMONIC.name))))
       },
       signUpData => {
         val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.mnemonic))
@@ -86,11 +90,11 @@ class AccountController @Inject()(
   }
 
   def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
-    val mnemonicResponse=queriesMnemonic.Service.get()
-    (for{
-      mnemonicResponse<-mnemonicResponse
-    }yield Ok(views.html.component.master.noteAndVerifyMnemonic( mnemonic = mnemonicResponse.body))
-      ).recover{
+    val mnemonicResponse = queriesMnemonic.Service.get()
+    (for {
+      mnemonicResponse <- mnemonicResponse
+    } yield Ok(views.html.component.master.noteAndVerifyMnemonic(mnemonic = mnemonicResponse.body))
+      ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
   }
@@ -327,5 +331,161 @@ class AccountController @Inject()(
     for {
       checkUsernameAvailable <- checkUsernameAvailable
     } yield if (checkUsernameAvailable) Ok else NoContent
+  }
+
+  def traderRelationList(): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.traderRelationList(acceptedTraderRelationListRoute = utilities.String.getJsRouteFunction(routes.javascript.AccountController.acceptedTraderRelationList), pendingTraderRelationListRoute = utilities.String.getJsRouteFunction(routes.javascript.AccountController.pendingTraderRelationList)))
+  }
+
+  def acceptedTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val acceptedTraderRelations: Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllAcceptedTraderRelation(loginState.username)
+      (for {
+        acceptedTraderRelations <- acceptedTraderRelations
+        result <- withUsernameToken.Ok(views.html.component.master.acceptedTraderRelationList(acceptedTraderRelationList = acceptedTraderRelations))
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def pendingTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val receivedPendingTraderRelations: Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllReceivedPendingTraderRelation(loginState.username)
+      val sentPendingTraderRelations: Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllSentPendingTraderRelation(loginState.username)
+      (for {
+        receivedPendingTraderRelations <- receivedPendingTraderRelations
+        sentPendingTraderRelations <- sentPendingTraderRelations
+        result <- withUsernameToken.Ok(views.html.component.master.pendingTraderRelationList(sentPendingTraderRelations = sentPendingTraderRelations, receivedPendingTraderRelations = receivedPendingTraderRelations))
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def acceptedTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val traderName = masterTraders.Service.getTraderName(toID)
+        val organizationID = masterTraders.Service.getOrganizationID(toID)
+
+        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+
+        (for {
+          traderName <- traderName
+          organizationID <- organizationID
+          organizationName <- getOrganizationName(organizationID)
+          result <- Future(Ok(views.html.component.master.acceptedTraderRelation(toID = toID, traderName = traderName, organizationName = organizationName)))
+        } yield result).recover {
+          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        }
+  }
+
+  def pendingSentTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val traderName = masterTraders.Service.getTraderName(toID)
+        val organizationID = masterTraders.Service.getOrganizationID(toID)
+
+        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+
+        (for {
+          traderName <- traderName
+          organizationID <- organizationID
+          organizationName <- getOrganizationName(organizationID)
+          result <- Future(Ok(views.html.component.master.pendingSentTraderRelation(toID = toID, traderName = traderName, organizationName = organizationName)))
+        } yield result).recover {
+          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        }
+  }
+
+  def pendingReceivedTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val traderRelation = masterTraderRelations.Service.get(fromID = loginState.username, toID = toID)
+        val traderName = masterTraders.Service.getTraderName(toID)
+        val organizationID = masterTraders.Service.getOrganizationID(toID)
+
+        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+
+        (for {
+          traderRelation <- traderRelation
+          traderName <- traderName
+          organizationID <- organizationID
+          organizationName <- getOrganizationName(organizationID)
+          result <- Future(Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, traderName = traderName, organizationName = organizationName)))
+        } yield result).recover {
+          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        }
+  }
+
+  def traderRelationRequestForm(): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(views.html.component.master.traderRelationRequest())
+  }
+
+  def traderRelationRequest(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.TraderRelationRequest.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.traderRelationRequest(formWithErrors)))
+        },
+        traderRelationRequestData => {
+          val status = masterTraders.Service.getVerificationStatus(traderRelationRequestData.to)
+
+          def create(status: Boolean): Future[String] = if (status) {
+            masterTraderRelations.Service.create(fromID = loginState.username, toID = traderRelationRequestData.to)
+          } else {
+            throw new BaseException(constants.Response.UNVERIFIED_TRADER)
+          }
+
+          (for {
+            status <- status
+            _ <- create(status)
+            result <- withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.COUNTERPARTY_REQUEST_SEND_SUCCESSFULLY)))
+          } yield result).recover {
+            case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def acceptOrRejectTraderRelationForm(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderRelation = masterTraderRelations.Service.get(fromID = fromID, toID = toID)
+      (for {
+        traderRelation <- traderRelation
+        result <- Future(Ok(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation)))
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def acceptOrRejectTraderRelation(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.AcceptOrRejectTraderRelation.form.bindFromRequest().fold(
+        formWithErrors => {
+          val traderRelation = masterTraderRelations.Service.get(fromID = formWithErrors(constants.FormField.FROM.name).value.get, toID = formWithErrors(constants.FormField.TO.name).value.get)
+          (for {
+            traderRelation <- traderRelation
+          } yield BadRequest(views.html.component.master.acceptOrRejectTraderRelation(formWithErrors, traderRelation = traderRelation))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        },
+        acceptOrRejectTraderRelationData => {
+          val updateStatus: Future[Int] = if (acceptOrRejectTraderRelationData.status) {
+            masterTraderRelations.Service.markAccepted(fromID = acceptOrRejectTraderRelationData.from, toID = acceptOrRejectTraderRelationData.to)
+          } else {
+            masterTraderRelations.Service.markRejected(fromID = acceptOrRejectTraderRelationData.from, toID = acceptOrRejectTraderRelationData.to)
+          }
+          val traderRelation = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.from, toID = acceptOrRejectTraderRelationData.to)
+          (for {
+            _ <- updateStatus
+            traderRelation <- traderRelation
+            result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))
+          } yield result).recover {
+            case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 }

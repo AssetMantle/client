@@ -73,7 +73,8 @@ object Response {
   val PASSWORD_UPDATED = new Success("PASSWORD_UPDATED")
   val OTP_SENT = new Success("OTP_SENT")
   val INVITATION_EMAIL_SENT = new Success("INVITATION_EMAIL_SENT")
-  val IDENTIFICATION_ADDED=  new Success("IDENTIFICATION_ADDED")
+  val IDENTIFICATION_ADDED_FOR_VERIFICATION = new Success("IDENTIFICATION_ADDED_FOR_VERIFICATION")
+  val COUNTERPARTY_REQUEST_SEND_SUCCESSFULLY = new Success("COUNTERPARTY_REQUEST_SEND_SUCCESSFULLY")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -98,6 +99,7 @@ object Response {
   val NOT_LOGGED_IN = new Failure("NOT_LOGGED_IN")
   val INCORRECT_LOG_IN = new Failure("INCORRECT_LOG_IN")
   val UNVERIFIED_ZONE = new Failure("UNVERIFIED_ZONE")
+  val UNVERIFIED_TRADER = new Failure("UNVERIFIED_TRADER")
   val UNVERIFIED_ORGANIZATION = new Failure("UNVERIFIED_ORGANIZATION")
   val REQUEST_ALREADY_APPROVED_OR_REJECTED = new Failure("REQUEST_ALREADY_APPROVED_OR_REJECTED")
   val USERNAME_NOT_FOUND = new Failure("USERNAME_NOT_FOUND")
@@ -121,6 +123,9 @@ object Response {
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
   val UNVERIFIED_IDENTIFICATION = new Failure("UNVERIFIED_IDENTIFICATION")
   val SFTP_SCHEDULER_FAILED = new Failure("SFTP_SCHEDULER_FAILED")
+  val FORM_FIELDS_CANNOT_BE_EMPTY = new Failure("FORM_FIELDS_CANNOT_BE_EMPTY")
+  val CANNOT_FILL_ALL_FIELDS = new Failure("CANNOT_FILL_ALL_FIELDS")
+  val COUNTERPARTY_CANNOT_BE_SELF = new Failure("COUNTERPARTY_CANNOT_BE_SELF")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
@@ -141,4 +146,5 @@ object Response {
     val message: String = PREFIX + INFO_PREFIX + response
     val action: String = utilities.String.getJsRouteString(actionController)
   }
+
 }

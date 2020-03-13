@@ -1,0 +1,20 @@
+@import controllers.actions.LoginState
+@import models.master.TraderRelation
+@import views.html.base._
+@import views.html.component.master._
+
+@(acceptedTraderRelationListRoute: String, pendingTraderRelationListRoute: String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div>
+    @commonCard() {
+        <div>
+            <span>@Messages(constants.View.TRADER_RELATION_LIST)</span>
+        </div>
+    } {
+        @commonHorizontalSwitcher(Seq(
+            (constants.User.TRADER, commonDiv("acceptedTraderRelationList", acceptedTraderRelationListRoute)),
+            (constants.View.PENDING_RELATION_REQUESTS, commonDiv("pendingTraderRelationList", pendingTraderRelationListRoute)),
+        ))
+    }
+</div>
+

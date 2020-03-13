@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+@import models.master.TraderRelation
+@import views.html.base._
+
+@(sentPendingTraderRelations: Seq[TraderRelation], receivedPendingTraderRelations: Seq[TraderRelation])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div>
+    @Messages(constants.View.PENDING_RECEIVED_TRADER_RELATION)
+    @for(receivedPendingTraderRelation <- receivedPendingTraderRelations) {
+        @defining(Seq(receivedPendingTraderRelation.fromID, receivedPendingTraderRelation.toID).mkString("")) { componentID =>
+            @commonInfoBox(componentID) {
+                <script>
+                        componentResource('@componentID', routes.javascript.AccountController.pendingReceivedTraderRelation('@receivedPendingTraderRelation.toID'))
+                </script>
+            }
+        }
+    }
+    <br>
+    @Messages(constants.View.PENDING_SENT_TRADER_RELATION)
+    @for(sentPendingTraderRelation <- sentPendingTraderRelations) {
+        @defining(Seq(sentPendingTraderRelation.fromID, sentPendingTraderRelation.toID).mkString("")) { componentID =>
+            @commonInfoBox(componentID) {
+                <script>
+                        componentResource('@componentID', routes.javascript.AccountController.pendingSentTraderRelation('@sentPendingTraderRelation.toID'))
+                </script>
+            }
+        }
+    }
+</div>

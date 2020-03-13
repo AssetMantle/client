@@ -1,0 +1,90 @@
+@import controllers.actions.LoginState
+@import play.twirl.api.Html
+@import views.html.component.master._
+@import models.master.{Organization, OrganizationKYC, Trader, TraderKYC, Zone}
+@import views.html.base._
+
+@import models.master.Identification
+@(organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderZone: Option[Zone] = None, traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq(), identification: Option[Identification] = None, accountStatus: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, loginState: LoginState = null)
+
+    @loginState.userType match {
+        case constants.User.ORGANIZATION => {
+            <div class="cmuk-width-expand@@m">
+            @commonCard() {
+                <div>
+                    <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
+                </div>
+            } {
+                @organizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs)
+            }
+            </div>
+        }
+        case constants.User.TRADER => {
+            <div class="cmuk-width-expand@@m">
+            @commonCard() {
+                <div>
+                    <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
+                </div>
+            } {
+                @organizationDetails(organizationZone = traderZone.get, organization = traderOrganization.get, organizationKYCs = Seq())
+            }
+            </div>
+        }
+        case constants.User.USER => {
+            <div class="cmuk-width-expand@@m">
+            @commonCard() {
+                <div>
+                    <span>@Messages(constants.Form.USER_DETAILS)</span>
+                </div>
+            } {
+                @if(identification.isDefined && accountStatus == constants.Status.Account.COMPLETE) {
+                    @identification.get.status match {
+                        case Some(status) => {
+                            @if(status) {
+                                @if(organization.isDefined || trader.isDefined) {
+                                    @defining(if(organization.isDefined) {
+                                        (constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS, organizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs))
+                                    } else {
+                                        ("", Html(""))
+                                    }) { item1 =>
+                                        @defining(if(trader.isDefined) {
+                                            (constants.View.PENDING_TRADER_REQUESTS, traderDetails(trader.get, traderOrganization.get, traderKYCs))
+                                        } else {
+                                            ("", Html(""))
+                                        }) { item2 =>
+                                            @defining(Seq(item1, item2)) { items =>
+                                                @commonHorizontalSwitcher(items)
+                                            }
+                                        }
+                                    }
+                                }
+                                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+                            } else {
+                                @Messages(constants.View.IDENTIFICATION_REJECTED)
+                            }
+                        }
+                        case None => {
+                            @Messages(constants.View.PENDING_IDENTIFICATION_VERIFICATION)
+                        }
+                    }
+                } else {
+                    @if(accountStatus != constants.Status.Account.COMPLETE) {
+                        @Messages(accountStatus) <br>
+                        }
+                    @Messages(constants.Form.UPLOAD_IDENTIFICATION)
+                }
+            }
+            </div>
+        }
+        case _ => {
+            <div class="cmuk-width-expand@@m">
+            @commonCard() {
+                <div>
+                    <span>@Messages(constants.View.TO_BE_FILLED)</span>
+                </div>
+            } {
+                TO_BE_FILLED
+            }
+            </div>
+        }
+    }

@@ -17,6 +17,7 @@ object Form {
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
+  val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.AccountController.traderRelationRequest())
 
   //AddKeyController
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
@@ -80,6 +81,7 @@ object Form {
 
   //ProfileController
   val IDENTIFICATION = new Form("IDENTIFICATION", routes.ProfileController.identification())
+  val REVIEW_IDENTIFICATION_ON_COMPLETION = new Form("REVIEW_IDENTIFICATION_ON_COMPLETION", routes.ProfileController.userReviewIdentificationDetails())
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())
@@ -196,6 +198,7 @@ object Form {
   val ZONE_DETAILS = "ZONE_DETAILS"
   val TRADER_KYC_FILES = "TRADER_KYC_FILES"
   val TRADER_DETAILS = "TRADER_DETAILS"
+  val USER_DETAILS = "USER_DETAILS"
   val RATING = "RATING"
   val TOTAL_ASSETS_OWNED = "TOTAL_ASSETS_OWNED"
   val TOTAL_FIATS = "TOTAL_FIATS"

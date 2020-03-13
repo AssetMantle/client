@@ -1,0 +1,18 @@
+@(items: Seq[(String, Html)])(implicit messagesProvider: MessagesProvider)
+
+<div>
+    <ul class="cmuk-subnav cmuk-subnav-divider" cmuk-switcher="animation: cmuk-animation-fade">
+        @for(item <- items) {
+            @if(item._1 != "") {
+                <li><a href="#">@Messages(item._1)</a></li>
+            }
+        }
+    </ul>
+    <ul class="cmuk-switcher cmuk-margin">
+    @for(item <- items) {
+        @if(item._1 != "") {
+            <li>@item._2</li>
+        }
+    }
+    </ul>
+</div>

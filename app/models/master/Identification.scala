@@ -4,15 +4,11 @@ import java.sql.Date
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.common.Serializable
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
-
-import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -43,6 +39,14 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByAccountID(accountID: String, status: Option[Boolean]): Future[Int] = db.run(identificationTable.filter(_.accountID === accountID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -99,11 +103,15 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean] = None): Future[String] = add(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, status))
+    def create(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String): Future[String] = add(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType))
 
-    def insertOrUpdate(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean]): Future[Int] = upsert(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, status))
+    def insertOrUpdate(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String): Future[Int] = upsert(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType))
 
-    def getOrNoneAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID)
+    def markVerified(accountID: String): Future[Int] = updateStatusByAccountID(accountID = accountID, status = Option(true))
+
+    def get(accountID: String): Future[Identification] = getIdentificationByAccountID(accountID)
+
+    def getOrNoneByAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID)
 
     def getName(accountID: String): Future[String] = getIdentificationByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 

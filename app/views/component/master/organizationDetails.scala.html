@@ -1,21 +1,42 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.Organization
+@import models.master.Zone
+@import models.master.OrganizationKYC
+@import views.html.component.master.commonDocumentViewer
 
-@(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
-@commonTable(){
-    <tr>
-        <th>@Messages(constants.Form.ORGANIZATION_NAME)</th>
-        <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
-        <th>@Messages(constants.Form.ESTABLISHMENT_DATE)</th>
-        <th>@Messages(constants.Form.VERIFIED_STATUS)</th>
-    </tr>
-    <tr>
-        <td>@organization.name</td>
-        <td>@organization.id </td>
-        <td>@organization.establishmentDate</td>
-        <td>@organization.verificationStatus</td>
-    </tr>
-}
+    <div>
+        <span>@Messages(constants.Form.ZONE_DETAILS)</span>
+        <br>
+            @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
+            @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
+            @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+    </div>
+    <div>
+        <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
+        <br>
+            @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
+            @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+            @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
+            @commonTextInfo(constants.View.REGISTERED_ADDRESS, Seq(organization.registeredAddress.addressLine1, organization.registeredAddress.addressLine2, organization.registeredAddress.landmark.getOrElse(""), Seq(organization.registeredAddress.city, organization.registeredAddress.zipCode).mkString(" - "), organization.registeredAddress.country).mkString(",\n"))
+            @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
+            @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
+            @commonTextInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate.toString)
+            @commonStatusInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+    </div>
+    <div>
+        <span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span>
+        <br>
+        @for(organizationKYC <- organizationKYCs) {
+            @commonDocumentViewer(organizationKYC) {
+                @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+            } {
+                <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+            } {
+
+            }
+        }
+    </div>
 </div>
