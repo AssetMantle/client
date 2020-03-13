@@ -1,3 +1,15 @@
+function formInitializtion(advancePayment,advancePercentage,credit,tentativeDate,tenure,refrence){
+    if( $(advancePayment).prop('checked') === false && $(credit).prop('checked') === true  ){
+        $(advancePercentage).val('').prop('disabled',true).prop('required',false);
+    }
+    if($(tentativeDate).val()){
+        $(tenure).val('').prop('disabled',true).prop('required',false);
+        $(refrence).val('').prop('disabled',true).prop('required',false);
+    }else if($(tenure).val() || $(refrence).val()){
+        $(tentativeDate).prop('disabled',true).prop('required',false);
+    }
+}
+
 function advancePaymentInput(source,advancePercentage,credit){
     if($(source).prop('checked') === false){
         $(credit).prop('checked',true);
