@@ -425,3 +425,4 @@ GET         /master/tradeDocumentList                                    control
 GET         /master/tradeDocumentView                                    controllers.TradeRoomController.documentView(fileName:String, documentType:String)
 GET         /master/chatRoom                                             controllers.TradeRoomController.chatRoom
 GET         /master/updateTermsStatus                                    controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
+GET         /master/tradeList                                            controllers.TradeRoomController.tradeList

@@ -83,4 +83,15 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+  def tradeList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+    val tradeList=masterTransactionTradeRooms.Service.tradeListByAccountID(loginState.username)
+      (for{
+      tradeList<-tradeList
+    }yield Ok(views.html.component.master.tradeList(tradeList))
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
 }

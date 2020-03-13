@@ -58,6 +58,8 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
+  private def getTradeListByAccountID(accountID: String) = db.run(tradeRoomTable.filter(x=> x.buyerAccountID===accountID || x.sellerAccountID ===accountID).result)
+
 
   private[models] class TradeRoomTable(tag: Tag) extends Table[TradeRoom](tag, "TradeRoom") {
 
@@ -84,6 +86,8 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def get(id: String) = findById(id)
 
     def tradeRoomIDBySalesQuoteID(salesQuoteID: String) = getTradeRoomIDBySalesQuoteID(salesQuoteID)
+
+    def tradeListByAccountID(accountID:String)=getTradeListByAccountID(accountID)
   }
 
 }

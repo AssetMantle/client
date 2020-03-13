@@ -10,13 +10,14 @@
 }
 
 @center = {
-    <li><a href="@controllers.routes.TradeRoomController.tradeRoom("RQMTTR1000120874701tqm66v6NTbtTh")">@Messages("TRADE ROOM")</a></li>
-
     @if(loginState.userType == constants.User.TRADER){
         <div class="cmuk-margin-top cmuk-margin-bottom">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
         </div>
         <div id="salesQuoteList">
+
+        </div>
+        <div id="tradeList">
 
         </div>
     }
@@ -26,5 +27,6 @@
     <script>
         @if(loginState.userType == constants.User.TRADER){
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
+                componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
             }
     </script>
