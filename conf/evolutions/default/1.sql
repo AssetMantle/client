@@ -733,7 +733,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
     "portOfDischargeValue"            VARCHAR NOT NULL,
     "portOfDischargeStatus"           BOOLEAN NOT NULL,
     "advancePaymentValue"             BOOLEAN NOT NULL,
-    "advancePercentage"               NUMERIC NOT NULL,
+    "advancePercentage"               NUMERIC,
     "advancePaymentStatus"            BOOLEAN NOT NULL,
     "creditTermsValue"                BOOLEAN NOT NULL,
     "tenure"                          VARCHAR,

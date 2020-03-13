@@ -195,7 +195,9 @@ EMAIL.LOGIN.MESSAGE = You have logged in {0}
 EMAIL.VERIFY_EMAIL.SUBJECT = Verify Email
 EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP is {0}
 EMAIL.TRADER_INVITATION.SUBJECT = Invitation to become Trader.
-EMAIL.TRADER_INVITATION.MESSAGE = Click on <a href="localhost:9000{0}">Trader</a>.
+EMAIL.TRADER_INVITATION.MESSAGE = Hi,\
+  You have been invited to be a part of Comdex by Organization: {0}.\
+  Please use this id:{1} to add as Trader for this organization. Click on "<a href="192.168.0.147">Comdex</a>.
 
 LATEST_BLOCK_HEIGHT=Latest block height
 AVERAGE_BLOCK_TIME=Average block time
@@ -272,7 +274,7 @@ FORM.ADD_TRADER.LEGEND=Add Trader
 FORM.ADD_TRADER.SUBMIT=Submit
 FORM.ADD_ZONE.SUBMIT=Submit
 FORM.VERIFY_ZONE.SUBMIT=Submit
-FORM.REVIEW_ADD_ZONE_ON_COMPLETION.LEGEND=Add Zone On Completion
+FORM.REVIEW_ADD_ZONE_ON_COMPLETION.LEGEND=Review Add Zone On Completion
 FORM.REVIEW_ADD_ZONE_ON_COMPLETION.SUBMIT=Submit
 FORM.USER_REVIEW_ADD_ORGANIZATION_REQUEST.LEGEND=User Review Add Organization Request
 FORM.USER_REVIEW_ADD_ORGANIZATION_REQUEST.SUBMIT=Submit

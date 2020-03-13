@@ -63,7 +63,7 @@ object profileControllerTest {
         Form.ID_NUMBER -> "${%s}".format(Test.TEST_ID_NUMBER),
         Form.ID_TYPE -> "${%s}".format(Test.TEST_ID_TYPE)
       ))
-      .check(substring("SUCCESS IDENTIFICATION_ADDED").exists)
+      .check(substring("SUCCESS RESPONSE.SUCCESS.IDENTIFICATION_ADDED").exists)
     )
 
 

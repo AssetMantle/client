@@ -40,7 +40,7 @@ object setACLControllerTest {
 
     .exec(http("Add_Trader_Form_GET")
       .get(routes.SetACLController.addTraderForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.ADD_TRADER.legend)).exists)
+      .check(css("legend:contains(%s)".format("Add Trader")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(2)
@@ -92,7 +92,7 @@ object setACLControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
-      .check(substring("SUCCESS TRADER_ADDED_FOR_VERIFICATION").exists)
+      .check(substring("Trader Added For Verification").exists)
     )
     .pause(3)
 
@@ -172,7 +172,7 @@ object setACLControllerTest {
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.PASSWORD -> "${%s}".format(Test.TEST_ORGANIZATION_PASSWORD)
       ))
-      .check(substring("SUCCESS ACL_SET").exists)
+      .check(substring("Acl Set").exists)
     )
     .pause(2)
 

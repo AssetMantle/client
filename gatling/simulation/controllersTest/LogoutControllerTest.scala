@@ -26,7 +26,7 @@ object logoutControllerTest {
       .formParamMap(Map(
         Form.RECEIVE_NOTIFICATIONS -> false,
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
-      .check(substring("SUCCESS LOGGED_OUT").exists)
+      .check(substring("Logged Out").exists)
     )
     .pause(2)
 }
