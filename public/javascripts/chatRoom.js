@@ -42,7 +42,6 @@ function submitChat(source, target = '#chatContainer') {
                     const loadMore = $(".chatContainer .chat:last");
                     console.log(data);
                     loadMore.after('<li class="chat sender cmuk-text-right">' + data.fromAccountID + ':' + data.message + '</li>');
-                    loadMore.remove();
                     $("#MESSAGE").val("");
 
                 },
