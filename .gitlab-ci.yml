@@ -1,7 +1,7 @@
 image: ubuntu
 
 before_script:
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)
   - echo "$DEV_SSH_KEY" | tr -d '\r' | ssh-add -
   - mkdir -p ~/.ssh
@@ -11,6 +11,8 @@ before_script:
 
 
 deploy:
-  script: ssh $DEV_SSH_USER@$DEV_SSH_HOST /home/deployment/update_commit.sh
+  script:
+    - echo $DEV_SSH_HOST $DEV_SSH_USER 
+    - ssh $DEV_SSH_USER@$DEV_SSH_HOST /home/deployment/update_commit.sh
   only: 
     - comdexClient
