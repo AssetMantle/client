@@ -99,10 +99,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       (for {
         allChatWindows <- allChatWindows
         allChatWindowsParticipants <- allChatWindowsParticipants(allChatWindows.map(_.id))
-        result <- Future(Ok(views.html.component.master.chatRoom(allChatWindows, allChatWindowsParticipants)))
-      } yield result
+      } yield Ok(views.html.component.master.chatRoom(allChatWindows, allChatWindowsParticipants))
         ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -121,10 +120,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-            result <- Future(Ok(views.html.component.master.chatWindow(views.companion.master.SendChat.form.fill(views.companion.master.SendChat.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID)))
-          } yield result
+          } yield Ok(views.html.component.master.chatWindow(views.companion.master.SendChat.form.fill(views.companion.master.SendChat.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID))
         } else {
-          Future(Unauthorized(constants.Response.UNAUTHORIZED.message))
+          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 
@@ -133,7 +131,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -152,10 +150,9 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-            result <- Future(Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatWindowID)))
-          } yield result
+          } yield Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatWindowID))
         } else {
-          Future(Unauthorized(constants.Response.UNAUTHORIZED.message))
+          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 
@@ -164,7 +161,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -213,8 +210,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       val chat = chats.Service.get(chatWindowID, chatID)
       (for {
         chat <- chat
-        result <- Future(Ok(Json.toJson(chat)))
-      } yield result
+      } yield Ok(Json.toJson(chat))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -231,8 +227,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       (for {
         chatIDs <- chatIDs
         _ <- markRead(chatIDs)
-        result <- Future(Ok(constants.Response.MESSAGE_READ.message))
-      } yield result
+      } yield Ok(constants.Response.MESSAGE_READ.message)
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
