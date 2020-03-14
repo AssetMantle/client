@@ -52,7 +52,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   // tradeRoom main view page skeleton
   def tradeRoom: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.tradeRoom("tradeID")))
+      withUsernameToken.Ok(views.html.tradeRoom("tradeID"))
   }
 
   // populates the trade Financials in the tradeRoom page, position- left top
@@ -99,7 +99,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       (for {
         allChatWindows <- allChatWindows
         allChatWindowsParticipants <- allChatWindowsParticipants(allChatWindows.map(_.id))
-        result <- withUsernameToken.Ok(views.html.component.master.chatRoom(allChatWindows, allChatWindowsParticipants))
+        result <- Future(Ok(views.html.component.master.chatRoom(allChatWindows, allChatWindowsParticipants)))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -121,7 +121,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-            result <- withUsernameToken.Ok(views.html.component.master.chatWindow(views.companion.master.SendChat.form.fill(views.companion.master.SendChat.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID))
+            result <- Future(Ok(views.html.component.master.chatWindow(views.companion.master.SendChat.form.fill(views.companion.master.SendChat.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID)))
           } yield result
         } else {
           Future(Unauthorized(constants.Response.UNAUTHORIZED.message))
@@ -152,7 +152,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-            result <- withUsernameToken.Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatWindowID))
+            result <- Future(Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatWindowID)))
           } yield result
         } else {
           Future(Unauthorized(constants.Response.UNAUTHORIZED.message))
@@ -213,7 +213,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       val chat = chats.Service.get(chatWindowID, chatID)
       (for {
         chat <- chat
-        result <- withUsernameToken.Ok(Json.toJson(chat))
+        result <- Future(Ok(Json.toJson(chat)))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -231,7 +231,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       (for {
         chatIDs <- chatIDs
         _ <- markRead(chatIDs)
-        result <- withUsernameToken.Ok(constants.Response.MESSAGE_READ.message)
+        result <- Future(Ok(constants.Response.MESSAGE_READ.message))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)

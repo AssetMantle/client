@@ -8,7 +8,7 @@
 
 @(sendChatForm: Form[SendChat.Data] = SendChat.form, chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 <div class="cmuk-card-body">
-<div id="chatMessages" class="chatMessages">
+<div id="chatMessages" class="chatMessages chat" title="You have chat with">
     <script>
             componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatWindowID', 0))
     </script>
@@ -17,9 +17,9 @@
 @if(chats.length > 0) {
     @* write the markchat read logic here*@
     @if(readChats.filter(x => x.chatID == chats.head.id).filter(x => x.toAccountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
-        <a onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatWindowID'))">@Messages("MARK_AS_READ")</a>
+        <a onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatWindowID'))" style="font-size: 12px;">@Messages("MARK_AS_READ")</a>
     }
-    <div>@Messages("READ_BY") : @readChats.filter(_.chatID == chats.head.id).map(_.toAccountID).mkString</div>
+    <div style="font-size: 12px;">@Messages("READ_BY") : @readChats.filter(_.chatID == chats.head.id).map(_.toAccountID).mkString</div>
 }
 </div>
 <div class="chatform">

@@ -7,34 +7,53 @@
 
 @(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-<div id="chatCointainer" class="chatContainer">
-    <div class = "chat loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+<div id="chatContainer" class="chatContainer chat_history">
+    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')" >@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
     @for(chat <- chats.reverse) {
         @if(chat.fromAccountID == loginState.username) {
-            <li class="chat sender cmuk-text-right">
-                @chat.replyToID match {
-                    case Some(replyToChatID) => {
-                        <script>
-                                 replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))
+            <li class="sender chatMessage">
+                <div class="you">
+                    @chat.replyToID match {
+                        case Some(replyToChatID) => {
+                            <div class="messageContent cmuk-text-right">
+                                <p id="@chat.replyToID@chat.id"></p>
+                                <script>
+                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'),'@chat.id')
                         </script>
+                            </div>
+                        }
+                        case None => {}
                     }
-                    case None => {}
-                }
-                <p onclick="replyButton('@chat.id','@chat.message','@chat.fromAccountID')">@chat.fromAccountID : @chat.message</p>
+                    <p onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">@chat.fromAccountID
+                        : @chat.message</p>
+                </div>
+                <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
             </li>
         } else {
             @* unread bar for viewer logic here _.chatid == chatid, to account == loginstate, read at time ==nondefining, show unread messages.*@
-            <li class="chat receiver cmuk-text-left">
-            @chat.replyToID match {
-                case Some(replyToChatID) => {
-                    <a onclick="replyMessage(this, jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'))">here</a>
-                }
-                case None => {}
-            }
-                <p onclick="replyButton('@chat.id','@chat.message','@chat.fromAccountID')">@chat.fromAccountID : @chat.message</p>
-            @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
-                <span class="unreadMessage">@Messages("UNREAD")</span>
-            }
+            <li class="receiver chatMessage">
+                <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
+                <div class="patner">
+                    @chat.replyToID match {
+                        case Some(replyToChatID) => {
+                            <div class="messageContent cmuk-text-right">
+                                <p id="@chat.replyToID@chat.id"></p>
+                                <script>
+                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'),'@chat.id')
+                        </script>
+                            </div>
+                        }
+                        case None => {}
+                    }
+                    <p onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">@chat.fromAccountID
+                        : @chat.message</p>
+                    @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
+@*                        <p style="font-size:10px;text-align: right" class="unread">unread</p>*@
+                        <script>
+                              unReadBar();
+                      </script>
+                    }
+                </div>
             </li>
         }
     }

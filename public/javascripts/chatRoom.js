@@ -6,7 +6,7 @@ function loadMoreChats(chatWindowID) {
         async: true,
         statusCode: {
             200: function (data) {
-                const loadMore = $(".chatContainer .chat:first");
+                const loadMore = $(".chatContainer .chatMessage:last");
                 loadMore.before(data);
                 loadMore.remove();
             }
@@ -25,6 +25,7 @@ function submitChat(source, target = '#chatContainer') {
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);
+        console.log(form);
         $.ajax({
             type: 'POST',
             contentType: 'application/x-www-form-urlencoded',
@@ -33,35 +34,50 @@ function submitChat(source, target = '#chatContainer') {
             async: true,
             statusCode: {
                 400: function (data) {
+
                     result.prepend(data.responseText);
                 },
                 500: function (data) {
                     result.prepend(data.responseText);
                 },
                 200: function (data) {
-                    const loadMore = $(".chatContainer .chat:last");
+                    const loadMore = $(".chatContainer .chatMessage:last");
                     console.log(data);
-                    loadMore.after('<li class="chat sender cmuk-text-right">' + data.fromAccountID + ':' + data.message + '</li>');
-                    loadMore.remove();
                     $("#MESSAGE").val("");
+                    $("#REPLY_TO_CHAT").val("");
+                    $("#replyBox").fadeOut();
+                    if (data.replyToID !== undefined) {
+                        console.log("you replies");
+                        loadMore.after('<li class="chatMessage sender"><div class="you"><div class="messageContent cmuk-text-right">' + '<p id="' + data.replyToID + data.id + '"></p>' +
+                            '<p style="color:#FFFFFF" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' + data.fromAccountID + ':' + data.message + '</p>' + '</div></div><span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span></li>');
+                        replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat(data.chatWindowID, data.replyToID),data.id);
+                    } else {
+                        console.log("you no replies");
+                        loadMore.after('<li class="chatMessage sender"><div class="you"><div class="messageContent cmuk-text-right">' + '<p style="color:#FFFFFF" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' + data.fromAccountID + ' : ' + data.message + '</p>' + '</div></div><span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span></li>');
+                    }
+                    markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead(data.chatWindowID))
 
                 },
+
             }
+
         }).fail(function (XMLHttpRequest) {
             if (XMLHttpRequest.readyState === 0) {
                 $('#connectionError').fadeIn(100);
             }
         });
     }
+    scrollToTop();
+
 }
 
-function replyButton(replyToChatID,replyMessage,fromAccount) {
+function replyButton(replyToChatID, replyMessage, fromAccount) {
     // the animation login here
     console.log(replyMessage);
     $("#REPLY_TO_CHAT").val(replyToChatID);
     $("#replyBox").fadeIn();
     document.getElementById("replyAccount").innerHTML = fromAccount;
-    document.getElementById("replymessage").innerHTML =  replyMessage;
+    document.getElementById("replymessage").innerHTML = replyMessage;
 }
 
 function markChatRead(route) {
@@ -71,7 +87,7 @@ function markChatRead(route) {
         async: true,
         statusCode: {
             200: function (data) {
-                //add the persons name in read list
+               $('.unread').hide();
             },
             401: function (data) {
                 replaceDocument(data.responseText);
@@ -84,7 +100,8 @@ function markChatRead(route) {
     });
 }
 
-function replyMessage(source, route) {
+function replyMessage(route, chatID) {
+    console.log(chatID);
     $.ajax({
         url: route.url,
         type: route.type,
@@ -92,8 +109,10 @@ function replyMessage(source, route) {
         statusCode: {
             200: function (data) {
                 //add the reply data..
-                console.log("reply message",data.message);
-                $(source).html(data.message);
+                // document.getElementById("repliedMessage").innerHTML = data.message;
+                $('#' + data.id + chatID).html(data.message);
+                console.log(data);
+                // $(source).html(data.message);
             },
             401: function (data) {
                 replaceDocument(data.responseText);
@@ -103,4 +122,22 @@ function replyMessage(source, route) {
             }
         }
     });
+}
+
+function scrollToTop() {
+    var height = 0;
+    $('#chatContainer li').each(function (i, value) {
+        height += parseInt($(this).height());
+    });
+    height += '';
+    $('#chatContainer').animate({scrollTop: height});
+}
+
+function unReadBar() {
+    if ($('#unRead').length == 0) {
+        console.log($('#unRead').length);
+        const loadMore = $(".chatContainer .chatMessage:last");
+        loadMore.append('<div id="unRead" style="color:red">un read message</div>');
+    } else {
+    }
 }
