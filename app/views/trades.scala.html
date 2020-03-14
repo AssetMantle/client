@@ -5,28 +5,30 @@
 
 @common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(Html(""))
 
-@left={
-
+@left = {
+    <div id="payableReceivable"></div>
 }
 
 @center = {
-    @if(loginState.userType == constants.User.TRADER){
-        <div class="cmuk-margin-top cmuk-margin-bottom">
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
-        </div>
-        <div id="salesQuoteList">
+@if(loginState.userType == constants.User.TRADER) {
+    <div class="cmuk-margin-top cmuk-margin-bottom">
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
+    </div>
+    <div id="salesQuoteList">
 
-        </div>
-        <div id="tradeList">
+    </div>
+    <div id="tradeList">
 
-        </div>
-    }
+    </div>
+}
     <h2>Trades PageUnderConstruction</h2>
 }
 
-    <script>
-        @if(loginState.userType == constants.User.TRADER){
+<script>
+    @if(loginState.userType == constants.User.TRADER) {
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
+                componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+
             }
-    </script>
+</script>

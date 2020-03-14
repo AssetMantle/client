@@ -86,6 +86,7 @@ GET         /master/component/availableAssetList                         control
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
 GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
+GET         /master/component/payableReceivable                          controllers.ComponentViewController.payableReceivable
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
@@ -304,6 +305,7 @@ GET         /master/negotiationComet                                     control
 GET         /master/orderComet                                           controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequestForm
+POST        /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequest
 
 GET         /master/viewPendingIssueFiatRequests                         controllers.IssueFiatController.viewPendingIssueFiatRequests
 GET         /master/rejectIssueFiatRequest                               controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
