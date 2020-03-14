@@ -64,9 +64,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findOrgByAccountID(accountID: String): Future[Option[OrganizationSerialized]] = db.run(organizationTable.filter(_.accountID === accountID).result.headOption)
+  private def findOrganizationByAccountID(accountID: String): Future[Option[OrganizationSerialized]] = db.run(organizationTable.filter(_.accountID === accountID).result.headOption)
 
-  private def getAccountIdById(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
+  private def getAccountIdByID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)

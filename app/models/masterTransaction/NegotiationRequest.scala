@@ -84,7 +84,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  private def findNegotiationByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[NegotiationRequest]] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).result.headOption.asTry).map {
+  private def findNegotiationOrNoneByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[NegotiationRequest]] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -92,7 +92,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  private def findIDByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[String]] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).map(_.id).result.headOption.asTry).map {
+  private def findIDOrNoneByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[String]] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).map(_.id).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -214,9 +214,9 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def checkNegotiationAndAccountIDExists(id: String, accountID: String): Future[Boolean] = checkByIDAndAccountID(id, accountID)
 
-    def getNegotiationByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[NegotiationRequest]] = findNegotiationByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
+    def getNegotiationByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[NegotiationRequest]] = findNegotiationOrNoneByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
 
-    def getIDByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[String]] = findIDByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
+    def getIDByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[String]] = findIDOrNoneByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
 
     def getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String, buyerAccountID: String, sellerAccountID: String): Future[NegotiationRequest] = findNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID)
 
