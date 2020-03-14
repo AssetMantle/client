@@ -32,7 +32,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             if (salesQuote.accountID == loginState.username) {
               withUsernameToken.Ok(views.html.component.master.commodityDetails(views.companion.master.CommodityDetails.form.fill(views.companion.master.CommodityDetails.Data(Option(salesQuote.id), salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetPrice, salesQuote.assetQuantity))))
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -43,7 +43,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         }
         case None => withUsernameToken.Ok(views.html.component.master.commodityDetails())
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
@@ -83,7 +83,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
               } yield result
             }
           }).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -105,7 +105,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         result <- getResult(salesQuote)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
@@ -250,7 +250,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             salesQuote <- salesQuote
           } yield BadRequest(views.html.component.master.traderReviewSalesQuoteDetails(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name), salesQuote))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
         traderReviewSalesQuoteDetailsData => {
@@ -274,7 +274,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
               salesQuote <- salesQuote
             } yield BadRequest(views.html.component.master.traderReviewSalesQuoteDetails(requestID = traderReviewSalesQuoteDetailsData.requestID, salesQuote = salesQuote))
           }).recover {
-            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

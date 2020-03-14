@@ -49,7 +49,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }
       )

@@ -72,7 +72,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               }
             }
             else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE))))
+              Future(Unauthorized(views.html.profile(failures = Seq(constants.Response.UNVERIFIED_ZONE))))
             }
           }
 
@@ -80,7 +80,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             verificationStatus <- verificationStatus
             result <- insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -181,7 +181,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         organizationKYCs <- getOrganizationKYCs(id)
       } yield Ok(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -197,13 +197,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       fileUploadInfo => {
         try {
           request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -230,7 +230,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -263,7 +263,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -286,7 +286,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         result <- withUsernameToken.Ok(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = zone, organizationKYCs = organizationKYCs))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -309,7 +309,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             organization <- organization
             (zone, organizationKYCs) <- getZoneOrganizationDetails(organization)
           } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(formWithErrors, organization = organization, zone = zone, organizationKYCs = organizationKYCs))).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         },
         userReviewAddOrganizationRequestData => {
@@ -322,7 +322,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               val markOrganizationFormCompleted = masterOrganizations.Service.markOrganizationFormCompleted(id)
               for {
                 _ <- markOrganizationFormCompleted
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
@@ -348,7 +348,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             allKYCFileTypesExists <- checkAllKYCFileTypesExists(id)
             result <- markOrganizationFormCompletedAndGetResult(id, allKYCFileTypesExists)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -387,10 +387,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 accountId <- accountId
                 organizationAccountAddress <- organizationAccountAddress(accountId)
                 _ <- transactionProcess(organizationAccountAddress)
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
+                result <- withUsernameToken.Ok(views.html.zoneRequest(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
               } yield result
             } else {
-              Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+              Future(PreconditionFailed(views.html.zoneRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
           }
 
@@ -399,7 +399,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             result <- processTransactionAndGetResult(allKYCFilesVerified)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -428,7 +428,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             organizationKYC <- organizationKYC
             result <- withUsernameToken.Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC))
           } yield result
-        } else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+        } else Future(Unauthorized(views.html.zoneRequest(failures = Seq(constants.Response.UNAUTHORIZED))))
       }
 
       (for {
@@ -437,7 +437,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         result <- getResult(userZoneID, organizationZoneID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
       }
   }
 
@@ -482,7 +482,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 result <- withUsernameToken.PartialContent(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC))
               } yield result
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized(views.html.zoneRequest(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -492,7 +492,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             result <- getResult(userZoneID, organizationZoneID)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -518,10 +518,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             _ <- rejectOrganization
             organizationAccountID <- organizationAccountID
             _ <- rejectAll(organizationAccountID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
+            result <- withUsernameToken.Ok(views.html.zoneRequest(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -549,7 +549,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         verifyOrganizationRequests <- verifyOrganizationRequests(zoneID)
       } yield Ok(views.html.component.master.viewPendingVerifyOrganizationRequests(verifyOrganizationRequests))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
       }
   }
 
@@ -569,13 +569,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       fileUploadInfo => {
         try {
           request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -599,7 +599,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 

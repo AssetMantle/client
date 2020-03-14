@@ -33,7 +33,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           case None=>Ok(views.html.component.master.updateContact())
         }
       }).recover{
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 

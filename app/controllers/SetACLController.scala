@@ -109,7 +109,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(traderKYCs))
               } yield result
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION))))
+              Future(Unauthorized(views.html.profile(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION))))
             }
           }
 
@@ -157,7 +157,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -184,7 +184,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(allDocuments))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -217,7 +217,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(allDocuments))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -242,7 +242,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- getResult(trader)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -268,7 +268,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             result <- getResult(trader)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         },
         userReviewAddTraderRequestData => {
@@ -281,7 +281,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(id)
               for {
                 _ <- markTraderFormCompleted
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
               val trader = masterTraders.Service.getByAccountID(loginState.username)
@@ -310,7 +310,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             result <- getResult(id, allKYCFileTypesExists)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -357,7 +357,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
               } yield result
             } else {
-              Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+              Future(PreconditionFailed(views.html.zoneRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
           }
 
@@ -418,7 +418,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- getResult(userZoneID, traderZoneID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
       }
   }
 
@@ -464,7 +464,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 result <- withUsernameToken.PartialContent(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = traderKYC))
               } yield result
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized(views.html.zoneRequest(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -503,7 +503,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -550,7 +550,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
               } yield result
             } else {
-              Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+              Future(PreconditionFailed(views.html.organizationRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
           }
 
@@ -560,7 +560,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             result <- getResult(checkAllKYCFilesVerified)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -656,7 +656,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- getResult(userOrganizationID, traderOrganizationID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
       }
   }
 
@@ -669,7 +669,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             traderKYC <- traderKYC
           } yield BadRequest(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(formWithErrors, traderKYC))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
           }
         },
         updateTraderKYCDocumentOrganizationStatusData => {
@@ -702,7 +702,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 result <- withUsernameToken.PartialContent(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = traderKYC))
               } yield result
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized(views.html.organizationRequest(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -741,7 +741,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -758,7 +758,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         verifyTraderRequestsForOrganization <- getVerifyTraderRequestsForOrganization(organizationAccount)
       } yield Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(verifyTraderRequestsForOrganization))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
       }
   }
 
@@ -780,7 +780,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -804,7 +804,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -834,7 +834,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
