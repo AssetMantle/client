@@ -598,8 +598,7 @@ dl .info:after {
   overflow: hidden;
   display: inline-block;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  height: 1.2em; }
+  white-space: nowrap; }
 
 .pageContent {
   display: flex;

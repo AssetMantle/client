@@ -115,9 +115,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def getAccountKYCFile(fileName: String, documentType: String)= withLoginAction.authenticated{implicit loginState =>
     implicit request =>
-      Future {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName))
-      }.recover {
+      val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
+
+      (for {
+        checkFileNameExists <- checkFileNameExists
+      } yield if (checkFileNameExists) Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName)) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -795,9 +798,13 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path: Future[String] = loginState.userType match {
         case constants.User.ZONE =>
-          val checkFileNameExistsZoneKYCs = masterZoneKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
+          val zoneID = masterZones.Service.getID(loginState.username)
+
+          def checkFileNameExistsZoneKYCs(zoneID: String): Future[Boolean] = masterZoneKYCs.Service.checkFileNameExists(id = zoneID, fileName = fileName)
+
           for {
-            checkFileNameExistsZoneKYCs <- checkFileNameExistsZoneKYCs
+            zoneID <- zoneID
+            checkFileNameExistsZoneKYCs <- checkFileNameExistsZoneKYCs(zoneID)
           } yield if (checkFileNameExistsZoneKYCs) fileResourceManager.getZoneKYCFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         case constants.User.ORGANIZATION =>
           val organizationID = masterOrganizations.Service.getID(loginState.username)

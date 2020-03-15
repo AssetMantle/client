@@ -96,6 +96,8 @@ object FormField {
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
+  val FROM_ID = new StringFormField("FROM_ID", 16, 16)
+  val TO_ID = new StringFormField("TO_ID", 16, 16)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)

@@ -1,5 +1,10 @@
 function componentResource(source, route){
     const div = $('#'+ source);
+    console.log('\n\n\n');
+    console.log(source);
+    console.log(route);
+    console.log(JSON.stringify(route));
+    console.log('\n\n\n');
     $.ajax({
         url: route.url,
         type: route.type,

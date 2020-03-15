@@ -6,8 +6,7 @@
 @(traderRelation: TraderRelation, traderName: String, organizationName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div>
-    @commonTextInfo(key = constants.View.ACCOUNT_ID, traderRelation.toID)
-    @commonTextInfo(key = constants.View.TRADER_NAME, traderName)
-    @commonTextInfo(key = constants.View.ORGANIZATION_NAME, organizationName)
+    @commonTextInfo(constants.View.TRADER_NAME, traderName)
+    @commonTextInfo(constants.View.ORGANIZATION_NAME, organizationName)
     @acceptOrRejectTraderRelation(traderRelation = traderRelation)
 </div>

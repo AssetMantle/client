@@ -9,7 +9,7 @@
         @defining(Seq(acceptedTraderRelation.fromID, acceptedTraderRelation.toID).mkString("")) { componentID =>
             @commonInfoBox(componentID) {
                 <script>
-                    componentResource('@componentID', routes.javascript.AccountController.acceptedTraderRelation('@acceptedTraderRelation.toID'))
+                    componentResource('@componentID', jsRoutes.controllers.AccountController.acceptedTraderRelation('@acceptedTraderRelation.toID'))
                 </script>
             }
         }

@@ -6,10 +6,10 @@ import play.api.data.Forms.{mapping, optional}
 object TraderRelationRequest {
   val form = Form(
     mapping(
-      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(to: String)
+  case class Data(accountID: String)
 
 }

@@ -10,8 +10,8 @@
 <div id="@traderRelation.id">
 @form(action = routes.AccountController.acceptOrRejectTraderRelation, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.FROM, 'value -> traderRelation.fromID, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.TO, 'value -> traderRelation.toID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.FROM_ID, 'value -> traderRelation.fromID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.TO_ID, 'value -> traderRelation.toID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(acceptOrRejectTraderRelationForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderRelation.fromID, traderRelation.toID, constants.FormField.STATUS.name).mkString(""))
 
     @if(acceptOrRejectTraderRelationForm.hasGlobalErrors) {

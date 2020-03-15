@@ -20,7 +20,6 @@ GET         /organizationInformation                                     control
 GET         /market                                                      controllers.ViewController.market
 GET         /profile                                                     controllers.ViewController.profile
 
-GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
 
 GET         /account/noteAndVerifyMnemonic                               controllers.AccountController.noteAndVerifyMnemonic
@@ -55,7 +54,7 @@ GET         /account/acceptedTraderRelationList                          control
 GET         /account/pendingTraderRelationList                           controllers.AccountController.pendingTraderRelationList
 GET         /account/acceptedTraderRelation                              controllers.AccountController.acceptedTraderRelation(toID: String)
 GET         /account/pendingSentTraderRelation                           controllers.AccountController.pendingSentTraderRelation(toID: String)
-GET         /account/pendingReceivedTraderRelation                       controllers.AccountController.pendingReceivedTraderRelation(toID: String)
+GET         /account/pendingReceivedTraderRelation                       controllers.AccountController.pendingReceivedTraderRelation(fromID: String)
 
 
 GET         /contact                                                     controllers.ContactController.contact

@@ -4,8 +4,15 @@
 @import views.html.component.master.commonDocumentViewer
 @import models.master.TraderKYC
 
-@(trader: Trader, organization: Organization, traderKYCs: Seq[TraderKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(trader: Trader, organization: Organization, traderKYCs: Seq[TraderKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
+<div>
+    <span>@Messages(constants.Form.TRADER_DETAILS)</span>
+    <br>
+        @commonTextInfo(constants.Form.NAME, trader.name)
+        @commonTextInfo(constants.Form.TRADER_ID, trader.id)
+        @commonBooleanInfo(constants.Form.VERIFIED_STATUS, trader.verificationStatus)
+</div>
 <div>
     <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
     <br>
@@ -16,14 +23,7 @@
         @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
         @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
         @commonTextInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate.toString)
-        @commonStatusInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
-</div>
-<div>
-    <span>@Messages(constants.Form.TRADER_DETAILS)</span>
-    <br>
-        @commonTextInfo(constants.Form.NAME, trader.name)
-        @commonTextInfo(constants.Form.TRADER_ID, trader.id)
-        @commonStatusInfo(constants.Form.VERIFIED_STATUS, trader.verificationStatus)
+        @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
 </div>
 <div>
     <span>@Messages(constants.View.TRADER_DOCUMENTS)</span>

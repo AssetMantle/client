@@ -44,6 +44,14 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findByEmail(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.head.asTry).map {
+    case Success(result) => Option(result)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
   private def getEmailAddressById(id: String, emailAddressVerified: Option[Boolean]): Future[String] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified.? === emailAddressVerified).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -136,7 +144,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Future[Option[Contact]] = findById(id)
+    def getOrNoneContact(id: String): Future[Option[Contact]] = findById(id)
+
+    def getOrNoneContactByEmail(email: String): Future[Option[Contact]] = findByEmail(email)
 
     def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] = upsert(Contact(id, mobileNumber, mobileNumberVerified = false, emailAddress, emailAddressVerified = false)).map { value => if (value > 0) true else false }
 

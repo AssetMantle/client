@@ -1,17 +1,28 @@
-@(items: Seq[(String, Html)])(implicit messagesProvider: MessagesProvider)
+@(items: Seq[(String, Html, Option[String])])(implicit messagesProvider: MessagesProvider)
 
 <div>
-    <ul class="cmuk-subnav cmuk-subnav-divider" cmuk-switcher="animation: cmuk-animation-fade">
+    <ul class="cmuk-subnav cmuk-subnav-pill" cmuk-switcher="animation: cmuk-animation-fade">
         @for(item <- items) {
             @if(item._1 != "") {
-                <li><a href="#">@Messages(item._1)</a></li>
+                <li>
+                @if(item._3.isDefined) {
+                    @defining(Seq(item._3.get, "()").mkString("")) { route =>
+                        <a href="#" onclick="componentResource('switcher@item._1', @route)">@Messages(item._1)</a>
+                        <script>
+                                componentResource('switcher@item._1', @route)
+                        </script>
+                    }
+                } else {
+                    <a href="#">@Messages(item._1)</a>
+                }
+                </li>
             }
         }
     </ul>
     <ul class="cmuk-switcher cmuk-margin">
     @for(item <- items) {
         @if(item._1 != "") {
-            <li>@item._2</li>
+            <li id="switcher@item._1">@item._2</li>
         }
     }
     </ul>

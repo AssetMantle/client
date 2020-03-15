@@ -104,7 +104,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
         routes.javascript.ComponentViewController.organizationViewTraderList,
         routes.javascript.ComponentViewController.organizationViewTrader,
-        routes.javascript.ComponentViewController.profileDocuments,
         routes.javascript.ComponentViewController.profilePicture,
         routes.javascript.ComponentViewController.accountDetails,
         routes.javascript.ComponentViewController.transactionDetails,

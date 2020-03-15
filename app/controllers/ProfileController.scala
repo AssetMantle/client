@@ -110,9 +110,9 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
 
           def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
             if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
-              //TODO markIdentificationFormCompleted
+              val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
               for {
-                //TODO _ <- markIdentificationFormCompleted
+                _ <- updateCompletionStatus
                 result <- withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
@@ -187,7 +187,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
             def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) getOrganizationKYCs(organization.get.id) else Future(Seq[OrganizationKYC]())
 
             def getUserResult(identification: Option[Identification], accountStatus: String): Future[Result] = {
-              val identificationStatus = if (identification.isDefined) identification.get.status.getOrElse(false) else false
+              val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
               if (identificationStatus && accountStatus == constants.Status.Account.COMPLETE) {
                 for {
                   trader <- getTraderOrNoneByAccountID(loginState.username)

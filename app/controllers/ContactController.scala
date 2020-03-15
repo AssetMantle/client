@@ -75,7 +75,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.getContact(loginState.username)
+      val contact = masterContacts.Service.getOrNoneContact(loginState.username)
       (for {
         contact <- contact
       } yield Ok(views.html.component.master.contact(contact))

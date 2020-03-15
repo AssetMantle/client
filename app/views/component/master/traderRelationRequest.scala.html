@@ -4,5 +4,5 @@
 
 @(sendRelationRequestForm: Form[TraderRelationRequest.Data] = TraderRelationRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.TRADER_RELATION_REQUEST, sendRelationRequestForm) {
-  @commonInputText(sendRelationRequestForm, constants.FormField.TO)
+  @commonInputText(sendRelationRequestForm, constants.FormField.ACCOUNT_ID)
 }

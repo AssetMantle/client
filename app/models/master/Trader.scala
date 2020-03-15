@@ -134,6 +134,14 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def findVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteById(id: String) = db.run(traderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -253,6 +261,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def getVerifiedTradersForOrganization(organizationID: String): Future[Seq[Trader]] = getVerifiedTradersByOrganizationID(organizationID)
 
     def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusById(id).map(_.getOrElse(false))
+
+    def getVerificationStatusByAccountID(accountID: String): Future[Boolean] = findVerificationStatusByAccountID(accountID).map(_.getOrElse(false))
 
     def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 

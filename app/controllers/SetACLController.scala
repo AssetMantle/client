@@ -6,7 +6,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Organization, Trader, TraderKYC}
+import models.master.{Contact, Organization, Trader, TraderKYC}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
@@ -37,19 +37,25 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         addTraderRequestData => {
 
-          val checkEmailPresence = masterContacts.Service.checkEmailPresence(addTraderRequestData.emailAddress)
+          val contact: Future[Option[Contact]] = masterContacts.Service.getOrNoneContactByEmail(addTraderRequestData.emailAddress)
 
-          def createSendInvitationAndGetResult(checkEmailPresence: Boolean) = {
-            if (false) {
+          def inviteeUserType(contact: Option[Contact]): Future[String] = if (contact.isDefined) {
+            masterAccounts.Service.getUserType(contact.get.id)
+          } else {
+            Future(constants.User.USER)
+          }
+
+          def createSendInvitationAndGetResult(inviteeUserType: String): Future[Result] = {
+            if (inviteeUserType != constants.User.USER) {
               Future(BadRequest(views.html.index(failures = Seq(constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE))))
             } else {
 
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
 
-              def createInvitation(_organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = _organization.id, inviteeEmail = addTraderRequestData.emailAddress)
+              def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmail = addTraderRequestData.emailAddress)
 
               def sendEmailAndGetResult(organizationName: String, organizationID: String): Future[Result] = {
-                utilitiesNotification.sendEmailViaAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, constants.Notification.TRADER_INVITATION.email.get, organizationName, organizationID)
+                utilitiesNotification.sendEmailViaAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, constants.Notification.ORGANIZATION_TRADER_INVITATION.email.get, organizationName, organizationID)
                 withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 
@@ -63,8 +69,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
 
           (for {
-            checkEmailPresence <- checkEmailPresence
-            result <- createSendInvitationAndGetResult(checkEmailPresence)
+            contact <- contact
+            inviteeUserType <- inviteeUserType(contact)
+            result <- createSendInvitationAndGetResult(inviteeUserType)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

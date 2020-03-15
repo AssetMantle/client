@@ -85,6 +85,7 @@ object Response {
   val FAILURE = new Failure("FAILURE")
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
   val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
+  val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")
   val PSQL_EXCEPTION = new Failure("PSQL_EXCEPTION")
   val JSON_PARSE_EXCEPTION = new Failure("JSON_PARSE_EXCEPTION")
   val JSON_MAPPING_EXCEPTION = new Failure("JSON_MAPPING_EXCEPTION")
@@ -126,6 +127,7 @@ object Response {
   val FORM_FIELDS_CANNOT_BE_EMPTY = new Failure("FORM_FIELDS_CANNOT_BE_EMPTY")
   val CANNOT_FILL_ALL_FIELDS = new Failure("CANNOT_FILL_ALL_FIELDS")
   val COUNTERPARTY_CANNOT_BE_SELF = new Failure("COUNTERPARTY_CANNOT_BE_SELF")
+  val COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION = new Failure("COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

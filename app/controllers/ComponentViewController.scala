@@ -240,47 +240,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       Future(Ok.chunked(blockchainOrders.Service.orderCometSource(loginState.username) via Comet.json("parent.orderCometMessage")).as(ContentTypes.HTML))
   }
 
-  def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val documents: Future[Seq[Document[_]]] = loginState.userType match {
-        case constants.User.ZONE =>
-          val id = masterZones.Service.getID(loginState.username)
-
-          def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYC.Service.getAllDocuments(loginState.username)
-
-          for {
-            id <- id
-            zoneKYCs <- zoneKYCs(id)
-          } yield zoneKYCs
-        case constants.User.ORGANIZATION =>
-          val id = masterOrganizations.Service.getID(loginState.username)
-
-          def organizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
-
-          for {
-            id <- id
-            organizationKYCs <- organizationKYCs(id)
-          } yield organizationKYCs
-        case constants.User.TRADER =>
-          val id = masterTraders.Service.getID(loginState.username)
-
-          def traderKYCs(id: String): Future[Seq[TraderKYC]] = masterTraderKYCs.Service.getAllDocuments(id)
-
-          for {
-            id <- id
-            traderKYCs <- traderKYCs(id)
-          } yield traderKYCs
-        case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
-        case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
-      }
-      (for {
-        documents <- documents
-      } yield Ok(views.html.component.master.profileDocuments(documents))
-        ).recover {
-        case _: BaseException => InternalServerError
-      }
-  }
-
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val profilePicture = masterAccountFile.Service.getProfilePicture(loginState.username)
