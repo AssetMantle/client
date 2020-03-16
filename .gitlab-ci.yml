@@ -1,51 +1,18 @@
-image: openjdk:11-jdk-slim
-stages:
-  - build
-  - deploy
+image: ubuntu
 
 before_script:
-  - echo $SERVER_PEM
-  - apt-get update
-  - apt-get -y install sudo
-  - apt-get -y install zip
-  - apt-get -y install curl
-  - apt-get -y install wget
-  - apt-get -y install git
-  - apt-get -y install --reinstall build-essential
-  - apt-get install openssh-client
-  ## install go 1.13 and install blockchain #note: bash lines should be appended before sdkman lines
-  - echo 'export GO111MODULE=on' >> ~/.bashrc
-  - echo 'export GOPATH=$HOME/go/path' >> ~/.bashrc
-  - echo 'export GOBIN=$HOME/go/bin' >> ~/.bashrc
-  - echo 'export PATH=$GOPATH:$GOBIN:$PATH' >> ~/.bashrc
-  - source ~/.bashrc
-  - cd $HOME
-  - wget https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
-  - tar -xzvf go1.13.5.linux-amd64.tar.gz
-
-  ## installation of sbt to run comdex scala app
-  - curl -s "https://get.sdkman.io" | bash
-  - source "$HOME/.sdkman/bin/sdkman-init.sh"
-  - sdk version
-  - sdk install sbt
-  - echo 'export function cd {builtin cd "$@" && ls}' >> ~/.bashrc
-
-  ## postgres installation and running 0.sql
-  - sudo apt-get install -y postgresql postgresql-client libpq-dev
-  - ls
-  - pwd
-  - cd /builds/deepanshutr/commitCentral/
-  - ls conf/evolutions/default/
-  - sudo service postgresql start
-  - sudo -u $POSTGRES_USER psql -c "alter user $POSTGRES_USER with password '$POSTGRES_PASSWORD';"
-  - sudo -u $POSTGRES_USER psql -U $POSTGRES_USER -a -f "conf/evolutions/default/0.sql"
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$DEV_SSH_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan $DEV_SSH_HOST >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
 
 
-
-build_local:
-  type: build
-  tags:
-    - linux
+deploy:
   script:
-    - sbt clean dist exit
-    - sbt clean dist exit
+    - echo $DEV_SSH_HOST $DEV_SSH_USER 
+    - ssh $DEV_SSH_USER@$DEV_SSH_HOST /home/ubuntu/deployment/update_commit.sh
+  only: 
+    - comdexClient
