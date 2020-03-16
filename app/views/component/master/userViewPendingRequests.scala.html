@@ -1,0 +1,53 @@
+@import controllers.actions.LoginState
+@import play.twirl.api.Html
+@import views.html.component.master._
+@import models.master.{Organization, OrganizationKYC, Trader, TraderKYC, Zone}
+@import views.html.base._
+@import models.master.Identification
+
+@(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, loginState: LoginState)
+
+@commonCard() {
+    <div>
+        <span>@Messages(constants.View.USER_VIEW_PENDING_REQUESTS)</span>
+    </div>
+} {
+    @if(identification.isDefined) {
+        @if(accountStatus == constants.Status.Account.COMPLETE) {
+            @identification.get.verificationStatus match {
+                case Some(status) => {
+                    @if(status) {
+                        @defining[Map[String, Html]](if(organization.isDefined && trader.isDefined) {
+                            Map(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs),
+                                constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs),
+                            )
+                        } else if(organization.isDefined && trader.isEmpty) {
+                            Map(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs),
+                            )
+                        } else if(organization.isEmpty && trader.isDefined) {
+                            Map(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs),
+                            )
+                        } else {
+                            Map()
+                        }) { htmlItems =>
+                            @commonHorizontalSwitcher(htmlItems = htmlItems)
+                        }
+                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+                    } else {
+                        @Messages(constants.View.IDENTIFICATION_REJECTED)
+                    }
+                }
+                case None => {
+                    @Messages(constants.View.PENDING_IDENTIFICATION_VERIFICATION)
+                }
+            }
+        } else {
+            @Messages(accountStatus) <br>
+        }
+    } else {
+        @if(accountStatus != constants.Status.Account.COMPLETE) {
+            @Messages(accountStatus) <br>
+        }
+        @Messages(constants.Form.UPLOAD_IDENTIFICATION)
+    }
+}

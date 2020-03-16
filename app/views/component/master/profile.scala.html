@@ -54,30 +54,69 @@
             }
             </div>
         </div>
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-            <div id="userTypeDetails"></div>
-            <div class="cmuk-width-expand@@m">
-            @commonCard() {
-                <div>
-                    <span>@Messages(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL)</span>
+        @loginState.userType match {
+            case constants.User.USER => {
+                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                    <div class="cmuk-width-expand@@m">
+                        <div id="userViewPendingRequests"></div>
+                    </div>
+
                 </div>
-            } {
-                <div id="identificationDetails">
-                </div>
+                <script>
+                    componentResource('userViewPendingRequests', jsRoutes.controllers.ProfileController.userViewPendingRequests());
+                </script>
+
             }
-            </div>
-        </div>
+            case constants.User.TRADER => {
+                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                    <div class="cmuk-width-expand@@m">
+                        <div id="traderViewOrganizationDetails"></div>
+                    </div>
+
+                    <div class="cmuk-width-expand@@m">
+                        <div id="traderViewOrganizationBankAccountDetails"></div>
+                    </div>
+
+                </div>
+                <script>
+                    componentResource('traderViewOrganizationDetails', jsRoutes.controllers.ProfileController.traderViewOrganizationDetails());
+                </script>
+            }
+            case constants.User.ORGANIZATION => {
+                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                    <div class="cmuk-width-expand@@m">
+                        <div id="viewOrganizationDetails"></div>
+                    </div>
+
+                    <div class="cmuk-width-expand@@m">
+                        <div id="viewOrganizationBankAccountDetails"></div>
+                    </div>
+
+                </div>
+                <script>
+                    componentResource('viewOrganizationDetails', jsRoutes.controllers.ProfileController.viewOrganizationDetails());
+                </script>
+            }
+            case _ => {}
+
+        }
+
         <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
             @if(loginState.userType == constants.User.TRADER) {
                 <div id="traderRelationList"></div>
             }
         </div>
+
+
     </div>
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('contactDetails', jsRoutes.controllers.ContactController.contact());
             componentResource('identificationDetails', jsRoutes.controllers.ProfileController.identificationDetails());
-            componentResource('userTypeDetails', jsRoutes.controllers.ProfileController.userTypeDetails());
+
             @*//TODO Remove when shifting to account *@
             componentResource('traderRelationList', jsRoutes.controllers.AccountController.traderRelationList());
     </script>

@@ -2,11 +2,18 @@
 @import views.html.base._
 @import models.master.Organization
 
-@( organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
-<div>
-    @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
-    @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-    @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
-    @commonTextInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate.toString)
-    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
-</div>
+@(traderOrganization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard() {
+    <div>
+        <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
+    </div>
+    } {
+        <div>
+            @commonTextInfo(constants.Form.ORGANIZATION_NAME, traderOrganization.name)
+            @commonTextInfo(constants.Form.ABBREVIATION, traderOrganization.abbreviation.getOrElse(""))
+            @commonTextInfo(constants.Form.ORGANIZATION_ID, traderOrganization.id)
+            @commonTextInfo(constants.Form.ESTABLISHMENT_DATE, traderOrganization.establishmentDate.toString)
+            @commonBooleanInfo(constants.Form.VERIFIED_STATUS, traderOrganization.verificationStatus)
+        </div>
+    }

@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -13,7 +13,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ProfileController @Inject()(messagesControllerComponents: MessagesControllerComponents, utilitiesNotification: utilities.Notification, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, masterAccountKYCs: master.AccountKYCs, masterContacts: master.Contacts, masterOrganizations: master.Organizations, masterIdentifications: master.Identifications, masterZones: master.Zones, masterTraders: master.Traders, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ProfileController @Inject()(messagesControllerComponents: MessagesControllerComponents, utilitiesNotification: utilities.Notification, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, masterAccountKYCs: master.AccountKYCs, masterContacts: master.Contacts, masterOrganizations: master.Organizations, masterIdentifications: master.Identifications, masterZones: master.Zones, masterTraders: master.Traders, withLoginAction: WithLoginAction, withUserLoginAction: WithUserLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -142,92 +142,80 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def userTypeDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val accountStatus: Future[String] = masterAccounts.Service.getStatus(loginState.username)
 
-      def getZone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
+      def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.getOrNoneByAccountID(accountID)
 
-      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+      def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
 
-      def getOrganizationByAccountID(accountID: String): Future[Organization] = masterOrganizations.Service.getByAccountID(accountID)
+      def getOrganizationOrNoneByTrader(trader: Option[Trader]): Future[Option[Organization]] = if (trader.isDefined) masterOrganizations.Service.getOrNone(trader.get.organizationID) else Future(None)
 
-      def getTraderByAccountID(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+      def getTraderKYCsByTrader(trader: Option[Trader]): Future[Seq[TraderKYC]] = if (trader.isDefined) masterTraderKYCs.Service.getAllDocuments(trader.get.id) else Future(Seq[TraderKYC]())
 
-      def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
-
-      def getTraderKYCs(id: String): Future[Seq[TraderKYC]] = masterTraderKYCs.Service.getAllDocuments(id)
+      def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) masterOrganizationKYCs.Service.getAllDocuments(organization.get.id) else Future(Seq[OrganizationKYC]())
 
       def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getOrNoneByAccountID(accountID)
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getOrNoneByAccountID(accountID)
 
-      val result: Future[Result] = {
-        loginState.userType match {
-          case constants.User.ORGANIZATION => {
-            for {
-              organization <- getOrganizationByAccountID(loginState.username)
-              organizationZone <- getZone(organization.zoneID)
-              organizationKYCs <- getOrganizationKYCs(organization.id)
-              result <- withUsernameToken.Ok(views.html.component.master.userTypeDetails(organizationZone = Option(organizationZone), organization = Option(organization), organizationKYCs = organizationKYCs))
-            } yield result
-          }
-          case constants.User.TRADER => {
-            for {
-              trader <- getTraderByAccountID(loginState.username)
-              traderOrganization <- getOrganizationByID(trader.organizationID)
-              traderZone <- getZone(trader.zoneID)
-              result <- withUsernameToken.Ok(views.html.component.master.userTypeDetails(traderZone = Option(traderZone), traderOrganization = Option(traderOrganization)))
-            } yield result
-          }
-          case constants.User.USER => {
-            def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.getOrNoneByAccountID(accountID)
-
-            val accountStatus: Future[String] = masterAccounts.Service.getStatus(loginState.username)
-
-            def getZoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
-
-            def getOrganizationOrNoneByTrader(trader: Option[Trader]): Future[Option[Organization]] = if (trader.isDefined) masterOrganizations.Service.getOrNone(trader.get.organizationID) else Future(None)
-
-            def getTraderKYCsByTrader(trader: Option[Trader]): Future[Seq[TraderKYC]] = if (trader.isDefined) getTraderKYCs(trader.get.id) else Future(Seq[TraderKYC]())
-
-            def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) getOrganizationKYCs(organization.get.id) else Future(Seq[OrganizationKYC]())
-
-            def getUserResult(identification: Option[Identification], accountStatus: String): Future[Result] = {
-              val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
-              if (identificationStatus && accountStatus == constants.Status.Account.COMPLETE) {
-                for {
-                  trader <- getTraderOrNoneByAccountID(loginState.username)
-                  traderOrganization <- getOrganizationOrNoneByTrader(trader)
-                  traderZone <- getZoneByOrganization(traderOrganization)
-                  traderKYCs <- getTraderKYCsByTrader(trader)
-                  organization <- getOrganizationOrNoneByAccountID(loginState.username)
-                  organizationZone <- getZoneByOrganization(organization)
-                  organizationKYCs <- getOrganizationKYCsByOrganization(organization)
-                  result <- withUsernameToken.Ok(views.html.component.master.userTypeDetails(identification = identification, accountStatus = accountStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, traderZone = traderZone, trader = trader, traderKYCs = traderKYCs))
-                } yield result
-              } else {
-                withUsernameToken.Ok(views.html.component.master.userTypeDetails(identification = identification, accountStatus = accountStatus))
-              }
-            }
-
-            for {
-              identification <- identification(loginState.username)
-              accountStatus <- accountStatus
-              result <- getUserResult(identification, accountStatus)
-            } yield result
-
-          }
-          case _ => {
-            withUsernameToken.Ok(views.html.component.master.userTypeDetails())
-          }
+      def getUserResult(identification: Option[Identification], accountStatus: String): Future[Result] = {
+        val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
+        if (identificationStatus && accountStatus == constants.Status.Account.COMPLETE) {
+          for {
+            trader <- getTraderOrNoneByAccountID(loginState.username)
+            traderOrganization <- getOrganizationOrNoneByTrader(trader)
+            traderKYCs <- getTraderKYCsByTrader(trader)
+            organization <- getOrganizationOrNoneByAccountID(loginState.username)
+            organizationZone <- getZoneOrNoneByOrganization(organization)
+            organizationKYCs <- getOrganizationKYCsByOrganization(organization)
+          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
+        } else {
+          Future(Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus)))
         }
       }
 
       (for {
-        result <- result
+        accountStatus <- accountStatus
+        identification <- identification(loginState.username)
+        result <- getUserResult(identification, accountStatus)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewOrganizationDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val trader: Future[Trader] = masterTraders.Service.getByAccountID(loginState.username)
+
+      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+
+      (for {
+        trader <- trader
+        traderOrganization <- getOrganizationByID(trader.organizationID)
+      } yield Ok(views.html.component.master.traderViewOrganizationDetails(traderOrganization))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def viewOrganizationDetails: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organization: Future[Organization] = masterOrganizations.Service.getByAccountID(loginState.username)
+
+      def getZone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
+
+      def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
+
+      (for {
+        organization <- organization
+        organizationZone <- getZone(organization.zoneID)
+        organizationKYCs <- getOrganizationKYCs(organization.id)
+      } yield Ok(views.html.component.master.viewOrganizationDetails(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
       }
   }
 }

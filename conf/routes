@@ -65,13 +65,15 @@ GET         /master/markNotificationAsRead                               control
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /master/identification                                       controllers.ProfileController.identificationForm
-POST        /master/identification                                       controllers.ProfileController.identification
-GET         /master/userUploadOrUpdateIdentificationView                 controllers.ProfileController.userUploadOrUpdateIdentificationView
-GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
-GET         /master/userTypeDetails                                      controllers.ProfileController.userTypeDetails
-GET         /master/userReviewIdentificationDetails                      controllers.ProfileController.userReviewIdentificationDetailsForm
-POST        /master/userReviewIdentificationDetails                      controllers.ProfileController.userReviewIdentificationDetails
+GET         /profile/identification                                      controllers.ProfileController.identificationForm
+POST        /profile/identification                                      controllers.ProfileController.identification
+GET         /profile/userUploadOrUpdateIdentificationView                controllers.ProfileController.userUploadOrUpdateIdentificationView
+GET         /profile/identificationDetails                               controllers.ProfileController.identificationDetails
+GET         /profile/userReviewIdentificationDetails                     controllers.ProfileController.userReviewIdentificationDetailsForm
+POST        /profile/userReviewIdentificationDetails                     controllers.ProfileController.userReviewIdentificationDetails
+GET         /profile/userViewPendingRequests                             controllers.ProfileController.userViewPendingRequests
+GET         /profile/traderViewOrganizationDetails                       controllers.ProfileController.traderViewOrganizationDetails
+GET         /profile/viewOrganizationDetails                             controllers.ProfileController.viewOrganizationDetails
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
