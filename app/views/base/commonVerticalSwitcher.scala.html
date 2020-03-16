@@ -1,23 +1,30 @@
-@(items: Seq[(String, Html)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(htmlItems: Map[String, Html] = Map(), jsRouteItems: Map[String, String] = Map())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
     <div cmuk-grid>
         <div class="cmuk-width-1-3">
             <ul class="cmuk-tab-left" cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
-            @for(item <- items) {
-                @if(item._1 != "") {
-                    <li><a href="#">@Messages(item._1)</a></li>
+                @for(itemHeader <- htmlItems.keys) {
+                    <li><a href="#">@Messages(itemHeader)</a></li>
                 }
-            }
+                @for((itemHeader, itemValue) <- jsRouteItems) {
+                    @defining(Seq(itemValue, "()").mkString("")) { route =>
+                        <li><a href="#" onclick="componentResource('switcher@itemHeader', @route)">@Messages(itemHeader)</a></li>
+                        <script>
+                                componentResource('switcher@itemHeader', @route)
+                        </script>
+                    }
+                }
             </ul>
         </div>
         <div class="cmuk-width-2-3">
             <ul id="component-tab-left" class="cmuk-switcher">
-            @for(item <- items) {
-                @if(item._1 != "") {
-                    <li>@item._2</li>
+                @for((itemHeader, itemValue) <- htmlItems) {
+                    <li id="switcher@itemHeader">@itemValue</li>
                 }
-            }
+                @for(itemHeader <- jsRouteItems.keys) {
+                    <li id="switcher@itemHeader"></li>
+                }
             </ul>
         </div>
     </div>

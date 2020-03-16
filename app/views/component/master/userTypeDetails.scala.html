@@ -37,22 +37,20 @@
                     @identification.get.verificationStatus match {
                         case Some(status) => {
                             @if(status) {
-                                @if(organization.isDefined || trader.isDefined) {
-                                    @defining(if(organization.isDefined) {
-                                        (constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS, userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs), None)
-                                    } else {
-                                        ("", Html(""), None)
-                                    }) { item1 =>
-                                        @defining(if(trader.isDefined) {
-                                            (constants.View.PENDING_TRADER_REQUESTS, userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs), None)
-                                        } else {
-                                            ("", Html(""), None)
-                                        }) { item2 =>
-                                            @defining(Seq(item1, item2)) { items =>
-                                                @commonHorizontalSwitcher(items)
-                                            }
-                                        }
-                                    }
+                                @defining[Map[String, Html]](if(organization.isDefined && trader.isDefined) {
+                                    Map(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs),
+                                        constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs),
+                                    )
+                                } else if(organization.isDefined && trader.isEmpty) {
+                                    Map(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs),
+                                    )
+                                } else if(organization.isEmpty && trader.isDefined) {
+                                    Map(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs),
+                                    )
+                                } else {
+                                    Map()
+                                }) { htmlItems =>
+                                    @commonHorizontalSwitcher(htmlItems = htmlItems)
                                 }
                                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
                             } else {

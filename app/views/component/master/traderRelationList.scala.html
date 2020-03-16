@@ -12,9 +12,8 @@
         </div>
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.traderRelationRequestForm())">@Messages(constants.Form.TRADER_RELATION_REQUEST.legend)</button>
     } {
-        @commonHorizontalSwitcher(Seq(
-            (constants.User.TRADER, Html(""), Option(acceptedTraderRelationListRoute)),
-            (constants.View.PENDING_RELATION_REQUESTS, Html(""), Option(pendingTraderRelationListRoute)),
+        @commonHorizontalSwitcher(jsRouteItems = Map(constants.User.TRADER -> acceptedTraderRelationListRoute,
+            constants.View.PENDING_RELATION_REQUESTS -> pendingTraderRelationListRoute,
         ))
     }
 </div>

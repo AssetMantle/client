@@ -1,29 +1,25 @@
-@(items: Seq[(String, Html, Option[String])])(implicit messagesProvider: MessagesProvider)
+@(htmlItems: Map[String, Html] = Map(), jsRouteItems: Map[String, String] = Map())(implicit messagesProvider: MessagesProvider)
 
 <div>
     <ul class="cmuk-subnav cmuk-subnav-pill" cmuk-switcher="animation: cmuk-animation-fade">
-        @for(item <- items) {
-            @if(item._1 != "") {
-                <li>
-                @if(item._3.isDefined) {
-                    @defining(Seq(item._3.get, "()").mkString("")) { route =>
-                        <a href="#" onclick="componentResource('switcher@item._1', @route)">@Messages(item._1)</a>
-                        <script>
-                                componentResource('switcher@item._1', @route)
-                        </script>
-                    }
-                } else {
-                    <a href="#">@Messages(item._1)</a>
-                }
-                </li>
+        @for(itemHeader <- htmlItems.keys) {
+            <li><a href="#">@Messages(itemHeader)</a></li>
+        }
+        @for((itemHeader, itemValue) <- jsRouteItems) {
+            @defining(Seq(itemValue, "()").mkString("")) { route =>
+                <li><a href="#" onclick="componentResource('switcher@itemHeader', @route)">@Messages(itemHeader)</a></li>
+                <script>
+                        componentResource('switcher@itemHeader', @route)
+                </script>
             }
         }
     </ul>
     <ul class="cmuk-switcher cmuk-margin">
-    @for(item <- items) {
-        @if(item._1 != "") {
-            <li id="switcher@item._1">@item._2</li>
+        @for((itemHeader, itemValue) <- htmlItems) {
+            <li id="switcher@itemHeader">@itemValue</li>
         }
-    }
+        @for(itemHeader <- jsRouteItems.keys) {
+            <li id="switcher@itemHeader"></li>
+        }
     </ul>
 </div>

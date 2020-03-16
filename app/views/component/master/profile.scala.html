@@ -22,7 +22,7 @@
                 <div>
                     <h3>@loginState.username</h3>
                     @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
-                    @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'valueID -> "blockchainAddress", 'valueClass -> "hashCode")
+                    @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'valueID -> "blockchainAddress", 'valueClass -> "hashCode infoRowValue")
                     <a class="toolTip" onclick="copyToClipboard('blockchainAddress')"><span class="toolTipText" id="toolTip">@Messages(constants.View.COPY_TO_CLIPBOARD)</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy()"></span></a>
                     <br>
                     <span><button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)</button></span>

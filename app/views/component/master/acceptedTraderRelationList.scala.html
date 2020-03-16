@@ -6,7 +6,7 @@
 
 <div>
     @for(acceptedTraderRelation <- acceptedTraderRelationList) {
-        @defining(Seq(acceptedTraderRelation.fromID, acceptedTraderRelation.toID).mkString("")) { componentID =>
+        @defining(Seq(acceptedTraderRelation.fromID, acceptedTraderRelation.toID, constants.View.TRADER_RELATION_LIST).mkString("")) { componentID =>
             @commonInfoBox(componentID) {
                 <script>
                     componentResource('@componentID', jsRoutes.controllers.AccountController.acceptedTraderRelation('@acceptedTraderRelation.toID'))
