@@ -41,22 +41,7 @@ function submitChat(source, target = '#chatContainer') {
                     result.prepend(data.responseText);
                 },
                 200: function (data) {
-                    const loadMore = $(".chatContainer .chatMessage:last");
-                    console.log(data);
-                    $("#MESSAGE").val("");
-                    $("#REPLY_TO_CHAT").val("");
-                    $("#replyBox").fadeOut();
-                    if (data.replyToID !== undefined) {
-                        console.log("you replies");
-                        loadMore.after('<li class="chatMessage sender"><div class="you"><div class="messageContent cmuk-text-right">' + '<p id="' + data.replyToID + data.id + '"></p>' +
-                            '<p style="color:#FFFFFF" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' + data.fromAccountID + ':' + data.message + '</p>' + '</div></div><span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span></li>');
-                        replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat(data.chatWindowID, data.replyToID),data.id);
-                    } else {
-                        console.log("you no replies");
-                        loadMore.after('<li class="chatMessage sender"><div class="you"><div class="messageContent cmuk-text-right">' + '<p style="color:#FFFFFF" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' + data.fromAccountID + ' : ' + data.message + '</p>' + '</div></div><span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span></li>');
-                    }
-                    markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead(data.chatWindowID))
-
+                    newChat(data)
                 },
 
             }
@@ -70,6 +55,37 @@ function submitChat(source, target = '#chatContainer') {
     scrollToTop();
 
 }
+function newChat(data) {
+    const loadMore = $(".chatContainer .chatMessage:last");
+    console.log(data);
+    $("#MESSAGE").val("");
+    $("#REPLY_TO_CHAT").val("");
+    $("#replyBox").fadeOut();
+    if (data.replyToID !== undefined) {
+        console.log("you replies");
+        loadMore.after('<li class="chatMessage sender">' +
+            '<div class="you" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' +
+            '<div class="messageContent replytoMessage cmuk-text-right">' +
+            '<p id="' + data.replyToID + data.id + '"></p>' +
+            '</div>' +
+            '<p style="color:#FFFFFF">' + data.fromAccountID + ':' + data.message + '</p>' +
+            '</div>' +
+            '<span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span>' +
+            '</li>');
+        replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat(data.chatWindowID, data.replyToID),data.id);
+    } else {
+        console.log("you no replies");
+        loadMore.after('<li class="chatMessage sender">' +
+            '<div class="you" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' +
+            '<div class="messageContent cmuk-text-right">' +
+            '<p style="color:#FFFFFF">' + data.fromAccountID + ' : ' + data.message + '</p>' +
+            '</div>' +
+            '</div>' +
+            '<span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span>' +
+            '</li>');
+    }
+    markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead(data.chatWindowID))
+}
 
 function replyButton(replyToChatID, replyMessage, fromAccount) {
     // the animation login here
@@ -81,15 +97,17 @@ function replyButton(replyToChatID, replyMessage, fromAccount) {
 }
 
 function markChatRead(route) {
+    console.log(route);
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
-               $('.unread').hide();
+               $('.unRead').fadeOut();
             },
             401: function (data) {
+
                 replaceDocument(data.responseText);
 
             },
@@ -136,8 +154,17 @@ function scrollToTop() {
 function unReadBar() {
     if ($('#unRead').length == 0) {
         console.log($('#unRead').length);
-        const loadMore = $(".chatContainer .chatMessage:last");
-        loadMore.append('<div id="unRead" style="color:red">un read message</div>');
+        var c=5;
+        const loadMore = $(".chatContainer .chatMessage:nth-last-child(5)");
+        loadMore.after('<div id="unRead" class="unRead">un read message</div>');
     } else {
     }
+}
+
+function closeReply() {
+    $("#replyBox").fadeOut();
+}
+
+function unReadHide() {
+    $('.unRead').fadeOut();
 }

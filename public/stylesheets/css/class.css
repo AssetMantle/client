@@ -1154,6 +1154,9 @@ input:checked + .slider {
     .chat .patner .messageInfo {
       color: #848A91;
       font-size: 12px; }
+    .chat .patner .replytoMessage p {
+      border-left: 2px solid #0862BE;
+      padding: 0px 10px; }
     .chat .patner .messageContent {
       color: #061728;
       font-size: 14px; }
@@ -1184,6 +1187,9 @@ input:checked + .slider {
     .chat .you .messageInfo {
       color: #6CA8E7;
       font-size: 12px; }
+    .chat .you .replytoMessage p {
+      border-left: 2px solid #6CA8E7;
+      padding: 0px 10px; }
     .chat .you .messageContent {
       color: #FFFFFF;
       font-size: 14px; }
@@ -1198,5 +1204,12 @@ input:checked + .slider {
     margin: auto;
     padding: 10px 0px;
     display: block; }
+
+.unRead {
+  color: #1e87f0;
+  background: lightblue;
+  text-align: center;
+  margin: 5px;
+  border-radius: 5px; }
 
 /*# sourceMappingURL=class.css.map */

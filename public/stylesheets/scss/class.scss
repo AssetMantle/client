@@ -1439,6 +1439,10 @@ input:checked+.slider {
       color: #848A91;
       font-size: $paragraphFontSizeSmall;
     }
+    .replytoMessage p{
+      border-left: 2px solid #0862BE;
+      padding: 0px 10px;
+    }
     .messageContent{
       color: #061728;
       font-size: $paragraphFontSizeMedium;
@@ -1475,6 +1479,10 @@ input:checked+.slider {
       color: #6CA8E7;
       font-size: $paragraphFontSizeSmall;
     }
+    .replytoMessage p{
+      border-left: 2px solid #6CA8E7;
+      padding: 0px 10px;
+    }
     .messageContent{
       color: #FFFFFF;
       font-size: $paragraphFontSizeMedium;
@@ -1495,4 +1503,12 @@ input:checked+.slider {
     display: block;
   }
 
+}
+
+.unRead{
+  color: #1e87f0;
+  background: lightblue;
+  text-align: center;
+  margin: 5px;
+  border-radius: 5px;
 }

@@ -11,11 +11,20 @@
         @CSRF.formField
         <div style="position: relative">
         <div id="replyBox" style="display:none;background-color: #FFffff;position: absolute;left:0;right:0;top:-68px;padding: 10px 1px" class="cmuk-flex">
-            <div><span cmuk-icon="icon: forward"></span></div><div><div id="replyAccount" class="replyAccount"></div><div id="replymessage" class="replyMessage"></div></div>
+            <div>
+                <span cmuk-icon="icon: forward"></span>
+            </div>
+            <div>
+                <div id="replyAccount" class="replyAccount"></div>
+                <div id="replymessage" class="replyMessage"></div>
+            </div>
+            <div>
+                <a class="cmuk-icon-link" onclick="closeReply()" cmuk-icon="close"></a>
+            </div>
         </div>
         @commonInputText(sendChatForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
         <div class="hiddenLabel">
-        @commonInputText(sendChatForm, constants.FormField.MESSAGE)
+        @commonInputText(sendChatForm, constants.FormField.MESSAGE, 'onfocus->"unReadHide()")
         </div>
         @commonInputText(sendChatForm, constants.FormField.REPLY_TO_CHAT,'containerDivClass -> "hidden", 'required -> false)
         </div>

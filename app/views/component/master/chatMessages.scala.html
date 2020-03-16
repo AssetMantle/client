@@ -12,10 +12,10 @@
     @for(chat <- chats.reverse) {
         @if(chat.fromAccountID == loginState.username) {
             <li class="sender chatMessage">
-                <div class="you">
+                <div class="you" onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">
                     @chat.replyToID match {
                         case Some(replyToChatID) => {
-                            <div class="messageContent cmuk-text-right">
+                            <div class="messageContent cmuk-text-right replytoMessage">
                                 <p id="@chat.replyToID@chat.id"></p>
                                 <script>
                                  replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'),'@chat.id')
@@ -24,7 +24,7 @@
                         }
                         case None => {}
                     }
-                    <p onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">@chat.fromAccountID
+                    <p>@chat.fromAccountID
                         : @chat.message</p>
                 </div>
                 <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
@@ -33,10 +33,10 @@
             @* unread bar for viewer logic here _.chatid == chatid, to account == loginstate, read at time ==nondefining, show unread messages.*@
             <li class="receiver chatMessage">
                 <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
-                <div class="patner">
+                <div class="patner" onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">
                     @chat.replyToID match {
                         case Some(replyToChatID) => {
-                            <div class="messageContent cmuk-text-right">
+                            <div class="messageContent cmuk-text-right replytoMessage">
                                 <p id="@chat.replyToID@chat.id"></p>
                                 <script>
                                  replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'),'@chat.id')
@@ -45,7 +45,7 @@
                         }
                         case None => {}
                     }
-                    <p onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">@chat.fromAccountID
+                    <p>@chat.fromAccountID
                         : @chat.message</p>
                     @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
 @*                        <p style="font-size:10px;text-align: right" class="unread">unread</p>*@
