@@ -164,7 +164,3 @@ function unReadBar() {
 function closeReply() {
     $("#replyBox").fadeOut();
 }
-
-function unReadHide() {
-    $('.unRead').fadeOut();
-}
