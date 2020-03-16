@@ -74,7 +74,7 @@ object Response {
   val OTP_SENT = new Success("OTP_SENT")
   val INVITATION_EMAIL_SENT = new Success("INVITATION_EMAIL_SENT")
   val IDENTIFICATION_ADDED_FOR_VERIFICATION = new Success("IDENTIFICATION_ADDED_FOR_VERIFICATION")
-  val COUNTERPARTY_REQUEST_SEND_SUCCESSFULLY = new Success("COUNTERPARTY_REQUEST_SEND_SUCCESSFULLY")
+  val TRADER_RELATION_REQUEST_SEND_SUCCESSFULLY = new Success("TRADER_RELATION_REQUEST_SEND_SUCCESSFULLY")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)

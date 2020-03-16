@@ -13,6 +13,5 @@ object User {
   val ZONE = "ZONE"
   val UNKNOWN = "UNKNOWN"
   val WITHOUT_LOGIN = "WITHOUT_LOGIN"
-  val FINANCIER = "FINANCIER"
 
 }

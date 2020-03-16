@@ -22,11 +22,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
 
-  def updateContactForm: Action[AnyContent] = Action { implicit request =>
+  def updateContactForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.updateContact())
   }
 
-  def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateContact(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
@@ -34,37 +34,37 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         updateContactData => {
 
-          val checkEmailPresence = masterContacts.Service.checkEmailPresence(updateContactData.emailAddress)
+          val emailPresent = masterContacts.Service.checkEmailPresence(updateContactData.emailAddress)
 
           val mobilePresent = masterContacts.Service.checkMobileNumberPresence(updateContactData.countryCode + updateContactData.mobileNumber)
 
-          def getResult(checkEmailPresence: Boolean, mobilePresent: Boolean) = {
-            if (mobilePresent && checkEmailPresence) {
+          def getResult(emailPresent: Boolean, mobilePresent: Boolean) = {
+            if (mobilePresent && emailPresent) {
               Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value = views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.EMAIL_ADDRESS.name, constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE.message).withError(constants.FormField.MOBILE_NUMBER.name, constants.Response.MOBILE_NUMBER_ALREADY_IN_USE.message))))
             }
             else if (mobilePresent) {
               Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value = views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.MOBILE_NUMBER.name, constants.Response.MOBILE_NUMBER_ALREADY_IN_USE.message))))
             }
-            else if (checkEmailPresence) {
+            else if (emailPresent) {
               Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value = views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.EMAIL_ADDRESS.name, constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE.message))))
             }
             else {
               val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
 
-              def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+              def updateStatusUnverifiedContact(): Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
 
               for {
                 _ <- insertOrUpdateContact
-                _ <- updateStatusUnverifiedContact
+                _ <- updateStatusUnverifiedContact()
                 result <- withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
               } yield result
             }
           }
 
           (for {
-            checkEmailPresence <- checkEmailPresence
+            emailPresent <- emailPresent
             mobilePresent <- mobilePresent
-            result <- getResult(checkEmailPresence, mobilePresent)
+            result <- getResult(emailPresent, mobilePresent)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

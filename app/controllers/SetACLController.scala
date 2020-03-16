@@ -54,15 +54,16 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmail = addTraderRequestData.emailAddress)
 
-              def sendEmailAndGetResult(organizationName: String, organizationID: String): Future[Result] = {
-                utilitiesNotification.sendEmailViaAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, constants.Notification.ORGANIZATION_TRADER_INVITATION.email.get, organizationName, organizationID)
+              def sendEmailNotificationsAndGetResult(organization: Organization): Future[Result] = {
+                utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
+                utilitiesNotification.sendEmailViaAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, organization.name, organization.id)
                 withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 
               for {
                 organization <- organization
                 _ <- createInvitation(organization)
-                result <- sendEmailAndGetResult(organization.name, organization.id)
+                result <- sendEmailNotificationsAndGetResult(organization)
               } yield result
             }
 
@@ -103,7 +104,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
             if (status) {
               val name = masterIdentifications.Service.getName(loginState.username)
-              val zoneID = masterOrganizations.Service.getZoneID(addTraderData.organizationID)
+              val organization: Future[Organization] = masterOrganizations.Service.get(addTraderData.organizationID)
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
@@ -119,8 +120,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
               for {
                 name <- name
-                zoneID <- zoneID
-                id <- addTrader(name, zoneID)
+                organization <- organization
+                id <- addTrader(name = name, zoneID = organization.zoneID)
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
                 traderKYCs <- getTraderKYCs(id)
@@ -290,13 +291,15 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         },
         userReviewAddTraderRequestData => {
-          val id = masterTraders.Service.getID(loginState.username)
+          val trader = masterTraders.Service.getByAccountID(loginState.username)
 
           def allKYCFileTypesExists(id: String): Future[Boolean] = masterTraderKYCs.Service.checkAllKYCFileTypesExists(id)
 
-          def getResult(id: String, allKYCFileTypesExists: Boolean): Future[Result] = {
+          def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
+
+          def getResult(trader: Trader, allKYCFileTypesExists: Boolean, traderOrganization: Organization): Future[Result] = {
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
-              val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(id)
+              val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
 
               val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
 
@@ -306,37 +309,35 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 Future(0)
               }
 
+              def sendNotificationsAndGetResult(traderOrganization: Organization, trader: Trader): Future[Result] = {
+                utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_USER_ADDED_OR_UPDATED_TRADER_REQUEST, trader.name)
+                utilitiesNotification.send(loginState.username, constants.Notification.USER_ADDED_OR_UPDATED_TRADER_REQUEST, traderOrganization.name, traderOrganization.id)
+                withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
+              }
+
               for {
                 _ <- markTraderFormCompleted
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
+                result <- sendNotificationsAndGetResult(traderOrganization, trader)
               } yield result
             } else {
-              val trader = masterTraders.Service.getByAccountID(loginState.username)
 
-              def getResult(trader: Trader): Future[Result] = {
-                val organization = masterOrganizations.Service.get(trader.organizationID)
-                val zone = masterZones.Service.get(trader.zoneID)
-                val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
-                for {
-                  organization <- organization
-                  zone <- zone
-                  traderKYCs <- traderKYCs
-                } yield BadRequest(views.html.component.master.userReviewAddTraderRequest(trader = trader, organization = organization, zone = zone, traderKYCs = traderKYCs))
-              }
+              val zone = masterZones.Service.get(trader.zoneID)
+              val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
 
               for {
-                trader <- trader
-                result <- getResult(trader)
-              } yield result
+                zone <- zone
+                traderKYCs <- traderKYCs
+              } yield BadRequest(views.html.component.master.userReviewAddTraderRequest(trader = trader, organization = traderOrganization, zone = zone, traderKYCs = traderKYCs))
             }
           }
 
           (for {
-            id <- id
-            allKYCFileTypesExists <- allKYCFileTypesExists(id)
-            result <- getResult(id, allKYCFileTypesExists)
+            trader <- trader
+            allKYCFileTypesExists <- allKYCFileTypesExists(trader.id)
+            traderOrganization <- organization(trader.organizationID)
+            result <- getResult(trader, allKYCFileTypesExists, traderOrganization)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

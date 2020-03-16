@@ -341,7 +341,9 @@ class AccountController @Inject()(
   def acceptedTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID: Future[String] = masterTraders.Service.getID(loginState.username)
+
       def acceptedTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllAcceptedTraderRelation(traderID)
+
       (for {
         traderID <- traderID
         acceptedTraderRelations <- acceptedTraderRelations(traderID)
@@ -353,8 +355,11 @@ class AccountController @Inject()(
   def pendingTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID: Future[String] = masterTraders.Service.getID(loginState.username)
+
       def receivedPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllReceivedPendingTraderRelation(traderID)
+
       def sentPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllSentPendingTraderRelation(traderID)
+
       (for {
         traderID <- traderID
         receivedPendingTraderRelations <- receivedPendingTraderRelations(traderID)
@@ -429,6 +434,8 @@ class AccountController @Inject()(
 
           def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
 
+          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+
           def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.verificationStatus.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
             masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
           } else {
@@ -438,16 +445,21 @@ class AccountController @Inject()(
             throw new BaseException(constants.Response.UNVERIFIED_TRADER)
           }
 
-          def sendNotificationAndGetResult(): Future[Result] = {
-            utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_TRADER_INVITATION, traderRelationRequestData.accountID)
-            withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.COUNTERPARTY_REQUEST_SEND_SUCCESSFULLY)))
+          def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization): Future[Result] = {
+            utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
+            utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
+            utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
+            utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
+            withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFULLY)))
           }
 
           (for {
             fromTrader <- getTrader(loginState.username)
             toTrader <- getTrader(traderRelationRequestData.accountID)
             _ <- create(fromTrader = fromTrader, toTrader)
-            result <- sendNotificationAndGetResult()
+            fromTraderOrganization <- getOrganization(fromTrader.organizationID)
+            toTraderOrganization <- getOrganization(toTrader.organizationID)
+            result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
           }
@@ -483,11 +495,36 @@ class AccountController @Inject()(
           } else {
             masterTraderRelations.Service.markRejected(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
           }
+
           def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
+
+          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+
+          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+
+          def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization, traderRelation: TraderRelation): Future[Result] = {
+            if (acceptOrRejectTraderRelationData.status) {
+              utilitiesNotification.send(fromTrader.accountID, constants.Notification.SENT_TRADER_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_SENT_TRADER_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.send(toTrader.accountID, constants.Notification.RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
+              utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
+            } else {
+              utilitiesNotification.send(fromTrader.accountID, constants.Notification.SENT_TRADER_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_SENT_TRADER_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.send(toTrader.accountID, constants.Notification.RECEIVED_TRADER_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
+              utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
+            }
+            withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))
+          }
+
           (for {
             _ <- updateStatus
             traderRelation <- traderRelation
-            result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))
+            fromTrader <- getTrader(acceptOrRejectTraderRelationData.fromID)
+            toTrader <- getTrader(acceptOrRejectTraderRelationData.toID)
+            fromTraderOrganization <- getOrganization(fromTrader.organizationID)
+            toTraderOrganization <- getOrganization(toTrader.organizationID)
+            result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization, traderRelation = traderRelation)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
           }

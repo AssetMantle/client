@@ -54,15 +54,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findOrNoneByID(id: String): Future[Option[ZoneSerialized]] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => Option(result)
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def findOrNoneByID(id: String): Future[Option[ZoneSerialized]] = db.run(zoneTable.filter(_.id === id).result.headOption)
 
   private def findByAccountID(accountID: String): Future[ZoneSerialized] = db.run(zoneTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
