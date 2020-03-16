@@ -7,6 +7,8 @@
 
 @left = {
     <div id="payableReceivable"></div>
+
+    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
 }
 
 @center = {
@@ -29,6 +31,10 @@
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
                 componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
-
             }
+</script>
+<script type="text/javascript">
+        var fiatCometMessage = function (event) {
+            componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+        }
 </script>
