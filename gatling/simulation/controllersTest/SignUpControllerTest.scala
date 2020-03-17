@@ -39,7 +39,7 @@ object signUpControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.CONFIRM_PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
-      .check(substring("SUCCESS SIGNED_UP").exists)
+      .check(substring("Signed Up").exists)
     )
     .pause(5)
 }

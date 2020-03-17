@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.PaymentTerms
+
+@(paymentTermsForm: Form[PaymentTerms.Data] = PaymentTerms.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.PAYMENT_TERMS, paymentTermsForm) {
+    @commonInputText(paymentTermsForm, constants.FormField.REQUEST_ID, 'value -> requestID, 'class -> "hidden", 'readonly -> true)
+    @commonCheckbox(paymentTermsForm, constants.FormField.ADVANCE_PAYMENT, 'oninput -> """advancePaymentInput(this, "#ADVANCE_PERCENTAGE", "#CREDIT")""")
+    @commonInputDouble(paymentTermsForm, constants.FormField.ADVANCE_PERCENTAGE, 'oninput -> """advancePercentageInput(this, "#CREDIT")""")
+    @commonCheckbox(paymentTermsForm, constants.FormField.CREDIT, 'oninput -> """creditInput(this, "#ADVANCE_PAYMENT", "#ADVANCE_PERCENTAGE")""")
+    @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'oninput -> """tentativeDateInput(this, "#TENURE", "#REFRENCE")""")
+    @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'oninput -> """tenureInput(this, "#TENTATIVE_DATE")""")
+    @commonSelect(paymentTermsForm, constants.FormField.REFRENCE, 'oninput -> """refrenceInput(this, "#TENTATIVE_DATE")""")
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.shippingDetailsForm('@requestID'))">@Messages(constants.Form.BACK)</button>
+}
+<script src="@routes.Assets.versioned("javascripts/paymentTerms.js")" type="text/javascript"></script>
+    <script>
+        formInitializtion("#ADVANCE_PAYMENT","#ADVANCE_PERCENTAGE", "#CREDIT","#TENTATIVE_DATE","#TENURE", "#REFRENCE")
+    </script>

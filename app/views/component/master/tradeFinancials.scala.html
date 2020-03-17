@@ -1,0 +1,49 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="financial">
+@commonCard() {
+    <p>@Messages(constants.View.FINANCIALS)</p>
+} {
+    <ul class="">
+        <li class="cmuk-flex">
+            <div class="cmuk-flex wallet">
+                <span class="walletIcon"><img src="./images/icons/walletIcon.svg"></span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
+                </div>
+            </div>
+            <div>
+                <button class="cmuk-button cmuk-button-default addBalanceButton">+ Add Balance</button>
+            </div>
+        </li>
+        <li class="cmuk-flex">
+            <div class="cmuk-flex payable">
+                <span class="payableIcon"><img src="./images/icons/payableIcon.svg"></span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
+                </div>
+            </div>
+            <div>
+                <button class="cmuk-button cmuk-button-default addBalanceButton cmuk-text-danger primaryFont">Pay</button>
+            </div>
+        </li>
+        <li class="cmuk-flex">
+            <div class="cmuk-flex leftDays">
+                <span class="leftDaysIcon"><img src="./images/icons/daysleftIcon.svg"></span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">Days Left</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">60 Days</p>
+                </div>
+            </div>
+
+        </li>
+    </ul>
+    <div class="refresh">
+        <span>refresh</span>
+    </div>
+}
+</div>

@@ -63,9 +63,9 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
               for {
                 _ <- updateAmount
                 negotiationFiles <- negotiationFiles
-                result<-withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
+                result <- withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
               } yield result
-            } else Future (Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+            } else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
           }
 
           for {
@@ -149,7 +149,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                 buyerAddress <- buyerAddress
                 negotiationFiles <- negotiationFiles
                 _ <- transactionProcess(buyerAddress, sellerContractHash(negotiationFiles))
-                result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))

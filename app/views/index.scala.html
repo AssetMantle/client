@@ -1,143 +1,107 @@
 @import controllers.actions.LoginState
-@import views.html.component.blockchain._
+@import views.html.base.common
+
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-    @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
-    @left = {
-        <div class="sideBarOpenButton" cmuk-toggle="target: #offcanvas-slide">
-            <span cmuk-icon="menu"></span>
-        </div>
+@center = {
 
-        <div class="sideBar" id="offcanvas-slide" cmuk-offcanvas="overlay: true">
-            <div class="cmuk-offcanvas-bar">
-                <button type="button" class="cmuk-offcanvas-close" cmuk-close></button>
-                <div class="sideBarOptions">
-                    <ul id="sideBarSearchMenu">
-                        <input type="text" id="sideBarSearch" class="sideBarSearch" onkeyup="sideBarSearch()" placeholder="@Messages(constants.Form.SEARCH)">
-                        <li> <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.BLOCKCHAIN_ADD_KEY.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.blockchainAddOrganizationForm())">@Messages(constants.Form.BLOCKCHAIN_ADD_ORGANIZATION.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.AddZoneController.blockchainAddZoneForm())">@Messages(constants.Form.BLOCKCHAIN_ADD_ZONE.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm())">@Messages(constants.Form.BLOCKCHAIN_BUYER_EXECUTE_ORDER.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm())">@Messages(constants.Form.BLOCKCHAIN_CHANGE_BUYER_BID.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.blockchainChangeSellerBidForm())">@Messages(constants.Form.BLOCKCHAIN_CHANGE_SELLER_BID.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm())">@Messages(constants.Form.BLOCKCHAIN_CONFIRM_BUYER_BID.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.blockchainConfirmSellerBidForm())">@Messages(constants.Form.BLOCKCHAIN_CONFIRM_SELLER_BID.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.IssueAssetController.blockchainIssueAssetForm())">@Messages(constants.Form.BLOCKCHAIN_ISSUE_ASSET.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.IssueFiatController.blockchainIssueFiatForm)">@Messages(constants.Form.BLOCKCHAIN_ISSUE_FIAT.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.blockchainRedeemAssetForm())">@Messages(constants.Form.BLOCKCHAIN_REDEEM_ASSET.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.blockchainRedeemFiatForm())">@Messages(constants.Form.BLOCKCHAIN_REDEEM_FIAT.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.blockchainReleaseAssetForm())">@Messages(constants.Form.BLOCKCHAIN_RELEASE_ASSET.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.blockchainSellerExecuteOrderForm())">@Messages(constants.Form.BLOCKCHAIN_SELLER_EXECUTE_ORDER.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SendAssetController.blockchainSendAssetForm())">@Messages(constants.Form.BLOCKCHAIN_SEND_ASSET.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SendCoinController.blockchainSendCoinForm())">@Messages(constants.Form.BLOCKCHAIN_SEND_COIN.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SendFiatController.blockchainSendFiatForm())">@Messages(constants.Form.BLOCKCHAIN_SEND_FIAT.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SetACLController.blockchainSetACLForm())">@Messages(constants.Form.BLOCKCHAIN_SET_ACL.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.BLOCKCHAIN_SET_BUYER_FEEDBACK.legend)</a></li>
-                        <li> <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm())">@Messages(constants.Form.BLOCKCHAIN_SET_SELLER_FEEDBACK.legend)</a></li>
-                    </ul>
+    <div class="cmuk-container headingSection">
+        <p class="cmuk-padding-large">Lorem ipsum dolor sit amet, consectetur $2,785,511, sed do eiusmod tempor
+            incididunt
+            ut 7500 et dolore magna 34. Ut enim.</p>
+    </div>
 
-                </div>
-            </div>
-        </div>
-    }
+    <div class="tabsSection">
+        <div class="cmuk-container">
+            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <h2>The value of Comdex</h2>
+                <div class="tabs">
+                    <div cmuk-grid>
+                        <div class="verticalDataTabs">
 
-    @center = {
+                            <ul class="cmuk-nav cmuk-nav-default cmuk-width-auto@@m"
+                            cmuk-switcher="connect: #component-nav; animation: cmuk-animation-fade">
+                                <li class=""><a href="#">Traders <span cmuk-icon="chevron-right"></span></a>
+                                </li>
+                                <li class=""><a href="#">Financiars <span cmuk-icon="chevron-right"></span></a></li>
+                                <li class=""><a href="#">Underwriters <span cmuk-icon="chevron-right"></span></a></li>
+                            </ul>
 
-        <div class="cmuk-margin-bottom">
-        @search()
-        </div>
-        <div class="cmuk-grid-medium
-                cmuk-margin-bottom
-        cmuk-child-width-1-4@@m
-        cmuk-child-width-1-2@@s
-        cmuk-child-width-1-4@@xs
-        cmuk-grid-match" cmuk-grid>
+                        </div>
+                        <div class="verticalDataTabsContent cmuk-width-expand@@m">
 
-            <div>
-                <div class="cmuk-card
-                        cmuk-card-default
-                        cmuk-card-body">
-                @lastBlockHeight()
-                </div>
-            </div>
-            <div>
-                <div class="cmuk-card
-                        cmuk-card-default
-                        cmuk-card-body">
-                @validators()
-                </div>
-            </div>
-            <div>
-                <div class="cmuk-card
-                        cmuk-card-default
-                        cmuk-card-body
-                        headerFontSize">
-                <p id="tokensValue" class="heading"></p>
-                <span class="cmuk-text-bold">@Messages(constants.Form.TOKENS)</span>
-            </div>
-        </div>
-        <div>
-            <div class="cmuk-card
-                        cmuk-card-default
-                        cmuk-card-body">
-                @averageBlockTime()
-                </div>
-            </div>
+                            <ul id="component-nav" class="cmuk-switcher">
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div class="cmuk-width-1-1@@s">
+                                            <p>Comdex is more than just a service with multiple products and advanced technology. It is a platform connecting all the parties of the commodity trading ecosystem.
+                                                It is a one stop shop for a company’s funding requirements connecting global partners on one single platform. These partnerships provide</p>
+                                        </div>
+                                        <div class="cmuk-width-1-1@@s">
+                                            <p>companies with access to working capital funding at a lower cost, which has been a traditional constraint for SMEs. The platform’s promise of greater transparency means processes become more streamlined and efficient which also equate to cost savings. </p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div>
+                                            <p>The Comdex platform provides access to a large global portfolio of potential customers to
+                                                increase their customer base. The robust KYC process and transparency
+                                                of the trades give the funders the perfect platform for verification of origin.</p>
+                                        </div>
+                                        <div>
+                                            <p>The participation of underwriters on the platform provides avenues to
+                                                mitigate risk and gives investors the ability to bring
+                                                their customers onto a trusted platform.</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div>
+                                            <p>Insurance plays a significant role in risk mitigation in trade finance
+                                                and with the participation of major underwriters on the platform;
+                                                investors have the peace of mind of credit insured sales and purchases.</p>
+                                        </div>
+                                        <div>
+                                            <p>Insurance is crucial when providing trade credit solutions and securing
+                                                a credit insurance can be the difference between missing an opportunity
+                                                and gaining a lucrative deal that bolsters the bottom line.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
 
-        </div>
-
-        <div id="indexBottomDivision">
-            <div class="cmuk-grid-match
-                    cmuk-margin-bottom
-                    cmuk-child-width-expand
-                    cmuk-text-center" cmuk-grid>
-                <div>
-                    <div class="cmuk-card
-                            cmuk-card-default
-                            cmuk-card-body">
-                    @blockTimeGraph()
-                    </div>
-                </div>
-
-            </div>
-            <div class="cmuk-grid-medium
-                cmuk-margin-bottom
-                cmuk-child-width-1-1@@
-            s
-            cmuk-child-width-1-1@@m
-            cmuk-child-width-1-2@@l
-            cmuk-child-width-2-2@@xl
-            cmuk-grid-match" cmuk-grid>
-                <div>
-                    <div class="cmuk-card
-                            cmuk-card-default
-                            cmuk-card-body"
-                    id="transactionExplorer">
-                    @transactionExplorer()
-                    </div>
-                </div>
-                <div>
-                    <div class="cmuk-card
-                            cmuk-card-default
-                            cmuk-card-body"
-                    id="blockExplorer">
-                    @blockExplorer()
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-    @transactionHash()
-    @blockHeight()
-    @validatorsTable()
-    @allBlocksTable()
+    <div class="contactSection">
 
-        <script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
-        <script>
-                back();
-                componentResource('availableAssetList', jsRoutes.controllers.ComponentViewController.availableAssetList());
-        </script>
-    }
+        <div class="cmuk-container">
+            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <div>
+                    <div cmuk-grid class="cmuk-child-width-1-1 cmuk-child-width-1-4@@m">
+                        <h3>Contact Us</h3>
+                        <div>
+                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Email">
+                        </div>
+                        <div>
+                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Message">
+                        </div>
+                        <div>
+                            <button type="submit" class="cmuk-button cmuk-width-small ">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
-    @right = {}
