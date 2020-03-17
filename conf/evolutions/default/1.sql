@@ -798,11 +798,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
     "tradeRoomID" VARCHAR NOT NULL,
     PRIMARY KEY ("notificationID","tradeRoomID")
 );
-ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
--- ALTER TABLE MASTER_TRANSACTION."TradeActivity"
---     ADD CONSTRAINT TradeActivity_TradeRoom_TradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER_TRANSACTION."TradeRoom("id");
-
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
 (
@@ -909,6 +904,10 @@ ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."EmailOTP"
     ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."TradeActivity"
+    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
+ALTER TABLE MASTER_TRANSACTION."TradeActivity"
+    ADD CONSTRAINT TradeActivity_TradeRoom_TradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER."TradeRoom"("id");
 
 /*Initial State*/
 
