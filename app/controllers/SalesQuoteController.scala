@@ -4,10 +4,9 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.Negotiation
 import models.common.Serializable
 import models.master.Accounts
-import models.masterTransaction.{NegotiationFile, SalesQuote}
+import models.masterTransaction.SalesQuote
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}

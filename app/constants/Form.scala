@@ -98,7 +98,7 @@ object Form {
   val SHIPPING_DETAILS = new Form("SHIPPING_DETAILS", routes.SalesQuoteController.shippingDetails())
   val PAYMENT_TERMS = new Form("PAYMENT_TERMS", routes.SalesQuoteController.paymentTerms())
   val SALES_QUOTE_DOCUMENTS = new Form("SALES_QUOTE_DOCUMENTS", routes.SalesQuoteController.salesQuoteDocuments())
-  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS",routes.SalesQuoteController.traderReviewSalesQuoteDetails)
+  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails)
 
   //SellerExecuteOrderController
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder())
@@ -139,6 +139,8 @@ object Form {
   val SET_SELLER_FEEDBACK = new Form("SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.setSellerFeedback())
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
 
+  //TradeRoomController
+  val UPDATE_TRADE_TERM_STATUS = new Form("UPDATE_TRADE_TERM_STATUS", routes.SetSellerFeedbackController.setSellerFeedback())
   //VerifyEmailAddressController
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress())
 
@@ -430,7 +432,7 @@ object Form {
   val BUYER_EMAIL = "buyer.email"
   val SERVICE_ID = "service1.id"
   val SERVICE_AMOUNT = "service1.amount"
-  val SHIPPING_PERIOD ="SHIPPING_PERIOD"
+  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
 
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"
@@ -515,6 +517,6 @@ object Form {
   val TABLE = "TABLE"
   val CARD = "CARD"
   val FOOTER_LOGO = "FOOTER_LOGO"
-  val ASSET_DETAILS="ASSET_DETAILS"
+  val ASSET_DETAILS = "ASSET_DETAILS"
 
 }

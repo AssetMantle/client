@@ -7,10 +7,9 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Organization, Trader, TraderKYC}
-import models.masterTransaction.AddTraderRequest
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 import views.companion.master.FileUpload
 
@@ -37,15 +36,16 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           Future(BadRequest(views.html.component.master.inviteTrader(formWithErrors)))
         },
         addTraderRequestData => {
-          val emailPresent=masterTransactionAddTraderRequests.Service.emailPresent(addTraderRequestData.emailAddress)
-          def getResult(emailPresent:Boolean)= if(emailPresent){
-            Future(BadRequest(views.html.component.master.inviteTrader(views.companion.master.InviteTrader.form.fill(value = views.companion.master.InviteTrader.Data(name=addTraderRequestData.name,emailAddress = addTraderRequestData.emailAddress)).withError(constants.FormField.EMAIL_ADDRESS.name,constants.Response.INVITATION_EMAIL_ALREADY_SENT.message))))
+          val emailPresent = masterTransactionAddTraderRequests.Service.emailPresent(addTraderRequestData.emailAddress)
+
+          def getResult(emailPresent: Boolean) = if (emailPresent) {
+            Future(BadRequest(views.html.component.master.inviteTrader(views.companion.master.InviteTrader.form.fill(value = views.companion.master.InviteTrader.Data(name = addTraderRequestData.name, emailAddress = addTraderRequestData.emailAddress)).withError(constants.FormField.EMAIL_ADDRESS.name, constants.Response.INVITATION_EMAIL_ALREADY_SENT.message))))
           }
-          else{
+          else {
             val organizationID = masterOrganizations.Service.getID(loginState.username)
             val organizationName = masterOrganizations.Service.nameByID(loginState.username)
 
-            def requestID(organizationID: String) = masterTransactionAddTraderRequests.Service.create(accountID = loginState.username, name=addTraderRequestData.name ,emailAddress = addTraderRequestData.emailAddress)
+            def requestID(organizationID: String) = masterTransactionAddTraderRequests.Service.create(accountID = loginState.username, name = addTraderRequestData.name, emailAddress = addTraderRequestData.emailAddress)
 
             def sendNotificationAndGetResult(requestID: String, organizationID: String, organizationName: String) = {
               utilitiesNotification.sendTraderInvite(loginState.username, addTraderRequestData.emailAddress, organizationName, organizationID)
@@ -59,11 +59,12 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               result <- sendNotificationAndGetResult(requestID, organizationID, organizationName)
             } yield result
           }
-          (for{
-            emailPresent<-emailPresent
-            result<-getResult(emailPresent)
-          }yield result
-            ).recover{
+
+          (for {
+            emailPresent <- emailPresent
+            result <- getResult(emailPresent)
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

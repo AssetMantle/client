@@ -46,7 +46,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           )
           (for {
             _ <- transactionProcess
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -69,7 +69,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           val create = masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
           (for {
             _ <- create
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -103,7 +103,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           val reject = masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
           (for {
             _ <- reject
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -145,14 +145,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 toAddress <- toAddress
                 ticketID <- ticketID(toAddress)
                 _ <- accept(ticketID)
-                result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
               } yield result
             } else {
-              Future (Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED))))
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED))))
             }
           }
 
-          (for{
+          (for {
             status <- status
             result <- getResult(status)
           } yield result

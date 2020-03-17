@@ -56,14 +56,14 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm(mnemonic:String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form,mnemonic))
+  def signUpForm(mnemonic: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form, mnemonic))
   }
 
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.signUp(formWithErrors,formWithErrors.data(constants.FormField.MNEMONIC.name))))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors, formWithErrors.data(constants.FormField.MNEMONIC.name))))
       },
       signUpData => {
         val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.mnemonic))
@@ -86,11 +86,11 @@ class AccountController @Inject()(
   }
 
   def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
-    val mnemonicResponse=queriesMnemonic.Service.get()
-    (for{
-      mnemonicResponse<-mnemonicResponse
-    }yield Ok(views.html.component.master.noteAndVerifyMnemonic( mnemonic = mnemonicResponse.body))
-      ).recover{
+    val mnemonicResponse = queriesMnemonic.Service.get()
+    (for {
+      mnemonicResponse <- mnemonicResponse
+    } yield Ok(views.html.component.master.noteAndVerifyMnemonic(mnemonic = mnemonicResponse.body))
+      ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
   }

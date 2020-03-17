@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithOrganizationLoginAction, WithUnknownLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -14,6 +14,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import views.companion.master.FileUpload
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -64,7 +65,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
               (for {
                 id <- id
-                organizationKYCs<-getOrganizationKYCs(id)
+                organizationKYCs <- getOrganizationKYCs(id)
                 result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
               } yield result
                 ).recoverWith {

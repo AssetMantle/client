@@ -1,12 +1,11 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithTraderLoginAction}
+import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, masterTransaction}
-import models.master.Contact
 import models.masterTransaction.EmailOTPs
+import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -30,7 +29,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       val tradeTerms = masterTransactionTradeTerms.Service.get(tradeRoomID)
       (for {
         tradeTerms <- tradeTerms
-      } yield Ok(views.html.component.master.termsView(tradeTerms))
+      } yield Ok(views.html.component.master.tradeTermsView(tradeTerms))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -84,13 +83,47 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
       }
   }
 
+  def updateTradeTermStatus: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.UpdateTradeTermStatus.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.updateTradeTermStatus(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name), formWithErrors.data(constants.FormField.TERM_TYPE.name), formWithErrors.data(constants.FormField.STATUS.name).toBoolean)))
+        },
+        updateTradeTermStatusData => {
+          println("Form Working")
+          val tradeID = updateTradeTermStatusData.tradeID
+          val status = updateTradeTermStatusData.status
+          println(tradeID, status, updateTradeTermStatusData.termType)
+          val updateStatus = updateTradeTermStatusData.termType match {
+            case constants.View.DESCRIPTION => masterTransactionTradeTerms.Service.updateAssetDescriptionStatus(tradeID, status)
+            case constants.View.QUANTITY => masterTransactionTradeTerms.Service.updateAssetQuantityStatus(tradeID, status)
+            case constants.View.CONTRACT_PRICE => masterTransactionTradeTerms.Service.updateAssetPriceStatus(tradeID, status)
+            case constants.View.SHIPMENT_PERIOD => masterTransactionTradeTerms.Service.updateShipmentPeriodStatus(tradeID, status)
+            case constants.View.LOAD_PORT => masterTransactionTradeTerms.Service.updatePortOfLoadingStatus(tradeID, status)
+            case constants.View.DISCHARGE_PORT => masterTransactionTradeTerms.Service.updatePortOfDischargeStatus(tradeID, status)
+            case constants.View.ADVANCE_PAYMENT => masterTransactionTradeTerms.Service.updateAdvancePaymentStatus(tradeID, status)
+            case constants.View.CREDIT_TERMS => masterTransactionTradeTerms.Service.updateCreditTermsStatus(tradeID, status)
+            case constants.View.BILL_OF_EXCHANGE_REQUIRED => masterTransactionTradeTerms.Service.updateBillOfExchangeRequiredStatus(tradeID, status)
+            case constants.View.PRIMARY_DOCUMENTS => masterTransactionTradeTerms.Service.updatePrimaryDocumentsStatus(tradeID, status)
+          }
+
+          (for {
+            _ <- updateStatus
+            result <- withUsernameToken.PartialContent(views.html.component.master.updateTradeTermStatus(tradeID = tradeID, termType = updateTradeTermStatusData.termType, status = status))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        })
+  }
+
   def tradeList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    val tradeList=masterTransactionTradeRooms.Service.tradeListByAccountID(loginState.username)
-      (for{
-      tradeList<-tradeList
-    }yield Ok(views.html.component.master.tradeList(tradeList))
-        ).recover{
+      val tradeList = masterTransactionTradeRooms.Service.tradeListByAccountID(loginState.username)
+      (for {
+        tradeList <- tradeList
+      } yield Ok(views.html.component.master.tradeList(tradeList))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

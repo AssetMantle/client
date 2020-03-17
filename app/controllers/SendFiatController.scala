@@ -42,7 +42,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           )
           (for {
             _ <- transactionProcess
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
