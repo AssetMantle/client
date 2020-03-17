@@ -22,8 +22,21 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
 
-  def updateContactForm(): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateContact())
+  def updateContactForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val contact = masterContacts.Service.getOrNoneContact(loginState.username)
+
+      (for {
+        contact <- contact
+      } yield {
+        contact match {
+          case Some(contact) =>
+            Ok(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value = views.companion.master.UpdateContact.Data(emailAddress = contact.emailAddress, mobileNumber = contact.mobileNumber.takeRight(10), countryCode = contact.mobileNumber.dropRight(10)))))
+          case None => Ok(views.html.component.master.updateContact())
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
   }
 
   def updateContact(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -56,7 +69,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
               for {
                 _ <- insertOrUpdateContact
                 _ <- updateStatusUnverifiedContact()
-                result <- withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
               } yield result
             }
           }

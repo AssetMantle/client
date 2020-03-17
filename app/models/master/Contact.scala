@@ -36,11 +36,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.headOption.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -125,6 +125,22 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def checkByEmail(email: String): Future[Boolean] = db.run(contactTable.filter(_.emailAddress === email).exists.result)
 
   private def checkByMobileNumber(mobileNumber: String): Future[Boolean] = db.run(contactTable.filter(_.mobileNumber === mobileNumber).exists.result)
+
+  private def getAllEmailIDsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).map(_.emailAddress).result)
+
+  private def getAllContactsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).result)
+
+  private def getContactByEmailId( email: String) = db.run(contactTable.filter(_.emailAddress === email).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def getContactsByEmailAddresses(emailIDs:Seq[String])=db.run(contactTable.filter(_.emailAddress inSet emailIDs).result)
 
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 

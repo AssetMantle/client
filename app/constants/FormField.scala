@@ -47,8 +47,8 @@ object FormField {
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 500)
   val FROM = new StringFormField("FROM", 45, 45)
-  val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
-  val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 0, 100)
+  val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 3, 100)
+  val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 3, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("BILL_OF_LADING_NUMBER", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
@@ -95,6 +95,10 @@ object FormField {
   val ID_TYPE = new StringFormField("ID_TYPE", 2, 100)
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
+  val OTHER_DOCUMENTS = new StringFormField("OTHER_DOCUMENTS", 0, 1000)
+  val ASSET_DESCRIPTION = new StringFormField("ASSET_DESCRIPTION", 1, 1000)
+  val TRADE_ID = new StringFormField("TRADE_ID", 1, 132)
+  val TERM_TYPE = new StringFormField("TERM_TYPE", 1, 100)
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
   val FROM_ID = new StringFormField("FROM_ID", 16, 16)
   val TO_ID = new StringFormField("TO_ID", 16, 16)
@@ -108,6 +112,8 @@ object FormField {
   val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldOptions.PAYMENT_TERMS)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
+  val REFRENCE = new SelectFormField("REFRENCE", constants.SelectFieldOptions.REFRENCE_DATES)
+
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
@@ -119,15 +125,19 @@ object FormField {
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
+  val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
+  val TENURE = new IntFormField("TENURE", 0, 500)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
   val DATE_OF_BIRTH = new DateFormField("DATE_OF_BIRTH")
+  val TENTATIVE_DATE = new DateFormField("TENTATIVE_DATE")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
+  val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -151,6 +161,13 @@ object FormField {
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_MNEMONIC_NOTED = new BooleanFormField("CONFIRM_MNEMONIC_NOTED")
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
+  val ADVANCE_PAYMENT = new BooleanFormField("ADVANCE_PAYMENT")
+  val CREDIT = new BooleanFormField("CREDIT")
+  val OBL = new BooleanFormField("OBL")
+  val INVOICE = new BooleanFormField("INVOICE")
+  val COO = new BooleanFormField("COO")
+  val COA = new BooleanFormField("COA")
+  val BILL_OF_EXCHANGE_REQUIRED = new BooleanFormField("BILL_OF_EXCHANGE_REQUIRED")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

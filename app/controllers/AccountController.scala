@@ -83,7 +83,7 @@ class AccountController @Inject()(
           createAccount <- createAccount(addKeyResponse)
           _ <- addLogin(createAccount)
         } yield {
-          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
+          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
         }).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
@@ -191,7 +191,7 @@ class AccountController @Inject()(
           result <- getResult(status, loginState)
         } yield result
           ).recover {
-          case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -220,14 +220,14 @@ class AccountController @Inject()(
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
             }
-            Ok(views.html.indexVersion3(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
           } yield shutdownActorsAndGetResult).recover {
-            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -418,7 +418,7 @@ class AccountController @Inject()(
 
               def sendNotificationsAndGetResult: Future[Result] = {
                 utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)
-                withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
+                withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
               }
 
               for {

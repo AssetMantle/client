@@ -270,9 +270,9 @@ class ComponentViewController @Inject()(
       val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
       (for {
         profilePicture <- profilePicture
-      } yield Ok(views.html.component.master.profilePicture(profilePicture))
+      } yield Ok(views.html.profilePicture(profilePicture))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.component.master.profilePicture())
+        case _: BaseException => InternalServerError(views.html.profilePicture())
       }
   }
 
@@ -417,7 +417,7 @@ class ComponentViewController @Inject()(
         result <- getUserResult(identification, accountStatus)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -432,7 +432,7 @@ class ComponentViewController @Inject()(
         traderOrganization <- getOrganizationByID(trader.organizationID)
       } yield Ok(views.html.component.master.traderViewOrganizationDetails(traderOrganization))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -450,7 +450,7 @@ class ComponentViewController @Inject()(
         organizationKYCs <- getOrganizationKYCs(organization.id)
       } yield Ok(views.html.component.master.viewOrganizationDetails(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -500,7 +500,7 @@ class ComponentViewController @Inject()(
           toTrader <- toTrader
           organizationName <- getOrganizationName(toTrader.organizationID)
         } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))).recover {
-          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
   }
 
@@ -515,7 +515,7 @@ class ComponentViewController @Inject()(
           trader <- trader
           organizationName <- getOrganizationName(trader.organizationID)
         } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, traderName = trader.name, organizationName = organizationName))).recover {
-          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
   }
 

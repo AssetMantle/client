@@ -2,6 +2,7 @@ package constants
 
 import play.api.data.validation._
 import views.companion.master.{AddTrader, IssueAssetRequest, TraderRelationRequest, SignUp}
+import views.companion.master.{IssueAssetRequest, SignUp}
 
 object FormConstraint {
   //TODO: Error Response through Messages

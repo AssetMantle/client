@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.SalesQuoteDocuments
+
+@(salesQuoteDocumentsForm: Form[SalesQuoteDocuments.Data] = SalesQuoteDocuments.form, requestID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.SALES_QUOTE_DOCUMENTS, salesQuoteDocumentsForm) {
+    @commonInputText(salesQuoteDocumentsForm, constants.FormField.REQUEST_ID, 'value ->requestID,'class -> "hidden", 'readonly -> true)
+    @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.BILL_OF_EXCHANGE_REQUIRED)
+    @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.OBL)
+    @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.INVOICE)
+    @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.COO)
+    @commonCheckbox(salesQuoteDocumentsForm, constants.FormField.COA)
+    @commonInputText(salesQuoteDocumentsForm, constants.FormField.OTHER_DOCUMENTS)
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.paymentTermsForm('@requestID'))">@Messages(constants.Form.BACK)</button>
+}

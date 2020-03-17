@@ -68,7 +68,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def findOrganizationOrNoneByAccountID(accountID: String): Future[Option[OrganizationSerialized]] = db.run(organizationTable.filter(_.accountID === accountID).result.headOption)
 
-  private def getAccountIdById(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
+  private def getAccountIDByID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -76,7 +76,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(organizationTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
+  private def getIDByAccountID(accountID: String) = db.run(organizationTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -264,7 +264,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def verifyOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
-    def getAccountId(id: String): Future[String] = getAccountIdById(id)
+    def getAccountId(id: String): Future[String] = getAccountIDByID(id)
 
     def getVerifyOrganizationRequests(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map { organizations => organizations.map(_.deserialize) }
 
