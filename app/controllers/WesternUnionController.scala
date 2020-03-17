@@ -3,17 +3,16 @@ package controllers
 
 import constants.Form
 import controllers.actions.WithTraderLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.i18n.I18nSupport
-import play.api.mvc._
-import models.masterTransaction
-import play.api.{Configuration, Logger}
-import controllers.results.WithUsernameToken
 import models.master.{Contacts, Organization, Organizations, Traders}
+import models.masterTransaction
 import models.masterTransaction.IssueFiatRequests
-import play.api.libs.json
+import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
+import play.api.mvc._
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq

@@ -14,13 +14,6 @@ class Notification(notificationType: String, sendEmail: Boolean, sendPushNotific
 
 object Notification {
 
-  private val EMAIL_PREFIX = "EMAIL"
-  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
-  private val SMS_PREFIX = "SMS"
-  private val SUBJECT_SUFFIX = "SUBJECT"
-  private val MESSAGE_SUFFIX = "MESSAGE"
-  private val TITLE_SUFFIX = "TITLE"
-
   val LOGIN = new Notification(notificationType = "LOGIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SIGN_UP = new Notification(notificationType = "SIGN_UP", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val LOG_OUT = new Notification(notificationType = "LOG_OUT", sendEmail = false, sendPushNotification = true, sendSMS = false)
@@ -50,6 +43,12 @@ object Notification {
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  private val EMAIL_PREFIX = "EMAIL"
+  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
+  private val SMS_PREFIX = "SMS"
+  private val SUBJECT_SUFFIX = "SUBJECT"
+  private val MESSAGE_SUFFIX = "MESSAGE"
+  private val TITLE_SUFFIX = "TITLE"
 
   class SMS(private val notificationType: String) {
     val message: String = Seq(SMS_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")

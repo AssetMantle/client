@@ -1,4 +1,4 @@
-package models.masterTransaction
+package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -7,8 +7,9 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: String, status: String)
 
@@ -50,7 +51,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def getTradeRoomIDBySalesQuoteID(salesQuoteID: String) = db.run(tradeRoomTable.filter(_.salesQuoteID === salesQuoteID).map(_.id).result.head.asTry).map {
+  private def getIDBySalesQuoteID(salesQuoteID: String) = db.run(tradeRoomTable.filter(_.salesQuoteID === salesQuoteID).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -58,7 +59,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def getTradeListByAccountID(accountID: String) = db.run(tradeRoomTable.filter(x=> x.buyerAccountID===accountID || x.sellerAccountID ===accountID).result)
+  private def getTradeListByAccountID(accountID: String) = db.run(tradeRoomTable.filter(x => x.buyerAccountID === accountID || x.sellerAccountID === accountID).result)
 
 
   private[models] class TradeRoomTable(tag: Tag) extends Table[TradeRoom](tag, "TradeRoom") {
@@ -85,9 +86,9 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def get(id: String) = findById(id)
 
-    def tradeRoomIDBySalesQuoteID(salesQuoteID: String) = getTradeRoomIDBySalesQuoteID(salesQuoteID)
+    def getID(salesQuoteID: String) = getIDBySalesQuoteID(salesQuoteID)
 
-    def tradeListByAccountID(accountID:String)=getTradeListByAccountID(accountID)
+    def tradeListByAccountID(accountID: String) = getTradeListByAccountID(accountID)
   }
 
 }

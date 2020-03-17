@@ -599,6 +599,18 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     PRIMARY KEY ("accountID")
 );
 
+
+CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
+(
+    "id"                          VARCHAR NOT NULL,
+    "salesQuoteID"                VARCHAR NOT NULL,
+    "buyerAccountID"              VARCHAR NOT NULL,
+    "sellerAccountID"             VARCHAR NOT NULL,
+    "financierAccountID"          VARCHAR NOT NULL,
+    "status"                      VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
 (
     "id"             VARCHAR NOT NULL,
@@ -705,17 +717,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeRoom"
-(
-    "id"                          VARCHAR NOT NULL,
-    "salesQuoteID"                VARCHAR NOT NULL,
-    "buyerAccountID"              VARCHAR NOT NULL,
-    "sellerAccountID"             VARCHAR NOT NULL,
-    "financierAccountID"          VARCHAR NOT NULL,
-    "status"                      VARCHAR NOT NULL,
-    PRIMARY KEY ("id")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
 (
     "id"                              VARCHAR NOT NULL,
@@ -733,7 +734,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
     "portOfDischargeValue"            VARCHAR NOT NULL,
     "portOfDischargeStatus"           BOOLEAN NOT NULL,
     "advancePaymentValue"             BOOLEAN NOT NULL,
-    "advancePercentage"               NUMERIC NOT NULL,
+    "advancePercentage"               NUMERIC,
     "advancePaymentStatus"            BOOLEAN NOT NULL,
     "creditTermsValue"                BOOLEAN NOT NULL,
     "tenure"                          VARCHAR,
@@ -966,6 +967,8 @@ DROP TABLE IF EXISTS MASTER."TraderKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
+DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
+DROP TABLE IF EXISTS MASTER."TradeRoom" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AddTraderRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
@@ -980,6 +983,8 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeTerm" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SalesQuote" CASCADE;
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;

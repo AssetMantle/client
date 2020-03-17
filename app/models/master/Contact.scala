@@ -153,14 +153,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def emailPresent(email:String, accountID:String): Future[Boolean]=checkEmailPresent(email,accountID)
 
     def mobileNumberPresent(mobileNumber: String,accountID:String): Future[Boolean]= checkMobilePresent(mobileNumber,accountID)
-
-    def getEmailIDs(accountIDs:Seq[String])=getAllEmailIDsForAccountIDs(accountIDs)
-
-    def getContacts(accountIDs:Seq[String])=getAllContactsForAccountIDs(accountIDs)
-
-    def contactByEmailId(email:String)=getContactByEmailId(email)
-
-    def getContactsByEmailID(emailAddresses:Seq[String])=getContactsByEmailAddresses(emailAddresses)
   }
 
 }
