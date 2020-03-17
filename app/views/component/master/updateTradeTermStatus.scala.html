@@ -1,0 +1,35 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import models.master.TraderKYC
+@import views.companion.master.UpdateTradeTermStatus
+
+@(updateTradeTermStatusForm: Form[UpdateTradeTermStatus.Data] = UpdateTradeTermStatus.form, tradeID: String, termType: String, status: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div id="@Seq(tradeID, termType).mkString("")">
+
+@form(action = routes.TradeRoomController.updateTradeTermStatus) {
+    @CSRF.formField
+    @commonInputText(updateTradeTermStatusForm, constants.FormField.TRADE_ID, 'value -> tradeID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(updateTradeTermStatusForm, constants.FormField.TERM_TYPE, 'value -> termType, 'containerDivClass -> "hidden", 'readonly -> true)
+    @if(status) {
+        @commonCheckbox(updateTradeTermStatusForm, constants.FormField.STATUS, 'onclick -> "updateStatus(this)", 'checked-> true)
+    } else {
+        @commonCheckbox(updateTradeTermStatusForm, constants.FormField.STATUS, 'onclick -> "updateStatus(this)")
+    }
+    @if(updateTradeTermStatusForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- updateTradeTermStatusForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+}
+
+</div>
+
+<script>
+        function updateStatus(source) {
+            submitForm(source, '@Seq('#',tradeID, termType).mkString("")')
+        }
+</script>

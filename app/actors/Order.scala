@@ -17,7 +17,7 @@ object MainOrderActor {
 }
 
 @Singleton
-class MainOrderActor @Inject()(actorTimeout: FiniteDuration,actorSystem: ActorSystem) extends Actor with ActorLogging {
+class MainOrderActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem) extends Actor with ActorLogging {
 
   private implicit val timeout: Timeout = Timeout(actorTimeout)
 
