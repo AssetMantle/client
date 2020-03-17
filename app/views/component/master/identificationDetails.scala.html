@@ -28,15 +28,20 @@
                 }
                 case None => {
                     <div>
-                        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ProfileController.userUploadOrUpdateIdentificationView())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
+                        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.userUploadOrUpdateIdentificationView())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
                     </div>
                 }
             }
         </div>
+        @if(!identification.completionStatus) {
+            <div>
+                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.Form.IDENTIFICATION.legend)</button>
+            </div>
+        }
     }
     case None => {
         <div>
-            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ProfileController.identificationForm())">@Messages(constants.Form.IDENTIFICATION.legend)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.Form.IDENTIFICATION.legend)</button>
         </div>
     }
 }

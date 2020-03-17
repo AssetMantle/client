@@ -18,13 +18,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.noteAndVerifyMnemonic,
-        routes.javascript.AccountController.traderRelationRequestForm,
-        routes.javascript.AccountController.traderRelationList,
-        routes.javascript.AccountController.acceptedTraderRelationList,
-        routes.javascript.AccountController.pendingTraderRelationList,
-        routes.javascript.AccountController.acceptedTraderRelation,
-        routes.javascript.AccountController.pendingSentTraderRelation,
-        routes.javascript.AccountController.pendingReceivedTraderRelation,
+        routes.javascript.AccountController.identificationForm,
+        routes.javascript.AccountController.userUploadOrUpdateIdentificationView,
+        routes.javascript.AccountController.userReviewIdentificationDetailsForm,
 
         routes.javascript.AddKeyController.blockchainAddKeyForm,
 
@@ -110,6 +106,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.tradeDetails,
         routes.javascript.ComponentViewController.subscriptionsDetails,
         routes.javascript.ComponentViewController.settingsDetails,
+        routes.javascript.ComponentViewController.identificationDetails,
+        routes.javascript.ComponentViewController.userViewPendingRequests,
+        routes.javascript.ComponentViewController.traderViewOrganizationDetails,
+        routes.javascript.ComponentViewController.viewOrganizationDetails,
+        routes.javascript.ComponentViewController.traderRelationList,
+        routes.javascript.ComponentViewController.acceptedTraderRelationList,
+        routes.javascript.ComponentViewController.pendingTraderRelationList,
+        routes.javascript.ComponentViewController.acceptedTraderRelation,
+        routes.javascript.ComponentViewController.pendingSentTraderRelation,
+        routes.javascript.ComponentViewController.pendingReceivedTraderRelation,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -179,15 +185,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
-
-        routes.javascript.ProfileController.identificationDetails,
-        routes.javascript.ProfileController.identificationForm,
-        routes.javascript.ProfileController.userUploadOrUpdateIdentificationView,
-        routes.javascript.ProfileController.userReviewIdentificationDetailsForm,
-        routes.javascript.ProfileController.userReviewIdentificationDetails,
-        routes.javascript.ProfileController.userViewPendingRequests,
-        routes.javascript.ProfileController.traderViewOrganizationDetails,
-        routes.javascript.ProfileController.viewOrganizationDetails,
 
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
@@ -262,6 +259,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.setSellerFeedbackForm,
         routes.javascript.SetSellerFeedbackController.sellerFeedbackList,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
+
+        routes.javascript.TraderController.traderRelationRequestForm,
 
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
 

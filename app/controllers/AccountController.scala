@@ -6,13 +6,12 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.{ACL, ACLAccount}
-import models.master.{Organization, Trader, TraderRelation, Zone}
+import models.master.{Identification, Organization, Zone}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import play.twirl.api.Html
 import services.SFTPScheduler
 import views.companion.master.{Login, Logout, SignUp}
 
@@ -50,6 +49,8 @@ class AccountController @Inject()(
                                    masterTraderRelations: master.TraderRelations,
                                    masterContacts: master.Contacts,
                                    masterTraders: master.Traders,
+                                   masterIdentifications: master.Identifications,
+                                   masterAccountKYCs: master.AccountKYCs
                                  )
                                  (implicit
                                   executionContext: ExecutionContext,
@@ -57,7 +58,7 @@ class AccountController @Inject()(
                                   wsClient: WSClient,
                                  ) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.CONTROLLER_ACCOUNT
+  private implicit val module: String = constants.Module.CONTROLLERS_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -334,199 +335,114 @@ class AccountController @Inject()(
     } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
-  def traderRelationList(): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.traderRelationList(acceptedTraderRelationListRoute = utilities.String.getJsRouteFunction(routes.javascript.AccountController.acceptedTraderRelationList), pendingTraderRelationListRoute = utilities.String.getJsRouteFunction(routes.javascript.AccountController.pendingTraderRelationList)))
-  }
-
-  def acceptedTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def identificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID: Future[String] = masterTraders.Service.getID(loginState.username)
+      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
 
-      def acceptedTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllAcceptedTraderRelation(traderID)
-
-      (for {
-        traderID <- traderID
-        acceptedTraderRelations <- acceptedTraderRelations(traderID)
-      } yield Ok(views.html.component.master.acceptedTraderRelationList(acceptedTraderRelationList = acceptedTraderRelations))).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      def getResult(identification: Option[Identification]): Future[Result] = identification match {
+        case Some(identity) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(views.companion.master.Identification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType))))
+        case None => withUsernameToken.Ok(views.html.component.master.identification())
       }
+
+      for {
+        identification <- identification
+        result <- getResult(identification)
+      } yield result
   }
 
-  def pendingTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def identification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID: Future[String] = masterTraders.Service.getID(loginState.username)
-
-      def receivedPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllReceivedPendingTraderRelation(traderID)
-
-      def sentPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllSentPendingTraderRelation(traderID)
-
-      (for {
-        traderID <- traderID
-        receivedPendingTraderRelations <- receivedPendingTraderRelations(traderID)
-        sentPendingTraderRelations <- sentPendingTraderRelations(traderID)
-      } yield Ok(views.html.component.master.pendingTraderRelationList(sentPendingTraderRelations = sentPendingTraderRelations, receivedPendingTraderRelations = receivedPendingTraderRelations))).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def acceptedTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
-    implicit loginState =>
-      implicit request =>
-        val toTrader = masterTraders.Service.get(toID)
-
-        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
-
-        (for {
-          toTrader <- toTrader
-          organizationName <- getOrganizationName(toTrader.organizationID)
-        } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))).recover {
-          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
-        }
-  }
-
-  def pendingSentTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
-    implicit loginState =>
-      implicit request =>
-        val trader = masterTraders.Service.get(toID)
-
-        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
-
-        (for {
-          trader <- trader
-          organizationName <- getOrganizationName(trader.organizationID)
-        } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, traderName = trader.name, organizationName = organizationName))).recover {
-          case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
-        }
-  }
-
-  def pendingReceivedTraderRelation(fromID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
-    implicit loginState =>
-      implicit request =>
-        val fromTrader = masterTraders.Service.get(fromID)
-        val toTrader = masterTraders.Service.getByAccountID(loginState.username)
-
-        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
-
-        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
-
-        (for {
-          fromTrader <- fromTrader
-          toTrader <- toTrader
-          traderRelation <- traderRelation(fromId = fromTrader.id, toId = toTrader.id)
-          organizationName <- getOrganizationName(fromTrader.organizationID)
-        } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, traderName = toTrader.name, organizationName = organizationName))).recover {
-          case baseException: BaseException => ServiceUnavailable(Html(baseException.failure.message))
-        }
-  }
-
-  def traderRelationRequestForm(): Action[AnyContent] = Action {
-    implicit request =>
-      Ok(views.html.component.master.traderRelationRequest())
-  }
-
-  def traderRelationRequest(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.TraderRelationRequest.form.bindFromRequest().fold(
+      views.companion.master.Identification.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.traderRelationRequest(formWithErrors)))
+          Future(BadRequest(views.html.component.master.identification(formWithErrors)))
         },
-        traderRelationRequestData => {
+        identificationData => {
+          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, identificationData.firstName, identificationData.lastName, utilities.Date.utilDateToSQLDate(identificationData.dateOfBirth), identificationData.idNumber, identificationData.idType)
 
-          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
-
-          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
-
-          def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.verificationStatus.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
-            masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
-          } else {
-            if (fromTrader.organizationID == toTrader.organizationID) {
-              throw new BaseException(constants.Response.COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION)
-            }
-            throw new BaseException(constants.Response.UNVERIFIED_TRADER)
-          }
-
-          def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization): Future[Result] = {
-            utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
-            utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
-            utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
-            utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
-            withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFULLY)))
-          }
+          def accountKYC(): Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
 
           (for {
-            fromTrader <- getTrader(loginState.username)
-            toTrader <- getTrader(traderRelationRequestData.accountID)
-            _ <- create(fromTrader = fromTrader, toTrader)
-            fromTraderOrganization <- getOrganization(fromTrader.organizationID)
-            toTraderOrganization <- getOrganization(toTrader.organizationID)
-            result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization)
-          } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+            _ <- add
+            accountKYC <- accountKYC()
+            result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, constants.File.IDENTIFICATION))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
   }
 
-  def acceptOrRejectTraderRelationForm(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def userUploadOrUpdateIdentificationView: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderRelation = masterTraderRelations.Service.get(fromID = fromID, toID = toID)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      for {
+        accountKYC <- accountKYC
+        result <- withUsernameToken.Ok(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, constants.File.IDENTIFICATION))
+      } yield result
+  }
+
+  def userReviewIdentificationDetailsForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       (for {
-        traderRelation <- traderRelation
-      } yield Ok(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))).recover {
-        case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+        identification <- identification
+        accountKYC <- accountKYC
+        result <- withUsernameToken.Ok(views.html.component.master.userReviewIdentificationDetails(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def acceptOrRejectTraderRelation(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def userReviewIdentificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.AcceptOrRejectTraderRelation.form.bindFromRequest().fold(
+      views.companion.master.UserReviewIdentificationDetails.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderRelation = masterTraderRelations.Service.get(fromID = formWithErrors(constants.FormField.FROM.name).value.get, toID = formWithErrors(constants.FormField.TO.name).value.get)
+          val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
           (for {
-            traderRelation <- traderRelation
-          } yield BadRequest(views.html.component.master.acceptOrRejectTraderRelation(formWithErrors, traderRelation = traderRelation))
+            identification <- identification
+            accountKYC <- accountKYC
+          } yield BadRequest(views.html.component.master.userReviewIdentificationDetails(formWithErrors, identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        acceptOrRejectTraderRelationData => {
-          val updateStatus: Future[Int] = if (acceptOrRejectTraderRelationData.status) {
-            masterTraderRelations.Service.markAccepted(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
-          } else {
-            masterTraderRelations.Service.markRejected(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
-          }
+        userReviewAddZoneRequestData => {
+          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.IDENTIFICATION)
 
-          def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
+          def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
+            if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
+              val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
 
-          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+              def sendNotificationsAndGetResult: Future[Result] = {
+                utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)
+                withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
+              }
 
-          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
-
-          def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization, traderRelation: TraderRelation): Future[Result] = {
-            if (acceptOrRejectTraderRelationData.status) {
-              utilitiesNotification.send(fromTrader.accountID, constants.Notification.SENT_TRADER_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_SENT_TRADER_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(toTrader.accountID, constants.Notification.RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
-              utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
+              for {
+                _ <- updateCompletionStatus
+                //TODO: Remove this when Trulioo is integrated
+                _ <- masterIdentifications.Service.markVerified(loginState.username)
+                result <- sendNotificationsAndGetResult
+              } yield result
             } else {
-              utilitiesNotification.send(fromTrader.accountID, constants.Notification.SENT_TRADER_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_SENT_TRADER_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(toTrader.accountID, constants.Notification.RECEIVED_TRADER_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
-              utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
+              val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+              for {
+                identification <- identification
+                accountKYC <- accountKYC
+              } yield BadRequest(views.html.component.master.userReviewIdentificationDetails(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
             }
-            withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))
           }
 
           (for {
-            _ <- updateStatus
-            traderRelation <- traderRelation
-            fromTrader <- getTrader(acceptOrRejectTraderRelationData.fromID)
-            toTrader <- getTrader(acceptOrRejectTraderRelationData.toID)
-            fromTraderOrganization <- getOrganization(fromTrader.organizationID)
-            toTraderOrganization <- getOrganization(toTrader.organizationID)
-            result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization, traderRelation = traderRelation)
-          } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.component.master.profile(failures = Seq(baseException.failure)))
+            identificationFileExists <- identificationFileExists
+            result <- markIdentificationFormCompletedAndGetResult(identificationFileExists)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

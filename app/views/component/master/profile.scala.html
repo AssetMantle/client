@@ -64,7 +64,7 @@
 
                 </div>
                 <script>
-                    componentResource('userViewPendingRequests', jsRoutes.controllers.ProfileController.userViewPendingRequests());
+                    componentResource('userViewPendingRequests', jsRoutes.controllers.ComponentViewController.userViewPendingRequests());
                 </script>
 
             }
@@ -81,7 +81,7 @@
 
                 </div>
                 <script>
-                    componentResource('traderViewOrganizationDetails', jsRoutes.controllers.ProfileController.traderViewOrganizationDetails());
+                    componentResource('traderViewOrganizationDetails', jsRoutes.controllers.ComponentViewController.traderViewOrganizationDetails());
                 </script>
             }
             case constants.User.ORGANIZATION => {
@@ -97,7 +97,7 @@
 
                 </div>
                 <script>
-                    componentResource('viewOrganizationDetails', jsRoutes.controllers.ProfileController.viewOrganizationDetails());
+                    componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
                 </script>
             }
             case _ => {}
@@ -115,9 +115,9 @@
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('contactDetails', jsRoutes.controllers.ContactController.contact());
-            componentResource('identificationDetails', jsRoutes.controllers.ProfileController.identificationDetails());
+            componentResource('identificationDetails', jsRoutes.controllers.ComponentViewController.identificationDetails());
 
             @*//TODO Remove when shifting to account *@
-            componentResource('traderRelationList', jsRoutes.controllers.AccountController.traderRelationList());
+            componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
     </script>
 }

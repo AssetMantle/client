@@ -17,7 +17,8 @@ object Form {
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
-  val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.AccountController.traderRelationRequest())
+  val IDENTIFICATION = new Form("IDENTIFICATION", routes.AccountController.identification())
+  val REVIEW_IDENTIFICATION_ON_COMPLETION = new Form("REVIEW_IDENTIFICATION_ON_COMPLETION", routes.AccountController.userReviewIdentificationDetails())
 
   //AddKeyController
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
@@ -79,10 +80,6 @@ object Form {
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
 
-  //ProfileController
-  val IDENTIFICATION = new Form("IDENTIFICATION", routes.ProfileController.identification())
-  val REVIEW_IDENTIFICATION_ON_COMPLETION = new Form("REVIEW_IDENTIFICATION_ON_COMPLETION", routes.ProfileController.userReviewIdentificationDetails())
-
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset())
@@ -133,6 +130,9 @@ object Form {
   //SetSellerFeedbackController
   val SET_SELLER_FEEDBACK = new Form("SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.setSellerFeedback())
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
+
+  //TraderController
+  val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest())
 
   //VerifyEmailAddressController
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress())

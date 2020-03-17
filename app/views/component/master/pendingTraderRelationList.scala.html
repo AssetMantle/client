@@ -10,7 +10,7 @@
         @defining(Seq(receivedPendingTraderRelation.fromID, receivedPendingTraderRelation.toID, constants.View.PENDING_RECEIVED_TRADER_RELATION).mkString("")) { componentID =>
             @commonInfoBox(componentID) {
                 <script>
-                        componentResource('@componentID', jsRoutes.controllers.AccountController.pendingReceivedTraderRelation('@receivedPendingTraderRelation.fromID'))
+                        componentResource('@componentID', jsRoutes.controllers.ComponentViewController.pendingReceivedTraderRelation('@receivedPendingTraderRelation.fromID'))
                 </script>
             }
         }
@@ -21,7 +21,7 @@
         @defining(Seq(sentPendingTraderRelation.fromID, sentPendingTraderRelation.toID, constants.View.PENDING_SENT_TRADER_RELATION).mkString("")) { componentID =>
             @commonInfoBox(componentID) {
                 <script>
-                        componentResource('@componentID', jsRoutes.controllers.AccountController.pendingSentTraderRelation('@sentPendingTraderRelation.toID'))
+                        componentResource('@componentID', jsRoutes.controllers.ComponentViewController.pendingSentTraderRelation('@sentPendingTraderRelation.toID'))
                 </script>
             }
         }

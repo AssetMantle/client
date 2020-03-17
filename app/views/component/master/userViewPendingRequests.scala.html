@@ -5,7 +5,7 @@
 @import views.html.base._
 @import models.master.Identification
 
-@(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, loginState: LoginState)
+@(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard() {
     <div>

@@ -20,8 +20,8 @@
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@file.documentType'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
                 <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
             }
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationForm())">@Messages(constants.Form.BACK)</button>
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.userReviewIdentificationDetailsForm())">@Messages(constants.Form.NEXT)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.Form.BACK)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userReviewIdentificationDetailsForm())">@Messages(constants.Form.NEXT)</button>
         }
         case None => {}
     }

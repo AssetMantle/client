@@ -43,19 +43,17 @@ POST        /account/forgotPassword                                      control
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /account/traderRelationRequest                               controllers.AccountController.traderRelationRequestForm
-POST        /account/traderRelationRequest                               controllers.AccountController.traderRelationRequest
+GET         /account/identification                                      controllers.AccountController.identificationForm
+POST        /account/identification                                      controllers.AccountController.identification
+GET         /account/userUploadOrUpdateIdentificationView                controllers.AccountController.userUploadOrUpdateIdentificationView
+GET         /account/userReviewIdentificationDetails                     controllers.AccountController.userReviewIdentificationDetailsForm
+POST        /account/userReviewIdentificationDetails                     controllers.AccountController.userReviewIdentificationDetails
 
-GET         /account/acceptOrRejectTraderRelation                        controllers.AccountController.acceptOrRejectTraderRelationForm(fromID: String, toID: String)
-POST        /account/acceptOrRejectTraderRelation                        controllers.AccountController.acceptOrRejectTraderRelation
+GET         /trader/traderRelationRequest                                controllers.TraderController.traderRelationRequestForm
+POST        /trader/traderRelationRequest                                controllers.TraderController.traderRelationRequest
 
-GET         /account/traderRelationList                                  controllers.AccountController.traderRelationList
-GET         /account/acceptedTraderRelationList                          controllers.AccountController.acceptedTraderRelationList
-GET         /account/pendingTraderRelationList                           controllers.AccountController.pendingTraderRelationList
-GET         /account/acceptedTraderRelation                              controllers.AccountController.acceptedTraderRelation(toID: String)
-GET         /account/pendingSentTraderRelation                           controllers.AccountController.pendingSentTraderRelation(toID: String)
-GET         /account/pendingReceivedTraderRelation                       controllers.AccountController.pendingReceivedTraderRelation(fromID: String)
-
+GET         /trader/acceptOrRejectTraderRelation                         controllers.TraderController.acceptOrRejectTraderRelationForm(fromID: String, toID: String)
+POST        /trader/acceptOrRejectTraderRelation                         controllers.TraderController.acceptOrRejectTraderRelation
 
 GET         /contact                                                     controllers.ContactController.contact
 
@@ -65,15 +63,17 @@ GET         /master/markNotificationAsRead                               control
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /profile/identification                                      controllers.ProfileController.identificationForm
-POST        /profile/identification                                      controllers.ProfileController.identification
-GET         /profile/userUploadOrUpdateIdentificationView                controllers.ProfileController.userUploadOrUpdateIdentificationView
-GET         /profile/identificationDetails                               controllers.ProfileController.identificationDetails
-GET         /profile/userReviewIdentificationDetails                     controllers.ProfileController.userReviewIdentificationDetailsForm
-POST        /profile/userReviewIdentificationDetails                     controllers.ProfileController.userReviewIdentificationDetails
-GET         /profile/userViewPendingRequests                             controllers.ProfileController.userViewPendingRequests
-GET         /profile/traderViewOrganizationDetails                       controllers.ProfileController.traderViewOrganizationDetails
-GET         /profile/viewOrganizationDetails                             controllers.ProfileController.viewOrganizationDetails
+GET         /component/identificationDetails                             controllers.ComponentViewController.identificationDetails
+GET         /component/userViewPendingRequests                           controllers.ComponentViewController.userViewPendingRequests
+GET         /component/traderViewOrganizationDetails                     controllers.ComponentViewController.traderViewOrganizationDetails
+GET         /component/viewOrganizationDetails                           controllers.ComponentViewController.viewOrganizationDetails
+
+GET         /component/traderRelationList                                controllers.ComponentViewController.traderRelationList
+GET         /component/acceptedTraderRelationList                        controllers.ComponentViewController.acceptedTraderRelationList
+GET         /component/pendingTraderRelationList                         controllers.ComponentViewController.pendingTraderRelationList
+GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(toID: String)
+GET         /component/pendingSentTraderRelation                         controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
+GET         /component/pendingReceivedTraderRelation                     controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
