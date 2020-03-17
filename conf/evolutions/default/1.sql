@@ -637,9 +637,10 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
 (
     "invitationID"   VARCHAR NOT NULL,
     "organizationID" VARCHAR NOT NULL,
-    "inviteeEmail"   VARCHAR NOT NULL UNIQUE,
+    "inviteeEmail"   VARCHAR NOT NULL,
     "status"         VARCHAR NOT NULL,
-    PRIMARY KEY ("invitationID")
+    PRIMARY KEY ("invitationID"),
+    UNIQUE ("organizationID", "inviteeEmail")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"

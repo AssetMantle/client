@@ -27,19 +27,19 @@ object Notification {
 
   //traderRelationRequest
   val TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "ORGANIZATION_TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED = new Notification(notificationType = "ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_RELATION_REQUEST_RECEIVED = new Notification(notificationType = "TRADER_RELATION_REQUEST_RECEIVED", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
   //acceptOrRejectTraderRelation
-  val SENT_TRADER_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "SENT_TRADER_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_SENT_TRADER_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_SENT_TRADER_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "RECEIVED_TRADER_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val SENT_TRADER_RELATION_REQUEST_REJECTED = new Notification(notificationType = "SENT_TRADER_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_SENT_TRADER_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_SENT_TRADER_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_RECEIVED_TRADER_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val RECEIVED_TRADER_RELATION_REQUEST_REJECTED = new Notification(notificationType = "RECEIVED_TRADER_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val TRADER_SENT_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "TRADER_SENT_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val TRADER_SENT_RELATION_REQUEST_REJECTED = new Notification(notificationType = "TRADER_SENT_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
   //userReviewAddTraderRequest
   val USER_ADDED_OR_UPDATED_TRADER_REQUEST = new Notification(notificationType = "USER_ADDED_OR_UPDATED_TRADER_REQUEST", sendEmail = true, sendPushNotification = true, sendSMS = false)
