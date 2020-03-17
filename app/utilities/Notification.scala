@@ -4,6 +4,7 @@ import com.twilio.Twilio
 import com.twilio.`type`.PhoneNumber
 import com.twilio.exception.{ApiConnectionException, ApiException}
 import com.twilio.rest.api.v2010.account.Message
+import constants.Notification.PushNotification
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -18,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class Notification @Inject()(masterContacts: master.Contacts,
                              masterTransactionNotifications: masterTransaction.Notifications,
+                             masterTransactionTradeActivities: masterTransaction.TradeActivities,
                              mailerClient: MailerClient,
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
@@ -60,13 +62,15 @@ class Notification @Inject()(masterContacts: master.Contacts,
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
-    val twilioInit= Future{Twilio.init(smsAccountSID, smsAuthToken)}
-    val mobileNumber=masterContacts.Service.getMobileNumber(accountID)
-    (for{
-      _<-twilioInit
-      mobileNumber<-mobileNumber
-    }yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
-      ).recover{
+    val twilioInit = Future {
+      Twilio.init(smsAccountSID, smsAuthToken)
+    }
+    val mobileNumber = masterContacts.Service.getMobileNumber(accountID)
+    (for {
+      _ <- twilioInit
+      mobileNumber <- mobileNumber
+    } yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
+      ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
@@ -74,6 +78,29 @@ class Notification @Inject()(masterContacts: master.Contacts,
       case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
         throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE)
     }
+  }
+
+  def createNotificationAndSend(accountID: String, tradeRoomID: Option[String], notification: constants.Notification, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+    if (notification.pushNotification.isDefined) {
+      val pushNotification = notification.pushNotification.get
+      val title = Future(messagesApi(pushNotification.title))
+      val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
+
+      def createNotification(title: String, message: String): Future[String] = masterTransactionNotifications.Service.create(accountID, title, message)
+
+      def createTradeActivity(notificationID: String, tradeRoomID: Option[String]): Future[String] = if (tradeRoomID.isDefined) masterTransactionTradeActivities.Service.create(notificationID, tradeRoomID.get) else Future("")
+
+      (for {
+        title <- title
+        message <- message
+        createNotification <- createNotification(title, message)
+        _ <- createTradeActivity(createNotification, tradeRoomID)
+      } yield {}).recover {
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+          throw baseException
+      }
+    }
+    send(accountID, notification, messageParameters: _*)
   }
 
   def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
@@ -87,10 +114,10 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def sendTraderInvite(accountID:String,toEmail:String, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID)))=sendTraderInviteEmail(toEmail,messageParameters = messageParameters: _*)
+  def sendTraderInvite(accountID: String, toEmail: String, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))) = sendTraderInviteEmail(toEmail, messageParameters = messageParameters: _*)
 
-  def sendTraderInviteEmail(toEmail:String, messageParameters: String*)(implicit lang: Lang)={
-    val email= constants.Notification.TRADER_INVITATION.email.get
+  def sendTraderInviteEmail(toEmail: String, messageParameters: String*)(implicit lang: Lang) = {
+    val email = constants.Notification.TRADER_INVITATION.email.get
 
     mailerClient.send(Email(
       subject = messagesApi(email.subject),
@@ -105,18 +132,18 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
 
-    val title=Future(messagesApi(pushNotification.title))
-    val message=Future(messagesApi(pushNotification.message, messageParameters: _*))
-    val pushNotificationToken=masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
-    def create(title:String,message:String): Future[String]=masterTransactionNotifications.Service.create(accountID, title, message)
-    def post(title:String,message:String,pushNotificationToken:String)=wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
-    (for{
-      title<-title
-      message<-message
-      create<-create(title,message)
-      pushNotificationToken<-pushNotificationToken
-      _<-post(title,message,pushNotificationToken)
-    }yield{}).recover{
+    val title = Future(messagesApi(pushNotification.title))
+    val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
+    val pushNotificationToken = masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
+
+    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
+
+    (for {
+      title <- title
+      message <- message
+      pushNotificationToken <- pushNotificationToken
+      _ <- post(title, message, pushNotificationToken)
+    } yield {}).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
@@ -124,14 +151,14 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private def sendEmail(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Future[String] = {
 
-    val verifyEmail=Future(constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+    val verifyEmail = Future(constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
-    def toEmailAddress(verifyEmail: constants.Notification.Email): Future[String]=if (email == verifyEmail) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+    def toEmailAddress(verifyEmail: constants.Notification.Email): Future[String] = if (email == verifyEmail) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
 
-    (for{
-      verifyEmail<-verifyEmail
-      toEmailAddress<-toEmailAddress(verifyEmail)
-    }yield{
+    (for {
+      verifyEmail <- verifyEmail
+      toEmailAddress <- toEmailAddress(verifyEmail)
+    } yield {
       mailerClient.send(Email(
         subject = messagesApi(email.subject),
         from = emailFromAddress,
@@ -141,7 +168,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
         replyTo = Seq(emailReplyTo),
         bounceAddress = Option(emailBounceAddress),
       ))
-    }).recover{
+    }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }

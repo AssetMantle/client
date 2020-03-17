@@ -791,6 +791,18 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
+(
+    "notificationID"         VARCHAR NOT NULL,
+    "tradeRoomID" VARCHAR NOT NULL,
+    PRIMARY KEY ("notificationID","tradeRoomID")
+);
+ALTER TABLE MASTER_TRANSACTION."TradeActivity"
+    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
+-- ALTER TABLE MASTER_TRANSACTION."TradeActivity"
+--     ADD CONSTRAINT TradeActivity_TradeRoom_TradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER_TRANSACTION."TradeRoom("id");
+
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
 (
     "id"      VARCHAR NOT NULL,

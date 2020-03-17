@@ -100,6 +100,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewTrader,
         routes.javascript.ComponentViewController.profileDocuments,
         routes.javascript.ComponentViewController.profilePicture,
+        routes.javascript.ComponentViewController.recentActivityForTradeRoom,
+        routes.javascript.ComponentViewController.recentActivityForTrader,
+        routes.javascript.ComponentViewController.recentActivityForOrganization,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
