@@ -2,22 +2,19 @@
 
 <div>
     <div cmuk-grid>
-        <div class="cmuk-width-1-3">
-            <ul class="cmuk-tab-left" cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
+        <div class="cmuk-width-auto@@m">
+            <ul class="cmuk-tab-left cmuk-subnav cmuk-subnav-pill" cmuk-switcher="connect: #component-tab-left; animation: cmuk-animation-fade">
                 @for(itemHeader <- htmlItems.keys) {
                     <li><a href="#">@Messages(itemHeader)</a></li>
                 }
                 @for((itemHeader, itemValue) <- jsRouteItems) {
                     @defining(Seq(itemValue, "()").mkString("")) { route =>
                         <li><a href="#" onclick="componentResource('switcher@itemHeader', @route)">@Messages(itemHeader)</a></li>
-                        <script>
-                                componentResource('switcher@itemHeader', @route)
-                        </script>
                     }
                 }
             </ul>
         </div>
-        <div class="cmuk-width-2-3">
+        <div class="cmuk-width-expand@@m">
             <ul id="component-tab-left" class="cmuk-switcher">
                 @for((itemHeader, itemValue) <- htmlItems) {
                     <li id="switcher@itemHeader">@itemValue</li>

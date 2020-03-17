@@ -7,18 +7,15 @@
 
 @center = {
     <div class="cmuk-container headingSection">
-        <p class="cmuk-padding-large">Lorem ipsum dolor sit amet, consectetur $2,785,511, sed do eiusmod tempor
-            incididunt
-            ut 7500 et dolore magna 34. Ut enim.</p>
+        <p class="cmuk-padding-large">@Messages(constants.View.INDEX_3)</p>
     </div>
 
     <div class="tabsSection">
         <div class="cmuk-container">
             <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
-                <h2>The value of Comdex</h2>
-                @commonVerticalSwitcher(htmlItems = Map(constants.View.INDEX_TRADERS_HEADER -> Html(Messages(constants.View.INDEX_TRADERS)),
-                    constants.View.INDEX_FINANCIER_HEADER -> Html(Messages(constants.View.INDEX_FINANCIER)),
-                    constants.View.INDEX_UNDERWRITERS_HEADER -> Html(Messages(constants.View.INDEX_UNDERWRITERS))))
+                @commonVerticalSwitcher(htmlItems = Map(constants.View.INDEX_TRADERS_HEADER -> views.html.component.master.indexTraders(),
+                    constants.View.INDEX_FINANCIERS_HEADER -> views.html.component.master.indexFinanciers(),
+                    constants.View.INDEX_UNDERWRITERS_HEADER -> views.html.component.master.indexUnderwriters()))
             </div>
         </div>
     </div>
