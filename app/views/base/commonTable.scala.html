@@ -1,9 +1,12 @@
-@()(tableBody: Html = Html(""))
+@()(title: Html = Html(""))(content: Html = Html(""))
 <div class="cmuk-overflow-auto">
+    <div class="cmuk-card-header">
+        <h2 class="cmuk-card-title leftText headerFontSize cmuk-text-bold">@title</h2>
+    </div>
     <div class="productTable">
         <table class="cmuk-table cmuk-table-divider">
             <tbody>
-                @tableBody
+                @content
             </tbody>
         </table>
     </div>

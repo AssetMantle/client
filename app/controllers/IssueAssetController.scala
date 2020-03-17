@@ -16,7 +16,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, utilitiesNotification: utilities.Notification, masterTraders: master.Traders, transaction: utilities.Transaction, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, masterAssets:master.Assets, masterTransactionAssetFiles: masterTransaction.AssetFiles, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, utilitiesNotification: utilities.Notification, masterTraders: master.Traders, transaction: utilities.Transaction, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, masterAssets: master.Assets, masterTransactionAssetFiles: masterTransaction.AssetFiles, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -28,7 +28,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
 
-      def status(pegHash:Option[String]) =pegHash match {
+      def status(pegHash: Option[String]) = pegHash match {
         case Some(value) => masterAssets.Service.getStatus(value)
         case None => Future("")
       }
@@ -38,8 +38,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(id)
           for {
             assetFiles <- assetFiles
-            status<-status(asset.pegHash)
-          } yield Ok(views.html.component.master.assetDetail(asset, assetFiles,status))
+            status <- status(asset.pegHash)
+          } yield Ok(views.html.component.master.assetDetail(asset, assetFiles, status))
         } else {
           Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
@@ -88,7 +88,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
           def getResult(asset: IssueAssetRequest): Future[Result] = {
             if (asset.physicalDocumentsHandledVia == constants.Form.COMDEX) {
-              val updateCompletionStatusAndComment= masterTransactionIssueAssetRequests.Service.updateCompletionStatus(issueAssetRequestData.requestID)
+              val updateCompletionStatusAndComment = masterTransactionIssueAssetRequests.Service.updateCompletionStatus(issueAssetRequestData.requestID)
               for {
                 _ <- updateCompletionStatusAndComment
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))

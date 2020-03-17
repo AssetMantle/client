@@ -21,4 +21,14 @@ object Status {
     val IN_ORDER = "IN_ORDER"
     val COMPLETED_TRADE = "COMPLETED_TRADE"
   }
+
+  object TraderStatus {
+    val NOT_SIGNED_UP = "NOT_SIGNED_UP"
+    val SIGNED_UP = "SIGNED_UP"
+    val ADD_TRADER_FORM_INCOMPLETE = "ADD_TRADER_FORM_INCOMPLETE"
+    val REQUESTED = "REQUESTED"
+    val REJECTED = "REJECTED"
+    val APPROVED = "APPROVED"
+  }
+
 }

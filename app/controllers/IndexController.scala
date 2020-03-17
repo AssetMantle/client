@@ -33,7 +33,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           for {
             id <- id
             zone <- zone(id)
-            result<-withUsernameToken.Ok(views.html.zoneIndex(zone = zone))
+            result <- withUsernameToken.Ok(views.html.zoneIndex(zone = zone))
           } yield result
         case constants.User.ORGANIZATION =>
           val id = blockchainOrganizations.Service.getID(loginState.address)
@@ -43,7 +43,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           for {
             id <- id
             organization <- organization(id)
-            result<-withUsernameToken.Ok(views.html.organizationIndex(organization = organization))
+            result <- withUsernameToken.Ok(views.html.organizationIndex(organization = organization))
           } yield result
         case constants.User.TRADER =>
           val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
@@ -64,7 +64,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
             aclAccount <- aclAccount
             totalFiat <- totalFiat
             (zone, organization) <- getZoneAndOrganization(aclAccount)
-            result<-withUsernameToken.Ok(views.html.traderIndex(totalFiat = totalFiat.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization))
+            result <- withUsernameToken.Ok(views.html.traderIndex(totalFiat = totalFiat.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization))
           } yield result
         case constants.User.USER => withUsernameToken.Ok(views.html.userIndex())
         case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex())
@@ -72,7 +72,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           val updateUserType = masterAccounts.Service.updateUserType(loginState.username, constants.User.USER)
           for {
             _ <- updateUserType
-            result<-withUsernameToken.Ok(views.html.dashboard())
+            result <- withUsernameToken.Ok(views.html.dashboard())
           } yield result
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

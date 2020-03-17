@@ -113,10 +113,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case _: NoSuchElementException => None
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -178,10 +179,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def create(file: NegotiationFile): Future[String] = add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
-    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map{ negotiationFile=> negotiationFile match {
-      case Some(negotiation) => negotiation
-      case None => NegotiationFile("", "", "", None, None, None)
-    }
+    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map { negotiationFile =>
+      negotiationFile match {
+        case Some(negotiation) => negotiation
+        case None => NegotiationFile("", "", "", None, None, None)
+      }
     }
 
     def get(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType)
@@ -194,7 +196,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def insertOrUpdateContext(file: NegotiationFile): Future[String] = upsertContext(file).map(_.toString)
 
-    def updateFileStatus(id: String, documentType: String, status: Boolean): Future[Int] =updateStatus(id, documentType, status)
+    def updateFileStatus(id: String, documentType: String, status: Boolean): Future[Int] = updateStatus(id, documentType, status)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 

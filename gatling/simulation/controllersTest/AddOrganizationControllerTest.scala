@@ -25,7 +25,7 @@ object addOrganizationControllerTest {
     .feed(AddressDataFeeder.addressDataFeed)
     .exec(http("Add_Organization_GET")
       .get(routes.AddOrganizationController.addOrganizationForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.ADD_ORGANIZATION.legend)).exists)
+      .check(css("legend:contains(%s)".format("Add Organization")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Add_Organization_POST")
@@ -52,7 +52,7 @@ object addOrganizationControllerTest {
         Form.POSTAL_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Form.POSTAL_PHONE -> "${%s}".format(Test.TEST_PHONE)
         ))
-      .check(substring("ORGANIZATION_KYC_FILES").exists)
+      .check(substring("Organization KYC Files").exists)
     )
     .pause(2)
     .foreach(organizationKYCs,"documentType"){
@@ -77,13 +77,13 @@ object addOrganizationControllerTest {
         .exec(
           http("Store_Organization_KYC_"+"${documentType}")
             .get(session=>routes.AddOrganizationController.userStoreOrganizationKYC(session(Test.TEST_FILE_NAME).as[String],session("documentType").as[String]).url)
-            .check(substring("ORGANIZATION_KYC_FILES").exists)
+            .check(substring("Organization KYC Files").exists)
         )
         .pause(2)
     }
     .exec(http("User_Review_Add_Organization_Request_Form_GET")
       .get(routes.AddOrganizationController.userReviewAddOrganizationRequestForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST.legend)).exists)
+      .check(css("legend:contains(%s)".format("User Review Add Organization Request")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(1)
@@ -93,7 +93,7 @@ object addOrganizationControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
-      .check(substring("SUCCESS ORGANIZATION_ADDED_FOR_VERIFICATION").exists)
+      .check(substring("Organization Added For Verification").exists)
     )
     .pause(3)
 
@@ -120,7 +120,7 @@ object addOrganizationControllerTest {
     .feed(GasFeeder.gasFeed)
     .exec(http("Verify_Organization_Form_GET")
       .get(session=>routes.AddOrganizationController.verifyOrganizationForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_ZONE_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.VERIFY_ORGANIZATION.legend)).exists)
+      .check(css("legend:contains(%s)".format("Verify Organization")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Verify_Organization_POST")
@@ -132,7 +132,7 @@ object addOrganizationControllerTest {
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.PASSWORD -> "${%s}".format(Test.TEST_ZONE_PASSWORD),
       ))
-      .check(substring("SUCCESS ORGANIZATION_VERIFIED").exists)
+      .check(substring("Organization Verified").exists)
     )
     .pause(3)
 

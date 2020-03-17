@@ -19,6 +19,9 @@ GET         /organizationRequest                                         control
 GET         /organizationInformation                                     controllers.ViewController.organizationInformation
 GET         /market                                                      controllers.ViewController.market
 GET         /profile                                                     controllers.ViewController.profile
+GET         /master/component/accountDetails                             controllers.ViewController.account
+GET         /master/component/transactionDetails                         controllers.ViewController.trades
+GET         /master/component/tradeDetails                               controllers.ViewController.dashboard
 
 GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
@@ -58,6 +61,18 @@ GET         /master/identificationDocument                               control
 GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
 GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
 
+GET         /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
+POST        /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetails
+GET         /master/shippingDetails                                      controllers.SalesQuoteController.shippingDetailsForm(id:String)
+POST        /master/shippingDetails                                      controllers.SalesQuoteController.shippingDetails
+GET         /master/paymentTerms                                         controllers.SalesQuoteController.paymentTermsForm(id:String)
+POST        /master/paymentTerms                                         controllers.SalesQuoteController.paymentTerms
+GET         /master/salesQuoteDocuments                                  controllers.SalesQuoteController.salesQuoteDocumentsForm(id:String)
+POST        /master/salesQuoteDocuments                                  controllers.SalesQuoteController.salesQuoteDocuments
+GET         /master/traderReviewSalesQuoteDetails                        controllers.SalesQuoteController.traderReviewSalesQuoteDetailsForm(id:String)
+POST        /master/traderReviewSalesQuoteDetails                        controllers.SalesQuoteController.traderReviewSalesQuoteDetails
+GET         /master/salesQuoteList                                       controllers.SalesQuoteController.salesQuoteList
+
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
 GET         /master/component/zoneDetails                                controllers.ComponentViewController.zoneDetails
@@ -71,11 +86,6 @@ GET         /master/component/availableAssetList                         control
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
 GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
-GET         /master/component/accountDetails                             controllers.ComponentViewController.accountDetails
-GET         /master/component/transactionDetails                         controllers.ComponentViewController.transactionDetails
-GET         /master/component/tradeDetails                               controllers.ComponentViewController.tradeDetails
-GET         /master/component/subscriptionsDetails                       controllers.ComponentViewController.subscriptionsDetails
-GET         /master/component/settingsDetails                            controllers.ComponentViewController.settingsDetails
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
@@ -405,3 +415,14 @@ POST        /blockchain/setBuyerFeedback                                 control
 
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
+
+GET         /master/tradeRoom                                            controllers.TradeRoomController.tradeRoom(salesQuoteID:String)
+GET         /master/tradeTerms                                           controllers.TradeRoomController.tradeTerms(salesQuoteID:String)
+GET         /master/recentActivity                                       controllers.TradeRoomController.recentActivity
+GET         /master/tradeFinancials                                      controllers.TradeRoomController.tradeFinancials
+GET         /master/tradeDocumentList                                    controllers.TradeRoomController.documentList
+GET         /master/tradeDocumentView                                    controllers.TradeRoomController.documentView(fileName:String, documentType:String)
+GET         /master/chatRoom                                             controllers.TradeRoomController.chatRoom
+GET         /master/updateTermsStatus                                    controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
+GET         /master/tradeList                                            controllers.TradeRoomController.tradeList
+POST        /master/updateTradeTermStatus                                controllers.TradeRoomController.updateTradeTermStatus
