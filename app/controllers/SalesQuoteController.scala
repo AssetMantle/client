@@ -5,7 +5,6 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable
-import models.master.Accounts
 import models.masterTransaction.SalesQuote
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -15,7 +14,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTransactionTradeRooms: masterTransaction.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTradeRooms: master.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: master.Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -255,7 +254,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         traderReviewSalesQuoteDetailsData => {
           (if (traderReviewSalesQuoteDetailsData.completion) {
             val updateCompletionStatus: Future[Int] = masterTransactionSalesQuotes.Service.updateCompletionStatus(traderReviewSalesQuoteDetailsData.requestID)
-            val createTradeRoom = masterTransactionTradeRooms.Service.create(traderReviewSalesQuoteDetailsData.requestID, "BUY10SdMxOf96", loginState.username, "None", "UnderNegotiation")
+            val createTradeRoom = masterTradeRooms.Service.create(traderReviewSalesQuoteDetailsData.requestID, "BUY10SdMxOf96", loginState.username, "None", "UnderNegotiation")
             val salesQuote = masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
 
             def createTradeTerms(tradeRoomID: String, salesQuote: SalesQuote) = masterTransactionTradeTerms.Service.create(tradeRoomID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, salesQuote.shippingDetails.get.shippingPeriod, salesQuote.shippingDetails.get.portOfLoading, salesQuote.shippingDetails.get.portOfDischarge, salesQuote.paymentTerms.get.advancePayment, salesQuote.paymentTerms.get.advancePercentage, salesQuote.paymentTerms.get.credit, salesQuote.paymentTerms.get.tenure, if (salesQuote.paymentTerms.get.tentativeDate.isDefined) Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get)) else None, salesQuote.paymentTerms.get.refrence, salesQuote.salesQuoteDocuments.get.billOfExchangeRequired, salesQuote.salesQuoteDocuments.get.obl, salesQuote.salesQuoteDocuments.get.invoice, salesQuote.salesQuoteDocuments.get.coo, salesQuote.salesQuoteDocuments.get.coa, salesQuote.salesQuoteDocuments.get.otherDocuments)

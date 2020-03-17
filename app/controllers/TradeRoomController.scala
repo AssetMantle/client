@@ -13,7 +13,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TradeRoomController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, emailOTPs: EmailOTPs, masterContacts: master.Contacts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTransactionTradeRooms: masterTransaction.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class TradeRoomController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, emailOTPs: EmailOTPs, masterContacts: master.Contacts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTradeRooms: master.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_TRADE_ROOM
 
@@ -119,7 +119,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
 
   def tradeList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val tradeList = masterTransactionTradeRooms.Service.tradeListByAccountID(loginState.username)
+      val tradeList = masterTradeRooms.Service.tradeListByAccountID(loginState.username)
       (for {
         tradeList <- tradeList
       } yield Ok(views.html.component.master.tradeList(tradeList))

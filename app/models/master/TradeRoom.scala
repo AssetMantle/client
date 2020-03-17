@@ -1,4 +1,4 @@
-package models.masterTransaction
+package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -7,8 +7,9 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: String, status: String)
 
