@@ -5,8 +5,10 @@
 
 @common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right))
 
-@left={
+@left = {
+    <div id="payableReceivable"></div>
 
+    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
 }
 
 @center = {
@@ -33,8 +35,15 @@
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
+                componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+
             }
         @if(loginState.userType == constants.User.ORGANIZATION){
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
             }
-    </script>
+</script>
+<script type="text/javascript">
+        var fiatCometMessage = function (event) {
+            componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+        }
+</script>

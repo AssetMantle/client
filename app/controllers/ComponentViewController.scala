@@ -176,6 +176,41 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
   }
 
+  def payableReceivable: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+      val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
+
+      def orders(negotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(negotiations.map(_.id))
+
+      def getFiatsInOrders(ordersIDS: Seq[String]): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(ordersIDS)
+
+      def getNegotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
+
+      def getPayable(negotiationsOfOrders: Seq[Negotiation], fiatsInOrders: Seq[Fiat]): Int = {
+        val sumBuying = negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.bid.toInt).sum
+        val sumBought = fiatsInOrders.filter(x => negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.id) contains x.ownerAddress).map(_.transactionAmount.toInt).sum
+        sumBought - sumBuying
+      }
+
+      def getReceivable(negotiationsOfOrders: Seq[Negotiation]): Int = {
+        val sumSelling = negotiationsOfOrders.filter(_.sellerAddress == loginState.address).map(_.bid.toInt).sum
+        sumSelling
+      }
+
+      def walletBalance(fiat: Seq[Fiat]): Int = fiat.map(_.transactionAmount.toInt).sum
+
+      (for {
+        fiatPegWallet <- fiatPegWallet
+        negotiations <- negotiations
+        orders <- orders(negotiations)
+        getFiatsInOrders <- getFiatsInOrders(orders.map(_.id))
+      } yield Ok(views.html.component.master.payableReceivable(walletBalance(fiatPegWallet), getPayable(getNegotiationsOfOrders(negotiations, orders), getFiatsInOrders), getReceivable(getNegotiationsOfOrders(negotiations, orders))))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiationsForBuyerAddress = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address)

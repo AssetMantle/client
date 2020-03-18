@@ -81,6 +81,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private def getFiatPegWalletByAddress(address: String): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerAddress === address).result)
 
+  private def getFiatPegWalletByAddresses(addresses: Seq[String]): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerAddress inSet addresses).result)
+
   private def getFiatsByDirtyBit(dirtyBit: Boolean): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.dirtyBit === dirtyBit).result)
 
   private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(fiatTable.filter(_.ownerAddress === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
@@ -135,6 +137,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[String] = add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit))
 
     def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address)
+
+    def getFiatPegWallet(addresses: Seq[String]): Future[Seq[Fiat]] = getFiatPegWalletByAddresses(addresses)
 
     def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[Int] = upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit))
 

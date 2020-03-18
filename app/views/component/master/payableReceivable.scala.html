@@ -1,0 +1,7 @@
+@import controllers.actions.LoginState
+
+@(walletBalance: Int, payable: Int, receivable: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@Messages("WALLET_BALANCE") : @walletBalance
+@Messages("PAYABLE") : @payable
+@Messages("RECEIVABLE") : @receivable

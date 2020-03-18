@@ -103,6 +103,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.recentActivityForTradeRoom,
         routes.javascript.ComponentViewController.recentActivityForTrader,
         routes.javascript.ComponentViewController.recentActivityForOrganization,
+        routes.javascript.ComponentViewController.payableReceivable,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
