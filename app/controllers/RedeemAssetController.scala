@@ -35,7 +35,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     implicit request =>
       views.companion.master.RedeemAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name), formWithErrors.data(constants.FormField.PEG_HASH.name))))
+          Future(BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name), formWithErrors.data(constants.FormField.PEG_HASH.name))))
         },
         redeemAssetData => {
           val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
@@ -53,7 +53,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           (for {
             toAddress <- toAddress
             _ <- transactionProcess(toAddress)
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -70,7 +70,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     views.companion.blockchain.RedeemAsset
       .form.bindFromRequest().fold(
       formWithErrors => {
-        Future (BadRequest(views.html.component.blockchain.redeemAsset(formWithErrors)))
+        Future(BadRequest(views.html.component.blockchain.redeemAsset(formWithErrors)))
       },
       redeemAssetData => {
         val post = transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas.toString), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))

@@ -23,7 +23,7 @@ class ShutdownActor @Inject()(actorSystem: ActorSystem)(implicit executionContex
   private implicit val module: String = constants.Module.ACTOR_SHUTDOWN
 
   def onLogOut(actorPath: String, username: String): Future[Unit] = Future {
-    shutdown(actorPath,username)
+    shutdown(actorPath, username)
   }
 
   def shutdown(actorPath: String, username: String): Unit = {

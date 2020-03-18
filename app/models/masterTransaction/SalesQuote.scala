@@ -146,9 +146,6 @@ class SalesQuotes @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    /*  def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shippingDetails: Serializable.ShippingDetails, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[String] =
-        add(serialize(SalesQuote(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shippingDetails = shippingDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, completionStatus = completionStatus, verificationStatus = verificationStatus, comment = null)))
-  */
     def insertOrUpdate(id: String, accountID: String, assetType: String, assetDescription: String, assetPrice: Int, assetQuantity: Int, shippingDetails: Option[Serializable.ShippingDetails], paymentTerms: Option[Serializable.PaymentTerms], salesQuoteDocuments: Option[Serializable.SalesQuoteDocuments], completionStatus: Boolean) = upsert(serialize(SalesQuote(id = id, accountID = accountID, assetType = assetType, assetDescription = assetDescription, assetQuantity = assetQuantity, assetPrice = assetPrice, shippingDetails = shippingDetails, paymentTerms = paymentTerms, salesQuoteDocuments = salesQuoteDocuments, completionStatus = completionStatus)))
 
     def get(id: String) = findByID(id).map(_.deSerialize)

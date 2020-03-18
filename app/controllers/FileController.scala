@@ -43,13 +43,13 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKYCFilePath(documentType))
               Ok
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -65,20 +65,20 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         masterCreate = masterAccountKYCs.Service.create
       )
 
-      def accountKYC=masterAccountKYCs.Service.get(loginState.username,documentType)
+      def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
-      def getResult(accountKYC:Option[AccountKYC])=documentType match{
-        case constants.File.IDENTIFICATION=>withUsernameToken.PartialContent(views.html.component.master.identificationDocument(accountKYC,documentType))
-        case constants.File.BANK_ACCOUNT_DETAIL=> withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+      def getResult(accountKYC: Option[AccountKYC]) = documentType match {
+        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.identificationDocument(accountKYC, documentType))
+        case constants.File.BANK_ACCOUNT_DETAIL => withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       }
 
       (for {
         _ <- storeFile
-        accountKYC<-accountKYC
+        accountKYC <- accountKYC
         result <- getResult(accountKYC)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -95,30 +95,30 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         updateOldDocument = masterAccountKYCs.Service.updateOldDocument
       )
 
-      def accountKYC=masterAccountKYCs.Service.get(loginState.username,documentType)
+      def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
-      def getResult(accountKYC:Option[AccountKYC])=documentType match{
-        case constants.File.IDENTIFICATION=>withUsernameToken.PartialContent(views.html.component.master.identificationDocument(accountKYC,documentType))
-        case constants.File.BANK_ACCOUNT_DETAIL=> withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+      def getResult(accountKYC: Option[AccountKYC]) = documentType match {
+        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.identificationDocument(accountKYC, documentType))
+        case constants.File.BANK_ACCOUNT_DETAIL => withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       }
 
       (for {
         oldDocumentFileName <- oldDocumentFileName
         _ <- updateFile(oldDocumentFileName)
-        accountKYC<-accountKYC
-        result<-getResult(accountKYC)
+        accountKYC <- accountKYC
+        result <- getResult(accountKYC)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
-  def getAccountKYCFile(fileName: String, documentType: String)= withLoginAction.authenticated{implicit loginState =>
+  def getAccountKYCFile(fileName: String, documentType: String) = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
         Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName))
       }.recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -857,11 +857,5 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-  }
-
-  def getTradeDocument(fileName:String, documentType:String)=withTraderLoginAction.authenticated{implicit loginState =>
-    implicit request =>
-    val path= fileResourceManager.getTraderKYCFilePath(documentType)
-    Future(Ok.sendFile(utilities.FileOperations.fetchFile(path=path, fileName = fileName)))
   }
 }
