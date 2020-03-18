@@ -4,6 +4,7 @@ import com.twilio.Twilio
 import com.twilio.`type`.PhoneNumber
 import com.twilio.exception.{ApiConnectionException, ApiException}
 import com.twilio.rest.api.v2010.account.Message
+import constants.Notification.PushNotification
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -18,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class Notification @Inject()(masterContacts: master.Contacts,
                              masterTransactionNotifications: masterTransaction.Notifications,
+                             masterTransactionTradeActivities: masterTransaction.TradeActivities,
                              mailerClient: MailerClient,
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
@@ -76,7 +78,30 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))):Unit = {
+  def createNotificationAndSend(accountID: String, tradeRoomID: Option[String], notification: constants.Notification, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+    if (notification.pushNotification.isDefined) {
+      val pushNotification = notification.pushNotification.get
+      val title = Future(messagesApi(pushNotification.title))
+      val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
+
+      def createNotification(title: String, message: String): Future[String] = masterTransactionNotifications.Service.create(accountID, title, message)
+
+      def createTradeActivity(notificationID: String, tradeRoomID: Option[String]): Future[String] = if (tradeRoomID.isDefined) masterTransactionTradeActivities.Service.create(notificationID, tradeRoomID.get) else Future("")
+
+      (for {
+        title <- title
+        message <- message
+        createNotification <- createNotification(title, message)
+        _ <- createTradeActivity(createNotification, tradeRoomID)
+      } yield {}).recover {
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+          throw baseException
+      }
+    }
+    send(accountID, notification, messageParameters: _*)
+  }
+
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
     try {
       if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
       if (notification.email.isDefined) sendEmail(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
@@ -105,18 +130,18 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) =  {
 
-    val title=Future(messagesApi(pushNotification.title))
-    val message=Future(messagesApi(pushNotification.message, messageParameters: _*))
-    val pushNotificationToken=masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
-    def create(title:String,message:String): Future[String]=masterTransactionNotifications.Service.create(accountID, title, message)
-    def post(title:String,message:String,pushNotificationToken:String)=wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
-    (for{
-      title<-title
-      message<-message
-      _<-create(title,message)
-      pushNotificationToken<-pushNotificationToken
-      _<-post(title,message,pushNotificationToken)
-    }yield{}).recover{
+    val title = Future(messagesApi(pushNotification.title))
+    val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
+    val pushNotificationToken = masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
+
+    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
+
+    (for {
+      title <- title
+      message <- message
+      pushNotificationToken <- pushNotificationToken
+      _ <- post(title, message, pushNotificationToken)
+    } yield {}).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }

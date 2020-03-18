@@ -7,7 +7,7 @@
 
 @for(chatWindow <- chatWindows){
     <div>
-        <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatWindow.id', 0))">@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString</button>
+        <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatWindow.id', 0))" title="@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString">@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
     </div>
 }
 <div class="cmuk-card cmuk-card-default">

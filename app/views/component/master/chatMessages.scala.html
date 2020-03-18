@@ -50,7 +50,7 @@
                     @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
 @*                        <p style="font-size:10px;text-align: right" class="unread">unread</p>*@
                         <script>
-                              unReadBar();
+                              unReadBar(@chats.filter(_.fromAccountID != loginState.username).length - @readChats.filter(_.toAccountID == loginState.username).length);
                       </script>
                     }
                 </div>

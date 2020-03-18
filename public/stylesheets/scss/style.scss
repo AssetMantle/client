@@ -658,6 +658,9 @@ header:before,
       right: inherit;
     }
   }
+  .notification > div{
+    padding: 0px;
+  }
 }
 
 .docView{
@@ -818,7 +821,7 @@ header:before,
   ul li{
     display: flex;
   }
-  .you{
+  .patner{
     word-break: break-all;
     padding: 10px;
     border-radius: 10px;
@@ -845,7 +848,7 @@ header:before,
       font-size: $paragraphFontSizeMedium;
     }
   }
-  .patner{
+  .you{
     word-break: break-all;
     padding: 10px;
     border-radius: 10px;

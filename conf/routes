@@ -86,6 +86,9 @@ GET         /master/component/availableAssetList                         control
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
 GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
+GET         /master/component/recentActivityForTradeRoom                     controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, tradeRoomID :String)
+GET         /master/component/recentActivityForTrader                     controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
+GET         /master/component/recentActivityForOrganization                     controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList

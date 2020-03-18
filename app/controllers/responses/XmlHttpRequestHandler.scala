@@ -17,7 +17,6 @@ class XmlHttpRequestHandler @Inject()(
                                      ) extends DefaultHttpErrorHandler(environment, configuration, sourceMapper, router) {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
-    println(utilities.XMLRestResponse.REQUEST_NOT_WELL_FORMED)
     Future.successful(
       utilities.XMLRestResponse.REQUEST_NOT_WELL_FORMED.result
     )
