@@ -23,7 +23,6 @@ GET         /master/component/accountDetails                             control
 GET         /master/component/transactionDetails                         controllers.ViewController.trades
 GET         /master/component/tradeDetails                               controllers.ViewController.dashboard
 
-GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
 
 GET         /account/noteAndVerifyMnemonic                               controllers.AccountController.noteAndVerifyMnemonic
@@ -47,6 +46,18 @@ POST        /account/forgotPassword                                      control
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
 
+GET         /account/identification                                      controllers.AccountController.identificationForm
+POST        /account/identification                                      controllers.AccountController.identification
+GET         /account/userUploadOrUpdateIdentificationView                controllers.AccountController.userUploadOrUpdateIdentificationView
+GET         /account/userReviewIdentificationDetails                     controllers.AccountController.userReviewIdentificationDetailsForm
+POST        /account/userReviewIdentificationDetails                     controllers.AccountController.userReviewIdentificationDetails
+
+GET         /trader/traderRelationRequest                                controllers.TraderController.traderRelationRequestForm
+POST        /trader/traderRelationRequest                                controllers.TraderController.traderRelationRequest
+
+GET         /trader/acceptOrRejectTraderRelation                         controllers.TraderController.acceptOrRejectTraderRelationForm(fromID: String, toID: String)
+POST        /trader/acceptOrRejectTraderRelation                         controllers.TraderController.acceptOrRejectTraderRelation
+
 GET         /contact                                                     controllers.ContactController.contact
 
 GET         /master/notifications                                        controllers.NotificationController.notificationPage(pageNumber:Int)
@@ -55,11 +66,17 @@ GET         /master/markNotificationAsRead                               control
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /master/identification                                       controllers.ProfileController.identificationForm
-POST        /master/identification                                       controllers.ProfileController.identification
-GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
-GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
-GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
+GET         /component/identificationDetails                             controllers.ComponentViewController.identificationDetails
+GET         /component/userViewPendingRequests                           controllers.ComponentViewController.userViewPendingRequests
+GET         /component/traderViewOrganizationDetails                     controllers.ComponentViewController.traderViewOrganizationDetails
+GET         /component/viewOrganizationDetails                           controllers.ComponentViewController.viewOrganizationDetails
+
+GET         /component/traderRelationList                                controllers.ComponentViewController.traderRelationList
+GET         /component/acceptedTraderRelationList                        controllers.ComponentViewController.acceptedTraderRelationList
+GET         /component/pendingTraderRelationList                         controllers.ComponentViewController.pendingTraderRelationList
+GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(toID: String)
+GET         /component/pendingSentTraderRelation                         controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
+GET         /component/pendingReceivedTraderRelation                     controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
 
 GET         /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
 POST        /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetails
@@ -76,7 +93,6 @@ GET         /master/salesQuoteList                                       control
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
 GET         /master/component/zoneDetails                                controllers.ComponentViewController.zoneDetails
-GET         /master/component/organizationDetails                        controllers.ComponentViewController.organizationDetails
 GET         /master/component/assetList                                  controllers.ComponentViewController.assetList
 GET         /master/component/fiatList                                   controllers.ComponentViewController.fiatList
 GET         /master/component/buyNegotiationList                         controllers.ComponentViewController.buyNegotiationList
@@ -173,7 +189,7 @@ POST        /master/organizationModifyTrader                             control
 GET         /master/organzationViewTraderKYCDocuments                    controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
 GET         /master/updateTraderKYCDocumentOrganizationStatus            controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentOrganizationStatus            controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
-GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewPendingVerifyTraderRequests
+GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewVerifyTraderRequests
 GET         /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequest
 

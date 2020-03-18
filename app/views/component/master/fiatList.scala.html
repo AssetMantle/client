@@ -6,16 +6,13 @@
     <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(fiat <- fiatPegWallet) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@fiat.transactionID</span>
-        </div>
+    @commonCard(fiat.transactionID) {
     } {
         <div>
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @fiat.pegHash <br>
-            <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span>: @fiat.transactionID <br>
-            <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span>: @fiat.transactionAmount <br>
-            <span class="red">@Messages(constants.Form.REDEEM_AMOUNT)</span>: @fiat.redeemedAmount
+            @commonTextInfo(constants.Form.PEG_HASH, fiat.pegHash)
+            @commonTextInfo(constants.Form.TRANSACTION_ID, fiat.transactionID)
+            @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, fiat.transactionAmount)
+            @commonTextInfo(constants.Form.REDEEM_AMOUNT, fiat.redeemedAmount)
         </div>
     }
     </div>

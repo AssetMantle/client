@@ -99,6 +99,9 @@ object FormField {
   val ASSET_DESCRIPTION = new StringFormField("ASSET_DESCRIPTION", 1, 1000)
   val TRADE_ID = new StringFormField("TRADE_ID", 1, 132)
   val TERM_TYPE = new StringFormField("TERM_TYPE", 1, 100)
+  val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
+  val FROM_ID = new StringFormField("FROM_ID", 16, 16)
+  val TO_ID = new StringFormField("TO_ID", 16, 16)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)

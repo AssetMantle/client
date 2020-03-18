@@ -1,15 +1,13 @@
 @import controllers.actions.LoginState
 @import models.blockchain.TraderFeedbackHistory
 @import views.html.base._
+
 @(traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(traderFeedbackHistory <- traderFeedbackHistories) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@traderFeedbackHistory.buyerAddress</span>
-        </div>
+    @commonCard(traderFeedbackHistory.buyerAddress) {
     } {
         <div>
             <div class="leftText">

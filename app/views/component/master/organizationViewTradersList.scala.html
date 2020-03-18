@@ -10,10 +10,7 @@
         }
 @for(trader <- traders) {
     <div>
-        @commonCard(){
-            <div>
-                <span class="headerFontSize cmuk-text-bold">@trader.name</span>
-            </div>
+        @commonCard(trader.name){
         }{
             <div class="cmuk-flex infoRow">
                 <div class="infoRowLabel red">@Messages(constants.Form.TRADER_ID)</div>

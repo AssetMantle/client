@@ -4,16 +4,13 @@
 @(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @for(traderVerificationRequest <- traderVerificationRequests) {
     <div>
-    @commonCard() {
-        @traderVerificationRequest.zoneID
+    @commonCard(traderVerificationRequest.zoneID) {
     }{
-        <div>
-            <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @traderVerificationRequest.zoneID <br>
-            <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @traderVerificationRequest.organizationID <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @traderVerificationRequest.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span>: @traderVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.DOCUMENTS)</span>: <br>
-        </div>
+        @commonTextInfo(constants.Form.ZONE_ID, traderVerificationRequest.zoneID)
+        @commonTextInfo(constants.Form.ORGANIZATION_ID, traderVerificationRequest.organizationID)
+        @commonTextInfo(constants.Form.ACCOUNT_ID, traderVerificationRequest.accountID)
+        @commonTextInfo(constants.Form.NAME, traderVerificationRequest.name)
+        @Messages(constants.Form.DOCUMENTS):<br>
         <span id = "kycDocuments@traderVerificationRequest.accountID">
             <script>componentResource('kycDocuments@traderVerificationRequest.accountID', jsRoutes.controllers.SetACLController.organizationViewKYCDocuments('@traderVerificationRequest.id'))</script>
         </span><br>

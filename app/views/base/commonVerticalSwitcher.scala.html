@@ -1,0 +1,34 @@
+@(htmlItems: Map[String, Html] = Map(), jsRouteItems: Map[String, String] = Map())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div>
+    <div cmuk-grid>
+        <div class="cmuk-width-auto@@m">
+            <ul class="cmuk-tab-left cmuk-subnav cmuk-subnav-pill" cmuk-switcher="connect: #component-tab-left; animation: cmuk-animation-fade">
+                @for(itemHeader <- htmlItems.keys) {
+                    <li><a href="#">@Messages(itemHeader)</a></li>
+                }
+                @for((itemHeader, itemValue) <- jsRouteItems) {
+                    @defining(Seq(itemValue, "()").mkString("")) { route =>
+                        <li><a href="#" onclick="componentResource('switcher@itemHeader', @route)">@Messages(itemHeader)</a></li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="cmuk-width-expand@@m">
+            <ul id="component-tab-left" class="cmuk-switcher">
+                @for((itemHeader, itemValue) <- htmlItems) {
+                    <li id="switcher@itemHeader">@itemValue</li>
+                }
+                @for((itemHeader, itemValue) <- jsRouteItems) {
+                    <li id="switcher@itemHeader">
+                    @defining(Seq(itemValue, "()").mkString("")) { route =>
+                        <script>
+                                componentResource('switcher@itemHeader', @route)
+                        </script>
+                    }
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
