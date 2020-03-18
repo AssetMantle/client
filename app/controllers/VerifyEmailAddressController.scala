@@ -8,7 +8,7 @@ import models.master
 import models.master.Contact
 import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,16 +22,18 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val emailAddress: Future[String] = masterContacts.Service.getUnverifiedEmailAddress(loginState.username)
       val otp = emailOTPs.Service.sendOTP(loginState.username)
 
-      def sendNotificationAndGetResult(otp: String) = {
-        utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
+      def sendNotificationAndGetResult(emailAddress: String, otp: String): Future[Result] = {
+        utilitiesNotification.sendEmailToEmailAddress(toEmailAddress = emailAddress, email = constants.Notification.VERIFY_EMAIL.email.get, otp)
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
       }
 
       (for {
+        emailAddress <- emailAddress
         otp <- otp
-        result <- sendNotificationAndGetResult(otp)
+        result <- sendNotificationAndGetResult(emailAddress = emailAddress, otp = otp)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }

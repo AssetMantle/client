@@ -56,7 +56,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
               def sendEmailNotificationsAndGetResult(organization: Organization): Future[Result] = {
                 utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
-                utilitiesNotification.sendEmailViaAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, organization.name, organization.id)
+                utilitiesNotification.sendEmailToEmailAddress(toEmailAddress = addTraderRequestData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, organization.name, organization.id)
                 withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 

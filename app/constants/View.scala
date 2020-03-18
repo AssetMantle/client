@@ -43,6 +43,7 @@ object View {
   val INDEX_3 = "INDEX_3"
   val SELL = "SELL"
   val BUY = "BUY"
+  val UNSET = "UNSET"
 
   val INDEX_FINANCIER_1 = "INDEX_FINANCIER_1"
   val INDEX_FINANCIER_2 = "INDEX_FINANCIER_2"

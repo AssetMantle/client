@@ -114,21 +114,18 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   }
 
-  def sendEmailViaAddress(fromAccountID: String, toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(fromAccountID))): Unit = {
+  def sendEmailToEmailAddress(toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(fromAccountID))): Unit = {
 
     sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
 
   }
 
-  def sendEmailViaAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
+  def sendEmailByAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
 
-    val verifyEmail = Future(constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
-
-    def toEmailAddress(verifyEmail: constants.Notification.Email): Future[String] = if (email == verifyEmail) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+    val toEmailAddress: Future[String] = masterContacts.Service.getVerifiedEmailAddress(toAccountID)
 
     (for {
-      verifyEmail <- verifyEmail
-      toEmailAddress <- toEmailAddress(verifyEmail)
+      toEmailAddress <- toEmailAddress
     } yield {
       sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
     }).recover {
@@ -140,7 +137,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
   def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
     try {
       if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
-      if (notification.email.isDefined) sendEmailViaAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
+      if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
       if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
