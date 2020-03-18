@@ -6,16 +6,13 @@
     <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(unModeratedBuyOrder <- unModeratedBuyOrders) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@unModeratedBuyOrder.id</span>
-        </div>
+    @commonCard(unModeratedBuyOrder.id) {
     } {
         <div>
             <div class="leftText">
-                <span class="red">@Messages(constants.Form.ID)</span>: @unModeratedBuyOrder.id <br>
-                <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @unModeratedBuyOrder.awbProofHash <br>
-                <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @unModeratedBuyOrder.fiatProofHash <br>
+                @commonTextInfo(constants.Form.ID, unModeratedBuyOrder.id)
+                @commonTextInfo(constants.Form.AWB_PROOF_HASH, unModeratedBuyOrder.awbProofHash.getOrElse(constants.View.UNAVAILABLE))
+                @commonTextInfo(constants.Form.FIAT_PROOF_HASH, unModeratedBuyOrder.fiatProofHash.getOrElse(constants.View.UNAVAILABLE))
                 <div class="centerText" >
                 @loginState.acl match {
                     case Some(acl) => {
@@ -34,16 +31,13 @@
 
 @for(unModeratedSellOrder <- unModeratedSellOrders) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@unModeratedSellOrder.id</span>
-        </div>
+    @commonCard(unModeratedSellOrder.id) {
     } {
         <div>
             <div class="leftText">
-                <span class="red">@Messages(constants.Form.ID)</span>: @unModeratedSellOrder.id <br>
-                <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @unModeratedSellOrder.awbProofHash <br>
-                <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @unModeratedSellOrder.fiatProofHash <br>
+                @commonTextInfo(constants.Form.ID, unModeratedSellOrder.id)
+                @commonTextInfo(constants.Form.AWB_PROOF_HASH, unModeratedSellOrder.awbProofHash.getOrElse(constants.View.UNAVAILABLE))
+                @commonTextInfo(constants.Form.FIAT_PROOF_HASH, unModeratedSellOrder.fiatProofHash.getOrElse(constants.View.UNAVAILABLE))
                 <div class="centerText" >
                 @loginState.acl match {
                     case Some(acl) => {
@@ -60,16 +54,13 @@
 }
 @for(moderatedOrder <- moderatedOrders) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@moderatedOrder.id</span>
-        </div>
+    @commonCard(moderatedOrder.id) {
     } {
         <div>
             <div class="leftText">
-                <span class="red">@Messages(constants.Form.ID)</span>: @moderatedOrder.id <br>
-                <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @moderatedOrder.awbProofHash <br>
-                <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @moderatedOrder.fiatProofHash <br>
+                @commonTextInfo(constants.Form.ID, moderatedOrder.id)
+                @commonTextInfo(constants.Form.AWB_PROOF_HASH, moderatedOrder.awbProofHash.getOrElse(constants.View.UNAVAILABLE))
+                @commonTextInfo(constants.Form.FIAT_PROOF_HASH, moderatedOrder.fiatProofHash.getOrElse(constants.View.UNAVAILABLE))
             </div>
         </div>
     }

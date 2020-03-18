@@ -60,13 +60,15 @@ class Notification @Inject()(masterContacts: master.Contacts,
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
-    val twilioInit= Future{Twilio.init(smsAccountSID, smsAuthToken)}
-    val mobileNumber=masterContacts.Service.getMobileNumber(accountID)
-    (for{
-      _<-twilioInit
-      mobileNumber<-mobileNumber
-    }yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
-      ).recover{
+    val twilioInit = Future {
+      Twilio.init(smsAccountSID, smsAuthToken)
+    }
+    val mobileNumber = masterContacts.Service.getMobileNumber(accountID)
+    (for {
+      _ <- twilioInit
+      mobileNumber <- mobileNumber
+    } yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
+      ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
@@ -76,72 +78,68 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))):Unit = {
-    try {
-      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
-      if (notification.email.isDefined) sendEmail(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
-      if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
-    } catch {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
-    }
-  }
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
 
-  def sendTraderInvite(accountID:String,toEmail:String, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID)))=sendTraderInviteEmail(toEmail,messageParameters = messageParameters: _*)
+    val title = Future(messagesApi(pushNotification.title))
+    val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
+    val pushNotificationToken = masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
 
-  def sendTraderInviteEmail(toEmail:String, messageParameters: String*)(implicit lang: Lang)={
-    val email= constants.Notification.TRADER_INVITATION.email.get
+    def create(title: String, message: String): Future[String] = masterTransactionNotifications.Service.create(accountID, title, message)
 
-    mailerClient.send(Email(
-      subject = messagesApi(email.subject),
-      from = emailFromAddress,
-      to = Seq(toEmail),
-      bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-      charset = Option(emailCharset),
-      replyTo = Seq(emailReplyTo),
-      bounceAddress = Option(emailBounceAddress),
-    ))
-  }
+    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) =  {
-
-    val title=Future(messagesApi(pushNotification.title))
-    val message=Future(messagesApi(pushNotification.message, messageParameters: _*))
-    val pushNotificationToken=masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
-    def create(title:String,message:String): Future[String]=masterTransactionNotifications.Service.create(accountID, title, message)
-    def post(title:String,message:String,pushNotificationToken:String)=wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
-    (for{
-      title<-title
-      message<-message
-      _<-create(title,message)
-      pushNotificationToken<-pushNotificationToken
-      _<-post(title,message,pushNotificationToken)
-    }yield{}).recover{
+    (for {
+      title <- title
+      message <- message
+      _ <- create(title, message)
+      pushNotificationToken <- pushNotificationToken
+      _ <- post(title, message, pushNotificationToken)
+    } yield {}).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
   }
 
-  private def sendEmail(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Future[String] = {
+  private def sendEmail(toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): String = {
 
-    val verifyEmail=Future(constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+    mailerClient.send(Email(
+      subject = messagesApi(email.subject),
+      from = emailFromAddress,
+      to = Seq(toEmailAddress),
+      bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
+      charset = Option(emailCharset),
+      replyTo = Seq(emailReplyTo),
+      bounceAddress = Option(emailBounceAddress),
+    ))
 
-    def toEmailAddress(verifyEmail: constants.Notification.Email): Future[String]=if (email == verifyEmail) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+  }
 
-    (for{
-      verifyEmail<-verifyEmail
-      toEmailAddress<-toEmailAddress(verifyEmail)
-    }yield{
-      mailerClient.send(Email(
-        subject = messagesApi(email.subject),
-        from = emailFromAddress,
-        to = Seq(toEmailAddress),
-        bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-        charset = Option(emailCharset),
-        replyTo = Seq(emailReplyTo),
-        bounceAddress = Option(emailBounceAddress),
-      ))
-    }).recover{
+  def sendEmailToEmailAddress(fromAccountID: String, toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(fromAccountID))): Unit = {
+
+    sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
+
+  }
+
+  def sendEmailByAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
+
+    val toEmailAddress: Future[String] = masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+
+    (for {
+      toEmailAddress <- toEmailAddress
+    } yield {
+      sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
+    }).recover {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
+    }
+  }
+
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+    try {
+      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
+      if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
+      if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
+    } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }

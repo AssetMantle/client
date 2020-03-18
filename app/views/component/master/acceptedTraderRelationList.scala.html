@@ -1,0 +1,17 @@
+@import controllers.actions.LoginState
+@import models.master.TraderRelation
+@import views.html.base._
+
+@(acceptedTraderRelationList: Seq[TraderRelation])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div>
+    @acceptedTraderRelationList.map { acceptedTraderRelation =>
+        @defining(Seq(acceptedTraderRelation.fromID, acceptedTraderRelation.toID, constants.View.TRADER_RELATION_LIST).mkString("")) { componentID =>
+            @commonInfoBox(componentID) {
+                <script>
+                        componentResource('@componentID', jsRoutes.controllers.ComponentViewController.acceptedTraderRelation('@acceptedTraderRelation.toID'))
+                </script>
+            }
+        }
+    }
+</div>

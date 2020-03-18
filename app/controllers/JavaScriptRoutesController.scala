@@ -18,6 +18,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.noteAndVerifyMnemonic,
+        routes.javascript.AccountController.identificationForm,
+        routes.javascript.AccountController.userUploadOrUpdateIdentificationView,
+        routes.javascript.AccountController.userReviewIdentificationDetailsForm,
 
         routes.javascript.AddKeyController.blockchainAddKeyForm,
 
@@ -88,7 +91,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.commonHome,
         routes.javascript.ComponentViewController.genesisDetails,
         routes.javascript.ComponentViewController.zoneDetails,
-        routes.javascript.ComponentViewController.organizationDetails,
         routes.javascript.ComponentViewController.assetList,
         routes.javascript.ComponentViewController.fiatList,
         routes.javascript.ComponentViewController.buyNegotiationList,
@@ -98,8 +100,17 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
         routes.javascript.ComponentViewController.organizationViewTraderList,
         routes.javascript.ComponentViewController.organizationViewTrader,
-        routes.javascript.ComponentViewController.profileDocuments,
         routes.javascript.ComponentViewController.profilePicture,
+        routes.javascript.ComponentViewController.identificationDetails,
+        routes.javascript.ComponentViewController.userViewPendingRequests,
+        routes.javascript.ComponentViewController.traderViewOrganizationDetails,
+        routes.javascript.ComponentViewController.viewOrganizationDetails,
+        routes.javascript.ComponentViewController.traderRelationList,
+        routes.javascript.ComponentViewController.acceptedTraderRelationList,
+        routes.javascript.ComponentViewController.pendingTraderRelationList,
+        routes.javascript.ComponentViewController.acceptedTraderRelation,
+        routes.javascript.ComponentViewController.pendingSentTraderRelation,
+        routes.javascript.ComponentViewController.pendingReceivedTraderRelation,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -170,11 +181,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
 
-        routes.javascript.ProfileController.identificationDetails,
-        routes.javascript.ProfileController.identificationForm,
-        routes.javascript.ProfileController.identificationDocument,
-        routes.javascript.ProfileController.organizationDetails,
-
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
@@ -233,7 +239,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm,
         routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
         routes.javascript.SetACLController.organizationRejectVerifyTraderRequestForm,
-        routes.javascript.SetACLController.organizationViewPendingVerifyTraderRequests,
+        routes.javascript.SetACLController.organizationViewVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetACLController.zoneViewKYCDocuments,
         routes.javascript.SetACLController.updateTraderKYCDocumentZoneStatusForm,
@@ -254,6 +260,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.setSellerFeedbackForm,
         routes.javascript.SetSellerFeedbackController.sellerFeedbackList,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
+
+        routes.javascript.TraderController.traderRelationRequestForm,
 
         routes.javascript.TradeRoomController.tradeTerms,
         routes.javascript.TradeRoomController.tradeFinancials,

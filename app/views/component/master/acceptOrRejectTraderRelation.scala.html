@@ -1,0 +1,40 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import views.companion.master.AcceptOrRejectTraderRelation
+@import models.master.TraderRelation
+
+@(acceptOrRejectTraderRelationForm: Form[AcceptOrRejectTraderRelation.Data] = AcceptOrRejectTraderRelation.form, traderRelation: TraderRelation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
+<div id="@traderRelation.id">
+@form(action = routes.TraderController.acceptOrRejectTraderRelation, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    @CSRF.formField
+    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.FROM_ID, 'value -> traderRelation.fromID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.TO_ID, 'value -> traderRelation.toID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonCheckbox(acceptOrRejectTraderRelationForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderRelation.fromID, traderRelation.toID, constants.FormField.STATUS.name).mkString(""))
+
+    @if(acceptOrRejectTraderRelationForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- acceptOrRejectTraderRelationForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <span class="red">@Messages(constants.FormField.STATUS.name):</span>
+    @traderRelation.status match {
+        case Some(status: Boolean) => {
+            @if(status) {
+                <span cmuk-icon="check"></span>
+            } else {
+                <span cmuk-icon="close"></span>
+            }
+        }
+        case None => {
+            <br>
+            <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", traderRelation.id).mkString("")', '@Seq(traderRelation.fromID, traderRelation.toID, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+            <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", traderRelation.id).mkString("")', '@Seq(traderRelation.fromID, traderRelation.toID, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+        }
+    }
+}
+</div>

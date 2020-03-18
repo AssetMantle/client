@@ -8,10 +8,7 @@
     <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(asset <- assetPegWallet) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ASSET_DETAILS)</span>
-        </div>
+    @commonCard(constants.Form.ASSET_DETAILS) {
     } {
         @asset.pegHash match {
             case Some(peghash) => {

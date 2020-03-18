@@ -1,0 +1,28 @@
+@(htmlItems: Map[String, Html] = Map(), jsRouteItems: Map[String, String] = Map())(implicit messagesProvider: MessagesProvider)
+
+<div>
+    <ul class="cmuk-subnav cmuk-subnav-pill" cmuk-switcher="animation: cmuk-animation-fade">
+        @for(itemHeader <- htmlItems.keys) {
+            <li><a href="#">@Messages(itemHeader)</a></li>
+        }
+        @for((itemHeader, itemValue) <- jsRouteItems) {
+            @defining(Seq(itemValue, "()").mkString("")) { route =>
+                <li><a href="#" onclick="componentResource('switcher@itemHeader', @route)">@Messages(itemHeader)</a></li>
+            }
+        }
+    </ul>
+    <ul class="cmuk-switcher cmuk-margin">
+        @for((itemHeader, itemValue) <- htmlItems) {
+            <li id="switcher@itemHeader">@itemValue</li>
+        }
+        @for((itemHeader, itemValue) <- jsRouteItems) {
+            <li id="switcher@itemHeader">
+            @defining(Seq(itemValue, "()").mkString("")) { route =>
+                <script>
+                        componentResource('switcher@itemHeader', @route)
+                </script>
+            }
+            </li>
+        }
+    </ul>
+</div>

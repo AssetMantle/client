@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import models.masterTransaction.NegotiationFile
 @import models.master.AccountKYC
 
 @(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
@@ -8,7 +7,7 @@
     <h4 class="latest_card-title">@Messages(constants.View.ID_PROOF)</h4>
 </div>
 <div class="centerText">
-    <div id="upload@documentType">
+    <div id="@Seq("upload", documentType).mkString("")">
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
     </div>
     @accountKYC match {
@@ -19,11 +18,11 @@
                 <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@file.documentType'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
-                <script>hideElement('upload@file.documentType')</script>
+                <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
             }
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationForm())">@Messages(constants.Form.NEXT)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.Form.BACK)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userReviewIdentificationDetailsForm())">@Messages(constants.Form.NEXT)</button>
         }
         case None => {}
     }
-
 </div>
