@@ -52,7 +52,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
 
-              def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmail = addTraderRequestData.emailAddress)
+              def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = addTraderRequestData.emailAddress)
 
               def sendEmailNotificationsAndGetResult(organization: Organization): Future[Result] = {
                 utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
@@ -111,7 +111,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
-                masterTransactionTraderInvitations.Service.updateStatusByEmail(inviteeEmail = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
+                masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
               } else {
                 Future(0)
               }
@@ -304,7 +304,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
-                masterTransactionTraderInvitations.Service.updateStatusByEmail(inviteeEmail = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
+                masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = traderOrganization.id, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
               } else {
                 Future(0)
               }

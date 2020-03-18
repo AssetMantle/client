@@ -11,7 +11,7 @@ import java.sql.Date
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderInvitation(invitationID: String, organizationID: String, inviteeEmail: String, status: String)
+case class TraderInvitation(id: String, organizationID: String, inviteeEmailAddress: String, status: String)
 
 @Singleton
 class TraderInvitations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -28,7 +28,7 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
 
   private[models] val traderInvitationTable = TableQuery[TraderInvitationTable]
 
-  private def add(traderInvitation: TraderInvitation): Future[String] = db.run((traderInvitationTable returning traderInvitationTable.map(_.invitationID) += traderInvitation).asTry).map {
+  private def add(traderInvitation: TraderInvitation): Future[String] = db.run((traderInvitationTable returning traderInvitationTable.map(_.id) += traderInvitation).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,7 +36,7 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def findByInvitationID(invitationID: String): Future[TraderInvitation] = db.run(traderInvitationTable.filter(_.invitationID === invitationID).result.head.asTry).map {
+  private def findByID(id: String): Future[TraderInvitation] = db.run(traderInvitationTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -44,23 +44,7 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def findByInviter(organizationID: String): Future[Seq[TraderInvitation]] = db.run(traderInvitationTable.filter(_.organizationID === organizationID).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findByInviteeEmail(inviteeEmail: String): Future[TraderInvitation] = db.run(traderInvitationTable.filter(_.inviteeEmail === inviteeEmail).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusByInviteeEmail(inviteeEmail: String, status: String): Future[Int] = db.run(traderInvitationTable.filter(_.inviteeEmail === inviteeEmail).map(_.status).update(status).asTry).map {
+  private def updateStatusByOrganizationIdAndInviteeEmail(organizationID: String, inviteeEmailAddress: String, status: String): Future[Int] = db.run(traderInvitationTable.filter(_.organizationID === organizationID).filter(_.inviteeEmailAddress === inviteeEmailAddress).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -72,13 +56,13 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class TraderInvitationTable(tag: Tag) extends Table[TraderInvitation](tag, "TraderInvitation") {
 
-    def * = (invitationID, organizationID, inviteeEmail, status) <> (TraderInvitation.tupled, TraderInvitation.unapply)
+    def * = (id, organizationID, inviteeEmailAddress, status) <> (TraderInvitation.tupled, TraderInvitation.unapply)
 
-    def invitationID = column[String]("invitationID", O.PrimaryKey)
-    
+    def id = column[String]("id", O.PrimaryKey)
+
     def organizationID = column[String]("organizationID")
 
-    def inviteeEmail = column[String]("inviteeEmail")
+    def inviteeEmailAddress = column[String]("inviteeEmailAddress")
 
     def status = column[String]("status")
 
@@ -86,15 +70,11 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(organizationID: String, inviteeEmail: String): Future[String] = add(TraderInvitation(invitationID = utilities.IDGenerator.requestID, organizationID = organizationID, inviteeEmail = inviteeEmail, status = constants.Status.TraderInvitation.NO_CONTACT))
+    def create(organizationID: String, inviteeEmailAddress: String): Future[String] = add(TraderInvitation(id = utilities.IDGenerator.requestID, organizationID = organizationID, inviteeEmailAddress = inviteeEmailAddress, status = constants.Status.TraderInvitation.NO_CONTACT))
 
-    def get(invitationID: String): Future[TraderInvitation] = findByInvitationID(invitationID)
+    def get(id: String): Future[TraderInvitation] = findByID(id)
 
-    def getByInviter(invitationID: String): Future[Seq[TraderInvitation]] = findByInviter(invitationID)
-
-    def getByInvitee(inviteeEmail: String): Future[TraderInvitation] = findByInviteeEmail(inviteeEmail)
-
-    def updateStatusByEmail(inviteeEmail: String, status: String): Future[Int] = updateStatusByInviteeEmail(inviteeEmail = inviteeEmail, status = status)
+    def updateStatusByEmailAddress(organizationID: String, emailAddress: String, status: String): Future[Int] = updateStatusByOrganizationIdAndInviteeEmail(organizationID = organizationID, inviteeEmailAddress = emailAddress, status = status)
   }
 
 }
