@@ -777,7 +777,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  def organizationViewPendingVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationViewVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationAccount = masterOrganizations.Service.getByAccountID(loginState.username)
 
@@ -786,7 +786,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       (for {
         organizationAccount <- organizationAccount
         verifyTraderRequestsForOrganization <- getVerifyTraderRequestsForOrganization(organizationAccount)
-      } yield Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(verifyTraderRequestsForOrganization))
+      } yield Ok(views.html.component.master.organizationViewVerifyTraderRequests(verifyTraderRequestsForOrganization))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
       }

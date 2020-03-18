@@ -6,7 +6,7 @@
 
 <div>
     @Messages(constants.View.PENDING_RECEIVED_TRADER_RELATION)
-    @for(receivedPendingTraderRelation <- receivedPendingTraderRelations) {
+    @receivedPendingTraderRelations.map { receivedPendingTraderRelation =>
         @defining(Seq(receivedPendingTraderRelation.fromID, receivedPendingTraderRelation.toID, constants.View.PENDING_RECEIVED_TRADER_RELATION).mkString("")) { componentID =>
             @commonInfoBox(componentID) {
                 <script>
@@ -17,7 +17,7 @@
     }
     <br>
     @Messages(constants.View.PENDING_SENT_TRADER_RELATION)
-    @for(sentPendingTraderRelation <- sentPendingTraderRelations) {
+    @sentPendingTraderRelations.map { sentPendingTraderRelation =>
         @defining(Seq(sentPendingTraderRelation.fromID, sentPendingTraderRelation.toID, constants.View.PENDING_SENT_TRADER_RELATION).mkString("")) { componentID =>
             @commonInfoBox(componentID) {
                 <script>

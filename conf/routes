@@ -189,7 +189,7 @@ POST        /master/organizationModifyTrader                             control
 GET         /master/organzationViewTraderKYCDocuments                    controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
 GET         /master/updateTraderKYCDocumentOrganizationStatus            controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentOrganizationStatus            controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
-GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewPendingVerifyTraderRequests
+GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewVerifyTraderRequests
 GET         /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequest
 
