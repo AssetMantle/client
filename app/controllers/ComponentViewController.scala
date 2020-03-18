@@ -175,7 +175,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         getFiatsInOrders <- getFiatsInOrders(orders.map(_.id))
       } yield Ok(views.html.component.master.payableReceivable(walletBalance(fiatPegWallet), getPayable(getNegotiationsOfOrders(negotiations, orders), getFiatsInOrders), getReceivable(getNegotiationsOfOrders(negotiations, orders))))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
