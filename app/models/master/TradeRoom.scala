@@ -16,7 +16,7 @@ case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, s
 @Singleton
 class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_TRADE_ROOM
+  private implicit val module: String = constants.Module.MASTER_TRADE_ROOM
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db

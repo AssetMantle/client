@@ -353,7 +353,6 @@ POST        /master/setBuyerFeedback                                     control
 GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
-GET         /master/tradeRoom                                            controllers.TradeRoomController.tradeRoom
 GET         /master/tradeRoom/chatRoom                                   controllers.TradeRoomController.chatRoom(tradeRoomID: String)
 GET         /master/tradeRoom/chatWindow                                 controllers.TradeRoomController.chatWindow(chatWindowID: String ,pageNumber: Int)
 GET         /master/tradeRoom/loadMoreChats                              controllers.TradeRoomController.loadMoreChats(chatWindowID: String ,pageNumber: Int)
@@ -431,7 +430,6 @@ GET         /master/recentActivity                                       control
 GET         /master/tradeFinancials                                      controllers.TradeRoomController.tradeFinancials
 GET         /master/tradeDocumentList                                    controllers.TradeRoomController.documentList
 GET         /master/tradeDocumentView                                    controllers.TradeRoomController.documentView(fileName:String, documentType:String)
-GET         /master/chatRoom                                             controllers.TradeRoomController.chatRoom
 GET         /master/updateTermsStatus                                    controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
 GET         /master/tradeList                                            controllers.TradeRoomController.tradeList
 POST        /master/updateTradeTermStatus                                controllers.TradeRoomController.updateTradeTermStatus
