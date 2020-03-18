@@ -126,7 +126,7 @@ class AccountController @Inject()(
           val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = loginData.pushNotificationToken)
           for {
             _ <- pushNotificationTokenUpdate
-          } yield utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
+          } yield utilitiesNotification.createNotificationAndSend(loginData.username, None,constants.Notification.LOGIN, loginData.username)
         }
 
         def getResult(status: String, loginStateValue: LoginState): Future[Result] = {

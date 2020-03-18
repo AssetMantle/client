@@ -6,7 +6,7 @@ import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import models.blockchain._
 import models.master.{Organization => _, Zone => _, _}
-import models.masterTransaction.{AssetFile, IssueAssetRequest}
+import models.masterTransaction.{AssetFile, IssueAssetRequest, Notification}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -18,11 +18,43 @@ import queries.GetAccount
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterTransactionAssetFiles: masterTransaction.AssetFiles, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withOrganizationLoginAction: WithOrganizationLoginAction, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                        masterTraders: master.Traders,
+                                        masterAccountKYC: master.AccountKYCs,
+                                        masterAccountFile: master.AccountFiles,
+                                        masterZoneKYC: master.ZoneKYCs,
+                                        masterOrganizationKYCs: master.OrganizationKYCs,
+                                        masterTraderKYCs: master.TraderKYCs,
+                                        masterAssets: master.Assets,
+                                        masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
+                                        masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                        masterTransactionNotifications: masterTransaction.Notifications,
+                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                        blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
+                                        withOrganizationLoginAction: WithOrganizationLoginAction,
+                                        withZoneLoginAction: WithZoneLoginAction,
+                                        withTraderLoginAction: WithTraderLoginAction,
+                                        withLoginAction: WithLoginAction,
+                                        masterAccounts: master.Accounts,
+                                        masterAccountFiles: master.AccountFiles,
+                                        blockchainAclAccounts: ACLAccounts,
+                                        blockchainZones: blockchain.Zones,
+                                        blockchainOrganizations: blockchain.Organizations,
+                                        blockchainAssets: blockchain.Assets,
+                                        blockchainFiats: blockchain.Fiats,
+                                        blockchainNegotiations: blockchain.Negotiations,
+                                        masterOrganizations: master.Organizations,
+                                        masterZones: master.Zones,
+                                        blockchainAclHashes: blockchain.ACLHashes,
+                                        blockchainOrders: blockchain.Orders,
+                                        getAccount: GetAccount,
+                                        blockchainAccounts: blockchain.Accounts)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
+
+  private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -144,6 +176,41 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
   }
 
+  def payableReceivable: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+      val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
+
+      def orders(negotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(negotiations.map(_.id))
+
+      def getFiatsInOrders(ordersIDS: Seq[String]): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(ordersIDS)
+
+      def getNegotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
+
+      def getPayable(negotiationsOfOrders: Seq[Negotiation], fiatsInOrders: Seq[Fiat]): Int = {
+        val sumBuying = negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.bid.toInt).sum
+        val sumBought = fiatsInOrders.filter(x => negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.id) contains x.ownerAddress).map(_.transactionAmount.toInt).sum
+        sumBought - sumBuying
+      }
+
+      def getReceivable(negotiationsOfOrders: Seq[Negotiation]): Int = {
+        val sumSelling = negotiationsOfOrders.filter(_.sellerAddress == loginState.address).map(_.bid.toInt).sum
+        sumSelling
+      }
+
+      def walletBalance(fiat: Seq[Fiat]): Int = fiat.map(_.transactionAmount.toInt).sum
+
+      (for {
+        fiatPegWallet <- fiatPegWallet
+        negotiations <- negotiations
+        orders <- orders(negotiations)
+        getFiatsInOrders <- getFiatsInOrders(orders.map(_.id))
+      } yield Ok(views.html.component.master.payableReceivable(walletBalance(fiatPegWallet), getPayable(getNegotiationsOfOrders(negotiations, orders), getFiatsInOrders), getReceivable(getNegotiationsOfOrders(negotiations, orders))))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiationsForBuyerAddress = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address)
@@ -236,6 +303,47 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case _: BaseException => NoContent
       }
   }
+
+  def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+//      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * limit, limit)
+      val organizationID = masterOrganizations.Service.getID(loginState.username)
+      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
+      def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber*limit, limit)
+      (for {
+        organizationID <- organizationID
+        tradersInOrganizations <- tradersInOrganizations(organizationID)
+        notificationsOfTraders <- notificationsOfTraders(tradersInOrganizations.map(_.accountID))
+      } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def recentActivityForTrader(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * limit, limit)
+      (for {
+        notifications <- notifications
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTrader), None))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def recentActivityForTradeRoom(pageNumber: Int = 0, tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val tradeActivities = masterTransactionTradeActivities.Service.getTradeActivity(tradeRoomID)
+      def notifications(ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(loginState.username, ids,pageNumber * limit, limit)
+      (for {
+        tradeActivities <- tradeActivities
+        notifications <- notifications(tradeActivities.map(_.notificationID))
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTradeRoom), Option(tradeRoomID)))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
 
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>

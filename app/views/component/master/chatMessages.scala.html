@@ -8,7 +8,7 @@
 @(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 <div id="chatContainer" class="chatContainer chat_history">
-    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')" >@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
     @for(chat <- chats.reverse) {
         @if(chat.fromAccountID == loginState.username) {
             <li class="sender chatMessage">
@@ -16,9 +16,9 @@
                     @chat.replyToID match {
                         case Some(replyToChatID) => {
                             <div class="messageContent cmuk-text-right replytoMessage">
-                                <p id="@chat.replyToID @chat.id"></p>
+                                <p id="@chat.replyToID@chat.id"></p>
                                 <script>
-                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'), '@chat.id')
+                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'),'@chat.id')
                         </script>
                             </div>
                         }
@@ -37,9 +37,9 @@
                     @chat.replyToID match {
                         case Some(replyToChatID) => {
                             <div class="messageContent cmuk-text-right replytoMessage">
-                                <p id="@chat.replyToID @chat.id"></p>
+                                <p id="@chat.replyToID@chat.id"></p>
                                 <script>
-                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'), '@chat.id')
+                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat('@chatWindowID', '@replyToChatID'),'@chat.id')
                         </script>
                             </div>
                         }
@@ -48,10 +48,10 @@
                     <p>@chat.fromAccountID
                         : @chat.message</p>
                     @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
-                        @* <p style="font-size:10px;text-align: right" class="unread">unread</p>*@
+@*                        <p style="font-size:10px;text-align: right" class="unread">unread</p>*@
                         <script>
-                                unReadBar(@chats.filter(_.fromAccountID != loginState.username).length - @readChats.filter(_.toAccountID == loginState.username).length);
-                        </script>
+                              unReadBar(@chats.filter(_.fromAccountID != loginState.username).length - @readChats.filter(_.toAccountID == loginState.username).length);
+                      </script>
                     }
                 </div>
             </li>

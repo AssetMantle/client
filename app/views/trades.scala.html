@@ -3,10 +3,13 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(Html(""))
+@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right))
 
-@left={
-
+@left = {
+    <div class="leftTradeFinancial">
+    <div id="payableReceivable"></div>
+    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+    </div>
 }
 
 @center = {
@@ -24,9 +27,26 @@
     <h2>Trades PageUnderConstruction</h2>
 }
 
+@right={
+    <div class="recentActivity">
+    <div id="recentActivity"></div>
+    </div>
+        }
+
     <script>
         @if(loginState.userType == constants.User.TRADER){
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
+                componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+
             }
-    </script>
+        @if(loginState.userType == constants.User.ORGANIZATION){
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
+            }
+</script>
+<script type="text/javascript">
+        var fiatCometMessage = function (event) {
+            componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+        }
+</script>

@@ -576,6 +576,8 @@ header:before,
     .timeline .timeline-item .timeline-content.right:before {
       left: -5px;
       right: inherit; }
+  .timeline .notification > div {
+    padding: 0px; }
 
 .docView .cmuk-card-header, .docView .cmuk-card-body, .docView .documentlist {
   padding: 0px; }
@@ -699,7 +701,7 @@ header:before,
     align-items: flex-end; }
   .chat ul li {
     display: flex; }
-  .chat .you {
+  .chat .patner {
     word-break: break-all;
     padding: 10px;
     border-radius: 10px;
@@ -707,7 +709,7 @@ header:before,
     background: #E8E8E8;
     position: relative;
     border-bottom-left-radius: 0px; }
-    .chat .you::after {
+    .chat .patner::after {
       position: absolute;
       left: -8px;
       bottom: 0;
@@ -716,13 +718,13 @@ header:before,
       border-bottom: .5rem solid #E8E8E8;
       border-left: .5rem solid transparent;
       border-right: .5rem solid #E8E8E8; }
-    .chat .you .messageInfo {
+    .chat .patner .messageInfo {
       color: #848A91;
       font-size: 1.2rem; }
-    .chat .you .messageContent {
+    .chat .patner .messageContent {
       color: #061728;
       font-size: 1.3rem; }
-  .chat .patner {
+  .chat .you {
     word-break: break-all;
     padding: 10px;
     border-radius: 10px;
@@ -731,7 +733,7 @@ header:before,
     color: #fff;
     position: relative;
     border-bottom-right-radius: 0px; }
-    .chat .patner::after {
+    .chat .you::after {
       position: absolute;
       right: -8px;
       bottom: 0;
@@ -740,10 +742,10 @@ header:before,
       border-bottom: .5rem solid #0862BE;
       border-left: .5rem solid #0862BE;
       border-right: .5rem solid transparent; }
-    .chat .patner .messageInfo {
+    .chat .you .messageInfo {
       color: #6CA8E7;
       font-size: 1.2rem; }
-    .chat .patner .messageContent {
+    .chat .you .messageContent {
       color: #FFFFFF;
       font-size: 1.3rem; }
   .chat .chatSubmit {

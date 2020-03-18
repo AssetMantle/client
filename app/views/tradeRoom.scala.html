@@ -75,12 +75,11 @@
 }
 
 <script>
-
     componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
     componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
     componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView("fileName","documentType"));
-    componentResource('recentActivity', jsRoutes.controllers.TradeRoomController.recentActivity());
+    componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@tradeRoomID'));
     componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom('@tradeRoomID'));
 
 </script>

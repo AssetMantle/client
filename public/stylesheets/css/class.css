@@ -1029,7 +1029,7 @@ input:checked + .slider {
 
 .chatContainer {
   height: 300px;
-  overflow: scroll; }
+  overflow: auto; }
 
 .chat {
   padding: 0px; }
@@ -1042,7 +1042,7 @@ input:checked + .slider {
     -moz-border-radius: 30px;
     border-radius: 50%;
     text-align: center;
-    font-size: 12px;
+    font-size: 1.2rem;
     align-items: center;
     justify-content: center; }
   .chat li {
@@ -1074,13 +1074,13 @@ input:checked + .slider {
       border-right: .5rem solid #E8E8E8; }
     .chat .patner .messageInfo {
       color: #848A91;
-      font-size: 12px; }
+      font-size: 1.2rem; }
     .chat .patner .replytoMessage p {
       border-left: 2px solid #0862BE;
       padding: 0px 10px; }
     .chat .patner .messageContent {
       color: #061728;
-      font-size: 14px; }
+      font-size: 1.3rem; }
       .chat .patner .messageContent p {
         margin: 0px;
         color: #0862BE;
@@ -1107,13 +1107,13 @@ input:checked + .slider {
       border-right: .5rem solid transparent; }
     .chat .you .messageInfo {
       color: #6CA8E7;
-      font-size: 12px; }
+      font-size: 1.2rem; }
     .chat .you .replytoMessage p {
       border-left: 2px solid #6CA8E7;
       padding: 0px 10px; }
     .chat .you .messageContent {
       color: #FFFFFF;
-      font-size: 14px; }
+      font-size: 1.3rem; }
       .chat .you .messageContent p {
         margin: 0px;
         color: #6CA8E7;

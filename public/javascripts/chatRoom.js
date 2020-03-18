@@ -151,10 +151,11 @@ function scrollToTop() {
     $('#chatContainer').animate({scrollTop: height});
 }
 
-function unReadBar(unreadMessagesCount) {
+function unReadBar(count) {
     if ($('#unRead').length == 0) {
-        var lastChild = unreadMessagesCount+1;
-        const loadMore = $(".chatContainer .chatMessage:nth-last-child("+lastChild+")");
+        console.log($('#unRead').length);
+        var c=count+1;
+        const loadMore = $(".chatContainer .chatMessage:nth-last-child("+c+")");
         loadMore.after('<div id="unRead" class="unRead">un read message</div>');
     } else {
     }
