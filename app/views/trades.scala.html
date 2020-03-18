@@ -6,9 +6,10 @@
 @common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right))
 
 @left = {
+    <div class="leftTradeFinancial">
     <div id="payableReceivable"></div>
-
     <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+    </div>
 }
 
 @center = {
@@ -27,8 +28,10 @@
 }
 
 @right={
+    <div class="recentActivity">
     <div id="recentActivity"></div>
-}
+    </div>
+        }
 
     <script>
         @if(loginState.userType == constants.User.TRADER){
