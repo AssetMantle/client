@@ -365,6 +365,11 @@ html, body {
         color: #061728;
         margin: 0px;
         margin-bottom: 5px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
+      display: flex; }
+      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
+        width: auto;
+        display: none; }
   .pageContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0px; }
 .pageContainer .rightSide {
@@ -446,6 +451,8 @@ html, body {
   padding: 0px 13px; }
   .recentActivity .cmuk-card-body .mCS-minimal-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
     background-color: #053C75; }
+.recentActivity .chatRoom .cmuk-card-body {
+  height: 430px; }
 .recentActivity .chatContainer .cmuk-card-body {
   font-family: "Oxygen", sans-serif;
   padding: 0px; }
@@ -504,11 +511,6 @@ header:before,
     left: 17px;
     top: 0;
     position: absolute; }
-  .timeline:after {
-    content: "";
-    clear: both;
-    display: table;
-    width: 100%; }
   .timeline .timeline-item {
     margin-bottom: 20px;
     height: 55px;
@@ -753,5 +755,78 @@ header:before,
     margin: auto;
     padding: 10px 0px;
     display: block; }
+
+.commonList {
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid rgba(5, 60, 117, 0.12);
+  box-sizing: border-box;
+  border-radius: 2px;
+  margin-bottom: 5px;
+  overflow: auto; }
+  .commonList .listItemChild {
+    margin: 0px;
+    font-size: 1.3rem;
+    font-family: "Oxygen", sans-serif;
+    font-weight: bold; }
+    .commonList .listItemChild .listItemChildTitle {
+      margin: 0px;
+      color: #4B4B4B; }
+    .commonList .listItemChild .listItemChildValue {
+      margin-bottom: 0px;
+      color: #848A91;
+      font-weight: normal; }
+
+.accountName {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  color: #FFFFFF;
+  margin: 0px;
+  width: 0;
+  height: 0;
+  border: 15px solid;
+  border-color: #5EB55C transparent transparent #5EB55C; }
+  .accountName span {
+    position: absolute;
+    top: -15px;
+    left: -10px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: arial;
+    transform: rotate(-45deg);
+    display: block; }
+
+.salesQuoteList, .tradeList {
+  margin-bottom: 20px; }
+  .salesQuoteList .cmuk-card-header, .tradeList .cmuk-card-header {
+    padding-bottom: 0px; }
+  .salesQuoteList .cmuk-card-body, .tradeList .cmuk-card-body {
+    height: 280px;
+    overflow: auto; }
+  .salesQuoteList .salesQuoteCardHeader, .salesQuoteList .tradeCardHeader, .tradeList .salesQuoteCardHeader, .tradeList .tradeCardHeader {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    font-size: 1.3rem;
+    font-family: "Oxygen", sans-serif; }
+    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav, .salesQuoteList .tradeCardHeader .cmuk-subnav, .tradeList .salesQuoteCardHeader .cmuk-subnav, .tradeList .tradeCardHeader .cmuk-subnav {
+      margin: 0px; }
+    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > *, .salesQuoteList .tradeCardHeader .cmuk-subnav > *, .tradeList .salesQuoteCardHeader .cmuk-subnav > *, .tradeList .tradeCardHeader .cmuk-subnav > * {
+      padding: 0px 30px; }
+    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav li a, .salesQuoteList .tradeCardHeader .cmuk-subnav li a, .tradeList .salesQuoteCardHeader .cmuk-subnav li a, .tradeList .tradeCardHeader .cmuk-subnav li a {
+      margin: 3px 0px 0px 0px;
+      padding-bottom: 13px;
+      font-size: 1.3rem;
+      font-family: "Oxygen", sans-serif; }
+    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active {
+      border-bottom: 2px solid #0862BE; }
+      .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active a {
+        font-weight: bold;
+        color: #343C44; }
 
 /*# sourceMappingURL=style.css.map */

@@ -7,8 +7,8 @@
     <div>
         <span class="serialNumber">@serialNumber</span><span class="termIcon">&#x2637;</span><span class="termName">@description</span>
     </div>
-    <div>
-        @value
+    <div class="termStatus">
+    @value
         @views.html.component.master.updateTradeTermStatus(tradeID = tradeID, termType = termType, status = status)
     </div>
 </div>

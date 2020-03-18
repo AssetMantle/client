@@ -3,28 +3,31 @@
 @import views.html.base._
 
 @(tradeRooms: Seq[TradeRoom])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div>
-    @commonTable(){
-        @Messages(constants.View.TRADE_LIST)
-    }{
-        <tr>
-            <th>@Messages(constants.Form.ID)</th>
-            <th>@Messages(constants.View.SALES_QUOTE_ID)</th>
-            <th>@Messages(constants.View.BUYER)</th>
-            <th>@Messages(constants.View.SELLER)</th>
-            <th>@Messages(constants.View.ACTION)</th>
-        </tr>
-        @for(tradeRoom <- tradeRooms) {
-            <tr>
-                <td>@tradeRoom.id</td>
-                <td>@tradeRoom.salesQuoteID </td>
-                <td>@tradeRoom.buyerAccountID</td>
-                <td>@tradeRoom.sellerAccountID</td>
-                <td><li><a href="@controllers.routes.TradeRoomController.tradeRoom(tradeRoom.id)">@Messages("OPEN TRADE ROOM")</a></li></td>
-            </tr>
-        }
+@for(tradeRoom <- tradeRooms) {
+    @commonList(){
+        <div class="listItemChild">
+            <p class="listItemChildTitle">@Messages(constants.Form.ID)</p>
+            <p class="hashCode listItemChildValue">@tradeRoom.id</p>
+        </div>
+        <div class="listItemChild">
+            <p class="listItemChildTitle">@Messages(constants.View.SALES_QUOTE_ID)</p>
+            <p class="hashCode listItemChildValue">@tradeRoom.salesQuoteID</p>
+        </div>
+        <div class="listItemChild">
+            <p class="listItemChildTitle">@Messages(constants.View.BUYER)</p>
+            <p class="hashCode listItemChildValue">@tradeRoom.buyerAccountID</p>
+        </div>
+        <div class="listItemChild">
+            <p class="listItemChildTitle">@Messages(constants.View.SELLER)</p>
+            <p class="hashCode listItemChildValue">@tradeRoom.sellerAccountID</p></div>
+        <div class="listItemChild">
+            <p class="listItemChildTitle">@Messages(constants.View.ACTION)</p>
+            <p  class="listItemChildValue"><a href="@controllers.routes.TradeRoomController.tradeRoom(tradeRoom.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+            </p>
+        </div>
     }
-</div>
+}
+
 
 
 

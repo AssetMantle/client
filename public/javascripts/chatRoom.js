@@ -1,13 +1,13 @@
 function loadMoreChats(chatWindowID) {
-    const route = jsRoutes.controllers.TradeRoomController.loadMoreChats(chatWindowID, ($(".chatContainer").length));
+    const route = jsRoutes.controllers.TradeRoomController.loadMoreChats(chatWindowID, ($(".chatInnerContainer").length));
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
-                const loadMore = $(".chatContainer .chatMessage:last");
-                loadMore.before(data);
+                const loadMore = $(".chatInnerContainer .chatMessage:first");
+                loadMore.after(data);
                 loadMore.remove();
             }
         }
@@ -21,7 +21,7 @@ function submitChatOnEnter(event, source) {
     }
 }
 
-function submitChat(source, target = '#chatContainer') {
+function submitChat(source, target = '#chatMessages') {
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);
@@ -56,7 +56,7 @@ function submitChat(source, target = '#chatContainer') {
 
 }
 function newChat(data) {
-    const loadMore = $(".chatContainer .chatMessage:last");
+    const loadMore = $(".chatMessages .chatMessage:last");
     console.log(data);
     $("#MESSAGE").val("");
     $("#REPLY_TO_CHAT").val("");
@@ -84,7 +84,6 @@ function newChat(data) {
             '<span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span>' +
             '</li>');
     }
-    markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead(data.chatWindowID))
 }
 
 function replyButton(replyToChatID, replyMessage, fromAccount) {
@@ -144,18 +143,18 @@ function replyMessage(route, chatID) {
 
 function scrollToTop() {
     var height = 0;
-    $('#chatContainer li').each(function (i, value) {
+    $('#chatMessages li').each(function (i, value) {
         height += parseInt($(this).height());
     });
     height += '';
-    $('#chatContainer').animate({scrollTop: height});
+    $('#chatMessages').animate({scrollTop: height});
 }
 
 function unReadBar(count) {
     if ($('#unRead').length == 0) {
         console.log($('#unRead').length);
         var c=count+1;
-        const loadMore = $(".chatContainer .chatMessage:nth-last-child("+c+")");
+        const loadMore = $(".chatMessages .chatMessage:nth-last-child("+c+")");
         loadMore.after('<div id="unRead" class="unRead">un read message</div>');
     } else {
     }

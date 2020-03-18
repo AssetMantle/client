@@ -2,31 +2,19 @@
 @import views.html.base._
 @(notifications: Seq[models.masterTransaction.Notification] = Seq(), route: String, tradeRoomID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<div class="recentActivityContainer">
-@commonCard() {
-    <p>Recent Activity</p>
-}{
-    <div class="scroller">
-        <div class="timeline">
-
-        @for(notification <- notifications) {
-            <div class="timeline-item">
-                <div class="timeline-icon">
-                    <img src="./images/icons/contractIcon.svg" alt="">
-                </div>
-                <div class="timeline-content right notification">
-                    <div>
-                        <div><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
-                        <div class="notificationTime">@notification.time</div>
-                    </div>
+<div class="timeline recentActivityBox">
+    @for(notification <- notifications) {
+        <div class="timeline-item notification">
+            <div class="timeline-icon">
+                <img src="./images/icons/contractIcon.svg" alt="">
+            </div>
+            <div class="timeline-content right">
+                <div>
+                    <div><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
+                    <div class="notificationTime">@notification.time</div>
                 </div>
             </div>
-        }
         </div>
-        <div class = "notification NotificationButton">
-            <a onclick="loadMoreActivities(@route, @tradeRoomID)"> @Messages(constants.Form.LOAD_MORE_NOTIFICATIONS) </a>
-        </div>
-        <div class="cover-bar"></div>
-    </div>
-}
+    }
+    <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@tradeRoomID')"> @Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
 </div>

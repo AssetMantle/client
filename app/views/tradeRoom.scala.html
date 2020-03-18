@@ -67,9 +67,18 @@
         </div>
     </div>
     <div class="recentActivity">
-        <div id="recentActivity">
+        <div class="recentActivityContainer">
+        @commonCard() {
+            <p>Recent Activity</p>
+        } {
+            <div class="scroller">
+                <div id="recentActivity">
+                </div>
+                <div class="cover-bar"></div>
+            </div>
+        }
         </div>
-        <div id="chatRoom">
+        <div id="chatRoom" class="chatRoom">
         </div>
     </div>
 }
