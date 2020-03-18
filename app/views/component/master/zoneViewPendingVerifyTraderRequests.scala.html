@@ -8,8 +8,7 @@
 } else {
     @for(traderVerificationRequest <- traderVerificationRequests) {
         <div>
-        @commonCard() {
-            @traderVerificationRequest.zoneID
+        @commonCard(traderVerificationRequest.zoneID) {
         } {
             <div>
                 @commonTextInfo(constants.Form.ZONE_ID, traderVerificationRequest.zoneID)

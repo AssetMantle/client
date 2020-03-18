@@ -6,10 +6,7 @@
     <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(traderFeedbackHistory <- traderFeedbackHistories) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@traderFeedbackHistory.sellerAddress</span>
-        </div>
+    @commonCard(traderFeedbackHistory.sellerAddress) {
     } {
         <div>
             <div class="leftText">

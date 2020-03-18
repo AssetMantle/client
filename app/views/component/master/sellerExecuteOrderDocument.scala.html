@@ -2,10 +2,8 @@
 @import models.masterTransaction.NegotiationFile
 @import views.html.base._
 @(negotiationFile: Option[NegotiationFile] = None, negotiationRequestID: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@commonCard(){
-    <div>
-        <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.SELLER_EXECUTE_ORDER.legend)</span>
-    </div>
+
+@commonCard(constants.Form.SELLER_EXECUTE_ORDER.legend){
 }{
     <div class="centerText">
         <div id="upload@documentType">

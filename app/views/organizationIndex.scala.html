@@ -9,10 +9,7 @@
     <div id="commonHome"></div>
         <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                @commonCard() {
-                    <div>
-                        <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ORGANIZATION)</span>
-                    </div>
+                @commonCard(constants.Form.ORGANIZATION) {
                     <div class="cmuk-inline">
                         <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
                         <div id="Edit" class="Editdropdown">
@@ -25,10 +22,7 @@
                 }
             </div>
             <div class="cmuk-width-expand@@m">
-                @commonCard() {
-                        <div>
-                            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ZONE)</span>
-                        </div>
+                @commonCard(constants.Form.ZONE) {
                         <div  class="cmuk-inline">
                             <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
                             <div id="Edit"  class="Editdropdown">
@@ -46,10 +40,7 @@
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
     </div>
 
-        @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.TEAM)</span>
-        </div>
+        @commonCard(constants.Form.TEAM) {
         }{
         <div id="organizationTraders"></div>
         }

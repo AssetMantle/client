@@ -6,12 +6,11 @@
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
         @for(zoneVerificationRequest <- zoneVerificationRequests) {
-            @commonCard() {
-                @zoneVerificationRequest.id
+            @commonCard(zoneVerificationRequest.id) {
             } {
-                <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @zoneVerificationRequest.accountID <br>
-                <span class="red">@Messages(constants.Form.NAME)</span>: @zoneVerificationRequest.name <br>
-                <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zoneVerificationRequest.currency <br>
+                @commonTextInfo(constants.Form.ACCOUNT_ID, zoneVerificationRequest.accountID)
+                @commonTextInfo(constants.Form.NAME, zoneVerificationRequest.name)
+                @commonTextInfo(constants.Form.CURRENCY, zoneVerificationRequest.currency)
                 <span class="red">@Messages(constants.Form.DOCUMENTS)</span>:
                 <span id = '@Seq("kycDocuments", zoneVerificationRequest.accountID).mkString("")'>
                     <script>componentResource('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKYCDocuments('@zoneVerificationRequest.id'))</script>

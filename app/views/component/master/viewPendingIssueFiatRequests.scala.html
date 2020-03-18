@@ -7,10 +7,7 @@
 } else {
     @for(issueFiatRequest <- issueFiatRequests) {
         <div>
-        @commonCard(){
-            <div>
-                <span class="headerFontSize cmuk-text-bold">@issueFiatRequest.accountID</span>
-            </div>
+        @commonCard(issueFiatRequest.accountID){
         }{
             <div>
                 @commonTextInfo(constants.Form.ACCOUNT_ID, issueFiatRequest.accountID)

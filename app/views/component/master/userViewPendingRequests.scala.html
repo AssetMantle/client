@@ -7,10 +7,7 @@
 
 @(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard() {
-    <div>
-        <span>@Messages(constants.View.USER_VIEW_PENDING_REQUESTS)</span>
-    </div>
+@commonCard(constants.View.USER_VIEW_PENDING_REQUESTS) {
 } {
     @if(identification.isDefined) {
         @if(accountStatus == constants.Status.Account.COMPLETE) {

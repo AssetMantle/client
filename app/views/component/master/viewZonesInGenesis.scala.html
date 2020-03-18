@@ -10,25 +10,12 @@
     }
   @for(zone <- zones) {
       <div>
-      @commonCard() {
-          @zone.id
+      @commonCard(zone.id) {
       }{
-          <div class="cmuk-flex infoRow">
-              <div class="infoRowLabel red">@Messages(constants.Form.ID)</div>
-              <div class="infoRowValue">@zone.id</div>
-          </div>
-          <div class="cmuk-flex infoRow">
-              <div class="infoRowLabel red">@Messages(constants.Form.ACCOUNT_ID)</div>
-              <div class="infoRowValue">@zone.accountID</div>
-          </div>
-          <div class="cmuk-flex infoRow">
-              <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
-              <div class="infoRowValue">@zone.name</div>
-          </div>
-          <div class="cmuk-flex infoRow">
-              <div class="infoRowLabel red">@Messages(constants.Form.CURRENCY)</div>
-              <div class="infoRowValue">@zone.currency</div>
-          </div>
+          @commonTextInfo(constants.Form.ID, zone.accountID)
+          @commonTextInfo(constants.Form.ACCOUNT_ID, zone.accountID)
+          @commonTextInfo(constants.Form.NAME, zone.name)
+          @commonTextInfo(constants.Form.CURRENCY, zone.currency)
         <div>
           <div>
             <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id'), this)">@Messages(constants.Form.ORGANIZATIONS)</h4>

@@ -26,7 +26,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       val otp = emailOTPs.Service.sendOTP(loginState.username)
 
       def sendNotificationAndGetResult(emailAddress: String, otp: String): Future[Result] = {
-        utilitiesNotification.sendEmailToEmailAddress(toEmailAddress = emailAddress, email = constants.Notification.VERIFY_EMAIL.email.get, otp)
+        utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = emailAddress, email = constants.Notification.VERIFY_EMAIL.email.get, otp)
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
       }
 

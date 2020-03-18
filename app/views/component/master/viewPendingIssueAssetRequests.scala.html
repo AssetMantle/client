@@ -10,8 +10,7 @@
         } else {
             @for(issueAssetRequest <- issueAssetRequests) {
                 <div>
-                @commonCard() {
-                    @issueAssetRequest.id
+                @commonCard(issueAssetRequest.id) {
                 } {
                     @commonTextInfo(constants.Form.ACCOUNT_ID, issueAssetRequest.accountID)
                     @commonTextInfo(constants.Form.DOCUMENT_HASH, issueAssetRequest.documentHash.getOrElse(""))
@@ -31,7 +30,7 @@
                     @commonTextInfo(constants.FormField.TRADE_TYPE.name, issueAssetRequest.shipmentDetails.tradeType)
                     @commonTextInfo(constants.FormField.PORT_OF_LOADING.name, issueAssetRequest.shipmentDetails.portOfLoading)
                     @commonTextInfo(constants.FormField.PORT_OF_DISCHARGE.name, issueAssetRequest.shipmentDetails.portOfDischarge)
-                    @commonTextInfo(constants.FormField.SHIPMENT_DATE.name, issueAssetRequest.shipmentDetails.shipmentDate.toString)
+                    @commonDateInfo(constants.FormField.SHIPMENT_DATE.name, issueAssetRequest.shipmentDetails.shipmentDate)
                     <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity, '@issueAssetRequest.takerAddress'))">@Messages(constants.Form.APPROVE)</button>
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
                     <div id = "assetDocuments@issueAssetRequest.id">

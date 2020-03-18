@@ -114,7 +114,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   }
 
-  def sendEmailToEmailAddress(toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(fromAccountID))): Unit = {
+  def sendEmailToEmailAddress(fromAccountID: String, toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(fromAccountID))): Unit = {
 
     sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
 

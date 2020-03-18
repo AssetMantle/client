@@ -4,8 +4,7 @@
 @(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @for(traderVerificationRequest <- traderVerificationRequests) {
     <div>
-    @commonCard() {
-        @traderVerificationRequest.zoneID
+    @commonCard(traderVerificationRequest.zoneID) {
     }{
         @commonTextInfo(constants.Form.ZONE_ID, traderVerificationRequest.zoneID)
         @commonTextInfo(constants.Form.ORGANIZATION_ID, traderVerificationRequest.organizationID)

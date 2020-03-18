@@ -7,10 +7,7 @@
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom">
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@loginState.username</span>
-        </div>
+    @commonCard(loginState.username) {
     } {
         <div class="cmuk-grid-medium cmuk-grid cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-1-1@@s cmuk-width-1-3@@m">
@@ -34,20 +31,14 @@
     <div class="cmuk-container cmuk-margin-bottom">
         <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-            @commonCard() {
-                <div>
-                    <span>@Messages(constants.View.CONTACT_DETAILS)</span>
-                </div>
+            @commonCard(constants.View.CONTACT_DETAILS) {
             } {
                 <div id="contactDetails">
                 </div>
             }
             </div>
             <div class="cmuk-width-expand@@m">
-            @commonCard() {
-                <div>
-                    <span>@Messages(constants.View.ID_PROOF)</span>
-                </div>
+            @commonCard(constants.View.ID_PROOF) {
             } {
                 <div id="identificationDetails">
                 </div>

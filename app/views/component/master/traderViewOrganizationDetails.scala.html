@@ -4,16 +4,13 @@
 
 @(traderOrganization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard() {
-    <div>
-        <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
-    </div>
+@commonCard(constants.Form.ORGANIZATION_DETAILS) {
     } {
         <div>
             @commonTextInfo(constants.Form.ORGANIZATION_NAME, traderOrganization.name)
             @commonTextInfo(constants.Form.ABBREVIATION, traderOrganization.abbreviation.getOrElse(""))
             @commonTextInfo(constants.Form.ORGANIZATION_ID, traderOrganization.id)
-            @commonTextInfo(constants.Form.ESTABLISHMENT_DATE, traderOrganization.establishmentDate.toString)
+            @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, traderOrganization.establishmentDate)
             @commonBooleanInfo(constants.Form.VERIFIED_STATUS, traderOrganization.verificationStatus)
         </div>
     }

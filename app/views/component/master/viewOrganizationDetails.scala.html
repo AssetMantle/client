@@ -8,10 +8,7 @@
 @import views.html.component.master.streetAddress
 @(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard() {
-    <div>
-        <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
-    </div>
+@commonCard(constants.Form.ORGANIZATION_DETAILS) {
 } {
     <div>
         <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span><br>
@@ -19,7 +16,7 @@
         @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
         @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
         @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
-        @commonTextInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate.toString)
+        @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
 
         <span>@Messages(constants.View.REGISTERED_ADDRESS):</span><br>
