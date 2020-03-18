@@ -2,132 +2,45 @@
 @import models.master.Organization
 @import play.api.Logger
 @import views.html.base._
+@import views.html.component.master.streetAddress
 
 @(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
-        @if(organizationVerificationRequests.length == 0){
-            <spa>No Requests Found</spa>
+        @if(organizationVerificationRequests.isEmpty){
+            <span>@Messages(constants.View.NO_REQUESTS_FOUND)</span>
         }
         @for(organizationVerificationRequest <- organizationVerificationRequests) {
             <div>
-            @commonCard() {
-                @organizationVerificationRequest.id
+            @commonCard(organizationVerificationRequest.id) {
             } {
                 <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ORGANIZATION_ID)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.id</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ZONE_ID)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.zoneID</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ACCOUNT_ID)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.accountID</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.name</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ABBREVIATION)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.abbreviation.getOrElse("")</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ESTABLISHMENT_DATE)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.establishmentDate</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.EMAIL)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.email</div>
-                    </div>
+                    @commonTextInfo(constants.Form.ORGANIZATION_ID, organizationVerificationRequest.id)
+                    @commonTextInfo(constants.Form.ZONE_ID, organizationVerificationRequest.zoneID)
+                    @commonTextInfo(constants.Form.ACCOUNT_ID, organizationVerificationRequest.accountID)
+                    @commonTextInfo(constants.Form.NAME, organizationVerificationRequest.name)
+                    @commonTextInfo(constants.Form.ABBREVIATION, organizationVerificationRequest.abbreviation.getOrElse(""))
+                    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organizationVerificationRequest.establishmentDate)
+                    @commonTextInfo(constants.Form.EMAIL, organizationVerificationRequest.email)
                 </div>
                 <div>@Messages(constants.FormField.REGISTERED_ADDRESS.name) : <br>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.ADDRESS_LINE_1.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.addressLine1</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.ADDRESS_LINE_2.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.addressLine2</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.LANDMARK.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.landmark.getOrElse("")</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.CITY.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.city</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.COUNTRY.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.country</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.ZIP_CODE.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.zipCode</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.PHONE)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.registeredAddress.phone</div>
-                    </div>
+                    @streetAddress(organizationVerificationRequest.registeredAddress)
                 </div>
                 <div>@Messages(constants.FormField.POSTAL_ADDRESS.name) : <br>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.ADDRESS_LINE_1.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.addressLine1</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.ADDRESS_LINE_2.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.addressLine2</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.LANDMARK.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.landmark.getOrElse("")</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.CITY.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.city</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.COUNTRY.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.country</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.ZIP_CODE.name)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.zipCode</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.PHONE)</div>
-                        <div class="infoRowValue"> @organizationVerificationRequest.postalAddress.phone</div>
-                    </div>
+                    @streetAddress(organizationVerificationRequest.postalAddress)
                 </div>
                 <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
                     @for(ubo <- organizationVerificationRequest.ubos.data) {
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.PERSON_NAME)</div>
-                            <div class="infoRowValue">@ubo.personName</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SHARE_PERCENTAGE)</div>
-                            <div class="infoRowValue">@ubo.sharePercentage</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.RELATIONSHIP)</div>
-                            <div class="infoRowValue">@ubo.relationship</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.TITLE)</div>
-                            <div class="infoRowValue">@ubo.title</div>
-                        </div>
-                        }
+                        @commonTextInfo(constants.Form.PERSON_NAME, ubo.personName)
+                        @commonTextInfo(constants.Form.SHARE_PERCENTAGE, ubo.sharePercentage.toString)
+                        @commonTextInfo(constants.Form.RELATIONSHIP, ubo.relationship)
+                        @commonTextInfo(constants.Form.TITLE, ubo.title)
+                    }
                 </div>
                 <br>
                 @Messages(constants.Form.DOCUMENTS): <br>
-                <div id = "kycDocuments@organizationVerificationRequest.accountID" class="kycDocumentsView">
-                    <script>componentResource('kycDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKYCDocuments('@organizationVerificationRequest.id'))</script>
+                <div id = "organizationKYCDocuments@organizationVerificationRequest.accountID" class="kycDocumentsView">
+                    <script>componentResource('organizationKYCDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKYCDocuments('@organizationVerificationRequest.id'))</script>
                 </div>
                 <br>
                 <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>

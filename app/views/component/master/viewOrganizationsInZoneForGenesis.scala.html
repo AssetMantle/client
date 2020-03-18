@@ -9,29 +9,13 @@
             <spa>No Organizations</spa>
         }
     @for(organization <- organizations) {
-        @commonCard() {
-            @organization.id
+        @commonCard(organization.id) {
         }{
-            <div class="cmuk-flex infoRow">
-                <div class="infoRowLabel red">@Messages(constants.Form.ID)</div>
-                <div class="infoRowValue">@organization.id</div>
-            </div>
-            <div class="cmuk-flex infoRow">
-                <div class="infoRowLabel red">@Messages(constants.Form.ACCOUNT_ID)</div>
-                <div class="infoRowValue">@organization.accountID</div>
-            </div>
-            <div class="cmuk-flex infoRow">
-                <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
-                <div class="infoRowValue">@organization.name</div>
-            </div>
-            <div class="cmuk-flex infoRow">
-                <div class="infoRowLabel red">@Messages(constants.Form.ESTABLISHMENT_DATE)</div>
-                <div class="infoRowValue">@organization.establishmentDate</div>
-            </div>
-            <div class="cmuk-flex infoRow">
-                <div class="infoRowLabel red">@Messages(constants.Form.EMAIL)</div>
-                <div class="infoRowValue">@organization.email</div>
-            </div>
+            @commonTextInfo(constants.Form.ID, organization.id)
+            @commonTextInfo(constants.Form.ACCOUNT_ID, organization.accountID)
+            @commonTextInfo(constants.Form.NAME, organization.name)
+            @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
+            @commonTextInfo(constants.Form.EMAIL, organization.email)
             <div>
                 <div>
                     <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@organization.id', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id'), this)">@Messages(constants.Form.TRADERS)</h4>

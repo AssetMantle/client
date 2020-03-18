@@ -1,10 +1,11 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Document
 import models.blockchain._
+import models.master.{Identification, Organization, OrganizationKYC, Trader, TraderKYC, TraderRelation, Zone}
+import models.masterTransaction.{AssetFile, IssueAssetRequest}
 import models.master.{Organization => _, Zone => _, _}
 import models.masterTransaction.{AssetFile, IssueAssetRequest, Notification}
 import models.{blockchain, master, masterTransaction}
@@ -13,42 +14,40 @@ import play.api.i18n.I18nSupport
 import play.api.libs.Comet
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import queries.GetAccount
+import play.twirl.api.Html
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                        masterTraders: master.Traders,
-                                        masterAccountKYC: master.AccountKYCs,
-                                        masterAccountFile: master.AccountFiles,
-                                        masterZoneKYC: master.ZoneKYCs,
-                                        masterOrganizationKYCs: master.OrganizationKYCs,
-                                        masterTraderKYCs: master.TraderKYCs,
-                                        masterAssets: master.Assets,
-                                        masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
-                                        masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                        masterTransactionNotifications: masterTransaction.Notifications,
-                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
-                                        blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
-                                        withOrganizationLoginAction: WithOrganizationLoginAction,
-                                        withZoneLoginAction: WithZoneLoginAction,
-                                        withTraderLoginAction: WithTraderLoginAction,
-                                        withLoginAction: WithLoginAction,
-                                        masterAccounts: master.Accounts,
-                                        masterAccountFiles: master.AccountFiles,
-                                        blockchainAclAccounts: ACLAccounts,
-                                        blockchainZones: blockchain.Zones,
-                                        blockchainOrganizations: blockchain.Organizations,
-                                        blockchainAssets: blockchain.Assets,
-                                        blockchainFiats: blockchain.Fiats,
-                                        blockchainNegotiations: blockchain.Negotiations,
-                                        masterOrganizations: master.Organizations,
-                                        masterZones: master.Zones,
-                                        blockchainAclHashes: blockchain.ACLHashes,
-                                        blockchainOrders: blockchain.Orders,
-                                        getAccount: GetAccount,
-                                        blockchainAccounts: blockchain.Accounts)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(
+                                         messagesControllerComponents: MessagesControllerComponents,
+                                         masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs,
+                                         masterOrganizationKYCs: master.OrganizationKYCs,
+                                         masterTraderKYCs: master.TraderKYCs,
+                                         masterAssets: master.Assets,
+                                         masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
+                                         masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                         blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
+                                         withOrganizationLoginAction: WithOrganizationLoginAction,
+                                         masterTransactionNotifications: masterTransaction.Notifications,
+                                         masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                         withZoneLoginAction: WithZoneLoginAction,
+                                         withTraderLoginAction: WithTraderLoginAction,
+                                         withLoginAction: WithLoginAction,
+                                         withUserLoginAction: WithUserLoginAction,
+                                         masterAccounts: master.Accounts,
+                                         masterAccountFiles: master.AccountFiles,
+                                         blockchainAssets: blockchain.Assets,
+                                         blockchainFiats: blockchain.Fiats,
+                                         blockchainNegotiations: blockchain.Negotiations,
+                                         masterOrganizations: master.Organizations,
+                                         masterZones: master.Zones,
+                                         blockchainOrders: blockchain.Orders,
+                                         blockchainAccounts: blockchain.Accounts,
+                                         masterAccountKYCs: master.AccountKYCs,
+                                         masterIdentifications: master.Identifications,
+                                         masterTraderRelations: master.TraderRelations
+                                       )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -113,28 +112,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
             zoneID <- zoneID
             zone <- zone(zoneID)
           } yield Ok(views.html.component.master.zoneDetails(zone))
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def organizationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      (loginState.userType match {
-        case constants.User.ORGANIZATION =>
-          val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-          for {
-            organization <- organization
-          } yield Ok(views.html.component.master.organizationDetails(organization))
-        case constants.User.TRADER =>
-          val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
-
-          def organization(organizationID: String): Future[models.master.Organization] = masterOrganizations.Service.get(organizationID)
-
-          for {
-            organizationID <- organizationID
-            organization <- organization(organizationID)
-          } yield Ok(views.html.component.master.organizationDetails(organization))
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -370,55 +347,14 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       Future(Ok.chunked(blockchainOrders.Service.orderCometSource(loginState.username) via Comet.json("parent.orderCometMessage")).as(ContentTypes.HTML))
   }
 
-  def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val documents: Future[Seq[Document[_]]] = loginState.userType match {
-        case constants.User.ZONE =>
-          val id = masterZones.Service.getID(loginState.username)
-
-          def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYC.Service.getAllDocuments(loginState.username)
-
-          for {
-            id <- id
-            zoneKYCs <- zoneKYCs(id)
-          } yield zoneKYCs
-        case constants.User.ORGANIZATION =>
-          val id = masterOrganizations.Service.getID(loginState.username)
-
-          def organizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
-
-          for {
-            id <- id
-            organizationKYCs <- organizationKYCs(id)
-          } yield organizationKYCs
-        case constants.User.TRADER =>
-          val id = masterTraders.Service.getID(loginState.username)
-
-          def traderKYCs(id: String): Future[Seq[TraderKYC]] = masterTraderKYCs.Service.getAllDocuments(id)
-
-          for {
-            id <- id
-            traderKYCs <- traderKYCs(id)
-          } yield traderKYCs
-        case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
-        case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
-      }
-      (for {
-        documents <- documents
-      } yield Ok(views.html.component.master.profileDocuments(documents))
-        ).recover {
-        case _: BaseException => InternalServerError
-      }
-  }
-
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val profilePicture = masterAccountFile.Service.getProfilePicture(loginState.username)
+      val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
       (for {
         profilePicture <- profilePicture
-      } yield Ok(views.html.component.master.profilePicture(profilePicture))
+      } yield Ok(views.html.profilePicture(profilePicture))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.component.master.profilePicture())
+        case _: BaseException => InternalServerError(views.html.profilePicture())
       }
   }
 
@@ -490,5 +426,198 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
+  }
+
+  def accountDetails = Action {
+    Ok(views.html.component.master.account())
+  }
+
+  def transactionDetails = Action {
+    Ok(views.html.component.master.transactions())
+  }
+
+  def tradeDetails = Action {
+    Ok(views.html.component.master.trades())
+  }
+
+  def subscriptionsDetails = Action {
+    Ok(views.html.component.master.subscriptions())
+  }
+
+  def settingsDetails = Action {
+    Ok(views.html.component.master.settings())
+  }
+
+  def identificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      for {
+        accountKYC <- accountKYC
+        identification <- identification
+      } yield Ok(views.html.component.master.identificationDetails(identification = identification, accountKYC = accountKYC))
+  }
+
+
+  def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val accountStatus: Future[String] = masterAccounts.Service.getStatus(loginState.username)
+
+      def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.getOrNoneByAccountID(accountID)
+
+      def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
+
+      def getOrganizationOrNoneByTrader(trader: Option[Trader]): Future[Option[Organization]] = if (trader.isDefined) masterOrganizations.Service.getOrNone(trader.get.organizationID) else Future(None)
+
+      def getTraderKYCsByTrader(trader: Option[Trader]): Future[Seq[TraderKYC]] = if (trader.isDefined) masterTraderKYCs.Service.getAllDocuments(trader.get.id) else Future(Seq[TraderKYC]())
+
+      def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) masterOrganizationKYCs.Service.getAllDocuments(organization.get.id) else Future(Seq[OrganizationKYC]())
+
+      def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getOrNoneByAccountID(accountID)
+
+      def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getOrNoneByAccountID(accountID)
+
+      def getUserResult(identification: Option[Identification], accountStatus: String): Future[Result] = {
+        val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
+        if (identificationStatus && accountStatus == constants.Status.Account.COMPLETE) {
+          for {
+            trader <- getTraderOrNoneByAccountID(loginState.username)
+            traderOrganization <- getOrganizationOrNoneByTrader(trader)
+            traderKYCs <- getTraderKYCsByTrader(trader)
+            organization <- getOrganizationOrNoneByAccountID(loginState.username)
+            organizationZone <- getZoneOrNoneByOrganization(organization)
+            organizationKYCs <- getOrganizationKYCsByOrganization(organization)
+          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
+        } else {
+          Future(Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus)))
+        }
+      }
+
+      (for {
+        accountStatus <- accountStatus
+        identification <- identification(loginState.username)
+        result <- getUserResult(identification, accountStatus)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewOrganizationDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val trader: Future[Trader] = masterTraders.Service.getByAccountID(loginState.username)
+
+      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+
+      (for {
+        trader <- trader
+        traderOrganization <- getOrganizationByID(trader.organizationID)
+      } yield Ok(views.html.component.master.traderViewOrganizationDetails(traderOrganization))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def viewOrganizationDetails: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organization: Future[Organization] = masterOrganizations.Service.getByAccountID(loginState.username)
+
+      def getZone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
+
+      def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
+
+      (for {
+        organization <- organization
+        organizationZone <- getZone(organization.zoneID)
+        organizationKYCs <- getOrganizationKYCs(organization.id)
+      } yield Ok(views.html.component.master.viewOrganizationDetails(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderRelationList(): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.traderRelationList(acceptedTraderRelationListRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.acceptedTraderRelationList), pendingTraderRelationListRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.pendingTraderRelationList)))
+  }
+
+  def acceptedTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID: Future[String] = masterTraders.Service.getID(loginState.username)
+
+      def acceptedTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllAcceptedTraderRelation(traderID)
+
+      (for {
+        traderID <- traderID
+        acceptedTraderRelations <- acceptedTraderRelations(traderID)
+      } yield Ok(views.html.component.master.acceptedTraderRelationList(acceptedTraderRelationList = acceptedTraderRelations))).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def pendingTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID: Future[String] = masterTraders.Service.getID(loginState.username)
+
+      def receivedPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllReceivedPendingTraderRelation(traderID)
+
+      def sentPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllSentPendingTraderRelation(traderID)
+
+      (for {
+        traderID <- traderID
+        receivedPendingTraderRelations <- receivedPendingTraderRelations(traderID)
+        sentPendingTraderRelations <- sentPendingTraderRelations(traderID)
+      } yield Ok(views.html.component.master.pendingTraderRelationList(sentPendingTraderRelations = sentPendingTraderRelations, receivedPendingTraderRelations = receivedPendingTraderRelations))).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def acceptedTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val toTrader = masterTraders.Service.get(toID)
+
+        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+
+        (for {
+          toTrader <- toTrader
+          organizationName <- getOrganizationName(toTrader.organizationID)
+        } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))).recover {
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        }
+  }
+
+  def pendingSentTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val trader = masterTraders.Service.get(toID)
+
+        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+
+        (for {
+          trader <- trader
+          organizationName <- getOrganizationName(trader.organizationID)
+        } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, traderName = trader.name, organizationName = organizationName))).recover {
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        }
+  }
+
+  def pendingReceivedTraderRelation(fromID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val fromTrader = masterTraders.Service.get(fromID)
+        val toTrader = masterTraders.Service.getByAccountID(loginState.username)
+
+        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
+
+        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+
+        (for {
+          fromTrader <- fromTrader
+          toTrader <- toTrader
+          traderRelation <- traderRelation(fromId = fromTrader.id, toId = toTrader.id)
+          organizationName <- getOrganizationName(fromTrader.organizationID)
+        } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, traderName = toTrader.name, organizationName = organizationName))).recover {
+          case baseException: BaseException => ServiceUnavailable(Html(baseException.failure.message))
+        }
   }
 }

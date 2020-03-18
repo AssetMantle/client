@@ -18,7 +18,7 @@
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
         </div>
         <div class="salesQuoteList">
-        @commonCard(){
+        @commonCard(constants.View.SALES_QUOTE_LIST){
             <div class="salesQuoteCardHeader">
                 <div>
                 @Messages(constants.View.OPEN_SALES_QUOTES)
@@ -38,7 +38,7 @@
         }
         </div>
         <div class="tradeList">
-        @commonCard(){
+        @commonCard(constants.View.TRADE_ROOMS){
             <div class="tradeCardHeader">
                 <div>
                 @Messages(constants.View.TRADE_ROOMS)
@@ -67,8 +67,7 @@
 @right={
     <div class="recentActivity">
         <div class="recentActivityContainer">
-            @commonCard() {
-                <p>Recent Activity</p>
+            @commonCard(constants.View.RECENT_ACTIVITY) {
             } {
                 <div class="scroller">
                     <div id="recentActivity">

@@ -103,7 +103,9 @@ object FormField {
   val MESSAGE = new StringFormField("MESSAGE", 1, 160)
   val REPLY_TO_CHAT = new StringFormField("REPLY_TO_CHAT", 2, 100)
   val CHAT_WINDOW_ID = new StringFormField("CHAT_WINDOW_ID", 2, 100)
-
+  val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
+  val FROM_ID = new StringFormField("FROM_ID", 16, 16)
+  val TO_ID = new StringFormField("TO_ID", 16, 16)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -170,7 +172,6 @@ object FormField {
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
   val BILL_OF_EXCHANGE_REQUIRED = new BooleanFormField("BILL_OF_EXCHANGE_REQUIRED")
-  val FINANCIER_VISIBILITY = new BooleanFormField("FINANCIER_VISIBILITY")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

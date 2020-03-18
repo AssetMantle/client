@@ -75,7 +75,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     documentType match {
       case constants.File.BANK_ACCOUNT_DETAIL => uploadAccountKYCBankAccountDetailPath
       case constants.File.IDENTIFICATION => uploadAccountKYCIdentificationPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
@@ -83,7 +83,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     documentType match {
       case constants.File.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
       case constants.File.IDENTIFICATION => uploadZoneKYCIdentificationPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
@@ -98,7 +98,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.SHARE_STRUCTURE => uploadOrganizationKYCShareStructurePath
       case constants.File.ORGANIZATION_AGREEMENT => uploadOrganizationAgreementPath
       case constants.File.INCORPORATION_DOCUMENT => uploadOrganizationKYCIncorporationDocumentPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
@@ -107,7 +107,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.TRADER_IDENTIFICATION => uploadTraderKYCIdentificationPath
       case constants.File.TRADER_AGREEMENT => uploadTraderAgreementPath
       case constants.File.EMPLOYMENT_PROOF => uploadTraderEmploymentProofPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
@@ -120,7 +120,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.COO => uploadTraderAssetCOOPath
       case constants.File.COA => uploadTraderAssetCOAPath
       case constants.File.OTHER => uploadTraderAssetOtherPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
@@ -130,7 +130,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.SELLER_CONTRACT => uploadTraderNegotiationSellerContractOtherPath
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
@@ -138,14 +138,14 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     documentType match {
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
   def getAccountFilePath(documentType: String): String = {
     documentType match {
       case constants.File.PROFILE_PICTURE => uploadAccountProfilePicturePath
-      case _ => constants.File.UNKNOWN_TYPE
+      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
 
