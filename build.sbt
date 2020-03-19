@@ -53,3 +53,38 @@ libraryDependencies += "commons-codec" % "commons-codec" % "1.11"
 libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "1.1.2"
 
 libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.64"
+
+libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1" artifacts( Artifact("javax.ws.rs-api", "jar", "jar"))
+
+libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.5.0-RC1"
+
+libraryDependencies += "io.swagger" % "swagger-annotations" % "1.5.8"
+
+libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19.1"
+
+libraryDependencies += "com.sun.jersey" % "jersey-client" % "1.19.1"
+
+libraryDependencies += "com.sun.jersey.contribs" % "jersey-multipart" % "1.19.1"
+
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.9"
+
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9"
+
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.9"
+
+libraryDependencies += "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % "2.9.9"
+
+libraryDependencies += "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.1.5"
+
+libraryDependencies += "joda-time" % "joda-time" % "2.9.3"
+
+libraryDependencies += "com.brsanthu" % "migbase64" % "2.2"
+
+libraryDependencies += "org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client" % "1.0.2"
+
+libraryDependencies += "junit" % "junit" % "4.12" % Test
+
+
+
+
+
