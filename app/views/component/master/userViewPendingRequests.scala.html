@@ -8,6 +8,11 @@
 @(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ORGANIZATION_DETAILS) {
+    @if(identification.isDefined || accountStatus == constants.Status.Account.COMPLETE) {
+        @if(identification.get.verificationStatus.getOrElse(false) && (organization.isDefined || trader.isDefined)) {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+        }
+    }
 } {
     @if(identification.isDefined) {
         @if(accountStatus == constants.Status.Account.COMPLETE) {
@@ -29,22 +34,34 @@
                         }) { htmlItems =>
                             @commonHorizontalSwitcher(htmlItems = htmlItems)
                         }
-                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+                        @if(organization.isEmpty && trader.isEmpty) {
+                            <div class="cmuk-position-center">
+                                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+                            </div>
+                        }
                     } else {
+                        <div class="cmuk-position-center">
                         @Messages(constants.View.IDENTIFICATION_REJECTED)
+                        </div>
                     }
                 }
                 case None => {
+                    <div class="cmuk-position-center">
                     @Messages(constants.View.PENDING_IDENTIFICATION_VERIFICATION)
+                    </div>
                 }
             }
         } else {
-            @Messages(accountStatus) <br>
+            <div class="cmuk-position-center">
+            @Messages(accountStatus)
+            </div>
         }
     } else {
-        @if(accountStatus != constants.Status.Account.COMPLETE) {
-            @Messages(accountStatus) <br>
-        }
-        @Messages(constants.Form.UPLOAD_IDENTIFICATION)
+        <div class="cmuk-position-center">
+            @if(accountStatus != constants.Status.Account.COMPLETE) {
+                @Messages(accountStatus) <br>
+                }
+            @Messages(constants.Form.UPLOAD_IDENTIFICATION)
+        </div>
     }
 }

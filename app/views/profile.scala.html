@@ -36,11 +36,7 @@
             </div>
 
             <div class="cmuk-width-expand@@m">
-            @commonCard(constants.View.ID_PROOF) {
-            } {
-                <div id="identificationDetails">
-                </div>
-            }
+                <div id="identificationDetails"></div>
             </div>
         </div>
         @loginState.userType match {
@@ -54,7 +50,9 @@
                     <div class="cmuk-width-expand@@m">
                     @commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
                     } {
-                        @Messages(constants.View.UNAVAILABLE)
+                        <div class="cmuk-position-center">
+                            @Messages(constants.View.UNAVAILABLE)
+                        </div>
                     }
                     </div>
 
