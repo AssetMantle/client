@@ -3,33 +3,31 @@
 @import views.html.base._
 
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-        @userContact match {
-            case Some(contact) => {
-                <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
-                    @if(contact.emailAddressVerified) {
-                        <span >Verified</span>
-                    } else {
-                        <span >Not Verified</span><button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
-                    }
-                </p>
-                <p>@Messages(constants.Form.MOBILE_NUMBER): <span>@contact.mobileNumber</span>
-                    @if(contact.mobileNumberVerified) {
-                        <span>Verified</span>
-                    } else {
-                        <span></span>Not Verified<button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
-                    }
-                </p>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
-            }
-            case _ => {
-                <div class="cmuk-flex infoRow">
-                    <div class="infoRowLabel red">@Messages(constants.Form.EMAIL_ADDRESS)</div>
-                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
-                </div>
-                <div class="cmuk-flex infoRow">
-                    <div class="infoRowLabel red">@Messages(constants.Form.MOBILE_NUMBER)</div>
-                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
-                </div>
-                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
-            }
+
+@commonCard(constants.View.CONTACT_DETAILS) {
+} {
+    @userContact match {
+        case Some(contact) => {
+            <p>
+                @Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
+                @if(contact.emailAddressVerified) {
+                    <span cmuk-icon="check"></span>
+                } else {
+                    <span cmuk-icon="close"></span>
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
+                }
+            </p>
+            <p>
+                @Messages(constants.Form.MOBILE_NUMBER): <span>@contact.mobileNumber</span>
+                @if(contact.mobileNumberVerified) {
+                    <span cmuk-icon="check"></span>
+                } else {
+                    <span cmuk-icon="close"></span>
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
+                }
+            </p>
         }
+        case _ => {}
+    }
+    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+}

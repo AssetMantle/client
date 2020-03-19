@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.companion.master.AddOrUpdateOrganizationBankAccountDetail
+@import views.html.base._
+
+@(addOrUpdateOrganizationBankAccountDetailForm: Form[AddOrUpdateOrganizationBankAccountDetail.Data] = AddOrUpdateOrganizationBankAccountDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL, addOrUpdateOrganizationBankAccountDetailForm) {
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.ACCOUNT_HOLDER_NAME)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.NICK_NAME)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.ACCOUNT_NUMBER)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.BANK_NAME)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.SWIFT_CODE)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.STREET_ADDRESS)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.COUNTRY)
+    @commonInputText(addOrUpdateOrganizationBankAccountDetailForm, constants.FormField.ZIP_CODE)
+}

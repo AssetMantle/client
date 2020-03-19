@@ -40,7 +40,6 @@ function validateForm(form) {
                     }
                     const ddInfoElement = $(this)[0];
                     const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
-                    console.log(ddValidationInfo[0]);
                     switch (ddValidationInfo[0]) {
                         case "Numeric":
                             if (inputValue === "" || isNaN(inputValue)) {

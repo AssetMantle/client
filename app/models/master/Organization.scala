@@ -242,7 +242,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       utilities.JSON.convertJsonStringToObject[UBOs](_)
     }
 
-    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+    def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
+
+    def tryAndGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
     def getNameByID(id: String): Future[String] = findNameByID(id)
 
