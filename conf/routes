@@ -76,7 +76,7 @@ GET         /component/traderViewOrganizationBankAccountDetail           control
 GET         /component/traderRelationList                                controllers.ComponentViewController.traderRelationList
 GET         /component/acceptedTraderRelationList                        controllers.ComponentViewController.acceptedTraderRelationList
 GET         /component/pendingTraderRelationList                         controllers.ComponentViewController.pendingTraderRelationList
-GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(toID: String)
+GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(fromID: String, toID: String)
 GET         /component/pendingSentTraderRelation                         controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
 GET         /component/pendingReceivedTraderRelation                     controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
 GET         /master/zoneViewOrganizationBankAccountDetail                controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)

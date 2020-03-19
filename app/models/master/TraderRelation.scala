@@ -96,7 +96,7 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def getAllSentPendingTraderRelation(fromID: String): Future[Seq[TraderRelation]] = findAllByFromIDAndStatus(fromID = fromID, status = null)
 
-    def get(fromID: String, toID: String): Future[TraderRelation] = findByID(getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
+    def get(trader1: String, trader2: String): Future[TraderRelation] = findByID(getTraderRelationIDByFromIDAndToID(fromID = trader1, toID = trader2))
 
     def markRejected(fromID: String, toID: String): Future[Int] = deleteByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
   }

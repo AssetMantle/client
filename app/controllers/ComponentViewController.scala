@@ -491,17 +491,32 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def acceptedTraderRelation(toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
+  def acceptedTraderRelation(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction.authenticated {
     implicit loginState =>
       implicit request =>
+        val fromTrader = masterTraders.Service.get(fromID)
         val toTrader = masterTraders.Service.get(toID)
 
-        def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
+        def getResult(fromTrader: Trader, toTrader: Trader): Future[Result] = {
+          def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
 
+          if (loginState.username == fromTrader.accountID) {
+            for {
+              organizationName <- getOrganizationName(toTrader.organizationID)
+            } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))
+          } else if (loginState.username == toTrader.accountID) {
+            for {
+              organizationName <- getOrganizationName(fromTrader.organizationID)
+            } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = fromTrader.accountID, traderName = fromTrader.name, organizationName = organizationName))
+          } else {
+            throw new BaseException(constants.Response.UNAUTHORIZED)
+          }
+        }
         (for {
+          fromTrader <- fromTrader
           toTrader <- toTrader
-          organizationName <- getOrganizationName(toTrader.organizationID)
-        } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))).recover {
+          result <- getResult(fromTrader = fromTrader, toTrader = toTrader)
+        } yield result).recover {
           case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
   }
@@ -527,7 +542,7 @@ class ComponentViewController @Inject()(
         val fromTrader = masterTraders.Service.get(fromID)
         val toTrader = masterTraders.Service.getByAccountID(loginState.username)
 
-        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
+        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(trader1 = fromId, trader2 = toId)
 
         def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
 
@@ -545,7 +560,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
       val zoneID = masterZones.Service.getID(loginState.username)
+
       def organizationBankAccountDetail(organizationZoneID: String, zoneID: String): Future[OrganizationBankAccountDetail] = if (organizationZoneID == zoneID) masterOrganizationBankAccountDetails.Service.tryAndGet(organizationID) else throw new BaseException(constants.Response.UNAUTHORIZED)
+
       (for {
         organizationZoneID <- organizationZoneID
         zoneID <- zoneID
