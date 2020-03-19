@@ -19,6 +19,7 @@
             componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatWindowID', 0))
     </script>
 </div>
+
 <div>
 @if(chats.length > 0) {
     <div style="font-size: 12px;">@Messages("READ_BY") : @readChats.filter(_.chatID == chats.head.id).map(_.toAccountID).mkString</div>

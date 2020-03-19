@@ -1,4 +1,3 @@
-
 function loadMoreActivities(notificationRoute, tradeRoomID = null) {
     let route;
     console.log(tradeRoomID);

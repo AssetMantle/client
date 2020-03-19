@@ -10,7 +10,8 @@
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         @CSRF.formField
         <div style="position: relative">
-        <div id="replyBox" style="display:none;background-color: #FFffff;position: absolute;left:0;right:0;top:-68px;padding: 10px 1px" class="cmuk-flex">
+        <div id="replyBox" style="display:none;" class="cmuk-flex replyBox">
+           <div class="cmuk-flex" style="align-items:center">
             <div>
                 <span cmuk-icon="icon: forward"></span>
             </div>
@@ -18,13 +19,15 @@
                 <div id="replyAccount" class="replyAccount"></div>
                 <div id="replymessage" class="replyMessage"></div>
             </div>
+           </div>
             <div>
                 <a class="cmuk-icon-link" onclick="closeReply()" cmuk-icon="close"></a>
             </div>
         </div>
         @commonInputText(sendChatForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
-        <div class="hiddenLabel">
+        <div class="hiddenLabel sendFormField">
         @commonInputText(sendChatForm, constants.FormField.MESSAGE)
+            <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)"><img src="@routes.Assets.versioned("images/icons/sendIcon.svg")"></button>
         </div>
         @commonInputText(sendChatForm, constants.FormField.REPLY_TO_CHAT,'containerDivClass -> "hidden", 'required -> false)
         </div>
@@ -36,6 +39,5 @@
             </ul>
         }
 
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitChat(this)">@Messages(constants.Form.SEND_CHAT.submit)</button>
     </fieldset>
 }

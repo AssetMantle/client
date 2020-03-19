@@ -663,13 +663,12 @@ dl .info {
 }
 
 .hashCode {
-  width: 100px;
   overflow: hidden;
-  display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+  width:120px;
 }
-
 
 .searchForm {
   width: 95%;
@@ -1178,7 +1177,7 @@ input:checked+.slider {
   }
 }
 
-.commonHomeData{
+.commonhomeData{
   font-size: $paragraphFontSizeMedium;
   p, h3{
     margin:5px 0px;
@@ -1255,140 +1254,8 @@ input:checked+.slider {
   }
 }
 
-.replyAccount{
-  font-size: 12px;
-  font-weight: bold;
-  color: #3f7fc9;
-}
-.replyMessage{
-  width: 100px;
-  overflow: hidden;
-  display: inline-block;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 14px;
-}
-.chatMessages{
-  height: 300px;
-  overflow: auto;
-}
 
-.chat{
-  .chatName{
-    color:#FFFFFF;
-    background: #193759;
-    display: inline-flex;
-    height: 26px;
-    width: 26px;
-    -moz-border-radius: 30px;
-    border-radius:50%;
-    text-align: center;
-    font-size: $paragraphFontSizeSmall;
-    align-items: center;
-    justify-content: center;
-  }
-  li{
-    list-style: none;
-  }
-  .sender{
-    justify-content: flex-end;
-    align-items: flex-end;
-  }
-  .receiver{
-    align-items: flex-end;
-  }
-  padding: 0px;
-  li{
-    display: flex;
-    list-style: none;
-  }
-  .patner{
-    word-break: break-all;
-    padding: 10px;
-    border-radius: 10px;
-    margin:10px;
-    background: #E8E8E8;
-    position: relative;
-    border-bottom-left-radius:0px;
-    &::after {
-      position: absolute;
-      left: -8px;
-      bottom:  0;
-      content: "";
-      border-top: .5rem solid transparent;
-      border-bottom: .5rem solid #E8E8E8;
-      border-left: .5rem solid transparent;
-      border-right: .5rem solid #E8E8E8;
-    }
-    .messageInfo{
-      color: #848A91;
-      font-size: $paragraphFontSizeSmall;
-    }
-    .replytoMessage p{
-      border-left: 2px solid #0862BE;
-      padding: 0px 10px;
-    }
-    .messageContent{
-      color: #061728;
-      font-size: $paragraphFontSizeMedium;
-      p{
-        margin:0px;
-        color: #0862BE;
-        text-align: left;
-      }
-    }
-    p{
-      margin: 0px;
-    }
-  }
-  .you{
-    word-break: break-all;
-    padding: 10px;
-    border-radius: 10px;
-    margin:10px;
-    background: #0862BE;
-    color:#fff;
-    position: relative;
-    border-bottom-right-radius: 0px;
-    &::after {
-      position: absolute;
-      right: -8px;
-      bottom: 0;
-      content: "";
-      border-top: .5rem solid transparent;
-      border-bottom: .5rem solid #0862BE;
-      border-left: .5rem solid #0862BE;
-      border-right: .5rem solid transparent;
-    }
-    .messageInfo{
-      color: #6CA8E7;
-      font-size: $paragraphFontSizeSmall;
-    }
-    .replytoMessage p{
-      border-left: 2px solid #6CA8E7;
-      padding: 0px 10px;
-    }
-    .messageContent{
-      color: #FFFFFF;
-      font-size: $paragraphFontSizeMedium;
-      p{
-        margin:0px;
-        color: #6CA8E7;
-        text-align: left;
-      }
-    }
-    p{
-      margin: 0px;
-    }
-  }
-  .chatSubmit{
-    width: 92%;
-    margin: auto;
-    padding: 10px 0px;
-    display: block;
-  }
 
-}
 
 .unRead{
   color: #1e87f0;

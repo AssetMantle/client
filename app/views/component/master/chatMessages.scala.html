@@ -7,7 +7,6 @@
 
 @(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-    <div class="chatInnerContainer">
     <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')" >@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
     @for(chat <- chats.reverse) {
         @if(chat.fromAccountID == loginState.username) {
@@ -56,4 +55,9 @@
             </li>
         }
     }
-    </div>
+
+<script>
+    if($("div.chatMessage").length==1) {
+        $('.chatMessages').scrollTop($('.chatMessages')[0].scrollHeight);
+    }
+</script>

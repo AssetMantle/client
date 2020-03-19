@@ -7,7 +7,7 @@
     <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
-                <span class="walletIcon"><img src="./images/icons/walletIcon.svg"></span>
+                <span class="walletIcon"><img src="@routes.Assets.versioned("./images/icons/walletIcon.svg")"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages("WALLET_BALANCE")</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance</p>
@@ -19,7 +19,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex payable">
-                <span class="payableIcon"><img src="./images/icons/payableIcon.svg"></span>
+                <span class="payableIcon"><img src="@routes.Assets.versioned("./images/icons/payableIcon.svg")"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages("PAYABLE")</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @payable</p>
@@ -31,7 +31,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex leftDays">
-                <span class="leftDaysIcon"><img src="./images/icons/daysleftIcon.svg"></span>
+                <span class="leftDaysIcon"><img src="@routes.Assets.versioned("./images/icons/daysleftIcon.svg")"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages("RECEIVABLE")</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@receivable</p>

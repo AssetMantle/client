@@ -11,8 +11,8 @@
         <div>
             <span cmuk-icon="arrow-left" class="backIcon"></span>
         </div>
-        <div>
-            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID)</span><span class="quoteId secondaryFont hashCode">@tradeRoomID</span>
+        <div class="cmuk-flex">
+            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID):</span><p class="quoteId secondaryFont hashCode cmuk-margin-remove">@tradeRoomID</p>
         </div>
         <div class="userIcons cmuk-flex secondaryFont">
             <span class="buyerIcon userIcon">B</span>
@@ -59,8 +59,8 @@
 
 @right={
     <div class="right cmuk-flex">
-        <button class="refresh"><img src="./images/icons/amendIcon.svg">Amend</button>
-        <button class="refresh "><img src="./images/icons/refreshIcon.svg">Refresh</button>
+        <button class="refresh"><img src="@routes.Assets.versioned("./images/icons/amendIcon.svg")">Amend</button>
+        <button class="refresh "><img src="@routes.Assets.versioned("./images/icons/refreshIcon.svg")">Refresh</button>
         <div class="cmuk-flex live">
             <span class="liveText secondaryFont">Live Trade Room </span>
             <div class="liveIcon"></div>

@@ -20,9 +20,6 @@
         <div class="salesQuoteList">
         @commonCard(constants.View.SALES_QUOTE_LIST){
             <div class="salesQuoteCardHeader">
-                <div>
-                @Messages(constants.View.OPEN_SALES_QUOTES)
-                </div>
                 <ul class="cmuk-subnav" cmuk-switcher="connect: #salesQuoteTab; animation: cmuk-animation-fade">
                     <li><a href="#">@Messages(constants.View.BUY)</a></li>
                     <li><a href="#">@Messages(constants.View.SELL)</a></li>
@@ -40,9 +37,6 @@
         <div class="tradeList">
         @commonCard(constants.View.TRADE_ROOMS){
             <div class="tradeCardHeader">
-                <div>
-                @Messages(constants.View.TRADE_ROOMS)
-                </div>
                 <ul class="cmuk-subnav" cmuk-switcher="connect: #tradeListTab; animation: cmuk-animation-fade">
                     <li><a href="#">@Messages(constants.View.ACTIVE)</a></li>
                     <li><a href="#">@Messages(constants.View.COMPLETED)</a></li>

@@ -8,22 +8,11 @@
     @for(salesQuote <- salesQuotes) {
         @commonList(){
             <p class="accountName"><span>B</span></p>
-            <div class="listItemChild">
-                <p class="listItemChildTitle">@Messages(constants.Form.ASSET_TYPE)</p>
-                <p class="listItemChildValue">@salesQuote.assetType</p>
-            </div>
-            <div class="listItemChild">
-                <p class="listItemChildTitle">@Messages(constants.View.ASSET_DESCRIPTION)</p>
-                <p class="listItemChildValue">@salesQuote.assetDescription</p>
-            </div>
-            <div class="listItemChild">
-                <p class="listItemChildTitle">@Messages(constants.Form.ASSET_QUANTITY)</p>
-                <p class="listItemChildValue">@salesQuote.assetQuantity</p>
-            </div>
-            <div class="listItemChild">
-                <p class="listItemChildTitle">@Messages(constants.Form.ASSET_PRICE)</p>
-                <p class="listItemChildValue">@salesQuote.assetPrice</p>
-            </div>
+            @commonVerticalTextInfo(constants.Form.ASSET_TYPE, salesQuote.assetType)
+            @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, salesQuote.assetDescription)
+            @commonVerticalIntInfo(constants.Form.ASSET_QUANTITY, salesQuote.assetQuantity)
+            @commonVerticalIntInfo(constants.Form.ASSET_PRICE, salesQuote.assetPrice)
+
             <div class="listItemChild">
                 <p class="listItemChildTitle">@Messages(constants.View.ACTION)</p>
                 <p class="listItemChildValue">

@@ -6,12 +6,12 @@
     @for(notification <- notifications) {
         <div class="timeline-item notification">
             <div class="timeline-icon">
-                <img src="./images/icons/contractIcon.svg" alt="">
+                <img src="@routes.Assets.versioned("./images/icons/contractIcon.svg")" alt="">
             </div>
             <div class="timeline-content right">
                 <div>
-                    <div><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
-                    <div class="notificationTime">@notification.time</div>
+                    <div class="textLineOverflow"><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
+                        <div class="notificationTime">@notification.time</div>
                 </div>
             </div>
         </div>

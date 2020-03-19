@@ -83,9 +83,8 @@
 
 html, body {
   height: 100%;
-  font-family: 'Source Sans Pro';
   background: #F0F0F0;
-  font-size: 100%; }
+  font-size: 61.5%; }
 
 .cover-bar {
   position: absolute;
@@ -110,7 +109,7 @@ html, body {
   align-items: center;
   margin-right: 15px; }
 
-.userIcons .buyerIcon, .userIcons .sellerIcon, .userIcons .financierIcon, .chat .chatName {
+.userIcons .buyerIcon, .userIcons .sellerIcon, .userIcons .financierIcon {
   display: inline-flex;
   height: 26px;
   width: 26px;
@@ -130,6 +129,12 @@ html, body {
   background: #FAFAFA;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
+
+.textLineOverflow {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden; }
 
 .primaryFont {
   font-family: "Rubik", sans-serif; }
@@ -452,7 +457,45 @@ html, body {
   .recentActivity .cmuk-card-body .mCS-minimal-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
     background-color: #053C75; }
 .recentActivity .chatRoom .cmuk-card-body {
-  height: 430px; }
+  height: 380px; }
+  .recentActivity .chatRoom .cmuk-card-body .chatMessages {
+    height: 300px;
+    overflow: auto; }
+  .recentActivity .chatRoom .cmuk-card-body .chatform .sendFormField {
+    position: relative; }
+  .recentActivity .chatRoom .cmuk-card-body .chatform .sendFormField input {
+    outline: none;
+    border-color: #e5e5e5; }
+  .recentActivity .chatRoom .cmuk-card-body .chatform .sendIconButton {
+    background: none;
+    padding: 0px 10px;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    right: 0; }
+  .recentActivity .chatRoom .cmuk-card-body .chatform .replyBox {
+    background-color: #FFffff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -65px;
+    padding: 10px 10px;
+    justify-content: space-between;
+    align-items: center; }
+  .recentActivity .chatRoom .cmuk-card-body .chatform .replyAccount {
+    font-size: 12px;
+    font-weight: bold;
+    color: #3f7fc9; }
+  .recentActivity .chatRoom .cmuk-card-body .chatform .replyMessage {
+    width: 100px;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px; }
+  .recentActivity .chatRoom .cmuk-card-body .chatMoveTop {
+    position: relative;
+    bottom: 50px; }
 .recentActivity .chatContainer .cmuk-card-body {
   font-family: "Oxygen", sans-serif;
   padding: 0px; }
@@ -627,18 +670,19 @@ header:before,
 .docView .cmuk-card-default {
   overflow-y: auto;
   height: calc(100% - 400px); }
-.docView .cmuk-card-header .cmuk-tab {
+.docView .cmuk-card-body .cmuk-tab {
   width: 100%;
-  margin: 0px; }
-  .docView .cmuk-card-header .cmuk-tab::before {
+  margin: 0px;
+  border-bottom: 1px solid #e5e5e5; }
+  .docView .cmuk-card-body .cmuk-tab::before {
     border: none; }
-  .docView .cmuk-card-header .cmuk-tab .first {
+  .docView .cmuk-card-body .cmuk-tab .first {
     border-right: 1px solid #cccccc; }
-  .docView .cmuk-card-header .cmuk-tab li {
+  .docView .cmuk-card-body .cmuk-tab li {
     width: 49%;
     padding: 0px;
     margin: 0; }
-    .docView .cmuk-card-header .cmuk-tab li a {
+    .docView .cmuk-card-body .cmuk-tab li a {
       padding: 15px 0px;
       font-size: 1.2rem;
       font-family: "Oxygen", sans-serif;
@@ -690,19 +734,29 @@ header:before,
   padding: 10px; }
 
 .chat {
-  padding: 0px; }
+  padding: 0px 10px 0px 0px; }
   .chat .chatName {
     color: #FFFFFF;
-    background: #193759; }
+    background: #193759;
+    display: inline-flex;
+    height: 26px;
+    width: 26px;
+    -moz-border-radius: 30px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 1.2rem;
+    align-items: center;
+    justify-content: center; }
   .chat li {
     list-style: none; }
-  .chat .self {
+  .chat .sender {
     justify-content: flex-end;
     align-items: flex-end; }
-  .chat .other {
+  .chat .receiver {
     align-items: flex-end; }
-  .chat ul li {
-    display: flex; }
+  .chat li {
+    display: flex;
+    list-style: none; }
   .chat .patner {
     word-break: break-all;
     padding: 10px;
@@ -723,9 +777,18 @@ header:before,
     .chat .patner .messageInfo {
       color: #848A91;
       font-size: 1.2rem; }
+    .chat .patner .replytoMessage p {
+      border-left: 2px solid #0862BE;
+      padding: 0px 10px; }
     .chat .patner .messageContent {
       color: #061728;
       font-size: 1.3rem; }
+      .chat .patner .messageContent p {
+        margin: 0px;
+        color: #0862BE;
+        text-align: left; }
+    .chat .patner p {
+      margin: 0px; }
   .chat .you {
     word-break: break-all;
     padding: 10px;
@@ -747,9 +810,18 @@ header:before,
     .chat .you .messageInfo {
       color: #6CA8E7;
       font-size: 1.2rem; }
+    .chat .you .replytoMessage p {
+      border-left: 2px solid #6CA8E7;
+      padding: 0px 10px; }
     .chat .you .messageContent {
       color: #FFFFFF;
       font-size: 1.3rem; }
+      .chat .you .messageContent p {
+        margin: 0px;
+        color: #6CA8E7;
+        text-align: left; }
+    .chat .you p {
+      margin: 0px; }
   .chat .chatSubmit {
     width: 92%;
     margin: auto;
@@ -808,25 +880,19 @@ header:before,
   .salesQuoteList .cmuk-card-body, .tradeList .cmuk-card-body {
     height: 280px;
     overflow: auto; }
-  .salesQuoteList .salesQuoteCardHeader, .salesQuoteList .tradeCardHeader, .tradeList .salesQuoteCardHeader, .tradeList .tradeCardHeader {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
+  .salesQuoteList .salesQuoteCardHeader .cmuk-subnav, .salesQuoteList .tradeCardHeader .cmuk-subnav, .tradeList .salesQuoteCardHeader .cmuk-subnav, .tradeList .tradeCardHeader .cmuk-subnav {
+    margin: 0px; }
+  .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > *, .salesQuoteList .tradeCardHeader .cmuk-subnav > *, .tradeList .salesQuoteCardHeader .cmuk-subnav > *, .tradeList .tradeCardHeader .cmuk-subnav > * {
+    padding: 0px 30px; }
+  .salesQuoteList .salesQuoteCardHeader .cmuk-subnav li a, .salesQuoteList .tradeCardHeader .cmuk-subnav li a, .tradeList .salesQuoteCardHeader .cmuk-subnav li a, .tradeList .tradeCardHeader .cmuk-subnav li a {
+    margin: 3px 0px 0px 0px;
+    padding-bottom: 13px;
     font-size: 1.3rem;
     font-family: "Oxygen", sans-serif; }
-    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav, .salesQuoteList .tradeCardHeader .cmuk-subnav, .tradeList .salesQuoteCardHeader .cmuk-subnav, .tradeList .tradeCardHeader .cmuk-subnav {
-      margin: 0px; }
-    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > *, .salesQuoteList .tradeCardHeader .cmuk-subnav > *, .tradeList .salesQuoteCardHeader .cmuk-subnav > *, .tradeList .tradeCardHeader .cmuk-subnav > * {
-      padding: 0px 30px; }
-    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav li a, .salesQuoteList .tradeCardHeader .cmuk-subnav li a, .tradeList .salesQuoteCardHeader .cmuk-subnav li a, .tradeList .tradeCardHeader .cmuk-subnav li a {
-      margin: 3px 0px 0px 0px;
-      padding-bottom: 13px;
-      font-size: 1.3rem;
-      font-family: "Oxygen", sans-serif; }
-    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active {
-      border-bottom: 2px solid #0862BE; }
-      .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active a {
-        font-weight: bold;
-        color: #343C44; }
+  .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active {
+    border-bottom: 2px solid #0862BE; }
+    .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active a {
+      font-weight: bold;
+      color: #343C44; }
 
 /*# sourceMappingURL=style.css.map */
