@@ -5,14 +5,11 @@
 
 @for(releaseAsset <- releaseAssetList) {
    <div>
-   @commonCard(){
-       <div>
-           <span class="headerFontSize cmuk-text-bold">@releaseAsset.ownerAddress</span>
-       </div>
+   @commonCard(releaseAsset.ownerAddress){
    }{
-           <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span>: @releaseAsset.ownerAddress <br>
-           <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @releaseAsset.pegHash <br>
-           <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
+       @commonTextInfo(constants.Form.OWNER_ADDRESS, releaseAsset.ownerAddress)
+       @commonTextInfo(constants.Form.PEG_HASH, releaseAsset.pegHash)
+       <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
    }
    </div>
 }

@@ -3,12 +3,11 @@
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="docView">
-@commonCard() {
+@commonInfoBox() {
     <ul cmuk-tab="connect: #component-tab-doc; animation: cmuk-animation-fade">
         <li class="cmuk-active first"><a href="#">documents</a></li>
         <li><a href="#">Upload History</a></li>
     </ul>
-} {
     <ul id="component-tab-doc" class="cmuk-switcher">
         <li>
             <ul class="documentlist scroller">

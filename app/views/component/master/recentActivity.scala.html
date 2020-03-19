@@ -3,8 +3,7 @@
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="recentActivityContainer">
-@commonCard() {
-    <p>Recent Activity</p>
+@commonCard(constants.View.RECENT_ACTIVITY) {
 }{
     <div class="timeline">
         <div class="timeline-item">
