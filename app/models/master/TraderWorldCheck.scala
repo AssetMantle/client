@@ -1,0 +1,151 @@
+package models.master
+
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
+import models.Trait.Document
+import org.postgresql.util.PSQLException
+import play.api.Logger
+import play.api.db.slick.DatabaseConfigProvider
+import slick.jdbc.JdbcProfile
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
+
+case class TraderWorldCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[TraderWorldCheck] {
+
+  def updateFile(newFile: Option[Array[Byte]]): TraderWorldCheck = TraderWorldCheck(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
+
+  def updateFileName(newFileName: String): TraderWorldCheck = TraderWorldCheck(id = id, documentType = documentType, fileName = newFileName, file = file, status = status)
+
+}
+
+@Singleton
+class TraderWorldChecks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.MASTER_ORGANIZATION_KYC
+
+  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
+  val db = databaseConfig.db
+
+  import databaseConfig.profile.api._
+
+  private[models] val traderWorldCheckTable = TableQuery[TraderWorldCheckTable]
+
+  private def add(traderWorldCheck: TraderWorldCheck): Future[String] = db.run((traderWorldCheckTable returning traderWorldCheckTable.map(_.id) += traderWorldCheck).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def upsert(traderWorldCheck: TraderWorldCheck): Future[Int] = db.run(traderWorldCheckTable.insertOrUpdate(traderWorldCheck).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
+  private def findByIdDocumentType(id: String, documentType: String): Future[TraderWorldCheck] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusById(id: String, status: Option[Boolean]): Future[Int] = db.run(traderWorldCheckTable.filter(_.id === id).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getAllDocumentsById(id: String): Future[Seq[TraderWorldCheck]] = db.run(traderWorldCheckTable.filter(_.id === id).result)
+
+  private def getAllDocumentTypesByIDAndDocumentSet(id: String, documentTypes: Seq[String]): Future[Seq[String]] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).map(_.documentType).result)
+
+  private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(_.status === status).map(_.documentType).result)
+
+  private def deleteById(id: String) = db.run(traderWorldCheckTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+
+  private[models] class TraderWorldCheckTable(tag: Tag) extends Table[TraderWorldCheck](tag, "TraderWorldCheck") {
+
+    def * = (id, documentType, fileName, file.?, status.?) <> (TraderWorldCheck.tupled, TraderWorldCheck.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def documentType = column[String]("documentType", O.PrimaryKey)
+
+    def status = column[Boolean]("status")
+
+    def fileName = column[String]("fileName", O.Unique)
+
+    def file = column[Array[Byte]]("file")
+
+  }
+
+  object Service {
+
+    def create(traderWorldCheck: TraderWorldCheck): Future[String] = add(TraderWorldCheck(id = traderWorldCheck.id, documentType = traderWorldCheck.documentType, fileName = traderWorldCheck.fileName, file = traderWorldCheck.file))
+
+    def updateOldDocument(traderWorldCheck: TraderWorldCheck): Future[Int] = upsert(TraderWorldCheck(id = traderWorldCheck.id, documentType = traderWorldCheck.documentType, fileName = traderWorldCheck.fileName, file = traderWorldCheck.file))
+
+    def get(id: String, documentType: String): Future[TraderWorldCheck] = findByIdDocumentType(id = id, documentType = documentType)
+
+    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
+
+    def getAllDocuments(id: String): Future[Seq[TraderWorldCheck]] = getAllDocumentsById(id = id)
+
+    def verifyAll(id: String): Future[Int] = updateStatusById(id = id, status = Option(true))
+
+    def verify(id: String, documentType: String): Future[Int] = updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true))
+
+    def reject(id: String, documentType: String): Future[Int] = updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(false))
+
+    def rejectAll(id: String): Future[Int] = updateStatusById(id = id, status = Option(false))
+
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
+
+    def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
+
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
+  }
+
+}

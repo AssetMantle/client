@@ -282,6 +282,19 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.dashboard,
         routes.javascript.ViewController.trades,
 
+        routes.javascript.WorldCheckController.uploadTraderWorldCheckFileForm,
+        routes.javascript.WorldCheckController.uploadTraderWorldCheckFile,
+        routes.javascript.WorldCheckController.storeTraderWorldCheckFile,
+        routes.javascript.WorldCheckController.updateTraderWorldCheckFileForm,
+        routes.javascript.WorldCheckController.updateTraderWorldCheckFile,
+        routes.javascript.WorldCheckController.uploadOrUpdateTraderWorldCheckFile,
+        routes.javascript.WorldCheckController.uploadOrganizationWorldCheckFileForm,
+        routes.javascript.WorldCheckController.uploadOrganizationWorldCheckFile,
+        routes.javascript.WorldCheckController.storeOrganizationWorldCheckFile,
+        routes.javascript.WorldCheckController.updateOrganizationWorldCheckFileForm,
+        routes.javascript.WorldCheckController.updateOrganizationWorldCheckFile,
+        routes.javascript.WorldCheckController.uploadOrUpdateOrganizationWorldCheckFile,
+
       )
     ).as("text/javascript")
   }
