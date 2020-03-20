@@ -12,16 +12,16 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderWorldCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[TraderWorldCheck] {
+case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[TraderBackgroundCheck] {
 
-  def updateFile(newFile: Option[Array[Byte]]): TraderWorldCheck = TraderWorldCheck(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
+  def updateFile(newFile: Option[Array[Byte]]): TraderBackgroundCheck = TraderBackgroundCheck(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
 
-  def updateFileName(newFileName: String): TraderWorldCheck = TraderWorldCheck(id = id, documentType = documentType, fileName = newFileName, file = file, status = status)
+  def updateFileName(newFileName: String): TraderBackgroundCheck = TraderBackgroundCheck(id = id, documentType = documentType, fileName = newFileName, file = file, status = status)
 
 }
 
 @Singleton
-class TraderWorldChecks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -33,9 +33,9 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
 
   import databaseConfig.profile.api._
 
-  private[models] val traderWorldCheckTable = TableQuery[TraderWorldCheckTable]
+  private[models] val traderBackgroundCheckTable = TableQuery[TraderBackgroundCheckTable]
 
-  private def add(traderWorldCheck: TraderWorldCheck): Future[String] = db.run((traderWorldCheckTable returning traderWorldCheckTable.map(_.id) += traderWorldCheck).asTry).map {
+  private def add(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = db.run((traderBackgroundCheckTable returning traderBackgroundCheckTable.map(_.id) += traderBackgroundCheck).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -43,7 +43,7 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def upsert(traderWorldCheck: TraderWorldCheck): Future[Int] = db.run(traderWorldCheckTable.insertOrUpdate(traderWorldCheck).asTry).map {
+  private def upsert(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = db.run(traderBackgroundCheckTable.insertOrUpdate(traderBackgroundCheck).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -53,7 +53,7 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[TraderWorldCheck] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def findByIdDocumentType(id: String, documentType: String): Future[TraderBackgroundCheck] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -61,7 +61,7 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -69,7 +69,7 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateStatusById(id: String, status: Option[Boolean]): Future[Int] = db.run(traderWorldCheckTable.filter(_.id === id).map(_.status.?).update(status).asTry).map {
+  private def updateStatusById(id: String, status: Option[Boolean]): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === id).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -77,7 +77,7 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
+  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -85,13 +85,13 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getAllDocumentsById(id: String): Future[Seq[TraderWorldCheck]] = db.run(traderWorldCheckTable.filter(_.id === id).result)
+  private def getAllDocumentsById(id: String): Future[Seq[TraderBackgroundCheck]] = db.run(traderBackgroundCheckTable.filter(_.id === id).result)
 
-  private def getAllDocumentTypesByIDAndDocumentSet(id: String, documentTypes: Seq[String]): Future[Seq[String]] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).map(_.documentType).result)
+  private def getAllDocumentTypesByIDAndDocumentSet(id: String, documentTypes: Seq[String]): Future[Seq[String]] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).map(_.documentType).result)
 
-  private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(_.status === status).map(_.documentType).result)
+  private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(_.status === status).map(_.documentType).result)
 
-  private def deleteById(id: String) = db.run(traderWorldCheckTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(traderBackgroundCheckTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -101,13 +101,13 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
-  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(traderWorldCheckTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
 
-  private[models] class TraderWorldCheckTable(tag: Tag) extends Table[TraderWorldCheck](tag, "TraderWorldCheck") {
+  private[models] class TraderBackgroundCheckTable(tag: Tag) extends Table[TraderBackgroundCheck](tag, "TraderBackgroundCheck") {
 
-    def * = (id, documentType, fileName, file.?, status.?) <> (TraderWorldCheck.tupled, TraderWorldCheck.unapply)
+    def * = (id, documentType, fileName, file.?, status.?) <> (TraderBackgroundCheck.tupled, TraderBackgroundCheck.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -123,15 +123,15 @@ class TraderWorldChecks @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(traderWorldCheck: TraderWorldCheck): Future[String] = add(TraderWorldCheck(id = traderWorldCheck.id, documentType = traderWorldCheck.documentType, fileName = traderWorldCheck.fileName, file = traderWorldCheck.file))
+    def create(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = add(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file))
 
-    def updateOldDocument(traderWorldCheck: TraderWorldCheck): Future[Int] = upsert(TraderWorldCheck(id = traderWorldCheck.id, documentType = traderWorldCheck.documentType, fileName = traderWorldCheck.fileName, file = traderWorldCheck.file))
+    def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = upsert(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file))
 
-    def get(id: String, documentType: String): Future[TraderWorldCheck] = findByIdDocumentType(id = id, documentType = documentType)
+    def get(id: String, documentType: String): Future[TraderBackgroundCheck] = findByIdDocumentType(id = id, documentType = documentType)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
-    def getAllDocuments(id: String): Future[Seq[TraderWorldCheck]] = getAllDocumentsById(id = id)
+    def getAllDocuments(id: String): Future[Seq[TraderBackgroundCheck]] = getAllDocumentsById(id = id)
 
     def verifyAll(id: String): Future[Int] = updateStatusById(id = id, status = Option(true))
 

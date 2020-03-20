@@ -574,7 +574,7 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
     PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationWorldCheck"
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
@@ -584,7 +584,7 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationWorldCheck"
     PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."TraderWorldCheck"
+CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
@@ -895,16 +895,16 @@ ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."OrganizationWorldCheck"
-    ADD CONSTRAINT OrganizationWorldCheck_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."OrganizationBackgroundCheck"
+    ADD CONSTRAINT OrganizationBackgroundCheck_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."TraderWorldCheck"
-    ADD CONSTRAINT TraderWorldCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."TraderBackgroundCheck"
+    ADD CONSTRAINT TraderBackgroundCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderKYC"
     ADD CONSTRAINT TraderKYC_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
@@ -992,11 +992,11 @@ DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationWorldCheck" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderKYC" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderWorldCheck" CASCADE;
+DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
 DROP TABLE IF EXISTS MASTER."TradeRoom" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;

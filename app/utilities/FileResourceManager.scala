@@ -43,7 +43,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadOrganizationKYCShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
-  private val uploadOrganizationWorldCheck = configuration.get[String]("upload.worldCheck.organization")
+  private val uploadOrganizationWorldCheck = configuration.get[String]("upload.documentCheck.organizationWorldCheck")
 
   private val uploadTraderKYCIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
 
@@ -51,7 +51,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderEmploymentProofPath = configuration.get[String]("upload.trader.employmentProofPath")
 
-  private val uploadTraderWorldCheck = configuration.get[String]("upload.worldCheck.trader")
+  private val uploadTraderWorldCheck = configuration.get[String]("upload.documentCheck.traderWorldCheck")
 
   private val uploadTraderAssetContractPath: String = configuration.get[String]("upload.asset.contract")
 
@@ -83,7 +83,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def getWorldCheckFilePath(documentType: String): String = {
+  def getBackgroundCheckFilePath(documentType: String): String = {
     documentType match {
       case constants.File.TRADER_WORLD_CHECK => uploadTraderWorldCheck
       case constants.File.ORGANIZATION_WORLD_CHECK => uploadOrganizationWorldCheck

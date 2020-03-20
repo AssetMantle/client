@@ -43,7 +43,7 @@
                     <script>componentResource('organizationKYCDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKYCDocuments('@organizationVerificationRequest.id'))</script>
                 </div>
                 <br>
-                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.WorldCheckController.uploadOrUpdateOrganizationWorldCheckFile('@organizationVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile('@organizationVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
                 <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
                 <br>
                 }
