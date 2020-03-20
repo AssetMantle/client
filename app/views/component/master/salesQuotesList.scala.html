@@ -4,37 +4,25 @@
 
 @(salesQuotes: Seq[SalesQuote])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
-    @commonTable(){
-        @Messages(constants.View.SALES_QUOTE_LIST)
-    }{
-        <tr>
-            <th>@Messages(constants.Form.ASSET_TYPE)</th>
-            <th>@Messages(constants.View.ASSET_DESCRIPTION)</th>
-            <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
-            <th>@Messages(constants.Form.ASSET_PRICE)</th>
-            <th>@Messages(constants.View.ACTION)</th>
-        </tr>
-        @for(salesQuote <- salesQuotes) {
-            <tr>
-                <td>@salesQuote.assetType</td>
-                <td>@salesQuote.assetDescription</td>
-                <td>@salesQuote.assetQuantity </td>
-                <td>@salesQuote.assetPrice</td>
-                <td>
-                @if(salesQuote.completionStatus){
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="">@Messages(constants.View.INVITE)</button>
-                }else{
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm('@salesQuote.id'))">@Messages(constants.View.COMPLETE)</button>
-                }
 
-                </td>
-            </tr>
+    @for(salesQuote <- salesQuotes) {
+        @commonList(){
+            <p class="accountName"><span>B</span></p>
+            @commonVerticalTextInfo(constants.Form.ASSET_TYPE, salesQuote.assetType)
+            @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, salesQuote.assetDescription)
+            @commonVerticalIntInfo(constants.Form.ASSET_QUANTITY, salesQuote.assetQuantity)
+            @commonVerticalIntInfo(constants.Form.ASSET_PRICE, salesQuote.assetPrice)
+
+            <div class="listItemChild">
+                <p class="listItemChildTitle">@Messages(constants.View.ACTION)</p>
+                <p class="listItemChildValue">
+                @if(salesQuote.completionStatus){
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="">@Messages(constants.View.INVITE)</button>
+                }else{
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm('@salesQuote.id'))">@Messages(constants.View.COMPLETE)</button>
+                }
+                </p>
+            </div>
         }
     }
 </div>
-
-
-
-
-
-

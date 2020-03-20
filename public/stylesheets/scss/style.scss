@@ -25,7 +25,6 @@
 }
 html, body{
   height: 100%;
-  font-family:'Source Sans Pro';
   background: #F0F0F0;
   font-size: 61.5%;
 }
@@ -77,6 +76,12 @@ html, body{
   border-radius: $buttonBorderRadius;
 }
 
+.textLineOverflow{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .primaryFont{
   font-family:$fontFamilyPrimary;
 }
@@ -375,6 +380,14 @@ margin-right: -5px;
                 margin-bottom: 5px;
               }
             }
+            .termStatus{
+              display: flex;
+              .commonCheckBox dt{
+                width: auto;
+                display: none;
+              }
+            }
+
           }
           hr{
             margin: 15px 0px;
@@ -509,6 +522,59 @@ margin-right: -5px;
       background-color: #053C75 ;
     }
   }
+  .chatRoom .cmuk-card-body{
+    height: 380px;
+
+    .chatMessages{
+      height: 300px;
+      overflow: auto;
+    }
+
+    .chatform{
+      .sendFormField{
+        position: relative;
+      }
+      .sendFormField input{
+        outline: none;
+        border-color: #e5e5e5;
+      }
+      .sendIconButton{
+        background: none;
+        padding: 0px 10px;
+        margin: 0;
+        position: absolute;
+        top:0;
+        right:0;
+      }
+      .replyBox{
+        background-color: #FFffff;
+        position: absolute;
+        left:0;
+        right:0;
+        top:-65px;
+        padding: 10px 10px;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .replyAccount{
+        font-size: 12px;
+        font-weight: bold;
+        color: #3f7fc9;
+      }
+      .replyMessage{
+        width: 100px;
+        overflow: hidden;
+        display: inline-block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+      }
+    }
+    .chatMoveTop{
+      position: relative;
+      bottom: 50px;
+    }
+  }
   .chatContainer{
     .cmuk-card-body
     {
@@ -579,11 +645,6 @@ header:before,
     left: 17px;
     top: 0;
     position: absolute; }
-  &:after {
-    content: "";
-    clear: both;
-    display: table;
-    width: 100%; }
   .timeline-item {
     margin-bottom: 20px;
     height: 55px;
@@ -726,9 +787,10 @@ header:before,
     overflow-y:auto;
     height: calc(100% - 400px);
   }
-  .cmuk-card-header .cmuk-tab{
+  .cmuk-card-body .cmuk-tab{
     width: 100%;
     margin: 0px;
+    border-bottom: 1px solid #e5e5e5;
     &::before{
       border: none;
     }
@@ -736,7 +798,6 @@ header:before,
       border-right: 1px solid #cccccc;
     }
     li{
-
       width: 49%;
       padding:0px;
       margin: 0;
@@ -800,26 +861,34 @@ header:before,
   padding:10px;
 }
 
-
 .chat{
   .chatName{
     color:#FFFFFF;
     background: #193759;
-    @extend %iconLetter;
+    display: inline-flex;
+    height: 26px;
+    width: 26px;
+    -moz-border-radius: 30px;
+    border-radius:50%;
+    text-align: center;
+    font-size: $paragraphFontSizeSmall;
+    align-items: center;
+    justify-content: center;
   }
   li{
     list-style: none;
   }
-  .self{
+  .sender{
     justify-content: flex-end;
     align-items: flex-end;
   }
-  .other{
+  .receiver{
     align-items: flex-end;
   }
-  padding: 0px;
-  ul li{
+  padding: 0px 10px 0px 0px;
+  li{
     display: flex;
+    list-style: none;
   }
   .patner{
     word-break: break-all;
@@ -843,9 +912,21 @@ header:before,
       color: #848A91;
       font-size: $paragraphFontSizeSmall;
     }
+    .replytoMessage p{
+      border-left: 2px solid #0862BE;
+      padding: 0px 10px;
+    }
     .messageContent{
       color: #061728;
       font-size: $paragraphFontSizeMedium;
+      p{
+        margin:0px;
+        color: #0862BE;
+        text-align: left;
+      }
+    }
+    p{
+      margin: 0px;
     }
   }
   .you{
@@ -871,9 +952,21 @@ header:before,
       color: #6CA8E7;
       font-size: $paragraphFontSizeSmall;
     }
+    .replytoMessage p{
+      border-left: 2px solid #6CA8E7;
+      padding: 0px 10px;
+    }
     .messageContent{
       color: #FFFFFF;
       font-size: $paragraphFontSizeMedium;
+      p{
+        margin:0px;
+        color: #6CA8E7;
+        text-align: left;
+      }
+    }
+    p{
+      margin: 0px;
     }
   }
   .chatSubmit{
@@ -883,4 +976,88 @@ header:before,
     display: block;
   }
 
+}
+.commonList{
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid rgba(5, 60, 117, 0.12);
+  box-sizing: border-box;
+  border-radius: 2px;
+  margin-bottom: 5px;
+  overflow:auto;
+  .listItemChild{
+    margin: 0px;
+    font-size: $paragraphFontSizeMedium;
+    font-family: $fontFamilySecondary;
+    font-weight: bold;
+    .listItemChildTitle
+    {
+      margin: 0px;
+      color: #4B4B4B;
+    }
+    .listItemChildValue{
+      margin-bottom: 0px;
+      color: #848A91;
+      font-weight: normal;
+    }
+  }
+}
+
+.accountName{
+  position:absolute;
+  top: 0px;
+  left: 0px;
+  color: #FFFFFF;
+  margin: 0px;
+  width: 0;
+  height: 0;
+  border: 15px solid;
+  border-color: #5EB55C transparent transparent #5EB55C;
+  span {
+    position:absolute;
+    top: -15px;
+    left: -10px;
+    text-align: center;
+    font-size:$paragraphFontSizeSmall;
+    font-weight: bold;
+    font-family: arial;
+    transform: rotate(-45deg);
+    display:block;
+  }
+}
+
+.salesQuoteList, .tradeList {
+  margin-bottom: 20px;
+  .cmuk-card-header{
+    padding-bottom: 0px;
+  }
+  .cmuk-card-body{
+    height: 280px;
+    overflow: auto;
+  }
+  .salesQuoteCardHeader, .tradeCardHeader {
+    .cmuk-subnav {
+      margin: 0px;
+    }
+    .cmuk-subnav>*{
+      padding:0px 30px;
+    }
+    .cmuk-subnav li a{
+      margin: 3px 0px 0px 0px ;
+      padding-bottom: 13px;
+      font-size: $paragraphFontSizeMedium;
+      font-family: $fontFamilySecondary;
+    }
+
+    .cmuk-subnav > .cmuk-active {
+      border-bottom: 2px solid #0862BE;
+      a{
+        font-weight: bold;
+        color: #343C44
+      }
+    }
+  }
 }

@@ -538,12 +538,11 @@ dl .info:after {
   color: rgba(131, 0, 4, 0.71); }
 
 .hashCode {
-  width: 100px;
   overflow: hidden;
-  display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
-  height: 1.2em; }
+  max-width: 100%;
+  width: 120px; }
 
 .searchForm {
   width: 95%;
@@ -949,9 +948,9 @@ input:checked + .slider {
 .mobileNumberUpdate .mobileNumber label {
   margin-left: -75px; }
 
-.commonHomeData {
+.commonhomeData {
   font-size: 1.3rem; }
-  .commonHomeData p, .commonHomeData h3 {
+  .commonhomeData p, .commonhomeData h3 {
     margin: 5px 0px; }
 
 .comdex .cmuk-input, .cmuk-card-default, button, a, p {
@@ -1013,118 +1012,6 @@ input:checked + .slider {
 .commonCheckBox dt {
   width: 200px;
   word-break: break-word; }
-
-.replyAccount {
-  font-size: 12px;
-  font-weight: bold;
-  color: #3f7fc9; }
-
-.replyMessage {
-  width: 100px;
-  overflow: hidden;
-  display: inline-block;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 14px; }
-
-.chatContainer {
-  height: 300px;
-  overflow: auto; }
-
-.chat {
-  padding: 0px; }
-  .chat .chatName {
-    color: #FFFFFF;
-    background: #193759;
-    display: inline-flex;
-    height: 26px;
-    width: 26px;
-    -moz-border-radius: 30px;
-    border-radius: 50%;
-    text-align: center;
-    font-size: 1.2rem;
-    align-items: center;
-    justify-content: center; }
-  .chat li {
-    list-style: none; }
-  .chat .sender {
-    justify-content: flex-end;
-    align-items: flex-end; }
-  .chat .receiver {
-    align-items: flex-end; }
-  .chat li {
-    display: flex;
-    list-style: none; }
-  .chat .patner {
-    word-break: break-all;
-    padding: 10px;
-    border-radius: 10px;
-    margin: 10px;
-    background: #E8E8E8;
-    position: relative;
-    border-bottom-left-radius: 0px; }
-    .chat .patner::after {
-      position: absolute;
-      left: -8px;
-      bottom: 0;
-      content: "";
-      border-top: .5rem solid transparent;
-      border-bottom: .5rem solid #E8E8E8;
-      border-left: .5rem solid transparent;
-      border-right: .5rem solid #E8E8E8; }
-    .chat .patner .messageInfo {
-      color: #848A91;
-      font-size: 1.2rem; }
-    .chat .patner .replytoMessage p {
-      border-left: 2px solid #0862BE;
-      padding: 0px 10px; }
-    .chat .patner .messageContent {
-      color: #061728;
-      font-size: 1.3rem; }
-      .chat .patner .messageContent p {
-        margin: 0px;
-        color: #0862BE;
-        text-align: left; }
-    .chat .patner p {
-      margin: 0px; }
-  .chat .you {
-    word-break: break-all;
-    padding: 10px;
-    border-radius: 10px;
-    margin: 10px;
-    background: #0862BE;
-    color: #fff;
-    position: relative;
-    border-bottom-right-radius: 0px; }
-    .chat .you::after {
-      position: absolute;
-      right: -8px;
-      bottom: 0;
-      content: "";
-      border-top: .5rem solid transparent;
-      border-bottom: .5rem solid #0862BE;
-      border-left: .5rem solid #0862BE;
-      border-right: .5rem solid transparent; }
-    .chat .you .messageInfo {
-      color: #6CA8E7;
-      font-size: 1.2rem; }
-    .chat .you .replytoMessage p {
-      border-left: 2px solid #6CA8E7;
-      padding: 0px 10px; }
-    .chat .you .messageContent {
-      color: #FFFFFF;
-      font-size: 1.3rem; }
-      .chat .you .messageContent p {
-        margin: 0px;
-        color: #6CA8E7;
-        text-align: left; }
-    .chat .you p {
-      margin: 0px; }
-  .chat .chatSubmit {
-    width: 92%;
-    margin: auto;
-    padding: 10px 0px;
-    display: block; }
 
 .unRead {
   color: #1e87f0;

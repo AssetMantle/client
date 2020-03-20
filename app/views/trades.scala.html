@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
-
+@import views.html.base._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right))
@@ -17,19 +17,59 @@
         <div class="cmuk-margin-top cmuk-margin-bottom">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
         </div>
-        <div id="salesQuoteList">
-
+        <div class="salesQuoteList">
+        @commonCard(constants.View.SALES_QUOTE_LIST){
+            <div class="salesQuoteCardHeader">
+                <ul class="cmuk-subnav" cmuk-switcher="connect: #salesQuoteTab; animation: cmuk-animation-fade">
+                    <li><a href="#">@Messages(constants.View.BUY)</a></li>
+                    <li><a href="#">@Messages(constants.View.SELL)</a></li>
+                </ul>
+            </div>
+        }{
+            <ul id="salesQuoteTab" class="cmuk-switcher cmuk-margin">
+                <li>
+                    <div id="salesQuoteList"></div>
+                </li>
+                <li>Hello</li>
+            </ul>
+        }
         </div>
-        <div id="tradeList">
-
+        <div class="tradeList">
+        @commonCard(constants.View.TRADE_ROOMS){
+            <div class="tradeCardHeader">
+                <ul class="cmuk-subnav" cmuk-switcher="connect: #tradeListTab; animation: cmuk-animation-fade">
+                    <li><a href="#">@Messages(constants.View.ACTIVE)</a></li>
+                    <li><a href="#">@Messages(constants.View.COMPLETED)</a></li>
+                </ul>
+            </div>
+        }{
+            <ul id="tradeListTab" class="cmuk-switcher cmuk-margin">
+                <li>
+                    <div id="tradeList">
+                    </div>
+                </li>
+                <li>Hello</li>
+            </ul>
+        }
         </div>
+
+
     }
-    <h2>Trades PageUnderConstruction</h2>
+
 }
 
 @right={
     <div class="recentActivity">
-    <div id="recentActivity"></div>
+        <div class="recentActivityContainer">
+            @commonCard(constants.View.RECENT_ACTIVITY) {
+            } {
+                <div class="scroller">
+                    <div id="recentActivity">
+                    </div>
+                    <div class="cover-bar"></div>
+                </div>
+            }
+        </div>
     </div>
         }
 

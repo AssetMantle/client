@@ -1,11 +1,10 @@
-
 function loadMoreActivities(notificationRoute, tradeRoomID = null) {
     let route;
     console.log(tradeRoomID);
     if(tradeRoomID==null) {
-        route = notificationRoute(($(".notificationContainer").length));
+        route = notificationRoute(($(".recentActivityBox").length));
     }else {
-        route = notificationRoute(($(".notificationContainer").length), tradeRoomID);
+        route = notificationRoute(($(".recentActivityBox").length), tradeRoomID);
     }
     $.ajax({
         url: route.url,
@@ -13,7 +12,8 @@ function loadMoreActivities(notificationRoute, tradeRoomID = null) {
         async: true,
         statusCode: {
             200: function (data) {
-                const loadMore = $(".notificationContainer .notification:last");
+                console.log(data)
+                const loadMore = $(".recentActivityBox .notification:last");
                 loadMore.before(data);
                 loadMore.remove();
             }

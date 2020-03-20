@@ -3,28 +3,20 @@
 @import views.html.base._
 
 @(tradeRooms: Seq[TradeRoom])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div>
-    @commonTable(){
-        @Messages(constants.View.TRADE_LIST)
-    }{
-        <tr>
-            <th>@Messages(constants.Form.ID)</th>
-            <th>@Messages(constants.View.SALES_QUOTE_ID)</th>
-            <th>@Messages(constants.View.BUYER)</th>
-            <th>@Messages(constants.View.SELLER)</th>
-            <th>@Messages(constants.View.ACTION)</th>
-        </tr>
-        @for(tradeRoom <- tradeRooms) {
-            <tr>
-                <td>@tradeRoom.id</td>
-                <td>@tradeRoom.salesQuoteID </td>
-                <td>@tradeRoom.buyerAccountID</td>
-                <td>@tradeRoom.sellerAccountID</td>
-                <td><li><a href="@controllers.routes.TradeRoomController.tradeRoom(tradeRoom.id)">@Messages("OPEN TRADE ROOM")</a></li></td>
-            </tr>
-        }
+@for(tradeRoom <- tradeRooms) {
+    @commonList(){
+        @commonVerticalTextInfo(constants.Form.ID, tradeRoom.id)
+        @commonVerticalTextInfo(constants.View.SALES_QUOTE_ID, tradeRoom.salesQuoteID)
+        @commonVerticalTextInfo(constants.View.BUYER, tradeRoom.buyerAccountID)
+        @commonVerticalTextInfo(constants.View.SELLER, tradeRoom.sellerAccountID)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">@Messages(constants.View.ACTION)</p>
+            <p  class="listItemChildValue"><a href="@controllers.routes.TradeRoomController.tradeRoom(tradeRoom.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+            </p>
+        </div>
     }
-</div>
+}
+
 
 
 

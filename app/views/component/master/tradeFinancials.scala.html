@@ -3,13 +3,12 @@
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="financial">
-@commonCard() {
-    <p>@Messages(constants.View.FINANCIALS)</p>
+@commonCard(constants.View.FINANCIALS) {
 } {
     <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
-                <span class="walletIcon"><img src="./images/icons/walletIcon.svg"></span>
+                <span class="walletIcon"><img src="@routes.Assets.versioned("./images/icons/walletIcon.svg")"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
@@ -21,9 +20,9 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex payable">
-                <span class="payableIcon"><img src="./images/icons/payableIcon.svg"></span>
+                <span class="payableIcon"><img src="@routes.Assets.versioned("./images/icons/payableIcon.svg")"></span>
                 <div>
-                    <p class="cmuk-margin-remove ctitle">Wallet Balance</p>
+                    <p class="cmuk-margin-remove ctitle">Total Payables</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ 150,000,000</p>
                 </div>
             </div>
@@ -33,7 +32,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex leftDays">
-                <span class="leftDaysIcon"><img src="./images/icons/daysleftIcon.svg"></span>
+                <span class="leftDaysIcon"><img src="@routes.Assets.versioned("./images/icons/daysleftIcon.svg")"></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">Days Left</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">60 Days</p>

@@ -1,0 +1,12 @@
+@import java.util.Date
+
+@(key: String, value: Date, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div class="cmuk-flex infoRow">
+    <div class="infoRowLabel red">
+        @Messages(key)
+    </div>
+    <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
+        @value
+    </div>
+</div>
