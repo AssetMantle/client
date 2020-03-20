@@ -13,37 +13,37 @@
                     <p class="cmuk-margin-remove">@Messages(constants.View.BUYER_ACCEPTANCE)</p>
                 </div>
                 <div class="terms">
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.DESCRIPTION,tradeTerm.assetDescription.assetDescriptionStatus,"./images/icons/doc.svg",1){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.DESCRIPTION,tradeTerm.assetDescription.assetDescriptionStatus,"icon-description",1){
                         @Messages(constants.View.DESCRIPTION)
                     }{
                         @tradeTerm.assetDescription.assetDescriptionValue
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.QUANTITY,tradeTerm.assetQuantity.assetQuantityStatus,"./images/icons/quantity.svg",2){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.QUANTITY,tradeTerm.assetQuantity.assetQuantityStatus,"icon-quantity",2){
                         @Messages(constants.View.QUANTITY)
                     }{
                         @tradeTerm.assetQuantity.assetQuantityValue
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.CONTRACT_PRICE,tradeTerm.assetPrice.assetPriceStatus,"./images/icons/contract.svg",3){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.CONTRACT_PRICE,tradeTerm.assetPrice.assetPriceStatus,"icon-contract-price",3){
                         @Messages(constants.View.CONTRACT_PRICE)
                     }{
                         @tradeTerm.assetPrice.assetPriceStatus
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.SHIPMENT_PERIOD,tradeTerm.shipmentPeriod.shipmentPeriodStatus,"./images/icons/shipment.svg",4){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.SHIPMENT_PERIOD,tradeTerm.shipmentPeriod.shipmentPeriodStatus,"icon-shipment-period",4){
                         @Messages(constants.View.SHIPMENT_PERIOD)
                     }{
                         @tradeTerm.shipmentPeriod.shipmentPeriodValue
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.LOAD_PORT,tradeTerm.portOfLoading.portOfLoadingStatus,"./images/icons/loadPort.svg",5){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.LOAD_PORT,tradeTerm.portOfLoading.portOfLoadingStatus,"icon-port",5){
                         @Messages(constants.View.LOAD_PORT)
                     }{
                         @tradeTerm.portOfLoading.portOfLoadingValue
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.DISCHARGE_PORT,tradeTerm.portOfDischarge.portOfDischargeStatus,"./images/icons/loadPort.svg",6){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.DISCHARGE_PORT,tradeTerm.portOfDischarge.portOfDischargeStatus,"icon-port",6){
                         @Messages(constants.View.DISCHARGE_PORT)
                     }{
                         @tradeTerm.portOfDischarge.portOfDischargeValue
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.ADVANCE_PAYMENT,tradeTerm.advancePayment.advancePaymentStatus,"./images/icons/advancPayment.svg",7){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.ADVANCE_PAYMENT,tradeTerm.advancePayment.advancePaymentStatus,"icon-advance-payment",7){
                         @Messages(constants.View.ADVANCE_PAYMENT)
                     }{
                         @if(tradeTerm.advancePayment.advancePaymentValue){
@@ -52,7 +52,7 @@
                             NO
                         }
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.CREDIT_TERMS,tradeTerm.creditTerms.creditTermsStatus,"./images/icons/creditTerms.svg",8){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.CREDIT_TERMS,tradeTerm.creditTerms.creditTermsStatus,"icon-credit-terms",8){
 
                         @Messages(constants.View.CREDIT_TERMS)
 
@@ -67,7 +67,7 @@
                     }{
                             FINANCED
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.BILL_OF_EXCHANGE_REQUIRED,tradeTerm.billOfExchangeRequired.billOfExchangeRequiredStatus,"./images/icons/doc.svg",9){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.BILL_OF_EXCHANGE_REQUIRED,tradeTerm.billOfExchangeRequired.billOfExchangeRequiredStatus,"icon-document",9){
                         @Messages(constants.View.BILL_OF_EXCHANGE_REQUIRED)
                     }{
                         @if(tradeTerm.billOfExchangeRequired.billOfExchangeRequiredValue){
@@ -76,7 +76,7 @@
                             NO
                         }
                     }
-                    @views.html.component.master.termView(tradeTerm.id,constants.View.PRIMARY_DOCUMENTS,tradeTerm.primaryDocuments.primaryDocumentsStatus,"./images/icons/doc.svg",10){
+                    @views.html.component.master.termView(tradeTerm.id,constants.View.PRIMARY_DOCUMENTS,tradeTerm.primaryDocuments.primaryDocumentsStatus,"icon-document",10){
                         @Messages(constants.View.PRIMARY_DOCUMENTS)
                         <div class="creditTerms">
                         @if(tradeTerm.primaryDocuments.obl){

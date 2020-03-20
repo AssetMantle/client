@@ -981,10 +981,9 @@ input:checked + .slider {
   color: red; }
 
 .cmuk-navbar-nav > li > a.active {
-  background-color: #f4f7fb;
   color: #343C44;
-  border-bottom: 2px solid #053C75; }
-  .cmuk-navbar-nav > li > a.active svg {
+  border-bottom: 3px solid #FFFFFF; }
+  .cmuk-navbar-nav > li > a.active .icon {
     fill: red; }
 
 .infoRow {

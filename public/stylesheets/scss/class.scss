@@ -1216,10 +1216,9 @@ input:checked+.slider {
 }
 
 .cmuk-navbar-nav>li>a.active{
-  background-color: #f4f7fb;
   color: #343C44;
-  border-bottom: 2px solid #053C75;
-  svg{
+  border-bottom: 3px solid #FFFFFF;
+  .icon {
     fill: red;
   }
 }

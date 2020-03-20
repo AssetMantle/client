@@ -6,7 +6,7 @@
 <div class="term">
     <div>
         <span class="serialNumber">@serialNumber</span>
-        <span class="termIcon"><img src="@routes.Assets.versioned(imgLink)"></span>
+        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#"+imgLink)"/></svg></span>
         <span class="termName">@description</span>
     </div>
     <div class="termStatus">

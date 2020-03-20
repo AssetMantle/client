@@ -44,10 +44,22 @@
                     @loginState match {
                         case null => {}
                         case default => {
-                            <li><a href="@controllers.routes.ViewController.dashboard()"><span><img src="@routes.Assets.versioned("images/icons/dashboardIcon.svg")"> </span> @Messages(constants.Form.DASHBOARD)</a></li>
-                            <li><a href="@controllers.routes.ViewController.trades()"><span><img src="@routes.Assets.versioned("images/icons/tradersIcon.svg")"> </span>@Messages(constants.Form.TRADES)</a></li>
-                            <li><a href="@controllers.routes.ViewController.account()"><span><img src="@routes.Assets.versioned("images/icons/accountIcon.svg")"> </span>@Messages(constants.Form.ACCOUNT)</a></li>
-                            <li><a href="@controllers.routes.ViewController.profile()">@Messages(constants.Form.PROFILE)</a></li>
+                            <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
+                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-dashboard")"/></svg>
+                            </span> @Messages(constants.Form.DASHBOARD)</a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
+                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
+                            </span>@Messages(constants.Form.TRADES)</a>
+                            </li>
+@*                            <li><a href=""><span>*@
+@*                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>*@
+@*                            </span>@Messages(constants.Form.TRANSACTIONS)</a>*@
+@*                            </li>*@
+                            <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
+                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
+                            </span>@Messages(constants.Form.ACCOUNT)</a>
+                            </li>
                         }
                     }
                 </ul>
@@ -99,24 +111,16 @@
                                     </ul>
                                 </div>
                             </li>
-                            <li class="userList">
-                                <a >@loginState.username</a>
-                                <div class="cmuk-navbar-dropdown">
-                                    <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
-                                        <li>
-                                            <a href="@controllers.routes.ViewController.profile()">
-                                                <span cmuk-icon="user"></span>
-                                                @Messages(constants.Form.PROFILE)
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                                <span cmuk-icon="sign-out"></span>
-                                                @Messages(constants.Form.LOGOUT.legend)
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <li>
+                                <a href="@controllers.routes.ViewController.profile()">
+                                    <span cmuk-icon="user"></span>
+                                    @loginState.username
+                                </a>
+                            </li>
+                            <li>
+                                <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
+                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-logout")"/></svg>
+                                </a>
                             </li>
 
                         }
