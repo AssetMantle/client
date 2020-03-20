@@ -25,7 +25,11 @@ object Form {
 
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
-  val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
+  val USER_ADD_OR_UPDATE_UBOS = new Form("USER_ADD_OR_UPDATE_UBOS", routes.AddOrganizationController.userAddOrUpdateUBOs())
+  val DELETE_UBO =  new Form("DELETE_UBO", routes.AddOrganizationController.deleteUBO())
+  val USER_DELETE_UBO =  new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO())
+  val ADD_UBO =  new Form("ADD_UBO", routes.AddOrganizationController.addUBO())
+  val USER_ADD_UBO =  new Form("USER_ADD_UBO", routes.AddOrganizationController.userAddUBO())
   val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail())
   val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest())
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
@@ -198,15 +202,7 @@ object Form {
   val SUBMIT = "SUBMIT"
   val ORGANIZATION_DETAILS = "ORGANIZATION_DETAILS"
   val ORGANIZATION_KYC_FILES = "ORGANIZATION_KYC_FILES"
-  val UBOS = "UBOS"
-  val UBO = "UBO"
-  val ADD_UBOS = "ADD_UBOS"
-  val ADD_UBOS_NEW = "ADD_UBOS_NEW"
   val DELETE = "DELETE"
-  val PERSON_NAME = "PERSON_NAME"
-  val SHARE_PERCENTAGE = "SHARE_PERCENTAGE"
-  val RELATIONSHIP = "RELATIONSHIP"
-  val TITLE = "TITLE"
   val ZONE_DETAILS = "ZONE_DETAILS"
   val TRADER_KYC_FILES = "TRADER_KYC_FILES"
   val TRADER_DETAILS = "TRADER_DETAILS"
@@ -220,15 +216,12 @@ object Form {
   val ON_GOING_SELL_ORDERS = "ON_GOING_SELL_ORDERS"
   val VIEW = "VIEW"
   val TEAM = "TEAM"
-  val PENDING = "PENDING"
   val VERIFY = "VERIFY"
   val ZONE_KYC_FILES = "ZONE_KYC_FILES"
   val UPDATE_ZONE_KYC_STATUS = "UPDATE_ZONE_KYC_STATUS"
   val UPDATE_ORGANIZATION_KYC_STATUS = "UPDATE_ORGANIZATION_KYC_STATUS"
   val UPDATE_ASSET_DOCUMENT_STATUS = "UPDATE_ASSET_DOCUMENT_STATUS"
   val UPDATE_STATUS = "UPDATE_STATUS"
-  val ZONE_STATUS = "ZONE_STATUS"
-  val ORGANIZATION_STATUS = "ORGANIZATION_STATUS"
   val STATUS_UPDATED = "STATUS_UPDATED"
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
   val HOME = "HOME"
@@ -398,7 +391,6 @@ object Form {
   val BANK_NAME = "BANK_NAME"
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
-  val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
   val FULL_ADDRESS = "FULL_ADDRESS"
 
   //MasterTransaction

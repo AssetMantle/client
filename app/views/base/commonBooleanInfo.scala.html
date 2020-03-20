@@ -1,7 +1,7 @@
 @(key: String, status: Option[Boolean], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
 <div class="cmuk-flex infoRow">
-    <div class="infoRowLabel red">
+    <div class="infoRowLabel">
     @Messages(key)
     </div>
     <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
@@ -14,7 +14,7 @@
             }
         }
         case _ => {
-            @Messages(constants.View.UNSET)
+            @Messages(constants.View.PENDING)
         }
     }
     </div>

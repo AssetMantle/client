@@ -34,7 +34,7 @@
         } {
             <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
         } {
-
+            @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
         }
     }
 </div>

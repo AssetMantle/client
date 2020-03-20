@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.DeleteUBO
+
+@(deleteUBOForm: Form[DeleteUBO.Data] = DeleteUBO.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.DELETE_UBO, deleteUBOForm) {
+    @commonInputText(deleteUBOForm, constants.FormField.PERSON_NAME, 'readonly -> true)
+    @commonInputDouble(deleteUBOForm, constants.FormField.SHARE_PERCENTAGE, 'readonly -> true)
+    @commonInputText(deleteUBOForm, constants.FormField.RELATIONSHIP, 'readonly -> true)
+    @commonInputText(deleteUBOForm, constants.FormField.TITLE, 'readonly -> true)
+}

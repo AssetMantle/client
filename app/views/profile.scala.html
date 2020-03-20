@@ -38,6 +38,7 @@
             <div class="cmuk-width-expand@@m">
                 <div id="identificationDetails"></div>
             </div>
+
         </div>
         @loginState.userType match {
             case constants.User.USER => {
@@ -48,17 +49,13 @@
                     </div>
 
                     <div class="cmuk-width-expand@@m">
-                    @commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
-                    } {
-                        <div class="cmuk-position-center">
-                            @Messages(constants.View.UNAVAILABLE)
-                        </div>
-                    }
+                        <div id="userViewOrganizationUBOs"></div>
                     </div>
 
                 </div>
                 <script>
                     componentResource('userViewPendingRequests', jsRoutes.controllers.ComponentViewController.userViewPendingRequests());
+                    componentResource('userViewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.userViewOrganizationUBOs());
                 </script>
 
             }
@@ -91,9 +88,17 @@
                     </div>
 
                 </div>
+                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                    <div class="cmuk-width-expand@@m">
+                        <div id="viewOrganizationUBOs"></div>
+                    </div>
+
+                </div>
                 <script>
                     componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
                     componentResource('viewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.viewOrganizationBankAccountDetail());
+                    componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
                 </script>
             }
             case _ => {}
