@@ -26,7 +26,7 @@ object Form {
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
   val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
-  val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
+  val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail())
   val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest())
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
