@@ -281,7 +281,7 @@ class ComponentViewController @Inject()(
 
   def organizationViewTraderList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationid = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationid = masterOrganizations.Service.tryGetID(loginState.username)
 
       def tradersListInOrganization(organizationid: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationid)
 
@@ -296,7 +296,7 @@ class ComponentViewController @Inject()(
 
   def organizationViewTrader(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
       def verifyOrganizationTrader(organizationID: String): Future[Boolean] = masterTraders.Service.verifyOrganizationTrader(traderID = traderID, organizationID)
 
@@ -462,7 +462,7 @@ class ComponentViewController @Inject()(
 
   def acceptedTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID: Future[String] = masterTraders.Service.tryAndGetID(loginState.username)
+      val traderID: Future[String] = masterTraders.Service.tryGetID(loginState.username)
 
       def acceptedTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllAcceptedTraderRelation(traderID)
 
@@ -476,7 +476,7 @@ class ComponentViewController @Inject()(
 
   def pendingTraderRelationList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID: Future[String] = masterTraders.Service.tryAndGetID(loginState.username)
+      val traderID: Future[String] = masterTraders.Service.tryGetID(loginState.username)
 
       def receivedPendingTraderRelations(traderID: String): Future[Seq[TraderRelation]] = masterTraderRelations.Service.getAllReceivedPendingTraderRelation(traderID)
 
@@ -545,7 +545,7 @@ class ComponentViewController @Inject()(
         val fromTrader = masterTraders.Service.get(fromID)
         val toTrader = masterTraders.Service.getByAccountID(loginState.username)
 
-        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(trader1 = fromId, trader2 = toId)
+        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
 
         def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
 
@@ -564,7 +564,7 @@ class ComponentViewController @Inject()(
       val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
       val zoneID = masterZones.Service.getID(loginState.username)
 
-      def organizationBankAccountDetail(organizationZoneID: String, zoneID: String): Future[OrganizationBankAccountDetail] = if (organizationZoneID == zoneID) masterOrganizationBankAccountDetails.Service.tryAndGet(organizationID) else throw new BaseException(constants.Response.UNAUTHORIZED)
+      def organizationBankAccountDetail(organizationZoneID: String, zoneID: String): Future[OrganizationBankAccountDetail] = if (organizationZoneID == zoneID) masterOrganizationBankAccountDetails.Service.tryGet(organizationID) else throw new BaseException(constants.Response.UNAUTHORIZED)
 
       (for {
         organizationZoneID <- organizationZoneID
@@ -578,7 +578,7 @@ class ComponentViewController @Inject()(
 
   def viewOrganizationBankAccountDetail(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
       def organizationBankAccountDetail(organizationID: String): Future[Option[OrganizationBankAccountDetail]] = masterOrganizationBankAccountDetails.Service.get(organizationID)
 

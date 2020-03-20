@@ -89,7 +89,7 @@ class TraderController @Inject()(
 
   def acceptOrRejectTraderRelationForm(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderRelation = masterTraderRelations.Service.get(trader1 = fromID, trader2 = toID)
+      val traderRelation = masterTraderRelations.Service.get(fromID = fromID, toID = toID)
       (for {
         traderRelation <- traderRelation
       } yield Ok(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))).recover {
@@ -101,7 +101,7 @@ class TraderController @Inject()(
     implicit request =>
       views.companion.master.AcceptOrRejectTraderRelation.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderRelation = masterTraderRelations.Service.get(trader1 = formWithErrors(constants.FormField.FROM.name).value.get, trader2 = formWithErrors(constants.FormField.TO.name).value.get)
+          val traderRelation = masterTraderRelations.Service.get(fromID = formWithErrors(constants.FormField.FROM.name).value.get, toID = formWithErrors(constants.FormField.TO.name).value.get)
           (for {
             traderRelation <- traderRelation
           } yield BadRequest(views.html.component.master.acceptOrRejectTraderRelation(formWithErrors, traderRelation = traderRelation))
@@ -116,7 +116,7 @@ class TraderController @Inject()(
             masterTraderRelations.Service.markRejected(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
           }
 
-          def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(trader1 = acceptOrRejectTraderRelationData.fromID, trader2 = acceptOrRejectTraderRelationData.toID)
+          def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
 
           def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
 

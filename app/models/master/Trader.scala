@@ -214,7 +214,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
       } yield id.getOrElse(utilities.IDGenerator.hexadecimal)
     }
 
-    def tryAndGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+    def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
     def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
 
