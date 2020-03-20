@@ -89,7 +89,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userUpdateUBOsForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val id = masterOrganizations.Service.tryGetID(loginState.username)
 
       def getUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
@@ -110,7 +110,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Future(BadRequest(views.html.component.master.userUpdateUBOs(formWithErrors)))
         },
         updateUBOsData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def updateUBOs(id: String): Future[Int] = masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map(uboData => UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
 
@@ -131,9 +131,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def addOrUpdateOrganizationBankAccountDetailForm(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def getOrganizationBankAccountDetail(organizationID: String): Future[OrganizationBankAccountDetail] = masterOrganizationBankAccountDetails.Service.tryAndGet(organizationID)
+      def getOrganizationBankAccountDetail(organizationID: String): Future[OrganizationBankAccountDetail] = masterOrganizationBankAccountDetails.Service.tryGet(organizationID)
 
       (for {
         organizationID <- organizationID
@@ -152,7 +152,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Future(BadRequest(views.html.component.master.addOrganizationBankAccountDetail(formWithErrors)))
         },
         organizationBankAccountDetailData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def insertOrUpdate(id: String): Future[Int] = masterOrganizationBankAccountDetails.Service.insertOrUpdate(id = id, accountHolder = organizationBankAccountDetailData.accountHolder, nickName = organizationBankAccountDetailData.nickName, accountNumber = organizationBankAccountDetailData.accountNumber, bankName = organizationBankAccountDetailData.bankName, swiftAddress = organizationBankAccountDetailData.swiftAddress, address = organizationBankAccountDetailData.streetAddress, country = organizationBankAccountDetailData.country, zipCode = organizationBankAccountDetailData.zipCode)
 
@@ -170,7 +170,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userUploadOrUpdateOrganizationKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val id = masterOrganizations.Service.tryGetID(loginState.username)
 
       def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
@@ -209,7 +209,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userStoreOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
       def storeFile(organizationID: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
         name = name,
@@ -238,7 +238,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
       def getOldDocumentFileName(organizationID: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType)
 
@@ -311,7 +311,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
         },
         userReviewAddOrganizationRequestData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def checkAllKYCFileTypesExists(id: String): Future[Boolean] = masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)
 
@@ -570,7 +570,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def storeOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val id = masterOrganizations.Service.tryGetID(loginState.username)
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
         name = name,
@@ -592,7 +592,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryAndGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
       def oldDocumentFileName(organizationID: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType)
 
