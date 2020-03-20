@@ -28,7 +28,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def addOrganizationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organization = masterOrganizations.Service.tryAndGetByAccountID(loginState.username)
+      val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
       val zones = masterZones.Service.getAllVerified
       (for {
         organization <- organization
@@ -143,7 +143,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Future(BadRequest(views.html.component.master.userAddUBO(formWithErrors)))
         },
         userAddUBOData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
@@ -177,7 +177,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Future(BadRequest(views.html.component.master.addUBO(formWithErrors)))
         },
         addUBOData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
@@ -211,7 +211,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Future(BadRequest(views.html.component.master.userDeleteUBO(formWithErrors)))
         },
         userDeleteUBOData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
@@ -244,7 +244,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Future(BadRequest(views.html.component.master.deleteUBO(formWithErrors)))
         },
         deleteUBOData => {
-          val id = masterOrganizations.Service.tryAndGetID(loginState.username)
+          val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
@@ -404,7 +404,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userReviewAddOrganizationRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organization = masterOrganizations.Service.tryAndGetByAccountID(loginState.username)
+      val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
       def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
         val zone = masterZones.Service.get(organization.zoneID)
@@ -429,7 +429,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.UserReviewAddOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          val organization = masterOrganizations.Service.tryAndGetByAccountID(loginState.username)
+          val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
           def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
             val zone = masterZones.Service.get(organization.zoneID)
@@ -460,7 +460,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
-              val organization = masterOrganizations.Service.tryAndGetByAccountID(loginState.username)
+              val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
               def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
                 val zone = masterZones.Service.get(organization.zoneID)

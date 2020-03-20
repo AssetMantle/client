@@ -254,7 +254,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getOrNone(id: String): Future[Option[Organization]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
-    def tryAndGetByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map { organizationSerialized => organizationSerialized.deserialize }
+    def tryGetByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map { organizationSerialized => organizationSerialized.deserialize }
 
     def getByAccountID(accountID: String): Future[Option[Organization]] = findOrNoneByAccountID(accountID).map(_.map(_.deserialize))
 
