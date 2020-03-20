@@ -5,14 +5,16 @@
 
 @(chatWindows: Seq[ChatWindow], chatWindowParticipants: Seq[ChatWindowParticipant])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-@for(chatWindow <- chatWindows){
-    <div>
-        <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatWindow.id', 0))" title="@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString">@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
-    </div>
-}
-<div class="cmuk-card cmuk-card-default">
-    <div class="cmuk-card-body">
-        <div id="chatWindow">
+
+    @commonInfoBox(){
+    @for(chatWindow <- chatWindows){
+        <div class="chatList">
+            <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatWindow.id', 0))" title="@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString">@chatWindowParticipants.filter(_.chatWindowID==chatWindow.id).filterNot(_.accountID==loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
         </div>
+    }
+    <div id="chatWindow">
     </div>
-</div>
+    }
+    <script>
+            noActivity();
+    </script>
