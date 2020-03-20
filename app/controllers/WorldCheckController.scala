@@ -135,7 +135,7 @@ class WorldCheckController @Inject()(messagesControllerComponents: MessagesContr
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-/////////////////////////////////////////////////
+
 def uploadOrganizationWorldCheckFileForm(documentType: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
   Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.WorldCheckController.uploadOrganizationWorldCheckFile), utilities.String.getJsRouteFunction(routes.javascript.WorldCheckController.storeOrganizationWorldCheckFile), documentType, organizationID))
 }
@@ -246,7 +246,6 @@ def uploadOrganizationWorldCheckFileForm(documentType: String, organizationID: S
       }
   }
 
-  /////////////////////////////////////////////////
   def zoneAccessedOrganizationWorldCheckFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
