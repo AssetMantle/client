@@ -17,32 +17,10 @@
 } {
     @identification match {
         case Some(identification) => {
-            <div>
-                @commonTextInfo(constants.Form.NAME, Seq(identification.firstName, identification.lastName).mkString(" "))
-                @commonTextInfo(constants.Form.DATE_OF_BIRTH, identification.dateOfBirth.toString)
-                @commonTextInfo(constants.Form.ID_NUMBER, identification.idNumber)
-                @commonTextInfo(constants.Form.ID_TYPE, identification.idType)
-                @commonBooleanInfo(constants.View.STATUS, identification.verificationStatus)
-            </div>
-            <br>
-            <div>@Messages(constants.View.ID_PROOF): <br>
-                @accountKYC match {
-                    case Some(file) => {
-                        @component.master.commonDocumentViewer(file) {
-                            @routes.FileController.getAccountKYCFile(file.fileName, file.documentType)
-                        } {
-                            <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
-                        } {
-
-                        }
-                    }
-                    case None => {
-                        <div>
-                            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.userUploadOrUpdateIdentificationView())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
-                        </div>
-                    }
-                }
-            </div>
+            @commonHorizontalSwitcher(htmlItems = Map(
+                constants.View.DETAILS -> views.html.component.master.identificationInformation(identification),
+                constants.View.DOCUMENTS -> views.html.component.master.identificationDocuments(accountKYC)),
+            )
         }
         case None => {
             <div class="cmuk-position-center">

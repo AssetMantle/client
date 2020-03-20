@@ -28,20 +28,26 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def addOrganizationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
+      val organization = masterOrganizations.Service.getByAccountID(loginState.username)
       val zones = masterZones.Service.getAllVerified
+
+      def getResult(organization: Option[Organization], zones: Seq[Zone]): Future[Result] = {
+        organization match {
+          case Some(organization) => {
+            withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.registeredAddress.addressLine1, addressLine2 = organization.registeredAddress.addressLine2, landmark = organization.registeredAddress.landmark, city = organization.registeredAddress.city, country = organization.registeredAddress.country, zipCode = organization.registeredAddress.zipCode, phone = organization.registeredAddress.phone), postalAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.postalAddress.addressLine1, addressLine2 = organization.postalAddress.addressLine2, landmark = organization.postalAddress.landmark, city = organization.postalAddress.city, country = organization.postalAddress.country, zipCode = organization.postalAddress.zipCode, phone = organization.postalAddress.phone))), zones = zones))
+          }
+          case None => {
+            withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = zones))
+          }
+        }
+      }
+
       (for {
         organization <- organization
         zones <- zones
-        result <- withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.registeredAddress.addressLine1, addressLine2 = organization.registeredAddress.addressLine2, landmark = organization.registeredAddress.landmark, city = organization.registeredAddress.city, country = organization.registeredAddress.country, zipCode = organization.registeredAddress.zipCode, phone = organization.registeredAddress.phone), postalAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.postalAddress.addressLine1, addressLine2 = organization.postalAddress.addressLine2, landmark = organization.postalAddress.landmark, city = organization.postalAddress.city, country = organization.postalAddress.country, zipCode = organization.postalAddress.zipCode, phone = organization.postalAddress.phone))), zones = zones))
-      } yield result
-        ).recoverWith {
-        case _: BaseException =>
-          val zones = masterZones.Service.getAllVerified
-          for {
-            zones <- zones
-            result <- withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = zones))
-          } yield result
+        result <- getResult(organization = organization, zones = zones)
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -63,14 +69,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
               def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
-              (for {
+              for {
                 id <- id
                 organizationKYCs <- getOrganizationKYCs(id)
                 result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
               } yield result
-                ).recoverWith {
-                case _: BaseException => withUsernameToken.PartialContent(views.html.component.master.userAddOrUpdateUBOs())
-              }
             }
             else {
               Future(Unauthorized(views.html.profile(failures = Seq(constants.Response.UNVERIFIED_ZONE))))
@@ -157,7 +160,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             id <- id
             oldUBOs <- getOldUBOs(id)
             _ <- updateUBOs(id, oldUBOs)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_ADDED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -191,7 +194,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             id <- id
             oldUBOs <- getOldUBOs(id)
             _ <- updateUBOs(id, oldUBOs)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_ADDED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -216,7 +219,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filter{ubo => ubo.personName != userDeleteUBOData.personName && ubo.sharePercentage != userDeleteUBOData.sharePercentage && ubo.relationship != userDeleteUBOData.relationship && ubo.title != userDeleteUBOData.title}
+            val newUBOs = oldUBOs.data.filterNot( ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title) )
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -224,7 +227,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             id <- id
             oldUBOs <- getOldUBOs(id)
             _ <- updateUBOs(id, oldUBOs)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_DELETED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -234,7 +237,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def deleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
-      Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personName = personName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
+    Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personName = personName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
   }
 
   def deleteUBO(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -249,7 +252,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filter{ubo => ubo.personName != deleteUBOData.personName && ubo.sharePercentage != deleteUBOData.sharePercentage && ubo.relationship != deleteUBOData.relationship && ubo.title != deleteUBOData.title}
+            val newUBOs = oldUBOs.data.filterNot( ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title) )
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -257,7 +260,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             id <- id
             oldUBOs <- getOldUBOs(id)
             _ <- updateUBOs(id, oldUBOs)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_DELETED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
