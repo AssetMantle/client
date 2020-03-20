@@ -108,7 +108,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def trades: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def trades(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
         Ok(views.html.trades())

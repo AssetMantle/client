@@ -3,7 +3,7 @@
 @import views.html.base._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right))
+@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
     <div class="leftTradeFinancial">
@@ -14,11 +14,9 @@
 
 @center = {
     @if(loginState.userType == constants.User.TRADER){
-        <div class="cmuk-margin-top cmuk-margin-bottom">
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
-        </div>
         <div class="salesQuoteList">
         @commonCard(constants.View.SALES_QUOTE_LIST){
+            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
             <div class="salesQuoteCardHeader">
                 <ul class="cmuk-subnav" cmuk-switcher="connect: #salesQuoteTab; animation: cmuk-animation-fade">
                     <li><a href="#">@Messages(constants.View.BUY)</a></li>

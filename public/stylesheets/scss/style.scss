@@ -107,6 +107,9 @@ html, body{
   .cmuk-logo{
     padding: 0px 40px 0px 0px;
     border-right: 1px solid #1C5998;
+    img{
+      width: 110px;
+    }
   }
 
   .cmuk-navbar-right{
@@ -132,6 +135,7 @@ html, body{
   height: 30px;
   align-items: center;
   padding: 15px 0px;
+  word-break: break-all;
   justify-content: space-between;
   .backIcon{
     width: 31px;
@@ -422,7 +426,7 @@ margin-right: -5px;
     font-size: $paragraphFontSizeMedium;
   }
   .cmuk-card-body{
-    height:276px;
+    height:275px;
     padding:0px;
     overflow-y: auto;
     ul{
@@ -500,9 +504,12 @@ margin-right: -5px;
 .recentActivity{
   .recentActivityContainer{
     margin-bottom: 20px;
+    .cmuk-card-header{
+      padding:15px 20px;
+    }
     .cmuk-card-body{
       overflow-y: auto;
-      height: 278px;
+      height: 275px;
     }
   }
   .cmuk-card-default{
@@ -523,10 +530,17 @@ margin-right: -5px;
     }
   }
   .chatRoom .cmuk-card-body{
-    height: 380px;
-
+    height: 360px;
+    .chatList{
+      padding: 5px 0px;
+      button
+      {
+        padding: 5px 10px;
+        margin: 0px 5px;
+      }
+    }
     .chatMessages{
-      height: 300px;
+      height: 250px;
       overflow: auto;
     }
 
@@ -636,6 +650,7 @@ header:before,
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
+  margin: 10px 0px;
   transition: all 0.4s ease;
   &:before {
     content: "";
@@ -1002,6 +1017,16 @@ header:before,
       margin-bottom: 0px;
       color: #848A91;
       font-weight: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width:120px;
+    }
+    button{
+        a, a:hover{
+          text-decoration: none;
+          color:#fff;
+        }
     }
   }
 }
@@ -1023,7 +1048,6 @@ header:before,
     text-align: center;
     font-size:$paragraphFontSizeSmall;
     font-weight: bold;
-    font-family: arial;
     transform: rotate(-45deg);
     display:block;
   }
@@ -1032,11 +1056,15 @@ header:before,
 .salesQuoteList, .tradeList {
   margin-bottom: 20px;
   .cmuk-card-header{
-    padding-bottom: 0px;
+    padding:0px 15px;
   }
   .cmuk-card-body{
-    height: 280px;
+    height: 275px;
     overflow: auto;
+    padding: 0px;
+    ul{
+      padding: 15px 20px;
+    }
   }
   .salesQuoteCardHeader, .tradeCardHeader {
     .cmuk-subnav {
@@ -1046,8 +1074,7 @@ header:before,
       padding:0px 30px;
     }
     .cmuk-subnav li a{
-      margin: 3px 0px 0px 0px ;
-      padding-bottom: 13px;
+      padding: 15px;
       font-size: $paragraphFontSizeMedium;
       font-family: $fontFamilySecondary;
     }

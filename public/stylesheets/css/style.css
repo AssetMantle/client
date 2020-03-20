@@ -19,9 +19,9 @@
   .leftTradeFinancial .cmuk-card-header {
     padding: 10px 15px;
     font-size: 12px; }
-  .leftTradeFinancial .cmuk-card-body {
+  .leftTradeFinancial .financial .cmuk-card-body {
     height: 210px; }
-    .leftTradeFinancial .cmuk-card-body .refresh {
+    .leftTradeFinancial .financial .cmuk-card-body .refresh {
       font-size: 10px; }
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
@@ -41,17 +41,19 @@
   .leftTradeFinancial .docView .cmuk-card-header, .leftTradeFinancial .docView .cmuk-card-body, .leftTradeFinancial .docView .documentlist {
     padding: 0px; }
   .leftTradeFinancial .docView .cmuk-card-body {
-    height: 270px; }
+    height: 300px; }
 
   .recentActivity .recentActivityContainer {
-    margin-bottom: 20px; }
+    margin-bottom: 15px; }
     .recentActivity .recentActivityContainer .cmuk-card-body {
       height: 210px; }
     .recentActivity .recentActivityContainer .cmuk-card-header {
       padding: 10px 15px;
       font-size: 12px; }
-  .recentActivity .chatContainer .cmuk-card-body .chat_history ul {
-    height: 246px; }
+  .recentActivity .chatRoom .cmuk-card-body {
+    height: 300px; }
+    .recentActivity .chatRoom .cmuk-card-body .chatMessages {
+      height: 190px; }
 
   .timeline {
     margin: 20px 0px; } }
@@ -156,6 +158,8 @@ html, body {
   .header .cmuk-logo {
     padding: 0px 40px 0px 0px;
     border-right: 1px solid #1C5998; }
+    .header .cmuk-logo img {
+      width: 110px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
     padding: 0px 25px;
     border-left: 1px solid #1C5998; }
@@ -173,6 +177,7 @@ html, body {
   height: 30px;
   align-items: center;
   padding: 15px 0px;
+  word-break: break-all;
   justify-content: space-between; }
   .left .backIcon {
     width: 31px;
@@ -393,7 +398,7 @@ html, body {
   color: #636363;
   font-size: 1.3rem; }
 .leftTradeFinancial .cmuk-card-body {
-  height: 276px;
+  height: 275px;
   padding: 0px;
   overflow-y: auto; }
   .leftTradeFinancial .cmuk-card-body ul {
@@ -440,9 +445,11 @@ html, body {
 
 .recentActivity .recentActivityContainer {
   margin-bottom: 20px; }
+  .recentActivity .recentActivityContainer .cmuk-card-header {
+    padding: 15px 20px; }
   .recentActivity .recentActivityContainer .cmuk-card-body {
     overflow-y: auto;
-    height: 278px; }
+    height: 275px; }
 .recentActivity .cmuk-card-default {
   background: #FAFAFA;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -457,9 +464,14 @@ html, body {
   .recentActivity .cmuk-card-body .mCS-minimal-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
     background-color: #053C75; }
 .recentActivity .chatRoom .cmuk-card-body {
-  height: 380px; }
+  height: 360px; }
+  .recentActivity .chatRoom .cmuk-card-body .chatList {
+    padding: 5px 0px; }
+    .recentActivity .chatRoom .cmuk-card-body .chatList button {
+      padding: 5px 10px;
+      margin: 0px 5px; }
   .recentActivity .chatRoom .cmuk-card-body .chatMessages {
-    height: 300px;
+    height: 250px;
     overflow: auto; }
   .recentActivity .chatRoom .cmuk-card-body .chatform .sendFormField {
     position: relative; }
@@ -545,6 +557,7 @@ header:before,
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
+  margin: 10px 0px;
   transition: all 0.4s ease; }
   .timeline:before {
     content: "";
@@ -850,7 +863,14 @@ header:before,
     .commonList .listItemChild .listItemChildValue {
       margin-bottom: 0px;
       color: #848A91;
-      font-weight: normal; }
+      font-weight: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 120px; }
+    .commonList .listItemChild button a, .commonList .listItemChild button a:hover {
+      text-decoration: none;
+      color: #fff; }
 
 .accountName {
   position: absolute;
@@ -869,24 +889,25 @@ header:before,
     text-align: center;
     font-size: 1.2rem;
     font-weight: bold;
-    font-family: arial;
     transform: rotate(-45deg);
     display: block; }
 
 .salesQuoteList, .tradeList {
   margin-bottom: 20px; }
   .salesQuoteList .cmuk-card-header, .tradeList .cmuk-card-header {
-    padding-bottom: 0px; }
+    padding: 0px 15px; }
   .salesQuoteList .cmuk-card-body, .tradeList .cmuk-card-body {
-    height: 280px;
-    overflow: auto; }
+    height: 275px;
+    overflow: auto;
+    padding: 0px; }
+    .salesQuoteList .cmuk-card-body ul, .tradeList .cmuk-card-body ul {
+      padding: 15px 20px; }
   .salesQuoteList .salesQuoteCardHeader .cmuk-subnav, .salesQuoteList .tradeCardHeader .cmuk-subnav, .tradeList .salesQuoteCardHeader .cmuk-subnav, .tradeList .tradeCardHeader .cmuk-subnav {
     margin: 0px; }
   .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > *, .salesQuoteList .tradeCardHeader .cmuk-subnav > *, .tradeList .salesQuoteCardHeader .cmuk-subnav > *, .tradeList .tradeCardHeader .cmuk-subnav > * {
     padding: 0px 30px; }
   .salesQuoteList .salesQuoteCardHeader .cmuk-subnav li a, .salesQuoteList .tradeCardHeader .cmuk-subnav li a, .tradeList .salesQuoteCardHeader .cmuk-subnav li a, .tradeList .tradeCardHeader .cmuk-subnav li a {
-    margin: 3px 0px 0px 0px;
-    padding-bottom: 13px;
+    padding: 15px;
     font-size: 1.3rem;
     font-family: "Oxygen", sans-serif; }
   .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active {
