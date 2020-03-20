@@ -50,7 +50,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
           def verifyEmailAddress = masterContacts.Service.verifyEmailAddress(loginState.username)
 
-          def contact: Future[Contact] = masterContacts.Service.getOrNoneContact(loginState.username).map { contact => contact.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+          def contact: Future[Contact] = masterContacts.Service.get(loginState.username).map { contact => contact.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
           def updateStatus(contact: Contact): Future[Int] = {
             if (contact.emailAddressVerified && contact.mobileNumberVerified) {

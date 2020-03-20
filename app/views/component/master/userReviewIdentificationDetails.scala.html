@@ -4,12 +4,28 @@
 @import models.master.Identification
 @import views.companion.master.UserReviewIdentificationDetails
 @import views.html.base._
-@import views.html.component.master.identificationDetails
 
 @(userIdentificationCompletionForm: Form[UserReviewIdentificationDetails.Data] = UserReviewIdentificationDetails.form, identification: Identification, accountKYC: AccountKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 
 @commonForm(constants.Form.REVIEW_IDENTIFICATION_ON_COMPLETION, userIdentificationCompletionForm) {
-    @identificationDetails(identification = Option(identification), accountKYC = Option(accountKYC))
+    <div>
+        @commonTextInfo(constants.Form.FIRST_NAME, identification.firstName)
+        @commonTextInfo(constants.Form.LAST_NAME, identification.lastName)
+        @commonTextInfo(constants.Form.DATE_OF_BIRTH, identification.dateOfBirth.toString)
+        @commonTextInfo(constants.Form.ID_NUMBER, identification.idNumber)
+        @commonTextInfo(constants.Form.ID_TYPE, identification.idType)
+        @commonBooleanInfo(constants.View.STATUS, identification.verificationStatus)
+    </div>
+    <br>
+    <div>@Messages(constants.View.ID_PROOF): <br>
+        @component.master.commonDocumentViewer(accountKYC) {
+            @routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)
+        } {
+            <a href="@routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)">@Messages(accountKYC.documentType)</a>
+        } {
+
+        }
+    </div>
     @commonCheckbox(userIdentificationCompletionForm, constants.FormField.COMPLETION)
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userUploadOrUpdateIdentificationView())">@Messages(constants.Form.BACK)</button>
 }

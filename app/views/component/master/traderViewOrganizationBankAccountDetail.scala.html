@@ -5,9 +5,6 @@
 @(organizationBankAccountDetail: Option[OrganizationBankAccountDetail])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
-    @if(organizationBankAccountDetail.isDefined) {
-        <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL.legend)</button>
-    }
 } {
     @organizationBankAccountDetail match {
         case Some(organizationBankAccountDetail) => {
@@ -22,7 +19,7 @@
         }
         case _ => {
             <div class="cmuk-position-center">
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL.legend)</button>
+            @Messages(constants.View.BANK_ACCOUNT_NOT_FOUND)
             </div>
         }
     }
