@@ -26,7 +26,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.AddOrganizationController.addOrganizationForm,
         routes.javascript.AddOrganizationController.userUpdateUBOsForm,
-        routes.javascript.AddOrganizationController.organizationBankAccountDetailForm,
+        routes.javascript.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm,
         routes.javascript.AddOrganizationController.userUploadOrUpdateOrganizationKYCView,
         routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,
         routes.javascript.AddOrganizationController.userUploadOrganizationKYC,
@@ -35,7 +35,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.userUpdateOrganizationKYC,
         routes.javascript.AddOrganizationController.userReviewAddOrganizationRequestForm,
         routes.javascript.AddOrganizationController.viewPendingVerifyOrganizationRequests,
-        routes.javascript.AddOrganizationController.viewOrganizationVerificationBankAccountDetail,
         routes.javascript.AddOrganizationController.viewKYCDocuments,
         routes.javascript.AddOrganizationController.updateOrganizationKYCDocumentStatusForm,
         routes.javascript.AddOrganizationController.verifyOrganizationForm,
@@ -111,6 +110,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.acceptedTraderRelation,
         routes.javascript.ComponentViewController.pendingSentTraderRelation,
         routes.javascript.ComponentViewController.pendingReceivedTraderRelation,
+        routes.javascript.ComponentViewController.viewOrganizationBankAccountDetail,
+        routes.javascript.ComponentViewController.traderViewOrganizationBankAccountDetail,
+        routes.javascript.ComponentViewController.zoneViewOrganizationBankAccountDetail,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
