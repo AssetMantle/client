@@ -7,7 +7,7 @@
 
 @(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')" >@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')" >@Messages(constants.View.LOAD_MORE_CHATS)</a></div>
     @for(chat <- chats.reverse) {
         @if(chat.fromAccountID == loginState.username) {
             <li class="sender chatMessage">
@@ -29,7 +29,6 @@
                 <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
             </li>
         } else {
-            @* unread bar for viewer logic here _.chatid == chatid, to account == loginstate, read at time ==nondefining, show unread messages.*@
             <li class="receiver chatMessage">
                 <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
                 <div class="patner" onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">

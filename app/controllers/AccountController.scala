@@ -132,7 +132,7 @@ class AccountController @Inject()(
           val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = loginData.pushNotificationToken)
           for {
             _ <- pushNotificationTokenUpdate
-          } yield utilitiesNotification.createNotificationAndSend(loginData.username, None,constants.Notification.LOGIN, loginData.username)
+          } yield utilitiesNotification.createNotificationAndSend(loginData.username, None, constants.Notification.LOGIN, loginData.username)
         }
 
         def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
@@ -226,7 +226,10 @@ class AccountController @Inject()(
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
-          } yield shutdownActorsAndGetResult).recover {
+          } yield {
+            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.LOG_OUT, loginState.username)
+            shutdownActorsAndGetResult
+          }).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

@@ -218,7 +218,10 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             id <- id
             allKYCFileTypesExists <- allKYCFileTypesExists(id)
             result <- markZoneFormCompletedAndGetResult(id, allKYCFileTypesExists)
-          } yield result
+          } yield {
+            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.ADD_ZONE_REQUESTED, loginState.username)
+            result
+          }
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -260,15 +263,20 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
                 zoneAccountAddress <- zoneAccountAddress(accountID)
                 _ <- transactionProcess(zoneAccountAddress)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
-              } yield result
+              } yield {
+                utilitiesNotification.createNotificationAndSend(accountID, None, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
+                result
+              }
             } else Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
           }
 
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
             result <- processTransactionAndGetResult(allKYCFilesVerified)
-          } yield result
-            ).recover {
+          } yield {
+            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
+            result
+          }).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

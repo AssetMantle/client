@@ -66,10 +66,10 @@ class TraderController @Inject()(
           }
 
           def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization): Future[Result] = {
-            utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
-            utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
-            utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
-            utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
+            utilitiesNotification.createNotificationAndSend(fromTrader.accountID, None, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
+            utilitiesNotification.createNotificationAndSend(fromTraderOrganization.accountID, None, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
+            utilitiesNotification.createNotificationAndSend(toTrader.accountID, None, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
+            utilitiesNotification.createNotificationAndSend(toTraderOrganization.accountID, None, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
             withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFUL)))
           }
 
@@ -124,15 +124,15 @@ class TraderController @Inject()(
 
           def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization, traderRelation: TraderRelation): Future[Result] = {
             if (acceptOrRejectTraderRelationData.status) {
-              utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
-              utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(fromTrader.accountID, None, constants.Notification.TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(fromTraderOrganization.accountID, None, constants.Notification.ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(toTrader.accountID, None, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(toTraderOrganization.accountID, None, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
             } else {
-              utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
-              utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
-              utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(fromTrader.accountID, None, constants.Notification.TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(fromTraderOrganization.accountID, None, constants.Notification.ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(toTrader.accountID, None, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
+              utilitiesNotification.createNotificationAndSend(toTraderOrganization.accountID, None, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
             }
             withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))
           }

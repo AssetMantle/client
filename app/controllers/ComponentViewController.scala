@@ -153,7 +153,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def payableReceivable: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderFinancials: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
       val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
@@ -182,7 +182,7 @@ class ComponentViewController @Inject()(
         negotiations <- negotiations
         orders <- orders(negotiations)
         getFiatsInOrders <- getFiatsInOrders(orders.map(_.id))
-      } yield Ok(views.html.component.master.payableReceivable(walletBalance(fiatPegWallet), getPayable(getNegotiationsOfOrders(negotiations, orders), getFiatsInOrders), getReceivable(getNegotiationsOfOrders(negotiations, orders))))
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance(fiatPegWallet), getPayable(getNegotiationsOfOrders(negotiations, orders), getFiatsInOrders), getReceivable(getNegotiationsOfOrders(negotiations, orders))))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -283,7 +283,6 @@ class ComponentViewController @Inject()(
 
   def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-//      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * limit, limit)
       val organizationID = masterOrganizations.Service.getID(loginState.username)
       def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
       def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber*limit, limit)

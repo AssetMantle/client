@@ -14,7 +14,22 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTradeRooms: master.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: master.Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                     utilitiesNotification: utilities.Notification,
+                                     transaction: utilities.Transaction,
+                                     masterAccounts: master.Accounts,
+                                     masterTransactionSalesQuotes: masterTransaction.SalesQuotes,
+                                     masterTradeRooms: master.TradeRooms,
+                                     masterTransactionTradeTerms: masterTransaction.TradeTerms,
+                                     withTraderLoginAction: WithTraderLoginAction,
+                                     withZoneLoginAction: WithZoneLoginAction,
+                                     transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
+                                     blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
+                                     accounts: master.Accounts,
+                                     blockchainACLAccounts: blockchain.ACLAccounts,
+                                     blockchainZones: blockchain.Zones,
+                                     blockchainNegotiations: blockchain.Negotiations,
+                                     withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -265,7 +280,10 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
               salesQuote <- salesQuote
               _ <- createTradeTerms(tradeRoomID, salesQuote)
               result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SALES_QUOTE_CREATED)))
-            } yield result
+            } yield {
+              utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.SALES_QUOTE_CREATED, loginState.username)
+              result
+            }
           } else {
             val salesQuote = masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
             for {

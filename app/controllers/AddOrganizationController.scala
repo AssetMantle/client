@@ -348,7 +348,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             id <- id
             allKYCFileTypesExists <- checkAllKYCFileTypesExists(id)
             result <- markOrganizationFormCompletedAndGetResult(id, allKYCFileTypesExists)
-          } yield result).recover {
+          } yield {
+            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.ADD_ORGANIZATION_REQUESTED, loginState.username)
+            result
+          }).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }
@@ -389,7 +392,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 organizationAccountAddress <- organizationAccountAddress(accountId)
                 _ <- transactionProcess(organizationAccountAddress)
                 result <- withUsernameToken.Ok(views.html.zoneRequest(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
-              } yield result
+              } yield {
+                utilitiesNotification.createNotificationAndSend(accountId, None, constants.Notification.ADD_ORGANIZATION_CONFIRMED, accountId)
+                result
+              }
             } else {
               Future(PreconditionFailed(views.html.zoneRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
@@ -398,7 +404,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
             result <- processTransactionAndGetResult(allKYCFilesVerified)
-          } yield result
+          } yield {
+            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.ADD_ORGANIZATION_CONFIRMED, loginState.username)
+            result
+          }
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }

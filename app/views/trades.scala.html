@@ -7,7 +7,7 @@
 
 @left = {
     <div class="leftTradeFinancial">
-    <div id="payableReceivable"></div>
+    <div id="traderFinancials"></div>
     <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
     </div>
 }
@@ -76,7 +76,7 @@
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
-                componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+                componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
 
             }
         @if(loginState.userType == constants.User.ORGANIZATION){
@@ -85,6 +85,6 @@
 </script>
 <script type="text/javascript">
         var fiatCometMessage = function (event) {
-            componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
         }
 </script>
