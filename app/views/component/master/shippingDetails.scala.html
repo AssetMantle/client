@@ -4,7 +4,7 @@
 
 @(shippingDetailsForm: Form[ShippingDetails.Data] = ShippingDetails.form, requestID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SHIPPING_DETAILS, shippingDetailsForm) {
-    @commonInputText(shippingDetailsForm, constants.FormField.REQUEST_ID, 'value ->requestID, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(shippingDetailsForm, constants.FormField.REQUEST_ID, 'value ->requestID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputInt(shippingDetailsForm, constants.FormField.SHIPPING_PERIOD)
     @commonInputText(shippingDetailsForm, constants.FormField.PORT_OF_LOADING)
     @commonInputText(shippingDetailsForm, constants.FormField.PORT_OF_DISCHARGE)

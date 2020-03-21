@@ -21,8 +21,6 @@
     font-size: 12px; }
   .leftTradeFinancial .financial .cmuk-card-body {
     height: 210px; }
-    .leftTradeFinancial .financial .cmuk-card-body .refresh {
-      font-size: 10px; }
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
   .leftTradeFinancial .financial .cmuk-comment-meta, .leftTradeFinancial .financial .ctitle {
@@ -84,6 +82,7 @@
   border-right: 1px solid white; }
 
 html, body {
+  overflow: overlay;
   height: 100%;
   background: #F0F0F0;
   font-size: 61.5%; }
@@ -161,12 +160,18 @@ html, body {
   .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
     padding: 0px 25px;
     border-left: 1px solid #1C5998; }
+  .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
+    background-color: #FE4350;
+    font-size: 1.2rem;
+    color: #FFFFFF; }
   .header .cmuk-navbar-right .cmuk-navbar-nav li:last-child a {
     padding-right: 0px; }
   .header .cmuk-navbar-nav > li > a {
+    padding: 0px 20px;
     font-weight: bold;
     color: #FFFFFF;
-    font-size: 1.2rem; }
+    font-size: 1.2rem;
+    box-sizing: border-box; }
   .header .icon {
     width: 17px;
     height: 15px;
@@ -174,6 +179,12 @@ html, body {
     margin-right: 5px; }
   .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {
     color: #FFFFFF; }
+  .header .cmuk-navbar-nav > li > a.active {
+    color: #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    padding-top: 3px; }
+    .header .cmuk-navbar-nav > li > a.active .icon {
+      fill: red; }
 
 .left {
   height: 30px;
@@ -410,10 +421,14 @@ html, body {
     padding: 0px;
     margin: 0px; }
   .leftTradeFinancial .cmuk-card-body .refresh {
-    padding: 0px 0px 10px 0px;
+    padding: 5px 0px 10px 0px;
     margin: 0px 15px;
     color: #848A91;
     font-size: 1.3rem; }
+    .leftTradeFinancial .cmuk-card-body .refresh .refreshIcon .icon {
+      width: 12px;
+      height: 12px;
+      margin-right: 5px; }
 .leftTradeFinancial .financial ul li {
   justify-content: space-between;
   border-bottom: 1px solid #E2E4E6;
@@ -609,7 +624,8 @@ header:before,
       -moz-border-radius: 50%;
       -ms-border-radius: 50%;
       border-radius: 50%; }
-    .timeline .timeline-item .timeline-icon img {
+    .timeline .timeline-item .timeline-icon .icon {
+      fill: #0862BE;
       position: absolute;
       top: 0;
       left: 0;
@@ -745,12 +761,6 @@ header:before,
       font-size: 1.2rem;
       font-family: "Rubik", sans-serif; }
 
-.footerContainer {
-  padding: 15px;
-  text-align: center;
-  background: #053C75;
-  margin-top: 30px; }
-
 .fixedElement {
   background-color: #c0c0c0;
   position: fixed;
@@ -884,7 +894,7 @@ header:before,
       color: #4B4B4B; }
     .commonList .listItemChild .listItemChildValue {
       margin-bottom: 0px;
-      color: #848A91;
+      color: #272829;
       font-weight: normal;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -917,7 +927,8 @@ header:before,
 .salesQuoteList, .tradeList {
   margin-bottom: 20px; }
   .salesQuoteList .cmuk-card-header, .tradeList .cmuk-card-header {
-    padding: 0px 15px; }
+    padding: 0px 15px;
+    font-family: "Oxygen", sans-serif; }
   .salesQuoteList .cmuk-card-body, .tradeList .cmuk-card-body {
     height: 275px;
     overflow: auto;
@@ -930,7 +941,7 @@ header:before,
     padding: 0px 30px; }
   .salesQuoteList .salesQuoteCardHeader .cmuk-subnav li a, .salesQuoteList .tradeCardHeader .cmuk-subnav li a, .tradeList .salesQuoteCardHeader .cmuk-subnav li a, .tradeList .tradeCardHeader .cmuk-subnav li a {
     padding: 15px;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-family: "Oxygen", sans-serif; }
   .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active {
     border-bottom: 2px solid #0862BE; }

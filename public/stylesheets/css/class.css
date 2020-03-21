@@ -108,7 +108,13 @@
     display: flex; } }
 .bannerContainer {
   background: #031221;
-  height: 363px; }
+  height: 363px;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center; }
   .bannerContainer .bannerText {
     width: 600px;
     padding: 50px 0px; }
@@ -128,6 +134,36 @@
     margin-left: auto; }
     .bannerContainer .bannerImage img {
       margin-top: -13px; }
+  .bannerContainer .cmuk-slider {
+    position: absolute;
+    bottom: 0px; }
+    .bannerContainer .cmuk-slider .cmuk-slider-items {
+      height: 37.63px;
+      align-items: center; }
+      .bannerContainer .cmuk-slider .cmuk-slider-items li:before {
+        content: ' ';
+        position: absolute;
+        width: 0px;
+        height: 0px;
+        left: -20px;
+        top: 7px;
+        border: 3px solid red;
+        transform: rotate(-45deg); }
+      .bannerContainer .cmuk-slider .cmuk-slider-items li span {
+        font-size: 1.2rem;
+        line-height: 172%;
+        letter-spacing: 0.01em; }
+      .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemName {
+        font-weight: bold;
+        color: #6C7883;
+        font-family: "Oxygen", sans-serif; }
+      .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemValue {
+        font-weight: bold;
+        color: #FFFFFF;
+        font-family: "Rubik", sans-serif; }
+      .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
+        color: #5EB55C;
+        font-family: "Oxygen", sans-serif; }
 
 .cmuk-button-primary {
   background-color: #0862BE !important; }
@@ -135,10 +171,10 @@
 .cmuk-legend {
   font-weight: bold;
   font-family: "Oxygen", sans-serif;
-  font-size: 1.2rem !important; }
+  font-size: 1.7rem !important; }
 
 .bannerButtons button {
-  font-size: 1.2rem;
+  font-size: 1.7rem;
   margin-right: 20px; }
 .bannerButtons .cmuk-button-default,
 .bannerButtons .cmuk-button-default:focus,
@@ -147,42 +183,36 @@
   color: #FFFFFF;
   background-color: transparent; }
 
-.cmuk-slider {
-  background: rgba(8, 98, 190, 0.06); }
-  .cmuk-slider .cmuk-slider-items {
-    height: 37.63px;
-    align-items: center; }
-    .cmuk-slider .cmuk-slider-items li span {
-      font-size: 1.2rem;
-      line-height: 172%;
-      letter-spacing: 0.01em; }
-    .cmuk-slider .cmuk-slider-items li .sliderItemName {
-      font-weight: bold;
-      color: #6C7883; }
-    .cmuk-slider .cmuk-slider-items li .sliderItemValue {
-      font-weight: bold;
-      color: #262525; }
-    .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
-      color: #5EB55C; }
-
 .headingSection p {
   font-family: "Oxygen", sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.9rem;
   line-height: 212%;
   text-align: center;
   letter-spacing: 0.01em;
   color: #59616A; }
 
-.tabsSection {
-  background: #EBF2F9; }
-  .tabsSection h2 {
+.tabsSection h2 {
+  font-family: "Oxygen", sans-serif;
+  font-weight: bold;
+  font-size: 2.2rem;
+  line-height: 153%;
+  letter-spacing: 0.01em;
+  color: #262525; }
+.tabsSection .cmuk-subnav-pill {
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+  border-radius: 5px 5px 0px 0px; }
+  .tabsSection .cmuk-subnav-pill li a {
+    padding: 10px 16px;
     font-family: "Oxygen", sans-serif;
-    padding-bottom: 50px;
-    font-weight: bold;
-    font-size: 2.2rem;
-    line-height: 153%;
-    letter-spacing: 0.01em;
-    color: #262525; }
+    font-size: 1.5rem;
+    color: #0862BE;
+    font-weight: bold; }
+.tabsSection .cmuk-subnav-pill > .cmuk-active > a {
+  background: #053C75;
+  color: #FFFFFF; }
+.tabsSection .cmuk-switcher li {
+  font-family: "Oxygen", sans-serif;
+  font-size: 1.7rem; }
 
 .verticalDataTabs {
   width: 214px; }
@@ -200,7 +230,7 @@
 .verticalDataTabsData p {
   font-family: "Oxygen", sans-serif;
   padding: 20px 20px;
-  font-size: 1.2rem;
+  font-size: 1.7rem;
   font-weight: normal;
   line-height: 182%;
   letter-spacing: 0.01em;
@@ -231,7 +261,7 @@
     border-radius: 3px;
     text-transform: capitalize;
     height: 45px;
-    font-size: 1.2rem;
+    font-size: 1.7rem;
     line-height: 172%;
     text-align: center;
     letter-spacing: 0.01em;
@@ -277,7 +307,7 @@
   opacity: 1; }
 
 .headerFontSize {
-  font-size: 1.2rem; }
+  font-size: 1.3rem; }
 
 .profileAcl {
   display: flex;
@@ -616,6 +646,7 @@ dl .info:after {
   margin-top: 20px;
   width: 100%;
   padding: 30px 0px;
+  font-size: 1.2rem;
   background: #031221; }
   .footer .footer a {
     color: #149f98; }
@@ -759,7 +790,7 @@ dl .info:after {
     font-style: normal;
     margin-left: 30px;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.7rem;
     line-height: 23px;
     color: #71757A; }
   .dashboardContainer .left .cmuk-nav-default > li.cmuk-active > a {
@@ -979,12 +1010,6 @@ input:checked + .slider {
   background: #e6e6e6;
   width: 100px;
   color: red; }
-
-.cmuk-navbar-nav > li > a.active {
-  color: #343C44;
-  border-bottom: 3px solid #FFFFFF; }
-  .cmuk-navbar-nav > li > a.active .icon {
-    fill: red; }
 
 .infoRow {
   line-height: 1.8;

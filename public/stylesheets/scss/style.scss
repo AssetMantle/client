@@ -24,6 +24,7 @@
   border-right: 1px solid white;
 }
 html, body{
+  overflow: overlay;
   height: 100%;
   background: #F0F0F0;
   font-size: 61.5%;
@@ -86,8 +87,6 @@ html, body{
 .secondaryFont{
   font-family:$fontFamilySecondary;
 }
-
-
 .header {
   background: #053C75;
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
@@ -115,15 +114,23 @@ html, body{
       padding:0px 25px;
       border-left: 1px solid #1C5998;
     }
-    .cmuk-navbar-nav li:last-child a{
-      padding-right: 0px;;
+    .cmuk-navbar-nav {
+      .buttonRegister{
+        background-color: #FE4350;
+        font-size: 1.2rem;
+        color: #FFFFFF;
+      }
+      li:last-child a {
+        padding-right: 0px;;
+      }
     }
-
   }
   .cmuk-navbar-nav>li>a{
+    padding:0px 20px;
     font-weight: bold;
     color: #FFFFFF;
     font-size:$paragraphFontSizeSmall;
+    box-sizing: border-box;
   }
   .icon {
     width: 17px;
@@ -133,6 +140,14 @@ html, body{
   }
   .cmuk-navbar-nav>li:hover>a, .cmuk-navbar-nav>li>a.cmuk-open, .cmuk-navbar-nav>li>a:focus{
     color: #FFFFFF;
+  }
+  .cmuk-navbar-nav>li>a.active{
+    color: #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    padding-top: 3px;
+    .icon {
+      fill: red;
+    }
   }
 }
 .left{
@@ -407,7 +422,6 @@ margin-right: -5px;
     }
   }
 
-
   .rightSide{
     height: 100%;
     width:24%;
@@ -441,10 +455,17 @@ margin-right: -5px;
       margin: 0px;
     }
     .refresh{
-      padding: 0px 0px 10px 0px;
+      padding: 5px 0px 10px 0px;
       margin: 0px 15px;
       color: #848A91;
       font-size: $paragraphFontSizeMedium;
+      .refreshIcon{
+        .icon{
+          width: 12px;
+          height: 12px;
+          margin-right: 5px;
+        }
+      }
     }
 
   }
@@ -712,7 +733,8 @@ header:before,
       -moz-border-radius: 50%;
       -ms-border-radius: 50%;
       border-radius: 50%; }
-    .timeline-icon img {
+    .timeline-icon .icon {
+      fill:#0862BE;
       position: absolute;
       top: 0;
       left: 0;
@@ -883,12 +905,7 @@ header:before,
     }
   }
 }
-.footerContainer{
-  padding:15px;
-  text-align: center;
-  background: #053C75;
-  margin-top: 30px;
-}
+
 .fixedElement {
   background-color: #c0c0c0;
   position:fixed;
@@ -1047,7 +1064,7 @@ header:before,
     }
     .listItemChildValue{
       margin-bottom: 0px;
-      color: #848A91;
+      color: #272829;
       font-weight: normal;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1089,6 +1106,7 @@ header:before,
   margin-bottom: 20px;
   .cmuk-card-header{
     padding:0px 15px;
+    font-family: $fontFamilySecondary;
   }
   .cmuk-card-body{
     height: 275px;
@@ -1107,7 +1125,7 @@ header:before,
     }
     .cmuk-subnav li a{
       padding: 15px;
-      font-size: $paragraphFontSizeMedium;
+      font-size: $paragraphFontSizeSmall;
       font-family: $fontFamilySecondary;
     }
 

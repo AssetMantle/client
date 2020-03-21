@@ -70,12 +70,12 @@
                         case null => {
                             <li>
                                 <a onclick="getForm(jsRoutes.controllers.AccountController.noteAndVerifyMnemonic())">
-                                @Messages(constants.Form.SIGN_UP.legend)
+                                    <button class="cmuk-button buttonRegister">@Messages(constants.Form.SIGN_UP.legend)</button>
                                 </a>
                             </li>
                             <li>
                                 <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
-                                    <button class="cmuk-button cmuk-button-primary">@Messages(constants.Form.LOGIN.legend)</button>
+                                    @Messages(constants.Form.LOGIN.legend)
                                 </a>
                             </li>
                             <a class="cmuk-navbar-toggle cmuk-hidden@@m" cmuk-toggle="target: #offcanvas-flip" cmuk-navbar-toggle-icon href="#"></a>
@@ -167,59 +167,51 @@
                     <div class="pageContainer">
                     @loginState match {
                         case null => {
-                            <div class="bannerContainer">
-                                <div class="cmuk-container cmuk-flex">
+                            <div class="bannerContainer cmuk-container">
                                     <div class="bannerText">
                                         <h2>@Messages(constants.View.INDEX_1)</h2>
                                         <p>@Messages(constants.View.INDEX_2)</p>
-                                        <div class="bannerButtons cmuk-flex">
-                                            <button class="cmuk-button cmuk-button-primary">@Messages(constants.View.SELL)</button>
-                                            <button class="cmuk-button cmuk-button-default">@Messages(constants.View.BUY)</button>
+                                    </div>
+                                    <div cmuk-slider>
+                                        <div class="cmuk-container">
+                                            <div class="cmuk-slider-container">
+                                                <marquee>
+                                                    <ul class="cmuk-slider-items cmuk-child-width-1-5@@m">
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                                            <span class="sliderItemPercentage">+4.5%</span>
+                                                        </li>
+                                                    </ul>
+                                                </marquee>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="bannerImage cmuk-visible@@m">
-                                        <img src="@routes.Assets.versioned("images/bannerImage.svg")">
-                                    </div>
-                                </div>
                             </div>
-                            <div cmuk-slider>
-                                <div class="cmuk-container">
-                                    <div class="cmuk-slider-container">
-                                        <marquee>
-                                            <ul class="cmuk-slider-items cmuk-child-width-1-5@@m">
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                                <li>
-                                                    <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
-                                                    <span class="sliderItemPercentage">+4.5%</span>
-                                                </li>
-                                            </ul>
-                                        </marquee>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="pageContent cmuk-container">
                                 <div class="leftSide sticky">
                                 @left
