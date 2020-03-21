@@ -24,7 +24,6 @@
   border-right: 1px solid white;
 }
 html, body{
-  overflow: overlay;
   height: 100%;
   background: #F0F0F0;
   font-size: 61.5%;
@@ -74,7 +73,16 @@ html, body{
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: $buttonBorderRadius;
 }
-
+%cmuk-button-link {
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+%verifiedLabel{
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 1rem;
+}
 .textLineOverflow{
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1137,4 +1145,69 @@ header:before,
       }
     }
   }
+}
+.profileContainer{
+  .infoRow{
+    font-size: $paragraphFontSizeLarge;
+    line-height: 2;
+  }
+  .infoRowLabel{
+    color:#4B4B4B;
+    font-family: $fontFamilySecondary;
+  }
+  .infoRowValue{
+    text-align: right;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-card-header{
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-badge.verified{
+    @extend  %verifiedLabel;
+    background-color: #49A948;
+  }
+  .cmuk-badge.rejected{
+    @extend  %verifiedLabel;
+    background-color: #FE4350;
+  }
+  .cmuk-card-body .cmuk-card-body{
+    background-color: #FFFFFF;
+  }
+}
+.profileDetails{
+  .cmuk-button-link{
+    @extend %cmuk-button-link;
+  }
+  .cmuk-badge{
+    @extend  %verifiedLabel;
+  }
+  .editIcon{
+    .icon{
+      height: 16px;
+      width: 16px;
+    }
+  }
+
+}
+.contactDetails {
+  .cmuk-button-link{
+    @extend %cmuk-button-link;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-badge{
+  margin-left: 10px;
+  }
+  .cmuk-card-default{
+    margin-bottom: 5px;
+  }
+  .cmuk-card-body{
+    position: relative;
+    .buttonUpdate{
+      position: absolute;
+      bottom: 20px;
+    }
+  }
+
 }

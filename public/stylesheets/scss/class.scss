@@ -61,7 +61,7 @@
 .bodyContainer{
   height:auto;
   min-height: 100%;
-  background: #F4F7FB;
+  background: #F0F0F0;
   margin: 0 auto -165px;
 }
 
@@ -132,8 +132,13 @@
 }
 
 .bannerContainer {
-    background: #031221;
-    height: 363px;
+
+    background-color: #031221;
+  background-image: url("../../images/bannerImage.svg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: 80% 6%;
+  height: 363px;
     display: flex;
    position: relative;
     flex-direction: column;
@@ -623,8 +628,8 @@ rightText {
 }
 
 .profilePicture {
-  height: 130px;
-  width: 130px;
+  height: 100px;
+  width: 100px;
 }
 .profilePictureContainer{
   border-radius: 50%;
@@ -1183,18 +1188,22 @@ input:checked+.slider {
 .documentItem{
   background: #EBF2F9;
   border-radius: $buttonBorderRadius;
-  padding: 10px;
-  margin: 10px;
+  border: 1px solid #DDE8F3;
+  display: flex;
+  justify-content: space-between;
   .documentContentTop{
     font-size: $paragraphFontSizeSmall;
-    margin-bottom: 5px;
+    margin: 10px;
+  }
+  .documentThumbnail{
+    margin: 10px;
   }
   .documentThumbnail img{
-    width: 100px;
-    height: 80px;
+    width: 20px;
+    height: 20px;
   }
   .documentContentBottom{
-    margin-top: 5px;
+    margin: 10px;
     font-size: $paragraphFontSizeSmall;
   }
 }
@@ -1267,7 +1276,8 @@ input:checked+.slider {
 }
 
 .infoRowLabel{
-  width: 110px;
+  color:#4B4B4B;
+  width: 125px;
   height: min-content;
   word-break: break-word;
 }

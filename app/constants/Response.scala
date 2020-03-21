@@ -76,6 +76,7 @@ object Response {
   val TRADER_RELATION_REQUEST_SEND_SUCCESSFUL = new Success("TRADER_RELATION_REQUEST_SEND_SUCCESSFUL")
   val SALES_QUOTE_CREATED = new Success("SALES_QUOTE_CREATED")
   val MESSAGE_READ=  new Success("MESSAGE_READ")
+  val BANK_ACCOUNT_DETAILS_UPDATED = new Success("BANK_ACCOUNT_DETAILS_UPDATED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)

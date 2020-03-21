@@ -82,7 +82,6 @@
   border-right: 1px solid white; }
 
 html, body {
-  overflow: overlay;
   height: 100%;
   background: #F0F0F0;
   font-size: 61.5%; }
@@ -128,6 +127,16 @@ html, body {
   background: #FAFAFA;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
+
+.profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-decoration: none; }
+
+.profileContainer .cmuk-badge.verified, .profileContainer .cmuk-badge.rejected, .profileDetails .cmuk-badge {
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 1rem; }
 
 .textLineOverflow {
   display: -webkit-box;
@@ -948,5 +957,41 @@ header:before,
     .salesQuoteList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .salesQuoteList .tradeCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .tradeList .tradeCardHeader .cmuk-subnav > .cmuk-active a {
       font-weight: bold;
       color: #343C44; }
+
+.profileContainer .infoRow {
+  font-size: 1.5rem;
+  line-height: 2; }
+.profileContainer .infoRowLabel {
+  color: #4B4B4B;
+  font-family: "Oxygen", sans-serif; }
+.profileContainer .infoRowValue {
+  text-align: right;
+  font-family: "Oxygen", sans-serif; }
+.profileContainer .cmuk-card-header {
+  font-family: "Oxygen", sans-serif; }
+.profileContainer .cmuk-badge.verified {
+  background-color: #49A948; }
+.profileContainer .cmuk-badge.rejected {
+  background-color: #FE4350; }
+.profileContainer .cmuk-card-body .cmuk-card-body {
+  background-color: #FFFFFF; }
+
+.profileDetails .editIcon .icon {
+  height: 16px;
+  width: 16px; }
+
+.contactDetails .cmuk-button-link {
+  margin-left: 10px;
+  margin-bottom: 5px;
+  font-family: "Oxygen", sans-serif; }
+.contactDetails .cmuk-badge {
+  margin-left: 10px; }
+.contactDetails .cmuk-card-default {
+  margin-bottom: 5px; }
+.contactDetails .cmuk-card-body {
+  position: relative; }
+  .contactDetails .cmuk-card-body .buttonUpdate {
+    position: absolute;
+    bottom: 20px; }
 
 /*# sourceMappingURL=style.css.map */

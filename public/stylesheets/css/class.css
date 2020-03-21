@@ -52,7 +52,7 @@
 .bodyContainer {
   height: auto;
   min-height: 100%;
-  background: #F4F7FB;
+  background: #F0F0F0;
   margin: 0 auto -165px; }
 
 .pageContainer {
@@ -107,7 +107,11 @@
   .verticalDataTabsData {
     display: flex; } }
 .bannerContainer {
-  background: #031221;
+  background-color: #031221;
+  background-image: url("../../images/bannerImage.svg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: 80% 6%;
   height: 363px;
   display: flex;
   position: relative;
@@ -497,8 +501,8 @@ rightText {
   background-color: #5eaf50; }
 
 .profilePicture {
-  height: 130px;
-  width: 130px; }
+  height: 100px;
+  width: 100px; }
 
 .profilePictureContainer {
   border-radius: 50%; }
@@ -950,16 +954,19 @@ input:checked + .slider {
 .documentItem {
   background: #EBF2F9;
   border-radius: 3px;
-  padding: 10px;
-  margin: 10px; }
+  border: 1px solid #DDE8F3;
+  display: flex;
+  justify-content: space-between; }
   .documentItem .documentContentTop {
     font-size: 1.2rem;
-    margin-bottom: 5px; }
+    margin: 10px; }
+  .documentItem .documentThumbnail {
+    margin: 10px; }
   .documentItem .documentThumbnail img {
-    width: 100px;
-    height: 80px; }
+    width: 20px;
+    height: 20px; }
   .documentItem .documentContentBottom {
-    margin-top: 5px;
+    margin: 10px;
     font-size: 1.2rem; }
 
 .profileDocuments {
@@ -1018,7 +1025,8 @@ input:checked + .slider {
   font-size: 14px; }
 
 .infoRowLabel {
-  width: 110px;
+  color: #4B4B4B;
+  width: 125px;
   height: min-content;
   word-break: break-word; }
 
