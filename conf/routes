@@ -77,6 +77,9 @@ GET         /component/pendingTraderRelationList                         control
 GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(toID: String)
 GET         /component/pendingSentTraderRelation                         controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
 GET         /component/pendingReceivedTraderRelation                     controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
+GET         /component/salesQuoteList                                    controllers.ComponentViewController.salesQuoteList
+GET         /component/sellSalesQuoteList                                controllers.ComponentViewController.sellSalesQuoteList
+GET         /component/buySalesQuoteList                                 controllers.ComponentViewController.buySalesQuoteList
 
 GET         /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
 POST        /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetails
@@ -88,7 +91,10 @@ GET         /master/salesQuoteDocuments                                  control
 POST        /master/salesQuoteDocuments                                  controllers.SalesQuoteController.salesQuoteDocuments
 GET         /master/traderReviewSalesQuoteDetails                        controllers.SalesQuoteController.traderReviewSalesQuoteDetailsForm(id:String)
 POST        /master/traderReviewSalesQuoteDetails                        controllers.SalesQuoteController.traderReviewSalesQuoteDetails
-GET         /master/salesQuoteList                                       controllers.SalesQuoteController.salesQuoteList
+GET         /master/inviteBuyer                                          controllers.SalesQuoteController.inviteSalesQuoteBuyerForm(requestID:String)
+POST        /master/inviteBuyer                                          controllers.SalesQuoteController.inviteSalesQuoteBuyer
+GET         /master/acceptOrRejectSalesQuote                             controllers.SalesQuoteController.acceptOrRejectSalesQuoteForm(id:String)
+POST        /master/acceptOrRejectSalesQuote                             controllers.SalesQuoteController.acceptOrRejectSalesQuote
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
@@ -102,6 +108,7 @@ GET         /master/component/availableAssetList                         control
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
 GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
+
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList

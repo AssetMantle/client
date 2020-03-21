@@ -97,7 +97,8 @@ object Form {
   val SHIPPING_DETAILS = new Form("SHIPPING_DETAILS", routes.SalesQuoteController.shippingDetails())
   val PAYMENT_TERMS = new Form("PAYMENT_TERMS", routes.SalesQuoteController.paymentTerms())
   val SALES_QUOTE_DOCUMENTS = new Form("SALES_QUOTE_DOCUMENTS", routes.SalesQuoteController.salesQuoteDocuments())
-  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails)
+  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails())
+  val INVITE_SALES_QUOTE_BUYER= new Form("INVITE_SALES_QUOTE_BUYER", routes.SalesQuoteController.inviteSalesQuoteBuyer())
 
   //SellerExecuteOrderController
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder())

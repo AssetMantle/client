@@ -2,35 +2,16 @@
 @import models.masterTransaction.SalesQuote
 @import views.html.base._
 
-@(salesQuotes: Seq[SalesQuote])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div>
-    @commonTable(){
-        @Messages(constants.View.SALES_QUOTE_LIST)
-    }{
-        <tr>
-            <th>@Messages(constants.Form.ASSET_TYPE)</th>
-            <th>@Messages(constants.View.ASSET_DESCRIPTION)</th>
-            <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
-            <th>@Messages(constants.Form.ASSET_PRICE)</th>
-            <th>@Messages(constants.View.ACTION)</th>
-        </tr>
-        @for(salesQuote <- salesQuotes) {
-            <tr>
-                <td>@salesQuote.assetType</td>
-                <td>@salesQuote.assetDescription</td>
-                <td>@salesQuote.assetQuantity </td>
-                <td>@salesQuote.assetPrice</td>
-                <td>
-                @if(salesQuote.completionStatus){
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="">@Messages(constants.View.INVITE)</button>
-                }else{
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm('@salesQuote.id'))">@Messages(constants.View.COMPLETE)</button>
-                }
+@(sellSalesQuoteListRoute:String,buySalesQuoteListRoute:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-                </td>
-            </tr>
-        }
-    }
+<div>
+@commonCard(constants.View.SALES_QUOTE_LIST) {
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
+} {
+    @commonHorizontalSwitcher(jsRouteItems = Map(constants.View.SELL -> sellSalesQuoteListRoute,
+        constants.View.BUY -> buySalesQuoteListRoute,
+    ))
+}
 </div>
 
 

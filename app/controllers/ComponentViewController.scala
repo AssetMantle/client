@@ -25,6 +25,7 @@ class ComponentViewController @Inject()(
                                          masterAssets: master.Assets,
                                          masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                         masterTransactionSalesQuotes: masterTransaction.SalesQuotes,
                                          blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withZoneLoginAction: WithZoneLoginAction,
@@ -537,5 +538,33 @@ class ComponentViewController @Inject()(
         } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, traderName = toTrader.name, organizationName = organizationName))).recover {
           case baseException: BaseException => ServiceUnavailable(Html(baseException.failure.message))
         }
+  }
+
+  def salesQuoteList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.salesQuotesList(sellSalesQuoteListRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.sellSalesQuoteList), buySalesQuoteListRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.buySalesQuoteList)))
+  }
+
+  def sellSalesQuoteList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val sellSalesQuoteList=masterTransactionSalesQuotes.Service.sellSalesQuotes(loginState.username)
+      for{
+        sellSalesQuoteList<-sellSalesQuoteList
+      }yield {
+        println("sellSalesQuoteList")
+        sellSalesQuoteList.foreach(println(_))
+        Ok(views.html.component.master.sellSalesQuoteList(sellSalesQuoteList=sellSalesQuoteList))}
+  }
+
+  def buySalesQuoteList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val buySalesQuoteList=masterTransactionSalesQuotes.Service.buySalesQuotes(loginState.username)
+      for{
+        buySalesQuoteList<-buySalesQuoteList
+      }yield {
+        println("buySalesQuoteList")
+        buySalesQuoteList.foreach(println(_))
+        Ok(views.html.component.master.buySalesQuoteList(buySalesQuoteList=buySalesQuoteList))
+
+      }
   }
 }

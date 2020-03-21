@@ -1,0 +1,38 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.SalesQuote
+@import views.html.base._
+
+@(buySalesQuoteList: Seq[SalesQuote])(implicit requestHeader: RequestHeader,messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+@commonTable(){
+}{
+    <tr>
+        <th>@Messages(constants.Form.ASSET_TYPE)</th>
+        <th>@Messages(constants.View.ASSET_DESCRIPTION)</th>
+        <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
+        <th>@Messages(constants.Form.ASSET_PRICE)</th>
+        <th>@Messages(constants.View.SELLER)</th>
+        <th>@Messages(constants.View.STATUS)</th>
+    </tr>
+    @buySalesQuoteList.map { buySalesQuote =>
+        <tr>
+            <td>@buySalesQuote.assetType</td>
+            <td>@buySalesQuote.assetDescription</td>
+            <td>@buySalesQuote.assetQuantity </td>
+            <td>@buySalesQuote.assetPrice</td>
+            <td>@buySalesQuote.accountID</td>
+            <td>
+            @buySalesQuote.invitationStatus match{
+                case None=>{
+                    @views.html.component.master.acceptOrRejectSalesQuote(salesQuote = buySalesQuote)
+                }
+                case Some(false)=>{
+                    @Messages(constants.View.REJECTED)
+                }
+            }
+            </td>
+        </tr>
+
+    }
+}
+</div>
