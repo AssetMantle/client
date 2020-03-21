@@ -369,14 +369,14 @@ class ComponentViewController @Inject()(
     Ok(views.html.component.master.settings())
   }
 
-  def identificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def viewIdentificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
       for {
         accountKYC <- accountKYC
         identification <- identification
-      } yield Ok(views.html.component.master.identificationDetails(identification = identification, accountKYC = accountKYC))
+      } yield Ok(views.html.component.master.viewIdentificationDetails(identification = identification, accountKYC = accountKYC))
   }
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>

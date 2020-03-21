@@ -104,7 +104,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewTraderList,
         routes.javascript.ComponentViewController.organizationViewTrader,
         routes.javascript.ComponentViewController.profilePicture,
-        routes.javascript.ComponentViewController.identificationDetails,
+        routes.javascript.ComponentViewController.viewIdentificationDetails,
         routes.javascript.ComponentViewController.userViewPendingRequests,
         routes.javascript.ComponentViewController.traderViewOrganizationDetails,
         routes.javascript.ComponentViewController.viewOrganizationDetails,
