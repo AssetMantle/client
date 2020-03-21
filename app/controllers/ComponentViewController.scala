@@ -286,7 +286,7 @@ class ComponentViewController @Inject()(
 
   def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.getID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
       def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
       def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber*limit, limit)
       (for {
