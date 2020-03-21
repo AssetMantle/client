@@ -3,30 +3,32 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(Html(""))
+@common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
+@left = {
 
 }
 
 @center = {
-    @if(loginState.userType == constants.User.TRADER){
-        <div class="cmuk-margin-top cmuk-margin-bottom">
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
-        </div>
-        <div id="salesQuoteList">
+    @loginState.userType match {
+        case constants.User.TRADER => {
+            <div class="cmuk-margin-top cmuk-margin-bottom">
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
+            </div>
 
-        </div>
-        <div id="tradeList">
+            <div id="salesQuoteList"></div>
+            <div id="tradeList"></div>
 
-        </div>
-    }
-    <h2>Trades PageUnderConstruction</h2>
-}
-
-    <script>
-        @if(loginState.userType == constants.User.TRADER){
+            <script>
                 componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
-            }
-    </script>
+            </script>
+        }
+
+        case _ => {}
+    }
+}
+
+@right = {
+
+}

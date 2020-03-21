@@ -3,12 +3,12 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+@common(Messages(constants.View.INDEX))(Html(""))(center)(Html(""))
 
 @center = {
     <ul cmuk-accordion="multiple: true" class="flexContainer">
         <li>
-            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('organizationInformation', jsRoutes.controllers.SetACLController.viewTradersInOrganization(), this)">@Messages(constants.Form.TRADERS)</a>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('organizationInformation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedTraders(), this)">@Messages(constants.View.TRADERS)</a>
             <div class="cmuk-accordion-content">
                 <div id="organizationInformation" class="flexContainer"></div>
             </div>

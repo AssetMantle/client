@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Trader
+
+@(pendingTraderRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@pendingTraderRequests.map { trader =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.TRADER_ID, trader.id)
+        @commonTextInfo(constants.View.NAME, trader.name)
+        @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewPendingTraderRequest('@trader.id'))">@Messages(constants.View.VIEW_REQUEST)</button>
+    }
+}

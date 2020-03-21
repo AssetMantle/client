@@ -40,15 +40,9 @@
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
     </div>
 
-        @commonCard(constants.Form.TEAM) {
-        }{
-        <div id="organizationTraders"></div>
-        }
-
 
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
-            componentResource('organizationTraders', jsRoutes.controllers.ComponentViewController.organizationViewTraderList());
     </script>
 }

@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import models.master.TraderKYC
+@import views.html.base._
 
 @(traderKYCs: Seq[TraderKYC])( implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(traderKYC <- traderKYCs) {
@@ -12,17 +13,6 @@
             @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = traderKYC)
         </div>
         <br>
-        <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):
-            @traderKYC.zoneStatus match {
-                case Some(status: Boolean) => {
-                    @if(status) {
-                        <span cmuk-icon="check"></span>
-                    } else {
-                        <span cmuk-icon="close"></span>
-                    }
-                }
-                case None => {}
-            }
-        </span>
+        @commonBooleanInfo(constants.View.ZONE_STATUS, traderKYC.zoneStatus)
     }
 }

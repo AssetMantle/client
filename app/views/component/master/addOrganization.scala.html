@@ -8,7 +8,7 @@
     <div>
     @for(zone <- zones) {
         <button type="button" class="cmuk-button cmuk-button-secondary cmuk-button-small" onclick="fillZoneIDField('@zone.id')">
-            @Messages(constants.Form.NAME): @zone.name <br>
+            @Messages(constants.View.NAME): @zone.name <br>
             @Messages(constants.Form.CURRENCY): @zone.currency <br>
             @Messages(constants.Form.ZONE_ID): @zone.id <br>
         </button>

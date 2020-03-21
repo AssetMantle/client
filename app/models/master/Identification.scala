@@ -58,23 +58,13 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getIdentificationOrNoneByAccountID(accountID: String): Future[Option[Identification]] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
-    case Success(result) => Option(result)
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def getByAccountID(accountID: String): Future[Option[Identification]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption)
 
-  private def getIdentificationByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
+  private def tryGetByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -120,11 +110,11 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def markIdentificationFormCompleted(accountID: String): Future[Int] = updateCompletionStatusByAccountID(accountID = accountID, completionStatus = true)
 
-    def get(accountID: String): Future[Identification] = getIdentificationByAccountID(accountID)
+    def tryGet(accountID: String): Future[Identification] = tryGetByAccountID(accountID)
 
-    def getOrNoneByAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID)
+    def get(accountID: String): Future[Option[Identification]] = getByAccountID(accountID)
 
-    def getName(accountID: String): Future[String] = getIdentificationByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
+    def tryGetName(accountID: String): Future[String] = tryGetByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 
     def getVerificationStatus(accountID: String): Future[Option[Boolean]] = getVerificationStatusByAccountID(accountID)
   }

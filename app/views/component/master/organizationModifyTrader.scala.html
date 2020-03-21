@@ -2,9 +2,9 @@
 @import views.html.base._
 @import views.companion.master.ModifyTrader
 
-@(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
-    @commonInputText(modifyTraderForm, constants.FormField.ACCOUNT_ID)
+    @commonInputText(modifyTraderForm, constants.FormField.ACCOUNT_ID, 'value -> accountID)
     @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_ASSET)
     @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_FIAT)
     @commonCheckbox(modifyTraderForm, constants.FormField.SEND_ASSET)

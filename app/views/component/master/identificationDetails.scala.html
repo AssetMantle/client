@@ -18,7 +18,7 @@
     @identification match {
         case Some(identification) => {
             <div>
-                @commonTextInfo(constants.Form.NAME, Seq(identification.firstName, identification.lastName).mkString(" "))
+                @commonTextInfo(constants.View.NAME, Seq(identification.firstName, identification.lastName).mkString(" "))
                 @commonTextInfo(constants.Form.DATE_OF_BIRTH, identification.dateOfBirth.toString)
                 @commonTextInfo(constants.Form.ID_NUMBER, identification.idNumber)
                 @commonTextInfo(constants.Form.ID_TYPE, identification.idType)

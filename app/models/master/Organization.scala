@@ -76,13 +76,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getIDByAccountID(accountID: String) = db.run(organizationTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-    }
-  }
+  private def getIDByAccountID(accountID: String) = db.run(organizationTable.filter(_.accountID === accountID).map(_.id).result.headOption)
+
+  private def getIDByAccountIDAndVerificationStatus(accountID: String, verificationStatus: Option[Boolean]) = db.run(organizationTable.filter(_.accountID === accountID).filter(_.verificationStatus.? === verificationStatus).map(_.id).result.headOption)
 
   private def findNameByAccountID(accountID: String): Future[String] = db.run(organizationTable.filter(_.accountID === accountID).map(_.name).result.head.asTry).map {
     case Success(result) => result
@@ -245,6 +241,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
 
     def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+
+    def tryGetVerifiedOrganizationID(accountID: String): Future[String] = getIDByAccountIDAndVerificationStatus(accountID = accountID, verificationStatus = Option(true)).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
     def getNameByID(id: String): Future[String] = findNameByID(id)
 

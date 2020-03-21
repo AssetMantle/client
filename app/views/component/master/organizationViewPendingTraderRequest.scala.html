@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@import models.master.Trader
+@import views.html.base._
+@import models.master.TraderKYC
+
+@(trader: Trader, traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.TRADER_REQUEST): @trader.id
+</legend>
+<hr>
+@commonTextInfo(constants.Form.ORGANIZATION_ID, trader.organizationID)
+@commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+@commonTextInfo(constants.View.NAME, trader.name)
+@Messages(constants.Form.DOCUMENTS):<br>
+@traderKYCs.map{traderKYC =>
+    @component.master.commonDocumentViewer(traderKYC) {
+        @routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)
+    } {
+        <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
+    } {
+        @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = traderKYC)
+        @commonBooleanInfo(constants.View.ZONE_STATUS, traderKYC.zoneStatus)
+    }
+}
+<br>
+<button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.organizationVerifyTraderForm('@trader.accountID', '@trader.organizationID'))">@Messages(constants.Form.APPROVE)</button>
+<button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.TraderController.organizationRejectTraderRequestForm('@trader.id'))">@Messages(constants.Form.REJECT)</button>

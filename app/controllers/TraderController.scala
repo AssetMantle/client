@@ -1,7 +1,7 @@
 package controllers
 
 import actors.ShutdownActor
-import controllers.actions.{WithLoginAction, WithTraderLoginAction}
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -24,8 +24,10 @@ class TraderController @Inject()(
                                   masterOrganizations: master.Organizations,
                                   masterZones: master.Zones,
                                   masterAccounts: master.Accounts,
+                                  masterTraderKYCs: master.TraderKYCs,
                                   messagesControllerComponents: MessagesControllerComponents,
                                   withTraderLoginAction: WithTraderLoginAction,
+                                  withOrganizationLoginAction: WithOrganizationLoginAction,
                                   masterTraderRelations: master.TraderRelations,
                                   masterTraders: master.Traders,
                                 )
@@ -38,6 +40,30 @@ class TraderController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_TRADER
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  def organizationRejectTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.organizationRejectTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
+  }
+
+  def organizationRejectTraderRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.organizationRejectTraderRequest(formWithErrors)))
+        },
+        rejectTraderRequestData => {
+          val rejectTrader = masterTraders.Service.rejectTrader(rejectTraderRequestData.traderID)
+
+          (for {
+            _ <- rejectTrader
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_REJECT_TRADER_REQUEST_SUCCESSFUL)))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
 
   def traderRelationRequestForm(): Action[AnyContent] = Action {
     implicit request =>

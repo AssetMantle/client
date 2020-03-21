@@ -42,10 +42,10 @@
                     @loginState match {
                         case null => {}
                         case default => {
-                            <li><a href="@controllers.routes.ViewController.account()">@Messages(constants.Form.ACCOUNT)</a></li>
-                            <li><a href="@controllers.routes.ViewController.dashboard()">@Messages(constants.Form.DASHBOARD)</a></li>
-                            <li><a href="@controllers.routes.ViewController.trades()">@Messages(constants.Form.TRADES)</a></li>
-                            <li><a href="@controllers.routes.ViewController.profile()">@Messages(constants.Form.PROFILE)</a></li>
+                            <li><a href="@controllers.routes.ViewController.account()">@Messages(constants.View.ACCOUNT)</a></li>
+                            <li><a href="@controllers.routes.ViewController.dashboard()">@Messages(constants.View.DASHBOARD)</a></li>
+                            <li><a href="@controllers.routes.ViewController.trades()">@Messages(constants.View.TRADES)</a></li>
+                            <li><a href="@controllers.routes.ViewController.profile()">@Messages(constants.View.PROFILE)</a></li>
                         }
                     }
                 </ul>
@@ -69,18 +69,18 @@
                         case default => {
                             @loginState.userType match {
                                 case constants.User.TRADER => {
-                                    <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.View.MARKET)</a></li>
                                 }
                                 case constants.User.ZONE => {
-                                    <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
                                     <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                 }
                                 case constants.User.ORGANIZATION => {
-                                    <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.View.REQUEST)</a></li>
                                     <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                 }
                                 case constants.User.GENESIS => {
-                                    <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
                                     <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                 }
                                 case _ => {}
@@ -104,7 +104,7 @@
                                         <li>
                                             <a href="@controllers.routes.ViewController.profile()">
                                                 <span cmuk-icon="user"></span>
-                                                @Messages(constants.Form.PROFILE)
+                                                @Messages(constants.View.PROFILE)
                                             </a>
                                         </li>
                                         <li>

@@ -7,7 +7,7 @@
 @(zoneCompletionForm: Form[ReviewAddZoneRequest.Data] = ReviewAddZoneRequest.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
     <div>@Messages(constants.Form.ZONE_DETAILS):<br>
-        <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
+        <span class="red">@Messages(constants.View.NAME)</span>: @zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
         @Messages(constants.Form.ADDRESS): <br>
         <span class="red">@Messages(constants.FormField.ADDRESS_LINE_1.name)</span>: @zone.address.addressLine1 <br>
@@ -32,5 +32,5 @@
     </div>
     <br>
     @commonCheckbox(zoneCompletionForm, constants.FormField.COMPLETION)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.Form.BACK)</button>
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.View.BACK)</button>
 }

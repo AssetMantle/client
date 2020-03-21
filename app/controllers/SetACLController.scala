@@ -103,7 +103,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
           def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
             if (status) {
-              val name = masterIdentifications.Service.getName(loginState.username)
+              val name = masterIdentifications.Service.tryGetName(loginState.username)
               val organization: Future[Organization] = masterOrganizations.Service.get(addTraderData.organizationID)
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
@@ -511,12 +511,12 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def zoneRejectVerifyTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneRejectVerifyTraderRequest(views.companion.master.RejectVerifyTraderRequest.form.fill(views.companion.master.RejectVerifyTraderRequest.Data(traderID = traderID))))
+    Ok(views.html.component.master.zoneRejectVerifyTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
   }
 
   def zoneRejectVerifyTraderRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.RejectVerifyTraderRequest.form.bindFromRequest().fold(
+      views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.zoneRejectVerifyTraderRequest(formWithErrors)))
         },
@@ -530,7 +530,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             _ <- rejectTrader
             zoneAccountID <- zoneAccountID
             _ <- zoneRejectAll(zoneAccountID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_REJECT_TRADER_REQUEST_SUCCESSFUL)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
@@ -577,10 +577,10 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 zoneID <- zoneID
                 _ <- createACL
                 _ <- transactionProcess(aclAddress, zoneID)
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
+                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
               } yield result
             } else {
-              Future(PreconditionFailed(views.html.organizationRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+              Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
           }
 
@@ -597,14 +597,14 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def organizationModifyTraderForm(accountID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.organizationModifyTrader(views.companion.master.ModifyTrader.form.fill(views.companion.master.ModifyTrader.Data(accountID = accountID, gas = constants.FormField.GAS.minimumValue, password = ""))))
+    Ok(views.html.component.master.organizationModifyTrader(accountID = accountID))
   }
 
   def organizationModifyTrader: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ModifyTrader.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors)))
+          Future(BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors, accountID = formWithErrors.data(constants.FormField.ACCOUNT_ID.name))))
         },
         verifyTraderData => {
           val id = masterTraders.Service.tryGetID(verifyTraderData.accountID)
@@ -748,50 +748,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  def organizationRejectVerifyTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.organizationRejectVerifyTraderRequest(views.companion.master.RejectVerifyTraderRequest.form.fill(views.companion.master.RejectVerifyTraderRequest.Data(traderID = traderID))))
-  }
-
-  def organizationRejectVerifyTraderRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.RejectVerifyTraderRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.organizationRejectVerifyTraderRequest(formWithErrors)))
-        },
-        rejectVerifyTraderRequestData => {
-          val rejectTrader = masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
-          val organizationAccountID = masterOrganizations.Service.getAccountId(rejectVerifyTraderRequestData.traderID)
-
-          def organizationRejectAll(organizationAccountID: String): Future[Int] = masterTraderKYCs.Service.organizationRejectAll(organizationAccountID)
-
-          (for {
-            _ <- rejectTrader
-            organizationAccountID <- organizationAccountID
-            _ <- organizationRejectAll(organizationAccountID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
-  def organizationViewVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationAccount = masterOrganizations.Service.getByAccountID(loginState.username)
-
-      def getVerifyTraderRequestsForOrganization(organizationAccount: Organization) = masterTraders.Service.getVerifyTraderRequestsForOrganization(organizationAccount.id)
-
-      (for {
-        organizationAccount <- organizationAccount
-        verifyTraderRequestsForOrganization <- getVerifyTraderRequestsForOrganization(organizationAccount)
-      } yield Ok(views.html.component.master.organizationViewVerifyTraderRequests(verifyTraderRequestsForOrganization))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
-      }
-  }
-
   def uploadTraderKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.storeTraderKYC), documentType))
   }
@@ -868,21 +824,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def viewTradersInOrganization: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationAccount = masterOrganizations.Service.getByAccountID(loginState.username)
-
-      def getVerifiedTradersForOrganization(organizationAccount: Organization): Future[Seq[Trader]] = masterTraders.Service.getVerifiedTradersForOrganization(organizationAccount.id)
-
-      (for {
-        organizationAccount <- organizationAccount
-        verifiedTradersForOrganization <- getVerifiedTradersForOrganization(organizationAccount)
-      } yield Ok(views.html.component.master.viewTradersInOrganizationForOrganization(verifiedTradersForOrganization))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def viewTradersInOrganizationForZone(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
@@ -890,7 +831,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
       def getResult(organizationZoneID: String, userZoneID: String): Future[Result] = {
         if (organizationZoneID == userZoneID) {
-          val verifiedTradersForOrganization = masterTraders.Service.getVerifiedTradersForOrganization(organizationID)
+          val verifiedTradersForOrganization = masterTraders.Service.getAcceptedTradersInOrganization(organizationID)
           for {
             verifiedTradersForOrganization <- verifiedTradersForOrganization
           } yield Ok(views.html.component.master.viewTradersInOrganization(verifiedTradersForOrganization))
@@ -911,7 +852,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def viewTradersInOrganizationForGenesis(organizationID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val verifiedTradersForOrganization = masterTraders.Service.getVerifiedTradersForOrganization(organizationID)
+      val verifiedTradersForOrganization = masterTraders.Service.getAcceptedTradersInOrganization(organizationID)
       for {
         verifiedTradersForOrganization <- verifiedTradersForOrganization
       } yield Ok(views.html.component.master.viewTradersInOrganization(verifiedTradersForOrganization))

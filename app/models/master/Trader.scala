@@ -142,10 +142,6 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
 
-  private def getVerifiedTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.verificationStatus === true).result)
-
-  private def getTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).result)
-
   private def checkOrganizationIDTraderIDExists(traderID: String, organizationID: String): Future[Boolean] = db.run(traderTable.filter(_.id === traderID).filter(_.organizationID === organizationID).exists.result)
 
   private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(traderTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
@@ -218,7 +214,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
 
-    def get(id: String): Future[Trader] = findById(id)
+    def tryGet(id: String): Future[Trader] = findById(id)
 
     def getByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
 
@@ -244,17 +240,17 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getVerifyTraderRequestsForZone(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null)
 
-    def getVerifyTraderRequestsForOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null)
-
-    def getVerifiedTradersForOrganization(organizationID: String): Future[Seq[Trader]] = getVerifiedTradersByOrganizationID(organizationID)
-
     def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusById(id).map(_.getOrElse(false))
 
     def getVerificationStatusByAccountID(accountID: String): Future[Boolean] = findVerificationStatusByAccountID(accountID).map(_.getOrElse(false))
 
     def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
-    def getTradersListInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByOrganizationID(organizationID)
+    def getAcceptedTradersInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = Option(true))
+
+    def getPendingTraderRequestsInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null)
+
+    def getRejectedTraderRequestsInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = Option(false))
 
     def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
 

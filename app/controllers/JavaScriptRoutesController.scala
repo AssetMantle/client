@@ -97,8 +97,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.orderList,
         routes.javascript.ComponentViewController.availableAssetList,
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
-        routes.javascript.ComponentViewController.organizationViewTraderList,
+
+        routes.javascript.ComponentViewController.organizationViewTradersAccountDetails,
+        routes.javascript.ComponentViewController.organizationViewAcceptedTradersAccountDetails,
+        routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountDetails,
+        routes.javascript.ComponentViewController.organizationViewPendingTraderRequests,
+        routes.javascript.ComponentViewController.organizationViewPendingTraderRequest,
+        routes.javascript.ComponentViewController.organizationViewRejectedTraderRequests,
+        routes.javascript.ComponentViewController.organizationViewRejectedTraderRequest,
+
         routes.javascript.ComponentViewController.organizationViewTrader,
+
+
         routes.javascript.ComponentViewController.profilePicture,
         routes.javascript.ComponentViewController.identificationDetails,
         routes.javascript.ComponentViewController.userViewPendingRequests,
@@ -232,7 +242,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.userUpdateTraderKYCForm,
         routes.javascript.SetACLController.userUpdateTraderKYC,
         routes.javascript.SetACLController.userReviewAddTraderRequestForm,
-        routes.javascript.SetACLController.viewTradersInOrganization,
         routes.javascript.SetACLController.viewTradersInOrganizationForZone,
         routes.javascript.SetACLController.viewTradersInOrganizationForGenesis,
         routes.javascript.SetACLController.zoneVerifyTraderForm,
@@ -240,8 +249,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.organizationModifyTraderForm,
         routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm,
         routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
-        routes.javascript.SetACLController.organizationRejectVerifyTraderRequestForm,
-        routes.javascript.SetACLController.organizationViewVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetACLController.zoneViewKYCDocuments,
         routes.javascript.SetACLController.updateTraderKYCDocumentZoneStatusForm,
@@ -264,6 +271,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
         routes.javascript.TraderController.traderRelationRequestForm,
+        routes.javascript.TraderController.organizationRejectTraderRequestForm,
 
         routes.javascript.TradeRoomController.tradeTerms,
         routes.javascript.TradeRoomController.tradeFinancials,

@@ -40,5 +40,5 @@
 
     @commonInputText(traderReviewSalesQuoteDetailsForm, constants.FormField.REQUEST_ID, 'value ->requestID, 'class -> "hidden", 'readonly -> true)
     @commonCheckbox(traderReviewSalesQuoteDetailsForm, constants.FormField.COMPLETION)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.salesQuoteDocumentsForm('@requestID'))">@Messages(constants.Form.BACK)</button>
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.salesQuoteDocumentsForm('@requestID'))">@Messages(constants.View.BACK)</button>
 }

@@ -8,8 +8,8 @@
         @for(zoneVerificationRequest <- zoneVerificationRequests) {
             @commonCard(zoneVerificationRequest.id) {
             } {
-                @commonTextInfo(constants.Form.ACCOUNT_ID, zoneVerificationRequest.accountID)
-                @commonTextInfo(constants.Form.NAME, zoneVerificationRequest.name)
+                @commonTextInfo(constants.View.ACCOUNT_ID, zoneVerificationRequest.accountID)
+                @commonTextInfo(constants.View.NAME, zoneVerificationRequest.name)
                 @commonTextInfo(constants.Form.CURRENCY, zoneVerificationRequest.currency)
                 <span class="red">@Messages(constants.Form.DOCUMENTS)</span>:
                 <span id = '@Seq("kycDocuments", zoneVerificationRequest.accountID).mkString("")'>

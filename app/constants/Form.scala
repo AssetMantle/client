@@ -127,7 +127,6 @@ object Form {
   val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest())
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader())
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.SetACLController.organizationModifyTrader())
-  val ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.organizationRejectVerifyTraderRequest())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
 
   //SetBuyerFeedbackController
@@ -139,6 +138,7 @@ object Form {
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
 
   //TraderController
+  val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectTraderRequest())
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest())
 
   //TradeRoomController
@@ -150,14 +150,6 @@ object Form {
   //VerifyMobileNumberController
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber())
 
-  val INDEX = "INDEX"
-  val DASHBOARD = "DASHBOARD"
-  val COMMIT = "COMMIT"
-  val PROFILE = "PROFILE"
-  val MARKET = "MARKET"
-  val ACCOUNT = "ACCOUNT"
-  val TRADES = "TRADES"
-  val REQUEST = "REQUEST"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
   val BLOCKS = "BLOCKS"
@@ -175,13 +167,11 @@ object Form {
   val ACL = "ACL"
   val LATEST_BLOCK_HEIGHT = "LATEST_BLOCK_HEIGHT"
   val AVERAGE_BLOCK_TIME = "AVERAGE_BLOCK_TIME"
-  val BACK = "BACK"
   val INVALID_BLOCK_HEIGHT = "INVALID_BLOCK_HEIGHT"
   val INVALID_TRANSACTION_HASH = "INVALID_TRANSACTION_HASH"
   val LOAD_MORE_NOTIFICATIONS = "LOAD_MORE_NOTIFICATIONS"
   val ORGANIZATIONS = "ORGANIZATIONS"
   val ZONES = "ZONES"
-  val TRADERS = "TRADERS"
   val INBOX = "INBOX"
   val NEGOTIATE = "NEGOTIATE"
   val ON_GOING_NEGOTIATIONS = "ON_GOING_NEGOTIATIONS"
@@ -219,7 +209,6 @@ object Form {
   val ON_GOING_BUY_ORDERS = "ON_GOING_BUY_ORDERS"
   val ON_GOING_SELL_ORDERS = "ON_GOING_SELL_ORDERS"
   val VIEW = "VIEW"
-  val TEAM = "TEAM"
   val PENDING = "PENDING"
   val VERIFY = "VERIFY"
   val ZONE_KYC_FILES = "ZONE_KYC_FILES"
@@ -227,8 +216,6 @@ object Form {
   val UPDATE_ORGANIZATION_KYC_STATUS = "UPDATE_ORGANIZATION_KYC_STATUS"
   val UPDATE_ASSET_DOCUMENT_STATUS = "UPDATE_ASSET_DOCUMENT_STATUS"
   val UPDATE_STATUS = "UPDATE_STATUS"
-  val ZONE_STATUS = "ZONE_STATUS"
-  val ORGANIZATION_STATUS = "ORGANIZATION_STATUS"
   val STATUS_UPDATED = "STATUS_UPDATED"
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
   val HOME = "HOME"
@@ -321,7 +308,6 @@ object Form {
   val TAKER_ADDRESS = "TAKER_ADDRESS"
   val BLOCKCHAIN_ADDRESS = "BLOCKCHAIN_ADDRESS"
   val PUBLIC_KEY = "PUBLIC_KEY"
-  val NAME = "NAME"
   val MNEMONIC = "MNEMONIC"
   val PASSWORD = "PASSWORD"
   val CONFIRM_PASSWORD = "CONFIRM_PASSWORD"
@@ -371,8 +357,6 @@ object Form {
   val PHONE = "PHONE"
   val EMAIL = "EMAIL"
   val ID = "ID"
-  val ACCOUNT_ID = "ACCOUNT_ID"
-  val TRADER_ID = "TRADER_ID"
   val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
   val USERNAME = "USERNAME"

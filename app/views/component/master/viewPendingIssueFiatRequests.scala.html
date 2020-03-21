@@ -10,7 +10,7 @@
         @commonCard(issueFiatRequest.accountID){
         }{
             <div>
-                @commonTextInfo(constants.Form.ACCOUNT_ID, issueFiatRequest.accountID)
+                @commonTextInfo(constants.View.ACCOUNT_ID, issueFiatRequest.accountID)
                 @commonTextInfo(constants.Form.TRANSACTION_ID, issueFiatRequest.transactionID)
                 @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, issueFiatRequest.transactionAmount.toString)
                 <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>

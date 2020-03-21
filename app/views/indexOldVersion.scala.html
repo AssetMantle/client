@@ -4,7 +4,7 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-    @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(left)(center)(right)
+    @common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 
     @left = {
         <div class="sideBarOpenButton" cmuk-toggle="target: #offcanvas-slide">

@@ -90,7 +90,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def organizationUpdateStatusById(id: String, status: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).map(_.organizationStatus.?).update(status).asTry).map {
+  private def updateOrganizationStatusByID(id: String, organizationStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).map(_.organizationStatus.?).update(organizationStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -168,13 +168,13 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def zoneRejectAll(id: String): Future[Int] = zoneUpdateStatusById(id = id, zoneStatus = Option(false))
 
-    def organizationVerifyAll(id: String): Future[Int] = organizationUpdateStatusById(id = id, status = Option(true))
+    def markAllOrganizationStatusAccepted(id: String): Future[Int] = updateOrganizationStatusByID(id = id, organizationStatus = Option(true))
+
+    def markAllOrganizationStatusRejected(id: String): Future[Int] = updateOrganizationStatusByID(id = id, organizationStatus = Option(false))
 
     def organizationVerify(id: String, documentType: String): Future[Int] = organizationUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true))
 
     def organizationReject(id: String, documentType: String): Future[Int] = organizationUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(false))
-
-    def organizationRejectAll(id: String): Future[Int] = organizationUpdateStatusById(id = id, status = Option(false))
 
     def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 

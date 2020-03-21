@@ -337,7 +337,7 @@ class AccountController @Inject()(
 
   def identificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      val identification = masterIdentifications.Service.get(loginState.username)
 
       def getResult(identification: Option[Identification]): Future[Result] = identification match {
         case Some(identity) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(views.companion.master.Identification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType))))
@@ -384,7 +384,7 @@ class AccountController @Inject()(
 
   def userReviewIdentificationDetailsForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      val identification = masterIdentifications.Service.get(loginState.username)
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       (for {
         identification <- identification
@@ -399,7 +399,7 @@ class AccountController @Inject()(
     implicit request =>
       views.companion.master.UserReviewIdentificationDetails.form.bindFromRequest().fold(
         formWithErrors => {
-          val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+          val identification = masterIdentifications.Service.get(loginState.username)
           val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
           (for {
             identification <- identification
@@ -428,7 +428,7 @@ class AccountController @Inject()(
                 result <- sendNotificationsAndGetResult
               } yield result
             } else {
-              val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+              val identification = masterIdentifications.Service.get(loginState.username)
               val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
               for {
                 identification <- identification

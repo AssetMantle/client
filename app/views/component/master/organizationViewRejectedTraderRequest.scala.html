@@ -1,0 +1,26 @@
+@import controllers.actions.LoginState
+@import models.master.Trader
+@import views.html.base._
+@import models.master.TraderKYC
+
+@(trader: Trader, traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.TRADER): @trader.id
+</legend>
+<hr>
+
+@commonTextInfo(constants.View.TRADER_ID, trader.id)
+@commonTextInfo(constants.View.NAME, trader.name)
+@commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+
+@traderKYCs.map { traderKYC =>
+    @component.master.commonDocumentViewer(traderKYC) {
+        @routes.FileController.organizationAccessedTraderKYCFile(traderID = traderKYC.id, fileName = traderKYC.fileName, documentType = traderKYC.documentType)
+    } {
+        <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderID = traderKYC.id, fileName = traderKYC.fileName, documentType = traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
+    } {
+        @commonBooleanInfo(constants.View.ORGANIZATION_STATUS, traderKYC.organizationStatus)
+        @commonBooleanInfo(constants.View.ZONE_STATUS, traderKYC.zoneStatus)
+    }
+}

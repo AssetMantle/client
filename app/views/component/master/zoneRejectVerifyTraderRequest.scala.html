@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.RejectVerifyTraderRequest
+@import views.companion.master.RejectTraderRequest
 
-@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data] = RejectVerifyTraderRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(rejectVerifyTraderRequestForm: Form[RejectTraderRequest.Data] = RejectTraderRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ZONE_REJECT_VERIFY_TRADER_REQUEST, rejectVerifyTraderRequestForm) {
     @commonInputText(rejectVerifyTraderRequestForm, constants.FormField.TRADER_ID)
 }

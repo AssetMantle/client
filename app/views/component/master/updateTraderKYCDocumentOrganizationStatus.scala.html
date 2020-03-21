@@ -4,7 +4,7 @@
 @import views.companion.master.UpdateTraderKYCDocumentOrganizationStatus
 @import views.html.base._
 
-@(updateTraderKYCDocumentOrganizationStatusForm: Form[UpdateTraderKYCDocumentOrganizationStatus.Data] = views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form, traderKYC: TraderKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(updateTraderKYCDocumentOrganizationStatusForm: Form[UpdateTraderKYCDocumentOrganizationStatus.Data] = views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form, traderKYC: TraderKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
@@ -21,7 +21,7 @@
         }
         </ul>
     }
-    <span class="red">@Messages(constants.Form.ORGANIZATION_STATUS):
+    <span class="red">@Messages(constants.View.ORGANIZATION_STATUS):
         @traderKYC.organizationStatus match {
             case Some(status: Boolean) => {
                 @if(status) {

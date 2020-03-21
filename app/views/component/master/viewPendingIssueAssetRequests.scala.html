@@ -12,7 +12,7 @@
                 <div>
                 @commonCard(issueAssetRequest.id) {
                 } {
-                    @commonTextInfo(constants.Form.ACCOUNT_ID, issueAssetRequest.accountID)
+                    @commonTextInfo(constants.View.ACCOUNT_ID, issueAssetRequest.accountID)
                     @commonTextInfo(constants.Form.DOCUMENT_HASH, issueAssetRequest.documentHash.getOrElse(""))
                     @commonTextInfo(constants.Form.ASSET_TYPE, issueAssetRequest.assetType)
                     @commonTextInfo(constants.Form.ASSET_QUANTITY, issueAssetRequest.assetQuantity.toString)

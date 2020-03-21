@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Trader
+
+@(acceptedTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@acceptedTraders.map { trader =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.TRADER_ID, trader.id)
+        @commonTextInfo(constants.View.NAME, trader.name)
+        @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewAcceptedTraderAccountDetails('@trader.id'))">@Messages(constants.Form.VIEW)</button>
+        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER.legend)</button>
+    }
+}
