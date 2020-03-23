@@ -96,9 +96,9 @@ html, body{
   font-family:$fontFamilySecondary;
 }
 .header {
-  background: #053C75;
+  background: $colorSecondary;
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
-    background: #053C75;
+    background: $colorSecondary;
     padding: 0px 30px;
 
   }
@@ -127,6 +127,7 @@ html, body{
         background-color: #FE4350;
         font-size: 1.2rem;
         color: #FFFFFF;
+        line-height: 30px;
       }
       li:last-child a {
         padding-right: 0px;;
@@ -171,7 +172,7 @@ html, body{
     display:flex;
     justify-content: center;
     border-radius: 50%;
-    color: #053C75;
+    color: $colorSecondary;
     font-weight: bold;
   }
   .quoteIdTtitle{
@@ -233,8 +234,12 @@ margin-right: -5px;
     transition: .1s ease-in-out;
     transition-property: color,background-color,border-color;
     outline: none;
-    img{
+    span{
       padding:0px 5px;
+    }
+    .icon {
+      width: 13px;
+      height: 13px;
     }
   }
   .live {
@@ -573,7 +578,7 @@ margin-right: -5px;
     font-family: $fontFamilySecondary;
     padding: 0px 13px;
     .mCS-minimal-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{
-      background-color: #053C75 ;
+      background-color: $colorSecondary ;
     }
   }
   .chatRoom .cmuk-card-body{

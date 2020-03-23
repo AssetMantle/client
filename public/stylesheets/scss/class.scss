@@ -25,7 +25,7 @@
     border-radius: 0.25rem;
     padding: 20px;
     margin: auto;
-    background-color: #fefefe;
+    background-color: #FAFAFA;
     box-sizing: border-box;
     position: relative;
     max-width: 100%;
@@ -119,21 +119,13 @@
   }
 }
 @media (min-width: 960px) {
-  .bannerText h2 {
-    font-size: 48px;
-  }
-  .bannerButtons button {
-    width: 198px;
-    height: 48px;
-  }
   .verticalDataTabsData {
     display: flex;
   }
 }
 
 .bannerContainer {
-
-    background-color: #031221;
+  background-color: #031221;
   background-image: url("../../images/bannerImage.svg");
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -148,10 +140,11 @@
   .bannerText {
     width: 600px;
     padding: 50px 0px;
-    h2 {
+    h3 {
       font-family: $fontFamilySecondary;
       line-height: 130%;
       margin: 0px;
+      font-size: 40px;
       font-weight: normal;
       color: #FFFFFF;
     }
@@ -266,17 +259,19 @@
         font-size: $paragraphFontSizeLarge;
         color:#0862BE;
         font-weight: bold;
+
       }
     }
   }
   .cmuk-subnav-pill>.cmuk-active>a{
-    background: #053C75;
+    background: $colorSecondary;
     color:#FFFFFF;
   }
   .cmuk-switcher{
     li{
       font-family: $fontFamilySecondary;
-      font-size: $headingFontSizeSmall;
+      font-size: $paragraphFontSizeLarge;
+      color: #365575;
     }
   }
 }
@@ -478,6 +473,8 @@
     display: none;
     color: red;
     padding: 10px;
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
   }
   .verifyMnemonic {
     flex-wrap: wrap;
@@ -485,27 +482,57 @@
     .verifyMnemonicbutton {
       width: 114px;
       height: 38px;
-      text-align: center;
-      line-height: 38px;
-      position: relative;
-      font-size: $paragraphFontSizeMedium;
-      float: left;
+      font-family: $fontFamilySecondary;
       margin-right: 10px;
       margin-bottom: 10px;
-      font-weight: 600;
       border-radius: $buttonBorderRadius;
-      .index {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        color: rgb(132, 142, 156);
-        font-size: 12px;
-        line-height: 12px;
+
+      input{
+        background: #F0F4FA;
+        border: 1px solid #859EB9;
+        color:#061728;
+        text-align: center;
+      }
+      .mnemonicField{
+        background-color: #FFffff;
       }
     }
   }
+  .buttonForm{
+    font-size: $paragraphFontSizeMedium;
+  }
 }
 
+.comdex {
+.buttonForm {
+  background:$colorSecondary;
+  color: #FFFFFF;
+  font-size: $paragraphFontSizeSmall;
+  font-family: $fontFamilySecondary;
+}
+.cmuk-input {
+  border: 1px solid rgba(5, 60, 117, 0.22);
+
+  &::placeholder {
+    color: #272829;
+  }
+
+  &:focus {
+    border: 1px solid rgba(5, 60, 117, 0.22);
+  }
+}
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+  }
+  .error {
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    color: #f0506e;
+  }
+}
 .flexContainer {
   display: flex;
   justify-content: left;
@@ -813,10 +840,6 @@ dl .info {
   .footer a {
     color: #149f98;
   }
-}
-
-.error {
-  color: #f0506e;
 }
 
 .status {
@@ -1219,7 +1242,7 @@ input:checked+.slider {
 }
 .mobileNumberUpdate {
   .countryCode {
-    margin-top: 24px;
+    margin-top: 19px;
     width: 80px;
     margin-right: 10px;
   }
@@ -1227,7 +1250,7 @@ input:checked+.slider {
     width:100%;
   }
   .mobileNumber label{
-    margin-left: -75px;
+    margin-left: -77px;
   }
 }
 
@@ -1240,26 +1263,33 @@ input:checked+.slider {
 .comdex .cmuk-input, .cmuk-card-default, button, a,  p{
   font-size: 1.2rem;
 }
-.inputField{
-  display: flex;
-  .inputFieldIcon{
+
+.loginForm {
+  .inputField {
     display: flex;
-    align-items: center;
-    height: 40px;
-    background: #ebebeb;
-    margin-top: 19px;
-    padding: 0px 10px;
+
+    .inputFieldIcon {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      background: #ebebeb;
+      margin-top: 19px;
+      padding: 0px 10px;
+    }
+
+    .inputFieldBody {
+      width: 100%;
+    }
+
+    .inputFieldBody input {
+      font-size: 1.2rem;
+    }
   }
-  .inputFieldBody{
-    width: 100%;
-  }
-  .inputFieldBody input{
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    font-size:1.2rem;
+  .cmuk-button-link{
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
   }
 }
-
 .connectionError{
   height: 100px;
   padding: 40px;

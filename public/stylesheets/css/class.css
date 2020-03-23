@@ -22,7 +22,7 @@
     border-radius: 0.25rem;
     padding: 20px;
     margin: auto;
-    background-color: #fefefe;
+    background-color: #FAFAFA;
     box-sizing: border-box;
     position: relative;
     max-width: 100%;
@@ -97,13 +97,6 @@
   .kycDocumentsView {
     display: flex; } }
 @media (min-width: 960px) {
-  .bannerText h2 {
-    font-size: 48px; }
-
-  .bannerButtons button {
-    width: 198px;
-    height: 48px; }
-
   .verticalDataTabsData {
     display: flex; } }
 .bannerContainer {
@@ -122,10 +115,11 @@
   .bannerContainer .bannerText {
     width: 600px;
     padding: 50px 0px; }
-    .bannerContainer .bannerText h2 {
+    .bannerContainer .bannerText h3 {
       font-family: "Oxygen", sans-serif;
       line-height: 130%;
       margin: 0px;
+      font-size: 40px;
       font-weight: normal;
       color: #FFFFFF; }
     .bannerContainer .bannerText p {
@@ -216,7 +210,8 @@
   color: #FFFFFF; }
 .tabsSection .cmuk-switcher li {
   font-family: "Oxygen", sans-serif;
-  font-size: 1.7rem; }
+  font-size: 1.5rem;
+  color: #365575; }
 
 .verticalDataTabs {
   width: 214px; }
@@ -376,29 +371,49 @@
 .MnemonicQuiz .errorMnemonicInput {
   display: none;
   color: red;
-  padding: 10px; }
+  padding: 10px;
+  font-size: 1.2rem;
+  font-family: "Oxygen", sans-serif; }
 .MnemonicQuiz .verifyMnemonic {
   flex-wrap: wrap;
   justify-content: center; }
   .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
     width: 114px;
     height: 38px;
-    text-align: center;
-    line-height: 38px;
-    position: relative;
-    font-size: 1.3rem;
-    float: left;
+    font-family: "Oxygen", sans-serif;
     margin-right: 10px;
     margin-bottom: 10px;
-    font-weight: 600;
     border-radius: 3px; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .index {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      color: #848e9c;
-      font-size: 12px;
-      line-height: 12px; }
+    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton input {
+      background: #F0F4FA;
+      border: 1px solid #859EB9;
+      color: #061728;
+      text-align: center; }
+    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .mnemonicField {
+      background-color: #FFffff; }
+.MnemonicQuiz .buttonForm {
+  font-size: 1.3rem; }
+
+.comdex .buttonForm {
+  background: #053C75;
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  font-family: "Oxygen", sans-serif; }
+.comdex .cmuk-input {
+  border: 1px solid rgba(5, 60, 117, 0.22); }
+  .comdex .cmuk-input::placeholder {
+    color: #272829; }
+  .comdex .cmuk-input:focus {
+    border: 1px solid rgba(5, 60, 117, 0.22); }
+.comdex input:-webkit-autofill,
+.comdex input:-webkit-autofill:hover,
+.comdex input:-webkit-autofill:focus,
+.comdex input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset; }
+.comdex .error {
+  font-size: 1.2rem;
+  font-family: "Oxygen", sans-serif;
+  color: #f0506e; }
 
 .flexContainer {
   display: flex;
@@ -654,9 +669,6 @@ dl .info:after {
   background: #031221; }
   .footer .footer a {
     color: #149f98; }
-
-.error {
-  color: #f0506e; }
 
 .status {
   width: 20px;
@@ -979,13 +991,13 @@ input:checked + .slider {
   text-transform: capitalize !important; }
 
 .mobileNumberUpdate .countryCode {
-  margin-top: 24px;
+  margin-top: 19px;
   width: 80px;
   margin-right: 10px; }
 .mobileNumberUpdate .mobileNumber {
   width: 100%; }
 .mobileNumberUpdate .mobileNumber label {
-  margin-left: -75px; }
+  margin-left: -77px; }
 
 .commonhomeData {
   font-size: 1.3rem; }
@@ -995,21 +1007,22 @@ input:checked + .slider {
 .comdex .cmuk-input, .cmuk-card-default, button, a, p {
   font-size: 1.2rem; }
 
-.inputField {
+.loginForm .inputField {
   display: flex; }
-  .inputField .inputFieldIcon {
+  .loginForm .inputField .inputFieldIcon {
     display: flex;
     align-items: center;
     height: 40px;
     background: #ebebeb;
     margin-top: 19px;
     padding: 0px 10px; }
-  .inputField .inputFieldBody {
+  .loginForm .inputField .inputFieldBody {
     width: 100%; }
-  .inputField .inputFieldBody input {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
+  .loginForm .inputField .inputFieldBody input {
     font-size: 1.2rem; }
+.loginForm .cmuk-button-link {
+  font-size: 1.2rem;
+  font-family: "Oxygen", sans-serif; }
 
 .connectionError {
   height: 100px;
