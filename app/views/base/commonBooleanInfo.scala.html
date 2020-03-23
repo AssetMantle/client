@@ -8,9 +8,9 @@
     @status match {
         case Some(status) => {
             @if(status) {
-                <span cmuk-icon="check"></span>
+                    <span class="cmuk-badge verified">Verified</span>
             } else {
-                <span cmuk-icon="close"></span>
+                <span class="cmuk-badge rejected">Not Verified</span>
             }
         }
         case _ => {

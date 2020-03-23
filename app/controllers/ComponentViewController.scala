@@ -287,12 +287,12 @@ class ComponentViewController @Inject()(
   def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
 //      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * limit, limit)
-      val organizationID = masterOrganizations.Service.getID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
       def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
       def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber*limit, limit)
       (for {
         organizationID <- organizationID
-        tradersInOrganizations <- tradersInOrganizations(organizationID)
+        tradersInOrganizations <- tradersInOrganizations(organizationID )
         notificationsOfTraders <- notificationsOfTraders(tradersInOrganizations.map(_.accountID))
       } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
         ).recover {

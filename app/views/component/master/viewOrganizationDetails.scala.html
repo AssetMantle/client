@@ -11,6 +11,7 @@
 @commonCard(constants.Form.ORGANIZATION_DETAILS) {
 } {
     <div>
+    @commonInfoBox(){
         <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span><br>
         @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
         @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
@@ -18,13 +19,17 @@
         @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
         @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
-
+    }
+        @commonInfoBox(){
         <span>@Messages(constants.View.REGISTERED_ADDRESS):</span><br>
         @streetAddress(organization.registeredAddress)
-
+        }
+        @commonInfoBox(){
         <span>@Messages(constants.View.POSTAL_ADDRESS):</span><br>
         @streetAddress(organization.postalAddress)
+        }
 
+        @commonInfoBox(){
         <span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span><br>
         @for(organizationKYC <- organizationKYCs) {
             @commonDocumentViewer(organizationKYC) {
@@ -35,10 +40,13 @@
 
             }
         }
+        }
 
+        @commonInfoBox(){
         <span>@Messages(constants.Form.ZONE_DETAILS)</span><br>
         @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
         @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
         @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+            }
     </div>
 }

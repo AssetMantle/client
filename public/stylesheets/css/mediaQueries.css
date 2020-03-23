@@ -13,6 +13,22 @@
       right: inherit; }
     .timeline .timeline-item .timeline-icon {
       left: 0; } }
+@media (min-width: 1200px) {
+  .pageContainer .leftSide {
+    height: 100%;
+    float: left;
+    left: 0;
+    margin-right: 1%;
+    width: 24%; }
+  .pageContainer .middle {
+    width: 50%;
+    height: calc(100% - 128px);
+    float: left; }
+  .pageContainer .rightSide {
+    height: 100%;
+    width: 24%;
+    float: left;
+    right: 0; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .leftTradeFinancial .financial {
     margin-bottom: 15px; }

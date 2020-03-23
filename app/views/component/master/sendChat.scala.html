@@ -27,7 +27,7 @@
         @commonInputText(sendChatForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
         <div class="hiddenLabel sendFormField">
         @commonInputText(sendChatForm, constants.FormField.MESSAGE)
-            <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)"><img src="@routes.Assets.versioned("images/icons/sendIcon.svg")"></button>
+            <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-telegram")"/></svg></button>
         </div>
         @commonInputText(sendChatForm, constants.FormField.REPLY_TO_CHAT,'containerDivClass -> "hidden", 'required -> false)
         </div>

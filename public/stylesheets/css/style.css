@@ -13,6 +13,22 @@
       right: inherit; }
     .timeline .timeline-item .timeline-icon {
       left: 0; } }
+@media (min-width: 1200px) {
+  .pageContainer .leftSide {
+    height: 100%;
+    float: left;
+    left: 0;
+    margin-right: 1%;
+    width: 24%; }
+  .pageContainer .middle {
+    width: 50%;
+    height: calc(100% - 128px);
+    float: left; }
+  .pageContainer .rightSide {
+    height: 100%;
+    width: 24%;
+    float: left;
+    right: 0; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .leftTradeFinancial .financial {
     margin-bottom: 15px; }
@@ -279,17 +295,9 @@ html, body {
     box-shadow: 0 0 0 5px #A1ED9F; }
 
 .pageContainer .leftSide {
-  height: 100%;
-  float: left;
-  left: 0;
-  margin-right: 1%;
-  width: 24%;
   margin-bottom: 5px;
   padding-top: 10px; }
 .pageContainer .middle {
-  width: 50%;
-  height: calc(100% - 128px);
-  float: left;
   padding-top: 10px; }
   .pageContainer .middle .cmuk-card-default {
     background: #FAFAFA;
@@ -407,10 +415,6 @@ html, body {
   .pageContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0px; }
 .pageContainer .rightSide {
-  height: 100%;
-  width: 24%;
-  float: left;
-  right: 0;
   margin-left: 1%;
   margin-bottom: 5px;
   padding-top: 10px; }
@@ -531,6 +535,9 @@ html, body {
     position: absolute;
     top: 0;
     right: 0; }
+    .recentActivity .chatRoom .cmuk-card-body .chatform .sendIconButton .icon {
+      width: 17px;
+      height: 17px; }
   .recentActivity .chatRoom .cmuk-card-body .chatform .replyBox {
     background-color: #FFffff;
     position: absolute;
@@ -700,28 +707,33 @@ header:before,
   vertical-align: top;
   font-size: 1.2rem; }
 .docView .documentlist .docIcon {
-  color: #262525;
-  font-size: 1.2rem; }
-  .docView .documentlist .docIcon img {
-    background: #FFFFFF;
-    border: 0.411524px solid #EAEAEA;
-    box-sizing: border-box;
-    padding: 5px;
-    border-radius: 1.6461px;
-    margin-right: 5px; }
+  background: #FFFFFF;
+  border: 0.411524px solid #EAEAEA;
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 1.6461px;
+  margin-right: 5px; }
+  .docView .documentlist .docIcon .icon {
+    width: 12px;
+    height: 15px; }
 .docView .documentlist .moreIcon span {
   width: 15px; }
-.docView .documentlist .seenIcon img {
+.docView .documentlist .seenIcon {
   padding: 5px;
   background: #DDE8F3;
   border-radius: 2px; }
+  .docView .documentlist .seenIcon .icon {
+    width: 20px;
+    height: 16px; }
 .docView .documentlist .table-scroll tbody {
   height: 200px; }
   .docView .documentlist .table-scroll tbody tr {
     padding: 6px 0px;
     border-bottom: 1px solid #E0E0E0; }
     .docView .documentlist .table-scroll tbody tr td:first-child {
-      padding-left: 15px; }
+      padding-left: 15px;
+      color: #262525;
+      font-size: 1.2rem; }
     .docView .documentlist .table-scroll tbody tr td:last-child {
       padding-right: 10px; }
 .docView .documentlist .primayDocs {
@@ -993,5 +1005,8 @@ header:before,
   .contactDetails .cmuk-card-body .buttonUpdate {
     position: absolute;
     bottom: 20px; }
+
+.organizationDetails .cmuk-card-body .cmuk-card-default {
+  margin-bottom: 5px; }
 
 /*# sourceMappingURL=style.css.map */

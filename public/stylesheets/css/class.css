@@ -956,7 +956,8 @@ input:checked + .slider {
   border-radius: 3px;
   border: 1px solid #DDE8F3;
   display: flex;
-  justify-content: space-between; }
+  justify-content: space-between;
+  margin-bottom: 5px; }
   .documentItem .documentContentTop {
     font-size: 1.2rem;
     margin: 10px; }
