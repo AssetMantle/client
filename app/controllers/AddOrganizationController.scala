@@ -116,7 +116,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def updateUBOs(id: String): Future[Int] = {
-            if (updateUBOsData.ubos.filter(_.isDefined).map(uboData => uboData.get.sharePercentage).sum > constants.Organization.MAXIMUM_TOTAL_UBO_SHARE_PERCENTAGE) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
+            if (updateUBOsData.ubos.filter(_.isDefined).map(uboData => uboData.get.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
             masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map(uboData => UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
           }
 
@@ -152,7 +152,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
             val newUBOs = oldUBOs.data :+ UBO(personName = userAddUBOData.personName, sharePercentage = userAddUBOData.sharePercentage, relationship = userAddUBOData.relationship, title = userAddUBOData.title)
-            if (newUBOs.map(_.sharePercentage).sum > constants.Organization.MAXIMUM_TOTAL_UBO_SHARE_PERCENTAGE) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
+            if (newUBOs.map(_.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -186,7 +186,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
             val newUBOs = oldUBOs.data :+ UBO(personName = addUBOData.personName, sharePercentage = addUBOData.sharePercentage, relationship = addUBOData.relationship, title = addUBOData.title)
-            if (newUBOs.map(_.sharePercentage).sum > constants.Organization.MAXIMUM_TOTAL_UBO_SHARE_PERCENTAGE) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
+            if (newUBOs.map(_.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
