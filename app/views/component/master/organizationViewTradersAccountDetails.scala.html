@@ -7,8 +7,8 @@
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
 }{
     @commonHorizontalSwitcher(jsRouteItems = Map(
-        constants.View.TEAM -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewAcceptedTradersAccountDetails),
-        constants.View.PENDING_TRADER_REQUESTS -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewPendingTraderRequests),
-        constants.View.REJECTED_TRADER_REQUESTS -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewRejectedTraderRequests),
+        constants.View.TEAM -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewAcceptedTradersAccountList),
+        constants.View.PENDING_TRADER_REQUESTS -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewPendingTraderRequestList),
+        constants.View.REJECTED_TRADER_REQUESTS -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewRejectedTraderRequestList),
     ))
 }

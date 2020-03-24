@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.ORGANIZATIONS) {
+}{
+    @commonHorizontalSwitcher(jsRouteItems = Map(
+        constants.View.APPROVED -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewAcceptedTradersAccountDetails),
+        constants.View.PENDING_ORGANIZATION_REQUESTS -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewPendingTraderRequests),
+        constants.View.REJECTED_ORGANIZATION_REQUESTS -> utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationViewRejectedTraderRequests),
+    ))
+}

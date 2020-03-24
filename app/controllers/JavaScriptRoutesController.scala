@@ -99,11 +99,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
 
         routes.javascript.ComponentViewController.organizationViewTradersAccountDetails,
-        routes.javascript.ComponentViewController.organizationViewAcceptedTradersAccountDetails,
+        routes.javascript.ComponentViewController.organizationViewAcceptedTradersAccountList,
         routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountDetails,
-        routes.javascript.ComponentViewController.organizationViewPendingTraderRequests,
+        routes.javascript.ComponentViewController.organizationViewPendingTraderRequestList,
         routes.javascript.ComponentViewController.organizationViewPendingTraderRequest,
-        routes.javascript.ComponentViewController.organizationViewRejectedTraderRequests,
+        routes.javascript.ComponentViewController.organizationViewRejectedTraderRequestList,
         routes.javascript.ComponentViewController.organizationViewRejectedTraderRequest,
 
         routes.javascript.ComponentViewController.organizationViewTrader,
