@@ -5,6 +5,7 @@ function getQuiz(getQuizButton,getMnemonicButton,verifyMnemonicButton) {
         if (!randomArray.includes(randomNum)) {
             randomArray.push(randomNum);
             $("#mnemonicElement-" + randomNum).attr('readonly', false).val("");
+            $("#mnemonicElement-" + randomNum).addClass('mnemonicField');
         }
     }
     $(getQuizButton).hide();
@@ -17,6 +18,7 @@ function getMnemonic(mnemonic,getQuizButton,getMnemonicButton,verifyMnemonicButt
     for (let i = 0; i < 24; i++) {
         let mnemonicElement = $("#mnemonicElement-" + i);
         if (!mnemonicElement.prop('readonly')) {
+            $("#mnemonicElement-" +i).removeClass('mnemonicField');
             mnemonicElement.val(mnemonicElementArray[i]).attr('readonly', true);
         }
     }

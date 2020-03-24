@@ -6,18 +6,12 @@
 <div class="loginForm cmuk-text-center">
 @commonForm(constants.Form.LOGIN, loginForm) {
     <div class="inputField">
-        <div class="inputFieldIcon">
-             <span class="cmuk-icon-link" cmuk-icon="user"></span>
-        </div>
         <div class="inputFieldBody">
         @commonInputText(loginForm, constants.FormField.USERNAME)
         </div>
 
     </div>
     <div class="inputField">
-        <div class="inputFieldIcon">
-            <span class="cmuk-icon-link" cmuk-icon="lock"></span>
-        </div>
         <div class="inputFieldBody">
             @commonInputPassword(loginForm, constants.FormField.PASSWORD)
         </div>

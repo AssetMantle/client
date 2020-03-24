@@ -188,7 +188,8 @@ html, body {
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 1.2rem;
-    color: #FFFFFF; }
+    color: #FFFFFF;
+    line-height: 30px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav li:last-child a {
     padding-right: 0px; }
   .header .cmuk-navbar-nav > li > a {
@@ -278,8 +279,11 @@ html, body {
     transition: .1s ease-in-out;
     transition-property: color,background-color,border-color;
     outline: none; }
-    .right .refresh img {
+    .right .refresh span {
       padding: 0px 5px; }
+    .right .refresh .icon {
+      width: 13px;
+      height: 13px; }
   .right .live {
     align-items: center; }
   .right .liveText {

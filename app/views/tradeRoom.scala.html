@@ -59,10 +59,10 @@
 
 @right={
     <div class="right cmuk-flex">
-        <button class="refresh"><img src="@routes.Assets.versioned("./images/icons/amendIcon.svg")">Amend</button>
-        <button class="refresh "><img src="@routes.Assets.versioned("./images/icons/refreshIcon.svg")">Refresh</button>
+        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>Amend</button>
+        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>Refresh</button>
         <div class="cmuk-flex live">
-            <span class="liveText secondaryFont">Live Trade Room </span>
+            <span class="liveText secondaryFont">@Messages("Live Trade Room") </span>
             <div class="liveIcon"></div>
         </div>
     </div>
