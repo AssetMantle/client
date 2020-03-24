@@ -1,0 +1,55 @@
+package transactions
+
+import java.net.ConnectException
+
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{JsValue, Json, OWrites}
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.{Configuration, Logger}
+import transactions.Abstract.BaseRequest
+
+import scala.concurrent.{ExecutionContext, Future}
+
+@Singleton
+class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+
+  private implicit val module: String = constants.Module.TRANSACTIONS_TRULIOO_VERIFY
+
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
+
+  private val apiKeyValue = configuration.get[String]("trulioo.apiKeyValue")
+
+  private val headers = Tuple2(apiKeyName,apiKeyValue)
+
+  private val baseURL = configuration.get[String]("trulioo.url")
+
+  private val endpoint = configuration.get[String]("trulioo.endpoints.verify")
+
+  private val url = baseURL + endpoint
+
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+
+  private implicit val personalInfoWrites: OWrites[PersoanlInfo] = Json.writes[PersoanlInfo]
+
+  case class PersoanlInfo(FirstGivenName: String, FirstSurName: String)
+
+  private implicit val dataFieldsWrites: OWrites[DataFields] = Json.writes[DataFields]
+
+  case class DataFields(PersonInfo: JsValue, Location: Option[JsValue], Communication: Option[JsValue], Passport: Option[JsValue])
+
+  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+
+  case class Request(AcceptTruliooTermsAndConditions: Boolean, CleansedAddress: Boolean, ConsentForDataSources: Seq[String], CountryCode: String, DataFields: JsValue) extends BaseRequest
+
+  object Service {
+
+    def post(request: Request): Future[WSResponse] = action(request).recover {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+    }
+  }
+
+}

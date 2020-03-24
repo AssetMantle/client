@@ -442,3 +442,5 @@ GET         /master/chatRoom                                             control
 GET         /master/updateTermsStatus                                    controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
 GET         /master/tradeList                                            controllers.TradeRoomController.tradeList
 POST        /master/updateTradeTermStatus                                controllers.TradeRoomController.updateTradeTermStatus
+
+GET         /test                                                        controllers.BackgroundCheckController.testTruliooAPI

@@ -6,9 +6,9 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.TraderReputationResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
+import queries.responses.TruliooAuthenticationResponse.Response
 
 @Singleton
 class GetTruliooAuthentication @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -29,7 +29,7 @@ class GetTruliooAuthentication @Inject()(wsClient: WSClient)(implicit configurat
 
   private val url = baseURL + endpoint
 
-  private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withHttpHeaders(headers).get)
+  private def action: Future[Response] = wsClient.url(url).withHttpHeaders(headers).get.map { response => new Response(response) }
 
   object Service {
 

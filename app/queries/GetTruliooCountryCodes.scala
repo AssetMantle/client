@@ -6,9 +6,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.TraderReputationResponse.Response
-
 import scala.concurrent.{ExecutionContext, Future}
+import queries.responses.TruliooCountryCodesResponse.Response
 
 @Singleton
 class GetTruliooCountryCodes @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -29,7 +28,7 @@ class GetTruliooCountryCodes @Inject()(wsClient: WSClient)(implicit configuratio
 
   private val url = baseURL + endpoint
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(headers).get)
+  private def action(request: String): Future[Response] = wsClient.url(url + request).withHttpHeaders(headers).get.map(response => new Response(response))
 
   object Service {
 
