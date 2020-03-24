@@ -24,7 +24,7 @@
         }
         case None => {
             <div class="cmuk-position-center">
-                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.Form.IDENTIFICATION.legend)</button>
+                @commonFormButton(constants.Form.IDENTIFICATION)
             </div>
         }
     }
