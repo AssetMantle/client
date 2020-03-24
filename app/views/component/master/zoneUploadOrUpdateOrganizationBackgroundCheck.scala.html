@@ -1,0 +1,30 @@
+@import controllers.actions.LoginState
+@import models.master.OrganizationBackgroundCheck
+@import models.master.Organization
+
+@(organizationBackgroundChecks: Seq[OrganizationBackgroundCheck], organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_BACKGROUND_CHECK)</h4>
+</div>
+<div class="centerText">
+    @for(documentType <- constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES) {
+        <div id="upload@documentType">
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm('@documentType', '@organization.id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(organizationBackgroundCheck <- organizationBackgroundChecks) {
+        @component.master.commonDocumentViewer(organizationBackgroundCheck) {
+            @routes.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationBackgroundCheck.id, organizationBackgroundCheck.fileName,organizationBackgroundCheck.documentType)
+        } {
+            <a href="@routes.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationBackgroundCheck.id, organizationBackgroundCheck.fileName, organizationBackgroundCheck.documentType)">@Messages(organizationBackgroundCheck.documentType)</a>
+        } {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm('@organizationBackgroundCheck.documentType','@organization.id'))">@Messages(constants.Form.UPDATE) @Messages(organizationBackgroundCheck.documentType)</button>
+            <script>hideElement('upload@organizationBackgroundCheck.documentType')</script>
+        }
+    }
+</div>
+
+@if(constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(organizationBackgroundChecks.map(_.documentType)).isEmpty) {
+    <button type="button" class="cmuk-button cmuk-button-primary" id="getOrganizationBackgroundCheckReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organization.id','@organization.zoneID'))">@Messages(constants.Form.NEXT)</button>
+}
