@@ -204,6 +204,23 @@ GET         /traderUpload/storeFile                                      control
 GET         /traderUpdate                                                controllers.SetACLController.updateTraderKYCForm(documentType: String)
 GET         /traderUpload/updateFile                                     controllers.SetACLController.updateTraderKYC(name: String, documentType: String)
 
+GET         /worldCheck/traderBackgroundCheckUpload                           controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
+POST        /worldCheck/traderBackgroundCheckUpload/file                      controllers.BackgroundCheckController.uploadTraderBackgroundCheckFile(documentType: String)
+GET         /worldCheck/traderBackgroundCheckUpload/storeFile                 controllers.BackgroundCheckController.storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
+GET         /worldCheck/traderBackgroundCheckUpdate                           controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm(documentType: String, traderID :String)
+GET         /worldCheck/traderBackgroundCheckUpdate/updateFile                controllers.BackgroundCheckController.updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
+GET         /worldCheck/uploadOrUpdateTraderBackgroundCheck                   controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile(traderID: String)
+
+GET         /worldCheck/organizationBackgroundCheckUpload                     controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
+POST        /worldCheck/organizationBackgroundCheckUpload/file                controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFile(documentType: String)
+GET         /worldCheck/organizationBackgroundCheckUpload/storeFile           controllers.BackgroundCheckController.storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
+GET         /worldCheck/organizationBackgroundCheckUpdate                     controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
+GET         /worldCheck/organizationBackgroundCheckUpdate/updateFile          controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
+GET         /worldCheck/uploadOrUpdateOrganizationBackgroundCheck             controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String)
+
+GET         /worldCheck/zoneAccessedTraderBackgroundCheckFile                 controllers.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String)
+GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile           controllers.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String)
+
 GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
 POST        /traderUpload/assetDocument                                  controllers.FileController.uploadTraderAsset(documentType: String)
 GET         /traderUpload/storeAssetDocument                             controllers.FileController.storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
