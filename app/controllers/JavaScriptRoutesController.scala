@@ -246,7 +246,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.viewTradersInOrganizationForGenesis,
         routes.javascript.SetACLController.zoneVerifyTraderForm,
         routes.javascript.SetACLController.organizationVerifyTraderForm,
-        routes.javascript.SetACLController.organizationModifyTraderForm,
         routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm,
         routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,
@@ -272,6 +271,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.TraderController.traderRelationRequestForm,
         routes.javascript.TraderController.organizationRejectTraderRequestForm,
+        routes.javascript.TraderController.organizationModifyTraderForm,
 
         routes.javascript.TradeRoomController.tradeTerms,
         routes.javascript.TradeRoomController.tradeFinancials,

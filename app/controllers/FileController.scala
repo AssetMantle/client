@@ -686,8 +686,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val buyerAccountID = masterTransactionNegotiationRequests.Service.getBuyerAccountID(id)
 
       def getTraders(sellerAccountID: String, buyerAccountID: String): Future[(Trader, Trader)] = {
-        val sellerTrader = masterTraders.Service.getByAccountID(sellerAccountID)
-        val buyerTrader = masterTraders.Service.getByAccountID(buyerAccountID)
+        val sellerTrader = masterTraders.Service.tryGetByAccountID(sellerAccountID)
+        val buyerTrader = masterTraders.Service.tryGetByAccountID(buyerAccountID)
         for {
           sellerTrader <- sellerTrader
           buyerTrader <- buyerTrader

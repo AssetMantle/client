@@ -126,7 +126,6 @@ object Form {
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader())
   val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest())
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader())
-  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.SetACLController.organizationModifyTrader())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
 
   //SetBuyerFeedbackController
@@ -140,6 +139,7 @@ object Form {
   //TraderController
   val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectTraderRequest())
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest())
+  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader())
 
   //TradeRoomController
   val UPDATE_TRADE_TERM_STATUS = new Form("UPDATE_TRADE_TERM_STATUS", routes.SetSellerFeedbackController.setSellerFeedback())

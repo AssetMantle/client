@@ -6,7 +6,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Organization, Trader, TraderRelation}
-import models.{blockchain, master, masterTransaction}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.{Configuration, Logger}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
@@ -30,6 +30,10 @@ class TraderController @Inject()(
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
                                   masterTraderRelations: master.TraderRelations,
                                   masterTraders: master.Traders,
+                                  transaction: utilities.Transaction,
+                                  blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
+                                  transactionsSetACL: transactions.SetACL,
+                                  blockchainAclHashes: blockchain.ACLHashes,
                                 )
                                 (implicit
                                  executionContext: ExecutionContext,
@@ -40,6 +44,8 @@ class TraderController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_TRADER
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   def organizationRejectTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.organizationRejectTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
@@ -78,7 +84,7 @@ class TraderController @Inject()(
         },
         traderRelationRequestData => {
 
-          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
 
@@ -144,7 +150,7 @@ class TraderController @Inject()(
 
           def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
 
-          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
 
@@ -173,6 +179,99 @@ class TraderController @Inject()(
             result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization, traderRelation = traderRelation)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def organizationModifyTraderForm(accountID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val trader = masterTraders.Service.tryGetByAccountID(accountID)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getResult(trader: Trader, organizationID: String) = if (trader.organizationID == organizationID) {
+        Ok(views.html.component.master.organizationModifyTrader(accountID = accountID, trader = trader))
+      } else {
+        Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
+      }
+
+      (for {
+        trader <- trader
+        organizationID <- organizationID
+      } yield getResult(trader, organizationID)).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationModifyTrader: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.ModifyTrader.form.bindFromRequest().fold(
+        formWithErrors => {
+          val trader = masterTraders.Service.tryGetByAccountID(formWithErrors.data(constants.FormField.ACCOUNT_ID.name))
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+          def getResult(trader: Trader, organizationID: String) = if (trader.organizationID == organizationID) {
+            BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors, accountID = formWithErrors.data(constants.FormField.ACCOUNT_ID.name), trader = trader))
+          } else {
+            Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
+          }
+
+          (for {
+            trader <- trader
+            organizationID <- organizationID
+          } yield getResult(trader, organizationID)).recover {
+            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+          }
+        },
+        modifyTraderData => {
+          val trader = masterTraders.Service.tryGetByAccountID(modifyTraderData.accountID)
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+          def checkAllKYCFilesVerified(trader: Trader, organizationID: String): Future[Boolean] = if (trader.organizationID == organizationID) {
+            masterTraderKYCs.Service.checkAllKYCFilesVerified(trader.id)
+          } else {
+            throw new BaseException(constants.Response.UNAUTHORIZED)
+          }
+
+          def getResult(checkAllKYCFilesVerified: Boolean): Future[Result] = {
+            if (checkAllKYCFilesVerified) {
+              val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
+              val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+              val aclAddress = masterAccounts.Service.getAddress(modifyTraderData.accountID)
+              val acl = blockchain.ACL(issueAsset = modifyTraderData.issueAsset, issueFiat = modifyTraderData.issueFiat, sendAsset = modifyTraderData.sendAsset, sendFiat = modifyTraderData.sendFiat, redeemAsset = modifyTraderData.redeemAsset, redeemFiat = modifyTraderData.redeemFiat, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder, changeBuyerBid = modifyTraderData.changeBuyerBid, changeSellerBid = modifyTraderData.changeSellerBid, confirmBuyerBid = modifyTraderData.confirmBuyerBid, confirmSellerBid = modifyTraderData.changeSellerBid, negotiation = modifyTraderData.negotiation, releaseAsset = modifyTraderData.releaseAsset)
+              val createACL = blockchainAclHashes.Service.create(acl)
+
+              def transactionProcess(aclAddress: String, zoneID: String, organizationID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = modifyTraderData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = modifyTraderData.gas.toString), password = modifyTraderData.password, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, issueAsset = modifyTraderData.issueAsset.toString, issueFiat = modifyTraderData.issueFiat.toString, sendAsset = modifyTraderData.sendAsset.toString, sendFiat = modifyTraderData.sendFiat.toString, redeemAsset = modifyTraderData.redeemAsset.toString, redeemFiat = modifyTraderData.redeemFiat.toString, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = modifyTraderData.changeBuyerBid.toString, changeSellerBid = modifyTraderData.changeSellerBid.toString, confirmBuyerBid = modifyTraderData.confirmBuyerBid.toString, confirmSellerBid = modifyTraderData.confirmSellerBid.toString, negotiation = modifyTraderData.negotiation.toString, releaseAsset = modifyTraderData.releaseAsset.toString, mode = transactionMode),
+                action = transactionsSetACL.Service.post,
+                onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+              )
+
+              for {
+                aclAddress <- aclAddress
+                zoneID <- zoneID
+                organizationID <- organizationID
+                _ <- createACL
+                _ <- transactionProcess(aclAddress, zoneID, organizationID)
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
+              } yield result
+            } else {
+              Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+            }
+          }
+
+          (for {
+            trader <- trader
+            organizationID <- organizationID
+            checkAllKYCFilesVerified <- checkAllKYCFilesVerified(trader, organizationID)
+            result <- getResult(checkAllKYCFilesVerified)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

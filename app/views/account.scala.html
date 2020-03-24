@@ -25,6 +25,9 @@
             </script>
         }
         case constants.User.TRADER => {}
+        case constants.User.USER => {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE.legend)</button>
+        }
         case _ => {}
     }
 

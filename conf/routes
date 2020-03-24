@@ -62,6 +62,9 @@ POST        /trader/traderRelationRequest                                   cont
 GET         /trader/acceptOrRejectTraderRelation                            controllers.TraderController.acceptOrRejectTraderRelationForm(fromID: String, toID: String)
 POST        /trader/acceptOrRejectTraderRelation                            controllers.TraderController.acceptOrRejectTraderRelation
 
+GET         /trader/organizationModifyTrader                                controllers.TraderController.organizationModifyTraderForm(accountID: String)
+POST        /trader/organizationModifyTrader                                controllers.TraderController.organizationModifyTrader
+
 GET         /contact                                                        controllers.ContactController.contact
 
 GET         /master/notifications                                           controllers.NotificationController.notificationPage(pageNumber:Int)
@@ -199,8 +202,6 @@ POST        /master/zoneRejectVerifyTraderRequest                           cont
 
 GET         /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTrader
-GET         /master/organizationModifyTrader                                controllers.SetACLController.organizationModifyTraderForm(accountID: String)
-POST        /master/organizationModifyTrader                                controllers.SetACLController.organizationModifyTrader
 GET         /master/organzationViewTraderKYCDocuments                       controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
 GET         /master/updateTraderKYCDocumentOrganizationStatus               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentOrganizationStatus               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus

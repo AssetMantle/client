@@ -503,7 +503,7 @@ class ComponentViewController @Inject()(
 
   def traderViewOrganizationDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val trader: Future[Trader] = masterTraders.Service.getByAccountID(loginState.username)
+      val trader: Future[Trader] = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
 
@@ -518,7 +518,7 @@ class ComponentViewController @Inject()(
 
   def viewOrganizationDetails: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organization: Future[Organization] = masterOrganizations.Service.getByAccountID(loginState.username)
+      val organization: Future[Organization] = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
       def getZone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
 
@@ -619,7 +619,7 @@ class ComponentViewController @Inject()(
     implicit loginState =>
       implicit request =>
         val fromTrader = masterTraders.Service.tryGet(fromID)
-        val toTrader = masterTraders.Service.getByAccountID(loginState.username)
+        val toTrader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
         def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
 
