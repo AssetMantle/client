@@ -2,7 +2,8 @@
 @import views.html.base._
 @import views.companion.master.RejectVerifyOrganizationRequest
 
-@(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data] = RejectVerifyOrganizationRequest.form, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data] = RejectVerifyOrganizationRequest.form, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, rejectVerifyOrganizationRequestForm) {
-    @commonInputText(rejectVerifyOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID)
+    @commonInputText(rejectVerifyOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID, 'readonly -> true)
 }
+@commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organizationID}'")

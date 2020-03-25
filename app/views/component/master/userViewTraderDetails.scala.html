@@ -18,10 +18,9 @@
     <br>
         @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
         @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-        @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
+        @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
         @commonTextInfo(constants.View.REGISTERED_ADDRESS, Seq(organization.registeredAddress.addressLine1, organization.registeredAddress.addressLine2, organization.registeredAddress.landmark.getOrElse(""), Seq(organization.registeredAddress.city, organization.registeredAddress.zipCode).mkString(" - "), organization.registeredAddress.country).mkString(",\n"))
         @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
-        @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
         @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
 </div>

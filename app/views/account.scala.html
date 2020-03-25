@@ -15,27 +15,38 @@
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="zoneViewOrganizationsAccountDetails"></div>
+                    <div id="zoneViewOrganizationAccountsList"></div>
                 </div>
 
             </div>
             <script>
-                    componentResource('zoneViewOrganizationsAccountDetails', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationsAccountDetails());
+                    componentResource('zoneViewOrganizationAccountsList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountsList());
             </script>
         }
         case constants.User.ORGANIZATION => {
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="organizationViewTradersAccountDetails"></div>
+                    <div id="organizationViewTraderAccountsList"></div>
                 </div>
 
             </div>
             <script>
-                    componentResource('organizationViewTradersAccountDetails', jsRoutes.controllers.ComponentViewController.organizationViewTradersAccountDetails());
+                    componentResource('organizationViewTraderAccountsList', jsRoutes.controllers.ComponentViewController.organizationViewTraderAccountsList());
             </script>
         }
-        case constants.User.TRADER => {}
+        case constants.User.TRADER => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderRelationList"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
+            </script>
+        }
         case constants.User.USER => {
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE.legend)</button>
         }

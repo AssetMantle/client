@@ -137,8 +137,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       (for {
         organizationZoneID <- organizationZoneID
         userZoneID <- userZoneID
@@ -156,7 +156,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderZoneID = masterTraders.Service.getZoneID(traderID)
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       (for {
         traderZoneID <- traderZoneID
         userZoneID <- userZoneID
@@ -612,7 +612,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   //TODO Shall we check if exists?
   def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def fileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
@@ -659,7 +659,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedAssetFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
 
       def traderZoneID(accountID: String): Future[String] = masterTraders.Service.getZoneIDByAccountID(accountID)
@@ -681,7 +681,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedNegotiationFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       val sellerAccountID = masterTransactionNegotiationRequests.Service.getSellerAccountID(id)
       val buyerAccountID = masterTransactionNegotiationRequests.Service.getBuyerAccountID(id)
 
@@ -799,7 +799,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path: Future[String] = loginState.userType match {
         case constants.User.ZONE =>
-          val zoneID = masterZones.Service.getID(loginState.username)
+          val zoneID = masterZones.Service.tryGetID(loginState.username)
 
           def checkFileNameExistsZoneKYCs(zoneID: String): Future[Boolean] = masterZoneKYCs.Service.checkFileNameExists(id = zoneID, fileName = fileName)
 

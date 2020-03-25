@@ -142,9 +142,9 @@ object Form {
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback(), routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm)
 
   //TraderController
-  val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectTraderRequest())
+  val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectTraderRequest(), routes.javascript.TraderController.organizationRejectTraderRequestForm)
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
-  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader())
+  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
 
   //TradeRoomController
   val UPDATE_TRADE_TERM_STATUS = new Form("UPDATE_TRADE_TERM_STATUS", routes.SetSellerFeedbackController.setSellerFeedback(), routes.javascript.SetSellerFeedbackController.setSellerFeedbackForm)
@@ -176,7 +176,6 @@ object Form {
   val INVALID_BLOCK_HEIGHT = "INVALID_BLOCK_HEIGHT"
   val INVALID_TRANSACTION_HASH = "INVALID_TRANSACTION_HASH"
   val LOAD_MORE_NOTIFICATIONS = "LOAD_MORE_NOTIFICATIONS"
-  val ORGANIZATIONS = "ORGANIZATIONS"
   val ZONES = "ZONES"
   val INBOX = "INBOX"
   val NEGOTIATE = "NEGOTIATE"
@@ -313,7 +312,6 @@ object Form {
   val CONFIRM_PASSWORD = "CONFIRM_PASSWORD"
   val FROM = "FROM"
   val TO = "TO"
-  val ORGANIZATION = "ORGANIZATION"
   val ZONE = "ZONE"
   val GENESIS = "GENESIS"
   val GENESIS_ADDRESS = "GENESIS_ADDRESS"
@@ -357,7 +355,6 @@ object Form {
   val PHONE = "PHONE"
   val EMAIL = "EMAIL"
   val ID = "ID"
-  val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
   val USERNAME = "USERNAME"
   val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"

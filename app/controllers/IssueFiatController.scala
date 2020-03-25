@@ -27,7 +27,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def addressesUnderZone(zoneID: String): Future[Seq[String]] = blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
 

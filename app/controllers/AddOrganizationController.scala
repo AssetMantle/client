@@ -28,7 +28,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def addOrganizationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
+      val organization = masterOrganizations.Service.getByAccountID(loginState.username)
       val zones = masterZones.Service.getAllVerified
 
       def getResult(organization: Option[Organization], zones: Seq[Zone]): Future[Result] = {
@@ -543,21 +543,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       )
   }
 
-  def viewKYCDocuments(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organizationID)
-      (for {
-        organizationKYCs <- organizationKYCs
-      } yield Ok(views.html.component.master.viewVerificationOrganizationKYCDouments(organizationKYCs))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userZoneID = masterZones.Service.getID(loginState.username)
-      val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
+      val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
 
       def getResult(userZoneID: String, organizationZoneID: String): Future[Result] = {
         if (userZoneID == organizationZoneID) {
@@ -589,8 +578,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           } yield BadRequest(views.html.component.master.updateOrganizationKYCDocumentStatus(formWithErrors, organizationKYC))
         },
         updateOrganizationKYCDocumentStatusData => {
-          val userZoneID = masterZones.Service.getID(loginState.username)
-          val organizationZoneID = masterOrganizations.Service.getZoneID(updateOrganizationKYCDocumentStatusData.organizationID)
+          val userZoneID = masterZones.Service.tryGetID(loginState.username)
+          val organizationZoneID = masterOrganizations.Service.tryGetZoneID(updateOrganizationKYCDocumentStatusData.organizationID)
 
           def verifyOrReject: Future[Unit] = {
             if (updateOrganizationKYCDocumentStatusData.status) {
@@ -656,28 +645,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             _ <- rejectOrganization
             organizationAccountID <- organizationAccountID
             _ <- rejectAll(organizationAccountID)
-            result <- withUsernameToken.Ok(views.html.zoneRequest(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }
         }
       )
-  }
-
-  def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
-
-      def verifyOrganizationRequests(zoneID: String): Future[Seq[Organization]] = masterOrganizations.Service.getVerifyOrganizationRequests(zoneID)
-
-      (for {
-        zoneID <- zoneID
-        verifyOrganizationRequests <- verifyOrganizationRequests(zoneID)
-      } yield Ok(views.html.component.master.viewPendingVerifyOrganizationRequests(verifyOrganizationRequests))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
-      }
   }
 
   def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -758,7 +732,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def viewOrganizationsInZone: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def organizationsInZone(zoneID: String): Future[Seq[Organization]] = masterOrganizations.Service.getOrganizationsInZone(zoneID)
 

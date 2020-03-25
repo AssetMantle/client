@@ -94,6 +94,13 @@
                         <div id="viewOrganizationUBOs"></div>
                     </div>
 
+                    <div class="cmuk-width-expand@@m">
+                        @commonCard(constants.View.ORGANIZATION_DECALRATIONS){
+                        }{
+                            @Messages(constants.View.TO_BE_FILLED)
+                        }
+                    </div>
+
                 </div>
                 <script>
                     componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
@@ -104,21 +111,10 @@
             case _ => {}
 
         }
-
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-            @if(loginState.userType == constants.User.TRADER) {
-                <div id="traderRelationList"></div>
-            }
-        </div>
-
-
     </div>
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('contact', jsRoutes.controllers.ContactController.contact());
             componentResource('viewIdentificationDetails', jsRoutes.controllers.ComponentViewController.viewIdentificationDetails());
-
-            @*//TODO Remove when shifting to account *@
-            componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
     </script>
 }

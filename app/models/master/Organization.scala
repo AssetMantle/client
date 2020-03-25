@@ -248,7 +248,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getNameByAccountID(accountID: String): Future[String] = findNameByAccountID(accountID)
 
-    def get(id: String): Future[Organization] = findById(id).map { organizationSerialized => organizationSerialized.deserialize }
+    def tryGet(id: String): Future[Organization] = findById(id).map { organizationSerialized => organizationSerialized.deserialize }
 
     def getOrNone(id: String): Future[Option[Organization]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
@@ -256,7 +256,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getByAccountID(accountID: String): Future[Option[Organization]] = findOrNoneByAccountID(accountID).map(_.map(_.deserialize))
 
-    def getZoneID(id: String): Future[String] = getZoneIDByID(id)
+    def tryGetZoneID(id: String): Future[String] = getZoneIDByID(id)
 
     def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
@@ -266,7 +266,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getAccountId(id: String): Future[String] = getAccountIDByID(id)
 
-    def getVerifyOrganizationRequests(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map { organizations => organizations.map(_.deserialize) }
+    def getAcceptedOrganizationsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(true)).map { organizations => organizations.map(_.deserialize) }
+
+    def getPendingOrganizationRequestsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map { organizations => organizations.map(_.deserialize) }
+
+    def getRejectedOrganizationRequestsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(false)).map { organizations => organizations.map(_.deserialize) }
 
     def getOrganizationsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByZoneID(zoneID).map { organizations => organizations.map(_.deserialize) }
 

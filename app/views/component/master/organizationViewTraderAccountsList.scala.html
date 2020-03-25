@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.TRADERS) {
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
+}{
+    @commonHorizontalSwitcher(jsRouteItems = Map(
+        constants.View.TEAM -> routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountsList,
+        constants.View.PENDING_TRADER_REQUESTS -> routes.javascript.ComponentViewController.organizationViewPendingTraderRequestsList,
+        constants.View.REJECTED_TRADER_REQUESTS -> routes.javascript.ComponentViewController.organizationViewRejectedTraderRequestsList,
+    ))
+}

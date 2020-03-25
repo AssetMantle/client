@@ -62,7 +62,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userUploadOrUpdateZoneKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def zoneKYCs(zoneID: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(zoneID)
 
@@ -102,7 +102,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userStoreZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
         name = name,
@@ -131,7 +131,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userUpdateZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
@@ -191,7 +191,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           }
         },
         userReviewAddZoneRequestData => {
-          val id = masterZones.Service.getID(loginState.username)
+          val id = masterZones.Service.tryGetID(loginState.username)
 
           def allKYCFileTypesExists(id: String): Future[Boolean] = masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)
 
@@ -418,7 +418,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def storeZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
         name = name,
@@ -444,7 +444,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def updateZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 

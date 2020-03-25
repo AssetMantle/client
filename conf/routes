@@ -113,14 +113,21 @@ GET         /master/component/orderList                                     cont
 GET         /master/component/availableAssetList                            controllers.ComponentViewController.availableAssetList
 GET         /master/component/availableAssetListWithLogin                   controllers.ComponentViewController.availableAssetListWithLogin
 
-GET         /component/organizationViewTradersAccountDetails                controllers.ComponentViewController.organizationViewTradersAccountDetails
-GET         /component/organizationViewAcceptedTradersAccountList           controllers.ComponentViewController.organizationViewAcceptedTradersAccountList
+GET         /component/organizationViewTraderAccountsList                   controllers.ComponentViewController.organizationViewTraderAccountsList
+GET         /component/organizationViewAcceptedTraderAccountsList           controllers.ComponentViewController.organizationViewAcceptedTraderAccountsList
 GET         /component/organizationViewAcceptedTraderAccountDetails         controllers.ComponentViewController.organizationViewAcceptedTraderAccountDetails(traderID: String)
-GET         /component/organizationViewPendingTraderRequestList             controllers.ComponentViewController.organizationViewPendingTraderRequestList
+GET         /component/organizationViewPendingTraderRequestsList            controllers.ComponentViewController.organizationViewPendingTraderRequestsList
 GET         /component/organizationViewPendingTraderRequest                 controllers.ComponentViewController.organizationViewPendingTraderRequest(traderID: String)
-GET         /component/organizationViewRejectedTraderRequestList            controllers.ComponentViewController.organizationViewRejectedTraderRequestList
+GET         /component/organizationViewRejectedTraderRequestsList           controllers.ComponentViewController.organizationViewRejectedTraderRequestsList
 GET         /component/organizationViewRejectedTraderRequest                controllers.ComponentViewController.organizationViewRejectedTraderRequest(traderID: String)
 
+GET         /component/zoneViewOrganizationAccountsList                     controllers.ComponentViewController.zoneViewOrganizationAccountsList
+GET         /component/zoneViewAcceptedOrganizationAccountsList             controllers.ComponentViewController.zoneViewAcceptedOrganizationAccountsList
+GET         /component/zoneViewAcceptedOrganizationAccountDetails           controllers.ComponentViewController.zoneViewAcceptedOrganizationAccountDetails(organizationID: String)
+GET         /component/zoneViewPendingOrganizationRequestsList              controllers.ComponentViewController.zoneViewPendingOrganizationRequestsList
+GET         /component/zoneViewPendingOrganizationRequest                   controllers.ComponentViewController.zoneViewPendingOrganizationRequest(organizationID: String)
+GET         /component/zoneViewRejectedOrganizationRequestsList             controllers.ComponentViewController.zoneViewRejectedOrganizationRequestsList
+GET         /component/zoneViewRejectedOrganizationRequest                  controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
 
 GET         /master/component/organizationViewTrader                        controllers.ComponentViewController.organizationViewTrader(traderID: String)
 
@@ -204,7 +211,6 @@ POST        /master/zoneRejectVerifyTraderRequest                           cont
 
 GET         /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTrader
-GET         /master/organzationViewTraderKYCDocuments                       controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
 GET         /master/updateTraderKYCDocumentOrganizationStatus               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentOrganizationStatus               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
 
@@ -274,8 +280,6 @@ GET         /master/userUpdateOrganizationKYCDocument                       cont
 
 GET         /master/userReviewAddOrganizationRequest                        controllers.AddOrganizationController.userReviewAddOrganizationRequestForm
 POST        /master/userReviewAddOrganizationRequest                        controllers.AddOrganizationController.userReviewAddOrganizationRequest
-GET         /master/viewVerifyOrganizationRequests                          controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
-GET         /master/viewOrganizationKYCDocuments                            controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
 GET         /master/updateOrganizationKYCDocumentStatus                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String)
 POST        /master/updateOrganizationKYCDocumentStatus                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatus
 GET         /master/rejectVerifyOrganizationRequest                         controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
