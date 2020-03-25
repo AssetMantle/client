@@ -77,6 +77,8 @@ object Response {
   val SALES_QUOTE_CREATED = new Success("SALES_QUOTE_CREATED")
   val MESSAGE_READ=  new Success("MESSAGE_READ")
   val BANK_ACCOUNT_DETAILS_UPDATED = new Success("BANK_ACCOUNT_DETAILS_UPDATED")
+  val UBO_ADDED = new Success("UBO_ADDED")
+  val UBO_DELETED = new Success("UBO_DELETED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -131,6 +133,7 @@ object Response {
   val COUNTERPARTY_CANNOT_BE_SELF = new Failure("COUNTERPARTY_CANNOT_BE_SELF")
   val COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION = new Failure("COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION")
   val INVITATION_EMAIL_ALREADY_SENT = new Failure("INVITATION_EMAIL_ALREADY_SENT")
+  val UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE = new Failure("UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

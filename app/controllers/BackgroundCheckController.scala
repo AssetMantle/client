@@ -67,7 +67,8 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
       )
 
       def allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
-      val trader = masterTraders.Service.get(traderID)
+
+      val trader = masterTraders.Service.tryGet(traderID)
 
       (for {
         _ <- storeFile
@@ -98,7 +99,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
       def allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
 
-      val trader = masterTraders.Service.get(traderID)
+      val trader = masterTraders.Service.tryGet(traderID)
 
       (for {
         oldDocumentFileName <- getOldDocumentFileName
@@ -117,16 +118,17 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def uploadOrUpdateTraderBackgroundCheckFile(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.getID(loginState.username)
-      val trader = masterTraders.Service.get(traderID)
-      val allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
+
       (for {
-        allDocuments <- allDocuments
         zoneID <- zoneID
         trader <- trader
-        result <- withUsernameToken.Ok(views.html.component.master.zoneUploadOrUpdateTraderBackgroundCheck(allDocuments, trader))
+        allDocuments <- allDocuments
       } yield {
         if (zoneID == trader.zoneID) {
-          result
+          Ok(views.html.component.master.zoneUploadOrUpdateTraderBackgroundCheck(allDocuments, trader))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -136,9 +138,9 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-def uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
-  Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFile), utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.storeOrganizationBackgroundCheckFile), documentType, organizationID))
-}
+  def uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFile), utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.storeOrganizationBackgroundCheckFile), documentType, organizationID))
+  }
 
   def updateOrganizationBackgroundCheckFileForm(documentType: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFile), utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.updateOrganizationBackgroundCheckFile), documentType, organizationID))
@@ -177,6 +179,7 @@ def uploadOrganizationBackgroundCheckFileForm(documentType: String, organization
       )
 
       def allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
+
       val organization = masterOrganizations.Service.get(organizationID)
 
       (for {

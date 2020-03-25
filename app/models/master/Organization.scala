@@ -66,7 +66,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findOrganizationOrNoneByAccountID(accountID: String): Future[Option[OrganizationSerialized]] = db.run(organizationTable.filter(_.accountID === accountID).result.headOption)
+  private def findOrNoneByAccountID(accountID: String): Future[Option[OrganizationSerialized]] = db.run(organizationTable.filter(_.accountID === accountID).result.headOption)
 
   private def getAccountIDByID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
@@ -254,9 +254,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getOrNone(id: String): Future[Option[Organization]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
-    def getByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map { organizationSerialized => organizationSerialized.deserialize }
+    def tryGetByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map { organizationSerialized => organizationSerialized.deserialize }
 
-    def getOrNoneByAccountID(accountID: String): Future[Option[Organization]] = findOrganizationOrNoneByAccountID(accountID).map(_.map(_.deserialize))
+    def getByAccountID(accountID: String): Future[Option[Organization]] = findOrNoneByAccountID(accountID).map(_.map(_.deserialize))
 
     def getZoneID(id: String): Future[String] = getZoneIDByID(id)
 

@@ -118,7 +118,7 @@ class TraderController @Inject()(
 
           def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
 
-          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+          def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
 

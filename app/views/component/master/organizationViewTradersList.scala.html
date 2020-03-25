@@ -30,7 +30,7 @@
             </div>
             <div class="cmuk-flex infoRow">
                 <div class="infoRowLabel red">@Messages(constants.Form.VERIFIED_STATUS)</div>
-                <div class="infoRowValue">@trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))</div>
+                <div class="infoRowValue">@trader.verificationStatus.getOrElse(Messages(constants.View.PENDING))</div>
             </div>
 
         @if(trader.verificationStatus.getOrElse(false)) {

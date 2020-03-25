@@ -218,7 +218,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
 
-    def get(id: String): Future[Trader] = findById(id)
+    def tryGet(id: String): Future[Trader] = findById(id)
 
     def getByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
 
