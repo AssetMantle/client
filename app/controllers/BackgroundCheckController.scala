@@ -30,7 +30,14 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 //    authTest
 //    countryCodes
 //    entities
-    fields
+//    fields
+//    recommdendedFields
+//    consents
+//    detailedConsents
+//    countrySubdivisions
+//    dataSources
+//    transactionRecord
+    verify
   }
 
   //auth test
@@ -110,7 +117,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
     } yield {
       val printValue = response
       println(printValue)
-      Ok(views.html.test(printValue.toString))
+      Ok(views.html.test(printValue.body.mkString))
     }).recover {
       case baseException: BaseException => InternalServerError(views.html.test(baseException.failure.message))
     }
@@ -160,7 +167,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   // transactionRecord
   def transactionRecord = {
-    val response = getTruliooTransactionRecords.Service.get(id = "AU")
+    val response = getTruliooTransactionRecords.Service.get(id = "259888b7-71e4-1e8a-6a59-ac52bd9c8386")
     (for {
       response <- response
     } yield {
@@ -174,11 +181,11 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   // POST verify
   def verify = {
-    val response = truliooVerify.Service.post(request =  truliooVerify.Request(true,true,Seq(""),"", Json.toJson("")))
+    val response = truliooVerify.Service.post(request =  truliooVerify.Request(true,false,"Identity Verification" ,Seq("Visa Verification"),"AU", truliooVerify.DataFields(truliooVerify.PersonInfo("J","Smith", 5, 3, 1983),truliooVerify.Location("Lawford","3108"),None,None)))
     (for {
       response <- response
     } yield {
-      val printValue = response
+      val printValue = response.body
       println(printValue)
       Ok(views.html.test(printValue.toString))
     }).recover {

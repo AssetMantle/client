@@ -30,19 +30,23 @@ class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Config
 
   private val url = baseURL + endpoint
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).withHttpHeaders(headers).post(Json.toJson(request))
 
-  private implicit val personalInfoWrites: OWrites[PersoanlInfo] = Json.writes[PersoanlInfo]
+  private implicit val locationWrites: OWrites[Location] = Json.writes[Location]
 
-  case class PersoanlInfo(FirstGivenName: String, FirstSurName: String)
+  case class Location(StreetName: String, PostalCode: String)
+
+  private implicit val personInfoWrites: OWrites[PersonInfo] = Json.writes[PersonInfo]
+
+  case class PersonInfo(FirstGivenName: String, FirstSurName: String, DayOfBirth: Int, MonthOfBirth: Int, YearOfBirth: Int)
 
   private implicit val dataFieldsWrites: OWrites[DataFields] = Json.writes[DataFields]
 
-  case class DataFields(PersonInfo: JsValue, Location: Option[JsValue], Communication: Option[JsValue], Passport: Option[JsValue])
+  case class DataFields(PersonInfo: PersonInfo, Location: Location, Communication: Option[JsValue], Passport: Option[JsValue])
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Request(AcceptTruliooTermsAndConditions: Boolean, CleansedAddress: Boolean, ConsentForDataSources: Seq[String], CountryCode: String, DataFields: JsValue) extends BaseRequest
+  case class Request(AcceptTruliooTermsAndConditions: Boolean, CleansedAddress: Boolean, ConfigurationName: String, ConsentForDataSources: Seq[String], CountryCode: String, DataFields: DataFields) extends BaseRequest
 
   object Service {
 

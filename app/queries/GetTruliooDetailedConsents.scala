@@ -28,11 +28,11 @@ class GetTruliooDetailedConsents @Inject()(wsClient: WSClient)(implicit configur
 
   private val url = baseURL + endpoint
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(headers).get)
+  private def action(request: String): Future[Seq[Response]] = wsClient.url(url + request).withHttpHeaders(headers).get.map { response => utilities.JSON.convertJsonStringToObject[Seq[Response]](response.body) }
 
   object Service {
 
-    def get(configurationName: String = "Identity Verification", countryCode: String): Future[Response] = action(configurationName+"/"+countryCode).recover {
+    def get(configurationName: String = "Identity Verification", countryCode: String): Future[Seq[Response]] = action(configurationName+"/"+countryCode).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

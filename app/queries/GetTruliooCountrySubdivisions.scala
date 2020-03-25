@@ -29,11 +29,11 @@ class GetTruliooCountrySubdivisions @Inject()(wsClient: WSClient)(implicit confi
 
   private val url = baseURL + endpoint
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(headers).get)
+  private def action(request: String): Future[Seq[Response]] = wsClient.url(url + request).withHttpHeaders(headers).get.map { response => utilities.JSON.convertJsonStringToObject[Seq[Response]](response.body) }
 
   object Service {
 
-    def get(countryCode: String): Future[Response] = action(countryCode).recover {
+    def get(countryCode: String): Future[Seq[Response]] = action(countryCode).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

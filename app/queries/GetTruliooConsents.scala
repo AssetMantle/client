@@ -28,7 +28,7 @@ class GetTruliooConsents @Inject()(wsClient: WSClient)(implicit configuration: C
 
   private val url = baseURL + endpoint
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(headers).get)
+  private def action(request: String): Future[Response] = wsClient.url(url + request).withHttpHeaders(headers).get.map{ response => new Response(response) }
 
   object Service {
 
