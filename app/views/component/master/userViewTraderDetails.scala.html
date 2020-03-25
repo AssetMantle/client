@@ -34,7 +34,8 @@
         } {
             <a href="@routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         } {
-
+            @commonBooleanInfo(constants.View.ORGANIZATION_STATUS, traderKYC.organizationStatus)
+            @commonBooleanInfo(constants.View.ZONE_STATUS, traderKYC.zoneStatus)
         }
     }
 </div>

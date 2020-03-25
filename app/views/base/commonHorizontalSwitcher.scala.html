@@ -1,4 +1,6 @@
-@(htmlItems: Map[String, Html] = Map(), jsRouteItems: Map[String, String] = Map())(implicit messagesProvider: MessagesProvider)
+@import play.api.routing.JavaScriptReverseRoute
+
+@(htmlItems: Map[String, Html] = Map(), jsRouteItems: Map[String, JavaScriptReverseRoute] = Map())(implicit messagesProvider: MessagesProvider)
 
 <div>
     <ul class="cmuk-subnav cmuk-subnav-pill" cmuk-switcher="animation: cmuk-animation-fade">
@@ -6,7 +8,7 @@
             <li><a href="#">@Messages(itemHeader)</a></li>
         }
         @for((itemHeader, itemValue) <- jsRouteItems) {
-            @defining(Seq(itemValue, "()").mkString("")) { route =>
+            @defining(utilities.String.getJsRouteString(itemValue)) { route =>
                 <li><a href="#" onclick="componentResource('switcher@itemHeader', @route)">@Messages(itemHeader)</a></li>
             }
         }
@@ -17,7 +19,7 @@
         }
         @for((itemHeader, itemValue) <- jsRouteItems) {
             <li id="switcher@itemHeader">
-            @defining(Seq(itemValue, "()").mkString("")) { route =>
+            @defining(utilities.String.getJsRouteString(itemValue)) { route =>
                 <script>
                         componentResource('switcher@itemHeader', @route)
                 </script>

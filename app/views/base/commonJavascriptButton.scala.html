@@ -1,7 +1,7 @@
-@(key: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+@(name: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
-<button type="button" class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("cmuk-button-primary")).mkString(" ")'  onclick="@function">
-@Messages(key)
+<button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("cmuk-button-primary")).mkString(" ")'  onclick="@function">
+@Messages(name)
 </button>
 
-@* Example Usage: `@commonButton(constants.View.IDENTIFICATION_DETAILS, JavaScript("""componentResource('identificationDetails', jsRoutes.controllers.ComponentViewController.identificationDetails('Kumar', 'Abhinav', 1996))"""))` *@
+@* Example Usage: @commonJavascriptButton(constants.View.IDENTIFICATION_DETAILS, JavaScript("""componentResource('identificationDetails', jsRoutes.controllers.ComponentViewController.identificationDetails('Abhinav', 1996))""")) *@

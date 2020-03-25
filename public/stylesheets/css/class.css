@@ -992,7 +992,7 @@ input:checked + .slider {
   font-size: 14px; }
 
 .infoRowLabel {
-  width: 110px;
+  width: 150px;
   height: min-content;
   word-break: break-word; }
 
