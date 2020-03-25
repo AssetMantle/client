@@ -3,7 +3,7 @@ package controllers
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import controllers.actions.{WithTraderLoginAction}
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -24,6 +24,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
                                     chatWindowParticipants: ChatWindowParticipants,
                                     chats: Chats,
                                     chatReceives: ChatReceives,
+                                    withLoginAction: WithLoginAction,
                                     masterAccounts: master.Accounts, emailOTPs: EmailOTPs, masterContacts: master.Contacts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTradeRooms: master.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_TRADE_ROOM
@@ -219,6 +220,10 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   //send chat form
+  def sendChatForm : Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+    Future(Ok(views.html.component.master.sendChat()))
+  }
   def sendChat(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SendChat.form.bindFromRequest().fold(
