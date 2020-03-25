@@ -1,36 +1,18 @@
 @import controllers.actions.LoginState
 @import models.blockchain.{Asset, Fiat, Negotiation, Order, TraderFeedbackHistory}
 @import models.master.Trader
+@import views.html.base._
 
 @(trader: Trader, assets: Seq[Asset], fiats: Seq[Fiat], buyOrders: Seq[Order], sellOrders: Seq[Order], buyNegotiations: Seq[Negotiation], sellNegotiations: Seq[Negotiation], traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="latest_card-header latest_card-header-primary text-center">
     <h4 class="latest_card-title">@Messages(constants.Form.TRADER_DETAILS)</h4>
 </div>
 <div id="traderDetails@trader.id">
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel red">@Messages(constants.View.TRADER_ID)</div>
-        <div class="infoRowValue">@trader.id</div>
-    </div>
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel red">@Messages(constants.View.NAME)</div>
-        <div class="infoRowValue">@trader.name</div>
-    </div>
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel red">@Messages(constants.View.ACCOUNT_ID)</div>
-        <div class="infoRowValue">@trader.accountID</div>
-    </div>
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel red">@Messages(constants.Form.COMPLETION_STATUS)</div>
-        <div class="infoRowValue">@trader.completionStatus</div>
-    </div>
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel red">@Messages(constants.Form.VERIFIED_STATUS)</div>
-        <div class="infoRowValue">@trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))</div>
-    </div>
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel red">@Messages(constants.Form.RATING)</div>
-        <div class="infoRowValue">@traderFeedbackHistories.map(_.rating.toInt).sum.toString</div>
-    </div>
+    @commonTextInfo(constants.View.TRADER_ID, trader.id)
+    @commonTextInfo(constants.View.NAME, trader.name)
+    @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, Option(trader.verificationStatus))
+    @commonIntInfo(constants.Form.RATING, traderFeedbackHistories.map(_.rating.toInt).sum)
 </div>
 
 @if(trader.verificationStatus.getOrElse(false)) {
@@ -39,42 +21,15 @@
         @for(asset <- assets) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.PEG_HASH)</div>
-                        <div class="infoRowValue">@asset.pegHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.DOCUMENT_HASH)</div>
-                        <div class="infoRowValue">@asset.documentHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ASSET_TYPE)</div>
-                        <div class="infoRowValue">@asset.assetType</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ASSET_QUANTITY)</div>
-                        <div class="infoRowValue">@asset.assetQuantity</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ASSET_PRICE)</div>
-                        <div class="infoRowValue">@asset.assetPrice</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.QUANTITY_UNIT)</div>
-                        <div class="infoRowValue">@asset.quantityUnit</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.FormField.MODERATED.name)</div>
-                        <div class="infoRowValue">@asset.moderated</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.TAKER_ADDRESS)</div>
-                        <div class="infoRowValue">@asset.takerAddress</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.LOCKED)</div>
-                        <div class="infoRowValue">@asset.locked</div>
-                    </div>
+                    @commonTextInfo(constants.Form.PEG_HASH, asset.pegHash)
+                    @commonTextInfo(constants.Form.DOCUMENT_HASH, asset.documentHash)
+                    @commonTextInfo(constants.Form.ASSET_TYPE, asset.assetType)
+                    @commonTextInfo(constants.Form.ASSET_QUANTITY, asset.assetQuantity)
+                    @commonTextInfo(constants.Form.ASSET_PRICE, asset.assetPrice)
+                    @commonTextInfo(constants.Form.QUANTITY_UNIT, asset.quantityUnit)
+                    @commonBooleanInfo(constants.Form.MODERATED, Option(asset.moderated))
+                    @commonTextInfo(constants.Form.TAKER_ADDRESS, asset.takerAddress.getOrElse(""))
+                    @commonBooleanInfo(constants.Form.LOCKED, Option(asset.locked))
                 </div>
             </div>
         }
@@ -85,22 +40,10 @@
         @for(fiat <- fiats) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.PEG_HASH)</div>
-                        <div class="infoRowValue">@fiat.pegHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.TRANSACTION_ID)</div>
-                        <div class="infoRowValue">@fiat.transactionID</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.TRANSACTION_AMOUNT)</div>
-                        <div class="infoRowValue">@fiat.transactionAmount</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.REDEEM_AMOUNT)</div>
-                        <div class="infoRowValue">@fiat.redeemedAmount</div>
-                    </div>
+                    @commonTextInfo(constants.Form.PEG_HASH, fiat.pegHash)
+                    @commonTextInfo(constants.Form.TRANSACTION_ID, fiat.transactionID)
+                    @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, fiat.transactionAmount)
+                    @commonTextInfo(constants.Form.REDEEM_AMOUNT, fiat.redeemedAmount)
                 </div>
             </div>
         }
@@ -111,56 +54,20 @@
         @for(buyNegotiation <- buyNegotiations) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.PEG_HASH)</div>
-                        <div class="infoRowValue">@buyNegotiation.assetPegHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.BID)</div>
-                        <div class="infoRowValue">@buyNegotiation.bid</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.TIME)</div>
-                        <div class="infoRowValue">@buyNegotiation.time</div>
-                    </div>
+                    @commonTextInfo(constants.Form.PEG_HASH, buyNegotiation.assetPegHash)
+                    @commonTextInfo(constants.Form.BID, buyNegotiation.bid)
+                    @commonTextInfo(constants.Form.TIME, buyNegotiation.time)
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="showHideByID('traderBuyNegotiationDetails@trader.id')">@Messages(constants.Form.SHOW_HIDE)</button>
                     <div class="hidden" id="traderBuyNegotiationDetails@trader.id">
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_ADDRESS)</div>
-                            <div class="infoRowValue">@buyNegotiation.buyerAddress</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_ADDRESS)</div>
-                            <div class="infoRowValue">@buyNegotiation.sellerAddress</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.NEGOTIATION_ID)</div>
-                            <div class="infoRowValue">@buyNegotiation.id</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_SIGNATURE)</div>
-                            <div class="infoRowValue">@buyNegotiation.buyerSignature</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_SIGNATURE)</div>
-                            <div class="infoRowValue">@buyNegotiation.sellerSignature</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</div>
-                            <div class="infoRowValue">@buyNegotiation.buyerBlockHeight</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</div>
-                            <div class="infoRowValue">@buyNegotiation.sellerBlockHeight</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</div>
-                            <div class="infoRowValue">@buyNegotiation.buyerContractHash</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</div>
-                            <div class="infoRowValue">@buyNegotiation.sellerContractHash</div>
-                        </div>
+                        @commonTextInfo(constants.Form.BUYER_ADDRESS, buyNegotiation.buyerAddress)
+                        @commonTextInfo(constants.Form.SELLER_ADDRESS, buyNegotiation.sellerAddress)
+                        @commonTextInfo(constants.Form.NEGOTIATION_ID, buyNegotiation.id)
+                        @commonTextInfo(constants.Form.BUYER_SIGNATURE, buyNegotiation.buyerSignature.getOrElse(""))
+                        @commonTextInfo(constants.Form.SELLER_SIGNATURE, buyNegotiation.sellerSignature.getOrElse(""))
+                        @commonTextInfo(constants.Form.BUYER_BLOCK_HEIGHT, buyNegotiation.buyerBlockHeight.getOrElse(""))
+                        @commonTextInfo(constants.Form.SELLER_BLOCK_HEIGHT, buyNegotiation.sellerBlockHeight.getOrElse(""))
+                        @commonTextInfo(constants.Form.BUYER_CONTRACT_HASH, buyNegotiation.buyerContractHash.getOrElse(""))
+                        @commonTextInfo(constants.Form.SELLER_CONTRACT_HASH, buyNegotiation.sellerContractHash.getOrElse(""))
                     </div>
                 </div>
             </div>
@@ -170,56 +77,20 @@
         @for(sellNegotiation <- sellNegotiations) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.PEG_HASH)</div>
-                        <div class="infoRowValue">@sellNegotiation.assetPegHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.BID)</div>
-                        <div class="infoRowValue">@sellNegotiation.bid</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.TIME)</div>
-                        <div class="infoRowValue">@sellNegotiation.time</div>
-                    </div>
+                    @commonTextInfo(constants.Form.PEG_HASH, sellNegotiation.assetPegHash)
+                    @commonTextInfo(constants.Form.BID, sellNegotiation.bid)
+                    @commonTextInfo(constants.Form.TIME, sellNegotiation.time)
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="showHideByID('traderSellNegotiationDetails@trader.id')">@Messages(constants.Form.SHOW_HIDE)</button>
                     <div class="hidden" id="traderSellNegotiationDetails@trader.id">
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_ADDRESS)</div>
-                            <div class="infoRowValue">@sellNegotiation.buyerAddress</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_ADDRESS)</div>
-                            <div class="infoRowValue">@sellNegotiation.sellerAddress</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.NEGOTIATION_ID)</div>
-                            <div class="infoRowValue">@sellNegotiation.id</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_SIGNATURE)</div>
-                            <div class="infoRowValue">@sellNegotiation.buyerSignature</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_SIGNATURE)</div>
-                            <div class="infoRowValue">@sellNegotiation.sellerSignature</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</div>
-                            <div class="infoRowValue">@sellNegotiation.buyerBlockHeight</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</div>
-                            <div class="infoRowValue">@sellNegotiation.sellerBlockHeight</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</div>
-                            <div class="infoRowValue">@sellNegotiation.buyerContractHash</div>
-                        </div>
-                        <div class="cmuk-flex infoRow">
-                            <div class="infoRowLabel red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</div>
-                            <div class="infoRowValue">@sellNegotiation.sellerContractHash</div>
-                        </div>
+                        @commonTextInfo(constants.Form.BUYER_ADDRESS, sellNegotiation.buyerAddress)
+                        @commonTextInfo(constants.Form.SELLER_ADDRESS, sellNegotiation.sellerAddress)
+                        @commonTextInfo(constants.Form.NEGOTIATION_ID, sellNegotiation.id)
+                        @commonTextInfo(constants.Form.BUYER_SIGNATURE, sellNegotiation.buyerSignature.getOrElse(""))
+                        @commonTextInfo(constants.Form.SELLER_SIGNATURE, sellNegotiation.sellerSignature.getOrElse(""))
+                        @commonTextInfo(constants.Form.BUYER_BLOCK_HEIGHT, sellNegotiation.buyerBlockHeight.getOrElse(""))
+                        @commonTextInfo(constants.Form.SELLER_BLOCK_HEIGHT, sellNegotiation.sellerBlockHeight.getOrElse(""))
+                        @commonTextInfo(constants.Form.BUYER_CONTRACT_HASH, sellNegotiation.buyerContractHash.getOrElse(""))
+                        @commonTextInfo(constants.Form.SELLER_CONTRACT_HASH, sellNegotiation.sellerContractHash.getOrElse(""))
                     </div>
                 </div>
             </div>
@@ -231,18 +102,9 @@
         @for(buyOrder <- buyOrders) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ID)</div>
-                        <div class="infoRowValue">@buyOrder.id</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.AWB_PROOF_HASH)</div>
-                        <div class="infoRowValue">@buyOrder.awbProofHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.FIAT_PROOF_HASH)</div>
-                        <div class="infoRowValue">@buyOrder.fiatProofHash</div>
-                    </div>
+                    @commonTextInfo(constants.Form.ID, buyOrder.id)
+                    @commonTextInfo(constants.Form.AWB_PROOF_HASH, buyOrder.awbProofHash.getOrElse(""))
+                    @commonTextInfo(constants.Form.FIAT_PROOF_HASH, buyOrder.fiatProofHash.getOrElse(""))
                 </div>
             </div>
         }
@@ -251,18 +113,9 @@
         @for(sellOrder <- sellOrders) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.ID)</div>
-                        <div class="infoRowValue">@sellOrder.id</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.AWB_PROOF_HASH)</div>
-                        <div class="infoRowValue">@sellOrder.awbProofHash</div>
-                    </div>
-                    <div class="cmuk-flex infoRow">
-                        <div class="infoRowLabel red">@Messages(constants.Form.FIAT_PROOF_HASH)</div>
-                        <div class="infoRowValue">@sellOrder.fiatProofHash</div>
-                    </div>
+                    @commonTextInfo(constants.Form.ID, sellOrder.id)
+                    @commonTextInfo(constants.Form.AWB_PROOF_HASH, sellOrder.awbProofHash.getOrElse(""))
+                    @commonTextInfo(constants.Form.FIAT_PROOF_HASH, sellOrder.fiatProofHash.getOrElse(""))
                 </div>
             </div>
         }
