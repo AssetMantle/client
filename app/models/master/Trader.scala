@@ -194,7 +194,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
       val id = getIDByAccountID(accountID)
 
-      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
+      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name, completionStatus = true))
 
       for {
         id <- id

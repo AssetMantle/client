@@ -36,7 +36,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name))))
+          Future(BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name))))
         },
         redeemFiatData => {
           val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
@@ -54,7 +54,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           (for {
             toAddress <- toAddress
             _ <- transactionProcess(toAddress)
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -70,7 +70,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   def blockchainRedeemFiat: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        Future (BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors)))
+        Future(BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors)))
       },
       redeemFiatData => {
         val post = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = redeemFiatData.from, gas = redeemFiatData.gas.toString), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = redeemFiatData.mode))

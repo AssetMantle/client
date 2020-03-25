@@ -6,7 +6,7 @@ function transactionExplorer() {
 
     let content = '';
     for (let i = 0; i < 7; i++) {
-        content = "<tr><td></td><td></td><td></td></tr>" + content;
+        content = "<tr><td></td><td></td></tr>" + content;
     }
     $('#transactionContainer').prepend(content);
     let transactionContainerList = document.getElementById("transactionContainer");
@@ -29,7 +29,7 @@ function transactionExplorer() {
                     if (transactionContainerListLength > 8) {
                         transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
                     }
-                    $('#transactionContainer').prepend("<tr><td><button type='button' onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td><button onclick='searchFunction(" + JSON.stringify(txHash) + ")'>" + txHash + "</button></td></button></td></tr>");
+                    $('#transactionContainer').prepend("<tr><td><a  class='cmuk-button-text cmuk-button' onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</a></td><td><a class='hashCode cmuk-text-primary' onclick='searchFunction(" + JSON.stringify(txHash) + ")'>" + txHash + "</a></td></tr>");
                 });
             }
         }

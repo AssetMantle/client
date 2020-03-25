@@ -23,7 +23,7 @@ case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, stat
 
 
 @Singleton
-class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
@@ -169,7 +169,7 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val redeemAsset = Service.getTransaction(ticketID)
 
-      def markRedeemed(pegHash: String): Future[Int] = masterTransactionIssueAssetRequests.Service.markRedeemed(Option(pegHash))
+      def markRedeemed(pegHash: String): Future[Int] = masterAssets.Service.markReedemed(pegHash)
 
       def markDirty(redeemAsset: RedeemAsset): Future[Unit] = {
         val markDirtyPegHash = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
@@ -208,8 +208,6 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val redeemAsset = Service.getTransaction(ticketID)
 
-      def markRedeemed(pegHash: String): Future[Int] = masterTransactionIssueAssetRequests.Service.markRedeemed(Option(pegHash))
-
       def getIDs(redeemAsset: RedeemAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(redeemAsset.to)
         val fromAccountID = masterAccounts.Service.getId(redeemAsset.from)
@@ -222,7 +220,6 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
       (for {
         _ <- markTransactionFailed
         redeemAsset <- redeemAsset
-        _ <- markRedeemed(redeemAsset.pegHash)
         (toAccountID, fromAccountID) <- getIDs(redeemAsset)
       } yield {
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)

@@ -37,7 +37,7 @@ function changeTableContent(clickValue) {
                             let blocks = JSON.parse(blockDetailsData);
                             let content = '';
                             Array.prototype.forEach.call(blocks, block => {
-                                content = content + "<tr><td>" + block.header.height + "</td><td>" + block.header.time + "</td><td>" + block.header.num_txs + "</td></td></tr>";
+                                content = content + "<tr><td><a class='cmuk-button-text cmuk-button' onclick='searchFunction(" + JSON.stringify(block.header.height) + ")'>" + block.header.height + "</a></td><td>" + block.header.time + "</td><td>" + block.header.num_txs + "</td></td></tr>";
                             });
                             $('#allBlocksTableBody').empty().append(content);
                         }
@@ -56,7 +56,7 @@ function updateShowAllBlocksTable(receivedData) {
         if (!((receivedData.result.data) === undefined)) {
             let numberOfTransactions = receivedData.result.data.value.block.header.num_txs;
             blockContainerList.removeChild(blockContainerList.childNodes[(blockContainerList.childNodes.length - 1)]);
-            $('#allBlocksTableBody').prepend("<tr><td>" + height + "</td><td>" + time + "</td><td>" + numberOfTransactions + "</td></td></tr>");
+            $('#allBlocksTableBody').prepend("<tr><td><a onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</a></td><td>" + time + "</td><td>" + numberOfTransactions + "</td></td></tr>");
         }
     }
 }

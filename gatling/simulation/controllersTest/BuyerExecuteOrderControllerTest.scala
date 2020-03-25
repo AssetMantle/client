@@ -17,11 +17,8 @@ class BuyerExecuteOrderControllerTest extends Simulation {
 object buyerExecuteOrderControllerTest {
 
   val moderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedBuyerExecuteOrder")
-
     .exec(http("Moderated_Buyer_Execute_Order_Document_Upload_Form_GET")
       .get(session=>routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument(session(Test.TEST_BUYER_ADDRESS).as[String],session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
-        .check(bodyString.saveAs("buyerExecute"))
-      //.check(substring("FIAT_PROOF").exists)
     )
     .exec{session=> println(session)
     session}

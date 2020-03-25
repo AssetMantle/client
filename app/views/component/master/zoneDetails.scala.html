@@ -1,17 +1,22 @@
 @import controllers.actions.LoginState
+@import views.html.base._
 @import models.master.Zone
 
 @(zone: Zone)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-@Messages(constants.Form.NAME): @zone.name <br>
-@Messages(constants.Form.ZONE_ID): @zone.id <br>
-@Messages(constants.Form.CURRENCY): @zone.currency <br>
-@Messages(constants.FormField.ADDRESS_LINE_1.name): @zone.address.addressLine1 <br>
-@Messages(constants.FormField.ADDRESS_LINE_2.name): @zone.address.addressLine2 <br>
-@Messages(constants.FormField.LANDMARK.name): @zone.address.landmark.getOrElse("") <br>
-@Messages(constants.FormField.CITY.name): @zone.address.city <br>
-@Messages(constants.FormField.COUNTRY.name): @zone.address.country <br>
-@Messages(constants.FormField.ZIP_CODE.name): @zone.address.zipCode <br>
-@Messages(constants.Form.PHONE): @zone.address.phone <br>
-@Messages(constants.Form.COMPLETION_STATUS): @zone.completionStatus <br>
-@Messages(constants.Form.VERIFIED_STATUS): @zone.verificationStatus.getOrElse(false) <br>
+@commonTable(){
+    @Messages(constants.Form.ZONE_DETAILS)
+} {
+    <tr>
+        <th>@Messages(constants.Form.NAME)</th>
+        <th>@Messages(constants.Form.ZONE_ID)</th>
+        <th>@Messages(constants.Form.COMPLETION_STATUS)</th>
+        <th>@Messages(constants.Form.VERIFIED_STATUS)</th>
+    </tr>
+    <tr>
+        <td> @zone.name</td>
+        <td> @zone.id </td>
+        <td>@zone.completionStatus</td>
+        <td>@zone.verificationStatus.getOrElse(false)</td>
+    </tr>
+}
 

@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import models.masterTransaction.IssueFiatRequest
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,25 +23,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueFiatRequest())
-  }
-
-  def issueFiatRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future (BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
-        },
-        issueFiatRequestData => {
-          val create = masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
-          (for {
-            _ <- create
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
   }
 
   def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -73,13 +54,13 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name))))
+          Future(BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name))))
         },
         rejectIssueFiatRequestData => {
           val reject = masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
           (for {
             _ <- reject
-            result<- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -96,7 +77,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.IssueFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest(views.html.component.master.issueFiat(formWithErrors)))
+          Future(BadRequest(views.html.component.master.issueFiat(formWithErrors)))
         },
         issueFiatData => {
           val status = masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID)
@@ -121,10 +102,10 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 toAddress <- toAddress
                 ticketID <- ticketID(toAddress)
                 _ <- accept(ticketID)
-                result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
               } yield result
             } else {
-              Future (Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED))))
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED))))
             }
           }
 
@@ -146,7 +127,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   def blockchainIssueFiat: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.IssueFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        Future (BadRequest(views.html.component.blockchain.issueFiat(formWithErrors)))
+        Future(BadRequest(views.html.component.blockchain.issueFiat(formWithErrors)))
       },
       issueFiatData => {
         val post = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))

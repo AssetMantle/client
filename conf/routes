@@ -6,7 +6,7 @@ GET         /javascriptRoutes                                            control
 
 GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
-GET         /index/testActionAsync                                       controllers.IndexController.testActionAsync(username: String)
+GET         /docuSign                                                    controllers.DocuSignController.docuSignTest
 
 GET         /blockExplorer/lastBlockHeight                               controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                  controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
@@ -21,11 +21,15 @@ GET         /organizationRequest                                         control
 GET         /organizationInformation                                     controllers.ViewController.organizationInformation
 GET         /market                                                      controllers.ViewController.market
 GET         /profile                                                     controllers.ViewController.profile
+GET         /master/component/accountDetails                             controllers.ViewController.account
+GET         /master/component/transactionDetails                         controllers.ViewController.trades
+GET         /master/component/tradeDetails                               controllers.ViewController.dashboard
 
 GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                                              controllers.AccountController.signUpForm
+GET         /account/noteAndVerifyMnemonic                               controllers.AccountController.noteAndVerifyMnemonic
+GET         /account/signUp                                              controllers.AccountController.signUpForm(mnemonic:String)
 POST        /account/signUp                                              controllers.AccountController.signUp
 
 GET         /account/login                                               controllers.AccountController.loginForm
@@ -44,7 +48,6 @@ GET         /account/forgotPassword                                      control
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
-POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
 
 GET         /contact                                                     controllers.ContactController.contact
 
@@ -53,6 +56,24 @@ GET         /master/unreadNotificationCount                              control
 GET         /master/markNotificationAsRead                               controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
+
+GET         /master/identification                                       controllers.ProfileController.identificationForm
+POST        /master/identification                                       controllers.ProfileController.identification
+GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
+GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
+GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
+
+GET         /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
+POST        /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetails
+GET         /master/shippingDetails                                      controllers.SalesQuoteController.shippingDetailsForm(id:String)
+POST        /master/shippingDetails                                      controllers.SalesQuoteController.shippingDetails
+GET         /master/paymentTerms                                         controllers.SalesQuoteController.paymentTermsForm(id:String)
+POST        /master/paymentTerms                                         controllers.SalesQuoteController.paymentTerms
+GET         /master/salesQuoteDocuments                                  controllers.SalesQuoteController.salesQuoteDocumentsForm(id:String)
+POST        /master/salesQuoteDocuments                                  controllers.SalesQuoteController.salesQuoteDocuments
+GET         /master/traderReviewSalesQuoteDetails                        controllers.SalesQuoteController.traderReviewSalesQuoteDetailsForm(id:String)
+POST        /master/traderReviewSalesQuoteDetails                        controllers.SalesQuoteController.traderReviewSalesQuoteDetails
+GET         /master/salesQuoteList                                       controllers.SalesQuoteController.salesQuoteList
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
@@ -99,6 +120,7 @@ POST        /userUpload/file                                             control
 GET         /userUpload/storeFile                                        controllers.FileController.storeAccountKYC(name: String, documentType: String)
 GET         /userUpdate                                                  controllers.FileController.updateAccountKYCForm(documentType: String)
 GET         /userUpdate/updateFile                                       controllers.FileController.updateAccountKYC(name: String, documentType: String)
+GET         /userUpload/getFile                                          controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
 
 GET         /userUpload/zoneKYC                                          controllers.AddZoneController.userUploadZoneKYCForm(documentType: String)
 POST        /userUpload/userZoneKYCDocument                              controllers.AddZoneController.userUploadZoneKYC(documentType: String)
@@ -126,7 +148,6 @@ POST        /master/verifyEmailAddress                                   control
 
 GET         /master/inviteTrader                                         controllers.SetACLController.inviteTraderForm
 POST        /master/inviteTrader                                         controllers.SetACLController.inviteTrader
-GET         /master/addTraderRequest                                     controllers.SetACLController.addTraderRequestForm(requestID: String)
 GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                            controllers.SetACLController.addTrader
 GET         /master/userUploadOrUpdateTraderKYCView                      controllers.SetACLController.userUploadOrUpdateTraderKYCView
@@ -284,7 +305,6 @@ GET         /master/negotiationComet                                     control
 GET         /master/orderComet                                           controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequestForm
-POST        /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequest
 
 GET         /master/viewPendingIssueFiatRequests                         controllers.IssueFiatController.viewPendingIssueFiatRequests
 GET         /master/rejectIssueFiatRequest                               controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
@@ -335,8 +355,8 @@ POST        /master/setBuyerFeedback                                     control
 GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
-GET         /wurtcb                                                      controllers.WesternUnionController.westernUnionForm
-POST        /wurtcb                                                      controllers.WesternUnionController.westernUnion
+POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
+POST        /wuRedirect                                                  controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKeyForm
 POST        /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKey
@@ -398,4 +418,13 @@ POST        /blockchain/setBuyerFeedback                                 control
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
 
-GET         /index/testPdf                                              controllers.IndexController.testPdf()
+GET         /master/tradeRoom                                            controllers.TradeRoomController.tradeRoom(salesQuoteID:String)
+GET         /master/tradeTerms                                           controllers.TradeRoomController.tradeTerms(salesQuoteID:String)
+GET         /master/recentActivity                                       controllers.TradeRoomController.recentActivity
+GET         /master/tradeFinancials                                      controllers.TradeRoomController.tradeFinancials
+GET         /master/tradeDocumentList                                    controllers.TradeRoomController.documentList
+GET         /master/tradeDocumentView                                    controllers.TradeRoomController.documentView(fileName:String, documentType:String)
+GET         /master/chatRoom                                             controllers.TradeRoomController.chatRoom
+GET         /master/updateTermsStatus                                    controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
+GET         /master/tradeList                                            controllers.TradeRoomController.tradeList
+POST        /master/updateTradeTermStatus                                controllers.TradeRoomController.updateTradeTermStatus

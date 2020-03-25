@@ -1,10 +1,27 @@
 @()(implicit messagesProvider: MessagesProvider)
-
+@import views.html.base._
 <div id="txHashBottomDivision">
-    <div class="cmuk-card cmuk-card-default cmuk-card-body">
-        <h4><p id="txHashPageHash"></p></h4>
-        <h3>@Messages(constants.Form.HEIGHT) : <p id="txHashPageHeight"></p></h3>
-        <h3>@Messages(constants.Form.FEE) : <p id="txHashPageFee"></p></h3>
-        <button type="button" class='cmuk-button cmuk-button-link' onclick='back()'><span cmuk-icon="arrow-left"></span>@Messages(constants.Form.BACK)</button><br>
-    </div>
+    <a onclick='back()' ><span cmuk-icon="arrow-left" title="Back"></span>@Messages(constants.Form.BACK)</a>
+    @commonCard() {
+
+    }{
+        <div class="cmuk-overflow-auto">
+            <table class="cmuk-table cmuk-table-divider">
+                <tbody>
+                    <tr>
+                        <th><span id="txHashPageHash"></span></th>
+                    </tr>
+                    <tr>
+                        <th>@Messages(constants.Form.HEIGHT):</th>
+                        <td><span id="txHashPageHeight"></span></td>
+                    </tr>
+                    <tr>
+                        <th>@Messages(constants.Form.FEE) :</th>
+                        <td><span id="txHashPageFee"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
 </div>

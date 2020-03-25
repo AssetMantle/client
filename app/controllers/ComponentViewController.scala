@@ -18,7 +18,7 @@ import queries.GetAccount
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterTransactionAssetFiles: masterTransaction.AssetFiles, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withOrganizationLoginAction: WithOrganizationLoginAction, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterTransactionAssetFiles: masterTransaction.AssetFiles, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withOrganizationLoginAction: WithOrganizationLoginAction, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -110,14 +110,24 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val assets = masterTransactionIssueAssetRequests.Service.getTraderAssetList(loginState.username)
+
+      val unapprovedAssets = masterTransactionIssueAssetRequests.Service.getUnapprovedAssets(loginState.username)
+
+      val getBlockchainAssetsPegHashes = blockchainAssets.Service.getAssetPegHashes(loginState.address)
+
+      def assetsWithPegHashes(pegHashes: Seq[String]): Future[Seq[IssueAssetRequest]] = masterTransactionIssueAssetRequests.Service.getAssetsByPegHashes(pegHashes)
+
+      def masterAssetList(pegHashes: Seq[String]): Future[Seq[models.master.Asset]] = masterAssets.Service.getAssetsByPegHashes(pegHashes)
 
       def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]): Future[Seq[AssetFile]] = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
 
       (for {
-        assets <- assets
-        allDocumentsForAllAssets <- allDocumentsForAllAssets(assets)
-      } yield Ok(views.html.component.master.assetList(assets, allDocumentsForAllAssets))
+        unapprovedAssets <- unapprovedAssets
+        blockchainAssetsPegHashes <- getBlockchainAssetsPegHashes
+        assetsWithPegHashes <- assetsWithPegHashes(blockchainAssetsPegHashes)
+        masterAssetList <- masterAssetList(blockchainAssetsPegHashes)
+        allDocumentsForAllAssets <- allDocumentsForAllAssets(unapprovedAssets ++ assetsWithPegHashes)
+      } yield Ok(views.html.component.master.assetList(unapprovedAssets ++ assetsWithPegHashes, masterAssetList, allDocumentsForAllAssets))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -168,7 +178,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
       def getNegotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
 
-      def assets(negotiationsOfOrders: Seq[Negotiation]): Future[Seq[Asset]] = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
+      def assets(negotiationsOfOrders: Seq[Negotiation]): Future[Seq[models.blockchain.Asset]] = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
 
       (for {
         negotiations <- negotiations
@@ -185,14 +195,17 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   }
 
   def availableAssetList: Action[AnyContent] = Action.async { implicit request =>
-    val assets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
+    val masterAssetList = masterAssets.Service.getMarketAssets()
+
+    def assets(pegHashes: Seq[String]) = masterTransactionIssueAssetRequests.Service.getAssetsByPegHashes(pegHashes)
 
     def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]): Future[Seq[AssetFile]] = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
 
     (for {
-      assets <- assets
+      masterAssetList <- masterAssetList
+      assets <- assets(masterAssetList.map(_.pegHash))
       allDocumentsForAllAssets <- allDocumentsForAllAssets(assets)
-    } yield Ok(views.html.component.master.availableAssetList(assets, allDocumentsForAllAssets))
+    } yield Ok(views.html.component.master.availableAssetList(assets, masterAssetList, allDocumentsForAllAssets))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
@@ -200,20 +213,24 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val masterTransactionAssets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
+      val masterAssetList = masterAssets.Service.getMarketAssets()
+
+      def masterTransactionAssets(pegHashes: Seq[String]) = masterTransactionIssueAssetRequests.Service.getAssetsByPegHashes(pegHashes)
+
       val allOrderIDs = blockchainOrders.Service.getAllOrderIds
 
-      def blockchainAssetList(allOrderIDs: Seq[String]): Future[Seq[Asset]] = blockchainAssets.Service.getAllPublic(allOrderIDs)
+      def blockchainAssetList(allOrderIDs: Seq[String]): Future[Seq[models.blockchain.Asset]] = blockchainAssets.Service.getAllPublic(allOrderIDs)
 
       def allDocumentsForAllAssets(masterTransactionAssets: Seq[IssueAssetRequest]): Future[Seq[AssetFile]] = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(masterTransactionAssets.map(_.id))
 
       (for {
+        masterAssetList <- masterAssetList
         allOrderIDs <- allOrderIDs
-        masterTransactionAssets <- masterTransactionAssets
+        masterTransactionAssets <- masterTransactionAssets(masterAssetList.map(_.pegHash))
         blockchainAssetList <- blockchainAssetList(allOrderIDs)
         allDocumentsForAllAssets <- allDocumentsForAllAssets(masterTransactionAssets)
       } yield {
-        Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, allDocumentsForAllAssets))
+        Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, masterAssetList, blockchainAssetList, allDocumentsForAllAssets))
       }
         ).recover {
         case _: BaseException => NoContent
@@ -330,7 +347,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
           val trader = masterTraders.Service.get(traderID)
 
-          def assets(address: String): Future[Seq[Asset]] = blockchainAssets.Service.getAssetPegWallet(address)
+          def assets(address: String): Future[Seq[models.blockchain.Asset]] = blockchainAssets.Service.getAssetPegWallet(address)
 
           def fiats(address: String): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(address)
 

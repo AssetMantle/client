@@ -60,7 +60,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   private def findById(address: String): Future[Seq[TraderFeedbackHistory]] = db.run(traderFeedbackHistoryTable.filter(_.address === address).result)
 
-  private def deleteById(traderFeedbackHistory: TraderFeedbackHistory)= db.run(traderFeedbackHistoryTable.filter(_.address === traderFeedbackHistory.address).filter(_.buyerAddress === traderFeedbackHistory.buyerAddress).filter(_.sellerAddress === traderFeedbackHistory.sellerAddress).filter(_.pegHash === traderFeedbackHistory.pegHash).delete.asTry).map {
+  private def deleteById(traderFeedbackHistory: TraderFeedbackHistory) = db.run(traderFeedbackHistoryTable.filter(_.address === traderFeedbackHistory.address).filter(_.buyerAddress === traderFeedbackHistory.buyerAddress).filter(_.sellerAddress === traderFeedbackHistory.sellerAddress).filter(_.pegHash === traderFeedbackHistory.pegHash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +88,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   object Service {
 
-    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[String] =add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
+    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[String] = add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
     def insertOrUpdate(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = upsert(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
@@ -96,9 +96,9 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def get(address: String): Future[Seq[TraderFeedbackHistory]] = findById(address)
 
-    def getNullRatingsForBuyerFeedback(buyerAddress: String): Future[Seq[TraderFeedbackHistory]] =findBuyersByNullRating(buyerAddress)
+    def getNullRatingsForBuyerFeedback(buyerAddress: String): Future[Seq[TraderFeedbackHistory]] = findBuyersByNullRating(buyerAddress)
 
-    def getNullRatingsForSellerFeedback(sellerAddress: String): Future[Seq[TraderFeedbackHistory]] =findSellersByNullRating(sellerAddress)
+    def getNullRatingsForSellerFeedback(sellerAddress: String): Future[Seq[TraderFeedbackHistory]] = findSellersByNullRating(sellerAddress)
   }
 
 }

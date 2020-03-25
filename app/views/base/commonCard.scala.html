@@ -1,11 +1,9 @@
 @()(title: Html = Html(""))(content: Html = Html(""))
-<div>
-    <div class="cmuk-card cmuk-card-default cmuk-card-hover cmuk-width-auto cmuk-width-large@@s">
-        <div class="cmuk-card-header">
-            <h3 class="cmuk-card-title leftText">@title</h3>
+    <div class="cmuk-card cmuk-card-default">
+        <div class="cmuk-card-header cmuk-flex" style="align-items: center ; justify-content: space-between;">
+            @title
         </div>
         <div class="cmuk-card-body">
-            <p>@content</p>
+            @content
         </div>
     </div>
-</div>

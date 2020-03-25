@@ -1,18 +1,24 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Negotiation
-
+@import views.html.base._
 @(negotiationList: Seq[Negotiation])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(negotiation <- negotiationList) {
-    <div class="col-md-6">
-        <div class="flexItem card-body lightBlue ">
+    <div>
+    @commonCard(){
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@negotiation.assetPegHash</span>
+        </div>
+    }{
+        <div>
             <div class="leftText">
-                <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @negotiation.assetPegHash <br>
+                <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @negotiation.assetPegHash<<br>
                 <span class="red">@Messages(constants.Form.TIME)</span>: @negotiation.time <br>
             </div>
             <div class="centerText">
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument('@negotiation.buyerAddress', '@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</button>
             </div>
         </div>
+    }
     </div>
 }

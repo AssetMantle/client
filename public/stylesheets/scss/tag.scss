@@ -1,0 +1,64 @@
+@import "variables.scss";
+input, select {
+  width: 100%;
+}
+
+input:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+input:hover {
+  cursor: pointer;
+}
+
+button {
+  margin-bottom: 5px !important;
+  background-color:#EEF9FF;
+  color: #1B7FBD;
+  padding: 10px 15px;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  word-break: break-all;
+}
+
+button:hover {
+  opacity: 1;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #cccccc;
+  -webkit-box-shadow: none;
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background:grey;
+}
+
+dl{
+  text-align: left;
+}
+
+label{
+  font-size: $paragraphFontSizeMedium;
+}
+
+// Media Queries
+@media (max-width: 600px) {
+  table thead {
+    font-size: 12px;
+  }
+  form{
+    max-width:500px;
+    text-align: center;
+  }
+}

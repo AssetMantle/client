@@ -23,15 +23,17 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val otp = smsOTPs.Service.sendOTP(loginState.username)
-      def sendNotificationAndGetResult(otp:String)={
+
+      def sendNotificationAndGetResult(otp: String) = {
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_PHONE, otp)
         withUsernameToken.Ok(views.html.component.master.verifyMobileNumber())
       }
+
       (for {
         otp <- otp
-        result<-sendNotificationAndGetResult(otp)
+        result <- sendNotificationAndGetResult(otp)
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -39,7 +41,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
-          Future (BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors)))
+          Future(BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors)))
         },
         verifyMobileNumberData => {
           val verifyOTP = smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
@@ -60,10 +62,10 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
             _ <- verifyMobileNumber
             contact <- contact
             _ <- updateStatus(contact)
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.SUCCESS)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => if (baseException.failure == constants.Response.INVALID_OTP) BadRequest(views.html.component.master.verifyMobileNumber(views.companion.master.VerifyMobileNumber.form.withError(constants.FormField.OTP.name, constants.Response.INVALID_OTP.message))) else InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }
       )

@@ -30,7 +30,7 @@ class MainAssetActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorS
   def receive = {
     case assetCometMessage: blockchain.AssetCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ASSET + "/" + assetCometMessage.username).resolveOne().onComplete {
-        case Success(actorRef) => logger.info(module + " " + assetCometMessage.username  + ": " + assetCometMessage.message)
+        case Success(actorRef) => logger.info(module + " " + assetCometMessage.username + ": " + assetCometMessage.message)
           actorRef ! assetCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }

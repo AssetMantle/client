@@ -17,7 +17,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
-        routes.javascript.AccountController.noteNewKeyDetails,
+        routes.javascript.AccountController.noteAndVerifyMnemonic,
 
         routes.javascript.AddKeyController.blockchainAddKeyForm,
 
@@ -140,6 +140,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateZoneNegotiationForm,
         routes.javascript.FileController.updateZoneNegotiation,
         routes.javascript.FileController.file,
+        routes.javascript.FileController.uploadAccountKYCForm,
+        routes.javascript.FileController.uploadAccountKYC,
+        routes.javascript.FileController.storeAccountKYC,
+        routes.javascript.FileController.updateAccountKYCForm,
+        routes.javascript.FileController.updateAccountKYC,
+
 
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
         routes.javascript.IssueAssetController.issueAssetForm,
@@ -164,6 +170,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
 
+        routes.javascript.ProfileController.identificationDetails,
+        routes.javascript.ProfileController.identificationForm,
+        routes.javascript.ProfileController.identificationDocument,
+        routes.javascript.ProfileController.organizationDetails,
+
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
@@ -177,6 +188,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ReleaseAssetController.releaseAssetList,
         routes.javascript.ReleaseAssetController.releaseAssetForm,
         routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
+
+        routes.javascript.SalesQuoteController.shippingDetailsForm,
+        routes.javascript.SalesQuoteController.commodityDetailsForm,
+        routes.javascript.SalesQuoteController.paymentTermsForm,
+        routes.javascript.SalesQuoteController.salesQuoteDocumentsForm,
+        routes.javascript.SalesQuoteController.salesQuoteList,
 
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderList,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderDocument,
@@ -238,11 +255,25 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.sellerFeedbackList,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
+        routes.javascript.TradeRoomController.tradeTerms,
+        routes.javascript.TradeRoomController.tradeFinancials,
+        routes.javascript.TradeRoomController.documentList,
+        routes.javascript.TradeRoomController.documentView,
+        routes.javascript.TradeRoomController.recentActivity,
+        routes.javascript.TradeRoomController.chatRoom,
+        routes.javascript.TradeRoomController.updateTermStatus,
+        routes.javascript.TradeRoomController.tradeList,
+
+
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
 
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
 
         routes.javascript.ViewController.profile,
+        routes.javascript.ViewController.account,
+        routes.javascript.ViewController.dashboard,
+        routes.javascript.ViewController.trades,
+
       )
     ).as("text/javascript")
   }

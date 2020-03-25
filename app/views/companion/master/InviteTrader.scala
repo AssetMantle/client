@@ -7,10 +7,11 @@ object InviteTrader {
 
   val form = Form(
     mapping(
-      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field
+      constants.FormField.NAME.name -> constants.FormField.NAME.field,
+      constants.FormField.EMAIL_ADDRESS.name -> constants.FormField.EMAIL_ADDRESS.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(accountID: String)
+  case class Data(name:String, emailAddress: String)
 
 }

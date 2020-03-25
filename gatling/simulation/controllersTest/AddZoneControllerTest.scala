@@ -24,7 +24,7 @@ object addZoneControllerTest {
 
     .exec(http("Add_Zone_Form_GET")
       .get(routes.AddZoneController.addZoneForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.ADD_ZONE.legend)).exists)
+      .check(css("legend:contains(%s)".format("Add Zone")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .feed(NameFeeder.nameFeed)
@@ -44,7 +44,7 @@ object addZoneControllerTest {
         Form.ADDRESS_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
-      .check(substring("ZONE_KYC_FILES").exists)
+      .check(substring("Zone KYC Files").exists)
     )
     .pause(2)
     .foreach(zoneKYCs,"documentType"){
@@ -69,14 +69,14 @@ object addZoneControllerTest {
            .exec(
              http("Store_ZoneKYC_"+"${documentType}")
                .get(session=>routes.AddZoneController.userStoreZoneKYC(session(Test.TEST_FILE_NAME).as[String],session("documentType").as[String]).url)
-               .check(substring("ZONE_KYC_FILES").exists)
+               .check(substring("Zone KYC Files").exists)
            )
         .pause(2)
     }
     .pause(1)
     .exec(http("User_Review_Add_Zone_Request_Form")
         .get(routes.AddZoneController.userReviewAddZoneRequestForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION.legend)).exists)
+      .check(css("legend:contains(%s)".format("Review Add Zone On Completion")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(2)
@@ -86,7 +86,7 @@ object addZoneControllerTest {
           Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
           Form.COMPLETION -> true
       ))
-      .check(substring("SUCCESS ZONE_ADDED_FOR_VERIFICATION").exists)
+      .check(substring("Zone Added For Verification").exists)
     )
     .pause(2)
 
@@ -98,7 +98,7 @@ object addZoneControllerTest {
     )
     .pause(1)
     .foreach(zoneKYCs,"documentType"){
-      exec(http("Zone_KYC_update_Status"+"${documentType}")
+      exec(http("Zone_KYC_update_Status_"+"${documentType}")
         .post(routes.AddZoneController.updateZoneKYCDocumentStatus().url)
         .formParamMap(Map(
           Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
@@ -122,7 +122,7 @@ object addZoneControllerTest {
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.PASSWORD ->"${%s}".format(Test.TEST_MAIN_PASSWORD),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
-      .check(substring("SUCCESS ZONE_VERIFIED").exists)
+      .check(substring("Zone Verified").exists)
     )
     .pause(2)
 

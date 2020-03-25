@@ -1,12 +1,18 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.IssueAssetRequest
+@import views.html.base._
 
 @(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
-@for(issueAssetRequest <- issueAssetRequests) {
-    <div class="col-md-4">
-        <br>
-        <div class="flexItem card-body leftText lightBlue">
+<div class="cmuk-container">
+    <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
+        @if(issueAssetRequests.length == 0){
+            <spa>No Requests Found</spa>
+        }
+        @for(issueAssetRequest <- issueAssetRequests) {
+            <div>
+            @commonCard() {
+                @issueAssetRequest.id
+            }{
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@issueAssetRequest.accountID <br>
             <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span>: @issueAssetRequest.documentHash <br>
             <span class="red">@Messages(constants.Form.ASSET_TYPE)</span>: @issueAssetRequest.assetType <br>
@@ -16,7 +22,7 @@
             <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span>: @issueAssetRequest.takerAddress <br>
             <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @issueAssetRequest.physicalDocumentsHandledVia <br>
             <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @issueAssetRequest.paymentTerms <br>
-            <span class="red">@Messages(constants.FormField.STATUS.name)</span> : @issueAssetRequest.status <br>
+            <span class="red">@Messages(constants.FormField.STATUS.name)</span> : @Messages(constants.Status.Asset.REQUESTED) <br>
             <span class="red">@Messages(constants.Form.SHIPMENT_DETAILS)</span> <br>
             <span class="red">@Messages(constants.FormField.COMMODITY_NAME.name)</span> : @issueAssetRequest.shipmentDetails.commodityName <br>
             <span class="red">@Messages(constants.FormField.QUALITY.name)</span> : @issueAssetRequest.shipmentDetails.quality <br>
@@ -27,10 +33,11 @@
             <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @issueAssetRequest.shipmentDetails.shipmentDate <br>
           <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity, '@issueAssetRequest.takerAddress'))">@Messages(constants.Form.APPROVE)</button>
           <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
-        </div>
-    </div>
-    <br>
-    <div id = "assetDocuments@issueAssetRequest.id">
-        <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
+            <div id = "assetDocuments@issueAssetRequest.id">
+                <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
+            </div>
+        }
     </div>
 }
+    </div>
+</div>

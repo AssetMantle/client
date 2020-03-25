@@ -1,0 +1,63 @@
+@import controllers.actions.LoginState
+@import models.master.Contact
+@import views.html.base._
+@import models.master.AccountKYC
+
+@import models.master.Identification
+@(accountKYC: Option[AccountKYC],identification: Option[Identification])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+        @identification match{
+            case Some(identification)=>{
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
+                    <div class="infoRowValue">@identification.firstName @identification.lastName</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.DATE_OF_BIRTH)</div>
+                    <div class="infoRowValue">@identification.dateOfBirth</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_NUMBER)</div>
+                    <div class="infoRowValue">@identification.idNumber</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_TYPE)</div>
+                    <div class="infoRowValue">@identification.idType</div>
+                </div>
+            }
+            case None=>{
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.DATE_OF_BIRTH)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_NUMBER)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+                <div class="cmuk-flex infoRow">
+                    <div class="infoRowLabel red">@Messages(constants.Form.ID_TYPE)</div>
+                    <div class="infoRowValue">@Messages(constants.View.NOT_SPECIFIED)</div>
+                </div>
+            }
+        }
+
+        @accountKYC match{
+            case Some(file)=>{
+                @component.master.commonDocumentViewer(file) {
+                    @routes.FileController.getAccountKYCFile(file.fileName,file.documentType)
+                } {
+                    <a href="@routes.FileController.getAccountKYCFile(file.fileName,file.documentType)">@Messages(file.documentType)</a>
+                } {
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPDATE_IDENTIFICATION) </button>
+                }
+            }
+            case None=>{
+                <div>
+                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
+                </div>
+            }
+        }

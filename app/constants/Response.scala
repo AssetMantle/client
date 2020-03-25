@@ -72,6 +72,8 @@ object Response {
   val PASSWORD_UPDATED = new Success("PASSWORD_UPDATED")
   val OTP_SENT = new Success("OTP_SENT")
   val INVITATION_EMAIL_SENT = new Success("INVITATION_EMAIL_SENT")
+  val IDENTIFICATION_ADDED = new Success("IDENTIFICATION_ADDED")
+  val SALES_QUOTE_CREATED = new Success("SALES_QUOTE_CREATED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -88,6 +90,8 @@ object Response {
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
+  val EMAIL_ADDRESS_ALREADY_IN_USE = new Failure("EMAIL_ADDRESS_ALREADY_IN_USE")
+  val MOBILE_NUMBER_ALREADY_IN_USE = new Failure("MOBILE_NUMBER_ALREADY_IN_USE")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")
@@ -107,6 +111,7 @@ object Response {
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
+  val INVALID_INPUT = new Failure("INVALID_INPUT")
   val NO_FILE = new Failure("NO_FILE")
   val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
   val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
@@ -114,6 +119,9 @@ object Response {
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
+  val UNVERIFIED_IDENTIFICATION = new Failure("UNVERIFIED_IDENTIFICATION")
+  val SFTP_SCHEDULER_FAILED = new Failure("SFTP_SCHEDULER_FAILED")
+  val INVITATION_EMAIL_ALREADY_SENT = new Failure("INVITATION_EMAIL_ALREADY_SENT")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

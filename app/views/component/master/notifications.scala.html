@@ -3,16 +3,16 @@
 @(notifications: Seq[models.masterTransaction.Notification] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="notificationContainer" class = "notificationContainer">
     @for(notification <- notifications) {
-        <div class = "notification">
+        <li class = "notification">
             <div @if(notification.read) {
                 class="read"
             } else {
                 onclick="markNotificationRead(this, '@notification.id')"
                 }>
-                <div>@notification.notificationTitle @notification.time</div>
-                <div>@notification.notificationMessage</div>
+                <div><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
+                <div class="notificationTime">@notification.time</div>
             </div>
-        </div>
+        </li>
     }
-<div class = "notification"> <a onclick="loadMoreNotifications()">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+<div class = "notification NotificationButton"> <a onclick="loadMoreNotifications()">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
 </div>

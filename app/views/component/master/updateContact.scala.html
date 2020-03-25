@@ -4,7 +4,13 @@
 
 @(updateContactForm: Form[UpdateContact.Data] = UpdateContact.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.UPDATE_CONTACT, updateContactForm) {
-    @commonInputText(updateContactForm, constants.FormField.MOBILE_NUMBER)
+    <div class="mobileNumberUpdate cmuk-flex">
+        <div class="countryCode hiddenLabel">
+            @commonSelect(updateContactForm, constants.FormField.COUNTRY_CODE)
+        </div>
+        <div class="mobileNumber">
+        @commonInputText(updateContactForm, constants.FormField.MOBILE_NUMBER)
+        </div>
+    </div>
     @commonInputText(updateContactForm, constants.FormField.EMAIL_ADDRESS)
-    @commonSelect(updateContactForm, constants.FormField.COUNTRY_CODE)
 }

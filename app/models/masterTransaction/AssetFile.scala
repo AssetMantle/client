@@ -108,11 +108,11 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[Option[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def findByIdDocumentType(id: String, documentType: String): Future[Option[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -187,7 +187,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def create(file: AssetFile): Future[String] = add(serialize(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)))
 
-    def getOrEmpty(id: String, documentType: String): Future[AssetFile] = findByIdDocumentType(id = id, documentType = documentType).map { documentType => documentType.getOrElse(AssetFileSerialized("", "", "", None, None, None)).deserialize }
+    def getOrEmpty(id: String, documentType: String): Future[AssetFile] = findByIdDocumentType(id = id, documentType = documentType).map { assetFile => assetFile.getOrElse(AssetFileSerialized("", "", "", None, None, None)).deserialize }
 
     def getOrNone(id: String, documentType: String): Future[Option[AssetFile]] = findByIdDocumentType(id = id, documentType = documentType).map { assetFile => if (assetFile.isDefined) Option(assetFile.get.deserialize) else None }
 

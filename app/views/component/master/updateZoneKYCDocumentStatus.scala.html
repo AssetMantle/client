@@ -10,8 +10,8 @@
 <div id="@Seq(zoneKYC.id, zoneKYC.documentType).mkString("")">
 @form(action = routes.AddZoneController.updateZoneKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.ZONE_ID, 'value -> zoneKYC.id, 'class -> "hidden", 'readonly -> true)
-    @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> zoneKYC.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.ZONE_ID, 'value -> zoneKYC.id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> zoneKYC.documentType, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(updateZoneKYCDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(zoneKYC.id, zoneKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateZoneKYCDocumentStatusForm.hasGlobalErrors) {

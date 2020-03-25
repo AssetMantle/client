@@ -10,7 +10,7 @@ object ConfirmBidFeeder {
 
   def arrayConstructor(users: Int): Array[Map[String, String]] = {
     val feed = new Array[Map[String, String]](users)
-    for (id <- 0 until users) feed(id) = Map(Test.TEST_CONFIRM_BID -> (500+Random.nextInt(1000)).toString )
+    for (id <- 0 until users) feed(id) = Map(Test.TEST_CONFIRM_BID -> "950")
     feed
   }
 }

@@ -1,26 +1,26 @@
 @import controllers.actions.LoginState
 @import models.master.Zone
-@(zone: Zone, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import views.html.base.common
 
+@(zone: Zone, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import views.html.base._
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 @center = {
-        <div id="commonHome" class="flexItem flexGrowth"></div>
-            <div class="cmuk-container">
+        <div id="commonHome"></div>
                 <div class="cmuk-grid-medium cmuk-grid cmuk-grid-match" cmuk-grid>
-                    <div class="cmuk-width-1-1 cmuk-width-expand@@m cmuk-first-column">
-                        <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-sticky cmuk-card-body">
-                            <span class="heading">@Messages(constants.Form.ZONE):</span>
+                    <div  class="cmuk-width-1-1 cmuk-width-expand@@m">
+                    @commonCard(){
+                        <div>
+                            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.ZONE):</span>
+                        </div>
+                    }{
+                        <div>
+                            <div id="genesisDetails" class="flexContainer"></div>
                             <div id="zone"></div>
                         </div>
-                    </div>
-                    <div class="cmuk-width-1-1 cmuk-width-expand@@m leftText">
-                        <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
-                            <span class="heading">@Messages(constants.Form.GENESIS)</span>
-                            <div id="genesisDetails" class="flexContainer"></div>
-                        </div>
+                    }
                     </div>
                 </div>
-            </div>
             <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());

@@ -1,52 +1,79 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Order
-
+@import views.html.base._
 @(unModeratedBuyOrders: Seq[Order], unModeratedSellOrders: Seq[Order], moderatedOrders: Seq[Order])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="cmuk-container">
+    <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(unModeratedBuyOrder <- unModeratedBuyOrders) {
-    <div class="flexItem thirdBox box lightBlue">
-        <div class="leftText">
-            <span class="red">@Messages(constants.Form.ID)</span>: @unModeratedBuyOrder.id <br>
-            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @unModeratedBuyOrder.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @unModeratedBuyOrder.fiatProofHash <br>
-            <div class="centerText" >
-            @loginState.acl match {
-                case Some(acl) => {
-                    @if(acl.buyerExecuteOrder) {
-                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderDocument('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</button>
-                    } <br>
-                    }
-                case _ => {}
-            }
+    <div>
+    @commonCard() {
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@unModeratedBuyOrder.id</span>
+        </div>
+    } {
+        <div>
+            <div class="leftText">
+                <span class="red">@Messages(constants.Form.ID)</span>: @unModeratedBuyOrder.id <br>
+                <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @unModeratedBuyOrder.awbProofHash <br>
+                <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @unModeratedBuyOrder.fiatProofHash <br>
+                <div class="centerText" >
+                @loginState.acl match {
+                    case Some(acl) => {
+                        @if(acl.buyerExecuteOrder) {
+                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderDocument('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</button>
+                        } <br>
+                        }
+                    case _ => {}
+                }
+                </div>
             </div>
         </div>
+    }
     </div>
 }
 
 @for(unModeratedSellOrder <- unModeratedSellOrders) {
-    <div class="flexItem thirdBox box lightBlue">
-        <div class="leftText">
-            <span class="red">@Messages(constants.Form.ID)</span>: @unModeratedSellOrder.id <br>
-            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @unModeratedSellOrder.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @unModeratedSellOrder.fiatProofHash <br>
-            <div class="centerText" >
-            @loginState.acl match {
-                case Some(acl) => {
-                    @if(acl.sellerExecuteOrder) {
-                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderDocument('@unModeratedSellOrder.id'))">@Messages(constants.Form.SELLER_EXECUTE_ORDER.legend)</button>
-                    } <br>}
-                case _ => {}
-            }
+    <div>
+    @commonCard() {
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@unModeratedSellOrder.id</span>
+        </div>
+    } {
+        <div>
+            <div class="leftText">
+                <span class="red">@Messages(constants.Form.ID)</span>: @unModeratedSellOrder.id <br>
+                <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @unModeratedSellOrder.awbProofHash <br>
+                <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @unModeratedSellOrder.fiatProofHash <br>
+                <div class="centerText" >
+                @loginState.acl match {
+                    case Some(acl) => {
+                        @if(acl.sellerExecuteOrder) {
+                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderDocument('@unModeratedSellOrder.id'))">@Messages(constants.Form.SELLER_EXECUTE_ORDER.legend)</button>
+                        } <br>}
+                    case _ => {}
+                }
+                </div>
             </div>
         </div>
+    }
     </div>
 }
 @for(moderatedOrder <- moderatedOrders) {
-    <div class="flexItem thirdBox box lightBlue">
-        <div class="leftText">
-            <span class="red">@Messages(constants.Form.ID)</span>: @moderatedOrder.id <br>
-            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @moderatedOrder.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @moderatedOrder.fiatProofHash <br>
+    <div>
+    @commonCard() {
+        <div>
+            <span class="headerFontSize cmuk-text-bold">@moderatedOrder.id</span>
         </div>
+    } {
+        <div>
+            <div class="leftText">
+                <span class="red">@Messages(constants.Form.ID)</span>: @moderatedOrder.id <br>
+                <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span>: @moderatedOrder.awbProofHash <br>
+                <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span>: @moderatedOrder.fiatProofHash <br>
+            </div>
+        </div>
+    }
     </div>
 }
+    </div>
+</div>

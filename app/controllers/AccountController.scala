@@ -12,6 +12,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import services.SFTPScheduler
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,9 +39,11 @@ class AccountController @Inject()(
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
+                                   queriesMnemonic: queries.GetMnemonic,
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
+                                   sftpScheduler: SFTPScheduler,
                                    messagesControllerComponents: MessagesControllerComponents,
                                  )
                                  (implicit
@@ -53,17 +56,17 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp())
+  def signUpForm(mnemonic: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form, mnemonic))
   }
 
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors, formWithErrors.data(constants.FormField.MNEMONIC.name))))
       },
       signUpData => {
-        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
+        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.mnemonic))
 
         def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey)
 
@@ -74,15 +77,23 @@ class AccountController @Inject()(
           createAccount <- createAccount(addKeyResponse)
           _ <- addLogin(createAccount)
         } yield {
-          PartialContent(views.html.component.master.noteNewKeyDetails(name = addKeyResponse.name, blockchainAddress = addKeyResponse.address, publicKey = addKeyResponse.pubkey, seed = addKeyResponse.mnemonic))
+          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
         }).recover {
-          case baseException: BaseException =>
-            InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
   }
 
+  def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
+    val mnemonicResponse = queriesMnemonic.Service.get()
+    (for {
+      mnemonicResponse <- mnemonicResponse
+    } yield Ok(views.html.component.master.noteAndVerifyMnemonic(mnemonic = mnemonicResponse.body))
+      ).recover {
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
+  }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.login())
@@ -118,9 +129,8 @@ class AccountController @Inject()(
           } yield utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
         }
 
-        // Discuss loginStateVal
-        def getResult(status: String, loginStateVal: LoginState): Future[Result] = {
-          implicit val loginState = loginStateVal
+        def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
+          implicit val loginState = loginStateValue
           val contactWarnings = utilities.Contact.getWarnings(status)
           loginState.userType match {
             case constants.User.GENESIS => withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
@@ -158,7 +168,7 @@ class AccountController @Inject()(
               } yield result
             case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
             case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
-            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
+            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.USER)
               for {
                 _ <- updateUserType
                 result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
@@ -312,28 +322,10 @@ class AccountController @Inject()(
     )
   }
 
-
   def checkUsernameAvailable(username: String): Action[AnyContent] = Action.async { implicit request =>
     val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
     for {
       checkUsernameAvailable <- checkUsernameAvailable
     } yield if (checkUsernameAvailable) Ok else NoContent
-  }
-
-  //TODO Remove query parameters
-  def noteNewKeyDetails(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
-    views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors, name, blockchainAddress, publicKey, seed))
-      },
-      noteNewKeyDetailsData => {
-        if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
-        }
-        else {
-          BadRequest(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
-        }
-      }
-    )
   }
 }
