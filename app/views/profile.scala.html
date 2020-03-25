@@ -24,16 +24,14 @@
                     </div>
                 </div>
         }</div>
-
+            <div class="cmuk-width-1-2@@m">
+                <div id="identificationDetails" class="identificationDetails"></div>
+            </div>
             <div class="cmuk-width-1-2@@m">
                 <div id="contact" class="contactDetails"></div>
             </div>
-
-        </div>
-
-        @loginState.userType match {
-            case constants.User.USER => {
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+            @loginState.userType match {
+                case constants.User.USER => {
 
                     <div class="cmuk-width-1-2@@m">
                         <div id="userViewPendingRequests"></div>
@@ -43,20 +41,16 @@
                     @commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
                     } {
                         <div class="cmuk-position-center">
-                            @Messages(constants.View.UNAVAILABLE)
+                        @Messages(constants.View.UNAVAILABLE)
                         </div>
                     }
                     </div>
-
-                </div>
-                <script>
+                    <script>
                     componentResource('userViewPendingRequests', jsRoutes.controllers.ComponentViewController.userViewPendingRequests());
                 </script>
 
-            }
-            case constants.User.TRADER => {
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
+                }
+                case constants.User.TRADER => {
                     <div class="cmuk-width-1-2@@m accountDetails">
                     @commonCard(constants.Form.ORGANIZATION_DETAILS) {
                     } {
@@ -69,15 +63,12 @@
                         <div id="traderViewOrganizationBankAccountDetail"></div>
                     </div>
 
-                </div>
-                <script>
+                    <script>
                     componentResource('traderViewOrganizationDetails', jsRoutes.controllers.ComponentViewController.traderViewOrganizationDetails());
                     componentResource('traderViewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccountDetail());
                 </script>
-            }
-            case constants.User.ORGANIZATION => {
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
+                }
+                case constants.User.ORGANIZATION => {
                     <div class="cmuk-width-1-2@@m">
                         <div id="viewOrganizationDetails" class="organizationDetails"></div>
                     </div>
@@ -86,28 +77,20 @@
                         <div id="viewOrganizationBankAccountDetail"></div>
                     </div>
 
-                </div>
-                <script>
+                    <script>
                     componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
                     componentResource('viewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.viewOrganizationBankAccountDetail());
                 </script>
+                }
+                case _ => {}
+
             }
-            case _ => {}
-
-        }
-
-        <div class="cmuk-grid-match cmuk-grid cmuk-margin-top" cmuk-grid>
-            <div class="cmuk-width-1-2@@m">
-                <div id="identificationDetails" class="identificationDetails"></div>
-            </div>
             <div class="cmuk-width-1-2">
-           @if(loginState.userType == constants.User.TRADER) {
-               <div id="traderRelationList"></div>
+            @if(loginState.userType == constants.User.TRADER) {
+                <div id="traderRelationList"></div>
             }
             </div>
         </div>
-
-
 
     </div>
     <script>
