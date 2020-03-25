@@ -70,13 +70,16 @@ GET         /component/identificationDetails                             control
 GET         /component/userViewPendingRequests                           controllers.ComponentViewController.userViewPendingRequests
 GET         /component/traderViewOrganizationDetails                     controllers.ComponentViewController.traderViewOrganizationDetails
 GET         /component/viewOrganizationDetails                           controllers.ComponentViewController.viewOrganizationDetails
+GET         /component/viewOrganizationBankAccountDetail                 controllers.ComponentViewController.viewOrganizationBankAccountDetail
+GET         /component/traderViewOrganizationBankAccountDetail           controllers.ComponentViewController.traderViewOrganizationBankAccountDetail
 
 GET         /component/traderRelationList                                controllers.ComponentViewController.traderRelationList
 GET         /component/acceptedTraderRelationList                        controllers.ComponentViewController.acceptedTraderRelationList
 GET         /component/pendingTraderRelationList                         controllers.ComponentViewController.pendingTraderRelationList
-GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(toID: String)
+GET         /component/acceptedTraderRelation                            controllers.ComponentViewController.acceptedTraderRelation(fromID: String, toID: String)
 GET         /component/pendingSentTraderRelation                         controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
 GET         /component/pendingReceivedTraderRelation                     controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
+GET         /master/zoneViewOrganizationBankAccountDetail                controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)
 
 GET         /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
 POST        /master/commodityDetails                                     controllers.SalesQuoteController.commodityDetails
@@ -199,6 +202,23 @@ GET         /traderUpload/storeFile                                      control
 GET         /traderUpdate                                                controllers.SetACLController.updateTraderKYCForm(documentType: String)
 GET         /traderUpload/updateFile                                     controllers.SetACLController.updateTraderKYC(name: String, documentType: String)
 
+GET         /worldCheck/traderBackgroundCheckUpload                           controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
+POST        /worldCheck/traderBackgroundCheckUpload/file                      controllers.BackgroundCheckController.uploadTraderBackgroundCheckFile(documentType: String)
+GET         /worldCheck/traderBackgroundCheckUpload/storeFile                 controllers.BackgroundCheckController.storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
+GET         /worldCheck/traderBackgroundCheckUpdate                           controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm(documentType: String, traderID :String)
+GET         /worldCheck/traderBackgroundCheckUpdate/updateFile                controllers.BackgroundCheckController.updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
+GET         /worldCheck/uploadOrUpdateTraderBackgroundCheck                   controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile(traderID: String)
+
+GET         /worldCheck/organizationBackgroundCheckUpload                     controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
+POST        /worldCheck/organizationBackgroundCheckUpload/file                controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFile(documentType: String)
+GET         /worldCheck/organizationBackgroundCheckUpload/storeFile           controllers.BackgroundCheckController.storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
+GET         /worldCheck/organizationBackgroundCheckUpdate                     controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
+GET         /worldCheck/organizationBackgroundCheckUpdate/updateFile          controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
+GET         /worldCheck/uploadOrUpdateOrganizationBackgroundCheck             controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String)
+
+GET         /worldCheck/zoneAccessedTraderBackgroundCheckFile                 controllers.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String)
+GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile           controllers.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String)
+
 GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
 POST        /traderUpload/assetDocument                                  controllers.FileController.uploadTraderAsset(documentType: String)
 GET         /traderUpload/storeAssetDocument                             controllers.FileController.storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
@@ -221,8 +241,8 @@ GET         /master/addOrganization                                      control
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization
 GET         /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOsForm
 POST        /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOs
-GET         /master/organizationBankAccountDetail                        controllers.AddOrganizationController.organizationBankAccountDetailForm
-POST        /master/organizationBankAccountDetail                        controllers.AddOrganizationController.organizationBankAccountDetail
+GET         /master/addOrUpdateOrganizationBankAccountDetail             controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm
+POST        /master/addOrUpdateOrganizationBankAccountDetail             controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail
 GET         /master/userUploadOrUpdateOrganizationKYCView                controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView
 GET         /master/userUploadOrganizationKYC                            controllers.AddOrganizationController.userUploadOrganizationKYCForm(documentType: String)
 POST        /master/userUploadOrganizationKYCDocument                    controllers.AddOrganizationController.userUploadOrganizationKYC(documentType: String)
@@ -233,7 +253,6 @@ GET         /master/userUpdateOrganizationKYCDocument                    control
 GET         /master/userReviewAddOrganizationRequest                     controllers.AddOrganizationController.userReviewAddOrganizationRequestForm
 POST        /master/userReviewAddOrganizationRequest                     controllers.AddOrganizationController.userReviewAddOrganizationRequest
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
-GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
 GET         /master/viewOrganizationKYCDocuments                         controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
 GET         /master/updateOrganizationKYCDocumentStatus                  controllers.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String)
 POST        /master/updateOrganizationKYCDocumentStatus                  controllers.AddOrganizationController.updateOrganizationKYCDocumentStatus

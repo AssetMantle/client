@@ -160,7 +160,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getOrNoneContact(id: String): Future[Option[Contact]] = findById(id)
+    def get(id: String): Future[Option[Contact]] = findById(id)
 
     def getOrNoneContactByEmail(email: String): Future[Option[Contact]] = findByEmailAddress(email)
 

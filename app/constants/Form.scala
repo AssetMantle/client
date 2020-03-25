@@ -26,7 +26,7 @@ object Form {
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
   val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
-  val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
+  val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail())
   val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest())
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
@@ -169,6 +169,7 @@ object Form {
   val SEARCH = "SEARCH"
   val PREVIOUS = "PREVIOUS"
   val ORGANIZATION_VERIFICATION = "ORGANIZATION_VERIFICATION"
+  val ORGANIZATION_BACKGROUND_CHECK = "ORGANIZATION_BACKGROUND_CHECK"
   val ZONE_VERIFICATION = "ZONE_VERIFICATION"
   val EVIDENCE_HASH = "EVIDENCE_HASH"
   val SEE_ALL = "SEE_ALL"
@@ -198,6 +199,7 @@ object Form {
   val SUBMIT = "SUBMIT"
   val ORGANIZATION_DETAILS = "ORGANIZATION_DETAILS"
   val ORGANIZATION_KYC_FILES = "ORGANIZATION_KYC_FILES"
+  val ORGANIZATION_BACKGROUND_CHECK_FILES = "ORGANIZATION_BACKGROUND_CHECK_FILES"
   val UBOS = "UBOS"
   val UBO = "UBO"
   val ADD_UBOS = "ADD_UBOS"
@@ -209,6 +211,7 @@ object Form {
   val TITLE = "TITLE"
   val ZONE_DETAILS = "ZONE_DETAILS"
   val TRADER_KYC_FILES = "TRADER_KYC_FILES"
+  val TRADER_BACKGROUND_CHECK = "TRADER_BACKGROUND_CHECK"
   val TRADER_DETAILS = "TRADER_DETAILS"
   val USER_DETAILS = "USER_DETAILS"
   val RATING = "RATING"
