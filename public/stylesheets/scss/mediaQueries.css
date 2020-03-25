@@ -1,0 +1,81 @@
+@media screen and (max-width: 768px) {
+  .timeline {
+    margin: 30px;
+    padding: 0; }
+    .timeline:before {
+      left: 0; }
+    .timeline .timeline-item .timeline-content {
+      width: 80%;
+      float: right; }
+    .timeline .timeline-item .timeline-content:before,
+    .timeline .timeline-item .timeline-content.right:before {
+      left: -5px;
+      right: inherit; }
+    .timeline .timeline-item .timeline-icon {
+      left: 0; } }
+@media (min-width: 1200px) {
+  .pageContainer .leftSide {
+    height: 100%;
+    float: left;
+    left: 0;
+    margin-right: 1%;
+    width: 24%; }
+  .pageContainer .middle {
+    width: 50%;
+    height: calc(100% - 128px);
+    float: left; }
+  .pageContainer .rightSide {
+    height: 100%;
+    width: 24%;
+    float: left;
+    right: 0; } }
+@media (min-width: 992px) and (max-width: 1600px) {
+  .leftTradeFinancial .financial {
+    margin-bottom: 15px; }
+  .leftTradeFinancial .cmuk-card-header {
+    padding: 10px 15px;
+    font-size: 12px; }
+  .leftTradeFinancial .financial .cmuk-card-body {
+    height: 210px; }
+  .leftTradeFinancial .financial ul li {
+    padding: 10px 0; }
+  .leftTradeFinancial .financial .cmuk-comment-meta, .leftTradeFinancial .financial .ctitle {
+    font-size: 10px; }
+  .leftTradeFinancial .addBalanceButton {
+    text-transform: capitalize;
+    font-family: "Rubik", sans-serif;
+    padding: 8px 8px;
+    font-size: 12px;
+    line-height: normal;
+    background: rgba(8, 98, 190, 0.1);
+    border-radius: 103px;
+    color: #0862BE;
+    font-size: 10px;
+    border: 0; }
+  .leftTradeFinancial .docView .cmuk-card-header, .leftTradeFinancial .docView .cmuk-card-body, .leftTradeFinancial .docView .documentlist {
+    padding: 0px; }
+  .leftTradeFinancial .docView .cmuk-card-body {
+    height: 300px; }
+
+  .recentActivity .recentActivityContainer {
+    margin-bottom: 15px; }
+    .recentActivity .recentActivityContainer .cmuk-card-body {
+      height: 210px; }
+    .recentActivity .recentActivityContainer .cmuk-card-header {
+      padding: 10px 15px;
+      font-size: 12px; }
+  .recentActivity .chatRoom .cmuk-card-body {
+    height: 300px; }
+    .recentActivity .chatRoom .cmuk-card-body .chatMessages {
+      height: 190px; }
+
+  .timeline {
+    margin: 20px 0px; } }
+@media (max-width: 1920px) {
+  .comdex .cmuk-container {
+    max-width: 100%; } }
+@media (min-width: 1921px) {
+  .comdex .cmuk-container {
+    max-width: 1920px; } }
+
+/*# sourceMappingURL=mediaQueries.css.map */

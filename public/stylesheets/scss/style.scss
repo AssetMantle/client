@@ -446,7 +446,6 @@ margin-right: -5px;
     font-family: $fontFamilySecondary;
   }
   .cmuk-card-body{
-    height:275px;
     padding:0px;
     overflow-y: auto;
     ul{
@@ -492,6 +491,7 @@ margin-right: -5px;
       .ctitle{
         color: #848A91;
         font-size: $paragraphFontSizeMedium;
+        font-family: $fontFamilySecondary;
       }
       .payable{
         align-items: center;
@@ -561,7 +561,6 @@ margin-right: -5px;
     }
     .cmuk-card-body{
       overflow-y: auto;
-      height: 275px;
     }
   }
   .cmuk-card-default{
@@ -1118,7 +1117,6 @@ header:before,
     font-family: $fontFamilySecondary;
   }
   .cmuk-card-body{
-    height: 275px;
     overflow: auto;
     padding: 0px;
     ul{

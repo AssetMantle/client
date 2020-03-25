@@ -1214,6 +1214,7 @@ input:checked+.slider {
   border: 1px solid #DDE8F3;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 5px;
   .documentContentTop{
     font-size: $paragraphFontSizeSmall;

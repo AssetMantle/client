@@ -1,0 +1,37 @@
+input, select {
+  width: 100%; }
+
+input:focus {
+  background-color: #ddd;
+  outline: none; }
+
+input:hover {
+  cursor: pointer; }
+
+button {
+  background-color: #EEF9FF;
+  color: #1B7FBD;
+  padding: 10px 15px;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  word-break: break-all; }
+
+dl {
+  text-align: left; }
+
+label {
+  font-size: 1.3rem;
+  font-family: "Oxygen", sans-serif;
+  font-weight: normal;
+  color: #272829; }
+
+@media (max-width: 600px) {
+  table thead {
+    font-size: 12px; }
+
+  form {
+    max-width: 500px;
+    text-align: center; } }
+
+/*# sourceMappingURL=tag.css.map */
