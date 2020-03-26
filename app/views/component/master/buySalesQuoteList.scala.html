@@ -24,7 +24,9 @@
             <td>
             @buySalesQuote.invitationStatus match{
                 case None=>{
+                    <div id="@buySalesQuote.id">
                     @views.html.component.master.acceptOrRejectSalesQuote(salesQuote = buySalesQuote)
+                    </div>
                 }
                 case Some(false)=>{
                     @Messages(constants.View.REJECTED)

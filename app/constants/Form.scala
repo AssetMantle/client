@@ -102,8 +102,9 @@ object Form {
   val SHIPPING_DETAILS = new Form("SHIPPING_DETAILS", routes.SalesQuoteController.shippingDetails(), routes.javascript.SalesQuoteController.shippingDetailsForm)
   val PAYMENT_TERMS = new Form("PAYMENT_TERMS", routes.SalesQuoteController.paymentTerms(), routes.javascript.SalesQuoteController.paymentTermsForm)
   val SALES_QUOTE_DOCUMENTS = new Form("SALES_QUOTE_DOCUMENTS", routes.SalesQuoteController.salesQuoteDocuments(), routes.javascript.SalesQuoteController.salesQuoteDocumentsForm)
-  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails, routes.javascript.SalesQuoteController.traderReviewSalesQuoteDetailsForm)
+  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails(), routes.javascript.SalesQuoteController.traderReviewSalesQuoteDetailsForm)
   val INVITE_SALES_QUOTE_BUYER = new Form("INVITE_SALES_QUOTE_BUYER", routes.SalesQuoteController.inviteSalesQuoteBuyer(), routes.javascript.SalesQuoteController.inviteSalesQuoteBuyerForm)
+  val ACCEPT_OR_REJECT_SALES_QUOTE= new Form("ACCEPT_OR_REJECT_SALES_QUOTE",routes.SalesQuoteController.acceptOrRejectSalesQuote(), routes.javascript.SalesQuoteController.acceptOrRejectSalesQuoteForm)
 
   //SellerExecuteOrderController
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder(), routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm)

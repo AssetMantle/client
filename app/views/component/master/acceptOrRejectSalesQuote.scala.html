@@ -7,20 +7,9 @@
 @(acceptOrRejectSalesQuoteForm: Form[AcceptOrRejectSalesQuote.Data] = AcceptOrRejectSalesQuote.form, salesQuote: SalesQuote)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
-<div id="@salesQuote.id">
-@form(action = routes.SalesQuoteController.acceptOrRejectSalesQuote, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    @CSRF.formField
+@commonForm(constants.Form.ACCEPT_OR_REJECT_SALES_QUOTE, acceptOrRejectSalesQuoteForm){
     @commonInputText(acceptOrRejectSalesQuoteForm, constants.FormField.SALES_QUOTE_ID, 'value -> salesQuote.id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(acceptOrRejectSalesQuoteForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(salesQuote.id, constants.FormField.STATUS.name).mkString(""))
-
-    @if(acceptOrRejectSalesQuoteForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- acceptOrRejectSalesQuoteForm.globalErrors) {
-            <li>@error.format</li>
-        }
-        </ul>
-    }
-
     @salesQuote.invitationStatus match {
         case Some(invitationStatus: Boolean) => {
             @if(invitationStatus) {
@@ -36,4 +25,7 @@
         }
     }
 }
-</div>
+<script>
+    hideElement("@constants.Form.ACCEPT_OR_REJECT_SALES_QUOTE.legend.replace(".","_")");
+    hideElement("@Seq(constants.Form.ACCEPT_OR_REJECT_SALES_QUOTE.legend, constants.Form.SUBMIT).mkString("").replace(".","_")");
+</script>

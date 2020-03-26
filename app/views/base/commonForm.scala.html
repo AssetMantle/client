@@ -4,7 +4,7 @@
 
 @form(action = formTemplate.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
-        <legend class="cmuk-legend">
+        <legend class="cmuk-legend" id='@formTemplate.legend.replace(".","_")'>
         @Messages(formTemplate.legend)
         </legend>
         <hr>
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(formTemplate.submit)</button>
+        <button type="button" class="cmuk-button cmuk-button-primary" id='@Seq(formTemplate.legend, constants.Form.SUBMIT).mkString("").replace(".","_")' onclick="submitForm(this)">@Messages(formTemplate.submit)</button>
     </fieldset>
 }
