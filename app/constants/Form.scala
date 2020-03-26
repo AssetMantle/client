@@ -27,10 +27,10 @@ object Form {
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization(), routes.javascript.AddOrganizationController.addOrganizationForm)
   val USER_ADD_OR_UPDATE_UBOS = new Form("USER_ADD_OR_UPDATE_UBOS", routes.AddOrganizationController.userAddOrUpdateUBOs(), routes.javascript.AddOrganizationController.userAddOrUpdateUBOsForm)
-  val DELETE_UBO =  new Form("DELETE_UBO", routes.AddOrganizationController.deleteUBO(), routes.javascript.AddOrganizationController.deleteUBOForm)
-  val USER_DELETE_UBO =  new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO(), routes.javascript.AddOrganizationController.userDeleteUBOForm)
-  val ADD_UBO =  new Form("ADD_UBO", routes.AddOrganizationController.addUBO(), routes.javascript.AddOrganizationController.addUBOForm)
-  val USER_ADD_UBO =  new Form("USER_ADD_UBO", routes.AddOrganizationController.userAddUBO(), routes.javascript.AddOrganizationController.userAddUBOForm)
+  val DELETE_UBO = new Form("DELETE_UBO", routes.AddOrganizationController.deleteUBO(), routes.javascript.AddOrganizationController.deleteUBOForm)
+  val USER_DELETE_UBO = new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO(), routes.javascript.AddOrganizationController.userDeleteUBOForm)
+  val ADD_UBO = new Form("ADD_UBO", routes.AddOrganizationController.addUBO(), routes.javascript.AddOrganizationController.addUBOForm)
+  val USER_ADD_UBO = new Form("USER_ADD_UBO", routes.AddOrganizationController.userAddUBO(), routes.javascript.AddOrganizationController.userAddUBOForm)
   val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail(), routes.javascript.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm)
   val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest(), routes.javascript.AddOrganizationController.userReviewAddOrganizationRequestForm)
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization(), routes.javascript.AddOrganizationController.verifyOrganizationForm)
@@ -98,12 +98,12 @@ object Form {
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
 
   //SalesQuoteController
-  val COMMODITY_DETAILS = new Form("COMMODITY_DETAILS", routes.SalesQuoteController.commodityDetails(), routes.javascript.SalesQuoteController.commodityDetailsForm )
+  val COMMODITY_DETAILS = new Form("COMMODITY_DETAILS", routes.SalesQuoteController.commodityDetails(), routes.javascript.SalesQuoteController.commodityDetailsForm)
   val SHIPPING_DETAILS = new Form("SHIPPING_DETAILS", routes.SalesQuoteController.shippingDetails(), routes.javascript.SalesQuoteController.shippingDetailsForm)
   val PAYMENT_TERMS = new Form("PAYMENT_TERMS", routes.SalesQuoteController.paymentTerms(), routes.javascript.SalesQuoteController.paymentTermsForm)
   val SALES_QUOTE_DOCUMENTS = new Form("SALES_QUOTE_DOCUMENTS", routes.SalesQuoteController.salesQuoteDocuments(), routes.javascript.SalesQuoteController.salesQuoteDocumentsForm)
   val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails, routes.javascript.SalesQuoteController.traderReviewSalesQuoteDetailsForm)
-  val INVITE_SALES_QUOTE_BUYER= new Form("INVITE_SALES_QUOTE_BUYER", routes.SalesQuoteController.inviteSalesQuoteBuyer(), routes.javascript.SalesQuoteController.inviteSalesQuoteBuyerForm)
+  val INVITE_SALES_QUOTE_BUYER = new Form("INVITE_SALES_QUOTE_BUYER", routes.SalesQuoteController.inviteSalesQuoteBuyer(), routes.javascript.SalesQuoteController.inviteSalesQuoteBuyerForm)
 
   //SellerExecuteOrderController
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder(), routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm)

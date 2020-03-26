@@ -279,7 +279,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
   def inviteSalesQuoteBuyerForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val buyerAccountID=masterTransactionSalesQuotes.Service.getBuyer(requestID)
+      val buyerAccountID = masterTransactionSalesQuotes.Service.getBuyer(requestID)
 
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -288,7 +288,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
       def getTraderCounterPartyDetails(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
       (for {
-        buyerAccountID<-buyerAccountID
+        buyerAccountID <- buyerAccountID
         traderID <- traderID
         traderRelationList <- getTraderRelationList(traderID)
         traderCounterPartyDetails <- getTraderCounterPartyDetails(traderRelationList.filter(_.fromID == traderID).map(_.toID) ++ traderRelationList.filter(_.toID == traderID).map(_.fromID))
@@ -398,22 +398,24 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
             def salesQuote = masterTransactionSalesQuotes.Service.get(acceptOrRejectSalesQuoteData.salesQuoteID)
 
-            def createTradeRoom(buyerAccountID:String,sellerAccountId:String) = masterTradeRooms.Service.create(acceptOrRejectSalesQuoteData.salesQuoteID, buyerAccountID, sellerAccountId, "None", "UnderNegotiation")
+            def createTradeRoom(buyerAccountID: String, sellerAccountId: String) = masterTradeRooms.Service.create(acceptOrRejectSalesQuoteData.salesQuoteID, buyerAccountID, sellerAccountId, "None", "UnderNegotiation")
 
-            def createTradeTerms(tradeRoomID: String,salesQuote: SalesQuote) = masterTransactionTradeTerms.Service.create(tradeRoomID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, salesQuote.shippingDetails.get.shippingPeriod, salesQuote.shippingDetails.get.portOfLoading, salesQuote.shippingDetails.get.portOfDischarge, salesQuote.paymentTerms.get.advancePayment, salesQuote.paymentTerms.get.advancePercentage, salesQuote.paymentTerms.get.credit, salesQuote.paymentTerms.get.tenure, if (salesQuote.paymentTerms.get.tentativeDate.isDefined) Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get)) else None, salesQuote.paymentTerms.get.refrence, salesQuote.salesQuoteDocuments.get.billOfExchangeRequired, salesQuote.salesQuoteDocuments.get.obl, salesQuote.salesQuoteDocuments.get.invoice, salesQuote.salesQuoteDocuments.get.coo, salesQuote.salesQuoteDocuments.get.coa, salesQuote.salesQuoteDocuments.get.otherDocuments)
+            def createTradeTerms(tradeRoomID: String, salesQuote: SalesQuote) = masterTransactionTradeTerms.Service.create(tradeRoomID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, salesQuote.shippingDetails.get.shippingPeriod, salesQuote.shippingDetails.get.portOfLoading, salesQuote.shippingDetails.get.portOfDischarge, salesQuote.paymentTerms.get.advancePayment, salesQuote.paymentTerms.get.advancePercentage, salesQuote.paymentTerms.get.credit, salesQuote.paymentTerms.get.tenure, if (salesQuote.paymentTerms.get.tentativeDate.isDefined) Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get)) else None, salesQuote.paymentTerms.get.refrence, salesQuote.salesQuoteDocuments.get.billOfExchangeRequired, salesQuote.salesQuoteDocuments.get.obl, salesQuote.salesQuoteDocuments.get.invoice, salesQuote.salesQuoteDocuments.get.coo, salesQuote.salesQuoteDocuments.get.coa, salesQuote.salesQuoteDocuments.get.otherDocuments)
 
             for {
               _ <- markAccepted
-              salesQuote<-salesQuote
-              tradeRoomID <- createTradeRoom(salesQuote.buyerAccountID.get,salesQuote.accountID)
-              _ <- createTradeTerms(tradeRoomID,salesQuote)
+              salesQuote <- salesQuote
+              tradeRoomID <- createTradeRoom(salesQuote.buyerAccountID.get, salesQuote.accountID)
+              _ <- createTradeTerms(tradeRoomID, salesQuote)
             } yield salesQuote
           } else {
             val markRejected = masterTransactionSalesQuotes.Service.markRejected(acceptOrRejectSalesQuoteData.salesQuoteID)
+
             def salesQuote = masterTransactionSalesQuotes.Service.get(acceptOrRejectSalesQuoteData.salesQuoteID)
+
             for {
               _ <- markRejected
-              salesQuote<-salesQuote
+              salesQuote <- salesQuote
             } yield salesQuote
           }
 
