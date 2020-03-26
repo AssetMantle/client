@@ -1,0 +1,30 @@
+@import controllers.actions.LoginState
+@import models.master.TraderBackgroundCheck
+@import models.master.Trader
+
+@(traderBackgroundChecks: Seq[TraderBackgroundCheck], trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.TRADER_BACKGROUND_CHECK)</h4>
+</div>
+<div class="centerText">
+    @for(documentType <- constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES) {
+        <div id="upload@documentType">
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm('@documentType', '@trader.id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(traderBackgroundCheck <- traderBackgroundChecks) {
+        @component.master.commonDocumentViewer(traderBackgroundCheck) {
+            @routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName,traderBackgroundCheck.documentType)
+        } {
+            <a href="@routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName, traderBackgroundCheck.documentType)">@Messages(traderBackgroundCheck.documentType)</a>
+        } {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm('@traderBackgroundCheck.documentType','@trader.id'))">@Messages(constants.Form.UPDATE) @Messages(traderBackgroundCheck.documentType)</button>
+            <script>hideElement('upload@traderBackgroundCheck.documentType')</script>
+        }
+    }
+</div>
+
+@if(constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(traderBackgroundChecks.map(_.documentType)).isEmpty) {
+    <button type="button" class="cmuk-button cmuk-button-primary" id="getTraderBackgroundCheckReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.zoneVerifyTraderForm('@trader.accountID','@trader.organizationID'))">@Messages(constants.Form.NEXT)</button>
+}

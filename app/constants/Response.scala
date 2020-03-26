@@ -75,6 +75,9 @@ object Response {
   val IDENTIFICATION_ADDED_FOR_VERIFICATION = new Success("IDENTIFICATION_ADDED_FOR_VERIFICATION")
   val TRADER_RELATION_REQUEST_SEND_SUCCESSFUL = new Success("TRADER_RELATION_REQUEST_SEND_SUCCESSFUL")
   val SALES_QUOTE_CREATED = new Success("SALES_QUOTE_CREATED")
+  val BANK_ACCOUNT_DETAILS_UPDATED = new Success("BANK_ACCOUNT_DETAILS_UPDATED")
+  val UBO_ADDED = new Success("UBO_ADDED")
+  val UBO_DELETED = new Success("UBO_DELETED")
   val SALES_QUOTE_INVITATION_SENT = new Success("SALES_QUOTE_INVITATION_SENT")
 
   //Warning- for telling that something important is not done and ask to do it
@@ -132,6 +135,7 @@ object Response {
   val INVITATION_EMAIL_ALREADY_SENT = new Failure("INVITATION_EMAIL_ALREADY_SENT")
   val BUYER_FROM_SAME_ORGANIZATION = new Failure("BUYER_FROM_SAME_ORGANIZATION")
   val NOT_PRESENT_AS_COUNTERPARTY= new Failure("NOT_PRESENT_AS_COUNTERPARTY")
+  val UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE = new Failure("UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

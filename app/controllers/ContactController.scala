@@ -24,7 +24,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def updateContactForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.getOrNoneContact(loginState.username)
+      val contact = masterContacts.Service.get(loginState.username)
 
       (for {
         contact <- contact
@@ -88,7 +88,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.getOrNoneContact(loginState.username)
+      val contact = masterContacts.Service.get(loginState.username)
       (for {
         contact <- contact
       } yield Ok(views.html.component.master.contact(contact))

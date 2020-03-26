@@ -5,46 +5,81 @@
 @import views.html.base._
 @import models.master.Identification
 
+@import scala.collection.immutable.ListMap
 @(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.USER_VIEW_PENDING_REQUESTS) {
+@commonCard(constants.View.ORGANIZATION_DETAILS) {
+    @identification match {
+        case Some(identification) => {
+            @if(accountStatus == constants.Status.Account.COMPLETE && (identification.verificationStatus.getOrElse(false) && (organization.isDefined || trader.isDefined))) {
+                <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+            }
+        }
+        case _ => {}
+    }
 } {
-    @if(identification.isDefined) {
-        @if(accountStatus == constants.Status.Account.COMPLETE) {
-            @identification.get.verificationStatus match {
-                case Some(status) => {
-                    @if(status) {
-                        @defining[Map[String, Html]](if(organization.isDefined && trader.isDefined) {
-                            Map(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs),
-                                constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs),
-                            )
-                        } else if(organization.isDefined && trader.isEmpty) {
-                            Map(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization.get, organizationKYCs = organizationKYCs),
-                            )
-                        } else if(organization.isEmpty && trader.isDefined) {
-                            Map(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader.get, traderOrganization.get, traderKYCs),
-                            )
+    @identification match {
+        case Some(identification) => {
+            @if(accountStatus == constants.Status.Account.COMPLETE) {
+                @identification.verificationStatus match {
+                    case Some(status) => {
+                        @if(status) {
+                            @defining[ListMap[String, Html]](
+                                organization match {
+                                    case Some(organization) => {
+                                        trader match {
+                                            case Some(trader) =>{
+                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs),
+                                                    constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader, traderOrganization.get, traderKYCs))
+                                            }
+                                            case _ => {
+                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs))
+                                            }
+                                        }
+                                    }
+                                    case _ => {
+                                        trader match {
+                                            case Some(trader) =>{
+                                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader, traderOrganization.get, traderKYCs))
+                                            }
+                                            case _ => {
+                                                ListMap()
+                                            }
+                                        }
+                                    }
+                                }) { items =>
+                                @commonHorizontalSwitcher(items)
+                            }
+                            @if(organization.isEmpty && trader.isEmpty) {
+                                <div class="cmuk-position-center">
+                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
+                                </div>
+                            }
                         } else {
-                            Map()
-                        }) { htmlItems =>
-                            @commonHorizontalSwitcher(htmlItems = htmlItems)
+                            <div class="cmuk-position-center">
+                            @Messages(constants.View.IDENTIFICATION_REJECTED)
+                            </div>
                         }
-                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
-                    } else {
-                        @Messages(constants.View.IDENTIFICATION_REJECTED)
+                    }
+                    case None => {
+                        <div class="cmuk-position-center">
+                        @Messages(constants.View.PENDING_IDENTIFICATION_VERIFICATION)
+                        </div>
                     }
                 }
-                case None => {
-                    @Messages(constants.View.PENDING_IDENTIFICATION_VERIFICATION)
-                }
+            } else {
+                <div class="cmuk-position-center">
+                @Messages(accountStatus)
+                </div>
             }
-        } else {
-            @Messages(accountStatus) <br>
         }
-    } else {
-        @if(accountStatus != constants.Status.Account.COMPLETE) {
-            @Messages(accountStatus) <br>
+        case _ => {
+            <div class="cmuk-position-center">
+                @if(accountStatus != constants.Status.Account.COMPLETE) {
+                    @Messages(accountStatus) <br>
+                    }
+                @Messages(constants.Form.UPLOAD_IDENTIFICATION)
+            </div>
         }
-        @Messages(constants.Form.UPLOAD_IDENTIFICATION)
     }
 }

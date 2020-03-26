@@ -1,15 +1,17 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.SalesQuote
 @import views.html.base._
+@import scala.collection.immutable.ListMap
+@import play.api.routing.JavaScriptReverseRoute
 
-@(sellSalesQuoteListRoute:String,buySalesQuoteListRoute:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div>
 @commonCard(constants.View.SALES_QUOTE_LIST) {
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
 } {
-    @commonHorizontalSwitcher(jsRouteItems = Map(constants.View.SELL -> sellSalesQuoteListRoute,
-        constants.View.BUY -> buySalesQuoteListRoute,
+    @commonHorizontalSwitcher(ListMap(constants.View.SELL -> routes.javascript.ComponentViewController.sellSalesQuoteList,
+        constants.View.BUY -> routes.javascript.ComponentViewController.buySalesQuoteList,
     ))
 }
 </div>

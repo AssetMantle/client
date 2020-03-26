@@ -212,7 +212,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         salesQuoteDocumentsData => {
           val updateSalesQuoteDocuments = masterTransactionSalesQuotes.Service.updateSalesQuoteDocuments(salesQuoteDocumentsData.requestID, Serializable.SalesQuoteDocuments(salesQuoteDocumentsData.billOfExchangeRequired, salesQuoteDocumentsData.obl, salesQuoteDocumentsData.invoice, salesQuoteDocumentsData.COA, salesQuoteDocumentsData.COO, salesQuoteDocumentsData.otherDocuments))
 
-          val traderID = masterTraders.Service.getID(loginState.username)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def getTraderRelationList(traderID: String) = masterTradeRelations.Service.getAllAcceptedTraderRelation(traderID)
 
@@ -281,7 +281,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
 
       val buyerAccountID=masterTransactionSalesQuotes.Service.getBuyer(requestID)
 
-      val traderID = masterTraders.Service.getID(loginState.username)
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def getTraderRelationList(traderID: String) = masterTradeRelations.Service.getAllAcceptedTraderRelation(traderID)
 
@@ -303,7 +303,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.InviteSalesQuoteBuyer.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderID = masterTraders.Service.getID(loginState.username)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def getTraderRelationList(traderID: String) = masterTradeRelations.Service.getAllAcceptedTraderRelation(traderID)
 
@@ -319,8 +319,8 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
           }
         },
         traderReviewSalesQuoteDetailsData => {
-          val counterPartyTraderID = masterTraders.Service.getID(traderReviewSalesQuoteDetailsData.counterParty)
-          val sellerTraderID = masterTraders.Service.getID(loginState.username)
+          val counterPartyTraderID = masterTraders.Service.tryGetID(traderReviewSalesQuoteDetailsData.counterParty)
+          val sellerTraderID = masterTraders.Service.tryGetID(loginState.username)
 
           def checkIfBuyerPresentAsCounterParty(counterPartyTraderID: String, sellerTraderID: String) = masterTradeRelations.Service.get(counterPartyTraderID, sellerTraderID).map(_ => true).recover {
             case baseException: BaseException => {
@@ -340,7 +340,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
                 result <- withUsernameToken.PartialContent(views.html.component.master.traderReviewSalesQuoteDetails(requestID = traderReviewSalesQuoteDetailsData.requestID, salesQuote = salesQuote))
               } yield result
             } else {
-              val traderID = masterTraders.Service.getID(loginState.username)
+              val traderID = masterTraders.Service.tryGetID(loginState.username)
 
               def getTraderRelationList(traderID: String) = masterTradeRelations.Service.getAllAcceptedTraderRelation(traderID)
 
