@@ -24,7 +24,7 @@ class GetTruliooTransactionRecords @Inject()(wsClient: WSClient)(implicit config
 
   private val baseURL = configuration.get[String]("trulioo.url")
 
-  private val endpoint = configuration.get[String]("trulioo.endpoints.dataSources")
+  private val endpoint = configuration.get[String]("trulioo.endpoints.transactionRecord")
 
   private val url = baseURL + endpoint
 

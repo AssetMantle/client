@@ -630,6 +630,15 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
 );
 
 
+CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheckData"
+(
+    "accountID"          VARCHAR NOT NULL,
+    "details"            VARCHAR NOT NULL,
+    PRIMARY KEY ("accountID")
+);
+ALTER TABLE MASTER."TraderBackgroundCheckData"
+    ADD CONSTRAINT TraderBackgroundCheckData_Trader_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Trader" ("accountID");
+
 CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
 (
     "id"                 VARCHAR NOT NULL,

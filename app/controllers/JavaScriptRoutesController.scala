@@ -240,6 +240,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.organizationModifyTraderForm,
         routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm,
         routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
+        routes.javascript.SetACLController.zoneViewBackgroundCheckData,
         routes.javascript.SetACLController.organizationRejectVerifyTraderRequestForm,
         routes.javascript.SetACLController.organizationViewVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,

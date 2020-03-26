@@ -354,7 +354,7 @@ class ComponentViewController @Inject()(
   }
 
   def transactionDetails = Action {
-    Ok(views.html.component.master.transactions())
+    Ok(views.html.component.master.transactionsTab())
   }
 
   def tradeDetails = Action {

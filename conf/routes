@@ -179,6 +179,7 @@ POST        /master/userReviewAddTraderRequest                           control
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
 GET         /master/zoneViewTraderKYCDocuments                           controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
+GET         /master/zoneViewBackgroundCheckData                          controllers.SetACLController.zoneViewBackgroundCheckData(accountID: String)
 GET         /master/updateTraderKYCDocumentZoneStatus                    controllers.SetACLController.updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentZoneStatus                    controllers.SetACLController.updateTraderKYCDocumentZoneStatus
 GET         /master/zoneViewVerifyTraderRequests                         controllers.SetACLController.zoneViewPendingVerifyTraderRequests

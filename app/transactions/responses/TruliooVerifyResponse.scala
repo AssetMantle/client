@@ -1,18 +1,13 @@
-package queries.responses
+package transactions.responses
 
 import play.api.libs.json.{JsValue, Json, Reads}
 import transactions.Abstract.BaseResponse
 
-object TruliooTransactionRecordResponse {
-
+object TruliooVerifyResponse {
 
   case class Errors(Code: String, Message: String)
 
   implicit val errorsReads: Reads[Errors] = Json.reads[Errors]
-
-  case class DataField(FieldName: String, Value: String, FieldGroup: Option[String])
-
-  implicit val dataFieldReads: Reads[DataField] = Json.reads[DataField]
 
   case class DatasourceField(FieldName: String, Status: String, FieldGroup: Option[String])
 
@@ -22,7 +17,7 @@ object TruliooTransactionRecordResponse {
 
   implicit val appendedFieldReads: Reads[AppendedField] = Json.reads[AppendedField]
 
-  case class DatasourceResult(DatasourceStatus: Option[String], DatasourceName: String, DatasourceFields: Option[Seq[DatasourceField]], AppendedFields: Option[Seq[AppendedField]], Errors: Option[Seq[Errors]], FieldGroups: Option[Seq[String]])
+  case class DatasourceResult(DatasourceStatus: Option[String], DatasourceName: String, DatasourceFields: Seq[DatasourceField], AppendedFields: Option[Seq[AppendedField]], Errors: Option[Seq[Errors]], FieldGroups: Option[Seq[String]])
 
   implicit val dataSourceResultReads: Reads[DatasourceResult] = Json.reads[DatasourceResult]
 
@@ -34,7 +29,7 @@ object TruliooTransactionRecordResponse {
 
   implicit val recordReads: Reads[Record] = Json.reads[Record]
 
-  case class Response(InputFields: Seq[DataField], TransactionID: String, UploadedDt: String, CountryCode: String, ProductName: String, Record: Record, CustomerReferenceID: Option[String], Errors: Option[Seq[Errors]]) extends BaseResponse
+  case class Response(TransactionID: String, UploadedDt: String, CountryCode: String, ProductName: String, Record: Record, CustomerReferenceID: Option[String], Errors: Seq[Errors]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

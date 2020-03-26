@@ -305,15 +305,15 @@ def uploadOrganizationBackgroundCheckFileForm(documentType: String, organization
   def testTruliooAPI: Action[AnyContent] = Action.async { implicit request =>
     //    authTest
     //    countryCodes
-    //    entities
+        entities
     //    fields
     //    recommdendedFields
     //    consents
     //    detailedConsents
     //    countrySubdivisions
     //    dataSources
-    //    transactionRecord
-    verify
+//    transactionRecord
+//    verify
   }
 
   //auth test
@@ -443,13 +443,13 @@ def uploadOrganizationBackgroundCheckFileForm(documentType: String, organization
 
   // transactionRecord
   def transactionRecord = {
-    val response = getTruliooTransactionRecords.Service.get(id = "259888b7-71e4-1e8a-6a59-ac52bd9c8386")
+    val response = getTruliooTransactionRecords.Service.get(id = "255e2d66-0b03-6203-0aff-9b8f7df8fe9f")
     (for {
       response <- response
     } yield {
       val printValue = response
-      println(printValue)
-      Ok(views.html.test(printValue.toString))
+      println(printValue.TransactionID)
+      Ok(views.html.test(printValue.CountryCode + printValue.CustomerReferenceID).toString()+ printValue.Errors.mkString + printValue.InputFields.mkString)
     }).recover {
       case baseException: BaseException => InternalServerError(views.html.test(baseException.failure.message))
     }
@@ -457,7 +457,7 @@ def uploadOrganizationBackgroundCheckFileForm(documentType: String, organization
 
   // POST verify
   def verify = {
-    val response = truliooVerify.Service.post(request =  truliooVerify.Request(true,false,"Identity Verification" ,Seq("Visa Verification"),"AU", truliooVerify.DataFields(truliooVerify.PersonInfo("J","Smith", 5, 3, 1983),truliooVerify.Location("Lawford","3108"),None,None)))
+    val response = truliooVerify.Service.post(request =  truliooVerify.Request(true,false,"Identity Verification" ,Seq("Visa Verification"),"AU", truliooVerify.DataFields(truliooVerify.PersonInfo("John","Smith", 5, 3, 1983),None,None,None)))
     (for {
       response <- response
     } yield {

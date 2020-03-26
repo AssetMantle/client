@@ -6,17 +6,22 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Contact, Organization, Trader, TraderKYC}
+import models.master.{Contact, Identification, Organization, Trader, TraderBackgroundCheckDatas, TraderKYC}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import queries.GetTruliooConsents
+import transactions.TruliooVerify
 import views.companion.master.FileUpload
+import java.util.Calendar
+
+import transactions.responses.TruliooVerifyResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, masterTransactionTraderInvitations: masterTransaction.TraderInvitations, masterContacts: master.Contacts, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterIdentifications: master.Identifications, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, traderBackgroundCheckDatas: TraderBackgroundCheckDatas, truliooVerify: TruliooVerify, getTruliooConsents: GetTruliooConsents, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, masterTransactionTraderInvitations: masterTransaction.TraderInvitations, masterContacts: master.Contacts, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterIdentifications: master.Identifications, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -297,6 +302,18 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
           def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
 
+          val identification = masterIdentifications.Service.get(loginState.username)
+
+          def consents(countryCode: String) = getTruliooConsents.Service.get(countryCode = countryCode)
+
+          def verify(countryCode: String, identification: Identification, consent: Seq[String]) = {
+            val calender = Calendar.getInstance
+            calender.setTime(identification.dateOfBirth)
+            truliooVerify.Service.post(truliooVerify.Request(true, false, "Identity Verification", consent, countryCode, truliooVerify.DataFields(truliooVerify.PersonInfo(identification.firstName, identification.lastName, calender.get(Calendar.DAY_OF_MONTH), calender.get(Calendar.MONTH), calender.get(Calendar.YEAR)), None, None, None)))
+          }
+
+          def addVerification(accountID: String, details: String) = traderBackgroundCheckDatas.Service.create(accountID, details)
+
           def getResult(trader: Trader, allKYCFileTypesExists: Boolean, traderOrganization: Organization): Future[Result] = {
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
@@ -337,6 +354,10 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             trader <- trader
             allKYCFileTypesExists <- allKYCFileTypesExists(trader.id)
             traderOrganization <- organization(trader.organizationID)
+            identification <- identification
+            consents <- consents(constants.Form.COUNTRY_CODES(traderOrganization.postalAddress.country.toUpperCase))
+            details <- verify(constants.Form.COUNTRY_CODES(traderOrganization.postalAddress.country.toUpperCase), identification, consents.body)
+            _ <- addVerification(loginState.username, details.body.toString)
             result <- getResult(trader, allKYCFileTypesExists, traderOrganization)
           } yield result
             ).recover {
@@ -414,6 +435,27 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         zoneID <- zoneID
         verifyTraderRequestsForZone <- getVerifyTraderRequestsForZone(zoneID)
       } yield Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(verifyTraderRequestsForZone))
+  }
+
+  def zoneViewBackgroundCheckData(accountID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.getID(loginState.username)
+      val traderZoneID = masterTraders.Service.getZoneIDByAccountID(accountID)
+      val truliooResult = traderBackgroundCheckDatas.Service.get(accountID)
+
+      (for {
+        zoneID <- zoneID
+        traderZoneID <- traderZoneID
+        truliooResult <- truliooResult
+      } yield {
+        if (zoneID == traderZoneID) {
+          Ok(views.html.component.master.zoneViewBackgroundCheckData(accountID, utilities.JSON.convertJsonStringToObject[Response](truliooResult.details)))
+        } else {
+          Unauthorized(views.html.zoneRequest(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
+      }
   }
 
   def zoneViewKYCDocuments(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>

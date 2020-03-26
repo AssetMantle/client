@@ -42,7 +42,7 @@ class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Config
 
   private implicit val dataFieldsWrites: OWrites[DataFields] = Json.writes[DataFields]
 
-  case class DataFields(PersonInfo: PersonInfo, Location: Location, Communication: Option[JsValue], Passport: Option[JsValue])
+  case class DataFields(PersonInfo: PersonInfo, Location: Option[JsValue], Communication: Option[JsValue], Passport: Option[JsValue])
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
