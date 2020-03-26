@@ -2,6 +2,7 @@
 @import models.master.AccountKYC
 @import views.html.base._
 @import models.master.Identification
+@import scala.collection.immutable.ListMap
 
 @(identification: Option[Identification], accountKYC: Option[AccountKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -17,9 +18,9 @@
 } {
     @identification match {
         case Some(identification) => {
-            @commonHorizontalSwitcher(htmlItems = Map(
+            @commonHorizontalSwitcher(ListMap(
                 constants.View.DETAILS -> views.html.component.master.identificationInformation(identification),
-                constants.View.DOCUMENTS -> views.html.component.master.identificationDocuments(accountKYC)),
+                constants.View.DOCUMENTS -> views.html.component.master.identificationDocuments(accountKYC))
             )
         }
         case None => {
