@@ -57,7 +57,7 @@ function submitChat(source, target = '#chatMessages') {
 function newChat(data) {
     const loadMore = $(".chatMessages .chatMessage:last");
     $("#MESSAGE").val("");
-    $("#REPLY_TO_CHAT").val("");
+    $("#REPLY_TO_MESSAGE").val("");
     $("#replyBox").fadeOut();
     if (data.replyToID !== undefined) {
         loadMore.after('<li class="chatMessage sender">' +
@@ -69,7 +69,7 @@ function newChat(data) {
             '</div>' +
             '<span class="chatName">'+ data.fromAccountID.substring(0, 1)+'</span>' +
             '</li>');
-        replyMessage(jsRoutes.controllers.TradeRoomController.replyToChat(data.chatWindowID, data.replyToID),data.id);
+        replyMessage(jsRoutes.controllers.TradeRoomController.replyToMessage(data.chatWindowID, data.replyToID),data.id);
     } else {
         loadMore.after('<li class="chatMessage sender">' +
             '<div class="you" onclick="replyButton(' + '\'' + data.id + '\'' + ',' + '\'' + data.message + '\'' + ',' + '\'' + data.fromAccountID + '\'' + ')">' +
@@ -82,8 +82,8 @@ function newChat(data) {
     }
 }
 
-function replyButton(replyToChatID, replyMessage, fromAccount) {
-    $("#REPLY_TO_CHAT").val(replyToChatID);
+function replyButton(replyToMessageID, replyMessage, fromAccount) {
+    $("#REPLY_TO_MESSAGE").val(replyToMessageID);
     $("#replyBox").fadeIn();
     document.getElementById("replyAccount").innerHTML = fromAccount;
     document.getElementById("replymessage").innerHTML = replyMessage;

@@ -277,10 +277,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.TradeRoomController.chatRoom,
         routes.javascript.TradeRoomController.chatWindow,
-        routes.javascript.TradeRoomController.sendChatForm,
+        routes.javascript.TradeRoomController.sendMessageForm,
         routes.javascript.TradeRoomController.loadMoreChats,
-        routes.javascript.TradeRoomController.sendChat,
-        routes.javascript.TradeRoomController.replyToChat,
+        routes.javascript.TradeRoomController.sendMessage,
+        routes.javascript.TradeRoomController.replyToMessage,
         routes.javascript.TradeRoomController.markChatAsRead,
         routes.javascript.TradeRoomController.tradeTerms,
         routes.javascript.TradeRoomController.tradeFinancials,

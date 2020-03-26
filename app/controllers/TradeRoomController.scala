@@ -175,7 +175,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-          } yield Ok(views.html.component.master.chatWindow(views.companion.master.SendChat.form.fill(views.companion.master.SendChat.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID))
+          } yield Ok(views.html.component.master.chatWindow(views.companion.master.SendMessage.form.fill(views.companion.master.SendMessage.Data(chatWindowID, "", None)), chatsInWindow, readChats, chatWindowID))
         } else {
           Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
@@ -220,23 +220,23 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   //send chat form
-  def sendChatForm : Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def sendMessageForm : Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.sendChat()))
+    Future(Ok(views.html.component.master.sendMessage()))
   }
-  def sendChat(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sendMessage(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.SendChat.form.bindFromRequest().fold(
+      views.companion.master.SendMessage.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(Messages("error in message, not sent")))
         },
-        sendChatData => {
-          val userIsParticipant = chatWindowParticipants.Service.checkUserInChatWindow(loginState.username, sendChatData.chatWindowID)
+        sendMessageData => {
+          val userIsParticipant = chatWindowParticipants.Service.checkUserInChatWindow(loginState.username, sendMessageData.chatWindowID)
 
           def getResult(userIsParticipant: Boolean) = {
             if (userIsParticipant) {
-              val chat = chats.Service.create(loginState.username, sendChatData.chatWindowID, sendChatData.message, sendChatData.replyToID)
-              val participants = chatWindowParticipants.Service.getParticipants(sendChatData.chatWindowID)
+              val chat = chats.Service.create(loginState.username, sendMessageData.chatWindowID, sendMessageData.message, sendMessageData.replyToID)
+              val participants = chatWindowParticipants.Service.getParticipants(sendMessageData.chatWindowID)
 
               def chatReceive(participants: Seq[String], chat: Chat): Future[Unit] = {
                 Future(
@@ -275,7 +275,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   // retrives a chat, that was part of a replied message
-  def replyToChat(chatWindowID: String, chatID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def replyToMessage(chatWindowID: String, chatID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userIsParticipant = chatWindowParticipants.Service.checkUserInChatWindow(loginState.username, chatWindowID)
 
@@ -329,7 +329,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   //send chat to other person in real time
-  def sendChatComet(chatWindowID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sendMessageComet(chatWindowID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userIsParticipant = chatWindowParticipants.Service.checkUserInChatWindow(loginState.username, chatWindowID)
       def getResult(userIsParticipant: Boolean)= {

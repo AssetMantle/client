@@ -638,6 +638,7 @@ CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
     "sellerAccountID"    VARCHAR NOT NULL,
     "financierAccountID" VARCHAR NOT NULL,
     "status"             VARCHAR NOT NULL,
+    "status"             VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
