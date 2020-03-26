@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="leftTradeFinancial secondaryFont">
-        <div id="tradeFinancials"></div>
+        <div id="payableReceivable"></div>
         <div id="documentList"></div>
     </div>
 }
@@ -62,13 +62,13 @@
         <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>Amend</button>
         <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>Refresh</button>
         <div class="cmuk-flex live">
-            <span class="liveText secondaryFont">@Messages("Live Trade Room") </span>
+            <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>
         </div>
     </div>
     <div class="recentActivity">
         <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY) {
+        @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
         } {
             <div class="scroller">
                 <div id="recentActivity">
@@ -83,7 +83,7 @@
 }
 
 <script>
-    componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
+    componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
     componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
     componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView("fileName","documentType"));

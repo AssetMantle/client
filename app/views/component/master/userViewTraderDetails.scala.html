@@ -7,15 +7,13 @@
 @(trader: Trader, organization: Organization, traderKYCs: Seq[TraderKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div>
-    <span>@Messages(constants.Form.TRADER_DETAILS)</span>
-    <br>
+   <div class="cmuk-text-left title"> <span>@Messages(constants.Form.TRADER_DETAILS)</span></div>
         @commonTextInfo(constants.Form.NAME, trader.name)
         @commonTextInfo(constants.Form.TRADER_ID, trader.id)
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, trader.verificationStatus)
 </div>
 <div>
-    <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
-    <br>
+    <div class="cmuk-text-left title"><span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
         @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
         @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
         @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
@@ -26,15 +24,15 @@
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
 </div>
 <div>
-    <span>@Messages(constants.View.TRADER_DOCUMENTS)</span>
-    <br>
+    <div class="cmuk-text-left title"><span>@Messages(constants.View.TRADER_DOCUMENTS)</span></div>
     @for(traderKYC <- traderKYCs) {
         @commonDocumentViewer(traderKYC) {
             @routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)
         } {
             <a href="@routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         } {
-
+            @commonBooleanInfo(constants.View.ORGANIZATION_STATUS, traderKYC.organizationStatus)
+            @commonBooleanInfo(constants.View.ZONE_STATUS, traderKYC.zoneStatus)
         }
     }
 </div>

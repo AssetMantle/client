@@ -7,9 +7,9 @@
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom profileContainer">
-        <div class="cmuk-grid" cmuk-grid>
+        <div class="cmuk-grid-small" cmuk-grid>
             <div class="cmuk-width-1-2@@m profileDetails">
-        @commonCard(constants.View.DETAILS) {
+        @commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
         } {
                 <div>
                     <div>
@@ -18,14 +18,14 @@
                     <div>
                         @commonTextInfo(constants.User.USER_NAME, loginState.username)
                         @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
-                        @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress", 'class -> "infoRowValue")
+                        @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress")
                         <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)
                             <span class="editIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-edit")"/></svg></span></button>
                     </div>
                 </div>
         }</div>
             <div class="cmuk-width-1-2@@m">
-                <div id="identificationDetails" class="identificationDetails"></div>
+                <div id="viewIdentificationDetails" class="identificationDetails"></div>
             </div>
             <div class="cmuk-width-1-2@@m">
                 <div id="contact" class="contactDetails"></div>
@@ -37,22 +37,18 @@
                         <div id="userViewPendingRequests"></div>
                     </div>
 
-                    <div class="cmuk-width-1-2@@m">
-                    @commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
-                    } {
-                        <div class="cmuk-position-center">
-                        @Messages(constants.View.UNAVAILABLE)
-                        </div>
-                    }
+                    <div class="cmuk-width-expand@@m">
+                        <div id="userViewOrganizationUBOs"></div>
                     </div>
                     <script>
                     componentResource('userViewPendingRequests', jsRoutes.controllers.ComponentViewController.userViewPendingRequests());
+                    componentResource('userViewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.userViewOrganizationUBOs());
                 </script>
 
                 }
                 case constants.User.TRADER => {
                     <div class="cmuk-width-1-2@@m accountDetails">
-                    @commonCard(constants.Form.ORGANIZATION_DETAILS) {
+                    @commonCard(constants.Form.ORGANIZATION_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-org-details") {
                     } {
                         <div id="traderViewOrganizationDetails"></div>
                     }
@@ -76,10 +72,14 @@
                     <div class="cmuk-width-1-2@@m">
                         <div id="viewOrganizationBankAccountDetail"></div>
                     </div>
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="viewOrganizationUBOs" class="organizationUbos"></div>
+                    </div>
 
                     <script>
                     componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
                     componentResource('viewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.viewOrganizationBankAccountDetail());
+                    componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
                 </script>
                 }
                 case _ => {}
@@ -87,7 +87,7 @@
             }
             <div class="cmuk-width-1-2">
             @if(loginState.userType == constants.User.TRADER) {
-                <div id="traderRelationList"></div>
+                <div id="traderRelationList" class="traderRelationList"></div>
             }
             </div>
         </div>
@@ -96,7 +96,7 @@
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('contact', jsRoutes.controllers.ContactController.contact());
-            componentResource('identificationDetails', jsRoutes.controllers.ComponentViewController.identificationDetails());
+            componentResource('viewIdentificationDetails', jsRoutes.controllers.ComponentViewController.viewIdentificationDetails());
 
             @*//TODO Remove when shifting to account *@
             componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());

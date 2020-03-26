@@ -12,25 +12,24 @@
 } {
     <div>
     @commonInfoBox(){
-        <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span><br>
-        @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
+        <div class="title"> <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
+        @commonTextInfo(constants.Form.NAME, organization.name)
         @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-        @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
-        @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
+        @commonTextInfo(constants.Form.ID, organization.id)
         @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
     }
         @commonInfoBox(){
-        <span>@Messages(constants.View.REGISTERED_ADDRESS):</span><br>
+            <div class="title"><span>@Messages(constants.View.REGISTERED_ADDRESS):</span></div>
         @streetAddress(organization.registeredAddress)
         }
         @commonInfoBox(){
-        <span>@Messages(constants.View.POSTAL_ADDRESS):</span><br>
+            <div class="title"><span>@Messages(constants.View.POSTAL_ADDRESS):</span></div>
         @streetAddress(organization.postalAddress)
         }
 
         @commonInfoBox(){
-        <span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span><br>
+            <div class="title"><span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span></div>
         @for(organizationKYC <- organizationKYCs) {
             @commonDocumentViewer(organizationKYC) {
                 @routes.FileController.file(organizationKYC.fileName, organizationKYC.documentType)
@@ -43,7 +42,7 @@
         }
 
         @commonInfoBox(){
-        <span>@Messages(constants.Form.ZONE_DETAILS)</span><br>
+            <div class="title"><span>@Messages(constants.Form.ZONE_DETAILS)</span></div>
         @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
         @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
         @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)

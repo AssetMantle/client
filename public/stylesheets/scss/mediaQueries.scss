@@ -47,6 +47,7 @@
     }
   }
 }
+
 @media (min-width:992px) and (max-width:1600px){
   .leftTradeFinancial{
     .financial{
@@ -61,13 +62,15 @@
       .cmuk-card-body{
         height:210px;
       }
-      ul li{
-        padding: 10px 0;
-      }
-      .cmuk-comment-meta, .ctitle{
-        font-size: 10px;
-      }
 
+        ul li {
+          padding: 10px 0;
+          .wallet {
+          .cmuk-comment-meta, .ctitle {
+            font-size: 1.5rem;
+          }
+        }
+      }
     }
     .addBalanceButton{
       text-transform: capitalize;
@@ -113,6 +116,15 @@
   }
   .timeline{
     margin: 20px 0px;
+  }
+}
+@media (min-width:1600px){
+  .leftTradeFinancial{
+    .financial {
+      ul li {
+        padding: 20px 0;
+      }
+    }
   }
 }
 @media (max-width:1920px){

@@ -1,20 +1,20 @@
 @(key: String, status: Option[Boolean], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
 <div class="cmuk-flex infoRow">
-    <div class="infoRowLabel red">
+    <div class="infoRowLabel">
     @Messages(key)
     </div>
     <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
     @status match {
         case Some(status) => {
             @if(status) {
-                    <span class="cmuk-badge verified">Verified</span>
+                    <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
             } else {
-                <span class="cmuk-badge rejected">Not Verified</span>
+                <span class="cmuk-badge rejected">@Messages(constants.View.NOT_VERIFIED)</span>
             }
         }
         case _ => {
-            @Messages(constants.View.UNSET)
+            <span class="cmuk-badge pending">@Messages(constants.View.PENDING)</span>
         }
     }
     </div>

@@ -4,7 +4,7 @@
 
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.CONTACT_DETAILS) {
+@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
 } {
     @userContact match {
         case Some(contact) => {

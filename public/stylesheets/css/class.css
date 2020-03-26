@@ -33,6 +33,11 @@
     .modal .modalContent .modalBody {
       padding: 20px;
       text-align: left; }
+      .modal .modalContent .modalBody .infoRowLabel {
+        text-align: left;
+        font-family: "Oxygen", sans-serif; }
+      .modal .modalContent .modalBody .title {
+        margin: 10px 0px; }
 
 .wordBreak {
   word-break: break-all; }
@@ -117,14 +122,13 @@
     padding: 50px 0px; }
     .bannerContainer .bannerText h3 {
       font-family: "Oxygen", sans-serif;
-      line-height: 130%;
       margin: 0px;
-      font-size: 40px;
+      font-size: 45px;
       font-weight: normal;
       color: #FFFFFF; }
     .bannerContainer .bannerText p {
       font-family: "Oxygen", sans-serif;
-      font-size: 1.3rem;
+      font-size: 14px;
       line-height: 172%;
       letter-spacing: 0.01em;
       color: #627F9F; }
@@ -148,7 +152,7 @@
         border: 3px solid red;
         transform: rotate(-45deg); }
       .bannerContainer .cmuk-slider .cmuk-slider-items li span {
-        font-size: 1.2rem;
+        font-size: 12px;
         line-height: 172%;
         letter-spacing: 0.01em; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemName {
@@ -169,10 +173,10 @@
 .cmuk-legend {
   font-weight: bold;
   font-family: "Oxygen", sans-serif;
-  font-size: 1.7rem !important; }
+  font-size: 20px !important; }
 
 .bannerButtons button {
-  font-size: 1.7rem;
+  font-size: 20px;
   margin-right: 20px; }
 .bannerButtons .cmuk-button-default,
 .bannerButtons .cmuk-button-default:focus,
@@ -183,26 +187,31 @@
 
 .headingSection p {
   font-family: "Oxygen", sans-serif;
-  font-size: 1.9rem;
+  font-size: 22px;
   line-height: 212%;
   text-align: center;
   letter-spacing: 0.01em;
   color: #59616A; }
 
-.tabsSection h2 {
+.tabsSection p {
   font-family: "Oxygen", sans-serif;
-  font-weight: bold;
-  font-size: 2.2rem;
-  line-height: 153%;
+  font-size: 26px;
   letter-spacing: 0.01em;
-  color: #262525; }
+  color: #000000; }
 .tabsSection .cmuk-subnav-pill {
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
   border-radius: 5px 5px 0px 0px; }
+  .tabsSection .cmuk-subnav-pill li:first-child a {
+    border-radius: 5px 5px 0px 0px; }
+  .tabsSection .cmuk-subnav-pill li:nth-child(2) {
+    border-top: 1px solid #FAFBFD;
+    border-bottom: 1px solid #FAFBFD; }
+  .tabsSection .cmuk-subnav-pill li:last-child a {
+    border-radius: 0px 0px 5px 5px; }
   .tabsSection .cmuk-subnav-pill li a {
-    padding: 10px 16px;
+    padding: 10px 35px 10px 15px;
     font-family: "Oxygen", sans-serif;
-    font-size: 1.5rem;
+    font-size: 14px;
     color: #0862BE;
     font-weight: bold; }
 .tabsSection .cmuk-subnav-pill > .cmuk-active > a {
@@ -210,8 +219,12 @@
   color: #FFFFFF; }
 .tabsSection .cmuk-switcher li {
   font-family: "Oxygen", sans-serif;
-  font-size: 1.5rem;
-  color: #365575; }
+  font-size: 16px;
+  color: #365575;
+  letter-spacing: 0.01em;
+  line-height: 1.8; }
+  .tabsSection .cmuk-switcher li div > div {
+    text-align: justify; }
 
 .verticalDataTabs {
   width: 214px; }
@@ -229,7 +242,7 @@
 .verticalDataTabsData p {
   font-family: "Oxygen", sans-serif;
   padding: 20px 20px;
-  font-size: 1.7rem;
+  font-size: 20px;
   font-weight: normal;
   line-height: 182%;
   letter-spacing: 0.01em;
@@ -248,7 +261,7 @@
   .contactSection h3 {
     font-family: "Oxygen", sans-serif;
     font-weight: bold;
-    font-size: 2.2rem;
+    font-size: 26px;
     line-height: 127.5%;
     letter-spacing: 0.01em;
     color: #FAFBFD; }
@@ -260,7 +273,7 @@
     border-radius: 3px;
     text-transform: capitalize;
     height: 45px;
-    font-size: 1.7rem;
+    font-size: 20px;
     line-height: 172%;
     text-align: center;
     letter-spacing: 0.01em;
@@ -306,7 +319,12 @@
   opacity: 1; }
 
 .headerFontSize {
-  font-size: 1.3rem; }
+  font-size: 14px; }
+
+.title {
+  font-size: 14px;
+  font-family: "Oxygen", sans-serif;
+  font-weight: bold; }
 
 .profileAcl {
   display: flex;
@@ -372,7 +390,7 @@
   display: none;
   color: red;
   padding: 10px;
-  font-size: 1.2rem;
+  font-size: 12px;
   font-family: "Oxygen", sans-serif; }
 .MnemonicQuiz .verifyMnemonic {
   flex-wrap: wrap;
@@ -392,28 +410,7 @@
     .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .mnemonicField {
       background-color: #FFffff; }
 .MnemonicQuiz .buttonForm {
-  font-size: 1.3rem; }
-
-.comdex .buttonForm {
-  background: #053C75;
-  color: #FFFFFF;
-  font-size: 1.2rem;
-  font-family: "Oxygen", sans-serif; }
-.comdex .cmuk-input {
-  border: 1px solid rgba(5, 60, 117, 0.22); }
-  .comdex .cmuk-input::placeholder {
-    color: #272829; }
-  .comdex .cmuk-input:focus {
-    border: 1px solid rgba(5, 60, 117, 0.22); }
-.comdex input:-webkit-autofill,
-.comdex input:-webkit-autofill:hover,
-.comdex input:-webkit-autofill:focus,
-.comdex input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px white inset; }
-.comdex .error {
-  font-size: 1.2rem;
-  font-family: "Oxygen", sans-serif;
-  color: #f0506e; }
+  font-size: 14px; }
 
 .flexContainer {
   display: flex;
@@ -665,10 +662,14 @@ dl .info:after {
   margin-top: 20px;
   width: 100%;
   padding: 30px 0px;
-  font-size: 1.2rem;
+  font-size: 12px;
   background: #031221; }
+  .footer .copyright {
+    margin: 10px 0px;
+    font-family: "Oxygen", sans-serif;
+    font-weight: bold; }
   .footer .footer a {
-    color: #149f98; }
+    color: 16px; }
 
 .status {
   width: 20px;
@@ -806,7 +807,7 @@ dl .info:after {
     font-style: normal;
     margin-left: 30px;
     font-weight: bold;
-    font-size: 1.7rem;
+    font-size: 20px;
     line-height: 23px;
     color: #71757A; }
   .dashboardContainer .left .cmuk-nav-default > li.cmuk-active > a {
@@ -970,9 +971,10 @@ input:checked + .slider {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px; }
+  margin: 5px 0px;
+  flex-wrap: wrap; }
   .documentItem .documentContentTop {
-    font-size: 1.2rem;
+    font-size: 12px;
     margin: 10px; }
   .documentItem .documentThumbnail {
     margin: 10px; }
@@ -981,7 +983,7 @@ input:checked + .slider {
     height: 20px; }
   .documentItem .documentContentBottom {
     margin: 10px;
-    font-size: 1.2rem; }
+    font-size: 12px; }
 
 .profileDocuments {
   display: flex;
@@ -1001,12 +1003,9 @@ input:checked + .slider {
   margin-left: -77px; }
 
 .commonhomeData {
-  font-size: 1.3rem; }
+  font-size: 14px; }
   .commonhomeData p, .commonhomeData h3 {
     margin: 5px 0px; }
-
-.comdex .cmuk-input, .cmuk-card-default, button, a, p {
-  font-size: 1.2rem; }
 
 .loginForm .inputField {
   display: flex; }
@@ -1020,9 +1019,9 @@ input:checked + .slider {
   .loginForm .inputField .inputFieldBody {
     width: 100%; }
   .loginForm .inputField .inputFieldBody input {
-    font-size: 1.2rem; }
+    font-size: 12px; }
 .loginForm .cmuk-button-link {
-  font-size: 1.2rem;
+  font-size: 12px;
   font-family: "Oxygen", sans-serif; }
 
 .connectionError {
@@ -1037,7 +1036,7 @@ input:checked + .slider {
   line-height: 1.8;
   align-items: flex-start;
   word-break: break-all;
-  font-size: 14px; }
+  font-size: 12px; }
 
 .infoRowLabel {
   color: #4B4B4B;
@@ -1049,8 +1048,7 @@ input:checked + .slider {
   flex: 1 1;
   color: #767f8d;
   font-weight: 400;
-  height: min-content;
-  line-height: 1.6; }
+  height: min-content; }
 
 .cmuk-accordion-title::before {
   background-image: url("../../images/chevron-up.svg") !important; }

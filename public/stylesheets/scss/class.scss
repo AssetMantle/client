@@ -37,6 +37,13 @@
     .modalBody {
       padding: 20px;
       text-align:left ;
+      .infoRowLabel{
+        text-align: left;
+        font-family: $fontFamilySecondary;
+      }
+      .title{
+        margin: 10px 0px;
+      }
     }
   }
 }
@@ -142,9 +149,8 @@
     padding: 50px 0px;
     h3 {
       font-family: $fontFamilySecondary;
-      line-height: 130%;
       margin: 0px;
-      font-size: 40px;
+      font-size: 45px;
       font-weight: normal;
       color: #FFFFFF;
     }
@@ -241,22 +247,30 @@
 }
 
 .tabsSection {
-  h2 {
+  p {
     font-family:$fontFamilySecondary;
-    font-weight: bold;
     font-size:$headingFontSizeLarge;
-    line-height: 153%;
     letter-spacing: 0.01em;
-    color: #262525;
+    color: #000000;
   }
   .cmuk-subnav-pill{
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
     border-radius: 5px 5px 0px 0px;
     li {
+      &:first-child a{
+        border-radius: 5px 5px 0px 0px;
+      }
+      &:nth-child(2){
+        border-top: 1px solid #FAFBFD;
+        border-bottom: 1px solid #FAFBFD;
+      }
+      &:last-child a{
+        border-radius: 0px 0px 5px 5px;
+      }
       a{
-        padding: 10px 16px;
+        padding: 10px 35px 10px 15px;
         font-family: $fontFamilySecondary;
-        font-size: $paragraphFontSizeLarge;
+        font-size: $paragraphFontSizeMedium;
         color:#0862BE;
         font-weight: bold;
 
@@ -272,6 +286,11 @@
       font-family: $fontFamilySecondary;
       font-size: $paragraphFontSizeLarge;
       color: #365575;
+      letter-spacing: 0.01em;
+      line-height: 1.8;
+      div >div{
+        text-align: justify;
+      }
     }
   }
 }
@@ -385,6 +404,12 @@
 
 .headerFontSize{
   font-size:$paragraphFontSizeMedium;
+}
+
+.title{
+  font-size: $paragraphFontSizeMedium;
+  font-family: $fontFamilySecondary;
+  font-weight: bold;
 }
 
 .profileAcl {
@@ -503,36 +528,6 @@
   }
 }
 
-.comdex {
-.buttonForm {
-  background:$colorSecondary;
-  color: #FFFFFF;
-  font-size: $paragraphFontSizeSmall;
-  font-family: $fontFamilySecondary;
-}
-.cmuk-input {
-  border: 1px solid rgba(5, 60, 117, 0.22);
-
-  &::placeholder {
-    color: #272829;
-  }
-
-  &:focus {
-    border: 1px solid rgba(5, 60, 117, 0.22);
-  }
-}
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active  {
-    -webkit-box-shadow: 0 0 0 30px white inset;
-  }
-  .error {
-    font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
-    color: #f0506e;
-  }
-}
 .flexContainer {
   display: flex;
   justify-content: left;
@@ -837,8 +832,13 @@ dl .info {
   padding: 30px 0px;
   font-size: $paragraphFontSizeSmall;
   background: #031221;
+  .copyright{
+    margin: 10px 0px;
+    font-family:$fontFamilySecondary;
+    font-weight: bold;
+  }
   .footer a {
-    color: #149f98;
+    color: $paragraphFontSizeLarge;
   }
 }
 
@@ -1215,7 +1215,8 @@ input:checked+.slider {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin: 5px 0px;
+  flex-wrap: wrap;
   .documentContentTop{
     font-size: $paragraphFontSizeSmall;
     margin: 10px;
@@ -1261,9 +1262,6 @@ input:checked+.slider {
     margin:5px 0px;
   }
 }
-.comdex .cmuk-input, .cmuk-card-default, button, a,  p{
-  font-size: 1.2rem;
-}
 
 .loginForm {
   .inputField {
@@ -1283,7 +1281,7 @@ input:checked+.slider {
     }
 
     .inputFieldBody input {
-      font-size: 1.2rem;
+      font-size: $paragraphFontSizeSmall;
     }
   }
   .cmuk-button-link{
@@ -1304,7 +1302,7 @@ input:checked+.slider {
   line-height: 1.8;
   align-items:flex-start;
   word-break: break-all;
-  font-size: 14px;
+  font-size: $paragraphFontSizeSmall;
 }
 
 .infoRowLabel{
@@ -1318,7 +1316,6 @@ input:checked+.slider {
   color: #767f8d;
   font-weight: 400;
   height: min-content;
-  line-height: 1.6;
 }
 
 .cmuk-accordion-title::before{

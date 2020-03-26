@@ -26,7 +26,6 @@
 html, body{
   height: 100%;
   background: #F0F0F0;
-  font-size: 61.5%;
 }
 
 .cover-bar {
@@ -66,7 +65,7 @@ html, body{
 }
 %cmuk-comment-meta{
   color: #061728;
-  font-size: $paragraphFontSizeMedium;
+  font-size: $paragraphFontSizeSmall;
 }
 %cmuk-card-default{
   background: #FAFAFA;
@@ -75,13 +74,13 @@ html, body{
 }
 %cmuk-button-link {
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: $paragraphFontSizeSmall;
   text-decoration: none;
 }
 %verifiedLabel{
   font-weight: bold;
   border-radius: 5px;
-  font-size: 1rem;
+  font-size: 10px;
 }
 .textLineOverflow{
   display: -webkit-box;
@@ -89,11 +88,62 @@ html, body{
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.primaryFont{
-  font-family:$fontFamilyPrimary;
-}
-.secondaryFont{
-  font-family:$fontFamilySecondary;
+
+.comdex {
+  .buttonForm {
+    background:$colorSecondary;
+    color: #FFFFFF;
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-input {
+    border: 1px solid rgba(5, 60, 117, 0.22);
+
+    &::placeholder {
+      color: #272829;
+      font-size: $paragraphFontSizeSmall;
+    }
+
+    &:focus {
+      border: 1px solid rgba(5, 60, 117, 0.22);
+    }
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+  }
+  .error {
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    color: #f0506e;
+  }
+  .cmuk-badge.verified{
+    @extend  %verifiedLabel;
+    background-color: #49A948;
+  }
+  .cmuk-badge.rejected{
+    @extend  %verifiedLabel;
+    background-color: #FE4350;
+  }
+  .cmuk-badge.pending{
+    @extend %verifiedLabel;
+    background-color: #faa05a;
+  }
+  .cmuk-button{
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-button-primary{
+    border: none;
+    font-size: $paragraphFontSizeSmall;
+  }
+  .primaryFont{
+    font-family:$fontFamilyPrimary;
+  }
+  .secondaryFont{
+    font-family:$fontFamilySecondary;
+  }
 }
 .header {
   background: $colorSecondary;
@@ -105,7 +155,7 @@ html, body{
   .cmuk-navbar-item,
   .cmuk-navbar-nav>li>a,
   .cmuk-navbar-toggle{
-    min-height:50px;
+    min-height:60px;
     font-family: $fontFamilySecondary;
     text-transform: capitalize;
   }
@@ -113,7 +163,7 @@ html, body{
     padding: 0px 40px 0px 0px;
     border-right: 1px solid #1C5998;
     img{
-      width: 110px;
+      width: 120px;
     }
   }
 
@@ -125,7 +175,7 @@ html, body{
     .cmuk-navbar-nav {
       .buttonRegister{
         background-color: #FE4350;
-        font-size: 1.2rem;
+        font-size: $paragraphFontSizeMedium;
         color: #FFFFFF;
         line-height: 30px;
       }
@@ -453,10 +503,10 @@ margin-right: -5px;
       margin: 0px;
     }
     .refresh{
-      padding: 5px 0px 10px 0px;
+      padding: 10px 0px 10px 0px;
       margin: 0px 15px;
       color: #848A91;
-      font-size: $paragraphFontSizeMedium;
+      font-size: $paragraphFontSizeSmall;
       .refreshIcon{
         .icon{
           width: 12px;
@@ -489,8 +539,8 @@ margin-right: -5px;
 
       }
       .ctitle{
-        color: #848A91;
-        font-size: $paragraphFontSizeMedium;
+        color: #5C6166;
+        font-size: $paragraphFontSizeSmall;
         font-family: $fontFamilySecondary;
       }
       .payable{
@@ -558,6 +608,10 @@ margin-right: -5px;
     margin-bottom: 20px;
     .cmuk-card-header{
       padding:15px 20px;
+      .icon{
+        width: 18px;
+        height: 18px;
+      }
     }
     .cmuk-card-body{
       overflow-y: auto;
@@ -711,7 +765,7 @@ header:before,
     content: "";
     width: 0px;
     height: 100%;
-    border-right:1px dashed #71757A;
+    border-right:2px dashed #CECECE;
     left: 17px;
     top: 0;
     position: absolute; }
@@ -720,8 +774,7 @@ header:before,
     height: 55px;
     position: relative;
     .timeline-icon {
-      background: #FFFFFF;
-      border: 1px solid #848A91;
+      background: #E4EBF2;
       box-sizing: border-box;
       width: 40px;
       height: 40px;
@@ -934,6 +987,9 @@ header:before,
 }
 
 .chat{
+  .chatMessage{
+    font-size:$paragraphFontSizeSmall;
+  }
   .chatName{
     color:#FFFFFF;
     background: #193759;
@@ -990,7 +1046,7 @@ header:before,
     }
     .messageContent{
       color: #061728;
-      font-size: $paragraphFontSizeMedium;
+      font-size: $paragraphFontSizeSmall;
       p{
         margin:0px;
         color: #0862BE;
@@ -1062,7 +1118,7 @@ header:before,
   overflow:auto;
   .listItemChild{
     margin: 0px;
-    font-size: $paragraphFontSizeMedium;
+    font-size: $paragraphFontSizeSmall;
     font-family: $fontFamilySecondary;
     font-weight: bold;
     .listItemChildTitle
@@ -1110,7 +1166,7 @@ header:before,
   }
 }
 
-.salesQuoteList, .tradeList {
+.switcherViewCard {
   margin-bottom: 20px;
   .cmuk-card-header{
     padding:0px 15px;
@@ -1147,7 +1203,7 @@ header:before,
 }
 .profileContainer{
   .infoRow{
-    font-size: $paragraphFontSizeLarge;
+    font-size: $paragraphFontSizeMedium;
     line-height: 2;
   }
   .infoRowLabel{
@@ -1161,16 +1217,14 @@ header:before,
   .cmuk-card-header{
     font-family: $fontFamilySecondary;
   }
-  .cmuk-badge.verified{
-    @extend  %verifiedLabel;
-    background-color: #49A948;
-  }
-  .cmuk-badge.rejected{
-    @extend  %verifiedLabel;
-    background-color: #FE4350;
-  }
   .cmuk-card-body .cmuk-card-body{
     background-color: #FFFFFF;
+  }
+  .icon{
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    margin-bottom: 3px;
   }
 }
 .profileDetails{
@@ -1192,7 +1246,6 @@ header:before,
   .cmuk-button-link{
     @extend %cmuk-button-link;
     margin-left: 10px;
-    margin-bottom: 5px;
     font-family: $fontFamilySecondary;
   }
   .cmuk-badge{
@@ -1210,10 +1263,21 @@ header:before,
   }
 
 }
-.organizationDetails{
+.identificationDetails, .traderRelationList{
+  .cmuk-subnav{
+    li{
+        font-family: $fontFamilySecondary;
+      a{
+        font-size: $paragraphFontSizeSmall;
+      }
+    }
+  }
+}
+.organizationDetails, .organizationUbos{
   .cmuk-card-body{
     .cmuk-card-default{
       margin-bottom: 5px;
     }
   }
 }
+

@@ -3,11 +3,11 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional, seq}
 
-object AddUBOs {
+object AddOrUpdateUBOs {
 
   val form = Form(
     mapping(
-      constants.Form.UBOS -> seq(optional(mapping(
+      constants.View.UBOS -> seq(optional(mapping(
         constants.FormField.PERSON_NAME.name -> constants.FormField.PERSON_NAME.field,
         constants.FormField.SHARE_PERCENTAGE.name -> constants.FormField.SHARE_PERCENTAGE.field,
         constants.FormField.RELATIONSHIP.name -> constants.FormField.RELATIONSHIP.field,

@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
-
+@import views.html.base._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.DASHBOARD), failures, warnings, successes, infos)(left)(center)(Html(""))
@@ -11,25 +11,43 @@
 
 @center = {
 
-    <h2>Dashboard PageUnderConstruction</h2>
-@*
-    <div class="dashboardContainer cmuk-flex">
-        <div class="left">
-            <img src="@routes.Assets.versioned("images/comdex.svg")">
-            <div class="cmuk-width-auto@@m">
-                <ul class="cmuk-nav cmuk-nav-default" cmuk-switcher="animation: cmuk-animation-fade">
-                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.accountDetails());">Account</a></li>
-                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.tradeDetails());">Trades</a></li>
-                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.transactionDetails());">Transactions</a></li>
-                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.subscriptionsDetails());">Subscriptions</a></li>
-                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.settingsDetails());">Settings</a></li>
-                </ul>
-            </div>
+@if(loginState.userType == constants.User.TRADER){
+    <div class="tradeList switcherViewCard">
+    @commonCard(constants.View.TRADE_ROOMS){
+        <div class="tradeCardHeader">
+            <ul class="cmuk-subnav" cmuk-switcher="connect: #tradeListTab; animation: cmuk-animation-fade">
+                <li><a href="#">@Messages(constants.View.ACTIVE)</a></li>
+                <li><a href="#">@Messages(constants.View.COMPLETED)</a></li>
+            </ul>
         </div>
-        <div class="right" id="component-nav">
-
-        </div>
+    }{
+        <ul id="tradeListTab" class="cmuk-switcher cmuk-margin">
+            <li>
+                <div id="tradeList">
+                </div>
+            </li>
+            <li>Hello</li>
+        </ul>
+    }
     </div>
-    <script>componentResource('component-nav', jsRoutes.controllers.ComponentViewController.accountDetails());</script>*@
+    <div class="salesQuoteList switcherViewCard">
+    @commonCard(constants.View.SALES_QUOTE_LIST){
+           <div class="salesQuoteCardHeader">
+            <ul class="cmuk-subnav" cmuk-switcher="connect: #salesQuoteTab; animation: cmuk-animation-fade">
+                <li><a href="#" >@Messages(constants.View.BUY)</a></li>
+                <li><a href="#">@Messages(constants.View.SELL)</a></li>
+            </ul>
+        </div>
 
+    }{
+        <ul id="salesQuoteTab" class="cmuk-switcher cmuk-margin">
+            <li>
+                <div id="salesQuoteList"></div>
+            </li>
+            <li>Hello</li>
+        </ul>
+
+    }
+    </div>
+}
 }
