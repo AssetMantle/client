@@ -19,8 +19,16 @@
                 </div>
 
             </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="zoneViewTraderAccountsList"></div>
+                </div>
+
+            </div>
             <script>
                     componentResource('zoneViewOrganizationAccountsList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountsList());
+                    componentResource('zoneViewTraderAccountsList', jsRoutes.controllers.ComponentViewController.zoneViewTraderAccountsList());
             </script>
         }
         case constants.User.ORGANIZATION => {

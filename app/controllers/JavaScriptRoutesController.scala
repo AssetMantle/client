@@ -108,6 +108,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewRejectedTraderRequestsList,
         routes.javascript.ComponentViewController.organizationViewRejectedTraderRequest,
 
+        routes.javascript.ComponentViewController.zoneViewTraderAccountsList,
+        routes.javascript.ComponentViewController.zoneViewAcceptedTraderAccountsList,
+        routes.javascript.ComponentViewController.zoneViewAcceptedTraderAccountDetails,
+        routes.javascript.ComponentViewController.zoneViewPendingTraderRequestsList,
+        routes.javascript.ComponentViewController.zoneViewPendingTraderRequest,
+        routes.javascript.ComponentViewController.zoneViewRejectedTraderRequestsList,
+        routes.javascript.ComponentViewController.zoneViewRejectedTraderRequest,
+
         routes.javascript.ComponentViewController.zoneViewOrganizationAccountsList,
         routes.javascript.ComponentViewController.zoneViewAcceptedOrganizationAccountsList,
         routes.javascript.ComponentViewController.zoneViewAcceptedOrganizationAccountDetails,

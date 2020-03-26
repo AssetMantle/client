@@ -282,7 +282,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       _.getOrElse(false)
     }
 
-    def getVerificationStatusWithTry(id: String): Future[Boolean] = {
+    def tryGetVerificationStatus(id: String): Future[Boolean] = {
       val verificationStatus = getVerificationStatusById(id)
       for {
         verificationStatus <- verificationStatus

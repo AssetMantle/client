@@ -88,7 +88,7 @@ GET         /component/pendingTraderRelationList                            cont
 GET         /component/acceptedTraderRelation                               controllers.ComponentViewController.acceptedTraderRelation(fromID: String, toID: String)
 GET         /component/pendingSentTraderRelation                            controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
 GET         /component/pendingReceivedTraderRelation                        controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
-GET         /master/zoneViewOrganizationBankAccountDetail                   controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)
+GET         /component/zoneViewOrganizationBankAccountDetail                controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)
 
 GET         /master/commodityDetails                                        controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
 POST        /master/commodityDetails                                        controllers.SalesQuoteController.commodityDetails
@@ -120,6 +120,14 @@ GET         /component/organizationViewPendingTraderRequestsList            cont
 GET         /component/organizationViewPendingTraderRequest                 controllers.ComponentViewController.organizationViewPendingTraderRequest(traderID: String)
 GET         /component/organizationViewRejectedTraderRequestsList           controllers.ComponentViewController.organizationViewRejectedTraderRequestsList
 GET         /component/organizationViewRejectedTraderRequest                controllers.ComponentViewController.organizationViewRejectedTraderRequest(traderID: String)
+
+GET         /component/zoneViewTraderAccountsList                           controllers.ComponentViewController.zoneViewTraderAccountsList
+GET         /component/zoneViewAcceptedTraderAccountsList                   controllers.ComponentViewController.zoneViewAcceptedTraderAccountsList
+GET         /component/zoneViewAcceptedTraderAccountDetails                 controllers.ComponentViewController.zoneViewAcceptedTraderAccountDetails(traderID: String)
+GET         /component/zoneViewPendingTraderRequestsList                    controllers.ComponentViewController.zoneViewPendingTraderRequestsList
+GET         /component/zoneViewPendingTraderRequest                         controllers.ComponentViewController.zoneViewPendingTraderRequest(traderID: String)
+GET         /component/zoneViewRejectedTraderRequestsList                   controllers.ComponentViewController.zoneViewRejectedTraderRequestsList
+GET         /component/zoneViewRejectedTraderRequest                        controllers.ComponentViewController.zoneViewRejectedTraderRequest(traderID: String)
 
 GET         /component/zoneViewOrganizationAccountsList                     controllers.ComponentViewController.zoneViewOrganizationAccountsList
 GET         /component/zoneViewAcceptedOrganizationAccountsList             controllers.ComponentViewController.zoneViewAcceptedOrganizationAccountsList
@@ -200,7 +208,7 @@ GET         /master/userUpdateTraderKYC                                     cont
 GET         /master/userReviewAddTraderRequest                              controllers.SetACLController.userReviewAddTraderRequestForm
 POST        /master/userReviewAddTraderRequest                              controllers.SetACLController.userReviewAddTraderRequest
 
-GET         /master/zoneVerifyTrader                                        controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
+GET         /master/zoneVerifyTrader                                        controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
 POST        /master/zoneVerifyTrader                                        controllers.SetACLController.zoneVerifyTrader
 GET         /master/zoneViewTraderKYCDocuments                              controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
 GET         /master/updateTraderKYCDocumentZoneStatus                       controllers.SetACLController.updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
@@ -209,7 +217,7 @@ GET         /master/zoneViewVerifyTraderRequests                            cont
 GET         /master/zoneRejectVerifyTraderRequest                           controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/zoneRejectVerifyTraderRequest                           controllers.SetACLController.zoneRejectVerifyTraderRequest
 
-GET         /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
+GET         /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTrader
 GET         /master/updateTraderKYCDocumentOrganizationStatus               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentOrganizationStatus               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
@@ -284,7 +292,7 @@ GET         /master/updateOrganizationKYCDocumentStatus                     cont
 POST        /master/updateOrganizationKYCDocumentStatus                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatus
 GET         /master/rejectVerifyOrganizationRequest                         controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
 POST        /master/rejectVerifyOrganizationRequest                         controllers.AddOrganizationController.rejectVerifyOrganizationRequest
-GET         /master/verifyOrganization                                      controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
+GET         /master/verifyOrganization                                      controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String)
 POST        /master/verifyOrganization                                      controllers.AddOrganizationController.verifyOrganization
 GET         /organizationUpload                                             controllers.AddOrganizationController.uploadOrganizationKYCForm(documentType: String)
 POST        /organizationUpload/file                                        controllers.AddOrganizationController.uploadOrganizationKYC(documentType: String)

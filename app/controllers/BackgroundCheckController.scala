@@ -1,14 +1,12 @@
 package controllers
 
 import java.nio.file.Files
-import java.util.Date
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.common.Serializable
-import models.master.{Trader}
+import models.master.{OrganizationBackgroundCheck, Trader}
 import models.masterTransaction.AssetFile
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -169,11 +167,11 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val storeFile = fileResourceManager.storeFile[master.OrganizationBackgroundCheck](
+      val storeFile = fileResourceManager.storeFile[OrganizationBackgroundCheck](
         name = name,
         documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None, status = Option(true)),
+        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None, status = Option(true)),
         masterCreate = masterOrganizationBackgroundChecks.Service.create
       )
 

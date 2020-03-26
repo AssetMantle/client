@@ -18,7 +18,29 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, withLoginAction: WithLoginAction, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(
+                                           messagesControllerComponents: MessagesControllerComponents,
+                                           withOrganizationLoginAction: WithOrganizationLoginAction,
+                                           withLoginAction: WithLoginAction,
+                                           fileResourceManager: utilities.FileResourceManager,
+                                           transaction: utilities.Transaction,
+                                           masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
+                                           utilitiesNotification: utilities.Notification,
+                                           blockchainAccounts: blockchain.Accounts,
+                                           masterOrganizationKYCs: master.OrganizationKYCs,
+                                           masterTraders: master.Traders,
+                                           transactionsAddOrganization: transactions.AddOrganization,
+                                           blockchainOrganizations: blockchain.Organizations,
+                                           masterZones: master.Zones,
+                                           blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations,
+                                           masterOrganizations: master.Organizations,
+                                           masterAccounts: master.Accounts,
+                                           withUserLoginAction: WithUserLoginAction,
+                                           withZoneLoginAction: WithZoneLoginAction,
+                                           withGenesisLoginAction: WithGenesisLoginAction,
+                                           withUsernameToken: WithUsernameToken,
+                                           masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks
+                                         )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -219,7 +241,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot( ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title) )
+            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title))
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -252,7 +274,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot( ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title) )
+            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title))
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -492,29 +514,63 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       )
   }
 
-  def verifyOrganizationForm(organizationID: String, zoneID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.verifyOrganization(organizationID = organizationID, zoneID = zoneID))
+  def verifyOrganizationForm(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organization = masterOrganizations.Service.tryGet(organizationID)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      (for {
+        organization <- organization
+        zoneID <- zoneID
+      } yield if (organization.zoneID == zoneID) {
+        Ok(views.html.component.master.verifyOrganization(organization = organization))
+      } else {
+        Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
+      }
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+      }
   }
 
   def verifyOrganization: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyOrganization.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.verifyOrganization(formWithErrors, organizationID = formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name))))
+          val organization = masterOrganizations.Service.tryGet(formWithErrors.data(constants.FormField.ORGANIZATION_ID.name))
+          val zoneID = masterZones.Service.tryGetID(loginState.username)
+          (for {
+            organization <- organization
+            zoneID <- zoneID
+          } yield if (organization.zoneID == zoneID) {
+            BadRequest(views.html.component.master.verifyOrganization(formWithErrors, organization = organization))
+          } else {
+            Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
+          }
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
         },
         verifyOrganizationData => {
-          val allKYCFilesVerified = masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)
+          val zoneID = masterZones.Service.tryGetID(loginState.username)
+          val organization = masterOrganizations.Service.tryGet(verifyOrganizationData.organizationID)
 
-          def processTransactionAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
-            if (allKYCFilesVerified) {
+          def checkAllKYCFilesVerified(zoneID: String, organization: Organization): Future[Boolean] = {
+            if (zoneID != organization.zoneID) throw new BaseException(constants.Response.UNAUTHORIZED)
+            masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)
+          }
+
+          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterOrganizationBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
+
+          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkAllBackgroundFilesVerified: Boolean, zoneID: String): Future[Result] = {
+            if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_ORGANIZATION_BACKGROUND_CHECK_FILES_NOT_VERFIED)
+            if (checkAllKYCFilesVerified) {
               val accountId = masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)
 
               def organizationAccountAddress(accountId: String): Future[String] = masterAccounts.Service.getAddress(accountId)
 
               def transactionProcess(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
-                entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
+                entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-                request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = verifyOrganizationData.gas.toString), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
+                request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = verifyOrganizationData.gas.toString), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = zoneID, password = verifyOrganizationData.password, mode = transactionMode),
                 action = transactionsAddOrganization.Service.post,
                 onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
                 onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
@@ -525,19 +581,22 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 accountId <- accountId
                 organizationAccountAddress <- organizationAccountAddress(accountId)
                 _ <- transactionProcess(organizationAccountAddress)
-                result <- withUsernameToken.Ok(views.html.zoneRequest(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
+                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
               } yield result
             } else {
-              Future(PreconditionFailed(views.html.zoneRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+              Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
           }
 
           (for {
-            allKYCFilesVerified <- allKYCFilesVerified
-            result <- processTransactionAndGetResult(allKYCFilesVerified)
+            zoneID <- zoneID
+            organization <- organization
+            checkAllKYCFilesVerified <- checkAllKYCFilesVerified(zoneID, organization)
+            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(organization.id)
+            result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, zoneID = zoneID)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )

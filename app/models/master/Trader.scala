@@ -252,6 +252,12 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getRejectedTraderRequestsInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = Option(false))
 
+    def getAcceptedTradersInZone(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(true))
+
+    def getPendingTraderRequestsInZone(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null)
+
+    def getRejectedTraderRequestsInZone(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(false))
+
     def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
 
     def getOrNoneByAccountID(accountID: String): Future[Option[Trader]] = getTraderOrNoneByAccountID(accountID)

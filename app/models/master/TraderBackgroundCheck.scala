@@ -146,6 +146,10 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
     def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
+
+    def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES, status = true).map {
+      constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(_).isEmpty
+    }
   }
 
 }

@@ -36,15 +36,15 @@
             <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
                 <div class="cmuk-navbar-left">
                     <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
-                        <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
+                        <img src="@routes.Assets.versioned("images/logo.svg")">
                     </a>
                     <ul class="cmuk-navbar-nav">
                     @loginState match {
                         case null => {}
                         case default => {
-                            <li><a href="@controllers.routes.ViewController.account()">@Messages(constants.View.ACCOUNT)</a></li>
                             <li><a href="@controllers.routes.ViewController.dashboard()">@Messages(constants.View.DASHBOARD)</a></li>
                             <li><a href="@controllers.routes.ViewController.trades()">@Messages(constants.View.TRADES)</a></li>
+                            <li><a href="@controllers.routes.ViewController.account()">@Messages(constants.View.ACCOUNT)</a></li>
                             <li><a href="@controllers.routes.ViewController.profile()">@Messages(constants.View.PROFILE)</a></li>
                         }
                     }
