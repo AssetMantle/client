@@ -292,7 +292,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         traderID <- traderID
         traderRelationList <- getTraderRelationList(traderID)
         traderCounterPartyDetails <- getTraderCounterPartyDetails(traderRelationList.filter(_.fromID == traderID).map(_.toID) ++ traderRelationList.filter(_.toID == traderID).map(_.fromID))
-        result <- withUsernameToken.Ok(views.html.component.master.inviteSalesQuoteBuyer( ,requestID = requestID, traders = traderCounterPartyDetails))
+        result <- withUsernameToken.Ok(views.html.component.master.inviteSalesQuoteBuyer(requestID = requestID, traders = traderCounterPartyDetails))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
