@@ -9,7 +9,7 @@
         @commonTextInfo(constants.View.TRADER_ID, trader.id)
         @commonTextInfo(constants.View.NAME, trader.name)
         @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewAcceptedTraderAccountDetails('@trader.id'))">@Messages(constants.Form.VIEW)</button>
-        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.TraderController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER.legend)</button>
+        @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountDetails, 'parameters -> s"'${trader.id}'")
+        @commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
     }
 }

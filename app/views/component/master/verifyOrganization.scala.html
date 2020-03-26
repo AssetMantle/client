@@ -9,3 +9,4 @@
     @commonInputInt(verifyOrganizationForm, constants.FormField.GAS)
     @commonInputPassword(verifyOrganizationForm, constants.FormField.PASSWORD)
 }
+@commonModalButton(constants.View.BACK, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'parameters -> s"'${organizationID}'")

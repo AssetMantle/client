@@ -7,5 +7,5 @@
     @commonInputText(rejectTraderRequestForm, constants.FormField.TRADER_ID)
 }
 @if(rejectTraderRequestForm.data(constants.FormField.TRADER_ID.name) != "") {
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewPendingTraderRequest('@rejectTraderRequestForm.data(constants.FormField.TRADER_ID.name)'))">@Messages(constants.View.BACK)</button>
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewPendingTraderRequest, 'parameters -> s"'${rejectTraderRequestForm.data(constants.FormField.TRADER_ID.name)}'")
 }

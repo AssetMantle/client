@@ -25,5 +25,5 @@
 }
 <br>
 @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)
-<button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.organizationVerifyTraderForm('@trader.accountID', '@trader.organizationID'))">@Messages(constants.Form.APPROVE)</button>
-<button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.TraderController.organizationRejectTraderRequestForm('@trader.id'))">@Messages(constants.Form.REJECT)</button>
+@commonFormButton(constants.Form.ORGANIZATION_VERIFY_TRADER, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${trader.accountID}', '${trader.organizationID}'")
+@commonFormButton(constants.Form.ORGANIZATION_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")

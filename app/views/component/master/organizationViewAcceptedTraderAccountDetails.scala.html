@@ -23,4 +23,4 @@
             @commonBooleanInfo(constants.View.ZONE_STATUS, traderKYC.zoneStatus)
         }
     }
-<button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.TraderController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER.legend)</button>
+@commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")

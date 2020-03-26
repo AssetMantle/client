@@ -47,5 +47,5 @@
 </div>
 <br>
 @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)
-<button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile('@organization.id'))">@Messages(constants.Form.APPROVE)</button>
-<button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organization.id'))">@Messages(constants.Form.REJECT)</button>
+@commonModalButton(constants.Form.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
+@commonFormButton(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")

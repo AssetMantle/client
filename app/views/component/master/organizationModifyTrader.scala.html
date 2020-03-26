@@ -24,4 +24,4 @@
     @commonInputInt(modifyTraderForm, constants.FormField.GAS)
     @commonInputPassword(modifyTraderForm, constants.FormField.PASSWORD)
 }
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewAcceptedTraderAccountDetails('@trader.id'))">@Messages(constants.View.BACK)</button>
+@commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountDetails, 'parameters -> s"'${trader.id}'")
