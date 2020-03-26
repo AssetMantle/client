@@ -34,18 +34,18 @@ class DocuSignController @Inject()(messagesControllerComponents: MessagesControl
 
   def docuSignTest=Action{
 
-    val accessToken="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjY4MTg1ZmYxLTRlNTEtNGNlOS1hZjFjLTY4OTgxMjIwMzMxNyJ9.eyJUb2tlblR5cGUiOjUsIklzc3VlSW5zdGFudCI6MTU4NTA1MDg4MCwiZXhwIjoxNTg1MDc5NjgwLCJVc2VySWQiOiJmNTczOWZhMi1kZGNkLTQwNmEtYTU5NS1lZDlhODk4NjJmMjEiLCJzaXRlaWQiOjEsInNjcCI6WyJzaWduYXR1cmUiLCJjbGljay5tYW5hZ2UiLCJvcmdhbml6YXRpb25fcmVhZCIsInJvb21fZm9ybXMiLCJncm91cF9yZWFkIiwicGVybWlzc2lvbl9yZWFkIiwidXNlcl9yZWFkIiwidXNlcl93cml0ZSIsImFjY291bnRfcmVhZCIsImRvbWFpbl9yZWFkIiwiaWRlbnRpdHlfcHJvdmlkZXJfcmVhZCIsImR0ci5yb29tcy5yZWFkIiwiZHRyLnJvb21zLndyaXRlIiwiZHRyLmRvY3VtZW50cy5yZWFkIiwiZHRyLmRvY3VtZW50cy53cml0ZSIsImR0ci5wcm9maWxlLnJlYWQiLCJkdHIucHJvZmlsZS53cml0ZSIsImR0ci5jb21wYW55LnJlYWQiLCJkdHIuY29tcGFueS53cml0ZSJdLCJhdWQiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJhenAiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJpc3MiOiJodHRwczovL2FjY291bnQtZC5kb2N1c2lnbi5jb20vIiwic3ViIjoiZjU3MzlmYTItZGRjZC00MDZhLWE1OTUtZWQ5YTg5ODYyZjIxIiwiYW1yIjpbImludGVyYWN0aXZlIl0sImF1dGhfdGltZSI6MTU4NTA1MDg3NiwicHdpZCI6ImUwNjJkNzc2LTJlMTgtNGU3ZC1iNDlkLWYyNDQwMGVkNThmYSJ9.15hYMK9r_x0S0NQfZmIAy5OPFvlKRbqQVWZdqJf6qkdQhI8nxDESp9m4WIre5u5PaCz8Rx0KUgZhRRyDf5YezFMxyHp7bjOJjclmeUOQGsWMdnXlRyZ3uodJTLJiQwHY26ZJK7aU2ShkZCxvq_afk_FZr5dDQ9V2VJOZNJaFxo_K3gt_6q3OkkLvbkx6CrqCFi4psG7rcdx62OpwGuzSf0s2X1bZHHWUSgjHTOWv7QmVVOrFCEactICw_y7mEJlGEw2dwP2l-zuuiG6Ae7Ao5ES5jHQ9R_srX_J9I7L6ykYPf9yNZO12UApRplWCWxkgbbwMXXIhpRJrc_cKL4TMVQ"
+    val accessToken="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjY4MTg1ZmYxLTRlNTEtNGNlOS1hZjFjLTY4OTgxMjIwMzMxNyJ9.eyJUb2tlblR5cGUiOjUsIklzc3VlSW5zdGFudCI6MTU4NTEyODAzMiwiZXhwIjoxNTg1MTU2ODMyLCJVc2VySWQiOiJmNTczOWZhMi1kZGNkLTQwNmEtYTU5NS1lZDlhODk4NjJmMjEiLCJzaXRlaWQiOjEsInNjcCI6WyJzaWduYXR1cmUiLCJjbGljay5tYW5hZ2UiLCJvcmdhbml6YXRpb25fcmVhZCIsInJvb21fZm9ybXMiLCJncm91cF9yZWFkIiwicGVybWlzc2lvbl9yZWFkIiwidXNlcl9yZWFkIiwidXNlcl93cml0ZSIsImFjY291bnRfcmVhZCIsImRvbWFpbl9yZWFkIiwiaWRlbnRpdHlfcHJvdmlkZXJfcmVhZCIsImR0ci5yb29tcy5yZWFkIiwiZHRyLnJvb21zLndyaXRlIiwiZHRyLmRvY3VtZW50cy5yZWFkIiwiZHRyLmRvY3VtZW50cy53cml0ZSIsImR0ci5wcm9maWxlLnJlYWQiLCJkdHIucHJvZmlsZS53cml0ZSIsImR0ci5jb21wYW55LnJlYWQiLCJkdHIuY29tcGFueS53cml0ZSJdLCJhdWQiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJhenAiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJpc3MiOiJodHRwczovL2FjY291bnQtZC5kb2N1c2lnbi5jb20vIiwic3ViIjoiZjU3MzlmYTItZGRjZC00MDZhLWE1OTUtZWQ5YTg5ODYyZjIxIiwiYXV0aF90aW1lIjoxNTg1MTI3OTIyLCJwd2lkIjoiZTA2MmQ3NzYtMmUxOC00ZTdkLWI0OWQtZjI0NDAwZWQ1OGZhIn0.I5mTsfxkTHKU-KQ82q-3DOYO5LQqsUgHFukXMBeey3uSyCyg6Pg7wx6RWSpWbBo9ehMr6GzyEM0Z5-StPu3rD_CyV5XwkBZLp3suP_j_891Y49peS7JUWohJv21ctb1eUGLqcRrwBeb1wP0tpDK6tsSLlm28vkqh-z5vALgYy2Dt-W5CMroprk67YuJaszWm3n8wtXaYdNELpSY3lqXGbt2f9iaFx8tyHHg5y8qLJFtkAx36iVJbKHSXHmnYheNcMKVGiIhXw6cWtnWzdY4FEk_fZ7W7bNejYTKldifTz5HxeyvN5mcUwtAIj3eF4PuOzDLUBUd5cp1DSY-9nilEYw"
     val accountID="10156924"
-    val signerName="Prashant Kumar Varun"
-    val signerEmail="prashantkrv96@gmail.com"
+    val signerName="Shiv Prasad"
+    val signerEmail="chardinkichandani123@gmail.com"
     val baseUrl="http://localhost:9000"
-    val clientUserID="123"
+    val clientUserID="789"
     val authenticationMethod="None"
     val basePath="https://demo.docusign.net/restapi"
     val tokenExpiration= (60.toLong).*(480:Long)
 
     // val base64File=Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile("/home/persistence-1/projects/commitCentral/public/images/", "44678.pdf")))
-    val fileByteArray=utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile("/home/persistence-1/projects/commitCentral/public/images/", "44678.pdf"))
+    val fileByteArray=utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile("/root/IdeaProjects/commitCentral/public/images/", "44678.pdf"))
     println("fileByteArray"+fileByteArray)
     val base64File= Base64.encode(fileByteArray).toString
     val base64File2=new String(Base64.encode(fileByteArray))
@@ -95,7 +95,7 @@ class DocuSignController @Inject()(messagesControllerComponents: MessagesControl
     val envelopeId = results.getEnvelopeId()
 
     val viewRequest = new RecipientViewRequest()
-    viewRequest.setReturnUrl(baseUrl + "/ds-return")
+    viewRequest.setReturnUrl(baseUrl + "/docuSignReturn")
     viewRequest.setAuthenticationMethod(authenticationMethod)
     viewRequest.setEmail(signerEmail)
     viewRequest.setUserName(signerName)
@@ -108,5 +108,19 @@ class DocuSignController @Inject()(messagesControllerComponents: MessagesControl
 
     redirect
 
+  }
+
+  def docuSignReturn(event:String)=Action{
+
+    if(event=="signing_complete"){
+      Ok("you have signed the document")
+    }else{
+      Ok("error occured")
+    }
+  }
+
+  def docuSignEnvelopes=Action{
+
+    Ok
   }
 }
