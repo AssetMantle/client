@@ -1,6 +1,8 @@
 @import controllers.actions.LoginState
 @import play.twirl.api.Html
 @import views.html.base._
+@import scala.collection.immutable.ListMap
+
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
@@ -13,7 +15,7 @@
     <div class="tabsSection">
         <div class="cmuk-container">
             <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
-                @commonVerticalSwitcher(htmlItems = Map(constants.View.INDEX_TRADERS_HEADER -> views.html.component.master.indexTraders(),
+                @commonVerticalSwitcher(ListMap(constants.View.INDEX_TRADERS_HEADER -> views.html.component.master.indexTraders(),
                     constants.View.INDEX_FINANCIERS_HEADER -> views.html.component.master.indexFinanciers(),
                     constants.View.INDEX_UNDERWRITERS_HEADER -> views.html.component.master.indexUnderwriters()))
             </div>
