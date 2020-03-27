@@ -123,9 +123,9 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   object Service {
 
-    def create(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = add(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file))
+    def create(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = add(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file, status = Option(true)))
 
-    def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = upsert(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file))
+    def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = upsert(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file, status = Option(true)))
 
     def get(id: String, documentType: String): Future[TraderBackgroundCheck] = findByIdDocumentType(id = id, documentType = documentType)
 

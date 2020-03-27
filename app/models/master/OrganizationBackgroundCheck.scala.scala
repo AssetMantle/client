@@ -123,9 +123,9 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   object Service {
 
-    def create(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = add(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file))
+    def create(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = add(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file, status = Option(true)))
 
-    def updateOldDocument(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = upsert(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file))
+    def updateOldDocument(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = upsert(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file, status = Option(true)))
 
     def get(id: String, documentType: String): Future[OrganizationBackgroundCheck] = findByIdDocumentType(id = id, documentType = documentType)
 
