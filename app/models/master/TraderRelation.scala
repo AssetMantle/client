@@ -100,7 +100,7 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def markRejected(fromID: String, toID: String): Future[Int] = deleteByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
 
-    def listOfAllCounterParties(id: String)=findAllByFromIDOrToIDAndStatus(id = id, status = Option(true)).map(_.map(tradeRelation=> if(tradeRelation.fromID==id) tradeRelation.toID else tradeRelation.toID))
+    def listOfAllCounterParties(id: String)=findAllByFromIDOrToIDAndStatus(id = id, status = Option(true)).map(_.map(tradeRelation=> if(tradeRelation.fromID==id) tradeRelation.toID else tradeRelation.fromID))
   }
 
 }
