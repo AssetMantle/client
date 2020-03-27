@@ -1,11 +1,12 @@
 @import controllers.actions.LoginState
 @import views.html.base._
+@import scala.collection.immutable.ListMap
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.ORGANIZATIONS) {
 }{
-    @commonHorizontalSwitcher(jsRouteItems = Map(
+    @commonHorizontalSwitcher(ListMap(
         constants.View.APPROVED -> routes.javascript.ComponentViewController.zoneViewAcceptedOrganizationAccountsList,
         constants.View.PENDING_ORGANIZATION_REQUESTS -> routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequestsList,
         constants.View.REJECTED_ORGANIZATION_REQUESTS -> routes.javascript.ComponentViewController.zoneViewRejectedOrganizationRequestsList))
