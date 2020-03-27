@@ -577,14 +577,9 @@ class SetACLController @Inject()(
         },
         rejectVerifyTraderRequestData => {
           val rejectTrader = masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
-          val zoneAccountID = masterZones.Service.getAccountId(rejectVerifyTraderRequestData.traderID)
-
-          def zoneRejectAll(zoneAccountID: String): Future[Int] = masterTraderKYCs.Service.zoneRejectAll(zoneAccountID)
 
           (for {
             _ <- rejectTrader
-            zoneAccountID <- zoneAccountID
-            _ <- zoneRejectAll(zoneAccountID)
             result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_REJECT_TRADER_REQUEST_SUCCESSFUL)))
           } yield result
             ).recover {
@@ -630,11 +625,12 @@ class SetACLController @Inject()(
         },
         verifyTraderData => {
           val trader = masterTraders.Service.tryGetByAccountID(verifyTraderData.accountID)
-          val organizationZoneID = masterOrganizations.Service.tryGetZoneID(verifyTraderData.organizationID)
+          val traderOrganization = masterOrganizations.Service.tryGet(verifyTraderData.organizationID)
+          val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
-          def checkAllKYCFilesVerified(trader: Trader, organizationZoneID: String): Future[Boolean] = {
-            if (trader.organizationID != verifyTraderData.organizationID || trader.zoneID != organizationZoneID) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (trader.zoneID != verifyTraderData.organizationID) throw new BaseException(constants.Response.ZONE_ID_DIFFERENT_THAN_TRADER_REQUEST_ZONE_ID)
+          def checkAllKYCFilesVerified(trader: Trader, traderOrganization: Organization, organization: Organization): Future[Boolean] = {
+            if (trader.organizationID != verifyTraderData.organizationID || traderOrganization.id != organization.id) throw new BaseException(constants.Response.UNAUTHORIZED)
+            if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_DIFFERENT_THAN_TRADER_REQUEST_ZONE_ID)
             masterTraderKYCs.Service.checkAllKYCFilesVerified(trader.id)
           }
 
@@ -671,8 +667,9 @@ class SetACLController @Inject()(
 
           (for {
             trader <- trader
-            organizationZoneID <- organizationZoneID
-            checkAllKYCFilesVerified <- checkAllKYCFilesVerified(trader, organizationZoneID)
+            traderOrganization <- traderOrganization
+            organization <- organization
+            checkAllKYCFilesVerified <- checkAllKYCFilesVerified(trader, traderOrganization, organization)
             checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(trader.id)
             result <- getResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, trader = trader)
           } yield result

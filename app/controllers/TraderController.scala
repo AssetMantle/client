@@ -62,10 +62,10 @@ class TraderController @Inject()(
 
           (for {
             _ <- rejectTrader
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_REJECT_TRADER_REQUEST_SUCCESSFUL)))
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REJECT_TRADER_REQUEST_SUCCESSFUL)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.organizationRequest(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -138,7 +138,7 @@ class TraderController @Inject()(
             traderRelation <- traderRelation
           } yield BadRequest(views.html.component.master.acceptOrRejectTraderRelation(formWithErrors, traderRelation = traderRelation))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         },
         acceptOrRejectTraderRelationData => {
@@ -257,10 +257,10 @@ class TraderController @Inject()(
                 organizationID <- organizationID
                 _ <- createACL
                 _ <- transactionProcess(aclAddress, zoneID, organizationID)
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
+                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
               } yield result
             } else {
-              Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+              Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
           }
 
@@ -271,7 +271,7 @@ class TraderController @Inject()(
             result <- getResult(checkAllKYCFilesVerified)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )

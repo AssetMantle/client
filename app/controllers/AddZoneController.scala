@@ -82,7 +82,7 @@ class AddZoneController @Inject()(
         result <- withUsernameToken.Ok(views.html.component.master.userAcceptZoneInvitation())
       } yield result
         ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addZone())
+        case _: BaseException => withUsernameToken.Ok(views.html.component.master.userAcceptZoneInvitation())
       }
   }
 
