@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneInvitation(id: String, emailAddress: String, status: Option[Boolean])
+case class ZoneInvitation(id: String, emailAddress: String, status: Option[Boolean] = None)
 
 @Singleton
 class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -65,7 +65,7 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(emailAddress: String): Future[String] = add(ZoneInvitation(id = utilities.IDGenerator.requestID, emailAddress = emailAddress, status = null))
+    def create(emailAddress: String): Future[String] = add(ZoneInvitation(id = utilities.IDGenerator.requestID, emailAddress = emailAddress))
 
     def tryGet(id: String): Future[ZoneInvitation] = findByID(id)
 
