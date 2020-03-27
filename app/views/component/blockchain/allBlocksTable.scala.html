@@ -2,10 +2,7 @@
     @import views.html.base._
 <div id="allBlocksTable">
     <a onclick='back()' ><span title="Back" cmuk-icon="arrow-left"></span>@Messages(constants.Form.BACK)</a>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.BLOCKS)</span>
-        </div>
+    @commonCard(constants.Form.BLOCKS) {
     }{
         <div class="cmuk-overflow-auto">
             <table class="cmuk-table cmuk-table-divider">

@@ -44,6 +44,14 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.head.asTry).map {
+    case Success(result) => Option(result)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
   private def getEmailAddressById(id: String, emailAddressVerified: Option[Boolean]): Future[String] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified.? === emailAddressVerified).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -52,7 +60,23 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findOrNoneEmailAddressById(id: String, emailAddressVerified: Option[Boolean]): Future[Option[String]] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified.? === emailAddressVerified).map(_.emailAddress).result.head.asTry).map {
+    case Success(result) => Option(result)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
   private def findMobileNumberById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.mobileNumber).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findAccountIDByEmailAddress(emailAddress: String): Future[String] = db.run(contactTable.filter(_.emailAddress === emailAddress).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -98,9 +122,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def checkEmailPresent(email:String, accountID:String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.emailAddress === email).exists.result)
+  private def checkByEmail(email: String): Future[Boolean] = db.run(contactTable.filter(_.emailAddress === email).exists.result)
 
-  private def checkMobilePresent(mobileNumber:String,accountID:String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.mobileNumber === mobileNumber).exists.result)
+  private def checkByMobileNumber(mobileNumber: String): Future[Boolean] = db.run(contactTable.filter(_.mobileNumber === mobileNumber).exists.result)
 
   private def getAllEmailIDsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).map(_.emailAddress).result)
 
@@ -136,7 +160,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Future[Option[Contact]] = findById(id)
+    def get(id: String): Future[Option[Contact]] = findById(id)
+
+    def getOrNoneContactByEmail(email: String): Future[Option[Contact]] = findByEmailAddress(email)
 
     def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] = upsert(Contact(id, mobileNumber, mobileNumberVerified = false, emailAddress, emailAddressVerified = false)).map { value => if (value > 0) true else false }
 
@@ -146,13 +172,18 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getVerifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(true))
 
+    def getOrNoneVerifiedEmailAddress(id: String): Future[Option[String]] = findOrNoneEmailAddressById(id = id, emailAddressVerified = Option(true))
+
     def getUnverifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(false))
 
     def getMobileNumber(id: String): Future[String] = findMobileNumberById(id)
 
-    def emailPresent(email:String, accountID:String): Future[Boolean]=checkEmailPresent(email,accountID)
+    def emailPresent(emailAddress: String): Future[Boolean] = checkByEmail(emailAddress)
 
-    def mobileNumberPresent(mobileNumber: String,accountID:String): Future[Boolean]= checkMobilePresent(mobileNumber,accountID)
+    def mobileNumberPresent(mobileNumber: String): Future[Boolean] = checkByMobileNumber(mobileNumber)
+
+    def getAccountIDByEmailAddress(emailAddress: String): Future[String] = findAccountIDByEmailAddress(emailAddress)
+
   }
 
 }

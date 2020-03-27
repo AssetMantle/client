@@ -1,9 +1,19 @@
-@()(title: Html = Html(""))(content: Html = Html(""))
-    <div class="cmuk-card cmuk-card-default">
-        <div class="cmuk-card-header cmuk-flex" style="align-items: center ; justify-content: space-between;">
-            @title
+@import controllers.Assets.Asset
+
+@(title: String, arguments: (Symbol, Any)*)(headerContent: Html = Html(""))(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
+
+<div class="cmuk-card cmuk-card-default">
+    <div class="cmuk-card-header cmuk-flex" style="align-items: center ;
+        justify-content: space-between;">
+        <div>
+            @if(arguments.toMap.get('cardIconPath).map(_.toString).isDefined) {
+                <span><img src='@routes.Assets.versioned(Asset(arguments.toMap.get('cardIconPath).map(_.toString).getOrElse("")))'></span>
+            }
+            <span class="headerFontSize cmuk-text-bold">@Messages(title)</span>
         </div>
-        <div class="cmuk-card-body">
-            @content
-        </div>
+        @headerContent
     </div>
+    <div class="cmuk-card-body cmuk-height-medium cmuk-overflow-auto">
+        @content
+    </div>
+</div>

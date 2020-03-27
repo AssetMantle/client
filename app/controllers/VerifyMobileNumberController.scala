@@ -47,7 +47,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
           val verifyOTP = smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
           val verifyMobileNumber = masterContacts.Service.verifyMobileNumber(loginState.username)
 
-          def contact: Future[Contact] = masterContacts.Service.getContact(loginState.username).map { contactVal => contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+          def contact: Future[Contact] = masterContacts.Service.get(loginState.username).map { contactVal => contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
           def updateStatus(contact: Contact): Future[Int] = {
             if (contact.emailAddressVerified && contact.mobileNumberVerified) {

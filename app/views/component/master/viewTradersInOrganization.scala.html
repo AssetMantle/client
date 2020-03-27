@@ -9,23 +9,11 @@
         }
     @for(trader <- traders) {
         <div>
-        @commonCard() {
-            @trader.id
+        @commonCard(trader.id) {
         } {
-            <div>
-                <div class="cmuk-flex infoRow">
-                    <div class="infoRowLabel red">@Messages(constants.Form.ID)</div>
-                    <div class="infoRowValue"> @trader.id </div>
-                </div>
-                <div class="cmuk-flex infoRow">
-                    <div class="infoRowLabel red">@Messages(constants.Form.ACCOUNT_ID)</div>
-                    <div class="infoRowValue"> @trader.accountID </div>
-                </div>
-                <div class="cmuk-flex infoRow">
-                    <div class="infoRowLabel red">@Messages(constants.Form.NAME)</div>
-                    <div class="infoRowValue"> @trader.name </div>
-                </div>
-            </div>
+            @commonTextInfo(constants.Form.ID, trader.id)
+            @commonTextInfo(constants.Form.ACCOUNT_ID, trader.accountID)
+            @commonTextInfo(constants.Form.NAME, trader.name)
         }
         </div>
     }

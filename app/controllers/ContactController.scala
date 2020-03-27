@@ -22,9 +22,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
 
-  def updateContactForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateContactForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.getContact(loginState.username)
+      val contact = masterContacts.Service.get(loginState.username)
 
       (for {
         contact <- contact
@@ -39,7 +39,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateContact(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
@@ -47,9 +47,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         updateContactData => {
 
-          val emailPresent = masterContacts.Service.emailPresent(updateContactData.emailAddress, loginState.username)
+          val emailPresent = masterContacts.Service.emailPresent(updateContactData.emailAddress)
 
-          val mobilePresent = masterContacts.Service.mobileNumberPresent(updateContactData.countryCode + updateContactData.mobileNumber, loginState.username)
+          val mobilePresent = masterContacts.Service.mobileNumberPresent(updateContactData.countryCode + updateContactData.mobileNumber)
 
           def getResult(emailPresent: Boolean, mobilePresent: Boolean) = {
             if (mobilePresent && emailPresent) {
@@ -88,7 +88,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.getContact(loginState.username)
+      val contact = masterContacts.Service.get(loginState.username)
       (for {
         contact <- contact
       } yield Ok(views.html.component.master.contact(contact))

@@ -12,7 +12,7 @@ object SignUp {
       constants.FormField.MNEMONIC.name -> constants.FormField.MNEMONIC.field,
       constants.FormField.SIGNUP_PASSWORD.name -> constants.FormField.SIGNUP_PASSWORD.field,
       constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> constants.FormField.SIGNUP_CONFIRM_PASSWORD.field
-    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpCheckConstraint))
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpConstraint))
 
   case class Data(username: String, usernameAvailable: Boolean,mnemonic:String, password: String, confirmPassword: String)
 

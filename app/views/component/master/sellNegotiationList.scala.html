@@ -6,10 +6,7 @@
     <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
 @for(negotiation <- sellNegotiations) {
     <div>
-    @commonCard() {
-        <div>
-            <span class="headerFontSize cmuk-text-bold">@negotiation.assetPegHash</span>
-        </div>
+    @commonCard(negotiation.assetPegHash) {
     } {
         <div>
             <div class="leftText">

@@ -1,0 +1,56 @@
+@import play.api.routing.JavaScriptReverseRoute
+@import scala.collection.immutable.ListMap
+
+@(items: ListMap[String, Any], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div>
+    <ul class="cmuk-subnav cmuk-subnav-pill" cmuk-switcher="animation: cmuk-animation-fade">
+        @for((itemHeader, itemValue) <- items) {
+            @itemValue match {
+                case html: Html => {
+                    <li><a href="#">@Messages(itemHeader)</a></li>
+                }
+                case route: JavaScriptReverseRoute => {
+                    @defining(utilities.String.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
+                        <li><a href="#" onclick="componentResource('switcher@itemHeader', @jsRoute)">@Messages(itemHeader)</a></li>
+                    }
+                }
+                case _ => {
+                    <li><a href="#">@Messages(itemHeader)</a></li>
+                }
+            }
+        }
+    </ul>
+    <ul class="cmuk-switcher cmuk-margin">
+        @for((itemHeader, itemValue) <- items) {
+            @itemValue match {
+                case html: Html => {
+                    <li id="switcher@itemHeader">@itemValue</li>
+                }
+                case route: JavaScriptReverseRoute => {
+                    <li id="switcher@itemHeader">
+                    @defining(utilities.String.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
+                        <script>
+                                componentResource('switcher@itemHeader', @jsRoute)
+                        </script>
+                    }
+                    </li>
+                }
+                case _ => {
+                    <li id="switcher@itemHeader">@itemValue.toString</li>
+                }
+            }
+        }
+    </ul>
+</div>
+
+@*Example Usage: @commonHorizontalSwitcher(
+                                ListMap(
+                                    "HEADER_1" -> views.html.component.master.scalaTemplate("parameters"),
+                                    "HEADER_2" -> routes.javascript.Controller.methodName,
+                                    "HEADER_3" -> routes.javascript.Controller.methodNameRequiringParameters),
+                                'HEADER_3_PARAMETERS -> "'StringParameter', 123")
+
+If you don't want to use Html or jsRoutes, and rather fill the details like on certain event in javascript, give the Header key and leave its value to be empty string,
+use the id "switcherYour_header_value" to fill the content. But this is not preferable, always use scala template or jsRoutes.
+*@

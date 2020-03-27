@@ -3,15 +3,12 @@
 @(coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <div class="cmuk-margin-bottom">
-   @commonCard() {
-       <div>
-           <span class="headerFontSize cmuk-text-bold">@loginState.username</span>
-       </div>
+   @commonCard(loginState.username) {
    }{
        <div class="cmuk-grid-medium cmuk-grid cmuk-grid-match" cmuk-grid>
            <div class="cmuk-width-1-1@@s cmuk-width-1-3@@m">
                <div>
-               @component.master.profilePicture(profilePicture)
+               @views.html.profilePicture(profilePicture)
                </div>
            </div>
            <div class="cmuk-width-1-1 cmuk-width-expand@@m">

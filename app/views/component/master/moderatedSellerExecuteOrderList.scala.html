@@ -5,15 +5,12 @@
 
 @for(negotiation <- negotiationList) {
     <div>
-        @commonCard(){
-            <div>
-                <span class="headerFontSize cmuk-text-bold">@negotiation.assetPegHash</span>
-            </div>
+        @commonCard(negotiation.assetPegHash){
         }{
             <div>
                 <div class="leftText">
-                    <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @negotiation.assetPegHash <br>
-                    <span class="red">@Messages(constants.Form.TIME)</span>: @negotiation.time <br>
+                    @commonTextInfo(constants.Form.PEG_HASH, negotiation.assetPegHash)
+                    @commonTextInfo(constants.Form.TIME, constants.Form.TIME)
                 </div>
                 <div class="centerText">
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument('@negotiation.buyerAddress', '@negotiation.sellerAddress', '@negotiation.assetPegHash'));">@Messages(constants.Form.SELLER_EXECUTE_ORDER.legend)</button>

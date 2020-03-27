@@ -1,0 +1,40 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Organization
+@import models.master.Zone
+@import models.master.OrganizationKYC
+@import views.html.component.master.commonDocumentViewer
+
+@import views.html.component.master.streetAddress
+@(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+<div>
+    <span>@Messages(constants.Form.ZONE_DETAILS)</span><br>
+    @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
+    @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
+    @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+
+    <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span><br>
+    @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
+    @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+    @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
+    @commonTextInfo(constants.Form.ORGANIZATION_ID, organization.id)
+    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
+    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+
+    <span>@Messages(constants.View.REGISTERED_ADDRESS):</span><br>
+    @streetAddress(organization.registeredAddress)
+
+    <span>@Messages(constants.View.POSTAL_ADDRESS):</span><br>
+    @streetAddress(organization.postalAddress)
+
+    <span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span><br>
+    @for(organizationKYC <- organizationKYCs) {
+        @commonDocumentViewer(organizationKYC) {
+            @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+        } {
+            <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+        } {
+            @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
+        }
+    }
+</div>

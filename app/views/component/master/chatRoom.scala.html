@@ -3,8 +3,7 @@
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="chatContainer">
-@commonCard() {
-    <p>chat</p>
+@commonCard(constants.View.CHAT) {
 }{
     <div class="chat" title="You have chat with">
         <div class="chat_history">

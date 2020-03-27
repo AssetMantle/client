@@ -68,7 +68,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
       def getResult(accountKYC: Option[AccountKYC]) = documentType match {
-        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.identificationDocument(accountKYC, documentType))
+        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, documentType))
         case constants.File.BANK_ACCOUNT_DETAIL => withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       }
 
@@ -98,7 +98,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
       def getResult(accountKYC: Option[AccountKYC]) = documentType match {
-        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.identificationDocument(accountKYC, documentType))
+        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, documentType))
         case constants.File.BANK_ACCOUNT_DETAIL => withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       }
 
@@ -115,9 +115,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def getAccountKYCFile(fileName: String, documentType: String) = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName))
-      }.recover {
+      val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
+
+      (for {
+        checkFileNameExists <- checkFileNameExists
+      } yield if (checkFileNameExists) Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName)) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -171,7 +174,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderOrganizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
-      val userOrganizationID = masterOrganizations.Service.getID(loginState.username)
+      val userOrganizationID = masterOrganizations.Service.tryGetID(loginState.username)
       (for {
         traderOrganizationID <- traderOrganizationID
         userOrganizationID <- userOrganizationID
@@ -625,7 +628,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   //TODO Shall we check if exists?
   def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterOrganizations.Service.getID(loginState.username)
+      val id = masterOrganizations.Service.tryGetID(loginState.username)
 
       def fileName(id: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType)
 
@@ -641,7 +644,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   //TODO Shall we check if exists?
   def userAccessedTraderKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterTraders.Service.getID(loginState.username)
+      val id = masterTraders.Service.tryGetID(loginState.username)
 
       def fileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
 
@@ -707,8 +710,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def organizationAccessedFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userOrganizationID = masterOrganizations.Service.getID(loginState.username)
-      val traderOrganizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+      val userOrganizationID = masterOrganizations.Service.tryGetID(loginState.username)
+      val traderOrganizationID = masterTraders.Service.getOrganizationIDByAccountID(accountID)
       (for {
         userOrganizationID <- userOrganizationID
         traderOrganizationID <- traderOrganizationID
@@ -796,12 +799,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path: Future[String] = loginState.userType match {
         case constants.User.ZONE =>
-          val checkFileNameExistsZoneKYCs = masterZoneKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
+          val zoneID = masterZones.Service.getID(loginState.username)
+
+          def checkFileNameExistsZoneKYCs(zoneID: String): Future[Boolean] = masterZoneKYCs.Service.checkFileNameExists(id = zoneID, fileName = fileName)
+
           for {
-            checkFileNameExistsZoneKYCs <- checkFileNameExistsZoneKYCs
+            zoneID <- zoneID
+            checkFileNameExistsZoneKYCs <- checkFileNameExistsZoneKYCs(zoneID)
           } yield if (checkFileNameExistsZoneKYCs) fileResourceManager.getZoneKYCFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         case constants.User.ORGANIZATION =>
-          val organizationID = masterOrganizations.Service.getID(loginState.username)
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
           def checkFileNameExistsOrganizationKYCs(organizationID: String): Future[Boolean] = masterOrganizationKYCs.Service.checkFileNameExists(id = organizationID, fileName = fileName)
 
@@ -810,7 +817,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             checkFileNameExistsOrganizationKYCs <- checkFileNameExistsOrganizationKYCs(organizationID)
           } yield if (checkFileNameExistsOrganizationKYCs) fileResourceManager.getOrganizationKYCFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         case constants.User.TRADER =>
-          val traderID = masterTraders.Service.getID(loginState.username)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def checkFileNameExistsTraderKYCs(traderID: String): Future[Boolean] = masterTraderKYCs.Service.checkFileNameExists(id = traderID, fileName = fileName)
 

@@ -76,13 +76,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(traderTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-    }
-  }
+  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(traderTable.filter(_.accountID === accountID).map(_.id).result.headOption)
 
   private def getZoneIDOnAccountID(accountID: String): Future[String] = db.run(traderTable.filter(_.accountID === accountID).map(_.zoneID).result.head.asTry).map {
     case Success(result) => result
@@ -108,7 +102,25 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def getTraderNameByID(id: String): Future[String] = db.run(traderTable.filter(_.id === id).map(_.name).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = db.run(traderTable.filter(_.accountID === accountID).result.headOption)
+
   private def getVerificationStatusById(id: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.id === id).map(_.verificationStatus.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -133,6 +145,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   private def getVerifiedTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.verificationStatus === true).result)
 
   private def getTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).result)
+
+  private def getTradersByTraderIDs(traderIDs:Seq[String]): Future[Seq[Trader]] = db.run(traderTable.filter(_.id inSet traderIDs).result)
 
   private def checkOrganizationIDTraderIDExists(traderID: String, organizationID: String): Future[Boolean] = db.run(traderTable.filter(_.id === traderID).filter(_.organizationID === organizationID).exists.result)
 
@@ -202,15 +216,19 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
       } yield id.getOrElse(utilities.IDGenerator.hexadecimal)
     }
 
-    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+    def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
-    def get(id: String): Future[Trader] = findById(id)
+    def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
+
+    def tryGet(id: String): Future[Trader] = findById(id)
 
     def getByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
 
     def getZoneID(id: String): Future[String] = getZoneIDByID(id)
 
     def getOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
+
+    def getTraderName(id: String): Future[String] = getTraderNameByID(id)
 
     def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
@@ -234,11 +252,17 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusById(id).map(_.getOrElse(false))
 
+    def getVerificationStatusByAccountID(accountID: String): Future[Boolean] = findVerificationStatusByAccountID(accountID).map(_.getOrElse(false))
+
     def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
     def getTradersListInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByOrganizationID(organizationID)
 
     def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
+
+    def getOrNoneByAccountID(accountID: String): Future[Option[Trader]] = getTraderOrNoneByAccountID(accountID)
+
+    def getTraders(traderIDs:Seq[String])=getTradersByTraderIDs(traderIDs)
   }
 
 }

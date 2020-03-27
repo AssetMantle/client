@@ -54,6 +54,8 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def findOrNoneByID(id: String): Future[Option[ZoneSerialized]] = db.run(zoneTable.filter(_.id === id).result.headOption)
+
   private def findByAccountID(accountID: String): Future[ZoneSerialized] = db.run(zoneTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -162,6 +164,8 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def get(id: String): Future[Zone] = findById(id).map {
       _.deserialize
     }
+
+    def getOrNone(id: String): Future[Option[Zone]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
     def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
