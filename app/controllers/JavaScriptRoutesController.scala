@@ -50,6 +50,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.updateOrganizationKYCForm,
         routes.javascript.AddOrganizationController.updateOrganizationKYC,
 
+        routes.javascript.AddZoneController.inviteZoneForm,
         routes.javascript.AddZoneController.viewPendingVerifyZoneRequests,
         routes.javascript.AddZoneController.addZoneForm,
         routes.javascript.AddZoneController.userUploadOrUpdateZoneKYCView,

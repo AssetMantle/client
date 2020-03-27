@@ -14,6 +14,13 @@ class Notification(notificationType: String, sendEmail: Boolean, sendPushNotific
 
 object Notification {
 
+  private val EMAIL_PREFIX = "EMAIL"
+  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
+  private val SMS_PREFIX = "SMS"
+  private val SUBJECT_SUFFIX = "SUBJECT"
+  private val MESSAGE_SUFFIX = "MESSAGE"
+  private val TITLE_SUFFIX = "TITLE"
+
   val LOGIN = new Notification(notificationType = "LOGIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val VERIFY_PHONE = new Notification(notificationType = "VERIFY_PHONE", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val VERIFY_EMAIL = new Notification(notificationType = "VERIFY_EMAIL", sendEmail = true, sendPushNotification = false, sendSMS = false)
@@ -24,6 +31,10 @@ object Notification {
   //inviteTrader
   val ORGANIZATION_TRADER_INVITATION = new Notification(notificationType = "ORGANIZATION_TRADER_INVITATION", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SEND_TRADER_INVITATION = new Notification(notificationType = "SEND_TRADER_INVITATION", sendEmail = true, sendPushNotification = false, sendSMS = false)
+
+  //inviteZone
+  val GENESIS_NOTIFY_ZONE_INVITATION_SENT = new Notification(notificationType = "GENESIS_NOTIFY_ZONE_INVITATION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SEND_ZONE_INVITATION = new Notification(notificationType = "SEND_ZONE_INVITATION", sendEmail = true, sendPushNotification = false, sendSMS = false)
 
   //traderRelationRequest
   val TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
@@ -48,12 +59,6 @@ object Notification {
   val FORGOT_PASSWORD_OTP = new Notification(notificationType = "FORGOT_PASSWORD_OTP", sendEmail = true, sendPushNotification = false, sendSMS = false)
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  private val EMAIL_PREFIX = "EMAIL"
-  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
-  private val SMS_PREFIX = "SMS"
-  private val SUBJECT_SUFFIX = "SUBJECT"
-  private val MESSAGE_SUFFIX = "MESSAGE"
-  private val TITLE_SUFFIX = "TITLE"
 
   class SMS(private val notificationType: String) {
     val message: String = Seq(SMS_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")

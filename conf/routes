@@ -143,6 +143,10 @@ GET         /component/traderSubscriptionDetails                            cont
 GET         /component/organizationViewTradeStatistics                      controllers.ComponentViewController.organizationViewTradeStatistics
 GET         /component/traderViewTradeStatistics                            controllers.ComponentViewController.traderViewTradeStatistics
 
+GET         /zone/inviteZone                                                controllers.AddZoneController.inviteZoneForm
+POST        /zone/inviteZone                                                controllers.AddZoneController.inviteZone
+GET         /zone/acceptInvitation                                          controllers.AddZoneController.acceptInvitation(token: String)
+
 GET         /master/component/organizationViewTrader                        controllers.ComponentViewController.organizationViewTrader(traderID: String)
 
 GET         /master/component/releaseAssetList                              controllers.ReleaseAssetController.releaseAssetList

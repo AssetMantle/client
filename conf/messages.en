@@ -194,10 +194,10 @@ EMAIL.LOGIN.SUBJECT = New Login
 EMAIL.LOGIN.MESSAGE = You have logged in {0}
 EMAIL.VERIFY_EMAIL.SUBJECT = Verify Email
 EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP is {0}
-EMAIL.TRADER_INVITATION.SUBJECT = Invitation to become Trader.
-EMAIL.TRADER_INVITATION.MESSAGE = Hi,\
+EMAIL.SEND_TRADER_INVITATION.SUBJECT = Invitation to become Trader.
+EMAIL.SEND_TRADER_INVITATION.MESSAGE = Hi {0},\
   You have been invited to be a part of Comdex by Organization: {1}.\
-  Please use this id:{0} to add as Trader for this organization. Click on "<a href="192.168.0.147">Comdex</a>.
+  Please use this id:{2} to add as Trader for this organization. Click on <a href="http://192.168.0.147">Comdex</a>.
 
 LATEST_BLOCK_HEIGHT=Latest block height
 AVERAGE_BLOCK_TIME=Average block time
@@ -364,3 +364,6 @@ RELATIONSHIP=Relationship
 TITLE=Title
 RESPONSE.FAILURE.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE=Total share percentage value for all UBOs exceeds 100%
 RESPONSE.SUCCESS.UBO_DELETED=UBO successfully deleted
+EMAIL.SEND_ZONE_INVITATION.SUBJECT = Invitation to become Zone.
+EMAIL.SEND_ZONE_INVITATION.MESSAGE = Hi,\
+  Please go to this <a href="http://localhost:9000/zone/acceptInvitation?token={0}">link</a>.

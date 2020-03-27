@@ -61,9 +61,9 @@ class SetACLController @Inject()(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.inviteTrader(formWithErrors)))
         },
-        addTraderRequestData => {
+        inviteTraderData => {
 
-          val contact: Future[Option[Contact]] = masterContacts.Service.getOrNoneContactByEmail(addTraderRequestData.emailAddress)
+          val contact: Future[Option[Contact]] = masterContacts.Service.getOrNoneContactByEmail(inviteTraderData.emailAddress)
 
           def inviteeUserType(contact: Option[Contact]): Future[String] = if (contact.isDefined) {
             masterAccounts.Service.getUserType(contact.get.id)
@@ -78,11 +78,11 @@ class SetACLController @Inject()(
 
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
-              def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = addTraderRequestData.emailAddress)
+              def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
               def sendEmailNotificationsAndGetResult(organization: Organization): Future[Result] = {
                 utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, organization.name, organization.id)
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, inviteTraderData.name, organization.name, organization.id)
                 withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 
