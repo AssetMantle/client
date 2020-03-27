@@ -102,7 +102,7 @@ class TraderController @Inject()(
             utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
             utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
             utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
-            withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFUL)))
+            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFUL)))
           }
 
           (for {
@@ -113,7 +113,7 @@ class TraderController @Inject()(
             toTraderOrganization <- getOrganization(toTrader.organizationID)
             result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -125,7 +125,7 @@ class TraderController @Inject()(
       (for {
         traderRelation <- traderRelation
       } yield Ok(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -178,7 +178,7 @@ class TraderController @Inject()(
             toTraderOrganization <- getOrganization(toTrader.organizationID)
             result <- sendNotificationsAndGetResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization, traderRelation = traderRelation)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )

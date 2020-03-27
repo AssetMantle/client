@@ -5,12 +5,40 @@
 
 @common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
+@left = {
 
 }
 
 @center = {
+    @loginState.userType match {
+        case constants.User.ZONE => {}
+        case constants.User.ORGANIZATION => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
+                <div class="cmuk-width-expand@@m">
+                    <div id="organizationViewTradeStatistics"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('organizationViewTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationViewTradeStatistics());
+            </script>
+        }
+        case constants.User.TRADER => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderViewTradeStatistics"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('traderViewTradeStatistics', jsRoutes.controllers.ComponentViewController.traderViewTradeStatistics());
+            </script>
+        }
+        case constants.User.USER => {}
+        case _ => {}
+    }
 }
 
 @right = {

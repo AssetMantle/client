@@ -137,6 +137,12 @@ GET         /component/zoneViewPendingOrganizationRequest                   cont
 GET         /component/zoneViewRejectedOrganizationRequestsList             controllers.ComponentViewController.zoneViewRejectedOrganizationRequestsList
 GET         /component/zoneViewRejectedOrganizationRequest                  controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
 
+GET         /component/organizationSubscriptionDetails                      controllers.ComponentViewController.organizationSubscriptionDetails
+GET         /component/traderSubscriptionDetails                            controllers.ComponentViewController.traderSubscriptionDetails
+
+GET         /component/organizationViewTradeStatistics                      controllers.ComponentViewController.organizationViewTradeStatistics
+GET         /component/traderViewTradeStatistics                            controllers.ComponentViewController.traderViewTradeStatistics
+
 GET         /master/component/organizationViewTrader                        controllers.ComponentViewController.organizationViewTrader(traderID: String)
 
 GET         /master/component/releaseAssetList                              controllers.ReleaseAssetController.releaseAssetList

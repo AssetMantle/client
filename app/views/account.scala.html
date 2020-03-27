@@ -39,8 +39,16 @@
                 </div>
 
             </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="organizationSubscriptionDetails"></div>
+                </div>
+
+            </div>
             <script>
                     componentResource('organizationViewTraderAccountsList', jsRoutes.controllers.ComponentViewController.organizationViewTraderAccountsList());
+                    componentResource('organizationSubscriptionDetails', jsRoutes.controllers.ComponentViewController.organizationSubscriptionDetails());
             </script>
         }
         case constants.User.TRADER => {
@@ -51,8 +59,16 @@
                 </div>
 
             </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderSubscriptionDetails"></div>
+                </div>
+
+            </div>
             <script>
                     componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
+                    componentResource('traderSubscriptionDetails', jsRoutes.controllers.ComponentViewController.traderSubscriptionDetails());
             </script>
         }
         case constants.User.USER => {

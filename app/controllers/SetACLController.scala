@@ -566,14 +566,14 @@ class SetACLController @Inject()(
   }
 
   def zoneRejectVerifyTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneRejectVerifyTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
+    Ok(views.html.component.master.zoneRejectVerifyTraderRequest(views.companion.master.RejectTraderRequest.form, traderID))
   }
 
   def zoneRejectVerifyTraderRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.zoneRejectVerifyTraderRequest(formWithErrors)))
+          Future(BadRequest(views.html.component.master.zoneRejectVerifyTraderRequest(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
         },
         rejectVerifyTraderRequestData => {
           val rejectTrader = masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)

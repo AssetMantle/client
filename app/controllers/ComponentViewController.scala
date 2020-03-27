@@ -463,7 +463,6 @@ class ComponentViewController @Inject()(
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
 
-
       def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
@@ -627,6 +626,16 @@ class ComponentViewController @Inject()(
         ).recover {
         case _: BaseException => InternalServerError(views.html.account())
       }
+  }
+
+  def organizationSubscriptionDetails(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationSubscriptionDetails()))
+  }
+
+  def traderSubscriptionDetails(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.traderSubscriptionDetails()))
   }
 
   def organizationViewTrader(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -944,6 +953,19 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
+  }
+
+
+  //Dashboard Cards
+
+  def organizationViewTradeStatistics(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationViewTradeStatistics()))
+  }
+
+  def traderViewTradeStatistics(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.traderViewTradeStatistics()))
   }
 
 }
