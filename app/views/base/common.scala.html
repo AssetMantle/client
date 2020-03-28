@@ -113,8 +113,8 @@
                             </li>
                             <li>
                                 <a href="@controllers.routes.ViewController.profile()">
-                                    <span cmuk-icon="user"></span>
                                     @loginState.username
+                                <span cmuk-icon="user" class="loginIcon"></span>
                                 </a>
                             </li>
                             <li>
@@ -274,7 +274,6 @@
                         <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.Form.FOOTER_LOGO)"/>
                     </div>
                 </div>
-                <hr>
                 <div class="copyright">
                             &copy;
                     <script>document.write(new Date().getFullYear())</script>

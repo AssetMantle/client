@@ -67,7 +67,7 @@
           padding: 10px 0;
           .wallet {
           .cmuk-comment-meta, .ctitle {
-            font-size: 1.5rem;
+            font-size:$paragraphFontSizeSmall;
           }
         }
       }
@@ -116,6 +116,16 @@
   }
   .timeline{
     margin: 20px 0px;
+  }
+  .switcherViewCard {
+    .cmuk-subnav li a {
+      padding: 11px;
+    }
+  }
+  .comdex {
+    .cmuk-height-medium{
+      height: 210px;
+    }
   }
 }
 @media (min-width:1600px){

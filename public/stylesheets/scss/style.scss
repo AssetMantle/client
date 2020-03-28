@@ -98,10 +98,12 @@ html, body{
   }
   .cmuk-input {
     border: 1px solid rgba(5, 60, 117, 0.22);
-
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
     &::placeholder {
-      color: #272829;
+      color: #848A91;
       font-size: $paragraphFontSizeSmall;
+      font-family: $fontFamilySecondary;
     }
 
     &:focus {
@@ -144,6 +146,12 @@ html, body{
   .secondaryFont{
     font-family:$fontFamilySecondary;
   }
+  .cmuk-alert{
+    p{
+      font-family: $fontFamilySecondary;
+      font-size: $paragraphFontSizeSmall;
+    }
+  }
 }
 .header {
   background: $colorSecondary;
@@ -183,6 +191,13 @@ html, body{
         padding-right: 0px;;
       }
     }
+    .loginIcon{
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin: 0px 5px 5px;
+      padding: 3px;
+    }
   }
   .cmuk-navbar-nav>li>a{
     padding:0px 20px;
@@ -191,11 +206,16 @@ html, body{
     font-size:$paragraphFontSizeSmall;
     box-sizing: border-box;
   }
+  .dashboardIcon .icon{
+    width: 16px;
+    height: 13px;
+  }
   .icon {
     width: 17px;
     height: 15px;
     fill:#FFFFFF;
     margin-right: 5px;
+    marign-bottom: 2px;
   }
   .cmuk-navbar-nav>li:hover>a, .cmuk-navbar-nav>li>a.cmuk-open, .cmuk-navbar-nav>li>a:focus{
     color: #FFFFFF;
@@ -212,7 +232,7 @@ html, body{
 .left{
   height: 30px;
   align-items: center;
-  padding: 15px 0px;
+  padding:0px 0px 15px 0px;
   word-break: break-all;
   justify-content: space-between;
   .backIcon{
@@ -252,7 +272,7 @@ margin-right: -5px;
 }
 .notifications{
   width: 600px;
-  min-height: 60px;
+  min-height: 45px;
   display: flex;
   align-items: center;
   .cmuk-alert{
@@ -266,7 +286,7 @@ margin-right: -5px;
   }
 }
 .right{
-  padding: 15px 0px;
+  padding:0px 0px  15px 0px;
   height: 30px;
   justify-content: flex-end;
   .refresh {
@@ -311,12 +331,13 @@ margin-right: -5px;
 }
 
 .pageContainer{
-  .leftSide{
-    margin-bottom: 5px;
+  .pageContent{
     padding-top: 10px;
   }
+  .leftSide{
+    margin-bottom: 5px;
+  }
   .middle{
-    padding-top: 10px;
     .cmuk-card-default{
       background: #FAFAFA;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -428,24 +449,13 @@ margin-right: -5px;
               font-family: $fontFamilySecondary;
               font-size: $paragraphFontSizeSmall;
               font-weight: bold;
+              text-transform: uppercase;
             }
             .termValue{
               color: #061728;
               font-family: $fontFamilySecondary;
               font-size: $paragraphFontSizeMedium;
               margin-right: 10px;
-            }
-            .termAction{
-              .cmuk-checkbox{
-                height: 20px;
-                width: 20px;
-              }
-              .cmuk-checkbox:focus, .cmuk-radio:focus{
-                border-color: #5EB55C;
-              }
-              .cmuk-checkbox:checked, .cmuk-checkbox:indeterminate, .cmuk-radio:checked{
-                background-color: #5EB55C;
-              }
             }
             .creditTerms{
               text-indent: 40px;
@@ -460,9 +470,25 @@ margin-right: -5px;
             }
             .termStatus{
               display: flex;
+              align-items: center;
+              font-family: $fontFamilySecondary;
+              color:#061728;
               .commonCheckBox dt{
                 width: auto;
                 display: none;
+              }
+              .commonCheckBox dl{
+                margin-bottom: 0px;
+              }
+              .cmuk-checkbox{
+                height: 20px;
+                width: 20px;
+              }
+              .cmuk-checkbox:focus, .cmuk-radio:focus{
+                border-color: #5EB55C;
+              }
+              .cmuk-checkbox:checked, .cmuk-checkbox:indeterminate, .cmuk-radio:checked{
+                background-color: #5EB55C;
               }
             }
 
@@ -478,7 +504,6 @@ margin-right: -5px;
   .rightSide{
     margin-left: 1%;
     margin-bottom: 5px;
-    padding-top: 10px;
   }
 }
 
@@ -506,6 +531,7 @@ margin-right: -5px;
       padding: 10px 0px 10px 0px;
       margin: 0px 15px;
       color: #848A91;
+      font-family: $fontFamilySecondary;
       font-size: $paragraphFontSizeSmall;
       .refreshIcon{
         .icon{
@@ -1135,6 +1161,9 @@ header:before,
       white-space: nowrap;
       max-width:120px;
     }
+    .listItemButton{
+      margin-bottom: 0px;
+    }
     button{
         a, a:hover{
           text-decoration: none;
@@ -1271,6 +1300,11 @@ header:before,
         font-size: $paragraphFontSizeSmall;
       }
     }
+  }
+}
+.traderRelationList{
+  .cmuk-card-header{
+    padding: 18px 20px;
   }
 }
 .organizationDetails, .organizationUbos{

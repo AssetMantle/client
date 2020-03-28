@@ -69,11 +69,11 @@
   height:auto;
   min-height: 100%;
   background: #F0F0F0;
-  margin: 0 auto -165px;
+  margin: 0 auto -135px;
 }
 
 .pageContainer{
-  padding-bottom: 165px;
+  padding-bottom: 135px;
 }
 .pageContainer,
 .dataContainer,
@@ -156,7 +156,7 @@
     }
     p {
       font-family: $fontFamilySecondary;
-      font-size: $paragraphFontSizeMedium;
+      font-size: $headingFontSizeSmall;
       line-height: 172%;
       letter-spacing: 0.01em;
       color: #627F9F;
@@ -1244,7 +1244,7 @@ input:checked+.slider {
 }
 .mobileNumberUpdate {
   .countryCode {
-    margin-top: 19px;
+    margin-top: 24px;
     width: 80px;
     margin-right: 10px;
   }

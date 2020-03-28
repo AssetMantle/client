@@ -37,8 +37,8 @@
         <div class="cmuk-card cmuk-card-default">
             <div class="cmuk-card-header">
                 <ul cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
-                    <li class="cmuk-active first"><a href="#">Terms View</a></li>
-                    <li class="docViewList"><a href="#">Docs View</a></li>
+                    <li class="cmuk-active first"><a href="#">@Messages(constants.View.TERMS_VIEW)</a></li>
+                    <li class="docViewList"><a href="#">@Messages(constants.View.DOCS_VIEW)</a></li>
                 </ul>
             </div>
             <div class="cmuk-card-body">
@@ -59,8 +59,9 @@
 
 @right={
     <div class="right cmuk-flex">
-        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>Amend</button>
-        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>Refresh</button>
+        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>@Messages(constants.View.AMEND)</button>
+        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>
+            @Messages(constants.View.REFRESH)</button>
         <div class="cmuk-flex live">
             <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>

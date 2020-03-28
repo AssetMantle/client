@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
+@import scala.collection.immutable.ListMap
 
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -7,9 +8,9 @@
         @commonCard(constants.View.TRADER_RELATION_LIST) {
         <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.TraderController.traderRelationRequestForm())">@Messages(constants.Form.TRADER_RELATION_REQUEST.legend)</button>
     } {
-        @commonHorizontalSwitcher(jsRouteItems = Map(constants.User.TRADER -> routes.javascript.ComponentViewController.acceptedTraderRelationList,
-            constants.View.PENDING_RELATION_REQUESTS -> routes.javascript.ComponentViewController.pendingTraderRelationList,
-        ))
+        @commonHorizontalSwitcher(ListMap(constants.User.TRADER -> routes.javascript.ComponentViewController.acceptedTraderRelationList,
+            constants.View.PENDING_RELATION_REQUESTS -> routes.javascript.ComponentViewController.pendingTraderRelationList)
+        )
     }
 </div>
 

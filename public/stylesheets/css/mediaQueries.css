@@ -40,7 +40,7 @@
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
     .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .wallet .ctitle {
-      font-size: 1.5rem; }
+      font-size: 12px; }
   .leftTradeFinancial .addBalanceButton {
     text-transform: capitalize;
     font-family: "Rubik", sans-serif;
@@ -70,7 +70,13 @@
       height: 190px; }
 
   .timeline {
-    margin: 20px 0px; } }
+    margin: 20px 0px; }
+
+  .switcherViewCard .cmuk-subnav li a {
+    padding: 11px; }
+
+  .comdex .cmuk-height-medium {
+    height: 210px; } }
 @media (min-width: 1600px) {
   .leftTradeFinancial .financial ul li {
     padding: 20px 0; } }

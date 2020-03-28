@@ -40,7 +40,7 @@
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
     .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .wallet .ctitle {
-      font-size: 1.5rem; }
+      font-size: 12px; }
   .leftTradeFinancial .addBalanceButton {
     text-transform: capitalize;
     font-family: "Rubik", sans-serif;
@@ -70,7 +70,13 @@
       height: 190px; }
 
   .timeline {
-    margin: 20px 0px; } }
+    margin: 20px 0px; }
+
+  .switcherViewCard .cmuk-subnav li a {
+    padding: 11px; }
+
+  .comdex .cmuk-height-medium {
+    height: 210px; } }
 @media (min-width: 1600px) {
   .leftTradeFinancial .financial ul li {
     padding: 20px 0; } }
@@ -168,10 +174,13 @@ html, body {
   font-size: 12px;
   font-family: "Oxygen", sans-serif; }
 .comdex .cmuk-input {
-  border: 1px solid rgba(5, 60, 117, 0.22); }
+  border: 1px solid rgba(5, 60, 117, 0.22);
+  font-size: 12px;
+  font-family: "Oxygen", sans-serif; }
   .comdex .cmuk-input::placeholder {
-    color: #272829;
-    font-size: 12px; }
+    color: #848A91;
+    font-size: 12px;
+    font-family: "Oxygen", sans-serif; }
   .comdex .cmuk-input:focus {
     border: 1px solid rgba(5, 60, 117, 0.22); }
 .comdex input:-webkit-autofill,
@@ -198,6 +207,9 @@ html, body {
   font-family: "Rubik", sans-serif; }
 .comdex .secondaryFont {
   font-family: "Oxygen", sans-serif; }
+.comdex .cmuk-alert p {
+  font-family: "Oxygen", sans-serif;
+  font-size: 12px; }
 
 .header {
   background: #053C75; }
@@ -225,17 +237,27 @@ html, body {
     line-height: 30px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav li:last-child a {
     padding-right: 0px; }
+  .header .cmuk-navbar-right .loginIcon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0px 5px 5px;
+    padding: 3px; }
   .header .cmuk-navbar-nav > li > a {
     padding: 0px 20px;
     font-weight: bold;
     color: #FFFFFF;
     font-size: 12px;
     box-sizing: border-box; }
+  .header .dashboardIcon .icon {
+    width: 16px;
+    height: 13px; }
   .header .icon {
     width: 17px;
     height: 15px;
     fill: #FFFFFF;
-    margin-right: 5px; }
+    margin-right: 5px;
+    marign-bottom: 2px; }
   .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {
     color: #FFFFFF; }
   .header .cmuk-navbar-nav > li > a.active {
@@ -248,7 +270,7 @@ html, body {
 .left {
   height: 30px;
   align-items: center;
-  padding: 15px 0px;
+  padding: 0px 0px 15px 0px;
   word-break: break-all;
   justify-content: space-between; }
   .left .backIcon {
@@ -282,7 +304,7 @@ html, body {
 
 .notifications {
   width: 600px;
-  min-height: 60px;
+  min-height: 45px;
   display: flex;
   align-items: center; }
   .notifications .cmuk-alert {
@@ -294,7 +316,7 @@ html, body {
     top: 15px; }
 
 .right {
-  padding: 15px 0px;
+  padding: 0px 0px  15px 0px;
   height: 30px;
   justify-content: flex-end; }
   .right .refresh {
@@ -331,130 +353,134 @@ html, body {
     border-radius: 50%;
     box-shadow: 0 0 0 5px #A1ED9F; }
 
+.pageContainer .pageContent {
+  padding-top: 10px; }
 .pageContainer .leftSide {
-  margin-bottom: 5px;
-  padding-top: 10px; }
-.pageContainer .middle {
-  padding-top: 10px; }
-  .pageContainer .middle .cmuk-card-default {
-    background: #FAFAFA;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 3px; }
-  .pageContainer .middle .mainTabs .cmuk-card-header {
-    padding: 0px; }
-    .pageContainer .middle .mainTabs .cmuk-card-header ul {
-      margin: 0px; }
-    .pageContainer .middle .mainTabs .cmuk-card-header ul li {
-      padding: 0px;
-      width: 49%; }
-      .pageContainer .middle .mainTabs .cmuk-card-header ul li:first-child {
-        border-right: 1px solid #cccccc; }
-      .pageContainer .middle .mainTabs .cmuk-card-header ul li a {
-        padding: 15px 0px;
-        font-family: "Oxygen", sans-serif;
-        text-transform: capitalize;
-        font-size: 14px; }
-    .pageContainer .middle .mainTabs .cmuk-card-header .cmuk-tab::before {
-      border: none; }
-    .pageContainer .middle .mainTabs .cmuk-card-header .cmuk-tab > .cmuk-active > a {
+  margin-bottom: 5px; }
+.pageContainer .middle .cmuk-card-default {
+  background: #FAFAFA;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 3px; }
+.pageContainer .middle .mainTabs .cmuk-card-header {
+  padding: 0px; }
+  .pageContainer .middle .mainTabs .cmuk-card-header ul {
+    margin: 0px; }
+  .pageContainer .middle .mainTabs .cmuk-card-header ul li {
+    padding: 0px;
+    width: 49%; }
+    .pageContainer .middle .mainTabs .cmuk-card-header ul li:first-child {
+      border-right: 1px solid #cccccc; }
+    .pageContainer .middle .mainTabs .cmuk-card-header ul li a {
+      padding: 15px 0px;
       font-family: "Oxygen", sans-serif;
-      color: #061728;
-      font-weight: bold;
-      border-bottom: 2px solid #0862BE; }
-  .pageContainer .middle .mainTabs .cmuk-card-body {
-    padding: 15px 30px; }
-  .pageContainer .middle .mainTabs .docViewList a {
-    margin-right: -11px; }
-  .pageContainer .middle .mainTabs .tradeTerms .traderCommodity {
-    display: flex;
-    align-items: center; }
-    .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage {
-      width: 30px;
-      height: 30px;
-      display: inline-block;
-      background: #cccc;
-      position: relative;
-      border-radius: 50%;
-      margin-right: 15px; }
-      .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto; }
-    .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
-      color: #4B4B4B;
-      font-weight: bold;
-      font-family: "Oxygen", sans-serif;
+      text-transform: capitalize;
       font-size: 14px; }
-  .pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
-    justify-content: space-between;
-    border-bottom: 1px solid #E8E8E8;
-    padding: 25px 0px 15px 0px;
-    margin-bottom: 25px;
+  .pageContainer .middle .mainTabs .cmuk-card-header .cmuk-tab::before {
+    border: none; }
+  .pageContainer .middle .mainTabs .cmuk-card-header .cmuk-tab > .cmuk-active > a {
     font-family: "Oxygen", sans-serif;
-    color: #848A91;
+    color: #061728;
+    font-weight: bold;
+    border-bottom: 2px solid #0862BE; }
+.pageContainer .middle .mainTabs .cmuk-card-body {
+  padding: 15px 30px; }
+.pageContainer .middle .mainTabs .docViewList a {
+  margin-right: -11px; }
+.pageContainer .middle .mainTabs .tradeTerms .traderCommodity {
+  display: flex;
+  align-items: center; }
+  .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    background: #cccc;
+    position: relative;
+    border-radius: 50%;
+    margin-right: 15px; }
+    .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto; }
+  .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
+    color: #4B4B4B;
+    font-weight: bold;
+    font-family: "Oxygen", sans-serif;
+    font-size: 14px; }
+.pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
+  justify-content: space-between;
+  border-bottom: 1px solid #E8E8E8;
+  padding: 25px 0px 15px 0px;
+  margin-bottom: 25px;
+  font-family: "Oxygen", sans-serif;
+  color: #848A91;
+  font-size: 12px;
+  font-weight: bold; }
+.pageContainer .middle .mainTabs .tradeTerms .terms .term {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 10px;
+  background: #F8F9FC;
+  border: 1px solid #E2E4E6;
+  box-sizing: border-box;
+  border-radius: 3px;
+  margin: 10px 0px;
+  align-items: center; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
+    color: #859EB9;
+    font-family: "Oxygen", sans-serif;
+    font-size: 14px;
+    margin-right: 10px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
+    margin-right: 10px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon .icon {
+      width: 16px;
+      height: 16px;
+      margin-bottom: 3px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
+    color: #0862BE;
+    font-family: "Oxygen", sans-serif;
     font-size: 12px;
-    font-weight: bold; }
-  .pageContainer .middle .mainTabs .tradeTerms .terms .term {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 10px;
-    background: #F8F9FC;
-    border: 1px solid #E2E4E6;
-    box-sizing: border-box;
-    border-radius: 3px;
-    margin: 10px 0px;
-    align-items: center; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
-      color: #859EB9;
+    font-weight: bold;
+    text-transform: uppercase; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
+    color: #061728;
+    font-family: "Oxygen", sans-serif;
+    font-size: 14px;
+    margin-right: 10px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
+    text-indent: 40px;
+    margin-top: 5px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
       font-family: "Oxygen", sans-serif;
       font-size: 14px;
-      margin-right: 10px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
-      margin-right: 10px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon .icon {
-        width: 16px;
-        height: 16px;
-        margin-bottom: 3px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
-      color: #0862BE;
-      font-family: "Oxygen", sans-serif;
-      font-size: 12px;
-      font-weight: bold; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
       color: #061728;
-      font-family: "Oxygen", sans-serif;
-      font-size: 14px;
-      margin-right: 10px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termAction .cmuk-checkbox {
+      margin: 0px;
+      margin-bottom: 5px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
+    display: flex;
+    align-items: center;
+    font-family: "Oxygen", sans-serif;
+    color: #061728; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
+      width: auto;
+      display: none; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dl {
+      margin-bottom: 0px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox {
       height: 20px;
       width: 20px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termAction .cmuk-checkbox:focus, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termAction .cmuk-radio:focus {
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:focus, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:focus {
       border-color: #5EB55C; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termAction .cmuk-checkbox:checked, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termAction .cmuk-checkbox:indeterminate, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termAction .cmuk-radio:checked {
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:checked, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:indeterminate, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:checked {
       background-color: #5EB55C; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
-      text-indent: 40px;
-      margin-top: 5px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
-        font-family: "Oxygen", sans-serif;
-        font-size: 14px;
-        color: #061728;
-        margin: 0px;
-        margin-bottom: 5px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
-      display: flex; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
-        width: auto;
-        display: none; }
-  .pageContainer .middle .mainTabs .tradeTerms .terms hr {
-    margin: 15px 0px; }
+.pageContainer .middle .mainTabs .tradeTerms .terms hr {
+  margin: 15px 0px; }
 .pageContainer .rightSide {
   margin-left: 1%;
-  margin-bottom: 5px;
-  padding-top: 10px; }
+  margin-bottom: 5px; }
 
 .leftTradeFinancial .financial {
   margin-bottom: 20px; }
@@ -473,6 +499,7 @@ html, body {
     padding: 10px 0px 10px 0px;
     margin: 0px 15px;
     color: #848A91;
+    font-family: "Oxygen", sans-serif;
     font-size: 12px; }
     .leftTradeFinancial .cmuk-card-body .refresh .refreshIcon .icon {
       width: 12px;
@@ -961,6 +988,8 @@ header:before,
       text-overflow: ellipsis;
       white-space: nowrap;
       max-width: 120px; }
+    .commonList .listItemChild .listItemButton {
+      margin-bottom: 0px; }
     .commonList .listItemChild button a, .commonList .listItemChild button a:hover {
       text-decoration: none;
       color: #fff; }
@@ -1049,6 +1078,9 @@ header:before,
   font-family: "Oxygen", sans-serif; }
   .identificationDetails .cmuk-subnav li a, .traderRelationList .cmuk-subnav li a {
     font-size: 12px; }
+
+.traderRelationList .cmuk-card-header {
+  padding: 18px 20px; }
 
 .organizationDetails .cmuk-card-body .cmuk-card-default, .organizationUbos .cmuk-card-body .cmuk-card-default {
   margin-bottom: 5px; }
