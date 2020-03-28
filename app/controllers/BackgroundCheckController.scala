@@ -29,18 +29,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BackgroundCheckController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                          getTruliooAuthentication: GetTruliooAuthentication,
-                                          getTruliooCountryCodes: GetTruliooCountryCodes,
-                                          getTruliooEntities: GetTruliooEntities,
-                                          getTruliooConsents: GetTruliooConsents,
-                                          getTruliooDetailedConsents: GetTruliooDetailedConsents,
-                                          getTruliooDataSources: GetTruliooDataSources,
-                                          getTruliooFields: GetTruliooFields,
-                                          getTruliooRecommendedFields: GetTruliooRecommendedFields,
-                                          getTruliooTransactionRecords: GetTruliooTransactionRecords,
-                                          getTruliooCountrySubdivisions: GetTruliooCountrySubdivisions,
-                                          truliooVerify: TruliooVerify,
-                                            withLoginAction: WithLoginAction, masterTraderBackgroundChecks: master.TraderBackgroundChecks, masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterTransactionNegotiationRequests: masterTransaction.NegotiationRequests, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, fileResourceManager: utilities.FileResourceManager, withZoneLoginAction: WithZoneLoginAction, withUserLoginAction: WithUserLoginAction, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                          withLoginAction: WithLoginAction,
+                                          masterTraderBackgroundChecks: master.TraderBackgroundChecks,
+                                          masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks,
+                                          masterZones: master.Zones, masterOrganizations: master.Organizations,
+                                          masterTraders: master.Traders,
+                                          fileResourceManager: utilities.FileResourceManager,
+                                          withZoneLoginAction: WithZoneLoginAction,
+                                          withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
