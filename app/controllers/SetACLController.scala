@@ -302,18 +302,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
           def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
 
-          val identification = masterIdentifications.Service.get(loginState.username)
-
-          def consents(countryCode: String) = getTruliooConsents.Service.get(countryCode = countryCode)
-
-          def verify(countryCode: String, identification: Identification, consent: Seq[String]) = {
-            val calender = Calendar.getInstance
-            calender.setTime(identification.dateOfBirth)
-            truliooVerify.Service.post(truliooVerify.Request(true, false, "Identity Verification", consent, countryCode, truliooVerify.DataFields(truliooVerify.PersonInfo(identification.firstName, identification.lastName, calender.get(Calendar.DAY_OF_MONTH), calender.get(Calendar.MONTH), calender.get(Calendar.YEAR)), None, None, None)))
-          }
-
-          def addVerification(accountID: String, details: String) = traderBackgroundCheckDatas.Service.create(accountID, details)
-
           def getResult(trader: Trader, allKYCFileTypesExists: Boolean, traderOrganization: Organization): Future[Result] = {
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
@@ -354,10 +342,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             trader <- trader
             allKYCFileTypesExists <- allKYCFileTypesExists(trader.id)
             traderOrganization <- organization(trader.organizationID)
-            identification <- identification
-            consents <- consents(constants.Form.COUNTRY_CODES(traderOrganization.postalAddress.country.toUpperCase))
-            details <- verify(constants.Form.COUNTRY_CODES(traderOrganization.postalAddress.country.toUpperCase), identification, consents.body)
-            _ <- addVerification(loginState.username, details.body.toString)
             result <- getResult(trader, allKYCFileTypesExists, traderOrganization)
           } yield result
             ).recover {
