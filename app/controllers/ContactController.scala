@@ -83,9 +83,10 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             emailPresent <- emailPresent
             mobilePresent <- mobilePresent
             result <- getResult(emailPresent, mobilePresent)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTACT_UPDATED, loginState.username)
           } yield {
-            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.CONTACT_UPDATED, loginState.username)
-            result}
+            result
+          }
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

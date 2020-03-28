@@ -280,8 +280,8 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
               salesQuote <- salesQuote
               _ <- createTradeTerms(tradeRoomID, salesQuote)
               result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SALES_QUOTE_CREATED)))
+              _ <- utilitiesNotification.send(loginState.username, constants.Notification.SALES_QUOTE_CREATED, loginState.username)
             } yield {
-              utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.SALES_QUOTE_CREATED, loginState.username)
               result
             }
           } else {

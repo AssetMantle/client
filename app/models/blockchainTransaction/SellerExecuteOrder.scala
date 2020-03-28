@@ -190,7 +190,8 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
             for {
               _ <- markDirtyFromAddress
               id <- id
-            } yield utilitiesNotification.send(id, constants.Notification.SUCCESS, blockResponse.txhash)
+              _ <- utilitiesNotification.send(id, constants.Notification.SUCCESS, blockResponse.txhash)
+            } yield {}
           } else Future {
             Unit
           }
@@ -204,7 +205,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
         } yield {}
       }
 
-      def getIDs(sellerExecuteOrder: SellerExecuteOrder): Future[(String,String)] = {
+      def getIDs(sellerExecuteOrder: SellerExecuteOrder): Future[(String, String)] = {
         val sellerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.sellerAddress)
         val buyerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress)
         for {
@@ -219,10 +220,9 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
         negotiationID <- negotiationID(sellerExecuteOrder)
         _ <- markDirty(negotiationID, sellerExecuteOrder)
         (sellerAddressID, buyerAddressID) <- getIDs(sellerExecuteOrder)
-      } yield {
-        utilitiesNotification.send(buyerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(sellerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(buyerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(sellerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -243,9 +243,10 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
             for {
               _ <- markDirtyFromAddress
               id <- id
-            } yield utilitiesNotification.send(id, constants.Notification.FAILURE, message)
+              _ <- utilitiesNotification.send(id, constants.Notification.FAILURE, message)
+            } yield {}
           } else {
-            Future ()
+            Future()
           }
         }
 
@@ -256,7 +257,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
         } yield {}
       }
 
-      def getIDs(sellerExecuteOrder: SellerExecuteOrder): Future[(String,String)] = {
+      def getIDs(sellerExecuteOrder: SellerExecuteOrder): Future[(String, String)] = {
         val sellerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.sellerAddress)
         val buyerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress)
         for {
@@ -270,10 +271,9 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
         sellerExecuteOrder <- sellerExecuteOrder
         _ <- markDirty(sellerExecuteOrder)
         (sellerAddressID, buyerAddressID) <- getIDs(sellerExecuteOrder)
-      } yield {
-        utilitiesNotification.send(buyerAddressID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(sellerAddressID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(buyerAddressID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(sellerAddressID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

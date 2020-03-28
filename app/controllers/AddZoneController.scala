@@ -218,8 +218,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             id <- id
             allKYCFileTypesExists <- allKYCFileTypesExists(id)
             result <- markZoneFormCompletedAndGetResult(id, allKYCFileTypesExists)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_REQUESTED, loginState.username)
+
           } yield {
-            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.ADD_ZONE_REQUESTED, loginState.username)
             result
           }
             ).recover {
@@ -263,8 +264,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
                 zoneAccountAddress <- zoneAccountAddress(accountID)
                 _ <- transactionProcess(zoneAccountAddress)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+                _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
               } yield {
-                utilitiesNotification.createNotificationAndSend(accountID, None, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
                 result
               }
             } else Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
@@ -273,8 +274,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
             result <- processTransactionAndGetResult(allKYCFilesVerified)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
           } yield {
-            utilitiesNotification.createNotificationAndSend(loginState.username, None, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
             result
           }).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -335,14 +336,16 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             for {
               _ <- verify
               zoneId <- zoneId
-            } yield utilitiesNotification.send(zoneId, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              _ <- utilitiesNotification.send(zoneId, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            } yield {}
           } else {
             val reject = masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
             val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- reject
               zoneId <- zoneId
-            } yield utilitiesNotification.send(zoneId, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              _ <- utilitiesNotification.send(zoneId, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+            } yield {}
           }
 
           def zoneKYC: Future[ZoneKYC] = masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
