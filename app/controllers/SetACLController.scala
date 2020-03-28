@@ -55,7 +55,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               Future(BadRequest(views.html.index(failures = Seq(constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE))))
             } else {
 
-              val organization = masterOrganizations.Service.getByAccountID(loginState.username)
+              val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = addTraderRequestData.emailAddress)
 
@@ -805,7 +805,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def organizationViewVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationAccount = masterOrganizations.Service.getByAccountID(loginState.username)
+      val organizationAccount = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
       def getVerifyTraderRequestsForOrganization(organizationAccount: Organization) = masterTraders.Service.getVerifyTraderRequestsForOrganization(organizationAccount.id)
 
@@ -896,7 +896,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def viewTradersInOrganization: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationAccount = masterOrganizations.Service.getByAccountID(loginState.username)
+      val organizationAccount = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
       def getVerifiedTradersForOrganization(organizationAccount: Organization): Future[Seq[Trader]] = masterTraders.Service.getVerifiedTradersForOrganization(organizationAccount.id)
 

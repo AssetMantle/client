@@ -1,10 +1,9 @@
 @import play.api.routing.JavaScriptReverseRoute
 
-@(form: constants.Form, route: JavaScriptReverseRoute, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
-@*//The `route: JavaScriptReverseRoute`  will go in class Form in constants. Kept here for testing purposes.*@
+@(form: constants.Form, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
-<button type="button" class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("cmuk-button-primary")).mkString(" ")'  onclick="getForm(@utilities.String.getJsRouteString(route, arguments.toMap.get('parameters).map(_.toString).getOrElse("")))">
+<button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("cmuk-button-primary")).mkString(" ")'  onclick="getForm(@utilities.String.getJsRouteString(form.get, arguments.toMap.get('parameters).map(_.toString).getOrElse("")))">
 @Messages(form.legend)
 </button>
 
-@*Example Usage: `@commonFormButton(constants.Form.IDENTIFICATION, routes.javascript.AccountController.identificationForm, 'parameters -> "'Abhinav', 1996")` *@
+@*Example Usage: @commonFormButton(constants.Form.IDENTIFICATION, 'parameters -> "'Abhinav', 1996") *@

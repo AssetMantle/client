@@ -66,12 +66,14 @@ GET         /master/markNotificationAsRead                               control
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /component/identificationDetails                             controllers.ComponentViewController.identificationDetails
+GET         /component/viewIdentificationDetails                         controllers.ComponentViewController.viewIdentificationDetails
 GET         /component/userViewPendingRequests                           controllers.ComponentViewController.userViewPendingRequests
 GET         /component/traderViewOrganizationDetails                     controllers.ComponentViewController.traderViewOrganizationDetails
 GET         /component/viewOrganizationDetails                           controllers.ComponentViewController.viewOrganizationDetails
 GET         /component/viewOrganizationBankAccountDetail                 controllers.ComponentViewController.viewOrganizationBankAccountDetail
 GET         /component/traderViewOrganizationBankAccountDetail           controllers.ComponentViewController.traderViewOrganizationBankAccountDetail
+GET         /component/userViewOrganizationUBOs                          controllers.ComponentViewController.userViewOrganizationUBOs
+GET         /component/viewOrganizationUBOs                              controllers.ComponentViewController.viewOrganizationUBOs
 
 GET         /component/traderRelationList                                controllers.ComponentViewController.traderRelationList
 GET         /component/acceptedTraderRelationList                        controllers.ComponentViewController.acceptedTraderRelationList
@@ -240,8 +242,18 @@ GET         /zoneUpdate/negotiationDocument                              control
 
 GET         /master/addOrganization                                      controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization
-GET         /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOsForm
-POST        /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOs
+
+GET         /master/userAddOrUpdateUBOs                                  controllers.AddOrganizationController.userAddOrUpdateUBOsForm
+POST        /master/userAddOrUpdateUBOs                                  controllers.AddOrganizationController.userAddOrUpdateUBOs
+GET         /master/userAddUBO                                           controllers.AddOrganizationController.userAddUBOForm
+POST        /master/userAddUBO                                           controllers.AddOrganizationController.userAddUBO
+GET         /master/addUBO                                               controllers.AddOrganizationController.addUBOForm
+POST        /master/addUBO                                               controllers.AddOrganizationController.addUBO
+GET         /master/userDeleteUBO                                        controllers.AddOrganizationController.userDeleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String)
+POST        /master/userDeleteUBO                                        controllers.AddOrganizationController.userDeleteUBO
+GET         /master/deleteUBO                                            controllers.AddOrganizationController.deleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String)
+POST        /master/deleteUBO                                            controllers.AddOrganizationController.deleteUBO
+
 GET         /master/addOrUpdateOrganizationBankAccountDetail             controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm
 POST        /master/addOrUpdateOrganizationBankAccountDetail             controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail
 GET         /master/userUploadOrUpdateOrganizationKYCView                controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView
