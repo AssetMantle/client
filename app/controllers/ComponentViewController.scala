@@ -163,17 +163,17 @@ class ComponentViewController @Inject()(
 
       def orders(negotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(negotiations.map(_.id))
 
-      def getFiatsInOrders(ordersIDS: Seq[String]): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(ordersIDS)
+      def fiatsInOrders(ordersIDS: Seq[String]): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(ordersIDS)
 
-      def getNegotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
+      def negotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
 
-      def getPayable(negotiationsOfOrders: Seq[Negotiation], fiatsInOrders: Seq[Fiat]): Int = {
+      def payables(negotiationsOfOrders: Seq[Negotiation], fiatsInOrders: Seq[Fiat]): Int = {
         val sumBuying = negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.bid.toInt).sum
         val sumBought = fiatsInOrders.filter(x => negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.id) contains x.ownerAddress).map(_.transactionAmount.toInt).sum
         sumBought - sumBuying
       }
 
-      def getReceivable(negotiationsOfOrders: Seq[Negotiation]): Int = {
+      def receivables(negotiationsOfOrders: Seq[Negotiation]): Int = {
         val sumSelling = negotiationsOfOrders.filter(_.sellerAddress == loginState.address).map(_.bid.toInt).sum
         sumSelling
       }
@@ -184,8 +184,8 @@ class ComponentViewController @Inject()(
         fiatPegWallet <- fiatPegWallet
         negotiations <- negotiations
         orders <- orders(negotiations)
-        getFiatsInOrders <- getFiatsInOrders(orders.map(_.id))
-      } yield Ok(views.html.component.master.traderFinancials(walletBalance(fiatPegWallet), getPayable(getNegotiationsOfOrders(negotiations, orders), getFiatsInOrders), getReceivable(getNegotiationsOfOrders(negotiations, orders))))
+        fiatsInOrders <- fiatsInOrders(orders.map(_.id))
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance(fiatPegWallet), payables(negotiationsOfOrders(negotiations, orders), fiatsInOrders), receivables(negotiationsOfOrders(negotiations, orders))))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
