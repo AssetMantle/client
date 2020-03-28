@@ -8,11 +8,11 @@ object SendMessage {
   val form = Form(
     mapping(
       constants.FormField.CHAT_WINDOW_ID.name -> constants.FormField.CHAT_WINDOW_ID.field,
-      constants.FormField.MESSAGE.name -> constants.FormField.MESSAGE.field,
+      constants.FormField.TEXT.name -> constants.FormField.TEXT.field,
       constants.FormField.REPLY_TO_MESSAGE.name -> optional(FormField.REPLY_TO_MESSAGE.field),
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(chatWindowID: String, message:String, replyToID: Option[String])
+  case class Data(chatID: String, text:String, replyToID: Option[String])
 
 }

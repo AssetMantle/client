@@ -10,14 +10,14 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success}
 
-case class CreateChatChildActorMessage(username: String, actorRef: ActorRef)
+case class CreateMessageChildActorMessage(username: String, actorRef: ActorRef)
 
-object MainChatActor {
-  def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainChatActor(actorTimeout, actorSystem))
+object MainMessageActor {
+  def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainMessageActor(actorTimeout, actorSystem))
 }
 
 @Singleton
-class MainChatActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem) extends Actor with ActorLogging {
+class MainMessageActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem) extends Actor with ActorLogging {
 
   private implicit val timeout: Timeout = Timeout(actorTimeout)
 
@@ -25,16 +25,16 @@ class MainChatActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSy
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACTOR_MAIN_CHAT
+  private implicit val module: String = constants.Module.ACTOR_MAIN_MESSAGE
 
   def receive: PartialFunction[Any, Unit] = {
-    case chatCometMessage: masterTransaction.ChatCometMessage =>
-      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_CHAT + "/" + chatCometMessage.username).resolveOne().onComplete {
+    case chatCometMessage: masterTransaction.MessageCometMessage =>
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_MESSAGE + "/" + chatCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module + " " + chatCometMessage.username + ": " + chatCometMessage.message)
           actorRef ! chatCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
-    case createChatChildActorMessage: CreateChatChildActorMessage => context.actorOf(props = UserChatActor.props(createChatChildActorMessage.actorRef, actorTimeout), name = createChatChildActorMessage.username)
+    case createChatChildActorMessage: CreateMessageChildActorMessage => context.actorOf(props = UserChatActor.props(createChatChildActorMessage.actorRef, actorTimeout), name = createChatChildActorMessage.username)
   }
 
 }
@@ -51,10 +51,10 @@ class UserChatActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) ext
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACTOR_USER_CHAT
+  private implicit val module: String = constants.Module.ACTOR_USER_MESSAGE
 
   def receive = {
-    case chatCometMessage: masterTransaction.ChatCometMessage => systemUserActor ! chatCometMessage.message
+    case chatCometMessage: masterTransaction.MessageCometMessage => systemUserActor ! chatCometMessage.message
     case _: ShutdownActorMessage =>
       systemUserActor ! PoisonPill
       context.stop(self)

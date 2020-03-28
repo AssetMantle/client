@@ -100,7 +100,7 @@ object FormField {
   val TRADE_ID = new StringFormField("TRADE_ID", 1, 132)
   val TERM_TYPE = new StringFormField("TERM_TYPE", 1, 100)
   val TRADE_ROOM_ID = new StringFormField("TRADE_ROOM_ID", 2, 100)
-  val MESSAGE = new StringFormField("MESSAGE", 1, 160)
+  val TEXT = new StringFormField("TEXT", 1, 160)
   val REPLY_TO_MESSAGE = new StringFormField("REPLY_TO_MESSAGE", 2, 100)
   val CHAT_WINDOW_ID = new StringFormField("CHAT_WINDOW_ID", 2, 100)
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)

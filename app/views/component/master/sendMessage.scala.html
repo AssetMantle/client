@@ -26,7 +26,7 @@
         </div>
         @commonInputText(sendMessageForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
         <div class="hiddenLabel sendFormField">
-        @commonInputText(sendMessageForm, constants.FormField.MESSAGE)
+        @commonInputText(sendMessageForm, constants.FormField.TEXT)
             <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)"><img src="@routes.Assets.versioned("images/icons/sendIcon.svg")"></button>
         </div>
         @commonInputText(sendMessageForm, constants.FormField.REPLY_TO_MESSAGE,'containerDivClass -> "hidden", 'required -> false)

@@ -1,59 +1,20 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.SendMessage
-@import models.masterTransaction.Chat
-@import models.masterTransaction.ChatReceive
-@import views.html.component.master.sendMessage
+@import models.masterTransaction.Message
+@import models.masterTransaction.MessageReceive
+@import views.html.component.master.messageBox
 
-@(chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(messages: Seq[Message], readMessages: Seq[MessageReceive], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatWindowID')" >@Messages(constants.View.LOAD_MORE_CHATS)</a></div>
-    @for(chat <- chats.reverse) {
-        @if(chat.fromAccountID == loginState.username) {
-            <li class="sender chatMessage">
-                <div class="you" onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">
-                    @chat.replyToID match {
-                        case Some(replyToMessageID) => {
-                            <div class="messageContent cmuk-text-right replytoMessage">
-                                <p id="@chat.replyToID@chat.id"></p>
-                                <script>
-                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToMessage('@chatWindowID', '@replyToMessageID'),'@chat.id')
-                        </script>
-                            </div>
-                        }
-                        case None => {}
-                    }
-                    <p>@chat.fromAccountID
-                        : @chat.message</p>
-                </div>
-                <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
-            </li>
-        } else {
-            <li class="receiver chatMessage">
-                <span class="chatName">@chat.fromAccountID.substring(0, 1)</span>
-                <div class="patner" onclick="replyButton('@chat.id', '@chat.message', '@chat.fromAccountID')">
-                    @chat.replyToID match {
-                        case Some(replyToMessageID) => {
-                            <div class="messageContent cmuk-text-right replytoMessage">
-                                <p id="@chat.replyToID@chat.id"></p>
-                                <script>
-                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToMessage('@chatWindowID', '@replyToMessageID'),'@chat.id')
-                        </script>
-                            </div>
-                        }
-                        case None => {}
-                    }
-                    <p>@chat.fromAccountID
-                        : @chat.message</p>
-                    @if(readChats.filter(x => x.chatID == chat.id && x.toAccountID == loginState.username).length == 0) {
-                        <script>
-                              unReadBar(@chats.filter(_.fromAccountID != loginState.username).length - @readChats.filter(_.toAccountID == loginState.username).length);
-                      </script>
-                    }
-                </div>
-            </li>
-        }
-    }
+    <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatID')" >@Messages(constants.View.LOAD_MORE_CHATS)</a></div>
+    @for(message <- messages.reverse) {
+    @messageBox(message)
+       @if(readMessages.filter(x => x.messageID == message.id && x.accountID == loginState.username && message.fromAccountID != loginState.username).length == 0) {
+                <script>
+                        unReadBar(@messages.filter(_.fromAccountID != loginState.username).length - @readMessages.filter(_.accountID == loginState.username).length);
+                </script>
+            }
+}
 
 <script>
     if($("div.chatMessage").length==1) {

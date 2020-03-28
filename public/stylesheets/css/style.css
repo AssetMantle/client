@@ -770,7 +770,7 @@ header:before,
   .chat li {
     display: flex;
     list-style: none; }
-  .chat .patner {
+  .chat .partner {
     word-break: break-all;
     padding: 10px;
     border-radius: 10px;
@@ -778,7 +778,7 @@ header:before,
     background: #E8E8E8;
     position: relative;
     border-bottom-left-radius: 0px; }
-    .chat .patner::after {
+    .chat .partner::after {
       position: absolute;
       left: -8px;
       bottom: 0;
@@ -787,20 +787,20 @@ header:before,
       border-bottom: .5rem solid #E8E8E8;
       border-left: .5rem solid transparent;
       border-right: .5rem solid #E8E8E8; }
-    .chat .patner .messageInfo {
+    .chat .partner .messageInfo {
       color: #848A91;
       font-size: 1.2rem; }
-    .chat .patner .replytoMessage p {
+    .chat .partner .replytoMessage p {
       border-left: 2px solid #0862BE;
       padding: 0px 10px; }
-    .chat .patner .messageContent {
+    .chat .partner .messageContent {
       color: #061728;
       font-size: 1.3rem; }
-      .chat .patner .messageContent p {
+      .chat .partner .messageContent p {
         margin: 0px;
         color: #0862BE;
         text-align: left; }
-    .chat .patner p {
+    .chat .partner p {
       margin: 0px; }
   .chat .you {
     word-break: break-all;

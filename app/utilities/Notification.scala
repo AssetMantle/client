@@ -92,10 +92,10 @@ class Notification @Inject()(masterContacts: master.Contacts,
     (for {
       title <- title
       message <- message
-      _ <- create(title, message)
+      notificationID <- create(title, message)
       pushNotificationToken <- pushNotificationToken
       _ <- post(title, message, pushNotificationToken)
-    } yield {}).recover {
+    } yield notificationID).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }

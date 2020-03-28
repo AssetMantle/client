@@ -406,13 +406,13 @@ GET         /master/setSellerFeedback                                    control
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
 GET         /master/tradeRoom/chatRoom                                   controllers.TradeRoomController.chatRoom(tradeRoomID: String)
-GET         /master/tradeRoom/chatWindow                                 controllers.TradeRoomController.chatWindow(chatWindowID: String ,pageNumber: Int)
-GET         /master/tradeRoom/loadMoreChats                              controllers.TradeRoomController.loadMoreChats(chatWindowID: String ,pageNumber: Int)
+GET         /master/tradeRoom/chatWindow                                 controllers.TradeRoomController.chatWindow(chatID: String ,pageNumber: Int)
+GET         /master/tradeRoom/loadMoreChats                              controllers.TradeRoomController.loadMoreChats(chatID: String ,pageNumber: Int)
 GET        /master/tradeRoom/sendMessage                                   controllers.TradeRoomController.sendMessageForm
 POST        /master/tradeRoom/sendMessage                                   controllers.TradeRoomController.sendMessage
-GET         /master/tradeRoom/markChatAsRead                             controllers.TradeRoomController.markChatAsRead(chatWindowID: String)
-GET         /master/tradeRoom/replyToMessage                                controllers.TradeRoomController.replyToMessage(chatWindowID: String, chatID: String)
-GET         /master/tradeRoom/chatComet                                  controllers.TradeRoomController.sendMessageComet(chatWindowID: String)
+GET         /master/tradeRoom/markChatAsRead                             controllers.TradeRoomController.markChatAsRead(chatID: String)
+GET         /master/tradeRoom/replyToMessage                                controllers.TradeRoomController.replyToMessage(chatID: String, messageID: String)
+GET         /master/tradeRoom/chatComet                                  controllers.TradeRoomController.sendMessageComet(chatID: String)
 
 POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
 POST        /wuRedirect                                                  controllers.WesternUnionController.westernUnionPortalRedirect
