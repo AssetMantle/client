@@ -7,7 +7,7 @@
 
 @(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageReceive], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
     @if(chats.length > 0) {
-        @if(readChats.filter(x => x.messageID == chats.head.id).filter(x => x.accountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
+        @if(readChats.filter(x => x.messageID == chats.head.id && x.accountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
             <div onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatID'))" style="font-size: 12px;">
             }
     }
