@@ -9,6 +9,7 @@
         @commonCard(Messages(constants.View.COUNTER_PARTY_LIST)){
         }{
             @for(trader<- traders){
+                @commonJavascriptButton()
                 <button type="button" class="cmuk-button cmuk-button-secondary cmuk-button-small" onclick="fillCounterPartyField('@trader.accountID')">
                     @Messages(constants.Form.ORGANIZATION_ID): @trader.organizationID <br>
                     @Messages(constants.Form.ACCOUNT_ID): @trader.accountID <br>

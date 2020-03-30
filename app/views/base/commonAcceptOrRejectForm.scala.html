@@ -1,4 +1,6 @@
+@import views.html.base._
 @import helper._
+
 
 @(formTemplate: constants.Form, formData: Form[_],target:String, statusFieldID:String,pendingBoolean:Option[Boolean])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
@@ -25,6 +27,7 @@
           }
           case None=> {
               <br>
+              @commonJavascriptButton(constants.Form.APPROVE,JavaScript("verifyReject(this, '@Seq('#', target).mkString("")', '@statusFieldID', true)"))
               <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", target).mkString("")', '@statusFieldID', true)">@Messages(constants.Form.APPROVE)</button>
               <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", target).mkString("")', '@statusFieldID', false)">@Messages(constants.Form.REJECT)</button>
           }
