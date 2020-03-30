@@ -258,7 +258,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
                 message <- message
                 participants <- participants
                 _ <- chatReceive(participants.filter(_.accountID != loginState.username).map(_.accountID), message)
-                result <- withUsernameToken.Ok(views.html.component.master.messageBox(message))
+                result <- withUsernameToken.Ok(views.html.component.master.messageBox(message)())
               } yield {
                 result
               }

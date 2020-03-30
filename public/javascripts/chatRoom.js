@@ -124,5 +124,6 @@ function unReadBar(count) {
 }
 
 function closeReply() {
+    $("#REPLY_TO_MESSAGE").val("");
     $("#replyBox").fadeOut();
 }
