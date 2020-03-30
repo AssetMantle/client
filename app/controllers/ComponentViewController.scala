@@ -987,8 +987,8 @@ class ComponentViewController @Inject()(
         buyersExecutedOrdersConfirmedNegotiationIDs <- buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations, buyersExecutedOrders)
         sellersExecutedOrdersConfirmedNegotiationIDs <- sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations, sellersExecutedOrders)
       } yield Ok(views.html.component.master.organizationViewTradeStatistics(
-        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)) ,
-        sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id))
+        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse ,
+        sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse
       ))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
@@ -1016,8 +1016,8 @@ class ComponentViewController @Inject()(
         buyersExecutedOrdersConfirmedNegotiationIDs <- buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations, buyersExecutedOrders)
         sellersExecutedOrdersConfirmedNegotiationIDs <- sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations, sellersExecutedOrders)
       } yield Ok(views.html.component.master.traderViewTradeStatistics(
-        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)) ,
-        sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id))
+        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse ,
+        sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse
       ))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
