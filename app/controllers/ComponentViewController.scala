@@ -960,12 +960,68 @@ class ComponentViewController @Inject()(
 
   def organizationViewTradeStatistics(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.organizationViewTradeStatistics()))
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getAcceptedTradersInOrganization(organizationID)
+
+      def tradersWalletAddress(traders: Seq[Trader]): Future[Seq[String]] = masterAccounts.Service.getAddresses(traders.map(_.accountID))
+
+      def buyerConfirmedNegotiations(tradersWalletAddresses : Seq[String]): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForBuyerAddresses(tradersWalletAddresses).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
+
+      def sellerConfirmedNegotiations(tradersWalletAddresses : Seq[String]): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForSellerAddresses(tradersWalletAddresses).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
+
+      def executedOrders(ids : Seq[String]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(ids).map(_.filter(_.awbProofHash != "").filter(_.fiatProofHash != ""))
+
+      def buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations: Seq[Negotiation], buyersExecutedOrders: Seq[Order]): Future[Seq[String]] = Future(buyerConfirmedNegotiations.map(_.id).intersect(buyersExecutedOrders.map(_.id)))
+
+      def sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations: Seq[Negotiation], sellersExecutedOrders: Seq[Order]): Future[Seq[String]] = Future(sellerConfirmedNegotiations.map(_.id).intersect(sellersExecutedOrders.map(_.id)))
+
+      (for {
+        organizationID <- organizationID
+        traders <- traders(organizationID)
+        tradersWalletAddress <- tradersWalletAddress(traders)
+        buyerConfirmedNegotiations <- buyerConfirmedNegotiations(tradersWalletAddress)
+        sellerConfirmedNegotiations <- sellerConfirmedNegotiations(tradersWalletAddress)
+        buyersExecutedOrders <- executedOrders(buyerConfirmedNegotiations.map(_.id))
+        sellersExecutedOrders <- executedOrders(sellerConfirmedNegotiations.map(_.id))
+        buyersExecutedOrdersConfirmedNegotiationIDs <- buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations, buyersExecutedOrders)
+        sellersExecutedOrdersConfirmedNegotiationIDs <- sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations, sellersExecutedOrders)
+      } yield Ok(views.html.component.master.organizationViewTradeStatistics(
+        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)) ,
+        sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id))
+      ))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
   }
 
   def traderViewTradeStatistics(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.traderViewTradeStatistics()))
+
+      val buyerConfirmedNegotiations: Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
+
+      val sellerConfirmedNegotiations: Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForSellerAddress(loginState.address).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
+
+      def executedOrders(ids : Seq[String]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(ids).map(_.filter(_.awbProofHash != "").filter(_.fiatProofHash != ""))
+
+      def buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations: Seq[Negotiation], buyersExecutedOrders: Seq[Order]): Future[Seq[String]] = Future(buyerConfirmedNegotiations.map(_.id).intersect(buyersExecutedOrders.map(_.id)))
+
+      def sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations: Seq[Negotiation], sellersExecutedOrders: Seq[Order]): Future[Seq[String]] = Future(sellerConfirmedNegotiations.map(_.id).intersect(sellersExecutedOrders.map(_.id)))
+
+      (for {
+        buyerConfirmedNegotiations <- buyerConfirmedNegotiations
+        sellerConfirmedNegotiations <- sellerConfirmedNegotiations
+        buyersExecutedOrders <- executedOrders(buyerConfirmedNegotiations.map(_.id))
+        sellersExecutedOrders <- executedOrders(sellerConfirmedNegotiations.map(_.id))
+        buyersExecutedOrdersConfirmedNegotiationIDs <- buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations, buyersExecutedOrders)
+        sellersExecutedOrdersConfirmedNegotiationIDs <- sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations, sellersExecutedOrders)
+      } yield Ok(views.html.component.master.traderViewTradeStatistics(
+        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)) ,
+        sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id))
+      ))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
   }
 
 }
