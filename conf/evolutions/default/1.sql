@@ -956,15 +956,15 @@ ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
+VALUES ('commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6',
         '1000',
-        'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
+        'commitpub1addwnpepq2yk5pt0qse3q6f45rc92skcuj55nqp8puv8vuh2xsc786jryjynku36hvc',
         '0',
         '0',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '711213004', 'commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 
