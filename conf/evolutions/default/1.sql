@@ -636,7 +636,7 @@ CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
     "salesQuoteID"       VARCHAR NOT NULL,
     "buyerAccountID"     VARCHAR NOT NULL,
     "sellerAccountID"    VARCHAR NOT NULL,
-    "financierAccountID" VARCHAR NOT NULL,
+    "financierAccountID" VARCHAR,
     "status"             VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
