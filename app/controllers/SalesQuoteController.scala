@@ -394,7 +394,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             val markAccepted = masterTransactionSalesQuotes.Service.markAccepted(acceptOrRejectSalesQuoteData.salesQuoteID)
 
             def salesQuote = masterTransactionSalesQuotes.Service.get(acceptOrRejectSalesQuoteData.salesQuoteID)
-
+            //TODO: trade Room Status to be defined
             def createTradeRoom(buyerAccountID: String, sellerAccountId: String) = masterTradeRooms.Service.create(acceptOrRejectSalesQuoteData.salesQuoteID, buyerAccountID, sellerAccountId, None, "UnderNegotiation")
 
             def createTradeTerms(tradeRoomID: String, salesQuote: SalesQuote) = masterTransactionTradeTerms.Service.create(tradeRoomID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, salesQuote.shippingDetails.get.shippingPeriod, salesQuote.shippingDetails.get.portOfLoading, salesQuote.shippingDetails.get.portOfDischarge, salesQuote.paymentTerms.get.advancePayment, salesQuote.paymentTerms.get.advancePercentage, salesQuote.paymentTerms.get.credit, salesQuote.paymentTerms.get.tenure, if (salesQuote.paymentTerms.get.tentativeDate.isDefined) Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get)) else None, salesQuote.paymentTerms.get.refrence, salesQuote.salesQuoteDocuments.get.billOfExchangeRequired, salesQuote.salesQuoteDocuments.get.obl, salesQuote.salesQuoteDocuments.get.invoice, salesQuote.salesQuoteDocuments.get.coo, salesQuote.salesQuoteDocuments.get.coa, salesQuote.salesQuoteDocuments.get.otherDocuments)
