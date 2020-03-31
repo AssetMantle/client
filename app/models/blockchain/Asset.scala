@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainAssetActor, ShutdownActor}
+import actors.{ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -24,16 +24,14 @@ case class Asset(pegHash: String, documentHash: String, assetType: String, asset
 case class AssetCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, accounts: Accounts,actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-  val mainAssetActor: ActorRef = actorSystem.actorOf(props = MainAssetActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ASSET)
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
@@ -175,7 +173,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, username)
       Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainAssetActor ! actors.CreateAssetChildActorMessage(username = username, actorRef = systemUserActor)
+      accounts.mainAccountActor ! actors.CreateAssetChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -205,7 +203,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               _ <- insertOrUpdate(ownerAccount)
               accountID <- accountID
             } yield {
-              mainAssetActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+              accounts.mainAccountActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
             }).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
@@ -214,7 +212,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
                   for {
                     _ <- deleteAssetPegWallet
                     id <- id
-                  } yield mainAssetActor ! AssetCometMessage(username = id, message = Json.toJson(constants.Comet.PING))
+                  } yield accounts.mainAccountActor ! AssetCometMessage(username = id, message = Json.toJson(constants.Comet.PING))
                 }
             }
           }

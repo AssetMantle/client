@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainNegotiationActor, ShutdownActor}
+import actors.{MainAccountActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -23,15 +23,13 @@ case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, 
 case class NegotiationCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
-
-  val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -183,7 +181,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
     def getSellerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findSellerOrdersInZone(ids, addresses)
 
-    def markDirty(id: String): Future[Int] =updateDirtyBitById(id, dirtyBit = true)
+    def markDirty(id: String): Future[Int] = updateDirtyBitById(id, dirtyBit = true)
 
     def refreshDirty(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Future[Int] = updateNegotiationById(id = id, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = false)
 
@@ -205,7 +203,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
       Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
+      accounts.mainAccountActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -236,8 +234,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
               _ <- refreshDirty(negotiationResponse)
               (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
-              mainNegotiationActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
-              mainNegotiationActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+              accounts.mainAccountActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
+              accounts.mainAccountActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

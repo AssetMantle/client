@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainOrderActor, ShutdownActor}
+import actors.{MainAccountActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -22,7 +22,7 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 case class OrderCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, masterAccounts: master.Accounts, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -30,9 +30,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
   import databaseConfig.profile.api._
 
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
-  val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -142,7 +140,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, username)
       Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainOrderActor ! actors.CreateOrderChildActorMessage(username = username, actorRef = systemUserActor)
+      accounts.mainAccountActor ! actors.CreateOrderChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -242,8 +240,8 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
               _ <- insertOrUpdateOrder(orderResponse)
               (buyerAddressID, sellerAddressID) <- ids(negotiation)
             } yield {
-              mainOrderActor ! OrderCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
-              mainOrderActor ! OrderCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
+              accounts.mainAccountActor ! OrderCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+              accounts.mainAccountActor ! OrderCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
