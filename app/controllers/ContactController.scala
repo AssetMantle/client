@@ -69,11 +69,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             else {
               val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
 
-              def updateStatusUnverifiedContact(): Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+              def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
 
               for {
                 _ <- insertOrUpdateContact
-                _ <- updateStatusUnverifiedContact()
+                _ <- updateStatusUnverifiedContact
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
               } yield result
             }

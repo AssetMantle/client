@@ -123,6 +123,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.recentActivityForTrader,
         routes.javascript.ComponentViewController.recentActivityForOrganization,
         routes.javascript.ComponentViewController.traderFinancials,
+        routes.javascript.ComponentViewController.salesQuoteList,
+        routes.javascript.ComponentViewController.sellSalesQuoteList,
+        routes.javascript.ComponentViewController.buySalesQuoteList,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -211,7 +214,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SalesQuoteController.commodityDetailsForm,
         routes.javascript.SalesQuoteController.paymentTermsForm,
         routes.javascript.SalesQuoteController.salesQuoteDocumentsForm,
-        routes.javascript.SalesQuoteController.salesQuoteList,
 
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderList,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderDocument,

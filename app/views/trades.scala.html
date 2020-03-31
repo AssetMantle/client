@@ -73,7 +73,7 @@
 
     <script>
         @if(loginState.userType == constants.User.TRADER){
-                componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
+                componentResource('salesQuoteList', jsRoutes.controllers.ComponentViewController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
                 componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());

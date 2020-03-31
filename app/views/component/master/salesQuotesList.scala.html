@@ -1,28 +1,23 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.SalesQuote
 @import views.html.base._
+@import scala.collection.immutable.ListMap
+@import play.api.routing.JavaScriptReverseRoute
 
-@(salesQuotes: Seq[SalesQuote])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
 <div>
-
-    @for(salesQuote <- salesQuotes) {
-        @commonList(){
-            <p class="accountName"><span>B</span></p>
-            @commonVerticalTextInfo(constants.Form.ASSET_TYPE, salesQuote.assetType)
-            @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, salesQuote.assetDescription)
-            @commonVerticalIntInfo(constants.Form.ASSET_QUANTITY, salesQuote.assetQuantity)
-            @commonVerticalIntInfo(constants.Form.ASSET_PRICE, salesQuote.assetPrice)
-
-            <div class="listItemChild">
-                <p class="listItemChildTitle">@Messages(constants.View.ACTION)</p>
-                <p class="listItemChildValue">
-                @if(salesQuote.completionStatus){
-                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="">@Messages(constants.View.INVITE)</button>
-                }else{
-                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm('@salesQuote.id'))">@Messages(constants.View.COMPLETE)</button>
-                }
-                </p>
-            </div>
-        }
-    }
+@commonCard(constants.View.SALES_QUOTE_LIST) {
+    @commonModalButton(constants.Form.CREATE_SALES_QUOTE,constants.Form.COMMODITY_DETAILS.get)
+} {
+    @commonHorizontalSwitcher(ListMap(constants.View.SELL -> routes.javascript.ComponentViewController.sellSalesQuoteList,
+        constants.View.BUY -> routes.javascript.ComponentViewController.buySalesQuoteList,
+    ))
+}
 </div>
+
+
+
+
+
+
