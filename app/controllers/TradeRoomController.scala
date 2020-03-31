@@ -40,7 +40,6 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
 
   def tradeRoom(tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      //TODO: create chatRoom and add chatParticipants ( after invite trader in sales quote is complete)
       withUsernameToken.Ok(views.html.tradeRoom(tradeRoomID = tradeRoomID))
   }
 

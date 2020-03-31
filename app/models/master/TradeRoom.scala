@@ -27,7 +27,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] val tradeRoomTable = TableQuery[TradeRoomTable]
 
-  private def add(tradeRoom: TradeRoom): Future[String] = db.run((tradeRoomTable returning tradeRoomTable.map(_.id) += tradeRoom).asTry).map {
+  private def add(tradeRoom: TradeRoom): Future[TradeRoom] = db.run((tradeRoomTable returning tradeRoomTable += tradeRoom).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -85,7 +85,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String): Future[String] = add(TradeRoom(id = utilities.IDGenerator.requestID, salesQuoteID = salesQuoteID, buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, financierAccountID = financierAccountID, chatID = utilities.IDGenerator.requestID, status = status))
+    def create(salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String): Future[TradeRoom] = add(TradeRoom(id = utilities.IDGenerator.requestID, salesQuoteID = salesQuoteID, buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, financierAccountID = financierAccountID, chatID = utilities.IDGenerator.requestID, status = status))
 
     def get(id: String) = findById(id)
 
