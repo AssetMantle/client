@@ -9,12 +9,12 @@
         @commonCard(Messages(constants.View.COUNTER_PARTY_LIST)){
         }{
             @for(trader<- traders){
-                <button type="button" class="cmuk-button cmuk-button-secondary cmuk-button-small" onclick="fillCounterPartyField('@trader.accountID')">
-                    @Messages(constants.Form.ORGANIZATION_ID): @trader.organizationID <br>
-                    @Messages(constants.Form.ACCOUNT_ID): @trader.accountID <br>
-                    @Messages(constants.Form.NAME): @trader.name <br>
-                </button>
-                <br>
+                @commonInfoBox(){
+                    @commonTextInfo(constants.Form.ORGANIZATION_ID,trader.organizationID) <br>
+                    @commonTextInfo(constants.Form.ACCOUNT_ID,trader.accountID) <br>
+                    @commonTextInfo(constants.Form.NAME,trader.name) <br>
+                    @commonJavascriptButton(constants.View.SELECT,JavaScript(s"fillCounterPartyField('${trader.accountID}')"))  <br>
+                }
         }
     }
     @commonInputText(inviteSalesQuoteBuyerForm, constants.FormField.REQUEST_ID, 'value ->requestID,'class -> "hidden", 'readonly -> true)

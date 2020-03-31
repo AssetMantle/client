@@ -128,4 +128,5 @@ object View {
   val PENDING = "PENDING"
   val DELETE = "DELETE"
   val DOCUMENTS = "DOCUMENTS"
+  val SELECT="SELECT"
 }
