@@ -25,6 +25,7 @@ class ComponentViewController @Inject()(
                                          masterAssets: master.Assets,
                                          masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                         masterTransactionSalesQuotes: masterTransaction.SalesQuotes,
                                          blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withZoneLoginAction: WithZoneLoginAction,
@@ -956,6 +957,31 @@ class ComponentViewController @Inject()(
   }
 
 
+  def salesQuoteList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.salesQuotesList())
+  }
+
+  def sellSalesQuoteList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val sellSalesQuoteList = masterTransactionSalesQuotes.Service.sellSalesQuotes(loginState.username)
+      for {
+        sellSalesQuoteList <- sellSalesQuoteList
+      } yield {
+        Ok(views.html.component.master.sellSalesQuoteList(sellSalesQuoteList = sellSalesQuoteList))
+      }
+  }
+
+  def buySalesQuoteList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val buySalesQuoteList = masterTransactionSalesQuotes.Service.buySalesQuotes(loginState.username)
+      for {
+        buySalesQuoteList <- buySalesQuoteList
+      } yield {
+        Ok(views.html.component.master.buySalesQuoteList(buySalesQuoteList = buySalesQuoteList))
+
+      }
+  }
+
   //Dashboard Cards
 
   def organizationViewTradeStatistics(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -966,11 +992,11 @@ class ComponentViewController @Inject()(
 
       def tradersWalletAddress(traders: Seq[Trader]): Future[Seq[String]] = masterAccounts.Service.getAddresses(traders.map(_.accountID))
 
-      def buyerConfirmedNegotiations(tradersWalletAddresses : Seq[String]): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForBuyerAddresses(tradersWalletAddresses).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
+      def buyerConfirmedNegotiations(tradersWalletAddresses: Seq[String]): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForBuyerAddresses(tradersWalletAddresses).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
 
-      def sellerConfirmedNegotiations(tradersWalletAddresses : Seq[String]): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForSellerAddresses(tradersWalletAddresses).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
+      def sellerConfirmedNegotiations(tradersWalletAddresses: Seq[String]): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForSellerAddresses(tradersWalletAddresses).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
 
-      def executedOrders(ids : Seq[String]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(ids).map(_.filter(_.awbProofHash != "").filter(_.fiatProofHash != ""))
+      def executedOrders(ids: Seq[String]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(ids).map(_.filter(_.awbProofHash != "").filter(_.fiatProofHash != ""))
 
       def buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations: Seq[Negotiation], buyersExecutedOrders: Seq[Order]): Future[Seq[String]] = Future(buyerConfirmedNegotiations.map(_.id).intersect(buyersExecutedOrders.map(_.id)))
 
@@ -987,7 +1013,7 @@ class ComponentViewController @Inject()(
         buyersExecutedOrdersConfirmedNegotiationIDs <- buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations, buyersExecutedOrders)
         sellersExecutedOrdersConfirmedNegotiationIDs <- sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations, sellersExecutedOrders)
       } yield Ok(views.html.component.master.organizationViewTradeStatistics(
-        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse ,
+        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse,
         sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse
       ))
         ).recover {
@@ -1002,7 +1028,7 @@ class ComponentViewController @Inject()(
 
       val sellerConfirmedNegotiations: Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForSellerAddress(loginState.address).map(_.filter(_.sellerSignature != "").filter(_.buyerSignature != ""))
 
-      def executedOrders(ids : Seq[String]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(ids).map(_.filter(_.awbProofHash != "").filter(_.fiatProofHash != ""))
+      def executedOrders(ids: Seq[String]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(ids).map(_.filter(_.awbProofHash != "").filter(_.fiatProofHash != ""))
 
       def buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations: Seq[Negotiation], buyersExecutedOrders: Seq[Order]): Future[Seq[String]] = Future(buyerConfirmedNegotiations.map(_.id).intersect(buyersExecutedOrders.map(_.id)))
 
@@ -1016,7 +1042,7 @@ class ComponentViewController @Inject()(
         buyersExecutedOrdersConfirmedNegotiationIDs <- buyersExecutedOrdersConfirmedNegotiationIDs(buyerConfirmedNegotiations, buyersExecutedOrders)
         sellersExecutedOrdersConfirmedNegotiationIDs <- sellersExecutedOrdersConfirmedNegotiationIDs(sellerConfirmedNegotiations, sellersExecutedOrders)
       } yield Ok(views.html.component.master.traderViewTradeStatistics(
-        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse ,
+        buyersNegotiationsForExecutedOrders = buyerConfirmedNegotiations.filter(negotiation => buyersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse,
         sellersNegotiationsForExecutedOrders = sellerConfirmedNegotiations.filter(negotiation => sellersExecutedOrdersConfirmedNegotiationIDs.contains(negotiation.id)).sortBy(_.time).reverse
       ))
         ).recover {

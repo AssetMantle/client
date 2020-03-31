@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AcceptOrRejectSalesQuote
+@import models.masterTransaction.SalesQuote
+
+@(acceptOrRejectSalesQuoteForm: Form[AcceptOrRejectSalesQuote.Data] = AcceptOrRejectSalesQuote.form, salesQuote: SalesQuote)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonAcceptOrRejectForm(constants.Form.ACCEPT_OR_REJECT_SALES_QUOTE, acceptOrRejectSalesQuoteForm,salesQuote.id,salesQuote.invitationStatus){
+    @commonInputText(acceptOrRejectSalesQuoteForm, constants.FormField.SALES_QUOTE_ID, 'value -> salesQuote.id, 'containerDivClass -> "hidden", 'readonly -> true)
+}
+

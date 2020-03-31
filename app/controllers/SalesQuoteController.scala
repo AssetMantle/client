@@ -14,7 +14,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTradeRooms: master.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: master.Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SalesQuoteController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionSalesQuotes: masterTransaction.SalesQuotes, masterTradeRelations: master.TraderRelations, masterTradeRooms: master.TradeRooms, masterTransactionTradeTerms: masterTransaction.TradeTerms, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: master.Accounts, masterTraders: master.Traders, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -74,7 +74,7 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
             }
             case None => {
               val requestID = utilities.IDGenerator.requestID()
-              val insertOrUpdate = masterTransactionSalesQuotes.Service.insertOrUpdate(requestID, accountID = loginState.username, assetType = commodityDetailsData.assetType, assetDescription = commodityDetailsData.assetDescription, assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice, shippingDetails = None, paymentTerms = None, salesQuoteDocuments = None, completionStatus = false)
+              val insertOrUpdate = masterTransactionSalesQuotes.Service.insertOrUpdate(requestID, accountID = loginState.username, assetType = commodityDetailsData.assetType, assetDescription = commodityDetailsData.assetDescription, assetQuantity = commodityDetailsData.assetQuantity, assetPrice = commodityDetailsData.assetPrice, shippingDetails = None, paymentTerms = None, salesQuoteDocuments = None, buyerAccountID = None, completionStatus = false, invitationStatus = None)
               for {
                 _ <- insertOrUpdate
                 result <- withUsernameToken.PartialContent(views.html.component.master.shippingDetails(requestID = requestID))
@@ -212,12 +212,18 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         salesQuoteDocumentsData => {
           val updateSalesQuoteDocuments = masterTransactionSalesQuotes.Service.updateSalesQuoteDocuments(salesQuoteDocumentsData.requestID, Serializable.SalesQuoteDocuments(salesQuoteDocumentsData.billOfExchangeRequired, salesQuoteDocumentsData.obl, salesQuoteDocumentsData.invoice, salesQuoteDocumentsData.COA, salesQuoteDocumentsData.COO, salesQuoteDocumentsData.otherDocuments))
 
-          def salesQuote: Future[SalesQuote] = masterTransactionSalesQuotes.Service.get(salesQuoteDocumentsData.requestID)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+          def getCounterPartyList(traderID: String) = masterTradeRelations.Service.getAllCounterPartyIDs(traderID)
+
+          def getTraderCounterPartyDetails(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
           (for {
             _ <- updateSalesQuoteDocuments
-            salesQuote <- salesQuote
-            result <- withUsernameToken.PartialContent(views.html.component.master.traderReviewSalesQuoteDetails(requestID = salesQuoteDocumentsData.requestID, salesQuote = salesQuote))
+            traderID <- traderID
+            counterPartyList <- getCounterPartyList(traderID)
+            traderCounterPartyDetails <- getTraderCounterPartyDetails(counterPartyList)
+            result <- withUsernameToken.PartialContent(views.html.component.master.inviteSalesQuoteBuyer(requestID = salesQuoteDocumentsData.requestID, traders = traderCounterPartyDetails))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -254,17 +260,9 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
         traderReviewSalesQuoteDetailsData => {
           (if (traderReviewSalesQuoteDetailsData.completion) {
             val updateCompletionStatus: Future[Int] = masterTransactionSalesQuotes.Service.updateCompletionStatus(traderReviewSalesQuoteDetailsData.requestID)
-            val createTradeRoom = masterTradeRooms.Service.create(traderReviewSalesQuoteDetailsData.requestID, "BUY10SdMxOf96", loginState.username, "None", "UnderNegotiation")
-            val salesQuote = masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
-
-            def createTradeTerms(tradeRoomID: String, salesQuote: SalesQuote) = masterTransactionTradeTerms.Service.create(tradeRoomID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, salesQuote.shippingDetails.get.shippingPeriod, salesQuote.shippingDetails.get.portOfLoading, salesQuote.shippingDetails.get.portOfDischarge, salesQuote.paymentTerms.get.advancePayment, salesQuote.paymentTerms.get.advancePercentage, salesQuote.paymentTerms.get.credit, salesQuote.paymentTerms.get.tenure, if (salesQuote.paymentTerms.get.tentativeDate.isDefined) Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get)) else None, salesQuote.paymentTerms.get.refrence, salesQuote.salesQuoteDocuments.get.billOfExchangeRequired, salesQuote.salesQuoteDocuments.get.obl, salesQuote.salesQuoteDocuments.get.invoice, salesQuote.salesQuoteDocuments.get.coo, salesQuote.salesQuoteDocuments.get.coa, salesQuote.salesQuoteDocuments.get.otherDocuments)
-
             for {
               _ <- updateCompletionStatus
-              tradeRoomID <- createTradeRoom
-              salesQuote <- salesQuote
-              _ <- createTradeTerms(tradeRoomID, salesQuote)
-              result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SALES_QUOTE_CREATED)))
+              result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.SALES_QUOTE_INVITATION_SENT)))
             } yield result
           } else {
             val salesQuote = masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
@@ -278,15 +276,154 @@ class SalesQuoteController @Inject()(messagesControllerComponents: MessagesContr
       )
   }
 
-  def salesQuoteList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def inviteSalesQuoteBuyerForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val salesQuotes = masterTransactionSalesQuotes.Service.getSalesQuotes(loginState.username)
+
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def getCounterPartyList(traderID: String) = masterTradeRelations.Service.getAllCounterPartyIDs(traderID)
+
+      def getTraderCounterPartyDetails(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
       (for {
-        salesQuotes <- salesQuotes
-      } yield Ok(views.html.component.master.salesQuotesList(salesQuotes))
+        traderID <- traderID
+        counterPartyList <- getCounterPartyList(traderID)
+        traderCounterPartyDetails <- getTraderCounterPartyDetails(counterPartyList)
+        result <- withUsernameToken.Ok(views.html.component.master.inviteSalesQuoteBuyer(requestID = requestID, traders = traderCounterPartyDetails))
+      } yield result
         ).recover {
-        case baseException: BaseException =>
-          InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
+  }
+
+  def inviteSalesQuoteBuyer: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.InviteSalesQuoteBuyer.form.bindFromRequest().fold(
+        formWithErrors => {
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+          def getCounterPartyList(traderID: String) = masterTradeRelations.Service.getAllCounterPartyIDs(traderID)
+
+          def getTraderCounterPartyDetails(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+          (for {
+            traderID <- traderID
+            counterPartyList <- getCounterPartyList(traderID)
+            traderCounterPartyDetails <- getTraderCounterPartyDetails(counterPartyList)
+          } yield BadRequest(views.html.component.master.inviteSalesQuoteBuyer(formWithErrors, formWithErrors.data(constants.FormField.COUNTER_PARTY.name), traders = traderCounterPartyDetails))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        },
+        traderReviewSalesQuoteDetailsData => {
+          val counterPartyTraderID = masterTraders.Service.tryGetID(traderReviewSalesQuoteDetailsData.counterParty)
+          val sellerTraderID = masterTraders.Service.tryGetID(loginState.username)
+
+          def checkIfBuyerPresentAsCounterParty(counterPartyTraderID: String, sellerTraderID: String) = masterTradeRelations.Service.get(counterPartyTraderID, sellerTraderID).map(_ => true).recover {
+            case baseException: BaseException => {
+              if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION) false else throw baseException
+            }
+          }
+
+          def updateAndGetResult(buyerPresentAsCounterParty: Boolean) = {
+            if (buyerPresentAsCounterParty) {
+              val updateSalesQuoteBuyer = masterTransactionSalesQuotes.Service.updateBuyer(traderReviewSalesQuoteDetailsData.requestID, traderReviewSalesQuoteDetailsData.counterParty)
+
+              def salesQuote = masterTransactionSalesQuotes.Service.get(traderReviewSalesQuoteDetailsData.requestID)
+
+              for {
+                _ <- updateSalesQuoteBuyer
+                salesQuote <- salesQuote
+                result <- withUsernameToken.PartialContent(views.html.component.master.traderReviewSalesQuoteDetails(requestID = traderReviewSalesQuoteDetailsData.requestID, salesQuote = salesQuote))
+              } yield result
+            } else {
+              val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+              def getCounterPartyList(traderID: String) = masterTradeRelations.Service.getAllCounterPartyIDs(traderID)
+
+              def getTraderCounterPartyDetails(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+              for {
+                traderID <- traderID
+                counterPartyList <- getCounterPartyList(traderID)
+                traderCounterPartyDetails <- getTraderCounterPartyDetails(counterPartyList)
+              } yield BadRequest(views.html.component.master.inviteSalesQuoteBuyer(views.companion.master.InviteSalesQuoteBuyer.form.fill(views.companion.master.InviteSalesQuoteBuyer.Data(traderReviewSalesQuoteDetailsData.requestID, traderReviewSalesQuoteDetailsData.counterParty)).withError(constants.FormField.COUNTER_PARTY.name, constants.Response.NOT_PRESENT_AS_COUNTERPARTY.message), requestID = traderReviewSalesQuoteDetailsData.requestID, traders = traderCounterPartyDetails))
+            }
+          }
+
+          (for {
+            counterPartyTraderID <- counterPartyTraderID
+            sellerTraderID <- sellerTraderID
+            buyerPresentAsCounterParty <- checkIfBuyerPresentAsCounterParty(counterPartyTraderID, sellerTraderID)
+            result <- updateAndGetResult(buyerPresentAsCounterParty)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def acceptOrRejectSalesQuoteForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val salesQuote = masterTransactionSalesQuotes.Service.get(id)
+      (for {
+        salesQuote <- salesQuote
+      } yield Ok(views.html.component.master.acceptOrRejectSalesQuote(salesQuote = salesQuote))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def acceptOrRejectSalesQuote: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.AcceptOrRejectSalesQuote.form.bindFromRequest().fold(
+        formWithErrors => {
+          val salesQuote = masterTransactionSalesQuotes.Service.get(formWithErrors.data(constants.FormField.SALES_QUOTE_ID.name))
+          (for {
+            salesQuote <- salesQuote
+          } yield BadRequest(views.html.component.master.acceptOrRejectSalesQuote(formWithErrors, salesQuote = salesQuote))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        },
+        acceptOrRejectSalesQuoteData => {
+
+          val updateStatusAndCreateTradeRoom = if (acceptOrRejectSalesQuoteData.status) {
+
+            val markAccepted = masterTransactionSalesQuotes.Service.markAccepted(acceptOrRejectSalesQuoteData.salesQuoteID)
+
+            def salesQuote = masterTransactionSalesQuotes.Service.get(acceptOrRejectSalesQuoteData.salesQuoteID)
+            //TODO: trade Room Status to be defined
+            def createTradeRoom(buyerAccountID: String, sellerAccountId: String) = masterTradeRooms.Service.create(acceptOrRejectSalesQuoteData.salesQuoteID, buyerAccountID, sellerAccountId, None, "UnderNegotiation")
+
+            def createTradeTerms(tradeRoomID: String, salesQuote: SalesQuote) = masterTransactionTradeTerms.Service.create(tradeRoomID, salesQuote.assetType, salesQuote.assetDescription, salesQuote.assetQuantity, salesQuote.assetPrice, salesQuote.shippingDetails.get.shippingPeriod, salesQuote.shippingDetails.get.portOfLoading, salesQuote.shippingDetails.get.portOfDischarge, salesQuote.paymentTerms.get.advancePayment, salesQuote.paymentTerms.get.advancePercentage, salesQuote.paymentTerms.get.credit, salesQuote.paymentTerms.get.tenure, if (salesQuote.paymentTerms.get.tentativeDate.isDefined) Some(utilities.Date.utilDateToSQLDate(salesQuote.paymentTerms.get.tentativeDate.get)) else None, salesQuote.paymentTerms.get.refrence, salesQuote.salesQuoteDocuments.get.billOfExchangeRequired, salesQuote.salesQuoteDocuments.get.obl, salesQuote.salesQuoteDocuments.get.invoice, salesQuote.salesQuoteDocuments.get.coo, salesQuote.salesQuoteDocuments.get.coa, salesQuote.salesQuoteDocuments.get.otherDocuments)
+
+            for {
+              _ <- markAccepted
+              salesQuote <- salesQuote
+              tradeRoomID <- createTradeRoom(salesQuote.buyerAccountID.get, salesQuote.accountID)
+              _ <- createTradeTerms(tradeRoomID, salesQuote)
+            } yield salesQuote
+          } else {
+            val markRejected = masterTransactionSalesQuotes.Service.markRejected(acceptOrRejectSalesQuoteData.salesQuoteID)
+
+            def salesQuote = masterTransactionSalesQuotes.Service.get(acceptOrRejectSalesQuoteData.salesQuoteID)
+
+            for {
+              _ <- markRejected
+              salesQuote <- salesQuote
+            } yield salesQuote
+          }
+
+          (for {
+            salesQuote <- updateStatusAndCreateTradeRoom
+            result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectSalesQuote(salesQuote = salesQuote))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 }

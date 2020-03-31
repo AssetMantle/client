@@ -89,6 +89,9 @@ GET         /component/acceptedTraderRelation                               cont
 GET         /component/pendingSentTraderRelation                            controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
 GET         /component/pendingReceivedTraderRelation                        controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
 GET         /component/zoneViewOrganizationBankAccountDetail                controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)
+GET         /component/salesQuoteList                                    controllers.ComponentViewController.salesQuoteList
+GET         /component/sellSalesQuoteList                                controllers.ComponentViewController.sellSalesQuoteList
+GET         /component/buySalesQuoteList                                 controllers.ComponentViewController.buySalesQuoteList
 
 GET         /master/commodityDetails                                        controllers.SalesQuoteController.commodityDetailsForm(id:Option[String])
 POST        /master/commodityDetails                                        controllers.SalesQuoteController.commodityDetails
@@ -100,7 +103,10 @@ GET         /master/salesQuoteDocuments                                     cont
 POST        /master/salesQuoteDocuments                                     controllers.SalesQuoteController.salesQuoteDocuments
 GET         /master/traderReviewSalesQuoteDetails                           controllers.SalesQuoteController.traderReviewSalesQuoteDetailsForm(id:String)
 POST        /master/traderReviewSalesQuoteDetails                           controllers.SalesQuoteController.traderReviewSalesQuoteDetails
-GET         /master/salesQuoteList                                          controllers.SalesQuoteController.salesQuoteList
+GET         /master/inviteBuyer                                          controllers.SalesQuoteController.inviteSalesQuoteBuyerForm(requestID:String)
+POST        /master/inviteBuyer                                          controllers.SalesQuoteController.inviteSalesQuoteBuyer
+GET         /master/acceptOrRejectSalesQuote                                          controllers.SalesQuoteController.acceptOrRejectSalesQuoteForm(id:String)
+POST        /master/acceptOrRejectSalesQuote                             controllers.SalesQuoteController.acceptOrRejectSalesQuote
 
 GET         /master/component/commonHome                                    controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                                controllers.ComponentViewController.genesisDetails

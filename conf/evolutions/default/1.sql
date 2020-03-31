@@ -636,7 +636,7 @@ CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
     "salesQuoteID"       VARCHAR NOT NULL,
     "buyerAccountID"     VARCHAR NOT NULL,
     "sellerAccountID"    VARCHAR NOT NULL,
-    "financierAccountID" VARCHAR NOT NULL,
+    "financierAccountID" VARCHAR,
     "status"             VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -744,7 +744,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
     "shippingDetails"  VARCHAR,
     "paymentTerms"     VARCHAR,
     "documents"        VARCHAR,
+    "buyerAccountID"   VARCHAR,
     "completionStatus" BOOLEAN NOT NULL,
+    "invitationStatus" BOOLEAN ,
     PRIMARY KEY ("id")
 );
 
@@ -940,6 +942,10 @@ ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
     ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SalesQuote"
+    ADD CONSTRAINT SalesQuote_Trader_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Trader" ("accountID");
+ALTER TABLE MASTER_TRANSACTION."SalesQuote"
+    ADD CONSTRAINT SalesQuote_Trader_buyerAccountID FOREIGN KEY ("buyerAccountID") REFERENCES MASTER."Trader" ("accountID");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
@@ -950,15 +956,15 @@ ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6',
+VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '1000',
-        'commitpub1addwnpepq2yk5pt0qse3q6f45rc92skcuj55nqp8puv8vuh2xsc786jryjynku36hvc',
+        'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '711213004', 'commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 

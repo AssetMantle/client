@@ -6,8 +6,6 @@
 
 @(updateTradeTermStatusForm: Form[UpdateTradeTermStatus.Data] = UpdateTradeTermStatus.form, tradeID: String, termType: String, status: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<div id="@Seq(tradeID, termType).mkString("")">
-
 @form(action = routes.TradeRoomController.updateTradeTermStatus) {
     @CSRF.formField
     @commonInputText(updateTradeTermStatusForm, constants.FormField.TRADE_ID, 'value -> tradeID, 'containerDivClass -> "hidden", 'readonly -> true)
@@ -25,8 +23,6 @@
         </ul>
     }
 }
-
-</div>
 
 <script>
         function updateStatus(source) {

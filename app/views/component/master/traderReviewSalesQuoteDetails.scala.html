@@ -37,6 +37,10 @@
         <span class="red">@Messages(constants.FormField.OTHER_DOCUMENTS.name)</span>: @salesQuote.salesQuoteDocuments.get.otherDocuments <br>
     </div>
     <br>
+    <div>@Messages(constants.View.INVITE) : <br>
+        <span class="red">@Messages(constants.FormField.COUNTER_PARTY.name)</span>: @salesQuote.buyerAccountID <br>
+    </div>
+    <br>
 
     @commonInputText(traderReviewSalesQuoteDetailsForm, constants.FormField.REQUEST_ID, 'value ->requestID, 'class -> "hidden", 'readonly -> true)
     @commonCheckbox(traderReviewSalesQuoteDetailsForm, constants.FormField.COMPLETION)

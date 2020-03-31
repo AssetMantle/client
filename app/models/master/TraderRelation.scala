@@ -99,6 +99,8 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
     def get(fromID: String, toID: String): Future[TraderRelation] = findByID(getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
 
     def markRejected(fromID: String, toID: String): Future[Int] = deleteByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
+
+    def getAllCounterPartyIDs(id: String): Future[Seq[String]] = findAllByFromIDOrToIDAndStatus(id = id, status = Option(true)).map(_.map(tradeRelation => if (tradeRelation.fromID == id) tradeRelation.toID else tradeRelation.fromID))
   }
 
 }
