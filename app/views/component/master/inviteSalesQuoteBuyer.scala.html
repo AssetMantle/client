@@ -1,0 +1,24 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.InviteSalesQuoteBuyer
+@import models.master.Trader
+
+@(inviteSalesQuoteBuyerForm: Form[InviteSalesQuoteBuyer.Data] = InviteSalesQuoteBuyer.form, requestID:String, traders:Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.INVITE_SALES_QUOTE_BUYER, inviteSalesQuoteBuyerForm) {
+
+        @commonCard(Messages(constants.View.COUNTER_PARTY_LIST)){
+        }{
+            @for(trader<- traders){
+                @commonInfoBox(){
+                    @commonTextInfo(constants.Form.ORGANIZATION_ID,trader.organizationID) <br>
+                    @commonTextInfo(constants.Form.ACCOUNT_ID,trader.accountID) <br>
+                    @commonTextInfo(constants.Form.NAME,trader.name) <br>
+                    @commonJavascriptButton(constants.View.SELECT,JavaScript(s"fillCounterPartyField('${trader.accountID}')"))  <br>
+                }
+        }
+    }
+    @commonInputText(inviteSalesQuoteBuyerForm, constants.FormField.REQUEST_ID, 'value ->requestID,'class -> "hidden", 'readonly -> true)
+    @commonInputText(inviteSalesQuoteBuyerForm, constants.FormField.COUNTER_PARTY)
+}
+
+<script src="@routes.Assets.versioned("javascripts/inviteSalesQuoteBuyer.js")" type="text/javascript"></script>
