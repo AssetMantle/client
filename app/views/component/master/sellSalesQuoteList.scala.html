@@ -32,8 +32,7 @@
                         }
                     }
                 }else{
-                    @commonModalButton(constants.View.INCOMPLETE,constants.Form.COMMODITY_DETAILS.get)
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm('@sellSalesQuote.id'))">@Messages(constants.View.INCOMPLETE)</button>
+                    @commonModalButton(constants.View.INCOMPLETE,constants.Form.COMMODITY_DETAILS.get, 'parameters-> s"'${sellSalesQuote.id}'")
                 }
                 </td>
             </tr>

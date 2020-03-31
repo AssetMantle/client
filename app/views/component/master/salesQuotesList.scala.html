@@ -8,7 +8,7 @@
 
 <div>
 @commonCard(constants.View.SALES_QUOTE_LIST) {
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
+    @commonModalButton(constants.Form.CREATE_SALES_QUOTE,constants.Form.COMMODITY_DETAILS.get)
 } {
     @commonHorizontalSwitcher(ListMap(constants.View.SELL -> routes.javascript.ComponentViewController.sellSalesQuoteList,
         constants.View.BUY -> routes.javascript.ComponentViewController.buySalesQuoteList,
