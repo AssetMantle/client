@@ -47,9 +47,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         updateContactData => {
 
-          val emailPresent = masterContacts.Service.emailPresent(updateContactData.emailAddress)
+          val emailPresent = masterContacts.Service.emailPresent(updateContactData.emailAddress,loginState.username)
 
-          val mobilePresent = masterContacts.Service.mobileNumberPresent(updateContactData.countryCode + updateContactData.mobileNumber)
+          val mobilePresent = masterContacts.Service.mobileNumberPresent(updateContactData.countryCode + updateContactData.mobileNumber,loginState.username)
 
           def getResult(emailPresent: Boolean, mobilePresent: Boolean) = {
             if (mobilePresent && emailPresent) {
