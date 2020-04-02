@@ -11,7 +11,7 @@
                 @commonTextInfo(constants.Form.ACCOUNT_ID, zoneVerificationRequest.accountID)
                 @commonTextInfo(constants.Form.NAME, zoneVerificationRequest.name)
                 @commonTextInfo(constants.Form.CURRENCY, zoneVerificationRequest.currency)
-                <span class="red">@Messages(constants.Form.DOCUMENTS)</span>:
+                <div class="cmuk-text-left title">@Messages(constants.Form.DOCUMENTS)</div>
                 <span id = '@Seq("kycDocuments", zoneVerificationRequest.accountID).mkString("")'>
                     <script>componentResource('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKYCDocuments('@zoneVerificationRequest.id'))</script>
                 </span>

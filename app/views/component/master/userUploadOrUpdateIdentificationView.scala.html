@@ -3,8 +3,8 @@
 
 @(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.View.ID_PROOF)</h4>
+<div class="centerText">
+    <h4>@Messages(constants.View.ID_PROOF)</h4>
 </div>
 <div class="centerText">
     <div id="@Seq("upload", documentType).mkString("")">

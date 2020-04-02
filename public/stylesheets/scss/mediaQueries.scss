@@ -1,4 +1,51 @@
 @import "variables.scss";
+@media (max-width: 600px) {
+  .pageContent {
+    margin: 20px;
+  }
+  .MnemonicQuiz{
+    max-width: 500px;
+  }
+  .bannerText{
+    width: 100%;
+  }
+
+  .mobile .cmuk-offcanvas-bar{
+    padding: 30px;
+  }
+  .mobile .cmuk-button{
+    background-color: $colorPrimary;
+  }
+  .modal .modalContent{
+    top:10%;
+    max-height: 400px;
+  }
+}
+@media (min-width: 600px) {
+  .modalBody{
+    form{
+      width: 500px;
+      text-align: center;
+    }
+  }
+  form{
+    hr{
+      margin-top: 10px;
+    }
+  }
+  .MnemonicQuiz {
+    text-align: center;
+    width: 500px;
+  }
+  .kycDocumentsView{
+    display: flex;
+  }
+}
+@media (min-width: 960px) {
+  .verticalDataTabsData {
+    display: flex;
+  }
+}
 @media screen and (max-width: 768px) {
   .timeline {
     margin: 30px;
@@ -49,12 +96,14 @@
 }
 
 @media (min-width:992px) and (max-width:1600px){
+  .modal .modalContent{
+    max-height: 470px;
+  }
   .leftTradeFinancial{
     .financial{
       margin-bottom: 15px;
     }
     .cmuk-card-header{
-      padding: 10px 15px;
       font-size: 12px;;
     }
 
@@ -100,7 +149,6 @@
         height: 210px;
       }
       .cmuk-card-header{
-        padding: 10px 15px;
         font-size:12px;
       }
     }
@@ -128,15 +176,39 @@
     }
   }
 }
-@media (min-width:1600px){
-  .leftTradeFinancial{
-    .financial {
-      ul li {
-        padding: 20px 0;
+
+@media (max-width: 1600px){
+  .commonList{
+    .listItemChild{
+      font-size: $paragraphFontSizeSmall;
+    }
+  }
+  .leftTradeFinancial {
+    .financial{
+      ul{
+        li .ctitle{
+          font-size: $paragraphFontSizeSmall;
+        }
       }
     }
   }
+  .timeline
+  {
+    .timeline-item{
+      .timeline-content{
+        .activityContent{
+          font-size:$paragraphFontSizeSmall;
+        }
+      }
+    }
+  }
+  .profileContainer{
+    .infoRow{
+      font-size: $paragraphFontSizeSmall;
+    }
+  }
 }
+
 @media (max-width:1920px){
   .comdex .cmuk-container {
     max-width: 100%;

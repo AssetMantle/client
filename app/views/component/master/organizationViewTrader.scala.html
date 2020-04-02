@@ -4,9 +4,7 @@
 @import views.html.base._
 
 @(trader: Trader, assets: Seq[Asset], fiats: Seq[Fiat], buyOrders: Seq[Order], sellOrders: Seq[Order], buyNegotiations: Seq[Negotiation], sellNegotiations: Seq[Negotiation], traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.TRADER_DETAILS)</h4>
-</div>
+<h4>@Messages(constants.Form.TRADER_DETAILS)</h4>
 <div id="traderDetails@trader.id">
     @commonTextInfo(constants.Form.TRADER_ID, trader.id)
     @commonTextInfo(constants.Form.NAME, trader.name)

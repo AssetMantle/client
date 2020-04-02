@@ -1,4 +1,5 @@
 @import "variables.scss";
+
 %buttonPrimary{
   background-color: $colorPrimary;
   font-family: $fontFamilyPrimary;
@@ -18,7 +19,6 @@
   background-color: rgba(0, 0, 0, 0.4);
   padding: 30px 30px;
   text-align: center;
-
   .modalContent {
     word-break: break-all;
     top: 20%;
@@ -47,9 +47,11 @@
     }
   }
 }
+
 .wordBreak{
   word-break: break-all;
 }
+
 .centerScreen {
   display: flex;
   flex-direction: column;
@@ -58,7 +60,6 @@
   text-align: center;
   min-height: 100vh;
 }
-
 
 .mainSection {
   display: flex;
@@ -81,69 +82,18 @@
   height: 100%;
 }
 
-// Media Queries
-@media (max-width: 600px) {
-
-  .pageContent {
-    margin: 20px;
-  }
-  .MnemonicQuiz{
-    max-width: 500px;
-  }
-  .bannerText{
-    width: 100%;
-  }
-
-  .mobile .cmuk-offcanvas-bar{
-    padding: 30px;
-  }
-  .mobile .cmuk-button{
-    background-color: $colorPrimary;
-  }
-  .modal .modalContent{
-    top:10%;
-    max-height: 400px;
-  }
-}
-@media (min-width: 600px) {
-  .modalBody{
-    form{
-      width: 500px;
-      text-align: center;
-    }
-  }
-  form{
-    hr{
-      margin-top: 10px;
-    }
-  }
-  .MnemonicQuiz {
-    text-align: center;
-    width: 500px;
-  }
-  .kycDocumentsView{
-    display: flex;
-  }
-}
-@media (min-width: 960px) {
-  .verticalDataTabsData {
-    display: flex;
-  }
-}
-
 .bannerContainer {
   background-color: #031221;
   background-image: url("../../images/bannerImage.svg");
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: 80% 6%;
+  background-position: 80% 8%;
   height: 363px;
-    display: flex;
-   position: relative;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   .bannerText {
     width: 600px;
     padding: 50px 0px;
@@ -160,12 +110,6 @@
       line-height: 172%;
       letter-spacing: 0.01em;
       color: #627F9F;
-    }
-  }
-  .bannerImage {
-    margin-left: auto;
-    img {
-      margin-top: -13px;
     }
   }
   .cmuk-slider {
@@ -185,7 +129,6 @@
           border: 3px solid red;
           transform: rotate(-45deg);
         }
-
       }
       li span {
         font-size: $paragraphFontSizeSmall;
@@ -210,42 +153,6 @@
   }
 }
 
-.cmuk-button-primary{
-  background-color: $colorPrimary !important;
-}
-
-.cmuk-legend{
-  font-weight: bold;
-  font-family: $fontFamilySecondary;
-  font-size: $headingFontSizeSmall !important;
-}
-
-.bannerButtons {
-  button {
-    @extend %buttonPrimary;
-    font-size: $headingFontSizeSmall;
-    margin-right: 20px;
-  }
-
-  .cmuk-button-default,
-  .cmuk-button-default:focus,
-  .cmuk-button-default:hover{
-    border-color: $colorPrimary;
-    color:#FFFFFF;
-    background-color: transparent;
-  }
-}
-
-
-.headingSection p {
-  font-family: $fontFamilySecondary;
-  font-size:$headingFontSizeMedium;
-  line-height: 212%;
-  text-align: center;
-  letter-spacing: 0.01em;
-  color: #59616A;
-}
-
 .tabsSection {
   p {
     font-family:$fontFamilySecondary;
@@ -255,31 +162,46 @@
   }
   .cmuk-subnav-pill{
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
-    border-radius: 5px 5px 0px 0px;
+    border-radius: 5px;
     li {
       &:first-child a{
         border-radius: 5px 5px 0px 0px;
       }
       &:nth-child(2){
-        border-top: 1px solid #FAFBFD;
-        border-bottom: 1px solid #FAFBFD;
+        border-top: 1px solid #e7eaf3;
+        border-bottom: 1px solid #e7eaf3;
       }
       &:last-child a{
         border-radius: 0px 0px 5px 5px;
       }
       a{
-        padding: 10px 35px 10px 15px;
+        background-color: #FAFBFD;
+        padding: 10px 0px 10px 15px;
         font-family: $fontFamilySecondary;
         font-size: $paragraphFontSizeMedium;
         color:#0862BE;
         font-weight: bold;
-
+        &:before{
+          content: "";
+          width: 1.4em;
+          height: 1.4em;
+          padding-right: 0px;
+          margin-left: 25px;
+          float: right;
+          background-repeat: no-repeat;
+          background-position: 50% 50%;
+          background-image: url(../../images/chevron-down.svg);
+          padding-left: 25px;
+        }
       }
     }
   }
   .cmuk-subnav-pill>.cmuk-active>a{
     background: $colorSecondary;
     color:#FFFFFF;
+    &:before{
+      background-image: url(../../images/chevron-right.svg);
+    }
   }
   .cmuk-switcher{
     li{
@@ -292,77 +214,6 @@
         text-align: justify;
       }
     }
-  }
-}
-
-.verticalDataTabs {
-  width: 214px;
-  ul li {
-    background: #FAFBFD;
-    margin-bottom: 2px;
-  }
-  .cmuk-nav-default>li.cmuk-active>a {
-    background: $colorPrimary;
-    color: #FFFFFF;
-  }
-  ul li a span {
-    float: right;
-    margin-top: 8px;
-  }
-}
-
-.verticalDataTabs ul li a,
-.verticalDataTabsData p {
-  font-family: $fontFamilySecondary;
-  padding: 20px 20px;
-  font-size: $headingFontSizeSmall;
-  font-weight: normal;
-  line-height: 182%;
-  letter-spacing: 0.01em;
-  color:$colorPrimary;
-}
-
-.verticalDataTabsData p{
-  color: #365575;
-  padding-top: 0px;
-}
-
-.contactSection{
-  background-image:url('../../images/contactbg.svg');
-  background-position: left;
-  background-repeat: no-repeat;
-  background-color: $colorPrimary;
-  background-size: contain;
-  h3 {
-    font-family: $fontFamilySecondary;
-    font-weight: bold;
-    font-size:$headingFontSizeLarge;
-    line-height: 127.5%;
-    letter-spacing: 0.01em;
-    color: #FAFBFD;
-  }
-  input::placeholder{
-    font-family: $fontFamilyPrimary;
-    color:$colorSecondary;
-  }
-  .cmuk-button {
-    background: $colorSecondary;
-    border-radius: $buttonBorderRadius;
-    text-transform: capitalize;
-    height: 45px;
-    font-size:$headingFontSizeSmall;
-    line-height: 172%;
-    text-align: center;
-    letter-spacing: 0.01em;
-    color: #FFFFFF;
-  }
-  .cmuk-form-width-medium {
-    background: #CFE5FD;
-    border: 1px solid rgba(5, 60, 117, 0.12);
-    box-sizing: border-box;
-    border-radius: $buttonBorderRadius;
-    width: 330px;
-    height: 45px;
   }
 }
 
@@ -511,7 +362,6 @@
       margin-right: 10px;
       margin-bottom: 10px;
       border-radius: $buttonBorderRadius;
-
       input{
         background: #F0F4FA;
         border: 1px solid #859EB9;
@@ -640,6 +490,7 @@ rightText {
   border-radius: $buttonBorderRadius;
   background-color: #ddd;
   height: 13px;
+  margin-bottom: 5px;
 }
 
 .progressBar {
@@ -653,9 +504,11 @@ rightText {
   height: 100px;
   width: 100px;
 }
+
 .profilePictureContainer{
   border-radius: 50%;
 }
+
 dl .info {
   background-color: #dadada;
   color: #838383;
@@ -667,9 +520,6 @@ dl .info {
   font-size: smaller;
   padding: 0;
   display: none;
-}
-
-dl .info {
   &:after {
     content: "";
     position: absolute;
@@ -901,11 +751,6 @@ dl .info {
   padding:10px;
 }
 
-.cmuk-spinner>*>*{
-  stroke-width:2 !important;
-  stroke:#102923 !important;
-}
-
 .userList .cmuk-navbar-dropdown {
   &:before {
     content: ' ';
@@ -982,94 +827,6 @@ dl .info {
 
 .dataContainer .cmuk-alert{
   margin:0px;
-}
-
-.dashboardContainer {
-  .left {
-    background: $colorSecondary;
-    width: 250px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
-    padding: 50px 30px 30px 30px;
-    img {
-      margin-bottom: 30px;
-      margin-left: 10px;
-    }
-    .cmuk-nav-default {
-      margin-left: -27px;
-    }
-    .cmuk-nav-default > li {
-      padding: 10px;
-      position: relative;
-    }
-    .cmuk-nav-default > li > a {
-      font-family:$fontFamilySecondary;
-      position: relative;
-      font-style: normal;
-      margin-left: 30px;
-      font-weight: bold;
-      font-size: $headingFontSizeSmall;
-      line-height: 23px;
-      color: #71757A;
-    }
-    .cmuk-nav-default > li.cmuk-active > a {
-      color: #F0F0F0;
-    }
-    .cmuk-nav-default > li.cmuk-active{
-      &:before {
-        content: ' ';
-        position: absolute;
-        width: 0;
-        height: 0;
-        left: 0px;
-        right: auto;
-        top: 15%;
-        bottom: -19px;
-        border: 20px solid;
-        border-color: transparent transparent transparent #e7eaf3;
-      }
-      &:after {
-        content: ' ';
-        position: absolute;
-        width: 0;
-        height: 0;
-        left: 6px;
-        right: auto;
-        top: 15%;
-        bottom: -19px;
-        border: 20px solid;
-        border-color: transparent transparent transparent $colorSecondary;
-      }
-    }
-  }
-
-  .right {
-    padding: 50px 30px 30px 30px;
-    width: calc(100% - 250px);
-  }
-
-  .accountTabSection,
-  .accountTabDeclaration {
-    width: 100%;
-  }
-
-  .accountTabSection {
-    .cmuk-card {
-      margin: 10px;
-    }
-    .cmuk-card .cmuk-card-header {
-      justify-content: space-between;
-    }
-    .cmuk-card .cmuk-card-header h3 {
-      margin: 0px;
-    }
-  }
-
-  .accountOrganization {
-    width: 40%;
-  }
-  .accountUbo {
-    width: 60%;
-  }
 }
 
 .switch {
@@ -1189,6 +946,7 @@ input:checked+.slider {
   font-weight: bold;
   color: black;
 }
+
 .Editdropdown{
   display: none;
   position: absolute;
@@ -1200,6 +958,7 @@ input:checked+.slider {
   color: #666;
   box-shadow: 0 5px 12px rgba(0,0,0,.15);
 }
+
 .hiddenLabel label{
   display: none;
 }
@@ -1218,7 +977,9 @@ input:checked+.slider {
   margin: 5px 0px;
   flex-wrap: wrap;
   .documentContentTop{
-    font-size: $paragraphFontSizeSmall;
+    font-size: $paragraphFontSizeMedium;
+    font-family: $fontFamilySecondary;
+    color:$colorPrimary;
     margin: 10px;
   }
   .documentThumbnail{
@@ -1231,17 +992,26 @@ input:checked+.slider {
   .documentContentBottom{
     margin: 10px;
     font-size: $paragraphFontSizeSmall;
+    text-align: left;
   }
 }
 
+.fileName{
+  font-size: $paragraphFontSizeMedium;
+  font-family: $fontFamilySecondary;
+  color: $colorPrimary;
+  margin-bottom: 5px;
+}
+
+.dropBox{
+  font-family: $fontFamilySecondary;
+}
 .profileDocuments{
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
 }
-.cmuk-table th, .cmuk-button{
-  text-transform: capitalize !important;
-}
+
 .mobileNumberUpdate {
   .countryCode {
     margin-top: 24px;
@@ -1266,7 +1036,6 @@ input:checked+.slider {
 .loginForm {
   .inputField {
     display: flex;
-
     .inputFieldIcon {
       display: flex;
       align-items: center;
@@ -1275,11 +1044,9 @@ input:checked+.slider {
       margin-top: 19px;
       padding: 0px 10px;
     }
-
     .inputFieldBody {
       width: 100%;
     }
-
     .inputFieldBody input {
       font-size: $paragraphFontSizeSmall;
     }
@@ -1289,10 +1056,16 @@ input:checked+.slider {
     font-family: $fontFamilySecondary;
   }
 }
+
 .connectionError{
   height: 100px;
+  position: relative;
+  top:25%;
+  margin: auto;
   padding: 40px;
   border-radius: $buttonBorderRadius;
+  font-family: $fontFamilySecondary;
+  font-size: $paragraphFontSizeMedium;
   background: #e6e6e6;
   width: 100px;
   color: red;
@@ -1302,7 +1075,8 @@ input:checked+.slider {
   line-height: 1.8;
   align-items:flex-start;
   word-break: break-all;
-  font-size: $paragraphFontSizeSmall;
+  font-size: $paragraphFontSizeMedium;
+  font-family: $fontFamilySecondary;
 }
 
 .infoRowLabel{
@@ -1311,6 +1085,7 @@ input:checked+.slider {
   height: min-content;
   word-break: break-word;
 }
+
 .infoRowValue{
   flex: 1 1;
   color: #767f8d;
@@ -1318,12 +1093,6 @@ input:checked+.slider {
   height: min-content;
 }
 
-.cmuk-accordion-title::before{
-  background-image:url('../../images/chevron-up.svg') !important;
-}
-.cmuk-open>.cmuk-accordion-title::before{
-  background-image:url("../../images/chevron-down.svg") !important;
-}
 .commonCheckBox{
   dt{
     width: 200px;
@@ -1331,13 +1100,17 @@ input:checked+.slider {
   }
 }
 
-
-
-
 .unRead{
   color: #1e87f0;
   background: lightblue;
   text-align: center;
   margin: 5px;
   border-radius: 5px;
+}
+
+.graphCard{
+  .cmuk-card-header{
+    padding: 15px 20px;
+  }
+  margin-bottom: 20px;
 }

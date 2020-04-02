@@ -1,3 +1,39 @@
+@media (max-width: 600px) {
+  .pageContent {
+    margin: 20px; }
+
+  .MnemonicQuiz {
+    max-width: 500px; }
+
+  .bannerText {
+    width: 100%; }
+
+  .mobile .cmuk-offcanvas-bar {
+    padding: 30px; }
+
+  .mobile .cmuk-button {
+    background-color: #0862BE; }
+
+  .modal .modalContent {
+    top: 10%;
+    max-height: 400px; } }
+@media (min-width: 600px) {
+  .modalBody form {
+    width: 500px;
+    text-align: center; }
+
+  form hr {
+    margin-top: 10px; }
+
+  .MnemonicQuiz {
+    text-align: center;
+    width: 500px; }
+
+  .kycDocumentsView {
+    display: flex; } }
+@media (min-width: 960px) {
+  .verticalDataTabsData {
+    display: flex; } }
 @media screen and (max-width: 768px) {
   .timeline {
     margin: 30px;
@@ -30,10 +66,12 @@
     float: left;
     right: 0; } }
 @media (min-width: 992px) and (max-width: 1600px) {
+  .modal .modalContent {
+    max-height: 470px; }
+
   .leftTradeFinancial .financial {
     margin-bottom: 15px; }
   .leftTradeFinancial .cmuk-card-header {
-    padding: 10px 15px;
     font-size: 12px; }
   .leftTradeFinancial .financial .cmuk-card-body {
     height: 210px; }
@@ -62,7 +100,6 @@
     .recentActivity .recentActivityContainer .cmuk-card-body {
       height: 210px; }
     .recentActivity .recentActivityContainer .cmuk-card-header {
-      padding: 10px 15px;
       font-size: 12px; }
   .recentActivity .chatRoom .cmuk-card-body {
     height: 300px; }
@@ -77,9 +114,18 @@
 
   .comdex .cmuk-height-medium {
     height: 210px; } }
-@media (min-width: 1600px) {
-  .leftTradeFinancial .financial ul li {
-    padding: 20px 0; } }
+@media (max-width: 1600px) {
+  .commonList .listItemChild {
+    font-size: 12px; }
+
+  .leftTradeFinancial .financial ul li .ctitle {
+    font-size: 12px; }
+
+  .timeline .timeline-item .timeline-content .activityContent {
+    font-size: 12px; }
+
+  .profileContainer .infoRow {
+    font-size: 12px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }
@@ -108,21 +154,8 @@
 
 html, body {
   height: 100%;
-  background: #F0F0F0; }
-
-.cover-bar {
-  position: absolute;
-  background: #FAFAFA;
-  height: 100%;
-  top: 0;
-  right: 0;
-  width: 7px;
-  -webkit-transition: all .5s;
-  opacity: 1; }
-
-.scroller:hover .cover-bar {
-  opacity: 0;
-  -webkit-transition: all .5s; }
+  background: #F0F0F0;
+  scroll-behavior: smooth; }
 
 .leftTradeFinancial .financial ul li .wallet .walletIcon, .leftTradeFinancial .financial ul li .payable .payableIcon, .leftTradeFinancial .financial ul li .receivable .receivableIcon, .leftTradeFinancial .financial ul li .leftDays .leftDaysIcon {
   width: 36px;
@@ -210,6 +243,31 @@ html, body {
 .comdex .cmuk-alert p {
   font-family: "Oxygen", sans-serif;
   font-size: 12px; }
+.comdex .cmuk-card-header {
+  color: #061728;
+  font-family: "Oxygen", sans-serif; }
+.comdex .cmuk-button-link {
+  color: #0862BE; }
+.comdex .cmuk-button-primary {
+  background-color: #0862BE; }
+.comdex .cmuk-legend {
+  font-weight: bold;
+  font-family: "Oxygen", sans-serif;
+  font-size: 18px; }
+.comdex .cmuk-spinner > * > * {
+  stroke-width: 2;
+  stroke: #102923; }
+.comdex .cmuk-accordion-title::before {
+  background-image: url("../../images/chevron-up.svg"); }
+.comdex .cmuk-open > .cmuk-accordion-title::before {
+  background-image: url("../../images/chevron-down.svg"); }
+.comdex .cmuk-table th, .comdex .cmuk-button {
+  text-transform: capitalize; }
+.comdex .modalBody .cmuk-button {
+  margin-bottom: 5px; }
+.comdex .modalBody .infoRowValue {
+  text-align: left;
+  margin-left: 30px; }
 
 .header {
   background: #053C75; }
@@ -234,9 +292,11 @@ html, body {
     background-color: #FE4350;
     font-size: 14px;
     color: #FFFFFF;
-    line-height: 30px; }
-  .header .cmuk-navbar-right .cmuk-navbar-nav li:last-child a {
-    padding-right: 0px; }
+    line-height: inherit;
+    padding: 8px 30px;
+    border-radius: 3px; }
+  .header .cmuk-navbar-right .cmuk-navbar-nav li .lastChild {
+    padding: 0px 0px 0px 30px; }
   .header .cmuk-navbar-right .loginIcon {
     width: 20px;
     height: 20px;
@@ -252,6 +312,10 @@ html, body {
   .header .dashboardIcon .icon {
     width: 16px;
     height: 13px; }
+  .header .dashboardIcon, .header .traderIcon, .header .accountIcon {
+    margi-right: 3px;
+    width: 20px;
+    height: 20px; }
   .header .icon {
     width: 17px;
     height: 15px;
@@ -486,7 +550,7 @@ html, body {
   margin-bottom: 20px; }
 .leftTradeFinancial .cmuk-card-header {
   padding: 15px 20px;
-  color: #636363;
+  color: #061728;
   font-size: 14px;
   font-family: "Oxygen", sans-serif; }
 .leftTradeFinancial .cmuk-card-body {
@@ -507,8 +571,7 @@ html, body {
       margin-right: 5px; }
 .leftTradeFinancial .financial ul li {
   justify-content: space-between;
-  border-bottom: 1px solid #E2E4E6;
-  padding: 20px 0;
+  padding: 25px 0;
   margin: 0px 15px; }
   .leftTradeFinancial .financial ul li:last-child {
     border: 0px; }
@@ -519,7 +582,7 @@ html, body {
       background: linear-gradient(180deg, #0862BE 0%, #05488C 100%); }
   .leftTradeFinancial .financial ul li .ctitle {
     color: #5C6166;
-    font-size: 12px;
+    font-size: 14px;
     font-family: "Oxygen", sans-serif; }
   .leftTradeFinancial .financial ul li .payable {
     align-items: center; }
@@ -670,8 +733,6 @@ header:before,
 
 .timeline {
   line-height: 1.5em;
-  font-size: 14px;
-  width: 250px;
   position: relative;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -683,7 +744,7 @@ header:before,
     width: 0px;
     height: 100%;
     border-right: 2px dashed #CECECE;
-    left: 17px;
+    left: 30px;
     top: 0;
     position: absolute; }
   .timeline .timeline-item {
@@ -698,9 +759,8 @@ header:before,
       position: relative;
       top: 0;
       display: inline-block;
-      left: 20px;
+      left: 10px;
       overflow: hidden;
-      margin-left: -23px;
       -webkit-border-radius: 50%;
       -moz-border-radius: 50%;
       -ms-border-radius: 50%;
@@ -723,31 +783,10 @@ header:before,
       -moz-transition: all 0.3s ease;
       -ms-transition: all 0.3s ease;
       transition: all 0.3s ease; }
-      .timeline .timeline-item .timeline-content h2 {
-        padding: 15px;
-        background: #ee4d4d;
-        color: #fff;
-        margin: -20px -20px 0 -20px;
-        font-weight: 500;
-        -webkit-border-radius: 3px 3px 0 0;
-        -moz-border-radius: 3px 3px 0 0;
-        -ms-border-radius: 3px 3px 0 0;
-        border-radius: 3px 3px 0 0; }
-      .timeline .timeline-item .timeline-content p {
+      .timeline .timeline-item .timeline-content .activityContent {
         color: #000000;
+        font-family: "Oxygen", sans-serif;
         font-size: 14px; }
-      .timeline .timeline-item .timeline-content span {
-        font-size: 12px; }
-      .timeline .timeline-item .timeline-content:before {
-        content: '';
-        position: absolute;
-        top: 20px;
-        right: -5px;
-        width: 14px;
-        height: 14px;
-        display: block;
-        border-radius: 3px;
-        transform: rotate(45deg); }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
     .timeline .timeline-item .timeline-content.right:before {
@@ -974,7 +1013,7 @@ header:before,
   overflow: auto; }
   .commonList .listItemChild {
     margin: 0px;
-    font-size: 12px;
+    font-size: 14px;
     font-family: "Oxygen", sans-serif;
     font-weight: bold; }
     .commonList .listItemChild .listItemChildTitle {
@@ -1056,6 +1095,10 @@ header:before,
   height: 16px;
   margin-right: 5px;
   margin-bottom: 3px; }
+.profileContainer .plusIcon .icon {
+  width: 11px;
+  height: 11px;
+  fill: #0862BE; }
 
 .profileDetails .editIcon .icon {
   height: 16px;
@@ -1084,5 +1127,8 @@ header:before,
 
 .organizationDetails .cmuk-card-body .cmuk-card-default, .organizationUbos .cmuk-card-body .cmuk-card-default {
   margin-bottom: 5px; }
+
+.paymentTermsForm .commonCheckBox dl {
+  margin-bottom: 0px; }
 
 /*# sourceMappingURL=style.css.map */

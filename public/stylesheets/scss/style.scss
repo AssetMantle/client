@@ -26,23 +26,24 @@
 html, body{
   height: 100%;
   background: #F0F0F0;
+  scroll-behavior: smooth;
 }
 
-.cover-bar {
-  position: absolute;
-  background: #FAFAFA;;
-  height: 100%;
-  top: 0;
-  right: 0;
-  width: 7px;
-  -webkit-transition: all .5s;
-  opacity: 1;
-}
-
-.scroller:hover .cover-bar {
-  opacity: 0;
-  -webkit-transition: all .5s;
-}
+//.cover-bar {
+//  position: absolute;
+//  background: #FAFAFA;;
+//  height: 100%;
+//  top: 0;
+//  right: 0;
+//  width: 7px;
+//  -webkit-transition: all .5s;
+//  opacity: 1;
+//}
+//
+//.scroller:hover .cover-bar {
+//  opacity: 0;
+//  -webkit-transition: all .5s;
+//}
 
 %iconBackground{
   width: 36px;
@@ -152,6 +153,43 @@ html, body{
       font-size: $paragraphFontSizeSmall;
     }
   }
+  .cmuk-card-header{
+    color:#061728;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-button-link{
+    color: $colorPrimary;
+  }
+  .cmuk-button-primary{
+    background-color: $colorPrimary;
+  }
+  .cmuk-legend{
+    font-weight: bold;
+    font-family: $fontFamilySecondary;
+    font-size: $headingFontSizeSmall;
+  }
+  .cmuk-spinner>*>*{
+    stroke-width:2;
+    stroke:#102923;
+  }
+  .cmuk-accordion-title::before{
+    background-image:url('../../images/chevron-up.svg');
+  }
+  .cmuk-open>.cmuk-accordion-title::before{
+    background-image:url("../../images/chevron-down.svg");
+  }
+  .cmuk-table th, .cmuk-button{
+    text-transform: capitalize;
+  }
+  .modalBody{
+    .cmuk-button{
+      margin-bottom: 5px;
+    }
+    .infoRowValue{
+      text-align: left;
+      margin-left: 30px;
+    }
+  }
 }
 .header {
   background: $colorSecondary;
@@ -185,10 +223,12 @@ html, body{
         background-color: #FE4350;
         font-size: $paragraphFontSizeMedium;
         color: #FFFFFF;
-        line-height: 30px;
+        line-height: inherit;
+        padding: 8px 30px;
+        border-radius: $buttonBorderRadius;
       }
-      li:last-child a {
-        padding-right: 0px;;
+      li .lastChild{
+        padding:0px 0px 0px 30px;
       }
     }
     .loginIcon{
@@ -209,6 +249,11 @@ html, body{
   .dashboardIcon .icon{
     width: 16px;
     height: 13px;
+  }
+  .dashboardIcon, .traderIcon, .accountIcon{
+    margi-right: 3px;
+    width: 20px;
+    height: 20px;
   }
   .icon {
     width: 17px;
@@ -516,7 +561,7 @@ margin-right: -5px;
   }
   .cmuk-card-header{
     padding: 15px 20px;
-    color: #636363;
+    color: #061728;
     font-size: $paragraphFontSizeMedium;
     font-family: $fontFamilySecondary;
   }
@@ -546,8 +591,7 @@ margin-right: -5px;
   .financial {
     ul li{
       justify-content: space-between;
-      border-bottom: 1px solid #E2E4E6;
-      padding: 20px 0;
+      padding: 25px 0;
       margin: 0px 15px;
       &:last-child{
         border: 0px;
@@ -566,7 +610,7 @@ margin-right: -5px;
       }
       .ctitle{
         color: #5C6166;
-        font-size: $paragraphFontSizeSmall;
+        font-size: $paragraphFontSizeMedium;
         font-family: $fontFamilySecondary;
       }
       .payable{
@@ -779,8 +823,7 @@ header:before,
 
 .timeline {
   line-height: 1.5em;
-  font-size: $paragraphFontSizeMedium;
-  width: 250px;
+  //width: 250px;
   position: relative;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -792,7 +835,7 @@ header:before,
     width: 0px;
     height: 100%;
     border-right:2px dashed #CECECE;
-    left: 17px;
+    left: 30px;
     top: 0;
     position: absolute; }
   .timeline-item {
@@ -807,9 +850,8 @@ header:before,
       position: relative;
       top: 0;
       display: inline-block;
-      left: 20px;
+      left: 10px;
       overflow: hidden;
-      margin-left: -23px;
       -webkit-border-radius: 50%;
       -moz-border-radius: 50%;
       -ms-border-radius: 50%;
@@ -832,35 +874,11 @@ header:before,
       -moz-transition: all 0.3s ease;
       -ms-transition: all 0.3s ease;
       transition: all 0.3s ease;
-      h2 {
-        padding: 15px;
-        background: #ee4d4d;
-        color: #fff;
-        margin: -20px -20px 0 -20px;
-        font-weight: 500;
-        -webkit-border-radius: 3px 3px 0 0;
-        -moz-border-radius: 3px 3px 0 0;
-        -ms-border-radius: 3px 3px 0 0;
-        border-radius: 3px 3px 0 0; }
-      p{
+      .activityContent{
         color: #000000;
-        font-size:$paragraphFontSizeMedium;
+        font-family: $fontFamilySecondary;
+        font-size: $paragraphFontSizeMedium;
       }
-      span{
-        font-size: $paragraphFontSizeSmall;
-      }
-      &:before {
-        content: '';
-        position: absolute;
-        top: 20px;
-        right: -5px;
-        width: 14px;
-        height: 14px;
-        //   background-color: #ee4d4d;
-        display: block;
-        border-radius: 3px;
-        transform: rotate(45deg); }
-
     }
     .timeline-content.right {
       float: right; }
@@ -1144,7 +1162,7 @@ header:before,
   overflow:auto;
   .listItemChild{
     margin: 0px;
-    font-size: $paragraphFontSizeSmall;
+    font-size: $paragraphFontSizeMedium;
     font-family: $fontFamilySecondary;
     font-weight: bold;
     .listItemChildTitle
@@ -1255,6 +1273,11 @@ header:before,
     margin-right: 5px;
     margin-bottom: 3px;
   }
+  .plusIcon .icon{
+    width: 11px;
+    height: 11px;
+    fill: $colorPrimary;
+  }
 }
 .profileDetails{
   .cmuk-button-link{
@@ -1315,3 +1338,8 @@ header:before,
   }
 }
 
+.paymentTermsForm{
+  .commonCheckBox dl{
+    margin-bottom: 0px;
+  }
+}

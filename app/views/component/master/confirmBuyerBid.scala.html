@@ -6,9 +6,9 @@
 
 @(confirmBidForm: Form[ConfirmBid.Data] = ConfirmBid.form, negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_BUYER_BID, confirmBidForm) {
-    <span class="red">@Messages(constants.Form.SELLER_ID)</span> : @negotiation.sellerAccountID <br>
-    <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.amount <br>
-    <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @negotiation.pegHash <br>
+    @commonTextInfo(constants.Form.SELLER_ID, negotiation.sellerAccountID)
+    @commonIntInfo(constants.FormField.BID.name, negotiation.amount)
+    @commonTextInfo(constants.FormField.PEG_HASH.name, negotiation.pegHash)
 
     @for(file <- files) {
         @component.master.commonDocumentViewer(file) {
