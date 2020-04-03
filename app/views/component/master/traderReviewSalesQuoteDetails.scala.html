@@ -31,6 +31,10 @@
     @commonBooleanInfo(constants.FormField.COO.name, Option(salesQuote.salesQuoteDocuments.get.coo))
     @commonBooleanInfo(constants.FormField.OTHER_DOCUMENTS.name, Option(salesQuote.salesQuoteDocuments.get.otherDocuments))
 
+    <div>@Messages(constants.View.INVITE) : <br>
+        <span class="red">@Messages(constants.FormField.COUNTER_PARTY.name)</span>: @salesQuote.buyerAccountID <br>
+    </div>
+
     @commonInputText(traderReviewSalesQuoteDetailsForm, constants.FormField.REQUEST_ID, 'value ->requestID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(traderReviewSalesQuoteDetailsForm, constants.FormField.COMPLETION)
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.salesQuoteDocumentsForm('@requestID'))">@Messages(constants.Form.BACK)</button>

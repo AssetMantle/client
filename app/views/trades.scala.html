@@ -4,7 +4,7 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(Html(""))
 
 @left = {
     <div class="leftTradeFinancial">
@@ -33,25 +33,8 @@
             </ul>
         }
         </div>
-        <div class="salesQuoteList switcherViewCard">
-        @commonCard(constants.View.SALES_QUOTE_LIST){
-            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
-            <div class="salesQuoteCardHeader">
-                <ul class="cmuk-subnav" cmuk-switcher="connect: #salesQuoteTab; animation: cmuk-animation-fade">
-                    <li><a href="#" >@Messages(constants.View.BUY)</a></li>
-                    <li><a href="#">@Messages(constants.View.SELL)</a></li>
-                </ul>
-            </div>
-
-        }{
-            <ul id="salesQuoteTab" class="cmuk-switcher cmuk-margin">
-                <li>
-                    <div id="salesQuoteList"></div>
-                </li>
-                <li>Hello</li>
-            </ul>
-
-        }
+        <div class="salesQuoteList">
+            <div id="salesQuoteList"></div>
         </div>
 
     }
@@ -75,7 +58,7 @@
 
     <script>
         @if(loginState.userType == constants.User.TRADER){
-                componentResource('salesQuoteList', jsRoutes.controllers.SalesQuoteController.salesQuoteList());
+                componentResource('salesQuoteList', jsRoutes.controllers.ComponentViewController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
                 componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());

@@ -636,7 +636,7 @@ CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
     "salesQuoteID"       VARCHAR NOT NULL,
     "buyerAccountID"     VARCHAR NOT NULL,
     "sellerAccountID"    VARCHAR NOT NULL,
-    "financierAccountID" VARCHAR NOT NULL,
+    "financierAccountID" VARCHAR,
     "status"             VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -744,7 +744,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
     "shippingDetails"  VARCHAR,
     "paymentTerms"     VARCHAR,
     "documents"        VARCHAR,
+    "buyerAccountID"   VARCHAR,
     "completionStatus" BOOLEAN NOT NULL,
+    "invitationStatus" BOOLEAN ,
     PRIMARY KEY ("id")
 );
 
@@ -983,6 +985,10 @@ ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
     ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SalesQuote"
+    ADD CONSTRAINT SalesQuote_Trader_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Trader" ("accountID");
+ALTER TABLE MASTER_TRANSACTION."SalesQuote"
+    ADD CONSTRAINT SalesQuote_Trader_buyerAccountID FOREIGN KEY ("buyerAccountID") REFERENCES MASTER."Trader" ("accountID");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"

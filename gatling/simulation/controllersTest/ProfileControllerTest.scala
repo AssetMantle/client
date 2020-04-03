@@ -17,9 +17,23 @@ class ProfileControllerTest extends Simulation {
 object profileControllerTest {
 
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
-    .exec(http("Add_IdentificationDocument")
-        .get(routes.ProfileController.identificationDocument().url)
-      .check(substring("ID Proof").exists)
+    .exec(http("Add_Identification_Detail_Form")
+        .get(routes.AccountController.identificationForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+    )
+    .feed(NameFeeder.nameFeed)
+    .feed(IdentificationFeeder.identificationFeed)
+    .pause(2)
+    .exec(http("IdentificationDetail_Post")
+      .post(routes.AccountController.identification().url)
+      .formParamMap(Map(
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Form.FIRST_NAME -> "${%s}".format(Test.TEST_FIRST_NAME),
+        Form.LAST_NAME -> "${%s}".format(Test.TEST_LAST_NAME),
+        Form.DATE_OF_BIRTH -> "2019-11-11",
+        Form.ID_NUMBER -> "${%s}".format(Test.TEST_ID_NUMBER),
+        Form.ID_TYPE -> "${%s}".format(Test.TEST_ID_TYPE)
+      ))
     )
     .pause(2)
     .exec(http("AddIdentificationForm")
@@ -43,28 +57,25 @@ object profileControllerTest {
     .exec(
       http("Store_Identification")
         .get(session=>routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String],"IDENTIFICATION").url)
-        .check(substring("ID Proof").exists)
     )
     .pause(2)
-    .feed(NameFeeder.nameFeed)
-    .feed(IdentificationFeeder.identificationFeed)
-    .exec(http("IdentificationDetailForm_GET")
-        .get(routes.ProfileController.identificationForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.IDENTIFICATION.legend)).exists)
+    .exec(http("AddIdentificationForm")
+      .get(routes.AccountController.userReviewIdentificationDetailsForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
+    .pause(2)
     .exec(http("IdentificationDetail_Post")
-        .post(routes.ProfileController.identification().url)
+      .post(routes.AccountController.userReviewIdentificationDetails().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
-        Form.FIRST_NAME -> "${%s}".format(Test.TEST_FIRST_NAME),
-        Form.LAST_NAME -> "${%s}".format(Test.TEST_LAST_NAME),
-        Form.DATE_OF_BIRTH -> "2019-11-11",
-        Form.ID_NUMBER -> "${%s}".format(Test.TEST_ID_NUMBER),
-        Form.ID_TYPE -> "${%s}".format(Test.TEST_ID_TYPE)
+        Form.COMPLETION -> true
       ))
-      .check(substring("SUCCESS RESPONSE.SUCCESS.IDENTIFICATION_ADDED").exists)
     )
+    .pause(2)
+
+
+
+
 
 
 

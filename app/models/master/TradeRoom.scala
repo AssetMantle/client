@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: String, status: String)
+case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String)
 
 @Singleton
 class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -64,7 +64,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class TradeRoomTable(tag: Tag) extends Table[TradeRoom](tag, "TradeRoom") {
 
-    def * = (id, salesQuoteID, buyerAccountID, sellerAccountID, financierAccountID, status) <> (TradeRoom.tupled, TradeRoom.unapply)
+    def * = (id, salesQuoteID, buyerAccountID, sellerAccountID, financierAccountID.?, status) <> (TradeRoom.tupled, TradeRoom.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -82,7 +82,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: String, status: String): Future[String] = add(TradeRoom(id = utilities.IDGenerator.requestID, salesQuoteID = salesQuoteID, buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, financierAccountID = financierAccountID, status = status))
+    def create(salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String): Future[String] = add(TradeRoom(id = utilities.IDGenerator.requestID, salesQuoteID = salesQuoteID, buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, financierAccountID = financierAccountID, status = status))
 
     def get(id: String) = findById(id)
 

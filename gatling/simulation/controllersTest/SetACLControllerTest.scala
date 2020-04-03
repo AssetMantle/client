@@ -139,7 +139,7 @@ object setACLControllerTest {
 
   val organizationVerifyTrader=scenario("organizationVerifyTrader")
     .exec(http("Get_Organization_Pending_Verify_Trader_Request")
-      .get(routes.SetACLController.organizationViewPendingVerifyTraderRequests().url)
+      .get(routes.SetACLController.organizationViewVerifyTraderRequests().url)
       .check(substring("${%s}".format(Test.TEST_TRADER_ID)).exists)
     )
     .pause(2)
@@ -215,7 +215,7 @@ object setACLControllerTest {
     .exec{session=> session.set(Test.TEST_USERNAME,"testOrg1512").set(Test.TEST_PASSWORD,"qwerty1234567890")}
     .exec(loginControllerTest.loginScenario)
     .exec(http("Get_Organization_Pending_Verify_Trader_Request")
-      .get(routes.SetACLController.organizationViewPendingVerifyTraderRequests().url)
+      .get(routes.SetACLController.organizationViewVerifyTraderRequests().url)
     )
     .foreach(traderKYCs,"documentType"){
       exec(http("Organization_Trader_KYC_update_Status"+"${documentType}")

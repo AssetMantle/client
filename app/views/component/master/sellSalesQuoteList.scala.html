@@ -1,0 +1,34 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.SalesQuote
+@import views.html.base._
+
+@(sellSalesQuoteList: Seq[SalesQuote])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @sellSalesQuoteList.map { sellSalesQuote =>
+        <li class="commonList">
+            <p class="accountName"><span>B</span></p>
+            @commonVerticalTextInfo(constants.Form.ASSET_TYPE, sellSalesQuote.assetType)
+            @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sellSalesQuote.assetDescription)
+            @commonVerticalIntInfo(constants.Form.ASSET_QUANTITY, sellSalesQuote.assetQuantity)
+            @commonVerticalIntInfo(constants.Form.ASSET_PRICE, sellSalesQuote.assetPrice)
+            @commonVerticalTextInfo(constants.View.BUYER, sellSalesQuote.buyerAccountID.getOrElse(""))
+            <div class="listItemChild">
+                <p class="listItemChildTitle">@Messages(constants.View.STATUS)</p>
+                <p class="listItemChildValue">
+                @if(sellSalesQuote.completionStatus){
+                    @sellSalesQuote.invitationStatus match{
+                        case None=>{
+                            @Messages(constants.View.INVITATION_SENT)
+                        }
+                        case Some(false)=>{
+                            @Messages(constants.View.REJECTED)
+                        }
+                    }
+                }else{
+                    @commonModalButton(constants.View.INCOMPLETE,constants.Form.COMMODITY_DETAILS.get, 'parameters-> s"'${sellSalesQuote.id}'")
+                }
+                </p>
+            </div>
+        </li>
+        }
+</div>
