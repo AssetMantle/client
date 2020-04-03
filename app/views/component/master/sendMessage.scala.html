@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.SendChat
+@import views.companion.master.SendMessage
 
 @import views.html.helper.form
 @import views.html.helper.CSRF
-@(sendChatForm: Form[SendChat.Data] = SendChat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 @form(action = constants.Form.SEND_CHAT.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
@@ -24,16 +24,16 @@
                 <a class="cmuk-icon-link" onclick="closeReply()" cmuk-icon="close"></a>
             </div>
         </div>
-        @commonInputText(sendChatForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
+        @commonInputText(sendMessageForm, constants.FormField.CHAT_WINDOW_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> true)
         <div class="hiddenLabel sendFormField">
-        @commonInputText(sendChatForm, constants.FormField.MESSAGE)
-            <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-telegram")"/></svg></button>
+        @commonInputText(sendMessageForm, constants.FormField.TEXT)
+            <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)"><img src="@routes.Assets.versioned("images/icons/sendIcon.svg")"></button>
         </div>
-        @commonInputText(sendChatForm, constants.FormField.REPLY_TO_CHAT,'containerDivClass -> "hidden", 'required -> false)
+        @commonInputText(sendMessageForm, constants.FormField.REPLY_TO_MESSAGE,'containerDivClass -> "hidden", 'required -> false)
         </div>
-        @if(sendChatForm.hasGlobalErrors) {
+        @if(sendMessageForm.hasGlobalErrors) {
             <ul class="signupErrorList">
-            @for(error <- sendChatForm.globalErrors) {
+            @for(error <- sendMessageForm.globalErrors) {
                 <li class="error">@error.format</li>
             }
             </ul>

@@ -11,12 +11,12 @@ import java.sql.Timestamp
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ChatReceive(chatID: String, toAccountID: String, readAt: Option[Timestamp])
+case class MessageReceive(messageID: String, accountID: String, readAt: Option[Timestamp])
 
 @Singleton
-class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class MessageReceives @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_CHAT_RECEIVE
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_MESSAGE_RECEIVE
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -26,9 +26,9 @@ class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   import databaseConfig.profile.api._
 
-  private[models] val chatReceiveTable = TableQuery[ChatReceiveTable]
+  private[models] val messageReceiveTable = TableQuery[MessageReceiveTable]
 
-  private def add(chatReceive: ChatReceive): Future[String] = db.run((chatReceiveTable returning chatReceiveTable.map(_.chatID) += chatReceive).asTry).map {
+  private def add(messageReceive: MessageReceive): Future[String] = db.run((messageReceiveTable returning messageReceiveTable.map(_.messageID) += messageReceive).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,7 +36,7 @@ class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def getAllChatsByRead(chatIDs: Seq[String]): Future[Seq[ChatReceive]] = db.run(chatReceiveTable.filter(_.chatID inSet chatIDs).filter(_.readAt.?.isDefined).result.asTry).map{
+  private def getAllChatsByRead(messageIDs: Seq[String]): Future[Seq[MessageReceive]] = db.run(messageReceiveTable.filter(_.messageID inSet messageIDs).filter(_.readAt.?.isDefined).result.asTry).map{
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -44,7 +44,7 @@ class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def upsert(chatReceive: ChatReceive): Future[Int] = db.run(chatReceiveTable.insertOrUpdate(chatReceive).asTry).map {
+  private def upsert(messageReceive: MessageReceive): Future[Int] = db.run(messageReceiveTable.insertOrUpdate(messageReceive).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -52,7 +52,7 @@ class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateReadTime(chatIDs: Seq[String], toAccountID : String, timestamp: Timestamp): Future[Int] = db.run(chatReceiveTable.filter(_.chatID inSet chatIDs).filter(_.toAccountID === toAccountID).map(_.readAt).update(timestamp).asTry).map {
+  private def updateReadTime(messageIDs: Seq[String], toAccountID : String, timestamp: Timestamp): Future[Int] = db.run(messageReceiveTable.filter(_.messageID inSet messageIDs).filter(_.accountID === toAccountID).map(_.readAt).update(timestamp).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -60,7 +60,7 @@ class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findById(chatID: String): Future[Seq[ChatReceive]] = db.run(chatReceiveTable.filter(_.chatID === chatID).result.asTry).map {
+  private def findById(messageID: String): Future[Seq[MessageReceive]] = db.run(messageReceiveTable.filter(_.messageID === messageID).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -68,24 +68,24 @@ class ChatReceives @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private[models] class ChatReceiveTable(tag: Tag) extends Table[ChatReceive](tag, "ChatReceive") {
+  private[models] class MessageReceiveTable(tag: Tag) extends Table[MessageReceive](tag, "MessageReceive") {
 
-    def * = (chatID, toAccountID, readAt.?) <> (ChatReceive.tupled, ChatReceive.unapply)
+    def * = (messageID, accountID, readAt.?) <> (MessageReceive.tupled, MessageReceive.unapply)
 
-    def chatID = column[String]("chatID", O.PrimaryKey)
+    def messageID = column[String]("messageID", O.PrimaryKey)
 
-    def toAccountID = column[String]("toAccountID", O.PrimaryKey)
+    def accountID = column[String]("accountID", O.PrimaryKey)
 
     def readAt = column[Timestamp]("readAt")
 
   }
 
   object Service {
-    def create(chatID: String, toAccountID: String): Future[String] = add(ChatReceive(chatID, toAccountID, None))
+    def create(messageID: String, toAccountID: String): Future[String] = add(MessageReceive(messageID, toAccountID, None))
 
-    def markRead(chatIDs: Seq[String], toAccountID: String): Future[Int] = updateReadTime(chatIDs, toAccountID, new Timestamp(System.currentTimeMillis))
+    def markRead(messageIDs: Seq[String], toAccountID: String): Future[Int] = updateReadTime(messageIDs, toAccountID, new Timestamp(System.currentTimeMillis))
 
-    def getAllRead(chatIDs: Seq[String]): Future[Seq[ChatReceive]] = {getAllChatsByRead(chatIDs)}
+    def getAllRead(messageIDs: Seq[String]): Future[Seq[MessageReceive]] = {getAllChatsByRead(messageIDs)}
   }
 
 

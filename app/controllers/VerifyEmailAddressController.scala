@@ -66,7 +66,10 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
             contact <- contact
             _ <- updateStatus(contact)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
-          } yield result
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)
+          } yield {
+            result
+          }
             ).recover {
             case baseException: BaseException => if (baseException.failure == constants.Response.INVALID_OTP) BadRequest(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form.withError(constants.FormField.OTP.name, constants.Response.INVALID_OTP.message))) else InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }

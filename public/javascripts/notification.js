@@ -41,7 +41,6 @@ function loadMoreNotifications() {
         async: true,
         statusCode: {
             200: function (data) {
-                console.log(data,"in not")
                 const loadMore = $(".notificationContainer .notification:last");
                 loadMore.before(data);
                 loadMore.remove();

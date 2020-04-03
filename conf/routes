@@ -116,7 +116,7 @@ GET         /master/component/organizationViewTrader                     control
 GET         /master/component/recentActivityForTradeRoom                     controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, tradeRoomID :String)
 GET         /master/component/recentActivityForTrader                     controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
 GET         /master/component/recentActivityForOrganization                     controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
-GET         /master/component/payableReceivable                          controllers.ComponentViewController.payableReceivable
+GET         /master/component/traderFinancials                          controllers.ComponentViewController.traderFinancials
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
@@ -412,12 +412,13 @@ GET         /master/setSellerFeedback                                    control
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
 GET         /master/tradeRoom/chatRoom                                   controllers.TradeRoomController.chatRoom(tradeRoomID: String)
-GET         /master/tradeRoom/chatWindow                                 controllers.TradeRoomController.chatWindow(chatWindowID: String ,pageNumber: Int)
-GET         /master/tradeRoom/loadMoreChats                              controllers.TradeRoomController.loadMoreChats(chatWindowID: String ,pageNumber: Int)
-POST        /master/tradeRoom/sendChat                                   controllers.TradeRoomController.sendChat
-GET         /master/tradeRoom/markChatAsRead                             controllers.TradeRoomController.markChatAsRead(chatWindowID: String)
-GET         /master/tradeRoom/replyToChat                                controllers.TradeRoomController.replyToChat(chatWindowID: String, chatID: String)
-GET         /master/tradeRoom/chatComet                                  controllers.TradeRoomController.sendChatComet(chatWindowID: String)
+GET         /master/tradeRoom/chatWindow                                 controllers.TradeRoomController.chatWindow(chatID: String ,pageNumber: Int)
+GET         /master/tradeRoom/loadMoreChats                              controllers.TradeRoomController.loadMoreChats(chatID: String ,pageNumber: Int)
+GET        /master/tradeRoom/sendMessage                                   controllers.TradeRoomController.sendMessageForm
+POST        /master/tradeRoom/sendMessage                                   controllers.TradeRoomController.sendMessage
+GET         /master/tradeRoom/markChatAsRead                             controllers.TradeRoomController.markChatAsRead(chatID: String)
+GET         /master/tradeRoom/replyToMessage                                controllers.TradeRoomController.replyToMessage(chatID: String, messageID: String)
+GET         /master/tradeRoom/chatComet                                  controllers.TradeRoomController.sendMessageComet(chatID: String)
 
 POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
 POST        /wuRedirect                                                  controllers.WesternUnionController.westernUnionPortalRedirect

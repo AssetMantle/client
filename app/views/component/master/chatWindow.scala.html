@@ -1,41 +1,37 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.SendChat
-@import models.masterTransaction.Chat
-@import models.masterTransaction.ChatReceive
-@import views.html.component.master.sendChat
-@import views.html.component.master.chatMessages
+@import views.companion.master.SendMessage
+@import models.masterTransaction.Message
+@import models.masterTransaction.MessageReceive
+@import views.html.component.master.sendMessage
 
-@(sendChatForm: Form[SendChat.Data] = SendChat.form, chats: Seq[Chat], readChats: Seq[ChatReceive], chatWindowID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-@if(chats.length > 0) {
-    @* write the markchat read logic here*@
-    @if(readChats.filter(x => x.chatID == chats.head.id).filter(x => x.toAccountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
-        <div onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatWindowID'))" style="font-size: 12px;">
+@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageReceive], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+    @if(chats.length > 0) {
+        @if(readChats.filter(x => x.messageID == chats.head.id && x.accountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
+            <div onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatID'))" style="font-size: 12px;">
+            }
     }
-}
 
-<div id="chatMessages" class="chatMessages chat" title="You have chat with">
-    <script>
-            componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatWindowID', 0))
+    <div id="chatMessages" class="chatMessages chat" title="You have chat with">
+        <script>
+            componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatID', 0))
     </script>
-</div>
+    </div>
 
-<div>
-@if(chats.length > 0) {
-    <div style="font-size: 12px;">@Messages("READ_BY") : @readChats.filter(_.chatID == chats.head.id).map(_.toAccountID).mkString</div>
-}
+    <div>
+    @if(chats.length > 0) {
+        <div style="font-size: 12px;">@Messages(constants.View.READ_BY)
+            : @readChats.filter(_.messageID == chats.head.id).map(_.accountID).mkString</div>
+    }
+    </div>
+    <div class="chatform">
+    @sendMessage(sendMessageForm)
+    </div>
 </div>
-<div class="chatform">
-@sendChat(sendChatForm)
-</div>
-</div>
-<script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>
-<script type="text/javascript">
+    <script type="text/javascript">
         var chatCometMessage = function (event) {
-            console.log(event);
-            console.log(JSON.stringify(event));
-            componentResource('cWhatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatWindowID', 0));
+            componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatID', 0));
         }
 </script>
 
-<iframe class="hidden" src="@routes.TradeRoomController.sendChatComet(chatWindowID)"></iframe>
+    <iframe class="hidden" src="@routes.TradeRoomController.sendMessageComet(chatID)"></iframe>

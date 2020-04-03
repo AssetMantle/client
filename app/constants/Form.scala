@@ -80,7 +80,7 @@ object Form {
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
 
   //IssueFiatController
-  val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.IssueFiatController.issueFiatRequest(), routes.javascript.IssueFiatController.issueFiatRequestForm)
+  val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect(), routes.javascript.IssueFiatController.issueFiatRequestForm)
   val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest(), routes.javascript.IssueFiatController.rejectIssueFiatRequestForm)
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat(), routes.javascript.IssueFiatController.issueFiatForm)
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat(), routes.javascript.IssueFiatController.blockchainIssueFiatForm)
@@ -158,7 +158,7 @@ object Form {
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber(), routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
 
   //TradeRoomController
-  val SEND_CHAT = new Form("SEND_CHAT", routes.TradeRoomController.sendChat(), routes.javascript.TradeRoomController.sendChat)
+  val SEND_CHAT = new Form("SEND_CHAT", routes.TradeRoomController.sendMessage(), routes.javascript.TradeRoomController.sendMessageForm)
 
   val INDEX = "INDEX"
   val DASHBOARD = "DASHBOARD"

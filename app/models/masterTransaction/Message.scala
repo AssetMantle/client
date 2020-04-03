@@ -10,7 +10,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import scala.concurrent.duration._
-import actors.{MainChatActor, ShutdownActor}
+import actors.{MainMessageActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -19,14 +19,14 @@ import play.api.libs.json.{JsString, JsValue, Json, OWrites, Reads, Writes}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Chat(id: String, fromAccountID: String, chatWindowID: String, message: String, replyToID: Option[String], createdAt: Timestamp)
+case class Message(id: String, fromAccountID: String, chatID: String, text: String, replyToID: Option[String], createdAt: Timestamp)
 
-case class ChatCometMessage(username: String, message: JsValue)
+case class MessageCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_CHAT
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_MESSAGE
   private val logger: Logger = Logger(this.getClass)
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
@@ -36,9 +36,9 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   implicit val timeWrites = new Writes[Timestamp] {
     override def writes(t: Timestamp): JsValue = JsString(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(t))
   }
-  implicit val chatWrites: OWrites[Chat] = Json.writes[Chat]
+  implicit val messageWrites: OWrites[Message] = Json.writes[Message]
 
-  val mainChatActor: ActorRef = actorSystem.actorOf(props = MainChatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_CHAT)
+  val mainMessageActor: ActorRef = actorSystem.actorOf(props = MainMessageActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_MESSAGE)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -47,9 +47,9 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   import databaseConfig.profile.api._
 
-  private[models] val chatTable = TableQuery[ChatTable]
+  private[models] val messageTable = TableQuery[MessageTable]
 
-  private def add(chat: Chat): Future[String] = db.run((chatTable returning chatTable.map(_.id) += chat).asTry).map {
+  private def add(message: Message): Future[String] = db.run((messageTable returning messageTable.map(_.id) += message).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -57,7 +57,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsert(chat: Chat): Future[Int] = db.run(chatTable.insertOrUpdate(chat).asTry).map {
+  private def upsert(message: Message): Future[Int] = db.run(messageTable.insertOrUpdate(message).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -65,7 +65,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findById(id: String): Future[Chat] = db.run(chatTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[Message] = db.run(messageTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -73,7 +73,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findAllChatIDsByChatWindowID(chatWindowID: String): Future[Seq[String]] = db.run(chatTable.filter(_.chatWindowID === chatWindowID).sortBy(_.createdAt.desc).map(_.id).result.asTry).map {
+  private def findAllChatIDsByChatWindowID(chatID: String): Future[Seq[String]] = db.run(messageTable.filter(_.chatID === chatID).sortBy(_.createdAt.desc).map(_.id).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -82,7 +82,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
 
-  private def findChatsByChatWindowID(chatWindowID: String, offset: Int, limit: Int): Future[Seq[Chat]] = db.run(chatTable.filter(_.chatWindowID === chatWindowID).sortBy(_.createdAt.desc).drop(offset).take(limit).result.asTry).map {
+  private def findChatsByChatWindowID(chatID: String, offset: Int, limit: Int): Future[Seq[Message]] = db.run(messageTable.filter(_.chatID === chatID).sortBy(_.createdAt.desc).drop(offset).take(limit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -90,7 +90,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findChatByChatWindowID(chatWindowID: String, chatID: String): Future[Chat] = db.run(chatTable.filter(x => x.id === chatID && x.chatWindowID === chatWindowID).result.head.asTry).map {
+  private def findChatByChatWindowID(chatID: String, messageID: String): Future[Message] = db.run(messageTable.filter(x => x.id === messageID && x.chatID === chatID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -98,7 +98,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteById(id: String): Future[Int] = db.run(chatTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(messageTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -108,17 +108,17 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private[models] class ChatTable(tag: Tag) extends Table[Chat](tag, "Chat") {
+  private[models] class MessageTable(tag: Tag) extends Table[Message](tag, "Message") {
 
-    def * = (id, fromAccountID, chatWindowID, message, replyToID.?, createdAt) <> (Chat.tupled, Chat.unapply)
+    def * = (id, fromAccountID, chatID, text, replyToID.?, createdAt) <> (Message.tupled, Message.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def fromAccountID = column[String]("fromAccountID")
 
-    def chatWindowID = column[String]("chatWindowID")
+    def chatID = column[String]("chatID")
 
-    def message = column[String]("message")
+    def text = column[String]("text")
 
     def replyToID = column[String]("replyToID")
 
@@ -127,28 +127,28 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   object Service {
-    def create(fromAccountID: String, chatWindowID: String, message: String, replyToID: Option[String]): Future[Chat] = {
-      val chat = Chat(utilities.IDGenerator.hexadecimal, fromAccountID, chatWindowID, message, replyToID, new Timestamp(System.currentTimeMillis))
+    def create(fromAccountID: String, chatID: String, text: String, replyToID: Option[String]): Future[Message] = {
+      val message = Message(utilities.IDGenerator.hexadecimal, fromAccountID, chatID, text, replyToID, new Timestamp(System.currentTimeMillis))
       for {
-        _ <- add(chat)
-      } yield chat
+        _ <- add(message)
+      } yield message
     }
 
-    def get(chatWindowID: String, offset: Int, limit: Int): Future[Seq[Chat]] = findChatsByChatWindowID(chatWindowID = chatWindowID, offset = offset, limit = limit)
+    def get(chatID: String, offset: Int, limit: Int): Future[Seq[Message]] = findChatsByChatWindowID(chatID = chatID, offset = offset, limit = limit)
 
-    def get(chatWindowID: String, chatID: String): Future[Chat] = findChatByChatWindowID(chatWindowID, chatID)
+    def get(chatID: String, messageID: String): Future[Message] = findChatByChatWindowID(chatID, messageID)
 
-    def getChatIDs(chatWindowID: String): Future[Seq[String]] = findAllChatIDsByChatWindowID(chatWindowID)
+    def getChatIDs(chatID: String): Future[Seq[String]] = findAllChatIDsByChatWindowID(chatID)
 
-    def chatCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_CHAT, username)
+    def messageCometSource(username: String) = {
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_MESSAGE, username)
       Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainChatActor ! actors.CreateChatChildActorMessage(username = username, actorRef = systemUserActor)
+      mainMessageActor ! actors.CreateMessageChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
 
-    def sendMessageToChatActors(participants: Seq[String], chat: Chat): Unit = participants.foreach(x => mainChatActor ! ChatCometMessage(x, Json.toJson(chat)))
+    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => mainMessageActor ! MessageCometMessage(x, Json.toJson(message)))
   }
 
 }

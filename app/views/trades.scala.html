@@ -1,14 +1,13 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 @import views.html.base._
-
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(Html(""))
 
 @left = {
     <div class="leftTradeFinancial">
-    <div id="payableReceivable"></div>
+    <div id="traderFinancials"></div>
     <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
     </div>
 }
@@ -61,7 +60,7 @@
                 componentResource('salesQuoteList', jsRoutes.controllers.ComponentViewController.salesQuoteList());
                 componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
-                componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+                componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
 
             }
         @if(loginState.userType == constants.User.ORGANIZATION){
@@ -70,6 +69,6 @@
 </script>
 <script type="text/javascript">
         var fiatCometMessage = function (event) {
-            componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
         }
 </script>

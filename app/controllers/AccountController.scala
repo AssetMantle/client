@@ -132,7 +132,8 @@ class AccountController @Inject()(
           val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = loginData.pushNotificationToken)
           for {
             _ <- pushNotificationTokenUpdate
-          } yield utilitiesNotification.createNotificationAndSend(loginData.username, None,constants.Notification.LOGIN, loginData.username)
+            _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
+          } yield {}
         }
 
         def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
@@ -226,7 +227,10 @@ class AccountController @Inject()(
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
-          } yield shutdownActorsAndGetResult).recover {
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)
+          } yield {
+            shutdownActorsAndGetResult
+          }).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -283,8 +287,8 @@ class AccountController @Inject()(
         val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
         (for {
           otp <- otp
+          _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
         } yield {
-          utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -416,8 +420,7 @@ class AccountController @Inject()(
             if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
               val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
 
-              def sendNotificationsAndGetResult: Future[Result] = {
-                utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)
+              def getResult: Future[Result] = {
                 withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
               }
 
@@ -425,7 +428,8 @@ class AccountController @Inject()(
                 _ <- updateCompletionStatus
                 //TODO: Remove this when Trulioo is integrated
                 _ <- masterIdentifications.Service.markVerified(loginState.username)
-                result <- sendNotificationsAndGetResult
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)
+                result <- getResult
               } yield result
             } else {
               val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)

@@ -195,7 +195,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       def updateUserType(toAccount: Account): Future[Any] = {
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
-        } else Future ()
+        } else Future()
       }
 
       def fromAccountID(fromAddress: String): Future[String] = masterAccounts.Service.getId(fromAddress)
@@ -207,10 +207,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         toAccount <- toAccount(sendCoin.to)
         _ <- updateUserType(toAccount)
         fromAccountID <- fromAccountID(sendCoin.from)
-      } yield {
-        utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -220,7 +219,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getIDs(sendCoin: SendCoin): Future[(String,String)] = {
+      def getIDs(sendCoin: SendCoin): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(sendCoin.to)
         val fromAccountID = masterAccounts.Service.getId(sendCoin.from)
         for {
@@ -233,10 +232,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         _ <- markTransactionFailed
         sendCoin <- sendCoin
         (toAccountID, fromAccountID) <- getIDs(sendCoin)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

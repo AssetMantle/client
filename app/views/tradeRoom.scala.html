@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="leftTradeFinancial secondaryFont">
-        <div id="payableReceivable"></div>
+        <div id="tradeFinancials"></div>
         <div id="documentList"></div>
     </div>
 }
@@ -84,7 +84,7 @@
 }
 
 <script>
-    componentResource('payableReceivable', jsRoutes.controllers.ComponentViewController.payableReceivable());
+    componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
     componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
     componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView("fileName","documentType"));

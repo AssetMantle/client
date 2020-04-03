@@ -79,7 +79,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = {
 
     val title = Future(messagesApi(pushNotification.title))
     val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
@@ -92,10 +92,10 @@ class Notification @Inject()(masterContacts: master.Contacts,
     (for {
       title <- title
       message <- message
-      _ <- create(title, message)
+      notificationID <- create(title, message)
       pushNotificationToken <- pushNotificationToken
       _ <- post(title, message, pushNotificationToken)
-    } yield {}).recover {
+    } yield Option(notificationID)).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
@@ -135,34 +135,15 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def createNotificationAndSend(accountID: String, tradeRoomID: Option[String], notification: constants.Notification, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
-    if (notification.pushNotification.isDefined) {
-      val pushNotification = notification.pushNotification.get
-      val title = Future(messagesApi(pushNotification.title))
-      val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
-
-      def createNotification(title: String, message: String): Future[String] = masterTransactionNotifications.Service.create(accountID, title, message)
-
-      def createTradeActivity(notificationID: String, tradeRoomID: Option[String]): Future[String] = if (tradeRoomID.isDefined) masterTransactionTradeActivities.Service.create(notificationID, tradeRoomID.get) else Future("")
-
-      (for {
-        title <- title
-        message <- message
-        createNotification <- createNotification(title, message)
-        _ <- createTradeActivity(createNotification, tradeRoomID)
-      } yield {}).recover {
-        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          throw baseException
-      }
-    }
-    send(accountID, notification, messageParameters: _*)
-  }
-
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Future[Option[java.lang.String]] = {
     try {
-      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
+      //save
+      val notificationID = if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future(None)
       if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
       if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
+      for {
+        notificationID <- notificationID
+      } yield notificationID
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException

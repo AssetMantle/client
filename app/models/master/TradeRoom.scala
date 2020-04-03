@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String)
+case class TradeRoom(id: String, salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], chatID: String, status: String)
 
 @Singleton
 class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -27,7 +27,7 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] val tradeRoomTable = TableQuery[TradeRoomTable]
 
-  private def add(tradeRoom: TradeRoom): Future[String] = db.run((tradeRoomTable returning tradeRoomTable.map(_.id) += tradeRoom).asTry).map {
+  private def add(tradeRoom: TradeRoom): Future[TradeRoom] = db.run((tradeRoomTable returning tradeRoomTable += tradeRoom).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -61,10 +61,11 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getTradeListByAccountID(accountID: String) = db.run(tradeRoomTable.filter(x => x.buyerAccountID === accountID || x.sellerAccountID === accountID).result)
 
+  private def checkTraderByAccountIDAndID(id: String, accountID: String): Future[Boolean] = db.run(tradeRoomTable.filter(_.id===id).filter(x => x.buyerAccountID === accountID || x.sellerAccountID === accountID).exists.result)
 
   private[models] class TradeRoomTable(tag: Tag) extends Table[TradeRoom](tag, "TradeRoom") {
 
-    def * = (id, salesQuoteID, buyerAccountID, sellerAccountID, financierAccountID.?, status) <> (TradeRoom.tupled, TradeRoom.unapply)
+    def * = (id, salesQuoteID, buyerAccountID, sellerAccountID, financierAccountID.?, chatID, status) <> (TradeRoom.tupled, TradeRoom.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -76,19 +77,23 @@ class TradeRooms @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def financierAccountID = column[String]("financierAccountID")
 
+    def chatID = column[String]("chatID")
+
     def status = column[String]("status")
 
   }
 
   object Service {
 
-    def create(salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String): Future[String] = add(TradeRoom(id = utilities.IDGenerator.requestID, salesQuoteID = salesQuoteID, buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, financierAccountID = financierAccountID, status = status))
+    def create(salesQuoteID: String, buyerAccountID: String, sellerAccountID: String, financierAccountID: Option[String], status: String): Future[TradeRoom] = add(TradeRoom(id = utilities.IDGenerator.requestID, salesQuoteID = salesQuoteID, buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, financierAccountID = financierAccountID, chatID = utilities.IDGenerator.requestID, status = status))
 
     def get(id: String) = findById(id)
 
     def getID(salesQuoteID: String) = getIDBySalesQuoteID(salesQuoteID)
 
     def tradeListByAccountID(accountID: String) = getTradeListByAccountID(accountID)
+
+    def checkTraderInTradeRoom(id: String, accountID: String) = checkTraderByAccountIDAndID(id, accountID)
   }
 
 }
