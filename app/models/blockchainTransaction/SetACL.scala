@@ -33,6 +33,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val setACLTable = TableQuery[SetACLTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -201,10 +202,9 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         _ <- markDirty(setACL.from)
         _ <- transactionFeedbacksInsertOrUpdate(setACL)
         fromAccountID <- fromAccountID(setACL.from)
-      } yield {
-        utilitiesNotification.send(aclAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(aclAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -214,7 +214,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setACL = Service.getTransaction(ticketID)
 
-      def getIDs(setACL: SetACL): Future[(String,String)] = {
+      def getIDs(setACL: SetACL): Future[(String, String)] = {
         val aclAddressID = masterAccounts.Service.getId(setACL.aclAddress)
         val fromID = masterAccounts.Service.getId(setACL.from)
         for {
@@ -227,10 +227,9 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         _ <- markTransactionFailed
         setACL <- setACL
         (aclAddressID, fromID) <- getIDs(setACL)
-      } yield {
-        utilitiesNotification.send(aclAddressID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(aclAddressID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

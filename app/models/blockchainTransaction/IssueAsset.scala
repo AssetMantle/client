@@ -192,32 +192,35 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
 
-      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) ={
+      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) = {
         responseAccount.value.assetPegWallet match {
-          case Some(assets)=> Future.sequence{assets.map{asset=>
-            val upsert=blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
-            def markListedForTradeAndUpdateStatus: Future[Any]=if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
-              val createAssetAndMarkListedForTrade=masterAssets.Service.create(asset.pegHash,status = constants.Status.Asset.LISTED_FOR_TRADE)
-              val updateVerificationStatus=masterTransactionIssueAssetRequests.Service.updatePegHashAndVerificationStatus(ticketID,asset.pegHash , true)
-              for{
-                _<-createAssetAndMarkListedForTrade
-                _<-updateVerificationStatus
-              }yield {}
-            }else Future{}
-            for{
-              _<-upsert
-              _<-markListedForTradeAndUpdateStatus
-            }yield {}
+          case Some(assets) => Future.sequence {
+            assets.map { asset =>
+              val upsert = blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
+
+              def markListedForTradeAndUpdateStatus: Future[Any] = if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
+                val createAssetAndMarkListedForTrade = masterAssets.Service.create(asset.pegHash, status = constants.Status.Asset.LISTED_FOR_TRADE)
+                val updateVerificationStatus = masterTransactionIssueAssetRequests.Service.updatePegHashAndVerificationStatus(ticketID, asset.pegHash, true)
+                for {
+                  _ <- createAssetAndMarkListedForTrade
+                  _ <- updateVerificationStatus
+                } yield {}
+              } else Future {}
+
+              for {
+                _ <- upsert
+                _ <- markListedForTradeAndUpdateStatus
+              } yield {}
+            }
           }
-          }
-          case None=> Future{}
+          case None => Future {}
         }
       }
 
 
       def markDirty(issueAsset: IssueAsset): Future[Int] = blockchainAccounts.Service.markDirty(issueAsset.from)
 
-      def getIDs(issueAsset: IssueAsset): Future[(String,String)] = {
+      def getIDs(issueAsset: IssueAsset): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(issueAsset.to)
         val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
         for {
@@ -234,10 +237,9 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         _ <- insertOrUpdate(responseAccount, assetRequest, issueAsset)
         _ <- markDirty(issueAsset)
         (toAccountID, fromAccountID) <- getIDs(issueAsset)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -249,7 +251,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val issueAsset = Service.getTransaction(ticketID)
       val markFailed = masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
 
-      def getIDs(issueAsset: IssueAsset): Future[(String,String)] = {
+      def getIDs(issueAsset: IssueAsset): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(issueAsset.to)
         val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
         for {
@@ -263,10 +265,9 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         _ <- markFailed
         issueAsset <- issueAsset
         (toAccountID, fromAccountID) <- getIDs(issueAsset)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
