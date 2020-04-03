@@ -5,6 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.Negotiation
+import models.master.Negotiations
 import models.masterTransaction.NegotiationFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -14,7 +15,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, masterTransactionNegotiationRequests: masterTransaction.NegotiationRequests, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, masterNegotiations: master.Negotiations, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -25,7 +26,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   //TODO username instead of Addresses
   def buyerExecuteOrderDocument(orderID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val requestID = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(orderID)
+      val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
       def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
 
@@ -41,7 +42,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   def buyerExecuteOrderForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
+      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(requestID)
       val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
 
       def negotiation(negotiationID: String): Future[Negotiation] = blockchainNegotiations.Service.get(negotiationID)
@@ -63,7 +64,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         formWithErrors => {
           val negotiationID = blockchainNegotiations.Service.getNegotiationID(loginState.address, formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
 
-          def getNegotiationRequestID(negotiationID: String): Future[String] = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
+          def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
           def getNegotiationFiles(negotiationRequestID: String): Future[Seq[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getDocuments(negotiationRequestID, Seq(constants.File.FIAT_PROOF))
 
@@ -122,7 +123,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress, sellerAddress, pegHash)
 
-      def getNegotiationRequestID(negotiationID: String): Future[String] = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
+      def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
       def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
 
@@ -139,7 +140,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   def moderatedBuyerExecuteOrderForm(requestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
+      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(requestID)
       val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
 
       def negotiation(negotiationID: String): Future[Negotiation] = blockchainNegotiations.Service.get(negotiationID)
@@ -161,7 +162,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         formWithErrors => {
           val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
 
-          def getNegotiationRequestID(negotiationID: String): Future[String] = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
+          def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
           def getNegotiationFiles(requestID: String): Future[Seq[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
 

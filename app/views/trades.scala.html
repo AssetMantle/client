@@ -3,28 +3,30 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(Html(""))
+@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
+@left = {
 
 }
 
 @center = {
-    @if(loginState.userType == constants.User.TRADER){
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-            <div id="salesQuoteList"></div>
-
-        </div>
-        <div id="tradeList">
-
-        </div>
+    <div class="cmuk-container cmuk-margin-bottom">
+    @loginState.userType match {
+        case constants.User.TRADER => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderViewNegotiationList"></div>
+                </div>
+            </div>
+            <script>
+                componentResource('traderViewNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewNegotiationList());
+            </script>
+        }
+        case _ => {}
     }
-    <h2>Trades PageUnderConstruction</h2>
+    </div>
 }
 
-    <script>
-        @if(loginState.userType == constants.User.TRADER){
-                componentResource('salesQuoteList', jsRoutes.controllers.ComponentViewController.salesQuoteList());
-                componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
-            }
-    </script>
+@right = {
+
+}

@@ -1,14 +1,14 @@
 @import controllers.actions.LoginState
+@import models.master.Negotiation
 @import views.html.base._
 @import views.companion.master.ConfirmBid
-@import models.masterTransaction.NegotiationRequest
 @import models.masterTransaction.NegotiationFile
 
-@(confirmBidForm: Form[ConfirmBid.Data] = ConfirmBid.form, negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(confirmBidForm: Form[ConfirmBid.Data] = ConfirmBid.form, negotiation: Negotiation, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_BUYER_BID, confirmBidForm) {
-    <span class="red">@Messages(constants.Form.SELLER_ID)</span> : @negotiation.sellerAccountID <br>
-    <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.amount <br>
-    <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @negotiation.pegHash <br>
+    <span class="red">@Messages(constants.Form.SELLER_ID)</span> : @negotiation.sellerTraderID <br>
+    <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.price <br>
+    <span class="red">@Messages(constants.FormField.ASSET_ID.name)</span> : @negotiation.assetID <br>
 
     @for(file <- files) {
         @component.master.commonDocumentViewer(file) {

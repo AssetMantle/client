@@ -78,7 +78,8 @@ object Response {
   val BANK_ACCOUNT_DETAILS_UPDATED = new Success("BANK_ACCOUNT_DETAILS_UPDATED")
   val UBO_ADDED = new Success("UBO_ADDED")
   val UBO_DELETED = new Success("UBO_DELETED")
-  val SALES_QUOTE_INVITATION_SENT = new Success("SALES_QUOTE_INVITATION_SENT")
+  val NEGOTIATION_REQUEST_SENT = new Success("NEGOTIATION_REQUEST_SENT")
+  val NEGOTIATION_REQUEST_ACCEPTED = new Success("NEGOTIATION_REQUEST_ACCEPTED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -136,6 +137,7 @@ object Response {
   val BUYER_FROM_SAME_ORGANIZATION = new Failure("BUYER_FROM_SAME_ORGANIZATION")
   val NOT_PRESENT_AS_COUNTERPARTY= new Failure("NOT_PRESENT_AS_COUNTERPARTY")
   val UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE = new Failure("UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE")
+  val ASSET_PEG_NOT_FOUND = new Failure("ASSET_PEG_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

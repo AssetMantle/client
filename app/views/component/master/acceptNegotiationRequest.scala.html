@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AcceptNegotiationRequest
+@import models.master.Negotiation
+
+@(acceptNegotiationRequestForm: Form[AcceptNegotiationRequest.Data] = AcceptNegotiationRequest.form, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.ADD_TRADER, acceptNegotiationRequestForm) {
+  @commonInputText(acceptNegotiationRequestForm, constants.FormField.ID, 'readonly -> true, 'containerDivClass -> "hidden")
+  @commonInputInt(acceptNegotiationRequestForm, constants.FormField.GAS)
+  @commonInputPassword(acceptNegotiationRequestForm, constants.FormField.PASSWORD)
+}

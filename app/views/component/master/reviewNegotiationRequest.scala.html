@@ -1,0 +1,46 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Asset
+@import models.master.Negotiation
+@import models.master.Trader
+@import views.companion.master.ReviewNegotiationRequest
+
+@(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.REVIEW_NEGOTIATION_REQUEST, traderReviewNegotiationRequest) {
+    <div>@Messages(constants.View.COUNTER_PARTY_DETAILS) : <br></div>
+    @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
+    @commonTextInfo(constants.View.ACCOUNT_ID, counterPartyTrader.accountID)
+    <br>
+    <div>@Messages(constants.View.ASSET): <br>
+        @commonTextInfo(constants.Form.ASSET_TYPE, asset.assetType)
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+        @commonTextInfo(constants.Form.ASSET_QUANTITY, asset.quantityUnit)
+        @commonTextInfo(constants.Form.QUANTITY_UNIT, asset.quantityUnit)
+        @commonIntInfo(constants.Form.ASSET_PRICE, asset.price)
+        @commonBooleanInfo(constants.Form.MODERATED, Option(asset.moderated))
+        @commonIntInfo(constants.Form.SHIPPING_PERIOD, asset.shippingPeriod)
+        @commonTextInfo(constants.Form.PORT_OF_LOADING, asset.portOfLoading)
+        @commonTextInfo(constants.Form.PORT_OF_DISCHARGE, asset.portOfDischarge)
+    </div>
+    <br>
+    <div>@Messages(constants.View.PAYMENT_TERMS) : <br>
+        @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, negotiation.advancePayment)
+        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.advancePercentage.getOrElse(0.0))
+        @commonBooleanInfo(constants.View.CREDIT, negotiation.credit)
+        @commonIntInfo(constants.View.TENURE, negotiation.tenure.getOrElse(0))
+@*//     TODO: commonOptionalDateInfo ???   *@
+        @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.tentativeDate.toString())
+        @commonTextInfo(constants.View.REFERENCE, negotiation.reference.getOrElse(""))
+    </div>
+    <br>
+    <div>@Messages(constants.View.DOCUMENTS_CHECKLIST) : <br>
+        @commonBooleanInfo(constants.View.BILL_OF_EXCHANGE, negotiation.billOfExchange)
+        @commonBooleanInfo(constants.View.COA, negotiation.coa)
+        @commonBooleanInfo(constants.View.COO, negotiation.coo)
+        @commonTextInfo(constants.View.OTHER_DOCUMENTS, negotiation.otherDocuments.getOrElse(""))
+    </div>
+    <br>
+
+    @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENTS_CHECKLIST.get, 'parameters -> s"'${negotiation.id}'")
+}

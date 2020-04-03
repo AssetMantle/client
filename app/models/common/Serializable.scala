@@ -1,4 +1,5 @@
 package models.common
+
 import play.api.libs.functional.syntax._
 import java.util.Date
 
@@ -64,7 +65,7 @@ object Serializable {
     Json.format[OBL].map(x => x: DocumentContent) or
       Json.format[Invoice].map(x => x: DocumentContent)
 
-  case class DocumentBlockchainDetails(documentType: String, documentHash:String)
+  case class DocumentBlockchainDetails(documentType: String, documentHash: String)
 
   implicit val documentBlockchainDetailsReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
   implicit val documentBlockchainDetailsWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]

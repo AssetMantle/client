@@ -472,14 +472,14 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             if (userZoneID == traderZoneID) {
               val verifyOrReject = if (updateTraderKYCDocumentZoneStatusData.zoneStatus) {
                 val zoneVerify = masterTraderKYCs.Service.zoneVerify(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
                 for {
                   _ <- zoneVerify
                   traderID <- traderID
                 } yield utilitiesNotification.send(traderID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
               } else {
                 val zoneReject = masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
                 for {
                   _ <- zoneReject
                   traderID <- traderID
@@ -710,14 +710,14 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             if (userOrganizationID == traderOrganizationID) {
               val verifyOrReject = if (updateTraderKYCDocumentOrganizationStatusData.organizationStatus) {
                 val organizationVerify = masterTraderKYCs.Service.organizationVerify(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
                 for {
                   _ <- organizationVerify
                   traderID <- traderID
                 } yield utilitiesNotification.send(traderID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
               } else {
                 val organizationReject = masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
                 for {
                   _ <- organizationReject
                   traderID <- traderID

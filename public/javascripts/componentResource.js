@@ -9,14 +9,10 @@ function componentResource(source, route){
                 div.html(data)
             },
             401: function (data) {
-                const newDocument = document.open("text/html", "replace");
-                newDocument.write(data);
-                newDocument.close();
+                replaceDocument(data.responseText);
             },
             500: function (data) {
-                const newDocument = document.open("text/html", "replace");
-                newDocument.write(data);
-                newDocument.close();
+                replaceDocument(data.responseText);
             }
         }
     });

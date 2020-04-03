@@ -37,6 +37,9 @@ object Form {
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest(), routes.javascript.AddOrganizationController.rejectVerifyOrganizationRequestForm)
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization(), routes.javascript.AddOrganizationController.blockchainAddOrganizationForm)
 
+  //AssetController
+  val ISSUE_ASSET_2 = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
+
   //AddZoneController
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone(), routes.javascript.AddZoneController.addZoneForm)
   val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.userReviewAddZoneRequest(), routes.javascript.AddZoneController.userReviewAddZoneRequestForm)
@@ -85,6 +88,12 @@ object Form {
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat(), routes.javascript.IssueFiatController.issueFiatForm)
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat(), routes.javascript.IssueFiatController.blockchainIssueFiatForm)
 
+  //NegotiationController
+  val NEGOTIATION_REQUEST = new Form("NEGOTIATION_REQUEST", routes.NegotiationController.request(), routes.javascript.NegotiationController.requestForm)
+  val NEGOTIATION_PAYMENT_TERMS = new Form("NEGOTIATION_PAYMENT_TERMS", routes.NegotiationController.paymentTerms(), routes.javascript.NegotiationController.paymentTermsForm)
+  val NEGOTIATION_DOCUMENTS_CHECKLIST = new Form("NEGOTIATION_DOCUMENTS_CHECKLIST", routes.NegotiationController.documentsCheckList(), routes.javascript.NegotiationController.documentsCheckListForm)
+  val REVIEW_NEGOTIATION_REQUEST = new Form("REVIEW_NEGOTIATION_REQUEST", routes.NegotiationController.reviewRequest(), routes.javascript.NegotiationController.reviewRequestForm)
+
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset(), routes.javascript.RedeemAssetController.blockchainRedeemAssetForm)
@@ -96,15 +105,6 @@ object Form {
   //ReleaseAssetController
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset(), routes.javascript.ReleaseAssetController.releaseAssetForm)
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
-
-  //SalesQuoteController
-  val COMMODITY_DETAILS = new Form("COMMODITY_DETAILS", routes.SalesQuoteController.commodityDetails(), routes.javascript.SalesQuoteController.commodityDetailsForm)
-  val SHIPPING_DETAILS = new Form("SHIPPING_DETAILS", routes.SalesQuoteController.shippingDetails(), routes.javascript.SalesQuoteController.shippingDetailsForm)
-  val PAYMENT_TERMS = new Form("PAYMENT_TERMS", routes.SalesQuoteController.paymentTerms(), routes.javascript.SalesQuoteController.paymentTermsForm)
-  val SALES_QUOTE_DOCUMENTS = new Form("SALES_QUOTE_DOCUMENTS", routes.SalesQuoteController.salesQuoteDocuments(), routes.javascript.SalesQuoteController.salesQuoteDocumentsForm)
-  val TRADER_REVIEW_SALES_QUOTE_DETAILS = new Form("TRADER_REVIEW_SALES_QUOTE_DETAILS", routes.SalesQuoteController.traderReviewSalesQuoteDetails(), routes.javascript.SalesQuoteController.traderReviewSalesQuoteDetailsForm)
-  val INVITE_SALES_QUOTE_BUYER = new Form("INVITE_SALES_QUOTE_BUYER", routes.SalesQuoteController.inviteSalesQuoteBuyer(), routes.javascript.SalesQuoteController.inviteSalesQuoteBuyerForm)
-  val ACCEPT_OR_REJECT_SALES_QUOTE= new Form("ACCEPT_OR_REJECT_SALES_QUOTE",routes.SalesQuoteController.acceptOrRejectSalesQuote(), routes.javascript.SalesQuoteController.acceptOrRejectSalesQuoteForm)
 
   //SellerExecuteOrderController
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder(), routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm)

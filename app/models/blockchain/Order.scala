@@ -210,14 +210,14 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
                 val insertOrUpdateSellerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 val insertOrUpdateBuyerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
-                def markTradeCompleted= masterAssets.Service.markTradeCompleted(negotiation.assetPegHash)
+//                def markTradeCompleted= masterAssets.Service.markTradeCompleted(negotiation.assetPegHash)
 
                 def deleteNegotiations: Future[Int] = blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
 
                 for {
                   _ <- insertOrUpdateSellerFeedbackHistories
                   _ <- insertOrUpdateBuyerFeedbackHistories
-                  _ <- markTradeCompleted
+//                  _ <- markTradeCompleted
                   _ <- deleteNegotiations
                 } yield Unit
               } else Future(Unit)

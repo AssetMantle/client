@@ -1,0 +1,36 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(buyerOnGoingNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@buyerOnGoingNegotiationList.map { buyerOnGoingNegotiation =>
+    @commonInfoBox() {
+        @defining(counterPartyTraders.filter(_.id == buyerOnGoingNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.Form.TRADER_ID, buyerOnGoingNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @defining(assets.filter(_.id == buyerOnGoingNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
+            @rejectedNegotiationAsset match {
+                case Some(asset) => {
+                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.ASSET_ID, buyerOnGoingNegotiation.assetID)
+                }
+            }
+        }
+        @commonIntInfo(constants.View.PRICE, buyerOnGoingNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(buyerOnGoingNegotiation.quantity.toString(), buyerOnGoingNegotiation.quantityUnit).mkString(" "))
+        @commonTextInfo(constants.View.STATUS, buyerOnGoingNegotiation.status)
+@*//    TODO: Add Button for trade Room    *@
+    }
+}

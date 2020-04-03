@@ -41,7 +41,7 @@
                     <ul class="cmuk-navbar-nav">
                     @loginState match {
                         case null => {}
-                        case default => {
+                        case _ => {
                             <li><a href="@controllers.routes.ViewController.account()">@Messages(constants.Form.ACCOUNT)</a></li>
                             <li><a href="@controllers.routes.ViewController.dashboard()">@Messages(constants.Form.DASHBOARD)</a></li>
                             <li><a href="@controllers.routes.ViewController.trades()">@Messages(constants.Form.TRADES)</a></li>

@@ -6,8 +6,8 @@ import play.api.data.Forms._
 object IssueAsset {
   val form = Form(
     mapping(
-      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
-      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
+      constants.FormField.ID.name -> constants.FormField.ID.field,
+      constants.FormField.TRADER_ID.name -> constants.FormField.TRADER_ID.field,
       constants.FormField.DOCUMENT_HASH.name -> constants.FormField.DOCUMENT_HASH.field,
       constants.FormField.ASSET_TYPE.name -> constants.FormField.ASSET_TYPE.field,
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
@@ -19,6 +19,6 @@ object IssueAsset {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], gas: Int, password: String)
+  case class Data(id: String, tarderID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], gas: Int, password: String)
 
 }

@@ -5,10 +5,10 @@ import play.api.data.Forms._
 
 import java.util.Date
 
-object PaymentTerms {
+object NegotiationPaymentTerms {
   val form = Form(
     mapping(
-      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.ID.name -> constants.FormField.ID.field,
       constants.FormField.ADVANCE_PAYMENT.name -> constants.FormField.ADVANCE_PAYMENT.field,
       constants.FormField.ADVANCE_PERCENTAGE.name -> optional(constants.FormField.ADVANCE_PERCENTAGE.field),
       constants.FormField.CREDIT.name -> constants.FormField.CREDIT.field,
@@ -18,6 +18,6 @@ object PaymentTerms {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, advancePayment:Boolean, advancePercentage:Option[Double], credit:Boolean,tenure:Option[Int], tentativeDate:Option[Date], refrence:Option[String])
+  case class Data(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String])
 
 }

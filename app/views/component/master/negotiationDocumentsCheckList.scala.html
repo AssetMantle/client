@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.NegotiationDocumentsCheckList
+
+@(negotiationRequestDocumentsCheckListForm: Form[NegotiationDocumentsCheckList.Data] = NegotiationDocumentsCheckList.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.NEGOTIATION_DOCUMENTS_CHECKLIST, negotiationRequestDocumentsCheckListForm) {
+    @commonInputText(negotiationRequestDocumentsCheckListForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonCheckbox(negotiationRequestDocumentsCheckListForm, constants.FormField.BILL_OF_EXCHANGE)
+    @commonCheckbox(negotiationRequestDocumentsCheckListForm, constants.FormField.COO)
+    @commonCheckbox(negotiationRequestDocumentsCheckListForm, constants.FormField.COA)
+    @commonInputText(negotiationRequestDocumentsCheckListForm, constants.FormField.OTHER_DOCUMENTS, 'required -> false)
+    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_PAYMENT_TERMS.get, 'parameters -> s"'${id}'")
+}
