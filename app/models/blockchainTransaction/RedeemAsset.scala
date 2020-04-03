@@ -195,10 +195,9 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
         _ <- markRedeemed(redeemAsset.pegHash)
         _ <- markDirty(redeemAsset)
         (toAccountID, fromAccountID) <- getIDs(redeemAsset)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -221,10 +220,9 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
         _ <- markTransactionFailed
         redeemAsset <- redeemAsset
         (toAccountID, fromAccountID) <- getIDs(redeemAsset)
-      } yield {
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

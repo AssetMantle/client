@@ -36,6 +36,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val sendFiatTable = TableQuery[SendFiatTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -200,7 +201,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } yield {}
       }
 
-      def getIDs(sendFiat: SendFiat): Future[(String,String)] = {
+      def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(sendFiat.to)
         val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
         for {
@@ -218,10 +219,9 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         _ <- insertOrUpdateFiats(orderResponse, negotiationID)
         _ <- markDirty(sendFiat)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -234,7 +234,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
-      def getIDs(sendFiat: SendFiat): Future[(String,String)] = {
+      def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(sendFiat.to)
         val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
         for {
@@ -248,10 +248,9 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         sendFiat <- sendFiat
         _ <- markDirty(sendFiat.from)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

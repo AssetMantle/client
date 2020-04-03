@@ -9,7 +9,6 @@ input:hover {
   cursor: pointer; }
 
 button {
-  margin-bottom: 5px !important;
   background-color: #EEF9FF;
   color: #1B7FBD;
   padding: 10px 15px;

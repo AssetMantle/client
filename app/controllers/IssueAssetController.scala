@@ -410,14 +410,16 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               for {
                 _ <- accept
                 id <- id
-              } yield utilitiesNotification.send(id, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                _ <- utilitiesNotification.send(id, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              } yield {}
             } else {
               val reject = masterTransactionAssetFiles.Service.reject(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
               val id = masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID)
               for {
                 _ <- reject
                 id <- id
-              } yield utilitiesNotification.send(id, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                _ <- utilitiesNotification.send(id, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              } yield {}
             }
           }
 
