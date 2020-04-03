@@ -6,7 +6,6 @@
 <div>
     @sellSalesQuoteList.map { sellSalesQuote =>
         <li class="commonList">
-            <p class="accountName"><span>B</span></p>
             @commonVerticalTextInfo(constants.Form.ASSET_TYPE, sellSalesQuote.assetType)
             @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sellSalesQuote.assetDescription)
             @commonVerticalIntInfo(constants.Form.ASSET_QUANTITY, sellSalesQuote.assetQuantity)

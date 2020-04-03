@@ -4,7 +4,7 @@
 
 @(tradeRooms: Seq[TradeRoom])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(tradeRoom <- tradeRooms) {
-    @commonList(){
+        <list class="commonList">
         @commonVerticalTextInfo(constants.Form.ID, tradeRoom.id)
         @commonVerticalTextInfo(constants.View.SALES_QUOTE_ID, tradeRoom.salesQuoteID)
         @commonVerticalTextInfo(constants.View.BUYER, tradeRoom.buyerAccountID)
@@ -14,7 +14,7 @@
             <p class="listItemButton"><button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small"><a href="@controllers.routes.TradeRoomController.tradeRoom(tradeRoom.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a></button>
             </p>
         </div>
-    }
+        </list>
 }
 
 

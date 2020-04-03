@@ -12,8 +12,8 @@
 } {
     @if(organization.ubos.data.isEmpty) {
         <div class="cmuk-position-center">
-            <button type="button" class="cmuk-button cmuk-button-small cmuk-button-link" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addUBOForm())"
-            <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>>@Messages(constants.Form.ADD_UBO.legend)</button>
+            <button type="button" class="cmuk-button cmuk-button-small cmuk-button-link" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addUBOForm())">
+            <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>@Messages(constants.Form.ADD_UBO.legend)</button>
         </div>
     } else {
         @organization.ubos.data.map{ubo =>

@@ -10,14 +10,14 @@
         }{
             @for(trader<- traders){
                 @commonInfoBox(){
-                    @commonTextInfo(constants.Form.ORGANIZATION_ID,trader.organizationID) <br>
-                    @commonTextInfo(constants.Form.ACCOUNT_ID,trader.accountID) <br>
-                    @commonTextInfo(constants.Form.NAME,trader.name) <br>
-                    @commonJavascriptButton(constants.View.SELECT,JavaScript(s"fillCounterPartyField('${trader.accountID}')"))  <br>
+                    @commonTextInfo(constants.Form.ORGANIZATION_ID,trader.organizationID)
+                    @commonTextInfo(constants.Form.ACCOUNT_ID,trader.accountID)
+                    @commonTextInfo(constants.Form.NAME,trader.name)
+                    @commonJavascriptButton(constants.View.SELECT,JavaScript(s"fillCounterPartyField('${trader.accountID}')"))
                 }
         }
     }
-    @commonInputText(inviteSalesQuoteBuyerForm, constants.FormField.REQUEST_ID, 'value ->requestID,'class -> "hidden", 'readonly -> true)
+    @commonInputText(inviteSalesQuoteBuyerForm, constants.FormField.REQUEST_ID, 'value ->requestID,'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(inviteSalesQuoteBuyerForm, constants.FormField.COUNTER_PARTY)
 }
 

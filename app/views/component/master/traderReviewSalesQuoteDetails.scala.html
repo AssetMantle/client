@@ -31,9 +31,8 @@
     @commonBooleanInfo(constants.FormField.COO.name, Option(salesQuote.salesQuoteDocuments.get.coo))
     @commonBooleanInfo(constants.FormField.OTHER_DOCUMENTS.name, Option(salesQuote.salesQuoteDocuments.get.otherDocuments))
 
-    <div>@Messages(constants.View.INVITE) : <br>
-        <span class="red">@Messages(constants.FormField.COUNTER_PARTY.name)</span>: @salesQuote.buyerAccountID <br>
-    </div>
+    <div class="cmuk-text-left title">@Messages(constants.View.INVITE)</div>
+    @commonTextInfo(constants.FormField.COUNTER_PARTY.name, salesQuote.buyerAccountID.getOrElse(""))
 
     @commonInputText(traderReviewSalesQuoteDetailsForm, constants.FormField.REQUEST_ID, 'value ->requestID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(traderReviewSalesQuoteDetailsForm, constants.FormField.COMPLETION)

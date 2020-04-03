@@ -27,7 +27,6 @@
               }
           }
           case None=> {
-              <br>
               @commonJavascriptButton(constants.Form.APPROVE,JavaScript(s"verifyReject(this,'${Seq("#", target).mkString("")}',true)"))
               @commonJavascriptButton(constants.Form.REJECT,JavaScript(s"verifyReject(this,'${Seq("#", target).mkString("")}',false)"))
             }

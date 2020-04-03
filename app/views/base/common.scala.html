@@ -10,7 +10,6 @@
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/Favicon.png")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/style.css")">
             <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
@@ -53,10 +52,11 @@
                                 <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
                             </span>@Messages(constants.Form.TRADES)</a>
                             </li>
-@*                            <li><a href=""><span>*@
-@*                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>*@
-@*                            </span>@Messages(constants.Form.TRANSACTIONS)</a>*@
-@*                            </li>*@
+                           <li>
+                               <a><span>
+                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>
+                            </span>@Messages(constants.Form.TRANSACTIONS)</a>
+                            </li>
                             <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
                                 <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
                             </span>@Messages(constants.Form.ACCOUNT)</a>
@@ -212,8 +212,10 @@
                         </div>
                     </div>
 
-                    <div class = "modal centerScreen" id="loading">
+                    <div class ="modal" id="loading">
+                        <div class="centerScreen">
                         <div cmuk-spinner="ratio: 2.5"></div>
+                    </div>
                     </div>
 
                 </div>
