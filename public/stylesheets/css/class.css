@@ -1777,9 +1777,6 @@ header:before,
   margin-bottom: 5px; }
 .contactDetails .cmuk-card-body {
   position: relative; }
-  .contactDetails .cmuk-card-body .buttonUpdate {
-    position: absolute;
-    bottom: 20px; }
 
 .toolTip {
   position: relative;
