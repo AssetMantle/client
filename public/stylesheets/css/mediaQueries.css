@@ -125,8 +125,6 @@
 
   .cmuk-card-body .cmuk-subnav li a {
     font-size: 10px; }
-  .cmuk-card-body .cmuk-subnav-pill > * > a:focus, .cmuk-card-body .cmuk-subnav-pill > * > a:hover {
-    background: none; }
 
   .modal .modalContent {
     top: 10%;
