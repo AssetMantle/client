@@ -214,6 +214,18 @@
     top:10%;
     max-height: 400px;
   }
+  .tabsSection{
+    .cmuk-grid-divider{
+      display: block;
+    }
+    .cmuk-grid-divider.cmuk-grid-stack>.cmuk-grid-margin{
+      margin:10px 0px 0px 0px;
+    }
+    .cmuk-grid-divider>:not(.cmuk-first-column)::before,
+    .cmuk-grid-divider.cmuk-grid-stack>.cmuk-grid-margin::before{
+      border: none;
+    }
+  }
 }
 
 @media (max-width:1920px){
