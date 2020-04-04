@@ -587,7 +587,7 @@ rightText {
   .header .dashboardIcon .icon {
     width: 16px;
     height: 13px; }
-  .header .dashboardIcon, .header .traderIcon, .header .accountIcon {
+  .header .dashboardIcon, .header .traderIcon, .header .accountIcon, .header .transactionIcon {
     margi-right: 3px;
     width: 20px;
     height: 20px; }
