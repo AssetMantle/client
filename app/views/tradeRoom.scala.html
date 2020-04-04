@@ -2,7 +2,7 @@
 @import models.master.{Organization, Zone}
 @import views.html.base.common
 @import views.html.base._
-@(tradeRoomID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(tradeID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
@@ -12,7 +12,7 @@
             <span cmuk-icon="arrow-left" class="backIcon"></span>
         </div>
         <div>
-            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID)</span><span class="quoteId secondaryFont hashCode">@tradeRoomID</span>
+            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID)</span><span class="quoteId secondaryFont hashCode">@tradeID</span>
         </div>
         <div class="userIcons cmuk-flex secondaryFont">
             <span class="buyerIcon userIcon">B</span>
@@ -78,7 +78,7 @@
 
     componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
     componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
-    componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
+    componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeID'));
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView("fileName","documentType"));
     componentResource('recentActivity', jsRoutes.controllers.TradeRoomController.recentActivity());
     componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom());

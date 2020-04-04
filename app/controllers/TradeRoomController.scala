@@ -19,14 +19,14 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def tradeRoom(tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeRoom(tradeID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      withUsernameToken.Ok(views.html.tradeRoom(tradeRoomID = tradeRoomID))
+      withUsernameToken.Ok(views.html.tradeRoom(tradeID = tradeID))
   }
 
-  def tradeTerms(tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeTerms(tradeID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val tradeTerms = masterTransactionTradeTerms.Service.get(tradeRoomID)
+      val tradeTerms = masterTransactionTradeTerms.Service.get(tradeID)
       (for {
         tradeTerms <- tradeTerms
       } yield Ok(views.html.component.master.tradeTermsView(tradeTerms))
