@@ -3,9 +3,6 @@ function noActivity() {
         $(".recentActivityBox").parent().html("<p class='cmuk-position-center'>No Activities Found</p>");
         $("head").append("<style>.timeline:before{height: 0%}</style>")
     }
-    if ($("#chatWindow").length == 1){
-        $("#chatWindow").html("<p class='cmuk-position-center'>Select chat to message</p>");
-    }
 }
 
 function loadMoreActivities(notificationRoute, tradeRoomID = null) {
