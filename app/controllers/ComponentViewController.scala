@@ -6,6 +6,8 @@ import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderKYC, TraderRelation, Zone}
 import models.masterTransaction.{AssetFile, IssueAssetRequest}
+import models.master.{Organization => _, Zone => _, _}
+import models.masterTransaction.{AssetFile, IssueAssetRequest, Notification}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -26,6 +28,8 @@ class ComponentViewController @Inject()(
                                          masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
+                                         masterTransactionNotifications: masterTransaction.Notifications,
+                                         masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                          masterNegotiations: master.Negotiations,
                                          masterAccounts: master.Accounts,
                                          masterAccountFiles: master.AccountFiles,
@@ -52,6 +56,8 @@ class ComponentViewController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 
   private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
+
+  private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -102,7 +108,7 @@ class ComponentViewController @Inject()(
             zone <- zone(zoneID)
           } yield Ok(views.html.component.master.zoneDetails(zone))
         case constants.User.TRADER =>
-          val zoneID = masterTraders.Service.getZoneIDByAccountID(loginState.username)
+          val zoneID = masterTraders.Service.tryGetZoneIDByAccountID(loginState.username)
 
           def zone(zoneID: String): Future[models.master.Zone] = masterZones.Service.get(zoneID)
 
@@ -146,6 +152,25 @@ class ComponentViewController @Inject()(
         assetsList <- assetsList(buyerOnGoingNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(buyerOnGoingNegotiationList.map(_.buyerTraderID))
       } yield Ok(views.html.component.master.traderViewBuyerOnGoingNegotiationList(buyerOnGoingNegotiationList = buyerOnGoingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderFinancials: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def negotiations(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
+
+      //If we make a master.Order Table and store order status such ASSET_SEND, FIAT_SEND, ORDER_COMPLETE, etc. then fetch incomplete orders and take difference w.r.t negotiations
+
+      (for {
+        fiatPegWallet <- fiatPegWallet
+        traderID <- traderID
+        negotiations <- negotiations(traderID)
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = negotiations.filter(_.buyerTraderID == traderID).map(_.price).sum, receivable = negotiations.filter(_.sellerTraderID == traderID).map(_.price).sum))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -262,6 +287,51 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
+
+      def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+
+      (for {
+        organizationID <- organizationID
+        tradersInOrganizations <- tradersInOrganizations(organizationID)
+        notificationsOfTraders <- notificationsOfTraders(tradersInOrganizations.map(_.accountID))
+      } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def recentActivityForTrader(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+      (for {
+        notifications <- notifications
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTrader), None))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def recentActivityForTradeRoom(pageNumber: Int = 0, tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val tradeActivities = masterTransactionTradeActivities.Service.getTradeActivity(tradeRoomID)
+
+      def notifications(ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(loginState.username, ids, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+
+      (for {
+        tradeActivities <- tradeActivities
+        notifications <- notifications(tradeActivities.map(_.notificationID))
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTradeRoom), Option(tradeRoomID)))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML))
@@ -354,7 +424,7 @@ class ComponentViewController @Inject()(
 
   def traderViewOrganizationDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val trader: Future[Trader] = masterTraders.Service.getByAccountID(loginState.username)
+      val trader: Future[Trader] = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
 
@@ -472,7 +542,7 @@ class ComponentViewController @Inject()(
     implicit loginState =>
       implicit request =>
         val fromTrader = masterTraders.Service.tryGet(fromID)
-        val toTrader = masterTraders.Service.getByAccountID(loginState.username)
+        val toTrader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
         def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
 

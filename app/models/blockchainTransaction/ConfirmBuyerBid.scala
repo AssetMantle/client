@@ -36,6 +36,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val confirmBuyerBidTable = TableQuery[ConfirmBuyerBidTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -193,12 +194,12 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
           negotiationIDResponse <- negotiationIDResponse
           negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
         } yield negotiation
-      }else getNegotiation.Service.get(negotiationID)
+      } else getNegotiation.Service.get(negotiationID)
 
       def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
 
       //TODO
-      def updateNegotiationID(negotiationResponse: NegotiationResponse.Response, pegHash: String, buyerAccountID: String): Future[Int] = masterNegotiations.Service.updateNegotiationID(negotiationResponse.value.negotiationID,  pegHash)
+      def updateNegotiationID(negotiationResponse: NegotiationResponse.Response, pegHash: String, buyerAccountID: String): Future[Int] = masterNegotiations.Service.markAcceptedAndUpdateNegotiationID(negotiationResponse.value.negotiationID,  pegHash)
 
       def markDirty(confirmBuyerBid: ConfirmBuyerBid): Future[Unit] = {
         val markDirtyFromAddressBlockchainAccounts = blockchainAccounts.Service.markDirty(confirmBuyerBid.from)
@@ -223,10 +224,9 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         _ <- updateNegotiationID(negotiationResponse, confirmBuyerBid.pegHash, buyerAccountID)
         _ <- markDirty(confirmBuyerBid)
         toAccountID <- toAccountID(confirmBuyerBid)
-      } yield {
-        utilitiesNotification.send(buyerAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -246,7 +246,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         } yield {}
       }
 
-      def getIDs(confirmBuyerBid: ConfirmBuyerBid): Future[(String,String)] = {
+      def getIDs(confirmBuyerBid: ConfirmBuyerBid): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(confirmBuyerBid.to)
         val fromAccountID = masterAccounts.Service.getId(confirmBuyerBid.from)
         for {
@@ -260,10 +260,9 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         confirmBuyerBid <- confirmBuyerBid
         _ <- markDirty(confirmBuyerBid)
         (toAccountID, fromAccountID) <- getIDs(confirmBuyerBid)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

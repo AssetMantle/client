@@ -19,9 +19,9 @@
   .leftTradeFinancial .cmuk-card-header {
     padding: 10px 15px;
     font-size: 12px; }
-  .leftTradeFinancial .cmuk-card-body {
+  .leftTradeFinancial .financial .cmuk-card-body {
     height: 210px; }
-    .leftTradeFinancial .cmuk-card-body .refresh {
+    .leftTradeFinancial .financial .cmuk-card-body .refresh {
       font-size: 10px; }
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
@@ -41,17 +41,19 @@
   .leftTradeFinancial .docView .cmuk-card-header, .leftTradeFinancial .docView .cmuk-card-body, .leftTradeFinancial .docView .documentlist {
     padding: 0px; }
   .leftTradeFinancial .docView .cmuk-card-body {
-    height: 270px; }
+    height: 300px; }
 
   .recentActivity .recentActivityContainer {
-    margin-bottom: 20px; }
+    margin-bottom: 15px; }
     .recentActivity .recentActivityContainer .cmuk-card-body {
       height: 210px; }
     .recentActivity .recentActivityContainer .cmuk-card-header {
       padding: 10px 15px;
       font-size: 12px; }
-  .recentActivity .chatContainer .cmuk-card-body .chat_history ul {
-    height: 246px; }
+  .recentActivity .chatRoom .cmuk-card-body {
+    height: 300px; }
+    .recentActivity .chatRoom .cmuk-card-body .chatMessages {
+      height: 190px; }
 
   .timeline {
     margin: 20px 0px; } }

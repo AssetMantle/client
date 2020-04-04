@@ -93,6 +93,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ChangeSellerBidController.changeSellerBidForm,
         routes.javascript.ChangeSellerBidController.blockchainChangeSellerBidForm,
 
+        routes.javascript.ChatController.chatRoom,
+        routes.javascript.ChatController.chatWindow,
+        routes.javascript.ChatController.sendMessageForm,
+        routes.javascript.ChatController.loadMoreChats,
+        routes.javascript.ChatController.replyToMessage,
+        routes.javascript.ChatController.markChatAsRead,
+
         routes.javascript.ComponentViewController.commonHome,
         routes.javascript.ComponentViewController.genesisDetails,
         routes.javascript.ComponentViewController.zoneDetails,
@@ -120,6 +127,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewOrganizationBankAccountDetail,
         routes.javascript.ComponentViewController.userViewOrganizationUBOs,
         routes.javascript.ComponentViewController.viewOrganizationUBOs,
+        routes.javascript.ComponentViewController.recentActivityForTradeRoom,
+        routes.javascript.ComponentViewController.recentActivityForTrader,
+        routes.javascript.ComponentViewController.recentActivityForOrganization,
+        routes.javascript.ComponentViewController.traderFinancials,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -275,9 +286,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.TradeRoomController.documentList,
         routes.javascript.TradeRoomController.documentView,
         routes.javascript.TradeRoomController.recentActivity,
-        routes.javascript.TradeRoomController.chatRoom,
         routes.javascript.TradeRoomController.updateTermStatus,
-
 
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
 

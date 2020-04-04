@@ -67,6 +67,12 @@ POST        /negotiation/documentsCheckList                                 cont
 GET         /negotiation/reviewRequest                                      controllers.NegotiationController.reviewRequestForm(id: String)
 POST        /negotiation/reviewRequest                                      controllers.NegotiationController.reviewRequest
 
+GET         /negotiation/acceptRequest                                      controllers.NegotiationController.acceptRequestForm(id: String)
+POST        /negotiation/acceptRequest                                      controllers.NegotiationController.acceptRequest
+
+GET         /negotiation/rejectRequest                                      controllers.NegotiationController.rejectRequestForm(id: String)
+POST        /negotiation/rejectRequest                                      controllers.NegotiationController.rejectRequest
+
 GET         /contact                                                        controllers.ContactController.contact
 
 GET         /trader/traderRelationRequest                                   controllers.TraderController.traderRelationRequestForm
@@ -106,22 +112,26 @@ GET         /component/pendingSentTraderRelation                            cont
 GET         /component/pendingReceivedTraderRelation                        controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
 GET         /master/zoneViewOrganizationBankAccountDetail                   controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)
 
-GET         /master/component/commonHome                                    controllers.ComponentViewController.commonHome
-GET         /master/component/genesisDetails                                controllers.ComponentViewController.genesisDetails
-GET         /master/component/zoneDetails                                   controllers.ComponentViewController.zoneDetails
-GET         /master/component/fiatList                                      controllers.ComponentViewController.fiatList
+GET         /component/commonHome                                           controllers.ComponentViewController.commonHome
+GET         /component/genesisDetails                                       controllers.ComponentViewController.genesisDetails
+GET         /component/zoneDetails                                          controllers.ComponentViewController.zoneDetails
+GET         /component/fiatList                                             controllers.ComponentViewController.fiatList
+GET         /component/recentActivityForTradeRoom                           controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, tradeRoomID :String)
+GET         /component/recentActivityForTrader                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
+GET         /component/recentActivityForOrganization                        controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
+GET         /component/traderFinancials                                     controllers.ComponentViewController.traderFinancials
 
-GET         /master/component/releaseAssetList                              controllers.ReleaseAssetController.releaseAssetList
-GET         /master/component/buyerExecuteOrderList                         controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
-GET         /master/component/sellerExecuteOrderList                        controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderList
-GET         /master/component/setBuyerFeedbackList                          controllers.SetBuyerFeedbackController.buyerFeedbackList
-GET         /master/component/setSellerFeedbackList                         controllers.SetSellerFeedbackController.sellerFeedbackList
-GET         /master/component/viewTradersInOrganization                     controllers.SetACLController.viewTradersInOrganization
-GET         /master/component/viewTradersInOrganizationForZone              controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
-GET         /master/component/viewTradersInOrganizationForGenesis           controllers.SetACLController.viewTradersInOrganizationForGenesis(organizationID: String)
-GET         /master/component/viewOrganizationsInZone                       controllers.AddOrganizationController.viewOrganizationsInZone
-GET         /master/component/viewOrganizationsInZoneForGenesis             controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis(zoneID: String)
-GET         /master/component/viewZonesInGenesis                            controllers.AddZoneController.viewZonesInGenesis
+GET         /component/releaseAssetList                                     controllers.ReleaseAssetController.releaseAssetList
+GET         /component/buyerExecuteOrderList                                controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
+GET         /component/sellerExecuteOrderList                               controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderList
+GET         /component/setBuyerFeedbackList                                 controllers.SetBuyerFeedbackController.buyerFeedbackList
+GET         /component/setSellerFeedbackList                                controllers.SetSellerFeedbackController.sellerFeedbackList
+GET         /component/viewTradersInOrganization                            controllers.SetACLController.viewTradersInOrganization
+GET         /component/viewTradersInOrganizationForZone                     controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
+GET         /component/viewTradersInOrganizationForGenesis                  controllers.SetACLController.viewTradersInOrganizationForGenesis(organizationID: String)
+GET         /component/viewOrganizationsInZone                              controllers.AddOrganizationController.viewOrganizationsInZone
+GET         /component/viewOrganizationsInZoneForGenesis                    controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis(zoneID: String)
+GET         /component/viewZonesInGenesis                                   controllers.AddZoneController.viewZonesInGenesis
 
 GET         /master/getGenesisAccessedFile                                  controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                         controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
@@ -352,6 +362,7 @@ GET         /master/negotiationComet                                        cont
 GET         /master/orderComet                                              controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                                        controllers.IssueFiatController.issueFiatRequestForm
+POST        /master/issueFiatRequest                                        controllers.IssueFiatController.issueFiatRequest
 
 GET         /master/viewPendingIssueFiatRequests                            controllers.IssueFiatController.viewPendingIssueFiatRequests
 GET         /master/rejectIssueFiatRequest                                  controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
@@ -401,6 +412,15 @@ POST        /master/setBuyerFeedback                                        cont
 
 GET         /master/setSellerFeedback                                       controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                       controllers.SetSellerFeedbackController.setSellerFeedback
+
+GET         /chat/chatRoom                                                  controllers.ChatController.chatRoom(tradeRoomID: String)
+GET         /chat/chatWindow                                                controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
+GET         /chat/loadMoreChats                                             controllers.ChatController.loadMoreChats(chatID: String ,pageNumber: Int)
+GET         /chat/sendMessage                                               controllers.ChatController.sendMessageForm
+POST        /chat/sendMessage                                               controllers.ChatController.sendMessage
+GET         /chat/markChatAsRead                                            controllers.ChatController.markChatAsRead(chatID: String)
+GET         /chat/replyToMessage                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
+GET         /chat/chatComet                                                 controllers.ChatController.sendMessageComet(chatID: String)
 
 POST        /wurtcb                                                         controllers.WesternUnionController.westernUnionRTCB
 POST        /wuRedirect                                                     controllers.WesternUnionController.westernUnionPortalRedirect
@@ -471,6 +491,5 @@ GET         /master/recentActivity                                          cont
 GET         /master/tradeFinancials                                         controllers.TradeRoomController.tradeFinancials
 GET         /master/tradeDocumentList                                       controllers.TradeRoomController.documentList
 GET         /master/tradeDocumentView                                       controllers.TradeRoomController.documentView(fileName:String, documentType:String)
-GET         /master/chatRoom                                                controllers.TradeRoomController.chatRoom
 GET         /master/updateTermsStatus                                       controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
 POST        /master/updateTradeTermStatus                                   controllers.TradeRoomController.updateTradeTermStatus

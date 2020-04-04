@@ -269,7 +269,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   def zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderZoneID = masterTraders.Service.getZoneID(traderID)
+      val traderZoneID = masterTraders.Service.tryGetZoneID(traderID)
       val userZoneID = masterZones.Service.getID(loginState.username)
       (for {
         traderZoneID <- traderZoneID

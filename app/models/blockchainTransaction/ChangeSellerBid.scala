@@ -193,8 +193,8 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
       def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
 
-      def updateNegotiationID(negotiation: Negotiation, negotiationID: String): Future[Int] = if (negotiation.negotiationID.isEmpty) {
-        masterNegotiations.Service.updateNegotiationID(id = negotiation.id, negotiationID = negotiationID)
+      def markNegotiationAcceptedAndUpdateNegotiationIDChatID(negotiation: Negotiation, negotiationID: String): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
+        masterNegotiations.Service.markAcceptedAndUpdateNegotiationID(id = negotiation.id, negotiationID = negotiationID)
       } else {
         Future(0)
       }
@@ -212,13 +212,16 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         } yield Unit
       }
 
-      def getIDs(changeSellerBid: ChangeSellerBid): Future[(String,String)] = {
-        val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
-        val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
+      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+
+      def sendNegotiationRequestAcceptedNotifications(fromAccountID: String, toAccountID: String, negotiation: Negotiation): Future[Unit] = {
+        if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
+          for {
+            _ <- utilitiesNotification.send(fromAccountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id)
+            _ <- utilitiesNotification.send(toAccountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id)
+          } yield Unit
+        }
+        Future(Unit)
       }
 
       (for {
@@ -228,14 +231,15 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         negotiationID <- negotiationID(changeSellerBid)
         negotiationResponse <- negotiationResponse(negotiationID, changeSellerBid)
         _ <- insertOrUpdate(negotiationResponse)
-        _ <- updateNegotiationID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
+        _ <- markNegotiationAcceptedAndUpdateNegotiationIDChatID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
         _ <- updatePriceAndQuantity(id = negotiation.id, price = negotiationResponse.value.bid.toInt, quantity = negotiation.quantity) //TODO Change quantity = negotiation.quantity if in future comes from blockchain
         _ <- markDirty(changeSellerBid)
-        (toAccountID, fromAccountID) <- getIDs(changeSellerBid)
-      } yield {
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        fromAccountID <- getID(changeSellerBid.from)
+        toAccountID <- getID(changeSellerBid.to)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash)
+        _ <- sendNegotiationRequestAcceptedNotifications(fromAccountID = fromAccountID, toAccountID = toAccountID, negotiation = negotiation)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -255,24 +259,17 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         } yield {}
       }
 
-      def getIDs(changeSellerBid: ChangeSellerBid): Future[(String,String)] = {
-        val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
-        val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionFailed
         changeSellerBid <- changeSellerBid
         _ <- markDirty(changeSellerBid)
-        (toAccountID, fromAccountID) <- getIDs(changeSellerBid)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        fromAccountID <- getID(changeSellerBid.from)
+        toAccountID <- getID(changeSellerBid.to)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

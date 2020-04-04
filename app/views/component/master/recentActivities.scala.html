@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@(notifications: Seq[models.masterTransaction.Notification] = Seq(), route: String, tradeRoomID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="timeline recentActivityBox">
+    @for(notification <- notifications) {
+        <div class="timeline-item notification">
+            <div class="timeline-icon">
+                <img src="@routes.Assets.versioned("./images/icons/contractIcon.svg")" alt="">
+            </div>
+            <div class="timeline-content right">
+                <div>
+                    <div class="textLineOverflow"><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
+                        <div class="notificationTime">@notification.time</div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@tradeRoomID')"> @Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
+</div>
+    <script>
+        noActivity()
+    </script>

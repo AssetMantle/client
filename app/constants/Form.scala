@@ -70,6 +70,9 @@ object Form {
   val CONFIRM_SELLER_BID_DETAIL = new Form("CONFIRM_SELLER_BID_DETAIL", routes.ConfirmSellerBidController.confirmSellerBidDetail(), routes.javascript.ConfirmSellerBidController.confirmSellerBidDetailForm)
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid(), routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm)
 
+  //ChatController
+  val SEND_CHAT = new Form("SEND_CHAT", routes.ChatController.sendMessage(), routes.javascript.ChatController.sendMessageForm)
+
   //ContactController
   val UPDATE_CONTACT = new Form("UPDATE_CONTACT", routes.ContactController.updateContact(), routes.javascript.ContactController.updateContactForm)
 
@@ -93,6 +96,8 @@ object Form {
   val NEGOTIATION_PAYMENT_TERMS = new Form("NEGOTIATION_PAYMENT_TERMS", routes.NegotiationController.paymentTerms(), routes.javascript.NegotiationController.paymentTermsForm)
   val NEGOTIATION_DOCUMENTS_CHECKLIST = new Form("NEGOTIATION_DOCUMENTS_CHECKLIST", routes.NegotiationController.documentsCheckList(), routes.javascript.NegotiationController.documentsCheckListForm)
   val REVIEW_NEGOTIATION_REQUEST = new Form("REVIEW_NEGOTIATION_REQUEST", routes.NegotiationController.reviewRequest(), routes.javascript.NegotiationController.reviewRequestForm)
+  val ACCEPT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.acceptRequest(), routes.javascript.NegotiationController.acceptRequestForm)
+  val REJECT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.rejectRequest(), routes.javascript.NegotiationController.rejectRequestForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)

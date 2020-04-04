@@ -224,15 +224,15 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def tryGet(id: String): Future[Trader] = findById(id)
 
-    def getByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
+    def tryGetByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
 
-    def getZoneID(id: String): Future[String] = getZoneIDByID(id)
+    def tryGetZoneID(id: String): Future[String] = getZoneIDByID(id)
 
-    def getOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
+    def tryGetOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
 
-    def getTraderName(id: String): Future[String] = getTraderNameByID(id)
+    def tryGetTraderName(id: String): Future[String] = getTraderNameByID(id)
 
-    def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
+    def tryGetZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
     def getOrganizationIDByAccountID(accountID: String): Future[String] = findOrganizationIDByAccountId(accountID)
 

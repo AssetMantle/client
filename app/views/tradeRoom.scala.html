@@ -9,10 +9,10 @@
 @left={
     <div class="left cmuk-flex">
         <div>
-            <span cmuk-icon="arrow-left" class="backIcon"></span>
+            <a><span cmuk-icon="arrow-left" class="backIcon"></span></a>
         </div>
-        <div>
-            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID)</span><span class="quoteId secondaryFont hashCode">@tradeRoomID</span>
+        <div class="cmuk-flex">
+            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID):</span><p class="quoteId secondaryFont hashCode cmuk-margin-remove">@tradeRoomID</p>
         </div>
         <div class="userIcons cmuk-flex secondaryFont">
             <span class="buyerIcon userIcon">B</span>
@@ -37,8 +37,8 @@
         <div class="cmuk-card cmuk-card-default">
             <div class="cmuk-card-header">
                 <ul cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
-                    <li class="cmuk-active first"><a href="#">Terms View</a></li>
-                    <li class="docViewList"><a href="#">Docs View</a></li>
+                    <li class="cmuk-active first"><a href="#">@Messages(constants.View.TERMS_VIEW)</a></li>
+                    <li class="docViewList"><a href="#">@Messages(constants.View.DOCS_VIEW)</a></li>
                 </ul>
             </div>
             <div class="cmuk-card-body">
@@ -59,28 +59,35 @@
 
 @right={
     <div class="right cmuk-flex">
-        <button class="refresh"><img src="./images/icons/amendIcon.svg">Amend</button>
-        <button class="refresh "><img src="./images/icons/refreshIcon.svg">Refresh</button>
+        <button class="refresh"><img src="@routes.Assets.versioned("./images/icons/amendIcon.svg")">@Messages(constants.View.AMEND)</button>
+        <button class="refresh "><img src="@routes.Assets.versioned("./images/icons/refreshIcon.svg")">@Messages(constants.View.REFRESH)</button>
         <div class="cmuk-flex live">
-            <span class="liveText secondaryFont">Live Trade Room </span>
+            <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>
         </div>
     </div>
     <div class="recentActivity">
-        <div id="recentActivity">
+        <div class="recentActivityContainer">
+        @commonCard(constants.View.RECENT_ACTIVITY) {
+        } {
+            <div class="scroller">
+                <div id="recentActivity">
+                </div>
+                <div class="cover-bar"></div>
+            </div>
+        }
         </div>
-        <div id="chatRoom">
+        <div id="chatRoom" class="chatRoom">
         </div>
     </div>
 }
 
 <script>
-
     componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
     componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
     componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
     componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView("fileName","documentType"));
-    componentResource('recentActivity', jsRoutes.controllers.TradeRoomController.recentActivity());
-    componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom());
+    componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@tradeRoomID'));
+    componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@tradeRoomID'));
 
 </script>

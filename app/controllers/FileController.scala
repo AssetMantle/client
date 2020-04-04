@@ -155,7 +155,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderZoneID = masterTraders.Service.getZoneID(traderID)
+      val traderZoneID = masterTraders.Service.tryGetZoneID(traderID)
       val userZoneID = masterZones.Service.getID(loginState.username)
       (for {
         traderZoneID <- traderZoneID
@@ -662,7 +662,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val userZoneID = masterZones.Service.getID(loginState.username)
       val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
 
-      def traderZoneID(accountID: String): Future[String] = masterTraders.Service.getZoneIDByAccountID(accountID)
+      def traderZoneID(accountID: String): Future[String] = masterTraders.Service.tryGetZoneIDByAccountID(accountID)
 
       (for {
         userZoneID <- userZoneID
@@ -687,8 +687,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val buyerAccountID = Future(id)
 
       def getTraders(sellerAccountID: String, buyerAccountID: String): Future[(Trader, Trader)] = {
-        val sellerTrader = masterTraders.Service.getByAccountID(sellerAccountID)
-        val buyerTrader = masterTraders.Service.getByAccountID(buyerAccountID)
+        val sellerTrader = masterTraders.Service.tryGetByAccountID(sellerAccountID)
+        val buyerTrader = masterTraders.Service.tryGetByAccountID(buyerAccountID)
         for {
           sellerTrader <- sellerTrader
           buyerTrader <- buyerTrader
