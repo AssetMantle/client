@@ -1778,8 +1778,12 @@ header:before,
   height: 16px;
   width: 16px; }
 
+.contactDetails .infoRowBox {
+  justify-content: space-between; }
+  .contactDetails .infoRowBox .infoRowLabel {
+    width: auto;
+    margin-right: 5px; }
 .contactDetails .cmuk-button-link {
-  margin-left: 10px;
   font-family: "Oxygen", sans-serif; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }

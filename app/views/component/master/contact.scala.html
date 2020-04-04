@@ -9,23 +9,23 @@
     @userContact match {
         case Some(contact) => {
             @commonInfoBox() {
-                <div class="cmuk-flex cmuk-flex-wrap">
+                <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
                     @commonTextInfo(constants.Form.EMAIL_ADDRESS, contact.emailAddress)
                     @if(contact.emailAddressVerified) {
-                        <span class="cmuk-badge verified">Verified</span>
+                        <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
-                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)<span cmuk-icon="chevron-right"></span></button>
+                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
                     }
 
                 </div>
             }
             @commonInfoBox() {
-                <div class="cmuk-flex cmuk-flex-wrap">
+                <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
                     @commonTextInfo(constants.Form.MOBILE_NUMBER, contact.mobileNumber)
                     @if(contact.mobileNumberVerified) {
-                        <span class="cmuk-badge verified">Verified</span>
+                        <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
-                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)<span cmuk-icon="chevron-right"></span></button>
+                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
                     }
                 </div>
             }

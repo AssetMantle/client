@@ -2142,9 +2142,15 @@ header:before,
 }
 
 .contactDetails {
+  .infoRowBox{
+    .infoRowLabel{
+      width: auto;
+      margin-right: 5px;
+    }
+    justify-content: space-between;
+  }
   .cmuk-button-link{
     @extend %cmuk-button-link;
-    margin-left: 10px;
     font-family: $fontFamilySecondary;
   }
   .cmuk-badge{
