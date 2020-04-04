@@ -16,10 +16,6 @@
   .mobile .cmuk-button{
     background-color: $colorPrimary;
   }
-  .modal .modalContent{
-    top:10%;
-    max-height: 400px;
-  }
 }
 @media (min-width: 600px) {
   .modalBody{
@@ -213,6 +209,10 @@
         font-size:10px;
       }
     }
+  }
+  .modal .modalContent{
+    top:10%;
+    max-height: 400px;
   }
 }
 

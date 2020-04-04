@@ -12,11 +12,7 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #0862BE; }
-
-  .modal .modalContent {
-    top: 10%;
-    max-height: 400px; } }
+    background-color: #0862BE; } }
 @media (min-width: 600px) {
   .modalBody form {
     width: 500px;
@@ -128,7 +124,11 @@
     font-size: 12px; }
 
   .cmuk-card-body .cmuk-subnav li a {
-    font-size: 10px; } }
+    font-size: 10px; }
+
+  .modal .modalContent {
+    top: 10%;
+    max-height: 400px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }
