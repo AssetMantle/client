@@ -8,13 +8,13 @@
     @status match {
         case Some(status) => {
             @if(status) {
-                    <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
+                <span cmuk-icon="check"></span>
             } else {
-                <span class="cmuk-badge rejected">@Messages(constants.View.NOT_VERIFIED)</span>
+                <span cmuk-icon="close"></span>
             }
         }
         case _ => {
-            <span class="cmuk-badge pending">@Messages(constants.View.PENDING)</span>
+            <span>@Messages(constants.View.PENDING)</span>
         }
     }
     </div>
