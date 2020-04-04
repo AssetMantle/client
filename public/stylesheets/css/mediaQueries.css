@@ -125,7 +125,10 @@
     font-size: 12px; }
 
   .profileContainer .infoRow {
-    font-size: 12px; } }
+    font-size: 12px; }
+
+  .cmuk-card-body .cmuk-subnav li a {
+    font-size: 10px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

@@ -207,6 +207,13 @@
       font-size: $paragraphFontSizeSmall;
     }
   }
+  .cmuk-card-body{
+    .cmuk-subnav {
+      li a {
+        font-size:10px;
+      }
+    }
+  }
 }
 
 @media (max-width:1920px){
