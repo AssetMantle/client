@@ -1720,20 +1720,26 @@ header:before,
   .salesQuoteList .cmuk-card-header .cmuk-button {
     padding: 0 15px;
     line-height: 28px; }
-.salesQuoteList .cmuk-card-body .commonList .cmuk-button {
-  padding: 0 15px;
-  line-height: 28px; }
-.salesQuoteList .cmuk-card-body .cmuk-subnav {
-  border-bottom: 1px solid #0862BE; }
-  .salesQuoteList .cmuk-card-body .cmuk-subnav li {
-    font-family: "Oxygen", sans-serif; }
-    .salesQuoteList .cmuk-card-body .cmuk-subnav li a {
-      font-size: 12px; }
-.salesQuoteList .cmuk-card-body .cmuk-subnav-pill > .cmuk-active > a {
-  background-color: #0862BE;
-  color: #FFffff; }
-.salesQuoteList .cmuk-card-body .cmuk-subnav-pill > * > :first-child {
-  color: #0862BE; }
+.salesQuoteList .cmuk-card-body {
+  padding-top: 5px; }
+  .salesQuoteList .cmuk-card-body .commonList .cmuk-button {
+    padding: 0 15px;
+    line-height: 28px; }
+  .salesQuoteList .cmuk-card-body .cmuk-subnav {
+    margin-left: 0px;
+    border-bottom: 1px solid #0862BE; }
+    .salesQuoteList .cmuk-card-body .cmuk-subnav li {
+      width: 50%;
+      text-align: center;
+      padding: 0;
+      font-family: "Oxygen", sans-serif; }
+      .salesQuoteList .cmuk-card-body .cmuk-subnav li a {
+        font-size: 12px; }
+  .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > .cmuk-active > a {
+    background-color: #0862BE;
+    color: #FFffff; }
+  .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > * > :first-child {
+    color: #0862BE; }
 
 .profileContainer .infoRow {
   font-size: 14px;
@@ -1858,9 +1864,15 @@ dl .info {
   .commonCheckBox dl {
     display: flex; }
 
+.identificationDetails .cmuk-card-body, .traderRelationList .cmuk-card-body {
+  padding-top: 5px; }
 .identificationDetails .cmuk-subnav, .traderRelationList .cmuk-subnav {
+  margin-left: 0px;
   border-bottom: 1px solid #0862BE; }
   .identificationDetails .cmuk-subnav li, .traderRelationList .cmuk-subnav li {
+    width: 50%;
+    text-align: center;
+    padding: 0;
     font-family: "Oxygen", sans-serif; }
     .identificationDetails .cmuk-subnav li a, .traderRelationList .cmuk-subnav li a {
       font-size: 12px; }

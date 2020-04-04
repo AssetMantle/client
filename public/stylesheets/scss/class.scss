@@ -2060,13 +2060,18 @@ header:before,
     }
   }
   .cmuk-card-body {
+    padding-top:5px;
     .commonList .cmuk-button {
       padding: 0 15px;
       line-height: 28px;
     }
     .cmuk-subnav{
+      margin-left:0px;
       border-bottom: 1px solid $colorPrimary;
       li{
+        width: 50%;
+        text-align: center;
+        padding: 0;
         font-family: $fontFamilySecondary;
         a{
           font-size: $paragraphFontSizeSmall;
@@ -2249,9 +2254,16 @@ dl .info {
 }
 
 .identificationDetails, .traderRelationList{
+  .cmuk-card-body{
+    padding-top: 5px;
+  }
   .cmuk-subnav{
+    margin-left:0px;
     border-bottom: 1px solid $colorPrimary;
     li{
+      width: 50%;
+      text-align: center;
+      padding: 0;
       font-family: $fontFamilySecondary;
       a{
         font-size: $paragraphFontSizeSmall;
