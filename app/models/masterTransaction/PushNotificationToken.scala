@@ -52,13 +52,7 @@ class PushNotificationTokens @Inject()(protected val databaseConfigProvider: Dat
     }
   }
 
-  private def getPushNotificationTokenByID(id: String): Future[Option[String]] = db.run(pushNotificationTokenTable.filter(_.id === id).map(_.token).result.headOption.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-    }
-  }
+  private def getPushNotificationTokenByID(id: String): Future[Option[String]] = db.run(pushNotificationTokenTable.filter(_.id === id).map(_.token).result.headOption)
 
   private def deleteByID(id: String): Future[Int] = db.run(pushNotificationTokenTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
