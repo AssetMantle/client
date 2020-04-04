@@ -1039,8 +1039,10 @@ rightText {
   }
 }
 
-.userIcons .userIcon {
-  margin-right: -5px;
+.userIcons  {
+  .userIcon {
+    margin-right: -5px;
+  }
   .buyerIcon {
     background: #FFD5D7;
     color: #061728;

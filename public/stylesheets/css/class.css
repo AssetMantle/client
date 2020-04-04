@@ -30,7 +30,7 @@ html, body {
   margin-right: 15px;
   position: relative; }
 
-.userIcons .userIcon .buyerIcon, .userIcons .userIcon .sellerIcon, .userIcons .userIcon .financierIcon {
+.userIcons .buyerIcon, .userIcons .sellerIcon, .userIcons .financierIcon {
   display: inline-flex;
   height: 26px;
   width: 26px;
@@ -812,13 +812,13 @@ rightText {
 
 .userIcons .userIcon {
   margin-right: -5px; }
-  .userIcons .userIcon .buyerIcon {
-    background: #FFD5D7;
-    color: #061728; }
-  .userIcons .userIcon .sellerIcon {
-    background: #9ECCFB; }
-  .userIcons .userIcon .financierIcon {
-    background: #A7FFC0; }
+.userIcons .buyerIcon {
+  background: #FFD5D7;
+  color: #061728; }
+.userIcons .sellerIcon {
+  background: #9ECCFB; }
+.userIcons .financierIcon {
+  background: #A7FFC0; }
 
 .notifications {
   width: 600px;
