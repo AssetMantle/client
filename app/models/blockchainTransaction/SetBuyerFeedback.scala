@@ -181,7 +181,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield {}
       }
 
-      def getIDs(setBuyerFeedback: SetBuyerFeedback): Future[(String,String)] = {
+      def getIDs(setBuyerFeedback: SetBuyerFeedback): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
         val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
         for {
@@ -195,10 +195,9 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         setBuyerFeedback <- setBuyerFeedback
         _ <- updateAndMarkDirty(setBuyerFeedback)
         (toAccountID, fromAccountID) <- getIDs(setBuyerFeedback)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -208,7 +207,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setBuyerFeedback = Service.getTransaction(ticketID)
 
-      def getIDs(setBuyerFeedback: SetBuyerFeedback): Future[(String,String)] = {
+      def getIDs(setBuyerFeedback: SetBuyerFeedback): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
         val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
         for {
@@ -221,10 +220,9 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         _ <- markTransactionFailed
         setBuyerFeedback <- setBuyerFeedback
         (toAccountID, fromAccountID) <- getIDs(setBuyerFeedback)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

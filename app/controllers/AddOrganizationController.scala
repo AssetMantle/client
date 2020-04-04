@@ -219,7 +219,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot( ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title) )
+            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title))
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -252,7 +252,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot( ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title) )
+            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title))
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -484,6 +484,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           (for {
             id <- id
             allKYCFileTypesExists <- checkAllKYCFileTypesExists(id)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ORGANIZATION_REQUESTED, loginState.username)
             result <- markOrganizationFormCompletedAndGetResult(id, allKYCFileTypesExists)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -526,7 +527,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 organizationAccountAddress <- organizationAccountAddress(accountId)
                 _ <- transactionProcess(organizationAccountAddress)
                 result <- withUsernameToken.Ok(views.html.zoneRequest(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
-              } yield result
+                _ <- utilitiesNotification.send(accountId, constants.Notification.ADD_ORGANIZATION_CONFIRMED, accountId)
+              } yield {
+                result
+              }
             } else {
               Future(PreconditionFailed(views.html.zoneRequest(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
             }
@@ -535,7 +539,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
             result <- processTransactionAndGetResult(allKYCFilesVerified)
-          } yield result
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ORGANIZATION_CONFIRMED, loginState.username)
+          } yield {
+            result
+          }
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.zoneRequest(failures = Seq(baseException.failure)))
           }
@@ -599,14 +606,16 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               for {
                 _ <- verifyOrganizationKYCs
                 organizationID <- organizationID
-              } yield utilitiesNotification.send(organizationID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                _ <- utilitiesNotification.send(organizationID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              } yield {}
             } else {
               val rejectOrganizationKYCs = masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
               val organizationID = masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID)
               for {
                 _ <- rejectOrganizationKYCs
                 organizationID <- organizationID
-              } yield utilitiesNotification.send(organizationID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                _ <- utilitiesNotification.send(organizationID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              } yield {}
             }
           }
 

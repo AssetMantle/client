@@ -180,7 +180,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         } yield {}
       }
 
-      def getIDs(redeemFiat: RedeemFiat): Future[(String,String)] = {
+      def getIDs(redeemFiat: RedeemFiat): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
         val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
         for {
@@ -194,10 +194,9 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         redeemFiat <- redeemFiat
         _ <- markDirty(redeemFiat)
         (toAccountID, fromAccountID) <- getIDs(redeemFiat)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -207,7 +206,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val redeemFiat = Service.getTransaction(ticketID)
 
-      def getIDs(redeemFiat: RedeemFiat): Future[(String,String)] = {
+      def getIDs(redeemFiat: RedeemFiat): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
         val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
         for {
@@ -220,10 +219,9 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         _ <- markTransactionFailed
         redeemFiat <- redeemFiat
         (toAccountID, fromAccountID) <- getIDs(redeemFiat)
-      } yield {
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
