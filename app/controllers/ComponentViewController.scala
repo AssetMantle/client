@@ -75,7 +75,7 @@ class ComponentViewController @Inject()(
             coins <- coins
           } yield Ok(views.html.component.master.commonHome(coins, profilePicture))
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 

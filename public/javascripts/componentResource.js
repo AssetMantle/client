@@ -6,14 +6,14 @@ function componentResource(source, route){
         async: true,
         statusCode: {
             200: function (data) {
-                div.html(data)
+                div.html(data);
             },
             401: function (data) {
-                replaceDocument(data.responseText);
+                div.html(data);
 
             },
             500: function (data) {
-                replaceDocument(data.responseText);
+                div.html(data);
             }
         }
     });
