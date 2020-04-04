@@ -9,11 +9,11 @@ function componentResource(source, route){
                 div.html(data);
             },
             401: function (data) {
-                div.html(data);
+                replaceDocument(data.responseText);
 
             },
             500: function (data) {
-                div.html(data);
+                replaceDocument(data.responseText);
             }
         }
     });
