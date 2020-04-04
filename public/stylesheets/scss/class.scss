@@ -1656,6 +1656,12 @@ header:before,
   .notification > div{
     padding: 0px;
   }
+  .NotificationButton{
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    font-weight: bold;
+    padding:0px 0px 0px 40px;
+  }
 }
 
 .docView{

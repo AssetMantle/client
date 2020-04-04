@@ -209,6 +209,9 @@
         font-size:10px;
       }
     }
+    .cmuk-subnav-pill>*>a:focus, .cmuk-subnav-pill>*>a:hover{
+      background: none;
+    }
   }
   .modal .modalContent{
     top:10%;
