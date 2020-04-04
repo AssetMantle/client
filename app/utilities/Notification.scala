@@ -79,7 +79,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = {
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang): Future[Option[String]] = {
 
     val title = Future(messagesApi(pushNotification.title))
     val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
@@ -94,7 +94,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
       message <- message
       notificationID <- create(title, message)
       pushNotificationToken <- pushNotificationToken
-      _ <- post(title, message, pushNotificationToken)
+      _ <- if(pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
     } yield Option(notificationID)).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
