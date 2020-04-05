@@ -1,15 +1,14 @@
-$(document).ready(function () {
+function checkPasswords() {
+    let confirmPassword = $('#signUpConfirmPassword').val();
+    let password = $('#signUpPassword').val();
+    let matchPasswordsResult = $('#matchPasswordsResult');
+    let matchConfirmPasswordsResult = $('#matchConfirmPasswordsResult');
 
-    $('#confirmPassword').keyup(function () {
-
-        let confirmPassword = $(this).val();
-        let password = $('#password').val();
-        let matchPasswordsImageResult = $('#matchPasswordsImageResult');
-
-        if (confirmPassword !== password) {
-            matchPasswordsImageResult.show();
-        } else {
-            matchPasswordsImageResult.hide();
-        }
-    });
-});
+    if (confirmPassword !== password) {
+        matchPasswordsResult.html('&#10060;');
+        matchConfirmPasswordsResult.html('&#10060;');
+    } else {
+        matchPasswordsResult.html('&#10004;');
+        matchConfirmPasswordsResult.html('&#10060;');
+    }
+}

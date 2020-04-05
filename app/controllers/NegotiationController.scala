@@ -172,7 +172,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             assetStatus <- assetStatus(negotiation.assetID)
             _ <- update(traderID = traderID, assetStatus = assetStatus, negotiation = negotiation)
-            result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentsCheckList(id = negotiation.id))
+            result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentsCheckList(views.companion.master.NegotiationDocumentsCheckList.form.fill(views.companion.master.NegotiationDocumentsCheckList.Data(id = negotiation.id, billOfExchange = negotiation.documentsCheckList.billOfExchange.getOrElse(false), coo = negotiation.documentsCheckList.coo.getOrElse(false), coa = negotiation.documentsCheckList.coa.getOrElse(false), otherDocuments = negotiation.documentsCheckList.otherDocuments)), id = negotiation.id))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -407,13 +407,13 @@ class NegotiationController @Inject()(
           def updateTicketID(id: String, ticketID: String): Future[Int] = masterNegotiations.Service.updateTicketID(id = id, ticketID = ticketID)
 
           def createChatIDAndChatRoom(sellerAccountID: String, negotiationID: String): Future[Unit] = {
-            val createdChatID = masterNegotiations.Service.createChatID(negotiationID)
+            val chatID = masterTransactionChats.Service.createGroupChat(loginState.username, sellerAccountID)
 
-            def createChats(chatID: String): Future[Seq[String]] = masterTransactionChats.Service.createMultipleWithCommonChatID(id = chatID, loginState.username, sellerAccountID)
+            def insertChatID(chatID: String): Future[String] = masterNegotiations.Service.insertChatID(id = negotiationID, chatID = chatID)
 
             for {
-              chatID <- createdChatID
-              _ <- createChats(chatID)
+              chatID <- chatID
+              _ <- insertChatID(chatID)
             } yield ()
 
           }

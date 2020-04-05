@@ -10,14 +10,15 @@
             </div>
             <div class="timeline-content right">
                 <div>
-                    <div class="textLineOverflow"><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
-                        <div class="notificationTime">@notification.time</div>
+                    <div class="textLineOverflow"><span class="cmuk-text-bolder">@notification.notificationTitle</span>
+                        @notification.notificationMessage</div>
+                    <div class="notificationTime">@notification.time</div>
                 </div>
             </div>
         </div>
     }
-    <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@tradeRoomID')"> @Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
+        <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@tradeRoomID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
 </div>
-    <script>
+<script>
         noActivity()
     </script>

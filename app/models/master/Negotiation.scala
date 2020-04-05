@@ -283,7 +283,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markRequestRejected(id: String, comment: Option[String]): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Negotiation.REJECTED, comment = comment)
 
-    def createChatID(id: String): Future[String] = updateChatIDByID(id = id, chatID = utilities.IDGenerator.hexadecimal)
+    def insertChatID(id: String, chatID: String): Future[String] = updateChatIDByID(id = id, chatID = chatID)
 
   }
 

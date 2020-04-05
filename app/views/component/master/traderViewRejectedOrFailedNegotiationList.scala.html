@@ -6,7 +6,7 @@
 
 @(rejectedNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-
+@Messages(constants.View.REJECTED_NEGOTIATION_LIST)
 @rejectedNegotiationList.map { rejectedNegotiation =>
     @commonInfoBox() {
         @defining(counterPartyTraders.filter(_.id == rejectedNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
@@ -31,12 +31,24 @@
         }
         @commonIntInfo(constants.View.PRICE, rejectedNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(rejectedNegotiation.quantity.toString(), rejectedNegotiation.quantityUnit).mkString(" "))
+        @commonTextInfo(constants.View.COMMENT, rejectedNegotiation.comment.getOrElse(""))
         @commonTextInfo(constants.View.STATUS, rejectedNegotiation.status)
     }
 }
-
+<br>
+@Messages(constants.View.FAILED_NEGOTIATION_LIST)
 @failedNegotiationList.map { failedNegotiation =>
     @commonInfoBox() {
+        @defining(counterPartyTraders.filter(_.id == failedNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.Form.TRADER_ID, failedNegotiation.buyerTraderID)
+                }
+            }
+        }
         @defining(assets.filter(_.id == failedNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
             @rejectedNegotiationAsset match {
                 case Some(asset) => {

@@ -132,31 +132,6 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewNegotiationList: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.traderViewNegotiationList())
-  }
-
-  def traderViewBuyerOnGoingNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username)
-
-      def buyerOnGoingNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllBuyerOnGoingNegotiationsByTraderID(traderID)
-
-      def assetsList(assetIDs: Seq[String]): Future[Seq[Asset]] = masterAssets.Service.getAllAssetsByID(assetIDs)
-
-      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
-
-      (for {
-        traderID <- traderID
-        buyerOnGoingNegotiationList <- buyerOnGoingNegotiationList(traderID)
-        assetsList <- assetsList(buyerOnGoingNegotiationList.map(_.assetID))
-        counterPartyTraders <- counterPartyTraders(buyerOnGoingNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewBuyerOnGoingNegotiationList(buyerOnGoingNegotiationList = buyerOnGoingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def traderFinancials: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
@@ -176,7 +151,32 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewSellerOnGoingNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewAcceptedNegotiationList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.traderViewAcceptedNegotiationList())
+  }
+
+  def traderViewAcceptedBuyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def buyerOnGoingNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllBuyerOnGoingNegotiationsByTraderID(traderID)
+
+      def assetsList(assetIDs: Seq[String]): Future[Seq[Asset]] = masterAssets.Service.getAllAssetsByID(assetIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        traderID <- traderID
+        buyerOnGoingNegotiationList <- buyerOnGoingNegotiationList(traderID)
+        assetsList <- assetsList(buyerOnGoingNegotiationList.map(_.assetID))
+        counterPartyTraders <- counterPartyTraders(buyerOnGoingNegotiationList.map(_.buyerTraderID))
+      } yield Ok(views.html.component.master.traderViewAcceptedBuyNegotiationList(buyerOnGoingNegotiationList = buyerOnGoingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewAcceptedSellNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -191,31 +191,14 @@ class ComponentViewController @Inject()(
         sellerOnGoingNegotiationList <- sellerOnGoingNegotiationList(traderID)
         assetsList <- assetsList(sellerOnGoingNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(sellerOnGoingNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewSellerOnGoingNegotiationList(sellerOnGoingNegotiationList = sellerOnGoingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+      } yield Ok(views.html.component.master.traderViewAcceptedSellNegotiationList(sellerOnGoingNegotiationList = sellerOnGoingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def traderViewNewIncomingNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username)
-
-      def buyerNewIncomingNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllBuyerNewIncomingNegotiationListByTraderID(traderID)
-
-      def assetsList(assetIDs: Seq[String]): Future[Seq[Asset]] = masterAssets.Service.getAllAssetsByID(assetIDs)
-
-      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
-
-      (for {
-        traderID <- traderID
-        buyerNewIncomingNegotiationList <- buyerNewIncomingNegotiationList(traderID)
-        assetsList <- assetsList(buyerNewIncomingNegotiationList.map(_.assetID))
-        counterPartyTraders <- counterPartyTraders(buyerNewIncomingNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewNewIncomingNegotiationList(buyerNewIncomingNegotiationList = buyerNewIncomingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+  def traderViewSentReceivedIncompleteRejectedFailedNegotiationList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.traderViewSentReceivedIncompleteRejectedFailedNegotiationList())
   }
 
   def traderViewSentNegotiationRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -234,6 +217,27 @@ class ComponentViewController @Inject()(
         assetsList <- assetsList(sentNegotiationRequestList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(sentNegotiationRequestList.map(_.buyerTraderID))
       } yield Ok(views.html.component.master.traderViewSentNegotiationRequestList(sentNegotiationRequestList = sentNegotiationRequestList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewReceivedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def buyerNewIncomingNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllBuyerNewIncomingNegotiationListByTraderID(traderID)
+
+      def assetsList(assetIDs: Seq[String]): Future[Seq[Asset]] = masterAssets.Service.getAllAssetsByID(assetIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        traderID <- traderID
+        buyerNewIncomingNegotiationList <- buyerNewIncomingNegotiationList(traderID)
+        assetsList <- assetsList(buyerNewIncomingNegotiationList.map(_.assetID))
+        counterPartyTraders <- counterPartyTraders(buyerNewIncomingNegotiationList.map(_.buyerTraderID))
+      } yield Ok(views.html.component.master.traderViewReceivedNegotiationList(buyerNewIncomingNegotiationList = buyerNewIncomingNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

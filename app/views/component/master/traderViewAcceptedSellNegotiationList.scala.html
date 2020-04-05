@@ -7,17 +7,17 @@
 @(sellerOnGoingNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellerOnGoingNegotiationList.map { sellerOnGoingNegotiation =>
-    @defining(counterPartyTraders.filter(_.id == sellerOnGoingNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
-        @counterPartyTrader match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-            }
-            case None => {
-                @commonTextInfo(constants.Form.TRADER_ID, sellerOnGoingNegotiation.buyerTraderID)
+    @commonInfoBox() {
+        @defining(counterPartyTraders.filter(_.id == sellerOnGoingNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.Form.TRADER_ID, sellerOnGoingNegotiation.buyerTraderID)
+                }
             }
         }
-    }
-    @commonInfoBox() {
         @defining(assets.filter(_.id == sellerOnGoingNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
             @rejectedNegotiationAsset match {
                 case Some(asset) => {

@@ -30,6 +30,7 @@
         }
         @commonIntInfo(constants.View.PRICE, newIncomingNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(newIncomingNegotiation.quantity.toString(), newIncomingNegotiation.quantityUnit).mkString(" "))
-@*//    TODO: Add Accept OR Reject    *@
+        @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${newIncomingNegotiation.id}'")
+        @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${newIncomingNegotiation.id}'")
     }
 }

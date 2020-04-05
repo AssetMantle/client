@@ -97,7 +97,7 @@ object Form {
   val NEGOTIATION_DOCUMENTS_CHECKLIST = new Form("NEGOTIATION_DOCUMENTS_CHECKLIST", routes.NegotiationController.documentsCheckList(), routes.javascript.NegotiationController.documentsCheckListForm)
   val REVIEW_NEGOTIATION_REQUEST = new Form("REVIEW_NEGOTIATION_REQUEST", routes.NegotiationController.reviewRequest(), routes.javascript.NegotiationController.reviewRequestForm)
   val ACCEPT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.acceptRequest(), routes.javascript.NegotiationController.acceptRequestForm)
-  val REJECT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.rejectRequest(), routes.javascript.NegotiationController.rejectRequestForm)
+  val REJECT_NEGOTIATION_REQUEST = new Form("REJECT_NEGOTIATION_REQUEST", routes.NegotiationController.rejectRequest(), routes.javascript.NegotiationController.rejectRequestForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
