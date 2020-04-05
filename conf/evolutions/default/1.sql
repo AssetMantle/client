@@ -491,7 +491,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     "pegHash"          VARCHAR,
     "assetType"        VARCHAR NOT NULL,
     "description"      VARCHAR NOT NULL,
-    "documentHash"     VARCHAR NOT NULL,
+    "documentHash"     VARCHAR NOT NULL UNIQUE,
     "quantity"         INT     NOT NULL,
     "quantityUnit"     VARCHAR NOT NULL,
     "price"            INT     NOT NULL,
