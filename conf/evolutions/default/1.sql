@@ -499,7 +499,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     "shippingPeriod"   INT     NOT NULL,
     "portOfLoading"    VARCHAR NOT NULL,
     "portOfDischarge"  VARCHAR NOT NULL,
-    "completionStatus" BOOLEAN NOT NULL,
     "status"           VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );

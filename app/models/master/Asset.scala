@@ -11,7 +11,7 @@ import slick.lifted.TableQuery
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(id: String, ownerID: String, ticketID: Option[String] = None, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, completionStatus: Boolean = false, status: String)
+case class Asset(id: String, ownerID: String, ticketID: Option[String] = None, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, status: String)
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -77,14 +77,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private def checkByIDAndStatus(id: String, status: String): Future[Boolean] = db.run(assetTable.filter(_.id === id).filter(_.status === status).exists.result)
 
-  private def updateCompletionStatusByID(id: String, completionStatus: Boolean): Future[Int] = db.run(assetTable.filter(_.id === id).map(x => x.completionStatus).update(completionStatus).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(assetTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -125,7 +117,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset") {
 
-    def * = (id, ownerID, ticketID.?, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, shippingPeriod, portOfLoading, portOfDischarge, completionStatus, status) <> (Asset.tupled, Asset.unapply)
+    def * = (id, ownerID, ticketID.?, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, shippingPeriod, portOfLoading, portOfDischarge, status) <> (Asset.tupled, Asset.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -155,8 +147,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def portOfDischarge = column[String]("portOfDischarge")
 
-    def completionStatus = column[Boolean]("completionStatus")
-
     def status = column[String]("status")
 
   }
@@ -182,8 +172,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def tryGetByTicketID(ticketID: String): Future[Asset] = findByTicketID(Option(ticketID))
 
     def updateTicketID(id: String, ticketID: String): Future[Int] = updateTicketIDByID(id = id, ticketID = Option(ticketID))
-
-    def markCompleted(id: String): Future[Int] = updateCompletionStatusByID(id = id, completionStatus = true)
 
     def getAllAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderID(ownerID)
 
