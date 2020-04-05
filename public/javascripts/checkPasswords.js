@@ -9,6 +9,6 @@ function checkPasswords() {
         matchConfirmPasswordsResult.html('&#10060;');
     } else {
         matchPasswordsResult.html('&#10004;');
-        matchConfirmPasswordsResult.html('&#10060;');
+        matchConfirmPasswordsResult.html('&#10004;');
     }
 }

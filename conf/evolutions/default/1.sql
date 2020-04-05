@@ -529,29 +529,41 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
 
 CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
 (
-    "id"                VARCHAR NOT NULL,
-    "negotiationID"     VARCHAR,
-    "ticketID"          VARCHAR,
-    "buyerTraderID"     VARCHAR NOT NULL,
-    "sellerTraderID"    VARCHAR NOT NULL,
-    "assetID"           VARCHAR NOT NULL,
-    "price"             INT     NOT NULL,
-    "quantity"          INT     NOT NULL,
-    "quantityUnit"      VARCHAR NOT NULL,
-    "time"              INT,
-    "advancePayment"    BOOLEAN,
-    "advancePercentage" DECIMAL(4, 2),
-    "credit"            BOOLEAN,
-    "tenure"            INT,
-    "tentativeDate"     DATE,
-    "reference"         VARCHAR,
-    "billOfExchange"    BOOLEAN,
-    "coo"               BOOLEAN,
-    "coa"               BOOLEAN,
-    "otherDocuments"    VARCHAR,
-    "chatID"            VARCHAR UNIQUE,
-    "status"            VARCHAR,
-    "comment"           VARCHAR,
+    "id"                            VARCHAR NOT NULL,
+    "negotiationID"                 VARCHAR,
+    "ticketID"                      VARCHAR,
+    "buyerTraderID"                 VARCHAR NOT NULL,
+    "sellerTraderID"                VARCHAR NOT NULL,
+    "assetID"                       VARCHAR NOT NULL,
+    "assetDescription"              VARCHAR NOT NULL,
+    "price"                         INT     NOT NULL,
+    "quantity"                      INT     NOT NULL,
+    "quantityUnit"                  VARCHAR NOT NULL,
+    "shippingPeriod"                INT     NOT NULL,
+    "time"                          INT,
+    "buyerAcceptedAssetDescription" BOOLEAN NOT NULL,
+    "buyerAcceptedPrice"            BOOLEAN NOT NULL,
+    "buyerAcceptedQuantity"         BOOLEAN NOT NULL,
+    "buyerAcceptedShippingPeriod"   BOOLEAN NOT NULL,
+    "advancePayment"                BOOLEAN,
+    "advancePercentage"             DECIMAL(4, 2),
+    "credit"                        BOOLEAN,
+    "tenure"                        INT,
+    "tentativeDate"                 DATE,
+    "reference"                     VARCHAR,
+    "buyerAcceptedAdvancePayment"   BOOLEAN NOT NULL,
+    "buyerAcceptedCredit"           BOOLEAN NOT NULL,
+    "billOfExchange"                BOOLEAN,
+    "coo"                           BOOLEAN,
+    "coa"                           BOOLEAN,
+    "otherDocuments"                VARCHAR,
+    "buyerAcceptedBillOfExchange"   BOOLEAN NOT NULL,
+    "buyerAcceptedCOO"              BOOLEAN NOT NULL,
+    "buyerAcceptedCOA"              BOOLEAN NOT NULL,
+    "buyerAcceptedOtherDocuments"   BOOLEAN NOT NULL,
+    "chatID"                        VARCHAR UNIQUE,
+    "status"                        VARCHAR,
+    "comment"                       VARCHAR,
     PRIMARY KEY ("id"),
     UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
 );
@@ -686,9 +698,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
 (
-    id          VARCHAR NOT NULL,
+    "id"        VARCHAR NOT NULL,
     "accountID" VARCHAR NOT NULL,
-    PRIMARY KEY (id, "accountID")
+    PRIMARY KEY ("id", "accountID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
@@ -810,8 +822,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
     "notificationID" VARCHAR NOT NULL,
-    "tradeRoomID"    VARCHAR NOT NULL,
-    PRIMARY KEY ("notificationID", "tradeRoomID")
+    "negotiationID"    VARCHAR NOT NULL,
+    PRIMARY KEY ("notificationID", "negotiationID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
@@ -822,41 +834,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
     "status"              VARCHAR NOT NULL,
     PRIMARY KEY ("id"),
     UNIQUE ("organizationID", "inviteeEmailAddress")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
-(
-    "id"                           VARCHAR NOT NULL,
-    "assetType"                    VARCHAR NOT NULL,
-    "assetDescriptionValue"        VARCHAR NOT NULL,
-    "assetDescriptionStatus"       BOOLEAN NOT NULL,
-    "assetQuantityValue"           INT     NOT NULL,
-    "assetQuantityStatus"          BOOLEAN NOT NULL,
-    "assetPriceValue"              INT     NOT NULL,
-    "assetPriceStatus"             BOOLEAN NOT NULL,
-    "shipmentPeriodValue"          INT     NOT NULL,
-    "shipmentPeriodStatus"         BOOLEAN NOT NULL,
-    "portOfLoadingValue"           VARCHAR NOT NULL,
-    "portOfLoadingStatus"          BOOLEAN NOT NULL,
-    "portOfDischargeValue"         VARCHAR NOT NULL,
-    "portOfDischargeStatus"        BOOLEAN NOT NULL,
-    "advancePaymentValue"          BOOLEAN NOT NULL,
-    "advancePercentage"            NUMERIC,
-    "advancePaymentStatus"         BOOLEAN NOT NULL,
-    "creditTermsValue"             BOOLEAN NOT NULL,
-    "tenure"                       VARCHAR,
-    "tentativeDate"                DATE,
-    "refrence"                     VARCHAR, /*Correct spelling*/
-    "creditTermsStatus"            BOOLEAN NOT NULL,
-    "billOfExchangeRequiredValue"  BOOLEAN NOT NULL,
-    "billOfExchangeRequiredStatus" BOOLEAN NOT NULL,
-    "obl"                          BOOLEAN NOT NULL,
-    "invoice"                      BOOLEAN NOT NULL,
-    "coo"                          BOOLEAN NOT NULL,
-    "coa"                          BOOLEAN NOT NULL,
-    "otherDocuments"               VARCHAR NOT NULL,
-    "primaryDocumentsStatus"       BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
@@ -967,7 +944,7 @@ ALTER TABLE MASTER_TRANSACTION."AssetFile"
 ALTER TABLE MASTER_TRANSACTION."Chat"
     ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Message"
-    ADD CONSTRAINT Message_Chat_accountIDChatWindowID FOREIGN KEY ("fromAccountID", "chatID") REFERENCES MASTER_TRANSACTION."Chat" ("accountID", id);
+    ADD CONSTRAINT Message_Chat_accountIDChatWindowID FOREIGN KEY ("fromAccountID", "chatID") REFERENCES MASTER_TRANSACTION."Chat" ("accountID", "id");
 ALTER TABLE MASTER_TRANSACTION."Message"
     ADD CONSTRAINT Message_Message_replyToID FOREIGN KEY ("replyToID") REFERENCES MASTER_TRANSACTION."Message" ("id");
 ALTER TABLE MASTER_TRANSACTION."MessageReceive"
@@ -993,7 +970,7 @@ ALTER TABLE MASTER_TRANSACTION."SMSOTP"
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER."Negotiation" ("id");
+    ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
@@ -1076,7 +1053,6 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TraderInvitation" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeTerm" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."WURTCBRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction" CASCADE;
 

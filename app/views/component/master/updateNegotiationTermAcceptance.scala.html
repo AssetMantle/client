@@ -1,0 +1,24 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import views.companion.master.UpdateNegotiationTermAcceptance
+
+@(updateNegotiationTermAcceptanceForm: Form[UpdateNegotiationTermAcceptance.Data] = UpdateNegotiationTermAcceptance.form, negotiationID: String, termType: String, status: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@form(action = constants.Form.UPDATE_TERM_ACCEPTANCE.route) {
+    @CSRF.formField
+    @commonInputText(updateNegotiationTermAcceptanceForm, constants.FormField.ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(updateNegotiationTermAcceptanceForm, constants.FormField.TERM_TYPE, 'value -> termType, 'containerDivClass -> "hidden", 'readonly -> true)
+    @if(status) {
+        @commonCheckbox(updateNegotiationTermAcceptanceForm, constants.FormField.STATUS, 'onclick -> s"submitForm(this, '${Seq("#", negotiationID, termType).mkString("")}')", 'checked -> true)
+    } else {
+        @commonCheckbox(updateNegotiationTermAcceptanceForm, constants.FormField.STATUS, 'onclick -> s"submitForm(this, '${Seq("#", negotiationID, termType).mkString("")}')")
+    }
+    @if(updateNegotiationTermAcceptanceForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- updateNegotiationTermAcceptanceForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+}

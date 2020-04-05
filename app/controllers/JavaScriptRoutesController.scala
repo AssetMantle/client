@@ -132,6 +132,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.recentActivityForTrader,
         routes.javascript.ComponentViewController.recentActivityForOrganization,
         routes.javascript.ComponentViewController.traderFinancials,
+        routes.javascript.ComponentViewController.traderViewNegotiation,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -207,6 +208,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.reviewRequestForm,
         routes.javascript.NegotiationController.acceptRequestForm,
         routes.javascript.NegotiationController.rejectRequestForm,
+        routes.javascript.NegotiationController.updateAssetTermsForm,
+        routes.javascript.NegotiationController.updatePaymentTermsForm,
+        routes.javascript.NegotiationController.updateDocumentCheckListForm,
+        routes.javascript.NegotiationController.updateTermAcceptanceForm,
 
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
@@ -284,9 +289,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.TraderController.traderRelationRequestForm,
 
-        routes.javascript.TradeRoomController.tradeTerms,
-        routes.javascript.TradeRoomController.updateTermStatus,
-
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
 
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
@@ -295,6 +297,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.account,
         routes.javascript.ViewController.dashboard,
         routes.javascript.ViewController.trades,
+        routes.javascript.ViewController.tradeRoom,
 
         routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,
         routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFile,

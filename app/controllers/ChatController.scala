@@ -26,7 +26,6 @@ class ChatController @Inject()(
                                 masterAccounts: master.Accounts,
                                 masterAssets: master.Assets,
                                 masterTradeRelations: master.TraderRelations,
-                                masterTransactionTradeTerms: masterTransaction.TradeTerms,
                                 withTraderLoginAction: WithTraderLoginAction,
                                 withZoneLoginAction: WithZoneLoginAction,
                                 transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
@@ -63,7 +62,6 @@ class ChatController @Inject()(
   def chatRoom(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
-
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
       def chatParticipants(traderID: String, negotiation: Negotiation): Future[Seq[Chat]] = if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
@@ -99,7 +97,7 @@ class ChatController @Inject()(
             readChats <- readChats(chatsInWindow.map(_.id))
           } yield Ok(views.html.component.master.chatWindow(views.companion.master.SendMessage.form.fill(views.companion.master.SendMessage.Data(chatID, "", None)), chatsInWindow, readChats, chatID))
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 
@@ -108,7 +106,7 @@ class ChatController @Inject()(
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
@@ -128,7 +126,7 @@ class ChatController @Inject()(
             readChats <- readChats(chatsInWindow.map(_.id))
           } yield Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatID))
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 
@@ -137,7 +135,7 @@ class ChatController @Inject()(
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
@@ -153,7 +151,7 @@ class ChatController @Inject()(
           Future(BadRequest(Messages(constants.View.MESSAGE_NOT_SENT_DUE_TO_SOME_ERROR)))
         },
         sendMessageData => {
-          val userIsParticipant = masterTransactionChats.Service.checkUserInChat(loginState.username, sendMessageData.chatID)
+          val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = sendMessageData.chatID, accountID = loginState.username)
 
           def getResult(userIsParticipant: Boolean) = {
             if (userIsParticipant) {
@@ -180,7 +178,7 @@ class ChatController @Inject()(
                 result
               }
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -198,7 +196,7 @@ class ChatController @Inject()(
   // retrives a chat, that was part of a replied message
   def replyToMessage(chatID: String, messageID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(loginState.username, chatID)
+      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatID, accountID = loginState.username)
 
       def getResult(userIsParticipant: Boolean) = {
         if (userIsParticipant) {
@@ -207,7 +205,7 @@ class ChatController @Inject()(
             chat <- chat
           } yield Ok(Json.toJson(chat))
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
 
       }
@@ -223,7 +221,7 @@ class ChatController @Inject()(
 
   def markChatAsRead(chatWindowID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(loginState.username, chatWindowID)
+      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatWindowID, accountID = loginState.username)
 
       def getResult(userIsParticipant: Boolean): Future[Result] = {
         if (userIsParticipant) {
@@ -236,7 +234,7 @@ class ChatController @Inject()(
             _ <- markRead(messageIDs)
           } yield Ok(constants.Response.MESSAGE_READ.message)
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 
@@ -252,13 +250,13 @@ class ChatController @Inject()(
   //send chat to other person in real time
   def sendMessageComet(chatWindowID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(loginState.username, chatWindowID)
+      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatWindowID, accountID = loginState.username)
 
       def getResult(userIsParticipant: Boolean) = {
         if (userIsParticipant) {
           Future(Ok.chunked(masterTransactionMessages.Service.messageCometSource(loginState.username).via(Comet.json("parent.chatCometMessage"))).as(ContentTypes.HTML))
         } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 

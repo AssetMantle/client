@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.NegotiationPaymentTerms
+@import views.companion.master.PaymentTerms
 
-@(paymentTermsForm: Form[NegotiationPaymentTerms.Data] = NegotiationPaymentTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(paymentTermsForm: Form[PaymentTerms.Data] = PaymentTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.NEGOTIATION_PAYMENT_TERMS, paymentTermsForm) {
     @commonInputText(paymentTermsForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(paymentTermsForm, constants.FormField.ADVANCE_PAYMENT, 'oninput -> """advancePaymentInput(this, '#ADVANCE_PERCENTAGE', '#CREDIT')""")

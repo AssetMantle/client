@@ -5,7 +5,7 @@ import play.api.data.Forms._
 
 import java.util.Date
 
-object NegotiationPaymentTerms {
+object PaymentTerms {
   val form = Form(
     mapping(
       constants.FormField.ID.name -> constants.FormField.ID.field,

@@ -38,7 +38,7 @@ object Form {
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization(), routes.javascript.AddOrganizationController.blockchainAddOrganizationForm)
 
   //AssetController
-  val ISSUE_ASSET_2 = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
+  val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
 
   //AddZoneController
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone(), routes.javascript.AddZoneController.addZoneForm)
@@ -82,7 +82,7 @@ object Form {
   val ISSUE_ASSET_OBL = new Form("ISSUE_ASSET_OBL", routes.IssueAssetController.issueAssetOBL(), routes.javascript.IssueAssetController.issueAssetOBLForm)
   val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice(), routes.javascript.IssueAssetController.issueAssetInvoiceForm)
   val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest(), routes.javascript.IssueAssetController.rejectIssueAssetRequestForm)
-  val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
+  val ISSUE_ASSET_OLD = new Form("ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
 
   //IssueFiatController
@@ -98,6 +98,10 @@ object Form {
   val REVIEW_NEGOTIATION_REQUEST = new Form("REVIEW_NEGOTIATION_REQUEST", routes.NegotiationController.reviewRequest(), routes.javascript.NegotiationController.reviewRequestForm)
   val ACCEPT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.acceptRequest(), routes.javascript.NegotiationController.acceptRequestForm)
   val REJECT_NEGOTIATION_REQUEST = new Form("REJECT_NEGOTIATION_REQUEST", routes.NegotiationController.rejectRequest(), routes.javascript.NegotiationController.rejectRequestForm)
+  val UPDATE_ASSET_TERMS = new Form("UPDATE_ASSET_TERMS", routes.NegotiationController.updateAssetTerms(), routes.javascript.NegotiationController.updateAssetTermsForm)
+  val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
+  val UPDATE_DOCUMENTS_CHECKLIST = new Form("UPDATE_DOCUMENTS_CHECKLIST", routes.NegotiationController.updateDocumentCheckList(), routes.javascript.NegotiationController.updateDocumentCheckListForm)
+  val UPDATE_TERM_ACCEPTANCE = new Form("UPDATE_TERM_ACCEPTANCE", routes.NegotiationController.updateTermAcceptance(), routes.javascript.NegotiationController.updateTermAcceptanceForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
@@ -152,9 +156,6 @@ object Form {
 
   //TraderController
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
-
-  //TradeRoomController
-  val UPDATE_TRADE_TERM_STATUS = new Form("UPDATE_TRADE_TERM_STATUS", routes.SetSellerFeedbackController.setSellerFeedback(), routes.javascript.SetSellerFeedbackController.setSellerFeedbackForm)
 
   //VerifyEmailAddressController
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress(), routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm)

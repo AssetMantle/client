@@ -22,6 +22,7 @@ GET         /profile                                                            
 GET         /account                                                                        controllers.ViewController.account
 GET         /trades                                                                         controllers.ViewController.trades
 GET         /dashboard                                                                      controllers.ViewController.dashboard
+GET         /traderRoom                                                                     controllers.ViewController.tradeRoom(id: String)
 
 GET         /profilePicture                                                                 controllers.ComponentViewController.profilePicture
 
@@ -73,6 +74,18 @@ POST        /negotiation/acceptRequest                                          
 GET         /negotiation/rejectRequest                                                      controllers.NegotiationController.rejectRequestForm(id: String)
 POST        /negotiation/rejectRequest                                                      controllers.NegotiationController.rejectRequest
 
+GET         /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTermsForm(id: String)
+POST        /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTerms
+
+GET         /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTermsForm(id: String)
+POST        /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTerms
+
+GET         /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckListForm(id: String)
+POST        /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckList
+
+GET         /negotiation/updateTermAcceptance                                               controllers.NegotiationController.updateTermAcceptanceForm(id: String, termType: String)
+POST        /negotiation/updateTermAcceptance                                               controllers.NegotiationController.updateTermAcceptance
+
 GET         /contact                                                                        controllers.ContactController.contact
 
 GET         /trader/traderRelationRequest                                                   controllers.TraderController.traderRelationRequestForm
@@ -118,10 +131,12 @@ GET         /component/commonHome                                               
 GET         /component/genesisDetails                                                       controllers.ComponentViewController.genesisDetails
 GET         /component/zoneDetails                                                          controllers.ComponentViewController.zoneDetails
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
-GET         /component/recentActivityForTradeRoom                                           controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, tradeRoomID :String)
+GET         /component/recentActivityForTradeRoom                                           controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, negotiationID :String)
 GET         /component/recentActivityForTrader                                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
 GET         /component/recentActivityForOrganization                                        controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
+
+GET         /component/traderViewNegotiation                                                controllers.ComponentViewController.traderViewNegotiation(id: String)
 
 GET         /component/releaseAssetList                                                     controllers.ReleaseAssetController.releaseAssetList
 GET         /component/buyerExecuteOrderList                                                controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
@@ -415,17 +430,17 @@ POST        /master/setBuyerFeedback                                            
 GET         /master/setSellerFeedback                                                       controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                                       controllers.SetSellerFeedbackController.setSellerFeedback
 
-GET         /chat/chatRoom                                                                  controllers.ChatController.chatRoom(tradeRoomID: String)
-GET         /chat/chatWindow                                                                controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
+GET         /chat/room                                                                      controllers.ChatController.chatRoom(negotiationID: String)
+GET         /chat/window                                                                    controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
 GET         /chat/loadMoreChats                                                             controllers.ChatController.loadMoreChats(chatID: String ,pageNumber: Int)
 GET         /chat/sendMessage                                                               controllers.ChatController.sendMessageForm
 POST        /chat/sendMessage                                                               controllers.ChatController.sendMessage
 GET         /chat/markChatAsRead                                                            controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
-GET         /chat/chatComet                                                                 controllers.ChatController.sendMessageComet(chatID: String)
+GET         /chat/comet                                                                     controllers.ChatController.sendMessageComet(chatID: String)
 
-POST        /wurtcb                                                                         controllers.WesternUnionController.westernUnionRTCB
-POST        /wuRedirect                                                                     controllers.WesternUnionController.westernUnionPortalRedirect
+POST        /wu/rtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm
 POST        /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKey
@@ -486,8 +501,3 @@ POST        /blockchain/setBuyerFeedback                                        
 
 GET         /blockchain/setSellerFeedback                                                   controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                                   controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
-
-GET         /master/tradeRoom                                                               controllers.TradeRoomController.tradeRoom(salesQuoteID:String)
-GET         /master/tradeTerms                                                              controllers.TradeRoomController.tradeTerms(salesQuoteID:String)
-GET         /master/updateTermsStatus                                                       controllers.TradeRoomController.updateTermStatus(tradeID:String,element:String,value:Boolean)
-POST        /master/updateTradeTermStatus                                                   controllers.TradeRoomController.updateTradeTermStatus

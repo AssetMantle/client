@@ -65,16 +65,9 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
-
   }
 
-  private def checkUserExists(id: String, accountID: String): Future[Boolean] = db.run(chatParticipantTable.filter(x => x.id === id && x.accountID === accountID).exists.result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def checkUserExists(id: String, accountID: String): Future[Boolean] = db.run(chatParticipantTable.filter(x => x.id === id && x.accountID === accountID).exists.result)
 
   private def deleteByIDAndAccountID(chatID: String, accountID: String): Future[Int] = db.run(chatParticipantTable.filter(_.id === chatID).filter(_.accountID === accountID).delete.asTry).map {
     case Success(result) => result

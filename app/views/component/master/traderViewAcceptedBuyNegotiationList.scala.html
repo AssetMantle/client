@@ -31,6 +31,6 @@
         @commonIntInfo(constants.View.PRICE, buyerOnGoingNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(buyerOnGoingNegotiation.quantity.toString(), buyerOnGoingNegotiation.quantityUnit).mkString(" "))
         @commonTextInfo(constants.View.STATUS, buyerOnGoingNegotiation.status)
-@*//    TODO: Add Button for trade Room    *@
+        <a class="cmuk-link" href="@routes.ViewController.tradeRoom(buyerOnGoingNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
     }
 }

@@ -175,6 +175,12 @@ object FormField {
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
   val BILL_OF_EXCHANGE = new BooleanFormField("BILL_OF_EXCHANGE")
+  val PRICE = new BooleanFormField("PRICE")
+  val QUANTITY = new BooleanFormField("QUANTITY")
+  val BUYER_SHIPPING_PERIOD = new BooleanFormField("BUYER_SHIPPING_PERIOD")
+  val BUYER_ADVANCE_PAYMENT = new BooleanFormField("BUYER_ADVANCE_PAYMENT")
+  val BUYER_CREDIT = new BooleanFormField("BUYER_CREDIT")
+  val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

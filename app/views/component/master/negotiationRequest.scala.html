@@ -4,16 +4,14 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(negotiationForm: Form[Negotiation.Data] = Negotiation.form, assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiationForm: Form[Negotiation.Data] = Negotiation.form, tradableAssets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationForm) {
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
-        @assets.map { asset =>
-            @if(asset.status == constants.Status.Asset.REQUESTED_TO_ZONE || asset.status == constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE || asset.status == constants.Status.Asset.ISSUED || asset.status == constants.Status.Asset.TRADE_COMPLETED) {
-                <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.portOfLoading, asset.portOfDischarge, asset.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
-                    @asset.id | @asset.description | @Messages(asset.status)</li>
-            }
+        @tradableAssets.map { asset =>
+            <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.portOfLoading, asset.portOfDischarge, asset.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
+                @asset.id | @asset.description | @Messages(asset.status)</li>
         }
         </ul>
     </div>
@@ -27,6 +25,6 @@
         </ul>
     </div>
     @commonInputText(negotiationForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
-    @commonFormButton(constants.Form.ISSUE_ASSET_2)
+    @commonFormButton(constants.Form.ISSUE_ASSET)
 }
 <script src="@routes.Assets.versioned("javascripts/negotiationRequest.js")" type="text/javascript"></script>

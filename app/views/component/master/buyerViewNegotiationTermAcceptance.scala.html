@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.UpdateNegotiationTermAcceptance
+
+@(updateNegotiationTermAcceptanceForm: Form[UpdateNegotiationTermAcceptance.Data] = UpdateNegotiationTermAcceptance.form, negotiationID: String, termType: String, status: Boolean, iconPath: String)(value: Html)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<div class="term">
+    <div>
+        <span class="termIcon"><img src="@routes.Assets.versioned(iconPath)"></span>
+        @value
+    </div>
+    
+    <div @Seq(negotiationID, termType).mkString("") class="termStatus">
+    @views.html.component.master.updateNegotiationTermAcceptance(negotiationID = negotiationID, termType = termType, status =  status)
+    </div>
+</div>

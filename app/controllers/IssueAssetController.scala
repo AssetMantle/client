@@ -433,7 +433,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       val asset = masterAssets.Service.tryGet(assetID)
       (for {
         asset <- asset
-      } yield Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(views.companion.master.IssueAsset.Data(id = assetID, tarderID = asset.ownerID, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, takerAddress = None, gas = constants.FormField.GAS.minimumValue, password = ""))))
+      } yield Ok(views.html.component.master.issueAssetOld(views.companion.master.IssueAssetOld.form.fill(views.companion.master.IssueAssetOld.Data(id = assetID, tarderID = asset.ownerID, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, takerAddress = None, gas = constants.FormField.GAS.minimumValue, password = ""))))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -441,9 +441,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.IssueAsset.form.bindFromRequest().fold(
+      views.companion.master.IssueAssetOld.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.issueAsset(formWithErrors)))
+          Future(BadRequest(views.html.component.master.issueAssetOld(formWithErrors)))
         },
         issueAssetData => {
           val traderAccountID = masterTraders.Service.tryGetAccountId(issueAssetData.tarderID)

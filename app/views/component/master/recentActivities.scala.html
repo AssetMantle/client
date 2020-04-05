@@ -1,9 +1,10 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@(notifications: Seq[models.masterTransaction.Notification] = Seq(), route: String, tradeRoomID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(notifications: Seq[models.masterTransaction.Notification] = Seq(), route: String, negotiationID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
+<script src="@routes.Assets.versioned("javascripts/recentActivity.js")" type="text/javascript"></script>
 <div class="timeline recentActivityBox">
-    @for(notification <- notifications) {
+    @notifications.map { notification =>
         <div class="timeline-item notification">
             <div class="timeline-icon">
                 <img src="@routes.Assets.versioned("./images/icons/contractIcon.svg")" alt="">
@@ -17,8 +18,8 @@
             </div>
         </div>
     }
-        <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@tradeRoomID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
+    <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
 </div>
 <script>
         noActivity()
-    </script>
+</script>
