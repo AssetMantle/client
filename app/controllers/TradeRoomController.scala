@@ -127,4 +127,7 @@ class TradeRoomController @Inject()(messagesControllerComponents: MessagesContro
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+
+
 }
