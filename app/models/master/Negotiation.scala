@@ -451,21 +451,15 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetPaymentTerms(id: String): Future[PaymentTerms] = findPaymentTermsByID(id)
 
-    def updatePaymentTerms(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String]): Future[Int] = {
-      updatePaymentTermsByID(id = id, advancePayment = Option(advancePayment), advancePercentage = advancePercentage, credit = Option(credit), tenure = tenure, tentativeDate = tentativeDate, refrence = refrence, buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms())
-    }
+    def updatePaymentTerms(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String]): Future[Int] = updatePaymentTermsByID(id = id, advancePayment = Option(advancePayment), advancePercentage = advancePercentage, credit = Option(credit), tenure = tenure, tentativeDate = tentativeDate, refrence = refrence, buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms())
 
     def tryGetDocumentsCheckList(id: String): Future[DocumentsCheckList] = findDocumentsCheckListByID(id)
 
-    def updateDocumentsCheckList(id: String, billOfExchange: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = {
-      updateDocumentsCheckListByID(id = id, billOfExchange = Option(billOfExchange), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments, buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList())
-    }
+    def updateDocumentsCheckList(id: String, billOfExchange: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = updateDocumentsCheckListByID(id = id, billOfExchange = Option(billOfExchange), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments, buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList())
 
     def updatePriceAndQuantity(id: String, price: Int, quantity: Int): Future[Int] = updatePriceAndQuantityByID(id = id, price = price, quantity = quantity)
 
-    def updateAssetTerms(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int): Future[Int] = {
-      updateAssetTermsByID(id = id, description = description, price = price, quantity = quantity, shippingPeriod = shippingPeriod, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails())
-    }
+    def updateAssetTerms(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int): Future[Int] = updateAssetTermsByID(id = id, description = description, price = price, quantity = quantity, shippingPeriod = shippingPeriod, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails())
 
     def tryGetBuyerAcceptedAssetDetails(id: String): Future[BuyerAcceptedAssetDetails] = findBuyerAcceptedAssetDetailsByID(id)
 
