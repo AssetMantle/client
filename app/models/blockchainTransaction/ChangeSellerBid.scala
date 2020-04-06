@@ -206,7 +206,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         } yield Unit
       }
 
-      def getIDs(changeSellerBid: ChangeSellerBid): Future[(String,String)] = {
+      def getIDs(changeSellerBid: ChangeSellerBid): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
         val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
         for {
@@ -224,10 +224,9 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         _ <- updateAmountForNegotiationID(negotiationResponse, changeSellerBid.bid)
         _ <- markDirty(changeSellerBid)
         (toAccountID, fromAccountID) <- getIDs(changeSellerBid)
-      } yield {
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -247,7 +246,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         } yield {}
       }
 
-      def getIDs(changeSellerBid: ChangeSellerBid): Future[(String,String)] = {
+      def getIDs(changeSellerBid: ChangeSellerBid): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
         val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
         for {
@@ -261,10 +260,9 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         changeSellerBid <- changeSellerBid
         _ <- markDirty(changeSellerBid)
         (toAccountID, fromAccountID) <- getIDs(changeSellerBid)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

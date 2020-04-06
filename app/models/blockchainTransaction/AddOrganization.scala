@@ -30,6 +30,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val addOrganizationTable = TableQuery[AddOrganizationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -186,10 +187,9 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
           _ <- updateUserType(organizationAccountId)
           _ <- markDirty
           fromAccountID <- fromAccountID(addOrganization.from)
-        } yield {
-          utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-          utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        }
+          _ <- utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+          _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        } yield {}
       }
 
       (for {
@@ -206,7 +206,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
 
-      def getIDs(addOrganization: AddOrganization): Future[(String,String)] = {
+      def getIDs(addOrganization: AddOrganization): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(addOrganization.to)
         val fromAccountID = masterAccounts.Service.getId(addOrganization.from)
         for {
@@ -219,10 +219,9 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         _ <- markTransactionFailed
         addOrganization <- addOrganization
         (toAccountID, fromAccountID) <- getIDs(addOrganization)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

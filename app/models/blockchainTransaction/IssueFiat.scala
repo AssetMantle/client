@@ -187,7 +187,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
 
-      def getIDs(issueFiat: IssueFiat): Future[(String,String)] = {
+      def getIDs(issueFiat: IssueFiat): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(issueFiat.to)
         val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
         for {
@@ -203,10 +203,9 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         _ <- insertOrUpdate(account, issueFiat)
         _ <- markDirty(issueFiat)
         (toAccountID, fromAccountID) <- getIDs(issueFiat)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -218,7 +217,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
 
-      def getIDs(issueFiat: IssueFiat): Future[(String,String)] = {
+      def getIDs(issueFiat: IssueFiat): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(issueFiat.to)
         val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
         for {
@@ -231,10 +230,9 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         _ <- markTransactionFailed
         issueFiat <- issueFiat
         (toAccountID, fromAccountID) <- getIDs(issueFiat)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

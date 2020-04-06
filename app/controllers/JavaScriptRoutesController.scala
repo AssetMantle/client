@@ -119,6 +119,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewOrganizationBankAccountDetail,
         routes.javascript.ComponentViewController.userViewOrganizationUBOs,
         routes.javascript.ComponentViewController.viewOrganizationUBOs,
+        routes.javascript.ComponentViewController.recentActivityForTradeRoom,
+        routes.javascript.ComponentViewController.recentActivityForTrader,
+        routes.javascript.ComponentViewController.recentActivityForOrganization,
+        routes.javascript.ComponentViewController.traderFinancials,
+        routes.javascript.ComponentViewController.salesQuoteList,
+        routes.javascript.ComponentViewController.sellSalesQuoteList,
+        routes.javascript.ComponentViewController.buySalesQuoteList,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -207,7 +214,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SalesQuoteController.commodityDetailsForm,
         routes.javascript.SalesQuoteController.paymentTermsForm,
         routes.javascript.SalesQuoteController.salesQuoteDocumentsForm,
-        routes.javascript.SalesQuoteController.salesQuoteList,
 
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderList,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderDocument,
@@ -271,12 +277,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.TraderController.traderRelationRequestForm,
 
+        routes.javascript.TradeRoomController.chatRoom,
+        routes.javascript.TradeRoomController.chatWindow,
+        routes.javascript.TradeRoomController.sendMessageForm,
+        routes.javascript.TradeRoomController.loadMoreChats,
+        routes.javascript.TradeRoomController.sendMessage,
+        routes.javascript.TradeRoomController.replyToMessage,
+        routes.javascript.TradeRoomController.markChatAsRead,
         routes.javascript.TradeRoomController.tradeTerms,
         routes.javascript.TradeRoomController.tradeFinancials,
         routes.javascript.TradeRoomController.documentList,
         routes.javascript.TradeRoomController.documentView,
         routes.javascript.TradeRoomController.recentActivity,
-        routes.javascript.TradeRoomController.chatRoom,
         routes.javascript.TradeRoomController.updateTermStatus,
         routes.javascript.TradeRoomController.tradeList,
 

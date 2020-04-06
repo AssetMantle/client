@@ -6,6 +6,8 @@ import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.master.{Identification, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderKYC, TraderRelation, Zone}
 import models.masterTransaction.{AssetFile, IssueAssetRequest}
+import models.master.{Organization => _, Zone => _, _}
+import models.masterTransaction.{AssetFile, IssueAssetRequest, Notification}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -25,8 +27,11 @@ class ComponentViewController @Inject()(
                                          masterAssets: master.Assets,
                                          masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                         masterTransactionSalesQuotes: masterTransaction.SalesQuotes,
                                          blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
+                                         masterTransactionNotifications: masterTransaction.Notifications,
+                                         masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                          withZoneLoginAction: WithZoneLoginAction,
                                          withTraderLoginAction: WithTraderLoginAction,
                                          withLoginAction: WithLoginAction,
@@ -51,6 +56,8 @@ class ComponentViewController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 
   private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
+
+  private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -150,6 +157,41 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def traderFinancials: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+      val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
+
+      def orders(negotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(negotiations.map(_.id))
+
+      def fiatsInOrders(ordersIDS: Seq[String]): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(ordersIDS)
+
+      def negotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
+
+      def payables(negotiationsOfOrders: Seq[Negotiation], fiatsInOrders: Seq[Fiat]): Int = {
+        val sumBuying = negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.bid.toInt).sum
+        val sumBought = fiatsInOrders.filter(x => negotiationsOfOrders.filter(_.buyerAddress == loginState.address).map(_.id) contains x.ownerAddress).map(_.transactionAmount.toInt).sum
+        sumBought - sumBuying
+      }
+
+      def receivables(negotiationsOfOrders: Seq[Negotiation]): Int = {
+        val sumSelling = negotiationsOfOrders.filter(_.sellerAddress == loginState.address).map(_.bid.toInt).sum
+        sumSelling
+      }
+
+      def walletBalance(fiat: Seq[Fiat]): Int = fiat.map(_.transactionAmount.toInt).sum
+
+      (for {
+        fiatPegWallet <- fiatPegWallet
+        negotiations <- negotiations
+        orders <- orders(negotiations)
+        fiatsInOrders <- fiatsInOrders(orders.map(_.id))
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance(fiatPegWallet), payables(negotiationsOfOrders(negotiations, orders), fiatsInOrders), receivables(negotiationsOfOrders(negotiations, orders))))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiationsForBuyerAddress = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address)
@@ -242,6 +284,46 @@ class ComponentViewController @Inject()(
         case _: BaseException => NoContent
       }
   }
+
+  def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
+      def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber*limit, limit)
+      (for {
+        organizationID <- organizationID
+        tradersInOrganizations <- tradersInOrganizations(organizationID)
+        notificationsOfTraders <- notificationsOfTraders(tradersInOrganizations.map(_.accountID))
+      } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def recentActivityForTrader(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * limit, limit)
+      (for {
+        notifications <- notifications
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTrader), None))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def recentActivityForTradeRoom(pageNumber: Int = 0, tradeRoomID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val tradeActivities = masterTransactionTradeActivities.Service.getTradeActivity(tradeRoomID)
+      def notifications(ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(loginState.username, ids,pageNumber * limit, limit)
+      (for {
+        tradeActivities <- tradeActivities
+        notifications <- notifications(tradeActivities.map(_.notificationID))
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTradeRoom), Option(tradeRoomID)))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
 
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -630,4 +712,28 @@ class ComponentViewController @Inject()(
       }
   }
 
+
+  def salesQuoteList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.salesQuotesList())
+  }
+
+  def sellSalesQuoteList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val sellSalesQuoteList=masterTransactionSalesQuotes.Service.sellSalesQuotes(loginState.username)
+      for{
+        sellSalesQuoteList<-sellSalesQuoteList
+      }yield {
+        Ok(views.html.component.master.sellSalesQuoteList(sellSalesQuoteList=sellSalesQuoteList))}
+  }
+
+  def buySalesQuoteList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val buySalesQuoteList=masterTransactionSalesQuotes.Service.buySalesQuotes(loginState.username)
+      for{
+        buySalesQuoteList<-buySalesQuoteList
+      }yield {
+        Ok(views.html.component.master.buySalesQuoteList(buySalesQuoteList=buySalesQuoteList))
+
+      }
+  }
 }

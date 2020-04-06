@@ -635,7 +635,8 @@ CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
     "salesQuoteID"       VARCHAR NOT NULL,
     "buyerAccountID"     VARCHAR NOT NULL,
     "sellerAccountID"    VARCHAR NOT NULL,
-    "financierAccountID" VARCHAR NOT NULL,
+    "financierAccountID" VARCHAR,
+    "chatID"             VARCHAR NOT NULL UNIQUE,
     "status"             VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -743,7 +744,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
     "shippingDetails"  VARCHAR,
     "paymentTerms"     VARCHAR,
     "documents"        VARCHAR,
+    "buyerAccountID"   VARCHAR,
     "completionStatus" BOOLEAN NOT NULL,
+    "invitationStatus" BOOLEAN ,
     PRIMARY KEY ("id")
 );
 
@@ -820,6 +823,39 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
     "id"         VARCHAR NOT NULL,
     "secretHash" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ChatParticipant"
+(
+    "accountID"    VARCHAR NOT NULL,
+    "chatID" VARCHAR NOT NULL,
+    PRIMARY KEY ("accountID", "chatID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Message"
+(
+    "id"            VARCHAR   NOT NULL,
+    "fromAccountID" VARCHAR   NOT NULL,
+    "chatID"  VARCHAR   NOT NULL,
+    "text" VARCHAR NOT NULL,
+    "replyToID"     VARCHAR,
+    "createdAt"     TIMESTAMP NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MessageReceive"
+(
+    "messageID"      VARCHAR   NOT NULL,
+    "accountID" VARCHAR   NOT NULL,
+    "readAt"      TIMESTAMP,
+    PRIMARY KEY ("messageID", "accountID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
+(
+    "notificationID"         VARCHAR NOT NULL,
+    "tradeRoomID" VARCHAR NOT NULL,
+    PRIMARY KEY ("notificationID","tradeRoomID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
@@ -917,6 +953,16 @@ ALTER TABLE MASTER."ZoneKYC"
 
 ALTER TABLE MASTER_TRANSACTION."AssetFile"
     ADD CONSTRAINT AssetFile_IssueAssetRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."IssueAssetRequest" ("id");
+
+ALTER TABLE MASTER_TRANSACTION."ChatParticipant"
+    ADD CONSTRAINT ChatParticipant_TradeRoom_chatID FOREIGN KEY ("chatID") REFERENCES MASTER."TradeRoom"("chatID");
+ALTER TABLE MASTER_TRANSACTION."Message"
+    ADD CONSTRAINT Message_ChatParticipant_accountIDChatWindowID FOREIGN KEY ("fromAccountID","chatID") REFERENCES MASTER_TRANSACTION."ChatParticipant"("accountID","chatID");
+ALTER TABLE MASTER_TRANSACTION."Message"
+    ADD CONSTRAINT Message_Message_replyToID FOREIGN KEY ("replyToID") REFERENCES MASTER_TRANSACTION."Message"("id");
+ALTER TABLE MASTER_TRANSACTION."MessageReceive"
+    ADD CONSTRAINT MessageReceive_Message_messageID FOREIGN KEY ("messageID") REFERENCES MASTER_TRANSACTION."Message"("id");
+
 ALTER TABLE MASTER_TRANSACTION."EmailOTP"
     ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
@@ -931,25 +977,33 @@ ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
     ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SalesQuote"
+    ADD CONSTRAINT SalesQuote_Trader_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Trader" ("accountID");
+ALTER TABLE MASTER_TRANSACTION."SalesQuote"
+    ADD CONSTRAINT SalesQuote_Trader_buyerAccountID FOREIGN KEY ("buyerAccountID") REFERENCES MASTER."Trader" ("accountID");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER_TRANSACTION."TradeActivity"
+    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
+ALTER TABLE MASTER_TRANSACTION."TradeActivity"
+    ADD CONSTRAINT TradeActivity_TradeRoom_TradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER."TradeRoom"("id");
 
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6',
+VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '1000',
-        'commitpub1addwnpepq2yk5pt0qse3q6f45rc92skcuj55nqp8puv8vuh2xsc786jryjynku36hvc',
+        'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '711213004', 'commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 
@@ -1013,8 +1067,13 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."PushNotificationToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SalesQuote" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeTerm" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."ChatParticipant" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."Message" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."MessageReceive" CASCADE;
+
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;

@@ -1,89 +1,20 @@
 @import controllers.actions.LoginState
 @import views.html.base._
+@import models.masterTransaction.ChatParticipant
 
-@()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="chatContainer">
-@commonCard(constants.View.CHAT) {
-}{
-    <div class="chat" title="You have chat with">
-        <div class="chat_history">
-            <ul class="list-unstyled scroller">
-                <li class="self">
-                    <div class="patner">
-                        <span class="messageInfo">Unknow 2019-12-18 16:29:14</span>
-                        <div class="messageContent cmuk-text-right">
-                            hello
-                        </div>
-                    </div>
-                    <span class="chatName">s</span>
-                </li>
+@(chatIDs: Seq[String], chatParticipants: Seq[ChatParticipant])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-                <li class="other">
-                    <span class="chatName">x</span>
-                    <div class="you">
-                        <span><small style="font-size:11px">You 2019-12-18 16:29:14</small><br>
-                            <div class="messageContent cmuk-text-left">
-                                hi
-                            </div>
-                        </span>
-                    </div>
-                </li>
-                <li class="self">
-                    <div class="patner">
-                        <span><small style="font-size:11px">Unknow 2019-12-18 16:29:14</small><br>
-                            <div class="messageContent cmuk-text-right">
-                                hello
-                            </div>
-                        </span>
-                    </div>
-                    <span class="chatName">s</span>
-                </li>
 
-                <li class="other">
-                    <span class="chatName">p</span>
-                    <div class="you">
-                        <span><small style="font-size:11px">You 2019-12-18 16:29:14</small><br>
-                            <div class="messageContent cmuk-text-left">
-                                hi
-                            </div>
-                        </span>
-                    </div>
-                </li>
-                <li class="self">
-                    <div class="patner">
-                        <span><small style="font-size:11px">Unknow 2019-12-18 16:29:14</small><br>
-                            <div class="selftime cmuk-text-right">
-                                hello
-                            </div>
-                        </span>
-                    </div>
-                    <span class="chatName">s</span>
-                </li>
-
-                <li class="other">
-                    <span class="chatName">p</span>
-                    <div class="you">
-                        <span><small style="font-size:11px">You 2019-12-18 16:29:14</small><br>
-                            <div class="messageContent cmuk-text-left">
-                                hi
-                            </div>
-                        </span>
-                    </div>
-                </li>
-                <div class="cover-bar"></div>
-            </ul>
-
+@commonInfoBox() {
+    @for(chatID <- chatIDs) {
+        <div class="chatList">
+            <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatID', 0))" title="@chatParticipants.filter(_.chatID == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString">@chatParticipants.filter(_.chatID == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
         </div>
-        <div class="cmuk-inline chatSubmit">
-            <form>
-                <a class="cmuk-form-icon send_chat" name="send_chat" href="#"><img
-                src="./images/icons/shareIcon.svg"> </a>
-                <input class="cmuk-input inputor" name="" type="text" id="myInput">
-                <a class="cmuk-form-icon cmuk-form-icon-flip" href="#"><img
-                src="./images/icons/sendIcon.svg"> </a>
-                <input type="submit" hidden="true" id="submitButton">
-            </form>
-        </div>
+        <script>
+            componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatIDs.head', 0))
+        </script>
+    }
+    <div id="chatWindow">
     </div>
 }
-</div>
+

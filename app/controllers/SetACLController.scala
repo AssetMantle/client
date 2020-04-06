@@ -59,8 +59,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = addTraderRequestData.emailAddress)
 
-              def sendEmailNotificationsAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
+              def sendEmailAndGetResult(organization: Organization): Future[Result] = {
                 utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = addTraderRequestData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, organization.name, organization.id)
                 withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
@@ -68,7 +67,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               for {
                 organization <- organization
                 _ <- createInvitation(organization)
-                result <- sendEmailNotificationsAndGetResult(organization)
+                _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
+                result <- sendEmailAndGetResult(organization)
               } yield result
             }
 
@@ -314,9 +314,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 Future(0)
               }
 
-              def sendNotificationsAndGetResult(traderOrganization: Organization, trader: Trader): Future[Result] = {
-                utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_USER_ADDED_OR_UPDATED_TRADER_REQUEST, trader.name)
-                utilitiesNotification.send(loginState.username, constants.Notification.USER_ADDED_OR_UPDATED_TRADER_REQUEST, traderOrganization.name, traderOrganization.id)
+              def getResult(traderOrganization: Organization, trader: Trader): Future[Result] = {
                 withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               }
 
@@ -324,7 +322,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 _ <- markTraderFormCompleted
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
-                result <- sendNotificationsAndGetResult(traderOrganization, trader)
+                _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_USER_ADDED_OR_UPDATED_TRADER_REQUEST, trader.name)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_ADDED_OR_UPDATED_TRADER_REQUEST, traderOrganization.name, traderOrganization.id)
+                result <- getResult(traderOrganization, trader)
               } yield result
             } else {
 
@@ -481,14 +481,16 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 for {
                   _ <- zoneVerify
                   traderID <- traderID
-                } yield utilitiesNotification.send(traderID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                  _ <- utilitiesNotification.send(traderID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                } yield {}
               } else {
                 val zoneReject = masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
                 val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
                 for {
                   _ <- zoneReject
                   traderID <- traderID
-                } yield utilitiesNotification.send(traderID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                  _ <- utilitiesNotification.send(traderID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                } yield {}
               }
 
               def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
@@ -719,14 +721,16 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 for {
                   _ <- organizationVerify
                   traderID <- traderID
-                } yield utilitiesNotification.send(traderID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                  _ <- utilitiesNotification.send(traderID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                } yield {}
               } else {
                 val organizationReject = masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
                 for {
                   _ <- organizationReject
                   traderID <- traderID
-                } yield utilitiesNotification.send(traderID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                  _ <- utilitiesNotification.send(traderID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                } yield {}
               }
 
               def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)

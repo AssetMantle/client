@@ -14,7 +14,12 @@ import views.companion.master.UpdateContact
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterContacts: master.Contacts, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                  utilitiesNotification: utilities.Notification,
+                                  masterContacts: master.Contacts,
+                                  withLoginAction: WithLoginAction,
+                                  masterAccounts: master.Accounts,
+                                  withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -64,11 +69,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             else {
               val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
 
-              def updateStatusUnverifiedContact(): Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+              def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
 
               for {
                 _ <- insertOrUpdateContact
-                _ <- updateStatusUnverifiedContact()
+                _ <- updateStatusUnverifiedContact
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
               } yield result
             }
@@ -78,7 +83,10 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             emailPresent <- emailPresent
             mobilePresent <- mobilePresent
             result <- getResult(emailPresent, mobilePresent)
-          } yield result
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTACT_UPDATED, loginState.username)
+          } yield {
+            result
+          }
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

@@ -99,9 +99,15 @@ object FormField {
   val ASSET_DESCRIPTION = new StringFormField("ASSET_DESCRIPTION", 1, 1000)
   val TRADE_ID = new StringFormField("TRADE_ID", 1, 132)
   val TERM_TYPE = new StringFormField("TERM_TYPE", 1, 100)
+  val TRADE_ROOM_ID = new StringFormField("TRADE_ROOM_ID", 2, 100)
+  val TEXT = new StringFormField("TEXT", 1, 160)
+  val REPLY_TO_MESSAGE = new StringFormField("REPLY_TO_MESSAGE", 2, 100)
+  val CHAT_WINDOW_ID = new StringFormField("CHAT_WINDOW_ID", 2, 100)
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
   val FROM_ID = new StringFormField("FROM_ID", 16, 16)
   val TO_ID = new StringFormField("TO_ID", 16, 16)
+  val COUNTER_PARTY = new StringFormField("COUNTER_PARTY", 2, 100)
+  val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -113,7 +119,6 @@ object FormField {
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
   val REFRENCE = new SelectFormField("REFRENCE", constants.SelectFieldOptions.REFRENCE_DATES)
-
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
