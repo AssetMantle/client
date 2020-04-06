@@ -1177,11 +1177,14 @@ rightText {
           .commodityImage{
             width: 30px;
             height: 30px;
-            display: inline-block;
+            display: inline-flex;
             background: #cccc;
             position: relative;
+            text-align: center;
             border-radius: 50%;
+            align-items: center;
             margin-right: 15px;
+            justify-content: center;
             img{
               position: absolute;
               top: 0;

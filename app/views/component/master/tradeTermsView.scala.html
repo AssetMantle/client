@@ -6,7 +6,7 @@
 
 
                 <div class="traderCommodity">
-                    <span class="commodityImage"><img src="@routes.Assets.versioned("./images/icons/IronIcon.svg")"></span><span class="tradeName">@tradeTerm.assetType</span>
+                    <span class="commodityImage">@tradeTerm.assetType.mkString.substring(0, 1)</span><span class="tradeName">@tradeTerm.assetType</span>
                 </div>
                 <div class="cmuk-flex tradeTermsData">
                     <p class="cmuk-margin-remove">@Messages(constants.View.TRADE_TERMS)</p>
