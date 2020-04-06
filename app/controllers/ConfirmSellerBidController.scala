@@ -21,6 +21,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                                            withTraderLoginAction: WithTraderLoginAction,
                                            transactionsConfirmSellerBid: transactions.ConfirmSellerBid,
                                            masterNegotiations: Negotiations,
+                                           masterTraders: master.Traders,
                                            masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                            blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
                                            withUsernameToken: WithUsernameToken)
@@ -66,10 +67,11 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
 
   def confirmSellerBidForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(requestID)
 
-      def getResult(negotiation: Negotiation): Future[Result] = {
-        if (negotiation.sellerTraderID == loginState.username) {
+      def getResult(negotiation: Negotiation, traderID: String): Future[Result] = {
+        if (negotiation.sellerTraderID == traderID) {
           val confirmBidDocuments = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)
           for {
             confirmBidDocuments <- confirmBidDocuments
@@ -80,8 +82,9 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
       }
 
       (for {
+        traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(negotiation)
+        result <- getResult(negotiation, traderID)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

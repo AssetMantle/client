@@ -196,7 +196,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
       def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
 
-      def markNegotiationAcceptedAndUpdateNegotiationIDChatID(negotiation: Negotiation, negotiationID: String): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
+      def markNegotiationAcceptedAndUpdateNegotiationID(negotiation: Negotiation, negotiationID: String): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
         masterNegotiations.Service.markAcceptedAndUpdateNegotiationID(id = negotiation.id, negotiationID = negotiationID)
       } else {
         Future(0)
@@ -234,7 +234,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         negotiationID <- negotiationID(changeBuyerBid)
         negotiationResponse <- negotiationResponse(negotiationID, changeBuyerBid)
         _ <- insertOrUpdate(negotiationResponse)
-        _ <- markNegotiationAcceptedAndUpdateNegotiationIDChatID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
+        _ <- markNegotiationAcceptedAndUpdateNegotiationID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
         _ <- updatePriceAndQuantity(id = negotiation.id, price = negotiationResponse.value.bid.toInt, quantity = negotiation.quantity) //TODO Change quantity = negotiation.quantity if in future comes from blockchain
         _ <- markDirty(changeBuyerBid)
         fromAccountID <- getID(changeBuyerBid.from)

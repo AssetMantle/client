@@ -5,7 +5,7 @@
 
 @(sendMessageForm: Form[SendMessage.Data] = SendMessage.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@form(action = constants.Form.SEND_CHAT.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
+@form(action = constants.Form.SEND_MESSAGE.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         @CSRF.formField
         <div style="position: relative">

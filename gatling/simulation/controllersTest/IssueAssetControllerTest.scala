@@ -356,7 +356,7 @@ object issueAssetControllerTest {
     .exec(session => session.set(Test.TEST_DOCUMENT_HASH, getDocumentHashForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])).set(Test.TEST_ASSET_TYPE, getAssetTypeForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])).set(Test.TEST_ASSET_PRICE, getAssetPriceForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])).set(Test.TEST_QUANTITY_UNIT, getQuantityUnitForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])).set(Test.TEST_ASSET_QUANTITY, getAssetQuantityForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])))
     .exec(http("Issue_Asset_Form")
       .get(session => routes.IssueAssetController.issueAssetForm(session(Test.TEST_REQUEST_ID).as[String], session(Test.TEST_SELLER_USERNAME).as[String], session(Test.TEST_DOCUMENT_HASH).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_PRICE).as[Int], session(Test.TEST_QUANTITY_UNIT).as[String], session(Test.TEST_ASSET_QUANTITY).as[Int], None).url)
-      .check(css("legend:contains(%s)".format(constants.Form.ISSUE_ASSET_OLD.legend)).exists)
+      .check(css("legend:contains(%s)".format(constants.Form.ISSUE_ASSET.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(2)

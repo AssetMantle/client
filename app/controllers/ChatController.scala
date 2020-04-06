@@ -148,7 +148,7 @@ class ChatController @Inject()(
     implicit request =>
       views.companion.master.SendMessage.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(Messages(constants.View.MESSAGE_NOT_SENT_DUE_TO_SOME_ERROR)))
+          Future(BadRequest(Messages(constants.View.MESSAGE_NOT_SENT)))
         },
         sendMessageData => {
           val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = sendMessageData.chatID, accountID = loginState.username)
