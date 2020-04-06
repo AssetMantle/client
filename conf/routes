@@ -332,22 +332,22 @@ GET         /master/moderatedBuyerExecuteOrderDocument                          
 GET         /master/moderatedBuyerExecuteOrder                                              controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(requestID: String)
 POST        /master/moderatedBuyerExecuteOrder                                              controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
 
-GET         /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBidForm(sellerAddress:String, pegHash:String)
+GET         /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBidForm
 POST        /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBid
 
-GET         /master/changeSellerBid                                                         controllers.ChangeSellerBidController.changeSellerBidForm(buyerAddress:String, pegHash: String)
+GET         /master/changeSellerBid                                                         controllers.ChangeSellerBidController.changeSellerBidForm
 POST        /master/changeSellerBid                                                         controllers.ChangeSellerBidController.changeSellerBid
 
 GET         /master/confirmBuyerBid                                                         controllers.ConfirmBuyerBidController.confirmBuyerBidForm(requestID: String)
 POST        /master/confirmBuyerBid                                                         controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmBuyerBidDetail                                                   controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm(sellerAddress:String, pegHash: String, bid:Int)
+GET         /master/confirmBuyerBidDetail                                                   controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm
 POST        /master/confirmBuyerBidDetail                                                   controllers.ConfirmBuyerBidController.confirmBuyerBidDetail
 
 GET         /master/confirmSellerBid                                                        controllers.ConfirmSellerBidController.confirmSellerBidForm(requestID: String)
 POST        /master/confirmSellerBid                                                        controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/confirmSellerBidDetail                                                  controllers.ConfirmSellerBidController.confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid:Int)
+GET         /master/confirmSellerBidDetail                                                  controllers.ConfirmSellerBidController.confirmSellerBidDetailForm
 POST        /master/confirmSellerBidDetail                                                  controllers.ConfirmSellerBidController.confirmSellerBidDetail
 
 GET         /master/issueAssetRequest                                                       controllers.IssueAssetController.issueAssetRequestForm(id: String)
