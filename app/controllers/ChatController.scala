@@ -8,7 +8,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.Negotiation
-import models.masterTransaction.{Chat, Chats, Message, MessageReceive, MessageReceives}
+import models.masterTransaction.{Chat, Chats, Message, MessageRead}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.{I18nSupport, Messages}
@@ -43,7 +43,7 @@ class ChatController @Inject()(
                                 utilitiesNotification: utilities.Notification,
                                 masterTransactionChats: masterTransaction.Chats,
                                 masterTransactionMessages: masterTransaction.Messages,
-                                masterTransactionMessageReceives: masterTransaction.MessageReceives,
+                                masterTransactionMessageReads: masterTransaction.MessageReads,
                               )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -90,7 +90,7 @@ class ChatController @Inject()(
         if (userIsParticipant) {
           val chatsInWindow = masterTransactionMessages.Service.get(chatID, pageNumber * messagesPerPage, messagesPerPage)
 
-          def readChats(messageIDs: Seq[String]): Future[Seq[MessageReceive]] = masterTransactionMessageReceives.Service.getAllRead(messageIDs)
+          def readChats(messageIDs: Seq[String]): Future[Seq[MessageRead]] = masterTransactionMessageReads.Service.getAllRead(messageIDs)
 
           for {
             chatsInWindow <- chatsInWindow
@@ -119,7 +119,7 @@ class ChatController @Inject()(
         if (userIsParticipant) {
           val chatsInWindow = masterTransactionMessages.Service.get(chatID, pageNumber * messagesPerPage, messagesPerPage)
 
-          def readChats(messageIDs: Seq[String]): Future[Seq[MessageReceive]] = masterTransactionMessageReceives.Service.getAllRead(messageIDs)
+          def readChats(messageIDs: Seq[String]): Future[Seq[MessageRead]] = masterTransactionMessageReads.Service.getAllRead(messageIDs)
 
           for {
             chatsInWindow <- chatsInWindow
@@ -161,7 +161,7 @@ class ChatController @Inject()(
               def chatReceive(participants: Seq[String], chat: Message): Future[Unit] = {
                 Future(
                   for (participant <- participants) {
-                    val create = masterTransactionMessageReceives.Service.create(chat.id, participant)
+                    val create = masterTransactionMessageReads.Service.create(chat.id, participant)
                     for {
                       _ <- create
                     } yield masterTransactionMessages.Service.sendMessageToChatActors(participants, chat)
@@ -227,7 +227,7 @@ class ChatController @Inject()(
         if (userIsParticipant) {
           val messageIDs = masterTransactionMessages.Service.getChatIDs(chatWindowID)
 
-          def markRead(messageIDs: Seq[String]): Future[Int] = masterTransactionMessageReceives.Service.markRead(messageIDs, loginState.username)
+          def markRead(messageIDs: Seq[String]): Future[Int] = masterTransactionMessageReads.Service.markRead(messageIDs, loginState.username)
 
           for {
             messageIDs <- messageIDs

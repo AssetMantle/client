@@ -503,7 +503,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateAssetTermsInNegotiation(views.companion.master.UpdateAssetTermsInNegotiation.form.fill(views.companion.master.UpdateAssetTermsInNegotiation.Data(id = negotiation.id, description = negotiation.assetDescription, price = negotiation.price, quantity = negotiation.quantity, shippingPeriod = negotiation.shippingPeriod))))
+        withUsernameToken.Ok(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, price = negotiation.price, quantity = negotiation.quantity, shippingPeriod = negotiation.shippingPeriod))))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -520,16 +520,16 @@ class NegotiationController @Inject()(
 
   def updateAssetTerms(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.UpdateAssetTermsInNegotiation.form.bindFromRequest().fold(
+      views.companion.master.UpdateNegotiationAssetTerms.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.updateAssetTermsInNegotiation(formWithErrors)))
+          Future(BadRequest(views.html.component.master.updateNegotiationAssetTerms(formWithErrors)))
         },
         updateAssetTermsData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(updateAssetTermsData.id)
 
           def update(traderID: String, negotiation: Negotiation): Future[Int] = if (traderID == negotiation.sellerTraderID) {
-            masterNegotiations.Service.updateDescriptionPriceQuantityAndShippingPeriod(id = updateAssetTermsData.id, description = updateAssetTermsData.description, price = updateAssetTermsData.price, quantity = updateAssetTermsData.quantity, shippingPeriod = updateAssetTermsData.shippingPeriod)
+            masterNegotiations.Service.updateAssetTerms(id = updateAssetTermsData.id, description = updateAssetTermsData.description, price = updateAssetTermsData.price, quantity = updateAssetTermsData.quantity, shippingPeriod = updateAssetTermsData.shippingPeriod)
           } else {
             throw new BaseException(constants.Response.UNAUTHORIZED)
           }
@@ -543,7 +543,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateAssetTermsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -598,7 +598,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(id = updatePaymentTermsData.id, successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -653,7 +653,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateDocumentCheckListData.id, successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -662,13 +662,13 @@ class NegotiationController @Inject()(
       )
   }
 
-  def updateTermAcceptanceForm(id: String, termType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def acceptOrRejectNegotiationTermsForm(id: String, termType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateNegotiationTermAcceptance(negotiationID = negotiation.id, termType = termType, status = false))
+        withUsernameToken.Ok(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = termType, status = false))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -683,28 +683,28 @@ class NegotiationController @Inject()(
       }
   }
 
-  def updateTermAcceptance(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def acceptOrRejectNegotiationTerms(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.UpdateNegotiationTermAcceptance.form.bindFromRequest().fold(
+      views.companion.master.AcceptOrRejectNegotiationTerms.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.updateNegotiationTermAcceptance(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.ID.name), termType = formWithErrors.data(constants.FormField.TERM_TYPE.name), status = false)))
+          Future(BadRequest(views.html.component.master.acceptOrRejectNegotiationTerms(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.ID.name), termType = formWithErrors.data(constants.FormField.TERM_TYPE.name), status = false)))
         },
-        updateNegotiationTermAcceptanceData => {
+        acceptOrRejectNegotiationTermsData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val negotiation = masterNegotiations.Service.tryGet(updateNegotiationTermAcceptanceData.id)
+          val negotiation = masterNegotiations.Service.tryGet(acceptOrRejectNegotiationTermsData.id)
 
           def updateStatus(traderID: String, negotiation: Negotiation): Future[Int] = if (traderID == negotiation.buyerTraderID) {
-            updateNegotiationTermAcceptanceData.termType match {
-              case constants.View.ASSET_DESCRIPTION => masterNegotiations.Service.updateBuyerAcceptedAssetDescription(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.PRICE => masterNegotiations.Service.updateBuyerAcceptedPrice(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.QUANTITY => masterNegotiations.Service.updateBuyerAcceptedQuantity(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.SHIPPING_PERIOD => masterNegotiations.Service.updateBuyerAcceptedShippingPeriod(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.ADVANCE_PAYMENT => masterNegotiations.Service.updateBuyerAcceptedAdvancePayment(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.CREDIT => masterNegotiations.Service.updateBuyerAcceptedCredit(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.BILL_OF_EXCHANGE => masterNegotiations.Service.updateBuyerAcceptedBillOfExchange(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.COO => masterNegotiations.Service.updateBuyerAcceptedCOO(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.COA => masterNegotiations.Service.updateBuyerAcceptedCOA(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
-              case constants.View.OTHER_DOCUMENTS => masterNegotiations.Service.updateBuyerAcceptedOtherDocuments(updateNegotiationTermAcceptanceData.id, updateNegotiationTermAcceptanceData.status)
+            acceptOrRejectNegotiationTermsData.termType match {
+              case constants.View.ASSET_DESCRIPTION => masterNegotiations.Service.updateBuyerAcceptedAssetDescription(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.PRICE => masterNegotiations.Service.updateBuyerAcceptedPrice(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.QUANTITY => masterNegotiations.Service.updateBuyerAcceptedQuantity(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.SHIPPING_PERIOD => masterNegotiations.Service.updateBuyerAcceptedShippingPeriod(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.ADVANCE_PAYMENT => masterNegotiations.Service.updateBuyerAcceptedAdvancePayment(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.CREDIT => masterNegotiations.Service.updateBuyerAcceptedCredit(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.BILL_OF_EXCHANGE => masterNegotiations.Service.updateBuyerAcceptedBillOfExchange(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.COO => masterNegotiations.Service.updateBuyerAcceptedCOO(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.COA => masterNegotiations.Service.updateBuyerAcceptedCOA(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.OTHER_DOCUMENTS => masterNegotiations.Service.updateBuyerAcceptedOtherDocuments(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
               case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
             }
 
@@ -716,7 +716,7 @@ class NegotiationController @Inject()(
             traderID <- traderID
             negotiation <- negotiation
             _ <- updateStatus(traderID = traderID, negotiation = negotiation)
-            result <- withUsernameToken.PartialContent(views.html.component.master.updateNegotiationTermAcceptance(negotiationID = negotiation.id, termType = updateNegotiationTermAcceptanceData.termType, status = updateNegotiationTermAcceptanceData.status))
+            result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = acceptOrRejectNegotiationTermsData.termType, status = acceptOrRejectNegotiationTermsData.status))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))

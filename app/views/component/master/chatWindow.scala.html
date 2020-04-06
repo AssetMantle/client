@@ -2,10 +2,10 @@
 @import views.html.base._
 @import views.companion.master.SendMessage
 @import models.masterTransaction.Message
-@import models.masterTransaction.MessageReceive
+@import models.masterTransaction.MessageRead
 @import views.html.component.master.sendMessage
 
-@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageReceive], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
     @if(chats.nonEmpty) {
         @if(readChats.filter(x => x.messageID == chats.head.id && x.accountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
             <div onclick="markChatRead(jsRoutes.controllers.ChatController.markChatAsRead('@chatID'))" style="font-size: 12px;">

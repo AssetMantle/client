@@ -14,13 +14,13 @@
                 @commonFormButton(constants.Form.UPDATE_ASSET_TERMS, 'parameters -> s"'${negotiation.id}'")
             } {
                 <div class="cmuk-flex cmuk-flex-column">
-                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                     @negotiation.buyerAcceptedAssetDetails.description
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
                     @negotiation.buyerAcceptedAssetDetails.price
                     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
                     @negotiation.buyerAcceptedAssetDetails.quantity
-                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, asset.shippingPeriod)
+                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.shippingPeriod)
                     @negotiation.buyerAcceptedAssetDetails.shippingPeriod
                     @commonTextInfo(constants.View.LOAD_PORT, asset.portOfLoading)
                     @commonTextInfo(constants.View.DISCHARGE_PORT, asset.portOfDischarge)
@@ -75,7 +75,7 @@
                     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
                 }
                 @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.SHIPPING_PERIOD, status = negotiation.buyerAcceptedAssetDetails.shippingPeriod, iconPath = "./images/icons/shipment.svg") {
-                    @commonIntInfo(constants.View.SHIPPING_PERIOD, asset.shippingPeriod)
+                    @commonIntInfo(constants.View.SHIPPING_PERIOD, negotiation.shippingPeriod)
                 }
                 @commonTextInfo(constants.View.LOAD_PORT, asset.portOfLoading)
                 @commonTextInfo(constants.View.DISCHARGE_PORT, asset.portOfDischarge)

@@ -82,6 +82,7 @@ object Form {
   val ISSUE_ASSET_OBL = new Form("ISSUE_ASSET_OBL", routes.IssueAssetController.issueAssetOBL(), routes.javascript.IssueAssetController.issueAssetOBLForm)
   val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice(), routes.javascript.IssueAssetController.issueAssetInvoiceForm)
   val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest(), routes.javascript.IssueAssetController.rejectIssueAssetRequestForm)
+  val ZONE_ISSUE_ASSET = new Form("ZONE_ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
 
   //IssueFiatController
@@ -100,7 +101,7 @@ object Form {
   val UPDATE_ASSET_TERMS = new Form("UPDATE_ASSET_TERMS", routes.NegotiationController.updateAssetTerms(), routes.javascript.NegotiationController.updateAssetTermsForm)
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENTS_CHECKLIST = new Form("UPDATE_DOCUMENTS_CHECKLIST", routes.NegotiationController.updateDocumentCheckList(), routes.javascript.NegotiationController.updateDocumentCheckListForm)
-  val UPDATE_TERM_ACCEPTANCE = new Form("UPDATE_TERM_ACCEPTANCE", routes.NegotiationController.updateTermAcceptance(), routes.javascript.NegotiationController.updateTermAcceptanceForm)
+  val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)

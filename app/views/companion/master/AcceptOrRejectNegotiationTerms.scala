@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object UpdateNegotiationTermAcceptance {
+object AcceptOrRejectNegotiationTerms {
   val form = Form(
     mapping(
       constants.FormField.ID.name -> constants.FormField.ID.field,

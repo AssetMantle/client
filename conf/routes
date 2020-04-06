@@ -83,8 +83,8 @@ POST        /negotiation/updatePaymentTerms                                     
 GET         /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckListForm(id: String)
 POST        /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckList
 
-GET         /negotiation/updateTermAcceptance                                               controllers.NegotiationController.updateTermAcceptanceForm(id: String, termType: String)
-POST        /negotiation/updateTermAcceptance                                               controllers.NegotiationController.updateTermAcceptance
+GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
+POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
 GET         /contact                                                                        controllers.ContactController.contact
 

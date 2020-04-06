@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.UpdateNegotiationTermAcceptance
+@import views.companion.master.AcceptOrRejectNegotiationTerms
 
-@(updateNegotiationTermAcceptanceForm: Form[UpdateNegotiationTermAcceptance.Data] = UpdateNegotiationTermAcceptance.form, negotiationID: String, termType: String, status: Boolean, iconPath: String)(value: Html)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(updateNegotiationTermAcceptanceForm: Form[AcceptOrRejectNegotiationTerms.Data] = AcceptOrRejectNegotiationTerms.form, negotiationID: String, termType: String, status: Boolean, iconPath: String)(value: Html)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="term">
     <div>
@@ -11,6 +11,6 @@
     </div>
     
     <div @Seq(negotiationID, termType).mkString("") class="termStatus">
-    @views.html.component.master.updateNegotiationTermAcceptance(negotiationID = negotiationID, termType = termType, status =  status)
+    @views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiationID, termType = termType, status =  status)
     </div>
 </div>

@@ -147,7 +147,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateDescriptionPriceQuantityAndShippingPeriodByID(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.price, x.quantity, x.shippingPeriod)).update((description, price, quantity, shippingPeriod)).asTry).map {
+  private def updateAssetTermsByID(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int, buyerAcceptedAssetDetails: BuyerAcceptedAssetDetails): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.price, x.quantity, x.shippingPeriod, x.buyerAcceptedAssetDescription, x.buyerAcceptedPrice, x.buyerAcceptedQuantity, x.buyerAcceptedShippingPeriod)).update((description, price, quantity, shippingPeriod, buyerAcceptedAssetDetails.description, buyerAcceptedAssetDetails.price, buyerAcceptedAssetDetails.quantity, buyerAcceptedAssetDetails.shippingPeriod)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -157,7 +157,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updatePaymentTermsByID(id: String, advancePayment: Option[Boolean], advancePercentage: Option[Double], credit: Option[Boolean], tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.advancePayment.?, x.advancePercentage.?, x.credit.?, x.tenure.?, x.tentativeDate.?, x.reference.?)).update((advancePayment, advancePercentage, credit, tenure, tentativeDate, refrence)).asTry).map {
+  private def updatePaymentTermsByID(id: String, advancePayment: Option[Boolean], advancePercentage: Option[Double], credit: Option[Boolean], tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String], buyerAcceptedPaymentTerms: BuyerAcceptedPaymentTerms): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.advancePayment.?, x.advancePercentage.?, x.credit.?, x.tenure.?, x.tentativeDate.?, x.reference.?, x.buyerAcceptedAdvancePayment, x.buyerAcceptedCredit)).update((advancePayment, advancePercentage, credit, tenure, tentativeDate, refrence, buyerAcceptedPaymentTerms.advancePayment, buyerAcceptedPaymentTerms.credit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -167,7 +167,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateDocumentsCheckListByID(id: String, billOfExchange: Option[Boolean], coo: Option[Boolean], coa: Option[Boolean], otherDocuments: Option[String]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchange.?, x.coo.?, x.coa.?, x.otherDocuments.?)).update((billOfExchange, coo, coa, otherDocuments)).asTry).map {
+  private def updateDocumentsCheckListByID(id: String, billOfExchange: Option[Boolean], coo: Option[Boolean], coa: Option[Boolean], otherDocuments: Option[String], buyerAcceptedDocumentsCheckList: BuyerAcceptedDocumentsCheckList): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchange.?, x.coo.?, x.coa.?, x.otherDocuments.?, x.buyerAcceptedBillOfExchange, x.buyerAcceptedCOO, x.buyerAcceptedCOA, x.buyerAcceptedOtherDocuments)).update((billOfExchange, coo, coa, otherDocuments, buyerAcceptedDocumentsCheckList.billOfExchange, buyerAcceptedDocumentsCheckList.coo, buyerAcceptedDocumentsCheckList.coa, buyerAcceptedDocumentsCheckList.otherDocuments)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -451,15 +451,21 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetPaymentTerms(id: String): Future[PaymentTerms] = findPaymentTermsByID(id)
 
-    def updatePaymentTerms(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String]): Future[Int] = updatePaymentTermsByID(id = id, advancePayment = Option(advancePayment), advancePercentage = advancePercentage, credit = Option(credit), tenure = tenure, tentativeDate = tentativeDate, refrence = refrence)
+    def updatePaymentTerms(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String]): Future[Int] = {
+      updatePaymentTermsByID(id = id, advancePayment = Option(advancePayment), advancePercentage = advancePercentage, credit = Option(credit), tenure = tenure, tentativeDate = tentativeDate, refrence = refrence, buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms())
+    }
 
     def tryGetDocumentsCheckList(id: String): Future[DocumentsCheckList] = findDocumentsCheckListByID(id)
 
-    def updateDocumentsCheckList(id: String, billOfExchange: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = updateDocumentsCheckListByID(id = id, billOfExchange = Option(billOfExchange), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments)
+    def updateDocumentsCheckList(id: String, billOfExchange: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = {
+      updateDocumentsCheckListByID(id = id, billOfExchange = Option(billOfExchange), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments, buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList())
+    }
 
     def updatePriceAndQuantity(id: String, price: Int, quantity: Int): Future[Int] = updatePriceAndQuantityByID(id = id, price = price, quantity = quantity)
 
-    def updateDescriptionPriceQuantityAndShippingPeriod(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int): Future[Int] = updateDescriptionPriceQuantityAndShippingPeriodByID(id = id, description = description, price = price, quantity = quantity, shippingPeriod = shippingPeriod)
+    def updateAssetTerms(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int): Future[Int] = {
+      updateAssetTermsByID(id = id, description = description, price = price, quantity = quantity, shippingPeriod = shippingPeriod, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails())
+    }
 
     def tryGetBuyerAcceptedAssetDetails(id: String): Future[BuyerAcceptedAssetDetails] = findBuyerAcceptedAssetDetailsByID(id)
 

@@ -451,7 +451,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           def toAddress(toAccountID: String): Future[String] = masterAccounts.Service.getAddress(toAccountID)
 
           val verifyRequestedStatus = masterAssets.Service.verifyAssetPendingRequestStatus(issueAssetData.id)
-          //val checkAllAssetFilesVerified = masterTransactionAssetFiles.Service.checkAllAssetFilesVerified(issueAssetData.id)
 
           def getResult(toAddress: String, verifyRequestedStatus: Boolean): Future[Result] = {
             if (verifyRequestedStatus) {
@@ -481,7 +480,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             traderAccountID <- traderAccountID
             toAddress <- toAddress(traderAccountID)
             verifyRequestedStatus <- verifyRequestedStatus
-            //              checkAllAssetFilesVerified <- checkAllAssetFilesVerified
             result <- getResult(toAddress, verifyRequestedStatus)
           } yield result
             ).recover {

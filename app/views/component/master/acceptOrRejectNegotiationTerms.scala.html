@@ -1,11 +1,11 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import helper._
-@import views.companion.master.UpdateNegotiationTermAcceptance
+@import views.companion.master.AcceptOrRejectNegotiationTerms
 
-@(updateNegotiationTermAcceptanceForm: Form[UpdateNegotiationTermAcceptance.Data] = UpdateNegotiationTermAcceptance.form, negotiationID: String, termType: String, status: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(updateNegotiationTermAcceptanceForm: Form[AcceptOrRejectNegotiationTerms.Data] = AcceptOrRejectNegotiationTerms.form, negotiationID: String, termType: String, status: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@form(action = constants.Form.UPDATE_TERM_ACCEPTANCE.route) {
+@form(action = constants.Form.ACCEPT_OR_REJECT_NEGOTIATION_TERMS.route) {
     @CSRF.formField
     @commonInputText(updateNegotiationTermAcceptanceForm, constants.FormField.ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(updateNegotiationTermAcceptanceForm, constants.FormField.TERM_TYPE, 'value -> termType, 'containerDivClass -> "hidden", 'readonly -> true)
