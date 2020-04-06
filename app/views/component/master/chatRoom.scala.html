@@ -1,20 +1,17 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.masterTransaction.ChatParticipant
+@import models.masterTransaction.Chat
 
-@(chatIDs: Seq[String], chatParticipants: Seq[ChatParticipant])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 
 @commonInfoBox() {
-    @for(chatID <- chatIDs) {
-        <div class="chatList">
-            <button onclick="componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatID', 0))" title="@chatParticipants.filter(_.chatID == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString">@chatParticipants.filter(_.chatID == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
-        </div>
-        <script>
-            componentResource('chatWindow', jsRoutes.controllers.TradeRoomController.chatWindow('@chatIDs.head', 0))
-        </script>
-    }
-    <div id="chatWindow">
+    <div class="chatList">
+        <button onclick="componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))" title="@chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString">@chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
     </div>
+    <div id="chatWindow"></div>
+    <script>
+            componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))
+    </script>
 }
 

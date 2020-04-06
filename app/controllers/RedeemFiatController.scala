@@ -22,7 +22,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   //TODO Shall we fetch username from login state using withTraderLoginAction?
   def redeemFiatForm(username: String): Action[AnyContent] = Action.async { implicit request =>
-    val zoneID = masterTraders.Service.getZoneIDByAccountID(username)
+    val zoneID = masterTraders.Service.tryGetZoneIDByAccountID(username)
     (for {
       zoneID <- zoneID
     } yield Ok(views.html.component.master.redeemFiat(zoneID = zoneID))

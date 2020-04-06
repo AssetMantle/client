@@ -1,0 +1,30 @@
+@import controllers.actions.LoginState
+@import views.companion.master.NegotiationRequest
+@import views.html.base._
+@import models.master.Asset
+@import models.master.Trader
+
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
+    <div class="cmuk-panel cmuk-panel-scrollable">
+        <ul class="cmuk-list">
+        @tradableAssets.map { asset =>
+            <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.portOfLoading, asset.portOfDischarge, asset.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
+                @asset.id | @asset.description | @Messages(asset.status)</li>
+        }
+        </ul>
+    </div>
+    @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'readonly -> true)
+
+    <div class="cmuk-panel cmuk-panel-scrollable">
+        <ul class="cmuk-list">
+        @counterPartyTraders.map { trader =>
+            <li onclick="fillCounterPartyField('@trader.id')">@trader.accountID | @trader.name</li>
+        }
+        </ul>
+    </div>
+    @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
+    @commonFormButton(constants.Form.ISSUE_ASSET)
+}
+<script src="@routes.Assets.versioned("javascripts/negotiationRequest.js")" type="text/javascript"></script>

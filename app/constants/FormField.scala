@@ -30,6 +30,7 @@ object FormField {
   val ABBREVIATION = new StringFormField("ABBREVIATION", 2, 10)
   val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
+  val ID = new StringFormField("ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 0, 1000)
   val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 0, 1000)
@@ -108,6 +109,7 @@ object FormField {
   val TO_ID = new StringFormField("TO_ID", 16, 16)
   val COUNTER_PARTY = new StringFormField("COUNTER_PARTY", 2, 100)
   val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
+  val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -172,7 +174,13 @@ object FormField {
   val INVOICE = new BooleanFormField("INVOICE")
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
-  val BILL_OF_EXCHANGE_REQUIRED = new BooleanFormField("BILL_OF_EXCHANGE_REQUIRED")
+  val BILL_OF_EXCHANGE = new BooleanFormField("BILL_OF_EXCHANGE")
+  val PRICE = new BooleanFormField("PRICE")
+  val QUANTITY = new BooleanFormField("QUANTITY")
+  val BUYER_SHIPPING_PERIOD = new BooleanFormField("BUYER_SHIPPING_PERIOD")
+  val BUYER_ADVANCE_PAYMENT = new BooleanFormField("BUYER_ADVANCE_PAYMENT")
+  val BUYER_CREDIT = new BooleanFormField("BUYER_CREDIT")
+  val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")

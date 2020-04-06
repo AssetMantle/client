@@ -8,7 +8,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.common.Serializable
-import models.master.{AccountKYC, Trader}
+import models.master.{AccountKYC, Negotiations, Trader}
 import models.masterTransaction.AssetFile
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -20,7 +20,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionAssetFiles: masterTransaction.AssetFiles, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterTransactionNegotiationRequests: masterTransaction.NegotiationRequests, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionAssetFiles: masterTransaction.AssetFiles, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterNegotiations: Negotiations, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -155,7 +155,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderZoneID = masterTraders.Service.getZoneID(traderID)
+      val traderZoneID = masterTraders.Service.tryGetZoneID(traderID)
       val userZoneID = masterZones.Service.getID(loginState.username)
       (for {
         traderZoneID <- traderZoneID
@@ -662,7 +662,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val userZoneID = masterZones.Service.getID(loginState.username)
       val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
 
-      def traderZoneID(accountID: String): Future[String] = masterTraders.Service.getZoneIDByAccountID(accountID)
+      def traderZoneID(accountID: String): Future[String] = masterTraders.Service.tryGetZoneIDByAccountID(accountID)
 
       (for {
         userZoneID <- userZoneID
@@ -682,23 +682,15 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedNegotiationFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userZoneID = masterZones.Service.getID(loginState.username)
-      val sellerAccountID = masterTransactionNegotiationRequests.Service.getSellerAccountID(id)
-      val buyerAccountID = masterTransactionNegotiationRequests.Service.getBuyerAccountID(id)
+      val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getTraders(sellerAccountID: String, buyerAccountID: String): Future[(Trader, Trader)] = {
-        val sellerTrader = masterTraders.Service.getByAccountID(sellerAccountID)
-        val buyerTrader = masterTraders.Service.getByAccountID(buyerAccountID)
-        for {
-          sellerTrader <- sellerTrader
-          buyerTrader <- buyerTrader
-        } yield (sellerTrader, buyerTrader)
-      }
+      def getTrader(id: String): Future[Trader] = masterTraders.Service.tryGet(id)
 
       (for {
         userZoneID <- userZoneID
-        sellerAccountID <- sellerAccountID
-        buyerAccountID <- buyerAccountID
-        (sellerTrader, buyerTrader) <- getTraders(sellerAccountID, buyerAccountID)
+        negotiation <- negotiation
+        sellerTrader <- getTrader(negotiation.sellerTraderID)
+        buyerTrader <- getTrader(negotiation.buyerTraderID)
       } yield {
         if (sellerTrader.zoneID == userZoneID || buyerTrader.zoneID == userZoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneNegotiationFilePath(documentType), fileName = fileName))
@@ -846,20 +838,24 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def tradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path: Future[String] = documentType match {
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def path(traderID: String): Future[String] = documentType match {
         case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE | constants.File.COO | constants.File.COA | constants.File.OTHER =>
           val accountId = masterTransactionIssueAssetRequests.Service.getAccountID(id)
           for {
             accountId <- accountId
           } yield if (accountId == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         case constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF =>
-          val checkNegotiationAndAccountIDExists = masterTransactionNegotiationRequests.Service.checkNegotiationAndAccountIDExists(id, loginState.username)
+          val checkNegotiationAndAccountIDExists = masterNegotiations.Service.checkTraderNegotiationExists(id = id, traderID = traderID)
           for {
             checkNegotiationAndAccountIDExists <- checkNegotiationAndAccountIDExists
           } yield if (checkNegotiationAndAccountIDExists) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
       }
+
       (for {
-        path <- path
+        traderID <- traderID
+        path <- path(traderID)
       } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

@@ -19,7 +19,6 @@
         <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/notification.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/recentActivity.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/getForm.js")" type="text/javascript"></script>
@@ -44,7 +43,7 @@
                     <ul class="cmuk-navbar-nav">
                     @loginState match {
                         case null => {}
-                        case default => {
+                        case _ => {
                             <li><a href="@controllers.routes.ViewController.dashboard()"><span><img src="@routes.Assets.versioned("images/icons/dashboardIcon.svg")"> </span> @Messages(constants.Form.DASHBOARD)</a></li>
                             <li><a href="@controllers.routes.ViewController.trades()"><span><img src="@routes.Assets.versioned("images/icons/tradersIcon.svg")"> </span>@Messages(constants.Form.TRADES)</a></li>
                             <li><a href="@controllers.routes.ViewController.account()"><span><img src="@routes.Assets.versioned("images/icons/accountIcon.svg")"> </span>@Messages(constants.Form.ACCOUNT)</a></li>

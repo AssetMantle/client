@@ -367,3 +367,7 @@ RESPONSE.SUCCESS.UBO_DELETED=UBO successfully deleted
 SMS.VERIFY_PHONE.SUBJECT=Verify Phone
 SMS.VERIFY_PHONE.MESSAGE=Your OTP is {0}
 SMS.PHONE_VERIFIED.MESSAGE=Phone Number is verified 
+NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP={0} {1} {2} @ {3} \n Shipping from {4} to {5} in period {6}.
+ISSUE_ASSET_PENDING=Issue Asset Pending, Request will not go if issue asset fails.
+PUSH_NOTIFICATION.NEGOTIATION_REQUEST_ACCEPTED.TITLE=Negotiation Request Accepted
+PUSH_NOTIFICATION.NEGOTIATION_REQUEST_ACCEPTED.MESSAGE=Ticket ID for the acceptance is {0}.

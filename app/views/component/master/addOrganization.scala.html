@@ -5,15 +5,12 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
-    <div>
-    @for(zone <- zones) {
-        <button type="button" class="cmuk-button cmuk-button-secondary cmuk-button-small" onclick="fillZoneIDField('@zone.id')">
-            @Messages(constants.Form.NAME): @zone.name <br>
-            @Messages(constants.Form.CURRENCY): @zone.currency <br>
-            @Messages(constants.Form.ZONE_ID): @zone.id <br>
-        </button>
-        <br>
+    <div class="cmuk-panel cmuk-panel-scrollable">
+        <ul class="cmuk-list">
+        @zones.map { zone =>
+            <li onclick="fillZoneIDField('@zone.id')">@zone.name | @zone.currency | @zone.id</li>
         }
+        </ul>
     </div>
     @commonInputText(addOrganizationForm, constants.FormField.ZONE_ID)
     @commonInputText(addOrganizationForm, constants.FormField.NAME)

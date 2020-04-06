@@ -6,7 +6,7 @@ import scala.util.Random
 
 object IDGenerator {
 
-  val count = new AtomicInteger()
+  private val count = new AtomicInteger()
 
   def requestID()(implicit module: String): String = {
     val initials = module.split("_").foldLeft("")(_ + _.take(1))
