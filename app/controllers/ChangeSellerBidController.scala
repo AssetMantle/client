@@ -32,7 +32,7 @@ class ChangeSellerBidController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_CHANGE_SELLER_BID
 
-  def changeSellerBidForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+  def changeSellerBidForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.changeSellerBid())
   }
 

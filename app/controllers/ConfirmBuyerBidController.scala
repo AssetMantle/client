@@ -33,7 +33,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   private implicit val module: String = constants.Module.CONTROLLERS_CONFIRM_BUYER_BID
 
-  def confirmBuyerBidDetailForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
+  def confirmBuyerBidDetailForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form))
   }
 
