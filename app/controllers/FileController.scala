@@ -682,24 +682,15 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedNegotiationFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userZoneID = masterZones.Service.getID(loginState.username)
-      //TODO
-      val sellerAccountID = Future(id)
-      val buyerAccountID = Future(id)
+      val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getTraders(sellerAccountID: String, buyerAccountID: String): Future[(Trader, Trader)] = {
-        val sellerTrader = masterTraders.Service.tryGetByAccountID(sellerAccountID)
-        val buyerTrader = masterTraders.Service.tryGetByAccountID(buyerAccountID)
-        for {
-          sellerTrader <- sellerTrader
-          buyerTrader <- buyerTrader
-        } yield (sellerTrader, buyerTrader)
-      }
+      def getTrader(id: String): Future[Trader] = masterTraders.Service.tryGet(id)
 
       (for {
         userZoneID <- userZoneID
-        sellerAccountID <- sellerAccountID
-        buyerAccountID <- buyerAccountID
-        (sellerTrader, buyerTrader) <- getTraders(sellerAccountID, buyerAccountID)
+        negotiation <- negotiation
+        sellerTrader <- getTrader(negotiation.sellerTraderID)
+        buyerTrader <- getTrader(negotiation.buyerTraderID)
       } yield {
         if (sellerTrader.zoneID == userZoneID || buyerTrader.zoneID == userZoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneNegotiationFilePath(documentType), fileName = fileName))
@@ -847,21 +838,24 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def tradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path: Future[String] = documentType match {
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def path(traderID: String): Future[String] = documentType match {
         case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE | constants.File.COO | constants.File.COA | constants.File.OTHER =>
           val accountId = masterTransactionIssueAssetRequests.Service.getAccountID(id)
           for {
             accountId <- accountId
           } yield if (accountId == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         case constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF =>
-          //TODO
-          val checkNegotiationAndAccountIDExists = Future(true)
+          val checkNegotiationAndAccountIDExists = masterNegotiations.Service.checkTraderNegotiationExists(id = id, traderID = traderID)
           for {
             checkNegotiationAndAccountIDExists <- checkNegotiationAndAccountIDExists
           } yield if (checkNegotiationAndAccountIDExists) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
       }
+
       (for {
-        path <- path
+        traderID <- traderID
+        path <- path(traderID)
       } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

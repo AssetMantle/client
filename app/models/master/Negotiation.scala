@@ -117,7 +117,17 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateStatusIDByID(id: String, status: String): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+  private def updateStatusByID(id: String, status: String): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByNegotiationID(negotiationID: String, status: String): Future[Int] = db.run(negotiationTable.filter(_.negotiationID === negotiationID).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -333,6 +343,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def checkByIDAndTraderID(id: String, traderID: String): Future[Boolean] = db.run(negotiationTable.filter(_.id === id).filter(x => x.buyerTraderID === traderID || x.sellerTraderID === traderID).exists.result)
+
   private[models] class NegotiationTable(tag: Tag) extends Table[Negotiation](tag, "Negotiation") {
 
     def * = (id, negotiationID.?, ticketID.?, buyerTraderID, sellerTraderID, assetID, assetDescription, price, quantity, quantityUnit, shippingPeriod, time.?, (buyerAcceptedAssetDescription, buyerAcceptedPrice, buyerAcceptedQuantity, buyerAcceptedShippingPeriod), (advancePayment.?, advancePercentage.?, credit.?, tenure.?, tentativeDate.?, reference.?), (buyerAcceptedAdvancePayment, buyerAcceptedCredit), (billOfExchange.?, coo.?, coa.?, otherDocuments.?), (buyerAcceptedBillOfExchange, buyerAcceptedCOO, buyerAcceptedCOA, buyerAcceptedOtherDocuments), chatID.?, status, comment.?).shaped <> ( {
@@ -459,11 +471,13 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetStatus(id: String): Future[String] = getStatusByID(id)
 
-    def markStatusRequestSent(id: String): Future[Int] = updateStatusIDByID(id = id, status = constants.Status.Negotiation.REQUEST_SENT)
+    def markStatusRequestSent(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.REQUEST_SENT)
 
-    def markStatusIssueAssetRequestFailed(id: String): Future[Int] = updateStatusIDByID(id = id, status = constants.Status.Negotiation.ISSUE_ASSET_FAILED)
+    def markStatusIssueAssetRequestFailed(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.ISSUE_ASSET_FAILED)
 
-    def markStatusIssueAssetPendingRequestSent(id: String): Future[Int] = updateStatusIDByID(id = id, status = constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET)
+    def markStatusIssueAssetPendingRequestSent(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET)
+
+    def markTradeCompletedByNegotiationID(negotiationID: String): Future[Int] = updateStatusByNegotiationID(negotiationID = negotiationID, status = constants.Status.Negotiation.TRADE_COMPLETED)
 
     def markRequestRejected(id: String, comment: Option[String]): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Negotiation.REJECTED, comment = comment)
 
@@ -510,6 +524,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def updateBuyerAcceptedCOA(id: String, buyerAcceptedCOA: Boolean): Future[Int] = updateBuyerAcceptedCOAByID(id = id, buyerAcceptedCOA = buyerAcceptedCOA)
 
     def updateBuyerAcceptedOtherDocuments(id: String, buyerAcceptedOtherDocuments: Boolean): Future[Int] = updateBuyerAcceptedOtherDocumentsByID(id = id, buyerAcceptedOtherDocuments = buyerAcceptedOtherDocuments)
+
+    def checkTraderNegotiationExists(id: String, traderID: String): Future[Boolean] = checkByIDAndTraderID(id = id, traderID = traderID)
   }
 
 }

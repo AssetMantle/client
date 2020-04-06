@@ -64,8 +64,8 @@ class ChatController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def chatParticipants(traderID: String, negotiation: Negotiation): Future[Seq[Chat]] = if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
-        masterTransactionChats.Service.getParticipants(negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)))
+      def getChats(traderID: String, negotiation: Negotiation): Future[Seq[Chat]] = if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
+        masterTransactionChats.Service.getAllChats(negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -74,8 +74,8 @@ class ChatController @Inject()(
         for {
           traderID <- traderID
           negotiation <- negotiation
-          chatParticipants <- chatParticipants(traderID, negotiation)
-        } yield Ok(views.html.component.master.chatRoom(chatID = negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)), chatParticipants = chatParticipants))
+          chats <- getChats(traderID, negotiation)
+        } yield Ok(views.html.component.master.chatRoom(chatID = negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)), chats = chats))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -153,10 +153,10 @@ class ChatController @Inject()(
         sendMessageData => {
           val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = sendMessageData.chatID, accountID = loginState.username)
 
-          def getResult(userIsParticipant: Boolean) = {
+          def getResult(userIsParticipant: Boolean): Future[Result] = {
             if (userIsParticipant) {
               val message = masterTransactionMessages.Service.create(loginState.username, sendMessageData.chatID, sendMessageData.text, sendMessageData.replyToID)
-              val participants = masterTransactionChats.Service.getParticipants(sendMessageData.chatID)
+              val chats = masterTransactionChats.Service.getAllChats(sendMessageData.chatID)
 
               def chatReceive(participants: Seq[String], chat: Message): Future[Unit] = {
                 Future(
@@ -171,8 +171,8 @@ class ChatController @Inject()(
 
               for {
                 message <- message
-                participants <- participants
-                _ <- chatReceive(participants.filter(_.accountID != loginState.username).map(_.accountID), message)
+                chats <- chats
+                _ <- chatReceive(chats.filter(_.accountID != loginState.username).map(_.accountID), message)
                 result <- withUsernameToken.Ok(views.html.component.master.messageBox(message)())
               } yield {
                 result

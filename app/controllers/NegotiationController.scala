@@ -68,7 +68,7 @@ class NegotiationController @Inject()(
 
   def request(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.Negotiation.form.bindFromRequest().fold(
+      views.companion.master.NegotiationRequest.form.bindFromRequest().fold(
         formWithErrors => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
 

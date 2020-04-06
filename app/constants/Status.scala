@@ -49,6 +49,7 @@ object Status {
     val BOTH_PARTY_CONFIRMED_PRICE = "BOTH_PARTY_CONFIRMED_PRICE"
     val TIMED_OUT = "TIMED_OUT"
     val REJECTED = "REJECTED"
+    val TRADE_COMPLETED = "TRADE_COMPLETED"
   }
 
   object TraderStatus {

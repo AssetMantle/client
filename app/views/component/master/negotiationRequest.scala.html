@@ -1,12 +1,12 @@
 @import controllers.actions.LoginState
-@import views.companion.master.Negotiation
+@import views.companion.master.NegotiationRequest
 @import views.html.base._
 @import models.master.Asset
 @import models.master.Trader
 
-@(negotiationForm: Form[Negotiation.Data] = Negotiation.form, tradableAssets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationForm) {
+@commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @tradableAssets.map { asset =>
@@ -15,7 +15,7 @@
         }
         </ul>
     </div>
-    @commonInputText(negotiationForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'readonly -> true)
+    @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'readonly -> true)
 
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
@@ -24,7 +24,7 @@
         }
         </ul>
     </div>
-    @commonInputText(negotiationForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
+    @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
     @commonFormButton(constants.Form.ISSUE_ASSET)
 }
 <script src="@routes.Assets.versioned("javascripts/negotiationRequest.js")" type="text/javascript"></script>

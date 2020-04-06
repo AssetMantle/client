@@ -2,12 +2,12 @@
 @import views.html.base._
 @import models.masterTransaction.Chat
 
-@(chatID: String, chatParticipants: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 
 @commonInfoBox() {
     <div class="chatList">
-        <button onclick="componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))" title="@chatParticipants.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString">@chatParticipants.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
+        <button onclick="componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))" title="@chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString">@chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
     </div>
     <div id="chatWindow"></div>
     <script>

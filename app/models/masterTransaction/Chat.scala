@@ -25,9 +25,9 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   import databaseConfig.profile.api._
 
-  private[models] val chatParticipantTable = TableQuery[ChatTable]
+  private[models] val chatTable = TableQuery[ChatTable]
 
-  private def add(chat: Chat): Future[String] = db.run((chatParticipantTable returning chatParticipantTable.map(_.id) += chat).asTry).map {
+  private def add(chat: Chat): Future[String] = db.run((chatTable returning chatTable.map(_.id) += chat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -35,7 +35,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def addMultiple(chats: Seq[Chat]): Future[Seq[String]] = db.run((chatParticipantTable returning chatParticipantTable ++= chats).asTry).map {
+  private def addMultiple(chats: Seq[Chat]): Future[Seq[String]] = db.run((chatTable returning chatTable ++= chats).asTry).map {
     case Success(result) => chats.map(_.accountID)
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -43,7 +43,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsert(chat: Chat): Future[Int] = db.run(chatParticipantTable.insertOrUpdate(chat).asTry).map {
+  private def upsert(chat: Chat): Future[Int] = db.run(chatTable.insertOrUpdate(chat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -51,7 +51,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getParticipantsByChatIDs(ids: Seq[String]): Future[Seq[Chat]] = db.run(chatParticipantTable.filter(_.id inSet ids).result.asTry).map {
+  private def getParticipantsByChatIDs(ids: Seq[String]): Future[Seq[Chat]] = db.run(chatTable.filter(_.id inSet ids).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -59,7 +59,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getParticipantsByChatID(id: String): Future[Seq[Chat]] = db.run(chatParticipantTable.filter(_.id === id).result.asTry).map {
+  private def getParticipantsByChatID(id: String): Future[Seq[Chat]] = db.run(chatTable.filter(_.id === id).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -67,9 +67,9 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def checkUserExists(id: String, accountID: String): Future[Boolean] = db.run(chatParticipantTable.filter(x => x.id === id && x.accountID === accountID).exists.result)
+  private def checkUserExists(id: String, accountID: String): Future[Boolean] = db.run(chatTable.filter(x => x.id === id && x.accountID === accountID).exists.result)
 
-  private def deleteByIDAndAccountID(chatID: String, accountID: String): Future[Int] = db.run(chatParticipantTable.filter(_.id === chatID).filter(_.accountID === accountID).delete.asTry).map {
+  private def deleteByIDAndAccountID(chatID: String, accountID: String): Future[Int] = db.run(chatTable.filter(_.id === chatID).filter(_.accountID === accountID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -104,9 +104,7 @@ class Chats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def delete(chatID: String, accountID: String): Future[Int] = deleteByIDAndAccountID(chatID = chatID, accountID = accountID)
 
-    def getParticipants(ids: Seq[String]): Future[Seq[Chat]] = getParticipantsByChatIDs(ids)
-
-    def getParticipants(id: String): Future[Seq[Chat]] = getParticipantsByChatID(id)
+    def getAllChats(id: String): Future[Seq[Chat]] = getParticipantsByChatID(id)
 
     def checkUserInChat(id: String, accountID: String): Future[Boolean] = checkUserExists(id = id, accountID = accountID)
 

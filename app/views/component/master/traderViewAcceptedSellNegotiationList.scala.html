@@ -4,33 +4,33 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(sellerOnGoingNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(sellNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@sellerOnGoingNegotiationList.map { sellerOnGoingNegotiation =>
+@sellNegotiationList.map { sellNegotiation =>
     @commonInfoBox() {
-        @defining(counterPartyTraders.filter(_.id == sellerOnGoingNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+        @defining(counterPartyTraders.filter(_.id == sellNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
                     @commonTextInfo(constants.View.TRADER_NAME, trader.name)
                 }
                 case None => {
-                    @commonTextInfo(constants.Form.TRADER_ID, sellerOnGoingNegotiation.buyerTraderID)
+                    @commonTextInfo(constants.Form.TRADER_ID, sellNegotiation.buyerTraderID)
                 }
             }
         }
-        @defining(assets.filter(_.id == sellerOnGoingNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
+        @defining(assets.filter(_.id == sellNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
             @rejectedNegotiationAsset match {
                 case Some(asset) => {
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
                 }
                 case None => {
-                    @commonTextInfo(constants.View.ASSET_ID, sellerOnGoingNegotiation.assetID)
+                    @commonTextInfo(constants.View.ASSET_ID, sellNegotiation.assetID)
                 }
             }
         }
-        @commonIntInfo(constants.View.PRICE, sellerOnGoingNegotiation.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(sellerOnGoingNegotiation.quantity.toString(), sellerOnGoingNegotiation.quantityUnit).mkString(" "))
-        @commonTextInfo(constants.View.STATUS, sellerOnGoingNegotiation.status)
-        <a class="cmuk-link" href="@routes.ViewController.tradeRoom(sellerOnGoingNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+        @commonIntInfo(constants.View.PRICE, sellNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString(), sellNegotiation.quantityUnit).mkString(" "))
+        @commonTextInfo(constants.View.STATUS, sellNegotiation.status)
+        <a class="cmuk-link" href="@routes.ViewController.tradeRoom(sellNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
     }
 }

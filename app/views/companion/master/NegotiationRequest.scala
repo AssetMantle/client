@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object Negotiation {
+object NegotiationRequest {
   val form = Form(
     mapping(
       constants.FormField.ASSET_ID.name -> constants.FormField.ASSET_ID.field,

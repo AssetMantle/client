@@ -47,12 +47,9 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
           )
           val id = masterAccounts.Service.getId(changeBuyerBidData.sellerAddress)
 
-          //def insertOrUpdate(id: String): Future[Int] = masterNegotiations.Service.insertOrUpdate(requestID, loginState.username, id, changeBuyerBidData.pegHash, changeBuyerBidData.bid)
-
           (for {
             _ <- transactionProcess
             id <- id
-            // _ <- insertOrUpdate(id)
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
           } yield result
             ).recover {

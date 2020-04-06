@@ -50,13 +50,10 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
           }
           val id = masterAccounts.Service.getId(confirmBuyerBidData.sellerAddress)
 
-//          def insertOrUpdate(id: String): Future[Int] = masterNegotiations.Service.insertOrUpdate(requestID, loginState.username, id, confirmBuyerBidData.pegHash, confirmBuyerBidData.bid)
-
           def negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.BUYER_CONTRACT)
 
           for {
             id <- id
-//            _ <- insertOrUpdate(id)
             negotiationFiles <- negotiationFiles
             result <- withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(negotiationFiles, requestID, constants.File.BUYER_CONTRACT))
           } yield result
