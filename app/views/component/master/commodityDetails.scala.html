@@ -5,7 +5,7 @@
 @(commodityDetailsForm: Form[CommodityDetails.Data] = CommodityDetails.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.COMMODITY_DETAILS, commodityDetailsForm) {
     @commonInputText(commodityDetailsForm, constants.FormField.REQUEST_ID, 'class -> "hidden", 'readonly -> true, 'required -> false)
-    @commonSelect(commodityDetailsForm, constants.FormField.ASSET_TYPE)
+    @commonSelect(commodityDetailsForm, constants.FormField.ASSET_TYPE, 'readonly -> true)
     @commonInputText(commodityDetailsForm, constants.FormField.ASSET_DESCRIPTION)
     @commonInputInt(commodityDetailsForm, constants.FormField.ASSET_PRICE)
     @commonInputInt(commodityDetailsForm, constants.FormField.ASSET_QUANTITY)

@@ -221,10 +221,9 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         _ <- updateNegotiationID(negotiationResponse, buyerAccountID, changeBuyerBid.pegHash)
         _ <- markDirty(changeBuyerBid)
         toAccountID <- getToAccountID(changeBuyerBid)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(buyerAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -244,7 +243,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         } yield {}
       }
 
-      def getIDs(changeBuyerBid: ChangeBuyerBid): Future[(String,String)] = {
+      def getIDs(changeBuyerBid: ChangeBuyerBid): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(changeBuyerBid.to)
         val fromAccountID = masterAccounts.Service.getId(changeBuyerBid.from)
         for {
@@ -258,10 +257,9 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         changeBuyerBid <- changeBuyerBid
         _ <- markDirty(changeBuyerBid)
         (toAccountID, fromAccountID) <- getIDs(changeBuyerBid)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

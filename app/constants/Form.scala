@@ -157,6 +157,9 @@ object Form {
   //VerifyMobileNumberController
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber(), routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
 
+  //TradeRoomController
+  val SEND_CHAT = new Form("SEND_CHAT", routes.TradeRoomController.sendMessage(), routes.javascript.TradeRoomController.sendMessageForm)
+
   val INDEX = "INDEX"
   val DASHBOARD = "DASHBOARD"
   val COMMIT = "COMMIT"

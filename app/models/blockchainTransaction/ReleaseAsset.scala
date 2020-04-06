@@ -179,7 +179,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         } yield {}
       }
 
-      def getIDs(releaseAsset: ReleaseAsset): Future[(String,String)] = {
+      def getIDs(releaseAsset: ReleaseAsset): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
         val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
         for {
@@ -193,10 +193,9 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         releaseAsset <- releaseAsset
         _ <- markDirty(releaseAsset)
         (toAccountID, fromAccountID) <- getIDs(releaseAsset)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -206,7 +205,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val releaseAsset = Service.getTransaction(ticketID)
 
-      def getIDs(releaseAsset: ReleaseAsset): Future[(String,String)] = {
+      def getIDs(releaseAsset: ReleaseAsset): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
         val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
         for {
@@ -219,10 +218,9 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         _ <- markTransactionFailed
         releaseAsset <- releaseAsset
         (toAccountID, fromAccountID) <- getIDs(releaseAsset)
-      } yield {
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

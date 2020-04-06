@@ -46,6 +46,22 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def findNotificationsByAccountIdAndNotificationIDs(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.id inSet ids).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === status).length.result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -97,6 +113,10 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false))
 
     def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit)
+
+    def getTradeRoomNotifications(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIdAndNotificationIDs(accountID = accountID, ids, offset = offset, limit = limit)
+
+    def getTradersNotifications(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = offset, limit = limit)
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 
