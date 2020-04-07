@@ -353,6 +353,7 @@ POST        /master/updateAssetDocumentStatus                            control
 GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])
 POST        /master/issueAsset                                           controllers.IssueAssetController.issueAsset
 
+GET         /master/comet                                                controllers.ComponentViewController.comet
 GET         /master/accountComet                                         controllers.ComponentViewController.accountComet
 GET         /master/assetComet                                           controllers.ComponentViewController.assetComet
 GET         /master/fiatComet                                            controllers.ComponentViewController.fiatComet

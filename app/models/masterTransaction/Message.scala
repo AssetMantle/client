@@ -21,8 +21,6 @@ import scala.util.{Failure, Success}
 
 case class Message(id: String, fromAccountID: String, chatID: String, text: String, replyToID: Option[String], createdAt: Timestamp)
 
-case class MessageCometMessage(username: String, message: JsValue)
-
 @Singleton
 class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 

@@ -88,6 +88,14 @@
                                 }
                                 case _ => {}
                             }
+                            <script type="text/javascript">
+                                var cometMessage = function (message) {
+                                    cometMessageHandler(message);
+                                }
+                            </script>
+                            <iframe class="hidden" src="@routes.ComponentViewController.cometMessage()"></iframe>
+
+
                             <li class="notificationDropdown">
                                 <a onclick="componentResource('mobileNotificationSection', jsRoutes.controllers.NotificationController.notificationPage(0))">
                                     @Messages(constants.Form.INBOX)

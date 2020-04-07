@@ -1,5 +1,6 @@
-function cometJSParser(response){
-    let a = JSON.parse(JSON.stringify(response));
+function cometMessageHandler(message){
+    let parsedMessage = JSON.parse(JSON.stringify(message));
+
 }
 
 function comet(source, route){

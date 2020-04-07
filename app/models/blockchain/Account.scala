@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainAccountActor, ShutdownActor}
+import actors.{MainActor, ShutdownActor}
 import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
@@ -22,8 +22,6 @@ import scala.util.{Failure, Success}
 
 case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
-case class AccountCometMessage(username: String, message: JsValue)
-
 @Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
@@ -35,15 +33,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ACCOUNT
 
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   import databaseConfig.profile.api._
 
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
-  val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
@@ -144,13 +136,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
-    def accountCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainAccountActor ! actors.CreateAccountChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
+
   }
 
   object Utility {
