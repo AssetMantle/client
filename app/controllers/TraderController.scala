@@ -1,7 +1,7 @@
 package controllers
 
 import actors.ShutdownActor
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction}
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -34,6 +34,7 @@ class TraderController @Inject()(
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
                                   transactionsSetACL: transactions.SetACL,
                                   blockchainAclHashes: blockchain.ACLHashes,
+                                  withZoneLoginAction: WithZoneLoginAction,
                                 )
                                 (implicit
                                  executionContext: ExecutionContext,
@@ -47,22 +48,62 @@ class TraderController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def organizationRejectTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
+  def organizationRejectRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.organizationRejectTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
   }
 
-  def organizationRejectTraderRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationRejectRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.organizationRejectTraderRequest(formWithErrors)))
         },
-        rejectTraderRequestData => {
-          val rejectTrader = masterTraders.Service.rejectTrader(rejectTraderRequestData.traderID)
+        organizationRejectRequestData => {
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+          val trader = masterTraders.Service.tryGet(organizationRejectRequestData.traderID)
+
+          def rejectTrader(organizationID: String, trader: Trader): Future[Int] = if (organizationID == trader.organizationID) {
+            masterTraders.Service.markRejected(id = organizationRejectRequestData.traderID, comment = organizationRejectRequestData.comment)
+          } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           (for {
-            _ <- rejectTrader
+            trader <- trader
+            organizationID <- organizationID
+            _ <- rejectTrader(organizationID = organizationID, trader = trader)
+            _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ORGANIZATION_REJECTED_TRADER_REQUEST, organizationRejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))
             result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REJECT_TRADER_REQUEST_SUCCESSFUL)))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def zoneRejectRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.zoneRejectTraderRequest(views.companion.master.RejectTraderRequest.form, traderID))
+  }
+
+  def zoneRejectRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.zoneRejectTraderRequest(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+        },
+        zoneRejectRequestData => {
+          val zoneID = masterZones.Service.tryGetID(loginState.username)
+          val trader = masterTraders.Service.tryGet(zoneRejectRequestData.traderID)
+
+          def rejectTrader(zoneID: String, trader: Trader): Future[Int] = if (zoneID == trader.zoneID) {
+            masterTraders.Service.markRejected(id = zoneRejectRequestData.traderID, comment = zoneRejectRequestData.comment)
+          } else throw new BaseException(constants.Response.UNAUTHORIZED)
+
+          (for {
+            trader <- trader
+            zoneID <- zoneID
+            _ <- rejectTrader(zoneID = zoneID, trader = trader)
+            _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ZONE_REJECTED_TRADER_REQUEST, zoneRejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_REJECT_TRADER_REQUEST_SUCCESSFUL)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

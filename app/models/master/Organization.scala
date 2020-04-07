@@ -16,7 +16,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
+case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, comment: Option[String] = None)
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -24,7 +24,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   val db = databaseConfig.db
   private[models] val organizationTable = TableQuery[OrganizationTable]
 
-  private def serialize(organization: Organization): OrganizationSerialized = OrganizationSerialized(id = organization.id, zoneID = organization.zoneID, accountID = organization.accountID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = organization.establishmentDate, email = organization.email, registeredAddress = Json.toJson(organization.registeredAddress).toString, postalAddress = Json.toJson(organization.postalAddress).toString, ubos = Option(Json.toJson(organization.ubos).toString), completionStatus = organization.completionStatus, verificationStatus = organization.verificationStatus)
+  private def serialize(organization: Organization): OrganizationSerialized = OrganizationSerialized(id = organization.id, zoneID = organization.zoneID, accountID = organization.accountID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = organization.establishmentDate, email = organization.email, registeredAddress = Json.toJson(organization.registeredAddress).toString, postalAddress = Json.toJson(organization.postalAddress).toString, ubos = Option(Json.toJson(organization.ubos).toString), completionStatus = organization.completionStatus, verificationStatus = organization.verificationStatus, comment = organization.comment)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -142,7 +142,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def getOrganizationsByZoneID(zoneID: String): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.verificationStatus.? === Option(true)).result)
 
-  private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(organizationTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
+  private def updateVerificationStatusAndCommentOnID(id: String, verificationStatus: Option[Boolean], comment: Option[String]): Future[Int] = db.run(organizationTable.filter(_.id === id).map(x => (x.verificationStatus.?, x.comment.?)).update((verificationStatus, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -152,7 +152,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateCompletionStatusOnID(id: String, completionStatus: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
+  private def updateCompletionStatusOnID(id: String, completionStatus: Boolean): Future[Int] = db.run(organizationTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -180,15 +180,15 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
+  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean, verificationStatus: Option[Boolean], comment: Option[String]) {
 
-    def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), ubos = utilities.JSON.convertJsonStringToObject[UBOs](ubos.getOrElse(Json.toJson(UBOs(Seq())).toString)), completionStatus = completionStatus, verificationStatus = verificationStatus)
+    def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), ubos = utilities.JSON.convertJsonStringToObject[UBOs](ubos.getOrElse(Json.toJson(UBOs(Seq())).toString)), completionStatus = completionStatus, verificationStatus = verificationStatus, comment = comment)
 
   }
 
   private[models] class OrganizationTable(tag: Tag) extends Table[OrganizationSerialized](tag, "Organization") {
 
-    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, email, registeredAddress, postalAddress, ubos.?, completionStatus, verificationStatus.?) <> (OrganizationSerialized.tupled, OrganizationSerialized.unapply)
+    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, email, registeredAddress, postalAddress, ubos.?, completionStatus, verificationStatus.?, comment.?) <> (OrganizationSerialized.tupled, OrganizationSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -213,6 +213,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def completionStatus = column[Boolean]("completionStatus")
 
     def verificationStatus = column[Boolean]("verificationStatus")
+
+    def comment = column[String]("comment")
 
   }
 
@@ -260,11 +262,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
-    def rejectOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(false))
+    def markRejected(id: String, comment: Option[String]): Future[Int] = updateVerificationStatusAndCommentOnID(id = id, verificationStatus = Option(false), comment = comment)
 
-    def verifyOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
+    def markAccepted(id: String): Future[Int] = updateVerificationStatusAndCommentOnID(id = id, verificationStatus = Option(true), comment = None)
 
-    def getAccountId(id: String): Future[String] = getAccountIDByID(id)
+    def tryGetAccountID(id: String): Future[String] = getAccountIDByID(id)
 
     def getAcceptedOrganizationsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(true)).map { organizations => organizations.map(_.deserialize) }
 

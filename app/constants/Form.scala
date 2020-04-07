@@ -33,8 +33,8 @@ object Form {
   val USER_ADD_UBO = new Form("USER_ADD_UBO", routes.AddOrganizationController.userAddUBO(), routes.javascript.AddOrganizationController.userAddUBOForm)
   val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail(), routes.javascript.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm)
   val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest(), routes.javascript.AddOrganizationController.userReviewAddOrganizationRequestForm)
-  val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization(), routes.javascript.AddOrganizationController.verifyOrganizationForm)
-  val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest(), routes.javascript.AddOrganizationController.rejectVerifyOrganizationRequestForm)
+  val ACCEPT_ORGANIZATION_REQUEST = new Form("ACCEPT_ORGANIZATION_REQUEST", routes.AddOrganizationController.acceptRequest(), routes.javascript.AddOrganizationController.acceptRequestForm)
+  val REJECT_ORGANIZATION_REQUEST = new Form("REJECT_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectRequest(), routes.javascript.AddOrganizationController.rejectRequestForm)
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization(), routes.javascript.AddOrganizationController.blockchainAddOrganizationForm)
 
   //AssetController
@@ -141,7 +141,6 @@ object Form {
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader(), routes.javascript.SetACLController.addTraderForm)
   val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest(), routes.javascript.SetACLController.userReviewAddTraderRequestForm)
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
-  val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest(), routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL(), routes.javascript.SetACLController.blockchainSetACLForm)
 
@@ -154,7 +153,8 @@ object Form {
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback(), routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm)
 
   //TraderController
-  val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectTraderRequest(), routes.javascript.TraderController.organizationRejectTraderRequestForm)
+  val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectRequest(), routes.javascript.TraderController.organizationRejectRequestForm)
+  val ZONE_REJECT_TRADER_REQUEST = new Form("ZONE_REJECT_TRADER_REQUEST", routes.TraderController.zoneRejectRequest(), routes.javascript.TraderController.zoneRejectRequestForm)
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
 

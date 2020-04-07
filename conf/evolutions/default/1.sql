@@ -485,21 +485,21 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
-    "id"               VARCHAR NOT NULL,
-    "ownerID"          VARCHAR NOT NULL,
-    "ticketID"         VARCHAR,
-    "pegHash"          VARCHAR,
-    "assetType"        VARCHAR NOT NULL,
-    "description"      VARCHAR NOT NULL,
-    "documentHash"     VARCHAR NOT NULL UNIQUE,
-    "quantity"         INT     NOT NULL,
-    "quantityUnit"     VARCHAR NOT NULL,
-    "price"            INT     NOT NULL,
-    "moderated"        BOOLEAN NOT NULL,
-    "shippingPeriod"   INT     NOT NULL,
-    "portOfLoading"    VARCHAR NOT NULL,
-    "portOfDischarge"  VARCHAR NOT NULL,
-    "status"           VARCHAR NOT NULL,
+    "id"              VARCHAR NOT NULL,
+    "ownerID"         VARCHAR NOT NULL,
+    "ticketID"        VARCHAR,
+    "pegHash"         VARCHAR,
+    "assetType"       VARCHAR NOT NULL,
+    "description"     VARCHAR NOT NULL,
+    "documentHash"    VARCHAR NOT NULL UNIQUE,
+    "quantity"        INT     NOT NULL,
+    "quantityUnit"    VARCHAR NOT NULL,
+    "price"           INT     NOT NULL,
+    "moderated"       BOOLEAN NOT NULL,
+    "shippingPeriod"  INT     NOT NULL,
+    "portOfLoading"   VARCHAR NOT NULL,
+    "portOfDischarge" VARCHAR NOT NULL,
+    "status"          VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -582,6 +582,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "ubos"               VARCHAR,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "comment"            VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -629,6 +630,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "name"               VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "comment"            VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -821,7 +823,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
     "notificationID" VARCHAR NOT NULL,
-    "negotiationID"    VARCHAR NOT NULL,
+    "negotiationID"  VARCHAR NOT NULL,
     PRIMARY KEY ("notificationID", "negotiationID")
 );
 

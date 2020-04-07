@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
+case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, comment: Option[String] = None)
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -148,7 +148,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def checkOrganizationIDTraderIDExists(traderID: String, organizationID: String): Future[Boolean] = db.run(traderTable.filter(_.id === traderID).filter(_.organizationID === organizationID).exists.result)
 
-  private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(traderTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
+  private def updateVerificationStatusAndCommentByID(id: String, verificationStatus: Option[Boolean], comment: Option[String]): Future[Int] = db.run(traderTable.filter(_.id === id).map(x => (x.verificationStatus.?, x.comment.?)).update((verificationStatus, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -168,19 +168,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def updateVerificationStatusOnAccountID(accountID: String, verificationStatus: Option[Boolean]) = db.run(traderTable.filter(_.accountID === accountID).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private[models] class TraderTable(tag: Tag) extends Table[Trader](tag, "Trader") {
 
-    def * = (id, zoneID, organizationID, accountID, name, completionStatus, verificationStatus.?) <> (Trader.tupled, Trader.unapply)
+    def * = (id, zoneID, organizationID, accountID, name, completionStatus, verificationStatus.?, comment.?) <> (Trader.tupled, Trader.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -195,6 +185,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def completionStatus = column[Boolean]("completionStatus")
 
     def verificationStatus = column[Boolean]("verificationStatus")
+
+    def comment = column[String]("comment")
 
   }
 
@@ -232,13 +224,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getOrganizationIDByAccountID(accountID: String): Future[String] = findOrganizationIDByAccountId(accountID)
 
-    def rejectTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(false))
+    def markAccepted(id: String): Future[Int] = updateVerificationStatusAndCommentByID(id = id, verificationStatus = Option(true), comment = None)
 
-    def verifyTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(true))
-
-    def rejectTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(false))
-
-    def verifyTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true))
+    def markRejected(id: String, comment: Option[String]): Future[Int] = updateVerificationStatusAndCommentByID(id = id, verificationStatus = Option(false), comment = comment)
 
     def tryGetAccountId(id: String): Future[String] = getAccountIdById(id)
 

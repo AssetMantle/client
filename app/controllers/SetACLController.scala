@@ -567,30 +567,6 @@ class SetACLController @Inject()(
       )
   }
 
-  def zoneRejectVerifyTraderRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneRejectVerifyTraderRequest(views.companion.master.RejectTraderRequest.form, traderID))
-  }
-
-  def zoneRejectVerifyTraderRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.zoneRejectVerifyTraderRequest(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
-        },
-        rejectVerifyTraderRequestData => {
-          val rejectTrader = masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
-
-          (for {
-            _ <- rejectTrader
-            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_REJECT_TRADER_REQUEST_SUCCESSFUL)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
   def organizationVerifyTraderForm(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.tryGet(traderID)

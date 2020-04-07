@@ -28,5 +28,5 @@
 
 @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organization.id}'")
 @if(constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(organizationBackgroundChecks.map(_.documentType)).isEmpty) {
-    @commonFormButton(constants.Form.VERIFY_ORGANIZATION, 'parameters -> s"'${organization.id}'")
+    @commonFormButton(constants.Form.ACCEPT_ORGANIZATION_REQUEST, 'parameters -> s"'${organization.id}'")
 }

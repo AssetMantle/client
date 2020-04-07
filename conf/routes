@@ -89,8 +89,11 @@ POST        /negotiation/acceptOrRejectNegotiationTerms                         
 
 GET         /contact                                                                        controllers.ContactController.contact
 
-GET         /trader/organizationRejectTraderRequest                                         controllers.TraderController.organizationRejectTraderRequestForm(traderID: String)
-POST        /trader/organizationRejectTraderRequest                                         controllers.TraderController.organizationRejectTraderRequest
+GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
+POST        /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequest
+
+GET         /trader/zoneRejectRequest                                                       controllers.TraderController.zoneRejectRequestForm(traderID: String)
+POST        /trader/zoneRejectRequest                                                       controllers.TraderController.zoneRejectRequest
 
 GET         /trader/traderRelationRequest                                                   controllers.TraderController.traderRelationRequestForm
 POST        /trader/traderRelationRequest                                                   controllers.TraderController.traderRelationRequest
@@ -254,8 +257,6 @@ GET         /master/zoneViewTraderKYCDocuments                                  
 GET         /master/updateTraderKYCDocumentZoneStatus                                       controllers.SetACLController.updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
 POST        /master/updateTraderKYCDocumentZoneStatus                                       controllers.SetACLController.updateTraderKYCDocumentZoneStatus
 GET         /master/zoneViewVerifyTraderRequests                                            controllers.SetACLController.zoneViewPendingVerifyTraderRequests
-GET         /master/zoneRejectVerifyTraderRequest                                           controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
-POST        /master/zoneRejectVerifyTraderRequest                                           controllers.SetACLController.zoneRejectVerifyTraderRequest
 
 GET         /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTrader
@@ -330,10 +331,10 @@ GET         /master/userReviewAddOrganizationRequest                            
 POST        /master/userReviewAddOrganizationRequest                                        controllers.AddOrganizationController.userReviewAddOrganizationRequest
 GET         /master/updateOrganizationKYCDocumentStatus                                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String)
 POST        /master/updateOrganizationKYCDocumentStatus                                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatus
-GET         /master/rejectVerifyOrganizationRequest                                         controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
-POST        /master/rejectVerifyOrganizationRequest                                         controllers.AddOrganizationController.rejectVerifyOrganizationRequest
-GET         /master/verifyOrganization                                                      controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String)
-POST        /master/verifyOrganization                                                      controllers.AddOrganizationController.verifyOrganization
+GET         /organization/rejectRequest                                                     controllers.AddOrganizationController.rejectRequestForm(organizationID: String)
+POST        /organization/rejectRequest                                                     controllers.AddOrganizationController.rejectRequest
+GET         /organization/acceptRequest                                                     controllers.AddOrganizationController.acceptRequestForm(organizationID: String)
+POST        /organization/acceptRequest                                                     controllers.AddOrganizationController.acceptRequest
 GET         /organizationUpload                                                             controllers.AddOrganizationController.uploadOrganizationKYCForm(documentType: String)
 POST        /organizationUpload/file                                                        controllers.AddOrganizationController.uploadOrganizationKYC(documentType: String)
 GET         /organizationUpload/storeFile                                                   controllers.AddOrganizationController.storeOrganizationKYC(name: String, documentType: String)

@@ -39,8 +39,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.userUpdateOrganizationKYC,
         routes.javascript.AddOrganizationController.userReviewAddOrganizationRequestForm,
         routes.javascript.AddOrganizationController.updateOrganizationKYCDocumentStatusForm,
-        routes.javascript.AddOrganizationController.verifyOrganizationForm,
-        routes.javascript.AddOrganizationController.rejectVerifyOrganizationRequestForm,
+        routes.javascript.AddOrganizationController.acceptRequestForm,
+        routes.javascript.AddOrganizationController.rejectRequestForm,
         routes.javascript.AddOrganizationController.viewOrganizationsInZone,
         routes.javascript.AddOrganizationController.viewOrganizationsInZoneForGenesis,
         routes.javascript.AddOrganizationController.blockchainAddOrganizationForm,
@@ -290,7 +290,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.viewTradersInOrganizationForGenesis,
         routes.javascript.SetACLController.zoneVerifyTraderForm,
         routes.javascript.SetACLController.organizationVerifyTraderForm,
-        routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm,
         routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetACLController.zoneViewKYCDocuments,
@@ -312,7 +311,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
         routes.javascript.TraderController.traderRelationRequestForm,
-        routes.javascript.TraderController.organizationRejectTraderRequestForm,
+        routes.javascript.TraderController.organizationRejectRequestForm,
+        routes.javascript.TraderController.zoneRejectRequestForm,
         routes.javascript.TraderController.organizationModifyTraderForm,
 
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
