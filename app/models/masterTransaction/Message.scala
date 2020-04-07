@@ -13,7 +13,6 @@ import scala.concurrent.duration._
 import actors.{ActorCreation, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import play.api.libs.json.{JsString, JsValue, Json, OWrites, Reads, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}

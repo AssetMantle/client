@@ -3,7 +3,6 @@ package models.blockchain
 import actors.{ActorCreation, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -35,13 +34,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
   import databaseConfig.profile.api._
 
   private[models] val fiatTable = TableQuery[FiatTable]
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 

@@ -3,7 +3,6 @@ package models.blockchain
 import actors.{ActorCreation, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -27,8 +26,6 @@ class Orders @Inject()(shutdownActors: ShutdownActor, actorCreation: ActorCreati
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
-
-
 
   private implicit val logger: Logger = Logger(this.getClass)
 

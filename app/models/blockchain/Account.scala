@@ -4,7 +4,6 @@ import actors.{ActorCreation, ShutdownActor}
 import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -33,9 +32,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ACCOUNT
 
-
   import databaseConfig.profile.api._
-
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 

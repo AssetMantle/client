@@ -3,7 +3,6 @@ package models.blockchain
 import actors.{ActorCreation, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -27,9 +26,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
