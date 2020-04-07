@@ -299,6 +299,11 @@ rightText {
   border-radius: 3px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
 
+.alretName {
+  font-weight: bold;
+  font-size: 14px;
+  font-family: "Oxygen", sans-serif; }
+
 .cmuk-accordion-buttons {
   background: #fff;
   padding: 10px; }

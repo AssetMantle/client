@@ -375,6 +375,11 @@ rightText {
   box-shadow: 0 5px 15px rgba(0,0,0,.08);
 }
 
+.alretName{
+  font-weight: bold;
+  font-size: $paragraphFontSizeMedium;
+  font-family: $fontFamilySecondary;
+}
 
 .cmuk-accordion-buttons{
   background: #fff;
