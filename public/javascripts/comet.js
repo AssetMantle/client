@@ -1,28 +1,42 @@
 function cometMessageHandler(message){
     let parsedMessage = JSON.parse(JSON.stringify(message));
-    console.log(parsedMessage);
-
     switch (parsedMessage.messageType) {
         case 'ASSET' :
-            comet('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+            if ($('#assetList').length) {
+                comet('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+            }
             break;
         case 'FIAT' :
-            $('#totalFiat').html(parsedMessage.messageContent.Fiat.ping);
-            comet('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
-            comet('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            if ($('#totalFiat').length) {
+                $('#totalFiat').html(parsedMessage.messageContent.ping);
+            }
+            if ($('#fiatList').length) {
+                comet('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
+            }
+            if ($('#traderFinancials').length) {
+                comet('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
             break;
         case 'ORDER':
-            comet('orderList', jsRoutes.controllers.ComponentViewController.orderList());
+            if ($('#orderList').length) {
+                comet('orderList', jsRoutes.controllers.ComponentViewController.orderList());
+            }
             break;
         case 'NEGOTIATION' :
-            comet('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-            comet('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+            if ($('#buyNegotiationList').length) {
+                comet('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
+            }
+            if ($('#sellNegotiationList').length) {
+                comet('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+            }
             break;
         case 'CHAT' :
-            comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.Message.chatID, 0));
+            if( $('#chatMessages').length ){
+                comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.chatID, 0));
+            }
             break;
         default :
-            console.log("Unhandled");
+            console.log("Unhandled Comet message", parsedMessage);
             break;
 
 
