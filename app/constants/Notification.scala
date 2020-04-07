@@ -13,6 +13,7 @@ class Notification(notificationType: String, sendEmail: Boolean, sendPushNotific
 }
 
 object Notification {
+
   private val EMAIL_PREFIX = "EMAIL"
   private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
   private val SMS_PREFIX = "SMS"
@@ -88,6 +89,19 @@ object Notification {
   val TERMS_UPDATED = new Notification(notificationType = "TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SALES_QUOTE_UPDATED = new Notification(notificationType = "SALES_QUOTE_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
+  val ASSET_ISSUED = new Notification(notificationType = "ASSET_ISSUED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_REQUEST_SENT = new Notification(notificationType = "NEGOTIATION_REQUEST_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ISSUE_ASSET_REQUEST_FAILED = new Notification(notificationType = "ISSUE_ASSET_REQUEST_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_REQUEST_SENT_FAILED = new Notification(notificationType = "NEGOTIATION_REQUEST_SENT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING = new Notification(notificationType = "NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_REQUEST_REJECTED = new Notification(notificationType = "NEGOTIATION_REQUEST_REJECTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val NEGOTIATION_UPDATED = new Notification(notificationType = "NEGOTIATION_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_UPDATE_FAILED = new Notification(notificationType = "NEGOTIATION_UPDATE_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_ACCEPTED = new Notification(notificationType = "NEGOTIATION_ACCEPTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_ASSET_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_ASSET_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

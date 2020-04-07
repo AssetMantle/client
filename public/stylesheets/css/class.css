@@ -543,6 +543,15 @@ rightText {
   color: #373E46; }
 .comdex .errorInput {
   border: 1px solid red; }
+.comdex .cmuk-panel-scrollable {
+  resize: none;
+  max-height: 100px;
+  padding: 0px; }
+.comdex .panelHeader {
+  font-size: 14px;
+  font-family: "Oxygen", sans-serif;
+  font-weight: normal;
+  color: #272829; }
 
 .header {
   background: #053C75; }
@@ -1568,7 +1577,7 @@ header:before,
 .switcherViewCard {
   margin-bottom: 20px; }
   .switcherViewCard .cmuk-card-header {
-    padding: 0px 15px;
+    padding: 15px 20px;
     font-family: "Oxygen", sans-serif; }
   .switcherViewCard .cmuk-card-body {
     overflow: auto;
@@ -1603,7 +1612,7 @@ header:before,
     margin-left: 0px;
     border-bottom: 1px solid #0862BE; }
     .salesQuoteList .cmuk-card-body .cmuk-subnav li {
-      width: 50%;
+      width: 25%;
       text-align: center;
       padding: 0;
       font-family: "Oxygen", sans-serif; }
@@ -1614,6 +1623,8 @@ header:before,
     color: #FFffff; }
   .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > * > :first-child {
     color: #0862BE; }
+  .salesQuoteList .cmuk-card-body .cmuk-card {
+    margin-bottom: 10px; }
 
 .profileContainer .infoRow {
   font-size: 14px;
@@ -1739,22 +1750,40 @@ dl .info {
   .commonCheckBox dl {
     display: flex; }
 
-.identificationDetails .cmuk-card-body, .traderRelationList .cmuk-card-body {
+.tradeList .cmuk-card-header {
+  padding: 15px 20px;
+  font-family: "Oxygen", sans-serif; }
+.tradeList .cmuk-card-body .cmuk-card {
+  margin-bottom: 10px; }
+
+.identificationDetails .cmuk-card-body,
+.traderRelationList .cmuk-card-body,
+.tradeList .cmuk-card-body {
   padding-top: 5px; }
-.identificationDetails .cmuk-subnav, .traderRelationList .cmuk-subnav {
+.identificationDetails .cmuk-subnav,
+.traderRelationList .cmuk-subnav,
+.tradeList .cmuk-subnav {
   margin-left: 0px;
   border-bottom: 1px solid #0862BE; }
-  .identificationDetails .cmuk-subnav li, .traderRelationList .cmuk-subnav li {
+  .identificationDetails .cmuk-subnav li,
+  .traderRelationList .cmuk-subnav li,
+  .tradeList .cmuk-subnav li {
     width: 50%;
     text-align: center;
     padding: 0;
     font-family: "Oxygen", sans-serif; }
-    .identificationDetails .cmuk-subnav li a, .traderRelationList .cmuk-subnav li a {
+    .identificationDetails .cmuk-subnav li a,
+    .traderRelationList .cmuk-subnav li a,
+    .tradeList .cmuk-subnav li a {
       font-size: 12px; }
-.identificationDetails .cmuk-subnav-pill > .cmuk-active > a, .traderRelationList .cmuk-subnav-pill > .cmuk-active > a {
+.identificationDetails .cmuk-subnav-pill > .cmuk-active > a,
+.traderRelationList .cmuk-subnav-pill > .cmuk-active > a,
+.tradeList .cmuk-subnav-pill > .cmuk-active > a {
   background-color: #0862BE;
   color: #FFffff; }
-.identificationDetails .cmuk-subnav-pill > * > :first-child, .traderRelationList .cmuk-subnav-pill > * > :first-child {
+.identificationDetails .cmuk-subnav-pill > * > :first-child,
+.traderRelationList .cmuk-subnav-pill > * > :first-child,
+.tradeList .cmuk-subnav-pill > * > :first-child {
   color: #0862BE; }
 
 .traderRelationList .cmuk-card-header {
@@ -1763,7 +1792,16 @@ dl .info {
 .organizationDetails .cmuk-card-body .cmuk-card-default, .organizationUbos .cmuk-card-body .cmuk-card-default {
   margin-bottom: 5px; }
 
-.paymentTermsForm .commonCheckBox dl {
-  margin-bottom: 0px; }
+.cmuk-panel {
+  padding: 0px;
+  margin-bottom: 10px; }
+  .cmuk-panel ul li {
+    font-size: 14px;
+    font-family: "Oxygen", sans-serif;
+    color: #272829;
+    text-align: left;
+    cursor: pointer;
+    padding: 10px;
+    background: #e7eaf3; }
 
 /*# sourceMappingURL=class.css.map */

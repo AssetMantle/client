@@ -24,7 +24,7 @@
                     <div class="messageContent cmuk-text-right replytoMessage">
                         <p id=@Seq(replyToMessageID, message.id).mkString("")></p>
                         <script>
-                                 replyMessage(jsRoutes.controllers.TradeRoomController.replyToMessage('@message.chatID', '@replyToMessageID'), '@message.id')
+                                 replyMessage(jsRoutes.controllers.ChatController.replyToMessage('@message.chatID', '@replyToMessageID'), '@message.id')
                         </script>
                     </div>
                 }

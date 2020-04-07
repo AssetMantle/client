@@ -58,6 +58,8 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
+  private def checkByFromIDToIDAndStatus(id: String, status: Option[Boolean]): Future[Boolean] = db.run(traderRelationTable.filter(_.id === id).filter(_.status.? === status).exists.result)
+
   private def findAllByFromIDOrToIDAndStatus(id: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(relation => relation.fromID === id || relation.toID === id).filter(_.status.? === status).result)
 
   private def findAllByFromIDAndStatus(fromID: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(_.fromID === fromID).filter(_.status.? === status).result)
@@ -100,7 +102,9 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def markRejected(fromID: String, toID: String): Future[Int] = deleteByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
 
-    def listOfAllCounterParties(id: String)=findAllByFromIDOrToIDAndStatus(id = id, status = Option(true)).map(_.map(tradeRelation=> if(tradeRelation.fromID==id) tradeRelation.toID else tradeRelation.fromID))
+    def getAllCounterParties(id: String): Future[Seq[String]] = findAllByFromIDOrToIDAndStatus(id = id, status = Option(true)).map(_.map(tradeRelation => if (tradeRelation.fromID == id) tradeRelation.toID else tradeRelation.fromID))
+
+    def checkRelationExists(fromID: String, toID: String): Future[Boolean] = checkByFromIDToIDAndStatus(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID), status = Option(true))
   }
 
 }

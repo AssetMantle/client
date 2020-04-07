@@ -1,12 +1,11 @@
-@import controllers.actions.LoginState
 @import views.html.base._
 @import views.companion.master.SendMessage
-
 @import views.html.helper.form
 @import views.html.helper.CSRF
-@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-@form(action = constants.Form.SEND_CHAT.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
+@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@form(action = constants.Form.SEND_MESSAGE.route, 'onkeypress -> "submitChatOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         @CSRF.formField
         <div style="position: relative">

@@ -52,7 +52,7 @@ class TraderController @Inject()(
         },
         traderRelationRequestData => {
 
-          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.getByAccountID(accountID)
+          def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
 

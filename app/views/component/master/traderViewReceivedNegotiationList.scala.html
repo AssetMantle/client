@@ -1,0 +1,36 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(receivedNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@receivedNegotiationList.map { receivedNegotiation =>
+    @commonInfoBox() {
+        @defining(counterPartyTraders.filter(_.id == receivedNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.Form.TRADER_ID, receivedNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @defining(assets.filter(_.id == receivedNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
+            @rejectedNegotiationAsset match {
+                case Some(asset) => {
+                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.ASSET_ID, receivedNegotiation.assetID)
+                }
+            }
+        }
+        @commonIntInfo(constants.View.PRICE, receivedNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(receivedNegotiation.quantity.toString(), receivedNegotiation.quantityUnit).mkString(" "))
+        @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiation.id}'")
+        @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiation.id}'")
+    }
+}

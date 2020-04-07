@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.masterTransaction.Message
-@import models.masterTransaction.MessageReceive
+@import models.masterTransaction.MessageRead
 @import views.html.component.master.messageBox
 
-@(messages: Seq[Message], readMessages: Seq[MessageReceive], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(messages: Seq[Message], readMessages: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 <div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatID')" >@Messages(constants.View.LOAD_MORE_CHATS)</a></div>
 @for(message <- messages.reverse) {

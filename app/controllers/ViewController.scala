@@ -14,7 +14,33 @@ import queries.GetAccount
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYC: master.OrganizationKYCs, masterTraderKYC: master.TraderKYCs, withLoginAction: WithLoginAction, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ViewController @Inject()(
+                                messagesControllerComponents: MessagesControllerComponents,
+                                masterAccountKYC: master.AccountKYCs,
+                                masterAccountFile: master.AccountFiles,
+                                masterZoneKYC: master.ZoneKYCs,
+                                masterOrganizationKYC: master.OrganizationKYCs,
+                                masterTraderKYC: master.TraderKYCs,
+                                withLoginAction: WithLoginAction,
+                                withTraderLoginAction: WithTraderLoginAction,
+                                withZoneLoginAction: WithZoneLoginAction,
+                                withOrganizationLoginAction: WithOrganizationLoginAction,
+                                withGenesisLoginAction: WithGenesisLoginAction,
+                                masterAccounts: master.Accounts,
+                                blockchainAclAccounts: ACLAccounts,
+                                blockchainZones: blockchain.Zones,
+                                blockchainOrganizations: blockchain.Organizations,
+                                blockchainAssets: blockchain.Assets,
+                                blockchainFiats: blockchain.Fiats,
+                                blockchainNegotiations: blockchain.Negotiations,
+                                masterOrganizations: master.Organizations,
+                                masterZones: master.Zones,
+                                blockchainAclHashes: blockchain.ACLHashes,
+                                blockchainOrders: blockchain.Orders,
+                                getAccount: GetAccount,
+                                blockchainAccounts: blockchain.Accounts,
+                                withUsernameToken: WithUsernameToken
+                              )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -83,37 +109,46 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def profile: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok(views.html.profile())
-      }.recover {
+      (for {
+        result <- withUsernameToken.Ok(views.html.profile())
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def account: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok(views.html.account())
-      }.recover {
+      (for {
+        result <- withUsernameToken.Ok(views.html.account())
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def dashboard: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok(views.html.dashboard())
-      }.recover {
+      (for {
+        result <- withUsernameToken.Ok(views.html.dashboard())
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def trades: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok(views.html.trades())
-      }.recover {
+      (for {
+        result <- withUsernameToken.Ok(views.html.trades())
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def tradeRoom(id: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.tradeRoom(id))
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 }

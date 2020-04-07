@@ -3,6 +3,7 @@
 
 @(items: ListMap[String, Any], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
+<script src="@routes.Assets.versioned("javascripts/switcher.js")" type="text/javascript"></script>
 <div>
     <div cmuk-grid>
         <div class="cmuk-width-auto@@m">
@@ -10,15 +11,15 @@
                 @for((itemHeader, itemValue) <- items) {
                     @itemValue match {
                         case html: Html => {
-                            <li><a href="#">@Messages(itemHeader)</a></li>
+                            <li><a id="switcherHeader@itemHeader" href="#">@Messages(itemHeader)</a></li>
                         }
                         case route: JavaScriptReverseRoute => {
                             @defining(utilities.String.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
-                                <li><a href="#" onclick="componentResource('switcher@itemHeader', @jsRoute)">@Messages(itemHeader)</a></li>
+                                <li><a id="switcherHeader@itemHeader" href="#" onclick="componentResource('switcherContent@itemHeader', @jsRoute)">@Messages(itemHeader)</a></li>
                             }
                         }
                         case _ => {
-                            <li><a href="#">@Messages(itemHeader)</a></li>
+                            <li><a id="switcherHeader@itemHeader" href="#">@Messages(itemHeader)</a></li>
                         }
                     }
                 }
@@ -29,19 +30,17 @@
             @for((itemHeader, itemValue) <- items) {
                 @itemValue match {
                     case html: Html => {
-                        <li id="switcher@itemHeader">@itemValue</li>
+                        <li id="switcherContent@itemHeader">@itemValue</li>
                     }
                     case route: JavaScriptReverseRoute => {
-                        <li id="switcher@itemHeader">
-                        @defining(utilities.String.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
+                        <li id="switcherContent@itemHeader">
                             <script>
-                                    componentResource('switcher@itemHeader', @jsRoute)
+                                loadSwitcherContent('switcherHeader@itemHeader');
                             </script>
-                        }
                         </li>
                     }
                     case _ => {
-                        <li id="switcher@itemHeader">@itemValue.toString</li>
+                        <li id="switcherContent@itemHeader">@itemValue.toString</li>
                     }
                 }
             }

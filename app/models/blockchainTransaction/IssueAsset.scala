@@ -1,11 +1,11 @@
 package models.blockchainTransaction
 
 import java.net.ConnectException
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.master.{Asset, Negotiation}
 import models.masterTransaction.IssueAssetRequest
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
@@ -25,9 +25,8 @@ case class IssueAsset(from: String, to: String, documentHash: String, assetType:
   def mutateTicketID(newTicketID: String): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, gas = gas, takerAddress = takerAddress, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
-class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterAssets: master.Assets, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets, blockchainAccounts: blockchain.Accounts, masterNegotiations: master.Negotiations, masterTraders: master.Traders)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -188,58 +187,73 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def responseAccount(issueAsset: IssueAsset): Future[AccountResponse.Response] = getAccount.Service.get(issueAsset.to)
+      def responseAccount(toAddress: String): Future[AccountResponse.Response] = getAccount.Service.get(toAddress)
 
-      val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
+      val asset = masterAssets.Service.tryGetByTicketID(ticketID)
 
-      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) = {
+      def negotiations(assetID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
+
+      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, asset: Asset, issueAsset: IssueAsset, negotiations: Seq[Negotiation]) = {
         responseAccount.value.assetPegWallet match {
-          case Some(assets) => Future.sequence {
-            assets.map { asset =>
-              val upsert = blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
+          case Some(bcAssets) => Future.sequence {
+            bcAssets.map { bcAsset =>
+              val upsert = blockchainAssets.Service.insertOrUpdate(pegHash = bcAsset.pegHash, documentHash = bcAsset.documentHash, assetType = bcAsset.assetType, assetPrice = bcAsset.assetPrice, assetQuantity = bcAsset.assetQuantity, quantityUnit = bcAsset.quantityUnit, locked = bcAsset.locked, moderated = bcAsset.moderated, takerAddress = if (bcAsset.takerAddress == "") null else Option(bcAsset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
 
-              def markListedForTradeAndUpdateStatus: Future[Any] = if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
-                val createAssetAndMarkListedForTrade = masterAssets.Service.create(asset.pegHash, status = constants.Status.Asset.LISTED_FOR_TRADE)
-                val updateVerificationStatus = masterTransactionIssueAssetRequests.Service.updatePegHashAndVerificationStatus(ticketID, asset.pegHash, true)
-                for {
-                  _ <- createAssetAndMarkListedForTrade
-                  _ <- updateVerificationStatus
-                } yield {}
-              } else Future {}
+              def markAssetIssued: Future[Int] = {
+                if (asset.documentHash == bcAsset.documentHash) {
+                  masterAssets.Service.markIssuedByID(id = asset.id, pegHash = bcAsset.pegHash)
+                } else {
+                  Future(0)
+                }
+              }
 
               for {
                 _ <- upsert
-                _ <- markListedForTradeAndUpdateStatus
-              } yield {}
+                _ <- markAssetIssued
+              } yield Future()
             }
           }
-          case None => Future {}
+          case None => Future()
         }
       }
 
+      def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-      def markDirty(issueAsset: IssueAsset): Future[Int] = blockchainAccounts.Service.markDirty(issueAsset.from)
+      def updateNegotiationStatus(negotiations: Seq[Negotiation], asset: Asset): Future[Int] = {
+        negotiations.map { negotiation =>
+          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING || negotiation.status == constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET) {
+            val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
 
-      def getIDs(issueAsset: IssueAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(issueAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
+            for {
+              _ <- markStatusRequestSent
+              sellerAccountID <- getIDByTraderID(negotiation.sellerTraderID)
+              buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
+              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
+            } yield Unit
+          }
+        }
+        Future(0)
       }
+
+      def markAccountDirty(from: String): Future[Int] = blockchainAccounts.Service.markDirty(from)
+
+      def getIDByAddress(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionSuccessful
         issueAsset <- issueAsset
-        responseAccount <- responseAccount(issueAsset)
-        assetRequest <- assetRequest
-        _ <- insertOrUpdate(responseAccount, assetRequest, issueAsset)
-        _ <- markDirty(issueAsset)
-        (toAccountID, fromAccountID) <- getIDs(issueAsset)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+        responseAccount <- responseAccount(issueAsset.to)
+        asset <- asset
+        negotiations <- negotiations(asset.id)
+        _ <- updateNegotiationStatus(negotiations, asset)
+        _ <- insertOrUpdate(responseAccount = responseAccount, asset = asset, issueAsset = issueAsset, negotiations = negotiations)
+        _ <- markAccountDirty(issueAsset.from)
+        fromAccountID <- getIDByAddress(issueAsset.from)
+        toAccountID <- getIDByAddress(issueAsset.to)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
+        _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString()) else Future(None)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -249,25 +263,45 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
     def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueAsset = Service.getTransaction(ticketID)
-      val markFailed = masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
+      val asset = masterAssets.Service.tryGetByTicketID(ticketID)
 
-      def getIDs(issueAsset: IssueAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(issueAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
+      def markIssueAssetRejected(assetID: String): Future[Int] = masterAssets.Service.markIssueAssetRejected(assetID)
+
+      def getIDByAddress(address: String): Future[String] = masterAccounts.Service.getId(address)
+
+      def negotiations(assetID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
+
+      def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+
+      def updateNegotiationStatus(negotiations: Seq[Negotiation], asset: Asset): Future[Int] = {
+        negotiations.map { negotiation =>
+          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING || negotiation.status == constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET) {
+            val markStatusIssueAssetRequestFailed = masterNegotiations.Service.markStatusIssueAssetRequestFailed(negotiation.id)
+
+            for {
+              _ <- markStatusIssueAssetRequestFailed
+              sellerAccountID <- getIDByTraderID(negotiation.sellerTraderID)
+              buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT_FAILED, asset.description, asset.assetType)
+              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT_FAILED, asset.description, asset.assetType)
+            } yield Unit
+          }
+        }
+        Future(0)
       }
 
       (for {
         _ <- markTransactionFailed
-        _ <- markFailed
         issueAsset <- issueAsset
-        (toAccountID, fromAccountID) <- getIDs(issueAsset)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      } yield {}).recover {
+        asset <- asset
+        negotiations <- negotiations(asset.id)
+        _ <- updateNegotiationStatus(negotiations = negotiations, asset = asset)
+        _ <- markIssueAssetRejected(asset.id)
+        fromAccountID <- getIDByAddress(issueAsset.from)
+        toAccountID <- getIDByAddress(issueAsset.to)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
+        _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString()) else Future(None)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

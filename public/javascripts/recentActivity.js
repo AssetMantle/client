@@ -1,18 +1,17 @@
 function noActivity() {
-    if($(".recentActivityBox .notification").length==1){
+    if ($(".recentActivityBox .notification").length === 1) {
         $(".recentActivityBox").parent().html("<p class='cmuk-position-center'>No Activities Found</p>");
         $("head").append("<style>.timeline:before{height: 0%}</style>")
     }
 }
 
-function loadMoreActivities(notificationRoute, tradeRoomID = null) {
+function loadMoreActivities(notificationRoute, negotiationID = null) {
     let route;
-    console.log(tradeRoomID);
 
-    if(tradeRoomID==null) {
+    if (negotiationID === null) {
         route = notificationRoute(($(".recentActivityBox").length));
-    }else {
-        route = notificationRoute(($(".recentActivityBox").length), tradeRoomID);
+    } else {
+        route = notificationRoute(($(".recentActivityBox").length), negotiationID);
     }
     $.ajax({
         url: route.url,

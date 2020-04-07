@@ -698,6 +698,17 @@ rightText {
   .errorInput{
     border: 1px solid red;
   }
+  .cmuk-panel-scrollable{
+    resize: none;
+    max-height:100px;
+    padding: 0px;
+  }
+  .panelHeader{
+    font-size: $paragraphFontSizeMedium;
+    font-family: $fontFamilySecondary;
+    font-weight: normal;
+    color: #272829;;
+  }
 }
 
 .header{
@@ -2028,7 +2039,7 @@ header:before,
 .switcherViewCard {
   margin-bottom: 20px;
   .cmuk-card-header{
-    padding:0px 15px;
+    padding: 15px 20px;
     font-family: $fontFamilySecondary;
   }
   .cmuk-card-body{
@@ -2079,7 +2090,7 @@ header:before,
       margin-left:0px;
       border-bottom: 1px solid $colorPrimary;
       li{
-        width: 50%;
+        width: 25%;
         text-align: center;
         padding: 0;
         font-family: $fontFamilySecondary;
@@ -2094,6 +2105,9 @@ header:before,
     }
     .cmuk-subnav-pill>*>:first-child{
       color:$colorPrimary
+    }
+    .cmuk-card{
+      margin-bottom: 10px;
     }
   }
 }
@@ -2265,7 +2279,20 @@ dl .info {
   }
 }
 
-.identificationDetails, .traderRelationList{
+.tradeList{
+  .cmuk-card-header{
+    padding: 15px 20px;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-card-body{
+    .cmuk-card{
+      margin-bottom: 10px;
+    }
+  }
+}
+.identificationDetails,
+.traderRelationList,
+.tradeList{
   .cmuk-card-body{
     padding-top: 5px;
   }
@@ -2303,8 +2330,24 @@ dl .info {
   }
 }
 
-.paymentTermsForm{
-  .commonCheckBox dl{
-    margin-bottom: 0px;
+//.paymentTermsForm{
+//  .commonCheckBox dl{
+//    margin-bottom: 0px;
+//  }
+//}
+
+.cmuk-panel{
+  padding: 0px;
+  margin-bottom: 10px;
+  ul{
+    li{
+      font-size:$paragraphFontSizeMedium;
+      font-family: $fontFamilySecondary;
+      color: #272829;
+      text-align: left;
+      cursor: pointer;
+      padding: 10px;
+      background: #e7eaf3;
+    }
   }
 }
