@@ -7,6 +7,9 @@
 @(confirmBidForm: Form[ConfirmBid.Data] = ConfirmBid.form, negotiation: Negotiation, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_SELLER_BID, confirmBidForm) {
 
+    @commonTextInfo(constants.Form.BUYER_ID, negotiation.buyerTraderID)
+    @commonIntInfo(constants.FormField.BID.name, negotiation.price)
+    @commonTextInfo(constants.FormField.ASSET_ID.name, negotiation.assetID)
     <span class="red">@Messages(constants.Form.BUYER_ID)</span> : @negotiation.buyerTraderID <br>
     <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.price <br>
     <span class="red">@Messages(constants.FormField.ASSET_ID.name)</span> : @negotiation.assetID <br>

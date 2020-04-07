@@ -21,13 +21,13 @@
         }
         </ul>
     }
-    <span class="red">@Messages(constants.FormField.STATUS.name):</span>
+    <div class="cmuk-text-left title">@Messages(constants.FormField.STATUS.name):</div>
     @traderRelation.status match {
         case Some(status: Boolean) => {
             @if(status) {
-                <span cmuk-icon="check"></span>
+                <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
             } else {
-                <span cmuk-icon="close"></span>
+                <span class="cmuk-badge rejected">@Messages(constants.View.NOT_VERIFIED)</span>
             }
         }
         case None => {

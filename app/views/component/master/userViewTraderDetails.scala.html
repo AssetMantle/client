@@ -7,26 +7,23 @@
 @(trader: Trader, organization: Organization, traderKYCs: Seq[TraderKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div>
-    <span>@Messages(constants.Form.TRADER_DETAILS)</span>
-    <br>
-        @commonTextInfo(constants.View.NAME, trader.name)
-        @commonTextInfo(constants.View.TRADER_ID, trader.id)
-        @commonBooleanInfo(constants.Form.VERIFIED_STATUS, trader.verificationStatus)
+    <div class="cmuk-text-left title"> <span>@Messages(constants.Form.TRADER_DETAILS)</span></div>
+    @commonTextInfo(constants.View.NAME, trader.name)
+    @commonTextInfo(constants.View.TRADER_ID, trader.id)
+    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, trader.verificationStatus)
 </div>
 <div>
-    <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span>
-    <br>
-        @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
-        @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-        @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
-        @commonTextInfo(constants.View.REGISTERED_ADDRESS, Seq(organization.registeredAddress.addressLine1, organization.registeredAddress.addressLine2, organization.registeredAddress.landmark.getOrElse(""), Seq(organization.registeredAddress.city, organization.registeredAddress.zipCode).mkString(" - "), organization.registeredAddress.country).mkString(",\n"))
-        @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
-        @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
-        @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+    <div class="cmuk-text-left title"><span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
+    @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
+    @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+    @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+    @commonTextInfo(constants.View.REGISTERED_ADDRESS, Seq(organization.registeredAddress.addressLine1, organization.registeredAddress.addressLine2, organization.registeredAddress.landmark.getOrElse(""), Seq(organization.registeredAddress.city, organization.registeredAddress.zipCode).mkString(" - "), organization.registeredAddress.country).mkString(",\n"))
+    @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
+    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
+    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
 </div>
 <div>
-    <span>@Messages(constants.View.TRADER_DOCUMENTS)</span>
-    <br>
+    <div class="cmuk-text-left title"><span>@Messages(constants.View.TRADER_DOCUMENTS)</span></div>
     @for(traderKYC <- traderKYCs) {
         @commonDocumentViewer(traderKYC) {
             @routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)

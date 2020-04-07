@@ -8,38 +8,13 @@
 @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
-    <div class="cmuk-container headingSection">
-        <p class="cmuk-padding-large">@Messages(constants.View.INDEX_3)</p>
-    </div>
-
     <div class="tabsSection">
         <div class="cmuk-container">
             <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <p>@Messages(constants.View.TAB_TITLE)</p>
                 @commonVerticalSwitcher(ListMap(constants.View.INDEX_TRADERS_HEADER -> views.html.component.master.indexTraders(),
                     constants.View.INDEX_FINANCIERS_HEADER -> views.html.component.master.indexFinanciers(),
                     constants.View.INDEX_UNDERWRITERS_HEADER -> views.html.component.master.indexUnderwriters()))
-            </div>
-        </div>
-    </div>
-
-    <div class="contactSection">
-
-        <div class="cmuk-container">
-            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
-                <div>
-                    <div cmuk-grid class="cmuk-child-width-1-1 cmuk-child-width-1-4@@m">
-                        <h3>Contact Us</h3>
-                        <div>
-                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Email">
-                        </div>
-                        <div>
-                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Message">
-                        </div>
-                        <div>
-                            <button type="submit" class="cmuk-button cmuk-width-small ">Send</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

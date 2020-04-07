@@ -7,13 +7,15 @@
         justify-content: space-between;">
         <div>
             @if(arguments.toMap.get('cardIconPath).map(_.toString).isDefined) {
-                <span><img src='@routes.Assets.versioned(Asset(arguments.toMap.get('cardIconPath).map(_.toString).getOrElse("")))'></span>
+                <svg class="icon"><use xlink:href='@routes.Assets.versioned(Asset(arguments.toMap.get('cardIconPath).map(_.toString).getOrElse("")))'/></svg>
             }
-            <span class="headerFontSize cmuk-text-bold">@Messages(title)</span>
+            <span class="headerFontSize">@Messages(title)</span>
         </div>
         @headerContent
     </div>
+    <div class="scroller">
     <div class="cmuk-card-body cmuk-height-medium cmuk-overflow-auto">
         @content
+    </div>
     </div>
 </div>

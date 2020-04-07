@@ -5,7 +5,7 @@
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div>
-    @commonCard(constants.View.TRADER_RELATION_LIST) {
+        @commonCard(constants.View.TRADER_RELATION_LIST) {
         @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
     } {
         @commonHorizontalSwitcher(ListMap(constants.User.TRADER -> routes.javascript.ComponentViewController.acceptedTraderRelationList,

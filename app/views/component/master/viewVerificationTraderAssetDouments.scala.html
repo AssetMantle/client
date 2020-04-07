@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.AssetFile
 @import models.common.Serializable._
-
+@import views.html.base._
 @(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(file <- files) {
     @component.master.commonDocumentViewer(file) {
@@ -15,20 +15,20 @@
         <br>
         @file.documentContent match {
             case Some(oblContent: OBL) => {
-                <span class="red">@Messages(constants.FormField.BILL_OF_LADING_NUMBER.name)</span> : @oblContent.billOfLadingID <br>
-                <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @oblContent.portOfLoading <br>
-                <span class="red">@Messages(constants.FormField.SHIPPER_NAME.name)</span> : @oblContent.shipperName <br>
-                <span class="red">@Messages(constants.FormField.SHIPPER_ADDRESS.name)</span> : @oblContent.shipperAddress <br>
-                <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</span> : @oblContent.notifyPartyName <br>
-                <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name)</span> : @oblContent.notifyPartyAddress <br>
-                <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @oblContent.dateOfShipping <br>
-                <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @oblContent.deliveryTerm <br>
-                <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @oblContent.weightOfConsignment <br>
-                <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @oblContent.declaredAssetValue <br>
+                @commonTextInfo(constants.FormField.BILL_OF_LADING_NUMBER.name, oblContent.billOfLadingID)
+                @commonTextInfo(constants.FormField.PORT_OF_LOADING.name, oblContent.portOfLoading)
+                @commonTextInfo(constants.FormField.SHIPPER_NAME.name, oblContent.shipperName)
+                @commonTextInfo(constants.FormField.SHIPPER_ADDRESS.name, oblContent.shipperAddress)
+                @commonTextInfo(constants.FormField.NOTIFY_PARTY_NAME.name, oblContent.notifyPartyName)
+                @commonTextInfo(constants.FormField.NOTIFY_PARTY_ADDRESS.name, oblContent.notifyPartyAddress)
+                @commonDateInfo(constants.FormField.SHIPMENT_DATE.name, oblContent.dateOfShipping)
+                @commonTextInfo(constants.FormField.DELIVERY_TERM.name, oblContent.deliveryTerm)
+                @commonIntInfo(constants.FormField.DELIVERY_TERM.name, oblContent.weightOfConsignment)
+                @commonIntInfo(constants.FormField.ASSET_PRICE.name, oblContent.declaredAssetValue)
             }
             case Some(invoiceContent: Invoice) => {
-                <span class="red">@Messages(constants.FormField.INVOICE_NUMBER.name)</span> : @invoiceContent.invoiceNumber <br>
-                <span class="red">@Messages(constants.FormField.INVOICE_DATE.name)</span> : @invoiceContent.invoiceDate <br>
+                @commonTextInfo(constants.FormField.INVOICE_NUMBER.name, invoiceContent.invoiceNumber)
+                @commonDateInfo(constants.FormField.DELIVERY_TERM.name, invoiceContent.invoiceDate)
             }
             case Some(content) => {
                 <span>content</span>

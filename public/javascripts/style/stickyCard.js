@@ -1,6 +1,13 @@
-$(document).scroll(function () {
-    $(".sticky").css({
-        "position": "sticky",
-        "top": 50,
-    });
+$(document).ready(function () {
+    if ($(window).width() > 1200) {
+        $(".sticky").css({
+            "position": "sticky",
+            "top": 71,
+        })
+    } else {
+        $(".sticky").css({
+            "position": "static",
+            "top": 0,
+        })
+    }
 });

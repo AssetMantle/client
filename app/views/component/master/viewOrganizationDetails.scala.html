@@ -11,33 +11,41 @@
 @commonCard(constants.Form.ORGANIZATION_DETAILS) {
 } {
     <div>
-        <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span><br>
-        @commonTextInfo(constants.View.NAME, organization.name)
-        @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-        @commonTextInfo(constants.Form.ID, organization.id)
-        @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
-        @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+        @commonInfoBox() {
+            <div class="title"> <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
+            @commonTextInfo(constants.View.NAME, organization.name)
+            @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+            @commonTextInfo(constants.Form.ID, organization.id)
+            @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
+            @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+        }
+        @commonInfoBox() {
+            <div class="title"><span>@Messages(constants.View.REGISTERED_ADDRESS):</span></div>
+            @streetAddress(organization.registeredAddress)
+        }
+        @commonInfoBox() {
+            <div class="title"><span>@Messages(constants.View.POSTAL_ADDRESS):</span></div>
+            @streetAddress(organization.postalAddress)
+        }
 
-        <span>@Messages(constants.View.REGISTERED_ADDRESS):</span><br>
-        @streetAddress(organization.registeredAddress)
+        @commonInfoBox() {
+            <div class="title"><span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span></div>
+            @for(organizationKYC <- organizationKYCs) {
+                @commonDocumentViewer(organizationKYC) {
+                    @routes.FileController.file(organizationKYC.fileName, organizationKYC.documentType)
+                } {
+                    <a href="@routes.FileController.file(organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+                } {
 
-        <span>@Messages(constants.View.POSTAL_ADDRESS):</span><br>
-        @streetAddress(organization.postalAddress)
-
-        <span>@Messages(constants.View.ORGANIZATION_DOCUMENTS)</span><br>
-        @for(organizationKYC <- organizationKYCs) {
-            @commonDocumentViewer(organizationKYC) {
-                @routes.FileController.file(organizationKYC.fileName, organizationKYC.documentType)
-            } {
-                <a href="@routes.FileController.file(organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
-            } {
-
+                }
             }
         }
 
-        <span>@Messages(constants.Form.ZONE_DETAILS)</span><br>
-        @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
-        @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
-        @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+        @commonInfoBox() {
+            <div class="title"><span>@Messages(constants.Form.ZONE_DETAILS)</span></div>
+            @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
+            @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
+            @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+        }
     </div>
 }

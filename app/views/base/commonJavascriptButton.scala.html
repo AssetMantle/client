@@ -1,6 +1,6 @@
 @(name: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
-<button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("cmuk-button-primary cmuk-button-small")).mkString(" ")'  onclick="@function">
+<button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("buttonForm")).mkString(" ")'  onclick="@function">
 @Messages(name)
 </button>
 
