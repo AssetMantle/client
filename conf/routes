@@ -433,7 +433,6 @@ GET         /chat/sendMessage                                                   
 POST        /chat/sendMessage                                                               controllers.ChatController.sendMessage
 GET         /chat/markChatAsRead                                                            controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
-GET         /chat/comet                                                                     controllers.ChatController.sendMessageComet(chatID: String)
 
 POST        /wu/rtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect

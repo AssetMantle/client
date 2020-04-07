@@ -54,12 +54,6 @@
                 </div>
                 <div class="cmuk-accordion-content">
                     <div id="assetList" class="flexContainer"></div>
-                        <script type="text/javascript">
-                                var assetCometMessage = function (event) {
-                                    console.log(event.toString());
-                                    componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
-                                }
-                        </script>
                 </div>
           </li>
     </ul>
@@ -82,13 +76,6 @@
             </div>
             <div class="cmuk-accordion-content">
                 <div id="fiatList" class="flexContainer"></div>
-                <script type="text/javascript">
-                        var fiatCometMessage = function (event) {
-                            console.log(event.toString());
-                            $('#totalFiat').html(event);
-                            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
-                        }
-                </script>
             </div>
         </li>
     </ul>
@@ -113,13 +100,6 @@
                     </li>
                 </ul>
             </div>
-             <script type="text/javascript">
-                var negotiationCometMessage = function (event) {
-                    console.log(event.toString());
-                    componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-                    componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
-                }
-            </script>
         </li>
     </ul>
     <ul class="flexContainer" cmuk-accordion>
@@ -127,12 +107,6 @@
             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</a>
             <div class="cmuk-accordion-content">
                 <div id="orderList" class="flexContainer"></div>
-                <script type="text/javascript">
-                    var orderCometMessage = function (event) {
-                        console.log(event.toString());
-                        componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
-                    }
-                </script>
             </div>
         </li>
     </ul>
@@ -163,8 +137,4 @@
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
     </script>
-    <iframe class="hidden" src="@routes.ComponentViewController.assetComet"></iframe>
-    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
-    <iframe class="hidden" src="@routes.ComponentViewController.negotiationComet"></iframe>
-    <iframe class="hidden" src="@routes.ComponentViewController.orderComet"></iframe>
 }

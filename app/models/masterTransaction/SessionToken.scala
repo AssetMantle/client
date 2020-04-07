@@ -148,20 +148,11 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIDs
 
-    def filterIDs(ids: Seq[String]) = masterAccounts.Service.filterTraderIDs(ids)
-
     for {
       ids <- ids
-      filterIDs <- filterIDs(ids)
     } yield {
       ids.foreach { id =>
         shutdownActors.shutdown(constants.Module.ACTOR_MAIN, id)
-      }
-      filterIDs.foreach { id =>
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
       }
       Service.deleteSessionTokens(ids)
     }
