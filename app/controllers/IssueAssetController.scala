@@ -7,6 +7,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable
+import models.master.Asset
 import models.masterTransaction.{AssetFile, IssueAssetRequest}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -23,36 +24,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
-
-  def assetDetail(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
-
-      def status(pegHash: Option[String]) = pegHash match {
-        case Some(value) => masterAssets.Service.getStatus(value)
-        case None => Future("")
-      }
-
-      def getResult(asset: IssueAssetRequest): Future[Result] = {
-        if (asset.accountID == loginState.username) {
-          val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(id)
-          for {
-            assetFiles <- assetFiles
-            status <- status(asset.pegHash)
-          } yield Ok(views.html.component.master.assetDetail(asset, assetFiles, status))
-        } else {
-          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
-        }
-      }
-
-      (for {
-        asset <- asset
-        result <- getResult(asset)
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
 
   def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -331,22 +302,17 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
-      def addressesUnderZone(zoneID: String): Future[Seq[String]] = blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
+      def traderIDsUnderZone(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
-      def iDsForAddresses(addresses: Seq[String]): Future[Seq[String]] = masterAccounts.Service.getIDsForAddresses(addresses)
-
-      def pendingIssueAssetRequests(iDs: Seq[String]): Future[Seq[IssueAssetRequest]] = masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(iDs)
+      def pendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = masterAssets.Service.getPendingIssueAssetRequests(traderIDs)
 
       (for {
         zoneID <- zoneID
-        addressesUnderZone <- addressesUnderZone(zoneID)
-        iDsForAddresses <- iDsForAddresses(addressesUnderZone)
-        pendingIssueAssetRequests <- pendingIssueAssetRequests(iDsForAddresses)
-      } yield {
-        Ok(views.html.component.master.viewPendingIssueAssetRequests(pendingIssueAssetRequests))
-      }
+        traderIDs <- traderIDsUnderZone(zoneID)
+        pendingIssueAssetRequests <- pendingIssueAssetRequests(traderIDs)
+      } yield Ok(views.html.component.master.viewPendingIssueAssetRequests(pendingIssueAssetRequests))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
@@ -366,7 +332,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       val userZoneID = masterZones.Service.tryGetID(loginState.username)
       val id = masterTransactionIssueAssetRequests.Service.getAccountID(requestID)
 
-      def traderZoneID(id: String): Future[String] = masterTraders.Service.getZoneIDByAccountID(id)
+      def traderZoneID(id: String): Future[String] = masterTraders.Service.tryGetZoneIDByAccountID(id)
 
       def getResult(userZoneID: String, traderZoneID: String): Future[Result] = {
         if (userZoneID == traderZoneID) {
@@ -410,14 +376,16 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               for {
                 _ <- accept
                 id <- id
-              } yield utilitiesNotification.send(id, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                _ <- utilitiesNotification.send(id, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              } yield {}
             } else {
               val reject = masterTransactionAssetFiles.Service.reject(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
               val id = masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID)
               for {
                 _ <- reject
                 id <- id
-              } yield utilitiesNotification.send(id, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                _ <- utilitiesNotification.send(id, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              } yield {}
             }
           }
 
@@ -460,58 +428,65 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         )
   }
 
-  def issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): Action[AnyContent] = Action {
+  def issueAssetForm(assetID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(views.companion.master.IssueAsset.Data(requestID = requestID, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, gas = constants.FormField.GAS.minimumValue, password = ""))))
+      val asset = masterAssets.Service.tryGet(assetID)
+      (for {
+        asset <- asset
+      } yield Ok(views.html.component.master.issueAssetOld(views.companion.master.IssueAssetOld.form.fill(views.companion.master.IssueAssetOld.Data(id = assetID, tarderID = asset.ownerID, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, takerAddress = None, gas = constants.FormField.GAS.minimumValue, password = ""))))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
-  def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated {
-    implicit loginState =>
-      implicit request =>
-        views.companion.master.IssueAsset.form.bindFromRequest().fold(
-          formWithErrors => {
-            Future(BadRequest(views.html.component.master.issueAsset(formWithErrors)))
-          },
-          issueAssetData => {
-            val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
-            val verifyRequestedStatus = masterTransactionIssueAssetRequests.Service.verifyRequestedStatus(issueAssetData.requestID)
-            val checkAllAssetFilesVerified = masterTransactionAssetFiles.Service.checkAllAssetFilesVerified(issueAssetData.requestID)
+  def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.IssueAssetOld.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.issueAssetOld(formWithErrors)))
+        },
+        issueAssetData => {
+          val traderAccountID = masterTraders.Service.tryGetAccountId(issueAssetData.tarderID)
 
-            def getResult(toAddress: String, verifyRequestedStatus: Boolean, checkAllAssetFilesVerified: Boolean): Future[Result] = {
-              if (verifyRequestedStatus && checkAllAssetFilesVerified) {
-                val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),
-                  action = transactionsIssueAsset.Service.post,
-                  onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                  onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-                )
+          def toAddress(toAccountID: String): Future[String] = masterAccounts.Service.getAddress(toAccountID)
 
-                def updateTicketID(ticketID: String): Future[Int] = masterTransactionIssueAssetRequests.Service.updateTicketID(issueAssetData.requestID, ticketID)
+          val verifyRequestedStatus = masterAssets.Service.verifyAssetPendingRequestStatus(issueAssetData.id)
 
-                for {
-                  ticketID <- ticketID
-                  _ <- updateTicketID(ticketID)
-                  result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
-                } yield result
-              } else {
-                Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED))))
-              }
-            }
+          def getResult(toAddress: String, verifyRequestedStatus: Boolean): Future[Result] = {
+            if (verifyRequestedStatus) {
+              val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),
+                action = transactionsIssueAsset.Service.post,
+                onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+                onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+              )
 
-            (for {
-              toAddress <- toAddress
-              verifyRequestedStatus <- verifyRequestedStatus
-              checkAllAssetFilesVerified <- checkAllAssetFilesVerified
-              result <- getResult(toAddress, verifyRequestedStatus, checkAllAssetFilesVerified)
-            } yield result
-              ).recover {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+              def updateTicketID(ticketID: String): Future[Int] = masterAssets.Service.updateTicketID(issueAssetData.id, ticketID)
+
+              for {
+                ticketID <- ticketID
+                _ <- updateTicketID(ticketID)
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
+              } yield result
+            } else {
+              Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED))))
             }
           }
-        )
+
+          (for {
+            traderAccountID <- traderAccountID
+            toAddress <- toAddress(traderAccountID)
+            verifyRequestedStatus <- verifyRequestedStatus
+            result <- getResult(toAddress, verifyRequestedStatus)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
   def blockchainIssueAssetForm: Action[AnyContent] = Action { implicit request =>

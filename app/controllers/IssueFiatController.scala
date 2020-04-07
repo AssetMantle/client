@@ -25,6 +25,25 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
     Ok(views.html.component.master.issueFiatRequest())
   }
 
+  def issueFiatRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
+        },
+        issueFiatRequestData => {
+          val create = masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
+          (for {
+            _ <- create
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
   def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)

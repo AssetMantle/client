@@ -11,6 +11,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/style.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
         <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
@@ -18,6 +19,7 @@
         <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/notification.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/getForm.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/replaceDocument.js")" type="text/javascript"></script>
@@ -41,10 +43,10 @@
                     <ul class="cmuk-navbar-nav">
                     @loginState match {
                         case null => {}
-                        case default => {
-                            <li><a href="@controllers.routes.ViewController.dashboard()">@Messages(constants.View.DASHBOARD)</a></li>
-                            <li><a href="@controllers.routes.ViewController.trades()">@Messages(constants.View.TRADES)</a></li>
-                            <li><a href="@controllers.routes.ViewController.account()">@Messages(constants.View.ACCOUNT)</a></li>
+                        case _ => {
+                            <li><a href="@controllers.routes.ViewController.dashboard()"><span><img src="@routes.Assets.versioned("images/icons/dashboardIcon.svg")"> </span> @Messages(constants.View.DASHBOARD)</a></li>
+                            <li><a href="@controllers.routes.ViewController.trades()"><span><img src="@routes.Assets.versioned("images/icons/tradersIcon.svg")"> </span>@Messages(constants.View.TRADES)</a></li>
+                            <li><a href="@controllers.routes.ViewController.account()"><span><img src="@routes.Assets.versioned("images/icons/accountIcon.svg")"> </span>@Messages(constants.View.ACCOUNT)</a></li>
                             <li><a href="@controllers.routes.ViewController.profile()">@Messages(constants.View.PROFILE)</a></li>
                         }
                     }
@@ -244,6 +246,7 @@
 
                     <div class="modal" id="commonModal">
                         <div class="modalContent">
+                            <button class="cmuk-modal-close-default" id="modalClose" type="button" cmuk-close></button>
                             <div class="modalBody" id="commonModalContent">
 
                             </div>

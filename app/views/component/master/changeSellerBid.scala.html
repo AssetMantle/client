@@ -2,13 +2,13 @@
 @import views.html.base._
 @import views.companion.master.ChangeSellerBid
 
-@(changeSellerBidForm: Form[ChangeSellerBid.Data] = ChangeSellerBid.form, requestID: String, buyerAddress: String, bid: Int, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(changeSellerBidForm: Form[ChangeSellerBid.Data] = ChangeSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CHANGE_SELLER_BID, changeSellerBidForm) {
-    @commonInputText(changeSellerBidForm, constants.FormField.REQUEST_ID, 'value -> requestID, 'class -> "hidden", 'readonly -> true, 'required -> false)
-    @commonInputText(changeSellerBidForm, constants.FormField.BUYER_ADDRESS, 'value -> buyerAddress)
-    @commonInputInt(changeSellerBidForm, constants.FormField.BID, 'value -> bid.toString)
+    @commonInputText(changeSellerBidForm, constants.FormField.REQUEST_ID,  'required -> false)
+    @commonInputText(changeSellerBidForm, constants.FormField.BUYER_ADDRESS)
+    @commonInputInt(changeSellerBidForm, constants.FormField.BID)
     @commonInputInt(changeSellerBidForm, constants.FormField.TIME)
-    @commonInputText(changeSellerBidForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputText(changeSellerBidForm, constants.FormField.PEG_HASH)
     @commonInputInt(changeSellerBidForm, constants.FormField.GAS)
     @commonInputPassword(changeSellerBidForm, constants.FormField.PASSWORD)
 }

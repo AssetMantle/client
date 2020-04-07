@@ -13,9 +13,9 @@
     @accountKYC match {
         case Some(file) => {
             @component.master.commonDocumentViewer(file) {
-                @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+                @routes.FileController.getAccountKYCFile(file.fileName, file.documentType)
             } {
-                <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+                <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@file.documentType'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
                 <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>

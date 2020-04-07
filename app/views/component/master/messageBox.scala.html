@@ -1,0 +1,37 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.Message
+
+@(message: Message)(receiverScript: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+    @if(message.fromAccountID == loginState.username) {
+        <li class="sender chatMessage">
+            @text("you")
+            <span class="chatName">@message.fromAccountID.substring(0, 1)</span>
+        </li>
+    } else {
+        <li class="chatMessage receiver">
+            <span class="chatName">@message.fromAccountID.substring(0, 1)</span>
+            @text("partner")
+            @receiverScript
+        </li>
+    }
+
+    @text(classname: String) = {
+        <div class="@classname" onclick="replyButton('@message.id', '@message.text', '@message.fromAccountID')">
+            @message.replyToID match {
+                case Some(replyToMessageID) => {
+                    <div class="messageContent cmuk-text-right replytoMessage">
+                        <p id=@Seq(replyToMessageID, message.id).mkString("")></p>
+                        <script>
+                                 replyMessage(jsRoutes.controllers.ChatController.replyToMessage('@message.chatID', '@replyToMessageID'), '@message.id')
+                        </script>
+                    </div>
+                }
+                case None => {}
+            }
+            <p>@message.fromAccountID
+                : @message.text</p>
+
+        </div>
+    }

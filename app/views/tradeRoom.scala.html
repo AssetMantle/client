@@ -2,85 +2,52 @@
 @import models.master.{Organization, Zone}
 @import views.html.base.common
 @import views.html.base._
-@(tradeRoomID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import scala.collection.immutable.ListMap
+@(id: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
-    <div class="left cmuk-flex">
-        <div>
-            <span cmuk-icon="arrow-left" class="backIcon"></span>
-        </div>
-        <div>
-            <span class="quoteIdTtitle secondaryFont">@Messages(constants.View.TRADE_ROOM_ID)</span><span class="quoteId secondaryFont hashCode">@tradeRoomID</span>
-        </div>
-        <div class="userIcons cmuk-flex secondaryFont">
-            <span class="buyerIcon userIcon">B</span>
-            <span class="sellerIcon userIcon">S</span>
-            <span class="financierIcon userIcon">F</span>
-        </div>
-    </div>
-    <div class="leftTradeFinancial secondaryFont">
-        <div id="tradeFinancials"></div>
-        <div id="documentList"></div>
-    </div>
+@left = {
+
 }
 
 @center = {
-    <div class="notifications">
-        <div class="cmuk-alert-success" cmuk-alert>
-            <a class="cmuk-alert-close" cmuk-close></a>
-            <span>Lorem ipsum dolor sit amet, </span>
-        </div>
-    </div>
-    <div class="mainTabs">
-        <div class="cmuk-card cmuk-card-default">
-            <div class="cmuk-card-header">
-                <ul cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
-                    <li class="cmuk-active first"><a href="#">Terms View</a></li>
-                    <li class="docViewList"><a href="#">Docs View</a></li>
-                </ul>
-            </div>
-            <div class="cmuk-card-body">
-            <ul id="component-tab-left" class="cmuk-switcher">
-                <li class="tradeTerms">
-                    <div  id="tradeTerms">
-                    </div>
-                </li>
-                <li>
-                    <div class="documentcontainer" id="documentContainer" class="cmuk-animation-fade">
-                    </div>
-                </li>
-            </ul>
-            </div>
+    <div class="cmuk-card cmuk-card-default">
+        <div class="cmuk-card-body">
+        @commonHorizontalSwitcher(ListMap(
+            constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.traderViewAcceptedNegotiation,
+            constants.View.VIEW_DOCUMENTS -> commonCard(constants.View.VIEW_DOCUMENTS)(Html(""))(Html("")),
+        ),
+            'VIEW_TERMS_PARAMETERS -> s"'${id}'")
         </div>
     </div>
 }
 
-@right={
+@right = {
     <div class="right cmuk-flex">
-        <button class="refresh"><img src="./images/icons/amendIcon.svg">Amend</button>
-        <button class="refresh "><img src="./images/icons/refreshIcon.svg">Refresh</button>
+        <button class="refresh"><img src="@routes.Assets.versioned("./images/icons/amendIcon.svg")">@Messages(constants.View.AMEND)</button>
+        <button class="refresh "><img src="@routes.Assets.versioned("./images/icons/refreshIcon.svg")">@Messages(constants.View.REFRESH)</button>
         <div class="cmuk-flex live">
-            <span class="liveText secondaryFont">Live Trade Room </span>
+            <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>
         </div>
     </div>
     <div class="recentActivity">
-        <div id="recentActivity">
+        <div class="recentActivityContainer">
+        @commonCard(constants.View.RECENT_ACTIVITY) {
+        } {
+            <div class="scroller">
+                <div id="recentActivity">
+                </div>
+                <div class="cover-bar"></div>
+            </div>
+        }
         </div>
-        <div id="chatRoom">
+        <div id="chatRoom" class="chatRoom">
         </div>
     </div>
+    <script>
+            componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@id'));
+            componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
+    </script>
 }
-
-<script>
-
-    componentResource('tradeFinancials', jsRoutes.controllers.TradeRoomController.tradeFinancials());
-    componentResource('documentList', jsRoutes.controllers.TradeRoomController.documentList());
-    componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@tradeRoomID'));
-    componentResource('documentContainer', jsRoutes.controllers.TradeRoomController.documentView("fileName","documentType"));
-    componentResource('recentActivity', jsRoutes.controllers.TradeRoomController.recentActivity());
-    componentResource('chatRoom', jsRoutes.controllers.TradeRoomController.chatRoom());
-
-</script>

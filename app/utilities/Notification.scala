@@ -21,6 +21,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
                              mailerClient: MailerClient,
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
+                             masterTransactionTradeActivities: masterTransaction.TradeActivities,
                              masterAccounts: master.Accounts,
                              messagesApi: MessagesApi
                             )
@@ -78,7 +79,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang): Future[Option[String]] = {
 
     val title = Future(messagesApi(pushNotification.title))
     val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
@@ -91,10 +92,10 @@ class Notification @Inject()(masterContacts: master.Contacts,
     (for {
       title <- title
       message <- message
-      _ <- create(title, message)
+      notificationID <- create(title, message)
       pushNotificationToken <- pushNotificationToken
-      _ <- post(title, message, pushNotificationToken)
-    } yield {}).recover {
+      _ <- if(pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
+    } yield Option(notificationID)).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
@@ -134,11 +135,15 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Future[Option[String]] = {
     try {
-      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
+      //save
+      val notificationID = if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future(None)
       if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
       if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
+      for {
+        notificationID <- notificationID
+      } yield notificationID
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException

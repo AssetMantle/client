@@ -1,0 +1,36 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(incompleteNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@incompleteNegotiationList.map { incompleteNegotiation =>
+    @commonInfoBox() {
+        @defining(counterPartyTraders.filter(_.id == incompleteNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.TRADER_ID, incompleteNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @defining(assets.filter(_.id == incompleteNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
+            @rejectedNegotiationAsset match {
+                case Some(asset) => {
+                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.ASSET_ID, incompleteNegotiation.assetID)
+                }
+            }
+        }
+        @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString(), incompleteNegotiation.quantityUnit).mkString(" "))
+        @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
+        @commonFormButton(constants.Form.NEGOTIATION_PAYMENT_TERMS, 'parameters -> s"'${incompleteNegotiation.id}'")
+    }
+}

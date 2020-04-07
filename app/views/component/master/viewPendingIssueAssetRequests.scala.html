@@ -1,40 +1,32 @@
 @import controllers.actions.LoginState
-@import models.masterTransaction.IssueAssetRequest
+@import models.master.Asset
 @import views.html.base._
 
-@(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(assetRequests: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
-        @if(issueAssetRequests.isEmpty) {
+        @if(assetRequests.isEmpty) {
             <span>@Messages(constants.View.NO_REQUESTS_FOUND)</span>
         } else {
-            @for(issueAssetRequest <- issueAssetRequests) {
+            @for(assetRequest <- assetRequests) {
                 <div>
-                @commonCard(issueAssetRequest.id) {
+                @commonCard(assetRequest.id) {
                 } {
-                    @commonTextInfo(constants.View.ACCOUNT_ID, issueAssetRequest.accountID)
-                    @commonTextInfo(constants.Form.DOCUMENT_HASH, issueAssetRequest.documentHash.getOrElse(""))
-                    @commonTextInfo(constants.Form.ASSET_TYPE, issueAssetRequest.assetType)
-                    @commonTextInfo(constants.Form.ASSET_QUANTITY, issueAssetRequest.assetQuantity.toString)
-                    @commonTextInfo(constants.Form.ASSET_PRICE, issueAssetRequest.assetPrice.toString)
-                    @commonTextInfo(constants.Form.QUANTITY_UNIT, issueAssetRequest.quantityUnit)
-                    @commonTextInfo(constants.Form.TAKER_ADDRESS, issueAssetRequest.takerAddress.getOrElse(""))
-                    @commonTextInfo(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name, issueAssetRequest.physicalDocumentsHandledVia)
-                    @commonTextInfo(constants.FormField.COMDEX_PAYMENT_TERMS.name, issueAssetRequest.paymentTerms)
-                    @commonBooleanInfo(constants.View.STATUS, issueAssetRequest.verificationStatus)
+                    @commonTextInfo(constants.View.ASSET_ID, assetRequest.id)
+                    @commonTextInfo(constants.Form.ASSET_TYPE, assetRequest.assetType)
+                    @commonTextInfo(constants.Form.ASSET_QUANTITY, Seq(assetRequest.quantity, assetRequest.quantityUnit).mkString(" "))
+                    @commonIntInfo(constants.Form.ASSET_PRICE, assetRequest.price)
+                    @commonBooleanInfo(constants.Form.MODERATED, Option(assetRequest.moderated))
+                    @commonTextInfo(constants.View.STATUS, assetRequest.status)
                     <span>@Messages(constants.Form.SHIPMENT_DETAILS)</span>
                     <br>
-                    @commonTextInfo(constants.FormField.COMMODITY_NAME.name, issueAssetRequest.shipmentDetails.commodityName)
-                    @commonTextInfo(constants.FormField.QUALITY.name, issueAssetRequest.shipmentDetails.quality)
-                    @commonTextInfo(constants.FormField.DELIVERY_TERM.name, issueAssetRequest.shipmentDetails.deliveryTerm)
-                    @commonTextInfo(constants.FormField.TRADE_TYPE.name, issueAssetRequest.shipmentDetails.tradeType)
-                    @commonTextInfo(constants.FormField.PORT_OF_LOADING.name, issueAssetRequest.shipmentDetails.portOfLoading)
-                    @commonTextInfo(constants.FormField.PORT_OF_DISCHARGE.name, issueAssetRequest.shipmentDetails.portOfDischarge)
-                    @commonDateInfo(constants.FormField.SHIPMENT_DATE.name, issueAssetRequest.shipmentDetails.shipmentDate)
-                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity, '@issueAssetRequest.takerAddress'))">@Messages(constants.Form.APPROVE)</button>
-                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
-                    <div id = "assetDocuments@issueAssetRequest.id">
-                        <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
+                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, assetRequest.shippingPeriod)
+                    @commonTextInfo(constants.View.LOAD_PORT, assetRequest.portOfLoading)
+                    @commonTextInfo(constants.View.DISCHARGE_PORT, assetRequest.portOfDischarge)
+                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@assetRequest.id'))">@Messages(constants.Form.APPROVE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+                    <div id = "assetDocuments@assetRequest.id">
+                        <script>componentResource('assetDocuments@assetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@assetRequest.id'))</script>
                     </div>
                 }
                 </div>

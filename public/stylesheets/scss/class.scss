@@ -663,13 +663,12 @@ dl .info {
 }
 
 .hashCode {
-  width: 100px;
   overflow: hidden;
-  display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+  width:120px;
 }
-
 
 .searchForm {
   width: 95%;
@@ -1178,7 +1177,7 @@ input:checked+.slider {
   }
 }
 
-.commonHomeData{
+.commonhomeData{
   font-size: $paragraphFontSizeMedium;
   p, h3{
     margin:5px 0px;
@@ -1220,6 +1219,9 @@ input:checked+.slider {
   background-color: #f4f7fb;
   color: #343C44;
   border-bottom: 2px solid #053C75;
+  svg{
+    fill: red;
+  }
 }
 
 .infoRow{
@@ -1253,4 +1255,15 @@ input:checked+.slider {
     width: 200px;
     word-break: break-word;
   }
+}
+
+
+
+
+.unRead{
+  color: #1e87f0;
+  background: lightblue;
+  text-align: center;
+  margin: 5px;
+  border-radius: 5px;
 }

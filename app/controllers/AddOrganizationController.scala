@@ -506,6 +506,7 @@ class AddOrganizationController @Inject()(
           (for {
             id <- id
             allKYCFileTypesExists <- checkAllKYCFileTypesExists(id)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ORGANIZATION_REQUESTED, loginState.username)
             result <- markOrganizationFormCompletedAndGetResult(id, allKYCFileTypesExists)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -581,6 +582,8 @@ class AddOrganizationController @Inject()(
                 accountId <- accountId
                 organizationAccountAddress <- organizationAccountAddress(accountId)
                 _ <- transactionProcess(organizationAccountAddress)
+                _ <- utilitiesNotification.send(accountId, constants.Notification.ADD_ORGANIZATION_CONFIRMED, accountId)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ORGANIZATION_CONFIRMED, loginState.username)
                 result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
               } yield result
             } else {
@@ -647,14 +650,16 @@ class AddOrganizationController @Inject()(
               for {
                 _ <- verifyOrganizationKYCs
                 organizationID <- organizationID
-              } yield utilitiesNotification.send(organizationID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                _ <- utilitiesNotification.send(organizationID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              } yield {}
             } else {
               val rejectOrganizationKYCs = masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
               val organizationID = masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID)
               for {
                 _ <- rejectOrganizationKYCs
                 organizationID <- organizationID
-              } yield utilitiesNotification.send(organizationID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                _ <- utilitiesNotification.send(organizationID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              } yield {}
             }
           }
 

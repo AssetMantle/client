@@ -1,34 +1,77 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
-
+@import views.html.base._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-
+    <div class="leftTradeFinancial">
+        <div id="traderFinancials"></div>
+        <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+    </div>
+    <script>
+            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+    </script>
 }
 
 @center = {
+    <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.TRADER => {
-            <div class="cmuk-margin-top cmuk-margin-bottom">
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderViewAcceptedNegotiationList"></div>
+                </div>
             </div>
 
-            <div id="salesQuoteList"></div>
-            <div id="tradeList"></div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+                </div>
+            </div>
 
             <script>
-                componentResource('salesQuoteList', jsRoutes.controllers.ComponentViewController.salesQuoteList());
-                componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
+                    componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
+                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
             </script>
         }
-
+        case constants.User.ORGANIZATION => {}
+        case constants.User.ZONE => {}
+        case constants.User.GENESIS => {}
         case _ => {}
     }
+    </div>
 }
 
 @right = {
-
+    <div class="recentActivity">
+        <div class="recentActivityContainer">
+        @commonCard(constants.View.RECENT_ACTIVITY) {
+        } {
+            <div class="scroller">
+                <div id="recentActivity"></div>
+                <div class="cover-bar"></div>
+            </div>
+        }
+        </div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
+            }
+            case constants.User.ORGANIZATION => {
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
+            }
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
 }
+<script type="text/javascript">
+        var fiatCometMessage = function (event) {
+            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+        }
+</script>

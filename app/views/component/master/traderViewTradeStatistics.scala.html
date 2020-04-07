@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.blockchain.Negotiation
+@import models.master.Negotiation
 
-@(buyersNegotiationsForExecutedOrders: Seq[Negotiation], sellersNegotiationsForExecutedOrders: Seq[Negotiation])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(tradeCompletedBuyNegotiationList: Seq[Negotiation], tradeCompletedSellNegotiationList: Seq[Negotiation])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.TRADER_TRADE_STATISTICS){
 }{

@@ -1,0 +1,17 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.IssueAssetOld
+
+@(issueAssetForm: Form[IssueAssetOld.Data] = IssueAssetOld.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ZONE_ISSUE_ASSET, issueAssetForm) {
+    @commonInputText(issueAssetForm, constants.FormField.ID, 'readonly -> true)
+    @commonInputText(issueAssetForm, constants.FormField.TRADER_ID)
+    @commonInputText(issueAssetForm, constants.FormField.DOCUMENT_HASH)
+    @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)
+    @commonInputInt(issueAssetForm, constants.FormField.ASSET_PRICE)
+    @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
+    @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputInt(issueAssetForm, constants.FormField.GAS)
+    @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS, 'required -> false)
+    @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD)
+}

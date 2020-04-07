@@ -197,10 +197,9 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
           _ <- updateUserTypeOnAddress
           _ <- markDirty
           (toAccountID, fromAccountID) <- getIDs(addZone)
-        } yield {
-          utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-          utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        }
+          _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+          _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        } yield {}
       }
 
       (for {
@@ -217,7 +216,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addZone = Service.getTransaction(ticketID)
 
-      def getIDs(addZone: AddZone): Future[(String,String)] = {
+      def getIDs(addZone: AddZone): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(addZone.to)
         val fromAccountID = masterAccounts.Service.getId(addZone.from)
         for {
@@ -230,10 +229,9 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         _ <- markTransactionFailed
         addZone <- addZone
         (toAccountID, fromAccountID) <- getIDs(addZone)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

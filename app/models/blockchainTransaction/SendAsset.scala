@@ -35,6 +35,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val sendAssetTable = TableQuery[SendAssetTable]
 
   private implicit val assetWrites: OWrites[blockchain.Asset] = Json.writes[blockchain.Asset]
@@ -184,10 +185,10 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       def orderResponse(negotiationID: String): Future[queries.responses.OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
-      def assetsInsertOrUpdate(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String)= {
+      def assetsInsertOrUpdate(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = {
         orderResponse.value.assetPegWallet match {
           case Some(assets) => Future.sequence(assets.map(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
-          case None => Future{}
+          case None => Future {}
         }
       }
 
@@ -200,7 +201,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         } yield {}
       }
 
-      def getIDs(sendAsset: SendAsset): Future[(String,String)] = {
+      def getIDs(sendAsset: SendAsset): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(sendAsset.to)
         val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
         for {
@@ -218,10 +219,9 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         _ <- assetsInsertOrUpdate(orderResponse, negotiationID)
         _ <- markDirty(sendAsset)
         (toAccountID, fromAccountID) <- getIDs(sendAsset)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -236,7 +236,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       def markDirty(address: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(address)
 
-      def getIDs(sendAsset: SendAsset): Future[(String,String)] = {
+      def getIDs(sendAsset: SendAsset): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(sendAsset.to)
         val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
         for {
@@ -251,10 +251,9 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         address <- address(sendAsset)
         _ <- markDirty(address)
         (toAccountID, fromAccountID) <- getIDs(sendAsset)
-      } yield {
-        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover {
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

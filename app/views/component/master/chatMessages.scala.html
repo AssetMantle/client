@@ -1,0 +1,24 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.Message
+@import models.masterTransaction.MessageRead
+@import views.html.component.master.messageBox
+
+@(messages: Seq[Message], readMessages: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+<div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatID')" >@Messages(constants.View.LOAD_MORE_CHATS)</a></div>
+@for(message <- messages.reverse) {
+    @messageBox(message) {
+        @if(readMessages.filter(x => x.messageID == message.id && x.accountID == loginState.username && message.fromAccountID != loginState.username).length == 0) {
+            <script>
+                    unReadBar(@messages.filter(_.fromAccountID != loginState.username).length - @readMessages.filter(_.accountID == loginState.username).length)
+            </script>
+        }
+    }
+}
+
+<script>
+        if ($("div.chatMessage").length == 1) {
+            $('.chatMessages').scrollTop($('.chatMessages')[0].scrollHeight);
+        }
+</script>

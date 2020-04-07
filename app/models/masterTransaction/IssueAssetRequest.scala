@@ -26,7 +26,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_ASSET_REQUESTS
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_ASSET_REQUEST
 
   import databaseConfig.profile.api._
 

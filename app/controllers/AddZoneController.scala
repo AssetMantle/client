@@ -279,7 +279,11 @@ class AddZoneController @Inject()(
             id <- id
             allKYCFileTypesExists <- allKYCFileTypesExists(id)
             result <- markZoneFormCompletedAndGetResult(id, allKYCFileTypesExists)
-          } yield result
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_REQUESTED, loginState.username)
+
+          } yield {
+            result
+          }
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -321,15 +325,20 @@ class AddZoneController @Inject()(
                 zoneAccountAddress <- zoneAccountAddress(accountID)
                 _ <- transactionProcess(zoneAccountAddress)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
-              } yield result
+                _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
+              } yield {
+                result
+              }
             } else Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
           }
 
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
             result <- processTransactionAndGetResult(allKYCFilesVerified)
-          } yield result
-            ).recover {
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
+          } yield {
+            result
+          }).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -388,14 +397,16 @@ class AddZoneController @Inject()(
             for {
               _ <- verify
               zoneId <- zoneId
-            } yield utilitiesNotification.send(zoneId, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              _ <- utilitiesNotification.send(zoneId, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            } yield {}
           } else {
             val reject = masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
             val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- reject
               zoneId <- zoneId
-            } yield utilitiesNotification.send(zoneId, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              _ <- utilitiesNotification.send(zoneId, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+            } yield {}
           }
 
           def zoneKYC: Future[ZoneKYC] = masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
