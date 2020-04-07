@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainActor, ShutdownActor}
+import actors.{ActorCreation, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean)
 
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActor, actorCreation: ActorCreation, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -31,12 +31,9 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, 
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -196,14 +193,6 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, 
     def getNegotiationIDsForSellerAddress(address: String): Future[Seq[String]] = getNegotiationIDsBySellerAddress(address)
 
     def deleteNegotiations(pegHash: String): Future[Int] = deleteNegotiationsByPegHash(pegHash)
-
-    def negotiationCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      accounts.mainAccountActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -232,8 +221,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, 
               _ <- refreshDirty(negotiationResponse)
               (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
-              accounts.mainAccountActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
-              accounts.mainAccountActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+              actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.ActorMessage.Negotiation())
+              actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.ActorMessage.Negotiation())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

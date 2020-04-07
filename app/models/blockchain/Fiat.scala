@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainActor, ShutdownActor}
+import actors.{ActorCreation, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, accounts: Accounts, actorSystem: ActorSystem, shutdownActors: ShutdownActor, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorCreation: ActorCreation, actorSystem: ActorSystem, shutdownActors: ShutdownActor, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -143,14 +143,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def getDirtyFiats: Future[Seq[Fiat]] = getFiatsByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
-
-    def fiatCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      accounts.mainAccountActor ! actors.CreateFiatChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -176,7 +168,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               accountOwnerAddress <- accountOwnerAddress
               fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
               accountID <- accountID
-            } yield accounts.mainAccountActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
+            } yield actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = accountID, messageType = constants.Comet.FIAT, messageContent = actors.ActorMessage.Fiat(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
               ).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
@@ -185,7 +177,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
                   for {
                     _ <- deleteFiatPegWallet
                     id <- id
-                  } yield accounts.mainAccountActor ! FiatCometMessage(username = id, message = Json.toJson("0"))
+                  } yield actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = id, messageType = constants.Comet.FIAT, messageContent = actors.ActorMessage.Fiat("0"))
                 }
             }
           }

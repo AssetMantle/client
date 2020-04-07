@@ -155,7 +155,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       filterIDs <- filterIDs(ids)
     } yield {
       ids.foreach { id =>
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN, id)
       }
       filterIDs.foreach { id =>
         shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)

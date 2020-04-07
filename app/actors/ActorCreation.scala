@@ -17,14 +17,14 @@ class ActorCreation @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
-  val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainActor.props(configurationActorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
+  val mainActor: ActorRef = actorSystem.actorOf(props = MainActor.props(configurationActorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN)
 
   object Service {
     def cometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN, username)
       Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainAccountActor ! actors.CreateAccountChildActorMessage(username = username, actorRef = systemUserActor)
+      mainActor ! actors.CreateAccountChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }

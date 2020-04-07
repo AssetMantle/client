@@ -214,13 +214,7 @@ class AccountController @Inject()(
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           def shutdownActorsAndGetResult = {
-            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
-            if (loginState.userType == constants.User.TRADER) {
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ASSET, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_FIAT, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
-            }
+            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN, loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 

@@ -29,11 +29,11 @@ class MainActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACTOR_MAIN_ACCOUNT
+  private implicit val module: String = constants.Module.ACTOR_MAIN
 
   def receive: PartialFunction[Any, Unit] = {
     case cometMessage: ActorMessage.CometMessage =>
-      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ACCOUNT + "/" + cometMessage.username).resolveOne().onComplete {
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN + "/" + cometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module + " " + cometMessage.username + ": " + cometMessage.message)
 
           actorRef ! cometMessage
@@ -56,7 +56,7 @@ class UserActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) extends
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACTOR_USER_ACCOUNT
+  private implicit val module: String = constants.Module.ACTOR_USER
 
 
   def receive = {

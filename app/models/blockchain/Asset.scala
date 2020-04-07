@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{ShutdownActor}
+import actors.{ActorCreation, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, accounts: Accounts,actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorCreation: ActorCreation,actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -166,14 +166,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true)
 
     def markDirty(pegHash: String): Future[Int] = updateDirtyBitByPegHash(pegHash, dirtyBit = true)
-
-    def assetCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      accounts.mainAccountActor ! actors.CreateAssetChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -201,7 +193,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               _ <- insertOrUpdate(ownerAccount)
               accountID <- accountID
             } yield {
-              accounts.mainAccountActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+               actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.ActorMessage.Asset())
             }).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
@@ -210,7 +202,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
                   for {
                     _ <- deleteAssetPegWallet
                     id <- id
-                  } yield accounts.mainAccountActor ! AssetCometMessage(username = id, message = Json.toJson(constants.Comet.PING))
+                  } yield actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = id, messageType = constants.Comet.ASSET, messageContent = actors.ActorMessage.Asset())
                 }
             }
           }

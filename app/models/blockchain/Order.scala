@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainActor, ShutdownActor}
+import actors.{ActorCreation, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, masterNegotiations: master.Negotiations, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActor, actorCreation: ActorCreation, masterAccounts: master.Accounts, masterNegotiations: master.Negotiations, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -32,13 +32,9 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   private[models] val orderTable = TableQuery[OrderTable]
 
@@ -133,14 +129,6 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
     def getAllOrderIdsWithoutAWBProofHash: Future[Seq[String]] = getOrderIDsWithoutAWBProofHash
 
     def markDirty(id: String): Future[Int] = updateDirtyBitById(id, dirtyBit = true)
-
-    def orderCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      accounts.mainAccountActor ! actors.CreateOrderChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -245,8 +233,8 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
               _ <- insertOrUpdateOrder(orderResponse)
               (buyerAddressID, sellerAddressID) <- ids(negotiation)
             } yield {
-              accounts.mainAccountActor ! OrderCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
-              accounts.mainAccountActor ! OrderCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
+              actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.ActorMessage.Order())
+              actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.ActorMessage.Order())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

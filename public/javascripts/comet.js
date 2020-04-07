@@ -1,6 +1,13 @@
 function cometMessageHandler(message){
     let parsedMessage = JSON.parse(JSON.stringify(message));
+    switch (parsedMessage.messageType) {
+        case 'ASSET' :
+            console.log(parsedMessage);
+            comet('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+            break;
+        case 'FIAT' :
 
+    }
 }
 
 function comet(source, route){
@@ -14,14 +21,10 @@ function comet(source, route){
                 div.html(data)
             },
             401: function (data) {
-                const newDocument = document.open("text/html", "replace");
-                newDocument.write(data);
-                newDocument.close();
+                div.html(data)
             },
             500: function (data) {
-                const newDocument = document.open("text/html", "replace");
-                newDocument.write(data);
-                newDocument.close();
+                div.html(data)
             }
         }
     });

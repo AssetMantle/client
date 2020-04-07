@@ -10,7 +10,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import scala.concurrent.duration._
-import actors.{MainMessageActor, ShutdownActor}
+import actors.{ActorCreation, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -22,21 +22,16 @@ import scala.util.{Failure, Success}
 case class Message(id: String, fromAccountID: String, chatID: String, text: String, replyToID: Option[String], createdAt: Timestamp)
 
 @Singleton
-class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorCreation: ActorCreation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_MESSAGE
   private val logger: Logger = Logger(this.getClass)
 
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
   implicit val timeWrites = new Writes[Timestamp] {
     override def writes(t: Timestamp): JsValue = JsString(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(t))
   }
   implicit val messageWrites: OWrites[Message] = Json.writes[Message]
 
-  val mainMessageActor: ActorRef = actorSystem.actorOf(props = MainMessageActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_MESSAGE)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -138,15 +133,7 @@ class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getChatIDs(chatID: String): Future[Seq[String]] = findAllChatIDsByChatWindowID(chatID)
 
-    def messageCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_MESSAGE, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainMessageActor ! actors.CreateMessageChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
-
-    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => mainMessageActor ! MessageCometMessage(x, Json.toJson(message)))
+    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(x, constants.Comet.CHAT , message))
   }
 
 }
