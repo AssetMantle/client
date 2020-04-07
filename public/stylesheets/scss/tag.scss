@@ -19,28 +19,7 @@ button {
   border-radius: 0.25rem;
   border: none;
   cursor: pointer;
-  opacity: 0.8;
   word-break: break-all;
-}
-
-button:hover {
-  opacity: 1;
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  background: #cccccc;
-  -webkit-box-shadow: none;
-}
-
-::-webkit-scrollbar-thumb:window-inactive {
-  background:grey;
 }
 
 dl{
@@ -49,6 +28,9 @@ dl{
 
 label{
   font-size: $paragraphFontSizeMedium;
+  font-family: $fontFamilySecondary;
+  font-weight: normal;
+  color: #272829;;
 }
 
 // Media Queries

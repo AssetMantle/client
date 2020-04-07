@@ -7,29 +7,29 @@
 @(sentNegotiationRequestList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sentNegotiationRequestList.map { sentNegotiationRequest =>
-    @commonInfoBox() {
+    <li class="commonList">
         @defining(counterPartyTraders.filter(_.id == sentNegotiationRequest.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
-                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
                 }
                 case None => {
-                    @commonTextInfo(constants.Form.TRADER_ID, sentNegotiationRequest.buyerTraderID)
+                    @commonVerticalTextInfo(constants.Form.TRADER_ID, sentNegotiationRequest.buyerTraderID)
                 }
             }
         }
         @defining(assets.filter(_.id == sentNegotiationRequest.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
             @rejectedNegotiationAsset match {
                 case Some(asset) => {
-                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                    @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
                 }
                 case None => {
-                    @commonTextInfo(constants.View.ASSET_ID, sentNegotiationRequest.assetID)
+                    @commonVerticalTextInfo(constants.View.ASSET_ID, sentNegotiationRequest.assetID)
                 }
             }
         }
-        @commonIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString(), sentNegotiationRequest.quantityUnit).mkString(" "))
-        @commonTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
+        @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString(), sentNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
     }
-}
+</li>

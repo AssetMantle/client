@@ -1,16 +1,12 @@
 $(document).mouseup(function (e) {
     $('.modal').each(function () {
         const modal = $(this);
-        if (modal.is(e.target)) {
-            $(modal).modal({
-                backdrop: 'static',
-                keyboard: false
-            })
+        const modalConnectionError = $('#connectionError');
+        if (modalConnectionError.is(e.target)) {
+            modalConnectionError.fadeOut(400)
         }
         $('#modalClose').click(function() {
-            modal.fadeOut();
+            modal.fadeOut(400);
         })
     })
-
-
 });

@@ -6,9 +6,6 @@
 
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
     <div class="inputField">
-        <div class="inputFieldIcon">
-            <span class="cmuk-icon-link" cmuk-icon="user"></span>
-        </div>
         <div class="inputFieldBody">
             <div class="usernameAvailibilty">
                 @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
@@ -17,9 +14,6 @@
         </div>
     </div>
     <div class="inputField">
-        <div class="inputFieldIcon">
-            <span class="cmuk-icon-link" cmuk-icon="lock"></span>
-        </div>
         <div class="inputFieldBody">
             <div class="usernameAvailibilty">
                 @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD, 'id -> "signUpPassword")
@@ -28,9 +22,6 @@
         </div>
     </div>
     <div class="inputField">
-        <div class="inputFieldIcon">
-            <span class="cmuk-icon-link" cmuk-icon="lock"></span>
-        </div>
         <div class="inputFieldBody">
             <div class="usernameAvailibilty">
                 @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, 'oninput -> "checkPasswords()", 'id -> "signUpConfirmPassword")

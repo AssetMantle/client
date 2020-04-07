@@ -14,7 +14,7 @@
             <div>
             @commonCard(organizationVerificationRequest.id) {
             } {
-                <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+                    <div class="cmuk-text-left title">@Messages(constants.Form.ORGANIZATION_DETAILS)</div>
                     @commonTextInfo(constants.Form.ORGANIZATION_ID, organizationVerificationRequest.id)
                     @commonTextInfo(constants.Form.ZONE_ID, organizationVerificationRequest.zoneID)
                     @commonTextInfo(constants.Form.ACCOUNT_ID, organizationVerificationRequest.accountID)
@@ -22,30 +22,24 @@
                     @commonTextInfo(constants.Form.ABBREVIATION, organizationVerificationRequest.abbreviation.getOrElse(""))
                     @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organizationVerificationRequest.establishmentDate)
                     @commonTextInfo(constants.Form.EMAIL, organizationVerificationRequest.email)
-                </div>
-                <div>@Messages(constants.FormField.REGISTERED_ADDRESS.name) : <br>
+
+                    <div class="cmuk-text-left title">@Messages(constants.FormField.REGISTERED_ADDRESS.name) </div>
                     @streetAddress(organizationVerificationRequest.registeredAddress)
-                </div>
-                <div>@Messages(constants.FormField.POSTAL_ADDRESS.name) : <br>
+                    <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name) </div>
                     @streetAddress(organizationVerificationRequest.postalAddress)
-                </div>
-                <div>@Messages(constants.View.ORGANIZATION_UBO_DETAIL): <br>
+                    <div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_UBO_DETAIL)</div>
                     @for(ubo <- organizationVerificationRequest.ubos.data) {
                         @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
                         @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
                         @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
                         @commonTextInfo(constants.View.TITLE, ubo.title)
                     }
-                </div>
-                <br>
-                @Messages(constants.Form.DOCUMENTS): <br>
-                <div id = "organizationKYCDocuments@organizationVerificationRequest.accountID" class="kycDocumentsView">
+                    <div class="cmuk-text-left title">@Messages(constants.Form.DOCUMENTS): </div>
+                    <div id = "organizationKYCDocuments@organizationVerificationRequest.accountID" class="kycDocumentsView">
                     <script>componentResource('organizationKYCDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKYCDocuments('@organizationVerificationRequest.id'))</script>
-                </div>
-                <br>
-                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile('@organizationVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
-                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
-                <br>
+                    </div>
+                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile('@organizationVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
                 }
             </div>
         }
