@@ -2,7 +2,7 @@
 @import views.html.base._
 @import views.companion.master.ConfirmBuyerBidDetail
 
-@(confirmBuyerBidDetailForm: Form[ConfirmBuyerBidDetail.Data] = ConfirmBuyerBidDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(confirmBuyerBidDetailForm: Form[ConfirmBuyerBidDetail.Data] = ConfirmBuyerBidDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_BUYER_BID_DETAIL, confirmBuyerBidDetailForm) {
     @commonInputText(confirmBuyerBidDetailForm, constants.FormField.REQUEST_ID, 'containerDivClass -> "hidden", 'readonly -> true, 'required -> false)
     @commonInputText(confirmBuyerBidDetailForm, constants.FormField.SELLER_ADDRESS)

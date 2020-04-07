@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, masterAccounts: master.Accounts, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, masterNegotiations: master.Negotiations, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -205,8 +205,15 @@ class Orders @Inject()(shutdownActors: ShutdownActor, accounts: Accounts, master
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
                 val insertOrUpdateSellerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 val insertOrUpdateBuyerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
-                //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
-                def markTradeCompleted= masterAssets.Service.markTradeCompleted(negotiation.assetPegHash)
+
+                def markTradeCompleted: Future[Unit] = {
+                  val updateNegotiationStatus = masterNegotiations.Service.markTradeCompletedByNegotiationID(negotiation.id)
+                  val updateAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(negotiation.assetPegHash)
+                  for {
+                    _ <- updateNegotiationStatus
+                    _ <- updateAssetStatus
+                  } yield Unit
+                }
 
                 def deleteNegotiations: Future[Int] = blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
 

@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.SALES_QUOTE_LIST) {
+  @commonFormButton(constants.Form.NEGOTIATION_REQUEST)
+} {
+  @commonHorizontalSwitcher(ListMap(
+    constants.View.SENT_NEGOTIATION_REQUEST_LIST -> routes.javascript.ComponentViewController.traderViewSentNegotiationRequestList,
+    constants.View.RECEIVED_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.traderViewReceivedNegotiationList,
+    constants.View.INCOMPLETE_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.traderViewIncompleteNegotiationList,
+    constants.View.REJECTED_OR_FAILED_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.traderViewRejectedOrFailedNegotiationList,
+  ))
+}

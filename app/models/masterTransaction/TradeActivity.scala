@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class TradeActivity(notificationID: String, tradeRoomID: String)
+case class TradeActivity(notificationID: String, negotiationID: String)
 
 @Singleton
 class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -43,7 +43,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def findById(tradeRoomID: String): Future[Seq[TradeActivity]] = db.run(tradeActivityTable.filter(_.tradeRoomID === tradeRoomID).result.asTry).map {
+  private def findById(negotiationID: String): Future[Seq[TradeActivity]] = db.run(tradeActivityTable.filter(_.negotiationID === negotiationID).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -63,18 +63,18 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class TradeActivityTable(tag: Tag) extends Table[TradeActivity](tag, "TradeActivity") {
 
-    def * = (notificationID, tradeRoomID) <> (TradeActivity.tupled, TradeActivity.unapply)
+    def * = (notificationID, negotiationID) <> (TradeActivity.tupled, TradeActivity.unapply)
 
     def notificationID = column[String]("notificationID", O.PrimaryKey)
 
-    def tradeRoomID = column[String]("tradeRoomID", O.PrimaryKey)
+    def negotiationID = column[String]("negotiationID", O.PrimaryKey)
 
   }
 
   object Service {
-    def create(notificationID: String, tradeRoomID: String): Future[String] = add(TradeActivity(notificationID,tradeRoomID))
+    def create(notificationID: String, negotiationID: String): Future[String] = add(TradeActivity(notificationID, negotiationID))
 
-    def getTradeActivity(tradeRoomID: String):Future[Seq[TradeActivity]] = findById(tradeRoomID)
+    def getTradeActivity(negotiationID: String): Future[Seq[TradeActivity]] = findById(negotiationID)
   }
 
 }

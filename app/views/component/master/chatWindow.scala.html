@@ -2,24 +2,24 @@
 @import views.html.base._
 @import views.companion.master.SendMessage
 @import models.masterTransaction.Message
-@import models.masterTransaction.MessageReceive
+@import models.masterTransaction.MessageRead
 @import views.html.component.master.sendMessage
 
-@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageReceive], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-    @if(chats.length > 0) {
+@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+    @if(chats.nonEmpty) {
         @if(readChats.filter(x => x.messageID == chats.head.id && x.accountID == loginState.username).length == 0 && chats.head.fromAccountID != loginState.username) {
-            <div onclick="markChatRead(jsRoutes.controllers.TradeRoomController.markChatAsRead('@chatID'))" style="font-size: 12px;">
+            <div onclick="markChatRead(jsRoutes.controllers.ChatController.markChatAsRead('@chatID'))" style="font-size: 12px;">
             }
     }
 
     <div id="chatMessages" class="chatMessages chat" title="You have chat with">
         <script>
-            componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatID', 0))
+            componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0))
     </script>
     </div>
 
     <div>
-    @if(chats.length > 0) {
+    @if(chats.nonEmpty) {
         <div style="font-size: 12px;">@Messages(constants.View.READ_BY)
             : @readChats.filter(_.messageID == chats.head.id).map(_.accountID).mkString</div>
     }
@@ -30,8 +30,8 @@
 </div>
     <script type="text/javascript">
         var chatCometMessage = function (event) {
-            componentResource('chatMessages', jsRoutes.controllers.TradeRoomController.loadMoreChats('@chatID', 0));
+            componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0));
         }
 </script>
 
-    <iframe class="hidden" src="@routes.TradeRoomController.sendMessageComet(chatID)"></iframe>
+    <iframe class="hidden" src="@routes.ChatController.sendMessageComet(chatID)"></iframe>
