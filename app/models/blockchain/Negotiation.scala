@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{ActorCreation, MainActor, ShutdownActor}
+import actors.{Create, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import exceptions.BaseException
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean)
 
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActor, actorCreation: ActorCreation, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors.Create, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -220,8 +220,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, actorCreation: Actor
               _ <- refreshDirty(negotiationResponse)
               (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
-              actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.ActorMessage.Negotiation())
-              actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.ActorMessage.Negotiation())
+              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
+              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

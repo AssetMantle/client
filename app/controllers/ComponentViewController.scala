@@ -1,6 +1,5 @@
 package controllers
 
-import actors.ActorCreation
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -21,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ComponentViewController @Inject()(
-                                       actorCreation: ActorCreation,
+                                         actorsCreate: actors.Create,
                                          messagesControllerComponents: MessagesControllerComponents,
                                          masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs,
                                          masterOrganizationKYCs: master.OrganizationKYCs,
@@ -339,7 +338,7 @@ class ComponentViewController @Inject()(
 
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok.chunked(actorCreation.Service.cometSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
+      Future(Ok.chunked(actorsCreate.Service.cometSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

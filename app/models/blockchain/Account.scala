@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{ActorCreation, ShutdownActor}
+import actors.{Create, ShutdownActor}
 import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorCreation: ActorCreation, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -153,7 +153,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
               responseAccount <- responseAccount
               _ <- refreshDirty(responseAccount)
               accountID <- accountID
-            } yield actorCreation.mainActor ! actors.ActorMessage.makeCometMessage(username = accountID, messageType = constants.Comet.ACCOUNT, messageContent = actors.ActorMessage.Account())
+            } yield actorsCreate.mainActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ACCOUNT, messageContent = actors.Message.Account())
           }
         }
       }

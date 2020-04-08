@@ -2,7 +2,7 @@ package actors
 
 import play.api.libs.json.{JsValue, Json, OWrites, Writes}
 
-object ActorMessage {
+object Message {
 
   private case class message(messageType: String, messageContent: JsValue)
 

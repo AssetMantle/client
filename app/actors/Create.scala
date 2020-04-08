@@ -9,7 +9,7 @@ import play.api.libs.json.JsValue
 import scala.concurrent.duration._
 
 @Singleton
-class ActorCreation @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit configuration: Configuration){
+class Create @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit configuration: Configuration){
 
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 

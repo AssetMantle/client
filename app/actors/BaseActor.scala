@@ -32,7 +32,7 @@ class MainActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem
   private implicit val module: String = constants.Module.ACTOR_MAIN
 
   def receive: PartialFunction[Any, Unit] = {
-    case cometMessage: ActorMessage.CometMessage =>
+    case cometMessage: Message.CometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN + "/" + cometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module + " " + cometMessage.username + ": " + cometMessage.message)
 
@@ -60,7 +60,7 @@ class UserActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) extends
 
 
   def receive = {
-    case cometMessage: ActorMessage.CometMessage => systemUserActor ! cometMessage.message
+    case cometMessage: Message.CometMessage => systemUserActor ! cometMessage.message
 
     case _: ShutdownActorMessage =>
       systemUserActor ! PoisonPill
