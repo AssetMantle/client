@@ -14,6 +14,9 @@
             case constants.User.TRADER => {
             componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
+            case constants.User.ORGANIZATION => {}
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
             case _ => {}
         }
     </script>
@@ -28,6 +31,9 @@
             </script>
             <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
         }
+        case constants.User.ORGANIZATION => {}
+        case constants.User.ZONE => {}
+        case constants.User.GENESIS => {}
         case _ => {}
     }
 }
