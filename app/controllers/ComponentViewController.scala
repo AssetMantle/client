@@ -1067,4 +1067,8 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def organizationDeclarations(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationDeclarations()))
+  }
 }

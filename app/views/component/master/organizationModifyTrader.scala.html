@@ -3,7 +3,7 @@
 @import views.companion.master.ModifyTrader
 @import models.master.Trader
 
-@(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String, trader: Trader)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String, trader: Trader)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
     @commonTextInfo(constants.View.NAME, trader.name)
     @commonInputText(modifyTraderForm, constants.FormField.ACCOUNT_ID, 'value -> accountID, 'readonly -> true)

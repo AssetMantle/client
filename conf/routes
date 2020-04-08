@@ -178,6 +178,8 @@ GET         /component/traderSubscriptionDetails                                
 GET         /component/organizationViewTradeStatistics                                      controllers.ComponentViewController.organizationViewTradeStatistics
 GET         /component/traderViewTradeStatistics                                            controllers.ComponentViewController.traderViewTradeStatistics
 
+GET         /component/organizationDeclarations                                             controllers.ComponentViewController.organizationDeclarations
+
 GET         /zone/inviteZone                                                                controllers.AddZoneController.inviteZoneForm
 POST        /zone/inviteZone                                                                controllers.AddZoneController.inviteZone
 GET         /zone/acceptInvitation                                                          controllers.AddZoneController.acceptInvitation(token: String)

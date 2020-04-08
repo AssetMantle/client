@@ -78,16 +78,14 @@
                     </div>
 
                     <div class="cmuk-width-expand@@m">
-                        @commonCard(constants.View.ORGANIZATION_DECALRATIONS){
-                        }{
-                            @Messages(constants.View.TO_BE_FILLED)
-                        }
+                        <div id="organizationDeclarations" class="organizationUbos"></div>
                     </div>
 
                     <script>
                     componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
                     componentResource('viewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.viewOrganizationBankAccountDetail());
                     componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
+                    componentResource('organizationDeclarations', jsRoutes.controllers.ComponentViewController.organizationDeclarations());
                 </script>
                 }
                 case _ => {}
