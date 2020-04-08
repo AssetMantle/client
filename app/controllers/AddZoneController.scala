@@ -43,6 +43,7 @@ class AddZoneController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
 
+  private val comdexURL: String = configuration.get[String]("comdex.url")
 
   def inviteZoneForm(): Action[AnyContent] = Action {
     implicit request =>
@@ -60,7 +61,7 @@ class AddZoneController @Inject()(
           val token = masterTransactionZoneInvitations.Service.create(inviteZoneData.emailAddress)
 
           def sendEmailNotificationsAndGetResult(token: String): Future[Result] = {
-            utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteZoneData.emailAddress, email = constants.Notification.SEND_ZONE_INVITATION.email.get, token)
+            utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteZoneData.emailAddress, email = constants.Notification.SEND_ZONE_INVITATION.email.get, comdexURL, token)
             utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.GENESIS_NOTIFY_ZONE_INVITATION_SENT)
             withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
           }

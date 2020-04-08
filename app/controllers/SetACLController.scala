@@ -50,6 +50,8 @@ class SetACLController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_SET_ACL
 
+  private val comdexURL: String = configuration.get[String]("comdex.url")
+
   def inviteTraderForm(): Action[AnyContent] = Action {
     implicit request =>
       Ok(views.html.component.master.inviteTrader())
@@ -81,7 +83,7 @@ class SetACLController @Inject()(
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
               def sendEmailAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, inviteTraderData.name, organization.name, organization.id)
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.SEND_TRADER_INVITATION.email.get, inviteTraderData.name, organization.name, organization.id, comdexURL)
                 withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 
