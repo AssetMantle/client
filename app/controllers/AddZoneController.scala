@@ -8,6 +8,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
 import models.master.ZoneKYC
+import models.masterTransaction.ZoneInvitation
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
@@ -76,13 +77,23 @@ class AddZoneController @Inject()(
 
   def acceptInvitation(token: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val updateStatus = masterTransactionZoneInvitations.Service.markInviationAccepted(token)
+      val invitation = masterTransactionZoneInvitations.Service.tryGet(token)
+
+      def updateStatus(invitation: ZoneInvitation): Future[Int] = {
+        if (invitation.accountID.isDefined) {
+          if (invitation.accountID.get != loginState.username) throw new BaseException(constants.Response.UNAUTHORIZED) else Future(0)
+        } else {
+          masterTransactionZoneInvitations.Service.markInvitationAccepted(id = token, accountID = loginState.username)
+        }
+      }
+
       (for {
-        _ <- updateStatus
+        invitation <- invitation
+        _ <- updateStatus(invitation)
         result <- withUsernameToken.Ok(views.html.component.master.userAcceptZoneInvitation())
       } yield result
         ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.userAcceptZoneInvitation())
+        case baseException: BaseException => withUsernameToken.Ok(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 

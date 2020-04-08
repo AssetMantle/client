@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneInvitation(id: String, emailAddress: String, status: Option[Boolean] = None)
+case class ZoneInvitation(id: String, emailAddress: String, accountID: Option[String] = None, status: Option[Boolean] = None)
 
 @Singleton
 class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -43,7 +43,7 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def updateStatusByID(id: String, status: Option[Boolean]): Future[Int] = db.run(zoneInvitationTable.filter(_.id === id).map(_.status.?).update(status).asTry).map {
+  private def updateStatusAndAccountIDByID(id: String, accountID: Option[String], status: Option[Boolean]): Future[Int] = db.run(zoneInvitationTable.filter(_.id === id).map(x => (x.accountID.?, x.status.?)).update((accountID, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.ZONE_INVITATION_DOES_NOT_EXISTS.message, noSuchElementException)
@@ -53,11 +53,13 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class ZoneInvitationTable(tag: Tag) extends Table[ZoneInvitation](tag, "ZoneInvitation") {
 
-    def * = (id, emailAddress, status.?) <> (ZoneInvitation.tupled, ZoneInvitation.unapply)
+    def * = (id, emailAddress, accountID.?, status.?) <> (ZoneInvitation.tupled, ZoneInvitation.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def emailAddress = column[String]("emailAddress")
+
+    def accountID = column[String]("accountID")
 
     def status = column[Boolean]("status")
 
@@ -69,7 +71,7 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def tryGet(id: String): Future[ZoneInvitation] = findByID(id)
 
-    def markInviationAccepted(id: String): Future[Int] = updateStatusByID(id = id, status = Option(true))
+    def markInvitationAccepted(id: String, accountID: String): Future[Int] = updateStatusAndAccountIDByID(id = id, accountID = Option(accountID), status = Option(true))
 
   }
 

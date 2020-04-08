@@ -863,6 +863,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
 (
     "id"           VARCHAR NOT NULL,
     "emailAddress" VARCHAR NOT NULL UNIQUE,
+    "accountID"    VARCHAR UNIQUE,
     "status"       BOOLEAN,
     PRIMARY KEY ("id")
 );
@@ -982,6 +983,8 @@ ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
+    ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 
 /*Initial State*/
 
