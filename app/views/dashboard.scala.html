@@ -17,24 +17,24 @@
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="organizationViewTradeStatistics"></div>
+                    <div id="organizationTradeStatistics"></div>
                 </div>
 
             </div>
             <script>
-                    componentResource('organizationViewTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationViewTradeStatistics());
+                    componentResource('organizationTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationTradeStatistics());
             </script>
         }
         case constants.User.TRADER => {
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="traderViewTradeStatistics"></div>
+                    <div id="traderTradeStatistics"></div>
                 </div>
 
             </div>
             <script>
-                    componentResource('traderViewTradeStatistics', jsRoutes.controllers.ComponentViewController.traderViewTradeStatistics());
+                    componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
             </script>
         }
         case constants.User.USER => {}

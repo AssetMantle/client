@@ -6,7 +6,6 @@
 
 @(rejectedNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-
 <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_NEGOTIATION_LIST)</div>
 @rejectedNegotiationList.map { rejectedNegotiation =>
     <li class="commonList">

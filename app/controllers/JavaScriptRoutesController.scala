@@ -19,7 +19,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.noteAndVerifyMnemonic,
         routes.javascript.AccountController.addIdentificationForm,
-        routes.javascript.AccountController.userUploadOrUpdateIdentificationView,
+        routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
 
         routes.javascript.AddKeyController.blockchainAddKeyForm,
@@ -103,9 +103,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewAcceptedSellNegotiationList,
         routes.javascript.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList,
         routes.javascript.ComponentViewController.traderViewSentNegotiationRequestList,
-        routes.javascript.ComponentViewController.traderViewReceivedNegotiationList,
+        routes.javascript.ComponentViewController.traderViewReceivedNegotiationRequestList,
         routes.javascript.ComponentViewController.traderViewIncompleteNegotiationList,
-        routes.javascript.ComponentViewController.traderViewRejectedOrFailedNegotiationList,
+        routes.javascript.ComponentViewController.traderViewRejectedAndFailedNegotiationList,
 
         routes.javascript.ComponentViewController.organizationViewTraderAccountList,
         routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountList,
@@ -134,8 +134,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationSubscription,
         routes.javascript.ComponentViewController.traderSubscription,
 
-        routes.javascript.ComponentViewController.organizationViewTradeStatistics,
-        routes.javascript.ComponentViewController.traderViewTradeStatistics,
+        routes.javascript.ComponentViewController.organizationTradeStatistics,
+        routes.javascript.ComponentViewController.traderTradeStatistics,
 
         routes.javascript.ComponentViewController.profilePicture,
         routes.javascript.ComponentViewController.identification,
@@ -289,8 +289,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetACLController.zoneViewKYCDocuments,
-        routes.javascript.SetACLController.updateTraderKYCDocumentZoneStatusForm,
-        routes.javascript.SetACLController.updateTraderKYCDocumentOrganizationStatusForm,
+        routes.javascript.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm,
+        routes.javascript.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm,
         routes.javascript.SetACLController.uploadTraderKYCForm,
         routes.javascript.SetACLController.uploadTraderKYC,
         routes.javascript.SetACLController.storeTraderKYC,

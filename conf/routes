@@ -47,7 +47,7 @@ GET         /account/checkUsernameAvailable                                     
 
 GET         /account/addIdentification                                                      controllers.AccountController.addIdentificationForm
 POST        /account/addIdentification                                                      controllers.AccountController.addIdentification
-GET         /account/userUploadOrUpdateIdentificationView                                   controllers.AccountController.userUploadOrUpdateIdentificationView
+GET         /account/userViewUploadOrUpdateIdentification                                   controllers.AccountController.userViewUploadOrUpdateIdentification
 GET         /account/userReviewIdentification                                               controllers.AccountController.userReviewIdentificationForm
 POST        /account/userReviewIdentification                                               controllers.AccountController.userReviewIdentification
 
@@ -113,9 +113,9 @@ GET         /component/traderViewAcceptedSellNegotiationList                    
 
 GET         /component/traderViewSentReceivedIncompleteRejectedFailedNegotiationList        controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList
 GET         /component/traderViewSentNegotiationRequestList                                 controllers.ComponentViewController.traderViewSentNegotiationRequestList
-GET         /component/traderViewReceivedNegotiationList                                    controllers.ComponentViewController.traderViewReceivedNegotiationList
+GET         /component/traderViewReceivedNegotiationRequestList                             controllers.ComponentViewController.traderViewReceivedNegotiationRequestList
 GET         /component/traderViewIncompleteNegotiationList                                  controllers.ComponentViewController.traderViewIncompleteNegotiationList
-GET         /component/traderViewRejectedOrFailedNegotiationList                            controllers.ComponentViewController.traderViewRejectedOrFailedNegotiationList
+GET         /component/traderViewRejectedAndFailedNegotiationList                           controllers.ComponentViewController.traderViewRejectedAndFailedNegotiationList
 
 GET         /component/identification                                                       controllers.ComponentViewController.identification
 GET         /component/userViewPendingRequests                                              controllers.ComponentViewController.userViewPendingRequests
@@ -170,8 +170,8 @@ GET         /component/zoneViewRejectedOrganizationRequest                      
 GET         /component/organizationSubscription                                             controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                   controllers.ComponentViewController.traderSubscription
 
-GET         /component/organizationViewTradeStatistics                                      controllers.ComponentViewController.organizationViewTradeStatistics
-GET         /component/traderViewTradeStatistics                                            controllers.ComponentViewController.traderViewTradeStatistics
+GET         /component/organizationTradeStatistics                                          controllers.ComponentViewController.organizationTradeStatistics
+GET         /component/traderTradeStatistics                                                controllers.ComponentViewController.traderTradeStatistics
 
 GET         /component/organizationDeclarations                                             controllers.ComponentViewController.organizationDeclarations
 
@@ -248,14 +248,14 @@ POST        /master/userReviewAddTraderRequest                                  
 GET         /master/zoneVerifyTrader                                                        controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
 POST        /master/zoneVerifyTrader                                                        controllers.SetACLController.zoneVerifyTrader
 GET         /master/zoneViewTraderKYCDocuments                                              controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
-GET         /master/updateTraderKYCDocumentZoneStatus                                       controllers.SetACLController.updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
-POST        /master/updateTraderKYCDocumentZoneStatus                                       controllers.SetACLController.updateTraderKYCDocumentZoneStatus
+GET         /master/zoneAcceptOrRejectTraderKYCDocument                                     controllers.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm(traderID: String, documentType: String)
+POST        /master/zoneAcceptOrRejectTraderKYCDocument                                     controllers.SetACLController.zoneAcceptOrRejectTraderKYCDocument
 GET         /master/zoneViewVerifyTraderRequests                                            controllers.SetACLController.zoneViewPendingVerifyTraderRequests
 
 GET         /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTrader
-GET         /master/updateTraderKYCDocumentOrganizationStatus                               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
-POST        /master/updateTraderKYCDocumentOrganizationStatus                               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
+GET         /master/organizationAcceptOrRejectTraderKYCDocument                             controllers.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm(traderID: String, documentType: String)
+POST        /master/organizationAcceptOrRejectTraderKYCDocument                             controllers.SetACLController.organizationAcceptOrRejectTraderKYCDocument
 
 GET         /traderUpload                                                                   controllers.SetACLController.uploadTraderKYCForm(documentType: String)
 POST        /traderUpload/file                                                              controllers.SetACLController.uploadTraderKYC(documentType: String)

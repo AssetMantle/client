@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object UpdateTraderKYCDocumentOrganizationStatus {
+object ZoneAcceptOrRejectTraderKYCDocument {
   val form = Form(
     mapping(
       constants.FormField.TRADER_ID.name -> constants.FormField.TRADER_ID.field,
@@ -12,5 +12,5 @@ object UpdateTraderKYCDocumentOrganizationStatus {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(traderID: String, documentType: String, organizationStatus: Boolean)
+  case class Data(traderID: String, documentType: String, zoneStatus: Boolean)
 }

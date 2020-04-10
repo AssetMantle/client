@@ -181,7 +181,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewReceivedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewReceivedNegotiationRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -196,7 +196,7 @@ class ComponentViewController @Inject()(
         receivedNegotiationList <- receivedNegotiationList(traderID)
         assetsList <- assetsList(receivedNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(receivedNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewReceivedNegotiationList(receivedNegotiationList = receivedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+      } yield Ok(views.html.component.master.traderViewReceivedNegotiationRequestList(receivedNegotiationRequestList = receivedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -223,7 +223,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewRejectedOrFailedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewRejectedAndFailedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -244,7 +244,7 @@ class ComponentViewController @Inject()(
         failedNegotiationList <- failedNegotiationList(traderID)
         assetsList <- assetsList(buyerRejectedNegotiationList.map(_.assetID) ++ sellerRejectedNegotiationList.map(_.assetID) ++ failedNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(buyerRejectedNegotiationList.map(_.buyerTraderID) ++ sellerRejectedNegotiationList.map(_.buyerTraderID) ++ failedNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewRejectedOrFailedNegotiationList(rejectedNegotiationList = buyerRejectedNegotiationList ++ sellerRejectedNegotiationList, failedNegotiationList = failedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+      } yield Ok(views.html.component.master.traderViewRejectedAndFailedNegotiationList(rejectedNegotiationList = buyerRejectedNegotiationList ++ sellerRejectedNegotiationList, failedNegotiationList = failedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -978,7 +978,7 @@ class ComponentViewController @Inject()(
 
   //Dashboard Cards
 
-  def organizationViewTradeStatistics(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationTradeStatistics(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -993,7 +993,7 @@ class ComponentViewController @Inject()(
         traders <- getTraders(organizationID)
         tradeCompletedBuyNegotiationList <- getTradeCompletedBuyNegotiationList(traders.map(_.id))
         tradeCompletedSellNegotiationList <- getTradeCompletedSellNegotiationList(traders.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewTradeStatistics(
+      } yield Ok(views.html.component.master.organizationTradeStatistics(
         tradeCompletedBuyNegotiationList = tradeCompletedBuyNegotiationList.sortBy(_.time).reverse,
         tradeCompletedSellNegotiationList = tradeCompletedSellNegotiationList.sortBy(_.time).reverse,
         traders = traders,
@@ -1003,7 +1003,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewTradeStatistics(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderTradeStatistics(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
       val traderID = masterTraders.Service.tryGetID(loginState.username)
@@ -1016,7 +1016,7 @@ class ComponentViewController @Inject()(
         traderID <- traderID
         tradeCompletedBuyNegotiationList <- getTradeCompletedBuyNegotiationList(traderID)
         tradeCompletedSellNegotiationList <- getTradeCompletedSellNegotiationList(traderID)
-      } yield Ok(views.html.component.master.traderViewTradeStatistics(
+      } yield Ok(views.html.component.master.traderTradeStatistics(
         tradeCompletedBuyNegotiationList = tradeCompletedBuyNegotiationList.sortBy(_.time).reverse,
         tradeCompletedSellNegotiationList = tradeCompletedSellNegotiationList.sortBy(_.time).reverse
       ))

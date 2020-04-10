@@ -68,7 +68,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
       def getResult(accountKYC: Option[AccountKYC]) = documentType match {
-        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, documentType))
+        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, documentType))
         case constants.File.BANK_ACCOUNT_DETAIL => withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       }
 
@@ -98,7 +98,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
       def getResult(accountKYC: Option[AccountKYC]) = documentType match {
-        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, documentType))
+        case constants.File.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, documentType))
         case constants.File.BANK_ACCOUNT_DETAIL => withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       }
 

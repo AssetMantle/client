@@ -368,7 +368,7 @@ class AccountController @Inject()(
           (for {
             _ <- add
             accountKYC <- accountKYC()
-            result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, constants.File.IDENTIFICATION))
+            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -377,12 +377,12 @@ class AccountController @Inject()(
       )
   }
 
-  def userUploadOrUpdateIdentificationView: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       for {
         accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, constants.File.IDENTIFICATION))
+        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
       } yield result
   }
 

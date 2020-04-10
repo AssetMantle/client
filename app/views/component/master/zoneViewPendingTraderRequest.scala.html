@@ -31,7 +31,7 @@
     } {
         <a href="@routes.FileController.zoneAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
     } {
-        @views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = traderKYC)
+        @views.html.component.master.zoneAcceptOrRejectTraderKYCDocument(traderKYC = traderKYC)
         @commonBooleanInfo(constants.View.ORGANIZATION_STATUS, traderKYC.organizationStatus)
     }
 }
