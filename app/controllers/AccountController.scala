@@ -6,6 +6,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.{ACL, ACLAccount}
+import models.common.Serializable.Address
 import models.master.{Identification, Organization, Zone}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -13,6 +14,7 @@ import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import services.SFTPScheduler
+import views.companion.master.Identification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -344,7 +346,7 @@ class AccountController @Inject()(
       val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
 
       def getResult(identification: Option[Identification]): Future[Result] = identification match {
-        case Some(identity) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(views.companion.master.Identification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType))))
+        case Some(identity) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(views.companion.master.Identification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType, address = AddressData(identity.address.addressLine1, identity.address.addressLine2, identity.address.landmark, identity.address.city, identity.address.country, identity.address.zipCode, identity.address.phone)))))
         case None => withUsernameToken.Ok(views.html.component.master.identification())
       }
 
@@ -361,7 +363,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.identification(formWithErrors)))
         },
         identificationData => {
-          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, identificationData.firstName, identificationData.lastName, utilities.Date.utilDateToSQLDate(identificationData.dateOfBirth), identificationData.idNumber, identificationData.idType)
+          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, identificationData.firstName, identificationData.lastName, utilities.Date.utilDateToSQLDate(identificationData.dateOfBirth), identificationData.idNumber, identificationData.idType, Address(addressLine1 = identificationData.address.addressLine1, addressLine2 = identificationData.address.addressLine2, landmark = identificationData.address.landmark, city = identificationData.address.city, country = identificationData.address.country, zipCode = identificationData.address.zipCode, phone = identificationData.address.phone))
 
           def accountKYC(): Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
 

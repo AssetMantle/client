@@ -7,8 +7,7 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Contact(id: String, mobileNumber: String, mobileNumberVerified: Boolean, emailAddress: String, emailAddressVerified: Boolean)
@@ -122,15 +121,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def checkByEmail(email: String): Future[Boolean] = db.run(contactTable.filter(_.emailAddress === email).exists.result)
+  private def checkByEmail(email: String, accountID: String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.emailAddress === email).exists.result)
 
-  private def checkByMobileNumber(mobileNumber: String): Future[Boolean] = db.run(contactTable.filter(_.mobileNumber === mobileNumber).exists.result)
+  private def checkByMobileNumber(mobileNumber: String, accountID: String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.mobileNumber === mobileNumber).exists.result)
 
-  private def getAllEmailIDsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).map(_.emailAddress).result)
-
-  private def getAllContactsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).result)
-
-  private def getContactByEmailId( email: String) = db.run(contactTable.filter(_.emailAddress === email).result.head.asTry).map {
+  private def getContactByEmailId(email: String) = db.run(contactTable.filter(_.emailAddress === email).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -140,7 +135,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getContactsByEmailAddresses(emailIDs:Seq[String])=db.run(contactTable.filter(_.emailAddress inSet emailIDs).result)
+  private def getContactsByEmailAddresses(emailIDs: Seq[String]) = db.run(contactTable.filter(_.emailAddress inSet emailIDs).result)
 
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 
@@ -164,7 +159,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getOrNoneContactByEmail(email: String): Future[Option[Contact]] = findByEmailAddress(email)
 
-    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] = upsert(Contact(id, mobileNumber, mobileNumberVerified = false, emailAddress, emailAddressVerified = false)).map { value => if (value > 0) true else false }
+    def insertOrUpdateContact(id: String, mobileNumber: String, mobileNumberVerificationStatus: Boolean, emailAddress: String, emailAddressVerificationStatus:Boolean): Future[Boolean] = upsert(Contact(id, mobileNumber, mobileNumberVerificationStatus, emailAddress, emailAddressVerificationStatus)).map { value => if (value > 0) true else false }
+
+    def updateEmailVerificationStatus(id: String, emailAddressVerificationStatus: Boolean)= updateEmailVerificationStatusOnId(id, emailAddressVerificationStatus)
+
+    def updateMobileNumberVerificationStatus(id :String, mobileNumberVerificationStatus: Boolean)= updateMobileNumberVerificationStatusOnId(id, mobileNumberVerificationStatus)
 
     def verifyMobileNumber(id: String): Future[Int] = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
 
@@ -178,9 +177,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getMobileNumber(id: String): Future[String] = findMobileNumberById(id)
 
-    def emailPresent(emailAddress: String): Future[Boolean] = checkByEmail(emailAddress)
+    def emailPresent(emailAddress: String, accountID: String): Future[Boolean] = checkByEmail(emailAddress, accountID)
 
-    def mobileNumberPresent(mobileNumber: String): Future[Boolean] = checkByMobileNumber(mobileNumber)
+    def mobileNumberPresent(mobileNumber: String, accountID: String): Future[Boolean] = checkByMobileNumber(mobileNumber, accountID)
 
     def getAccountIDByEmailAddress(emailAddress: String): Future[String] = findAccountIDByEmailAddress(emailAddress)
 

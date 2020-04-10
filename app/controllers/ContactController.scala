@@ -5,6 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
+import models.master.Contact
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -52,9 +53,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         updateContactData => {
 
-          val emailPresent = masterContacts.Service.emailPresent(updateContactData.emailAddress)
+          val emailPresent = masterContacts.Service.emailPresent(updateContactData.emailAddress, loginState.username)
 
-          val mobilePresent = masterContacts.Service.mobileNumberPresent(updateContactData.countryCode + updateContactData.mobileNumber)
+          val mobilePresent = masterContacts.Service.mobileNumberPresent(updateContactData.countryCode + updateContactData.mobileNumber, loginState.username)
 
           def getResult(emailPresent: Boolean, mobilePresent: Boolean) = {
             if (mobilePresent && emailPresent) {
@@ -67,12 +68,26 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
               Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value = views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.EMAIL_ADDRESS.name, constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE.message))))
             }
             else {
-              val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
+
+              val contact= masterContacts.Service.get(loginState.username)
+
+              def updateContact(contactDetails: Option[Contact])={
+                contactDetails match{
+                  case Some(contact)=>{
+                    if(contact.mobileNumber != (updateContactData.countryCode + updateContactData.mobileNumber) && contact.emailAddress != updateContactData.emailAddress) masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, false, updateContactData.emailAddress, false)
+                    else if(contact.mobileNumber != (updateContactData.countryCode + updateContactData.mobileNumber)) masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, false, updateContactData.emailAddress, contact.emailAddressVerified)
+                    else if(contact.emailAddress != updateContactData.emailAddress) masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, contact.mobileNumberVerified, updateContactData.emailAddress, false)
+                    else Future{}
+                  }
+                  case None =>  masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, false, updateContactData.emailAddress, false)
+                }
+              }
 
               def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
 
               for {
-                _ <- insertOrUpdateContact
+                contact<-contact
+                _ <- updateContact(contact)
                 _ <- updateStatusUnverifiedContact
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
               } yield result
