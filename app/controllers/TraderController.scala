@@ -149,9 +149,9 @@ class TraderController @Inject()(
             fromTraderOrganization <- getOrganization(fromTrader.organizationID)
             toTraderOrganization <- getOrganization(toTrader.organizationID)
             _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
-            _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
+            _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
             _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
-            _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
+            _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
             result <- getResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -199,16 +199,16 @@ class TraderController @Inject()(
             if (acceptOrRejectTraderRelationData.status) {
               for {
                 _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
-                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
+                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.name, toTraderOrganization.name)
                 _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
-                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
+                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.name, fromTraderOrganization.name)
               } yield {}
             } else {
               for {
                 _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
-                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
+                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.name, toTraderOrganization.name)
                 _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
-                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
+                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.name, fromTraderOrganization.name)
               } yield {}
             }
             withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))

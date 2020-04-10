@@ -34,6 +34,9 @@ object Notification {
     val subject: String = Seq(EMAIL_PREFIX, notificationType, SUBJECT_SUFFIX).mkString(".")
     val message: String = Seq(EMAIL_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
+  //Invitation Emails
+  val ZONE_INVITATION = new Email(notificationType = "ZONE_INVITATION")
+  val TRADER_INVITATION = new Email(notificationType = "TRADER_INVITATION")
 
   val LOGIN = new Notification(notificationType = "LOGIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SIGN_UP = new Notification(notificationType = "SIGN_UP", sendEmail = false, sendPushNotification = true, sendSMS = false)
@@ -50,28 +53,26 @@ object Notification {
 
   //inviteTrader
   val ORGANIZATION_TRADER_INVITATION = new Notification(notificationType = "ORGANIZATION_TRADER_INVITATION", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val SEND_TRADER_INVITATION = new Notification(notificationType = "SEND_TRADER_INVITATION", sendEmail = true, sendPushNotification = false, sendSMS = false)
 
   //inviteZone
-  val GENESIS_NOTIFY_ZONE_INVITATION_SENT = new Notification(notificationType = "GENESIS_NOTIFY_ZONE_INVITATION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val SEND_ZONE_INVITATION = new Notification(notificationType = "SEND_ZONE_INVITATION", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val ZONE_INVITATION_SENT = new Notification(notificationType = "ZONE_INVITATION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   //trader
   val ORGANIZATION_REJECTED_TRADER_REQUEST = new Notification(notificationType = "ORGANIZATION_REJECTED_TRADER_REQUEST", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val ZONE_REJECTED_TRADER_REQUEST = new Notification(notificationType = "ZONE_REJECTED_TRADER_REQUEST", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RELATION_REQUEST_RECEIVED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_RELATION_REQUEST_SENT = new Notification(notificationType = "ORGANIZATION_TRADER_RELATION_REQUEST_SENT", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED = new Notification(notificationType = "ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_RELATION_REQUEST_RECEIVED = new Notification(notificationType = "TRADER_RELATION_REQUEST_RECEIVED", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
   //acceptOrRejectTraderRelation
   val TRADER_SENT_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "TRADER_SENT_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_SENT_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_TRADER_SENT_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED = new Notification(notificationType = "TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_SENT_RELATION_REQUEST_REJECTED = new Notification(notificationType = "TRADER_SENT_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_SENT_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
   //userReviewAddTraderRequest
@@ -87,12 +88,12 @@ object Notification {
   val ADD_ORGANIZATION_SUCCESSFUL = new Notification(notificationType = "ADD_ORGANIZATION_SUCCESSFUL", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val ADD_ORGANIZATION_FAILED = new Notification(notificationType = "ADD_ORGANIZATION_FAILED", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
-  val ADD_TRADER_SUCCESSFUL = new Notification(notificationType = "ADD_TRADER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val ZONE_NOTIFY_ADD_TRADER_SUCCESSFUL = new Notification(notificationType = "ZONE_NOTIFY_ADD_TRADER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_ADD_TRADER_SUCCESSFUL = new Notification(notificationType = "ORGANIZATION_NOTIFY_ADD_TRADER_SUCCESSFUL", sendEmail = true, sendPushNotification = true, sendSMS = false)
-  val ADD_TRADER_FAILED = new Notification(notificationType = "ADD_TRADER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val ZONE_NOTIFY_ADD_TRADER_FAILED = new Notification(notificationType = "ZONE_NOTIFY_ADD_TRADER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val ORGANIZATION_NOTIFY_ADD_TRADER_FAILED = new Notification(notificationType = "ORGANIZATION_NOTIFY_ADD_TRADER_FAILED", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val TRADER_REGISTRATION_SUCCESSFUL = new Notification(notificationType = "TRADER_REGISTRATION_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL = new Notification(notificationType = "ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val TRADER_REGISTRATION_FAILED = new Notification(notificationType = "D = ne", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_TRADER_REGISTRATION_FAILED = new Notification(notificationType = "ORGANIZATION_TRADER_REGISTRATION_FAILED", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
   //addZone
   val ADD_ZONE_REQUESTED = new Notification(notificationType = "ADD_ZONE_REQUESTED", sendEmail = false, sendPushNotification = true, sendSMS = false)

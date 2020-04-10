@@ -194,8 +194,8 @@ EMAIL.LOGIN.SUBJECT = New Login
 EMAIL.LOGIN.MESSAGE = You have logged in {0}
 EMAIL.VERIFY_EMAIL.SUBJECT = Verify Email
 EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP is {0}
-EMAIL.SEND_TRADER_INVITATION.SUBJECT = Invitation to become Trader.
-EMAIL.SEND_TRADER_INVITATION.MESSAGE = Hi {0},\
+EMAIL.TRADER_INVITATION.SUBJECT = Invitation to become Trader.
+EMAIL.TRADER_INVITATION.MESSAGE = Hi {0},\
   You have been invited to be a part of Comdex by Organization: {1}.\
   Please use this id:{2} to add as Trader for this organization. Click on <a href="{3}">Comdex</a>.
 
@@ -519,6 +519,6 @@ FORM.ACCEPT_NEGOTIATION_REQUEST.SUBMIT=Submit
 FORM.REJECT_NEGOTIATION_REQUEST.LEGEND=Reject Sales Quote
 FORM.REJECT_NEGOTIATION_REQUEST.SUBMIT=Submit
 COMMENT=Comment
-EMAIL.SEND_ZONE_INVITATION.SUBJECT = Invitation to become Zone.
-EMAIL.SEND_ZONE_INVITATION.MESSAGE = Hi,\
+EMAIL.ZONE_INVITATION.SUBJECT = Invitation to become Zone.
+EMAIL.ZONE_INVITATION.MESSAGE = Hi,\
   Please go to this <a href="{0}/zone/acceptInvitation?token={1}">link</a>.

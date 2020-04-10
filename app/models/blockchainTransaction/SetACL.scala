@@ -221,9 +221,9 @@ class SetACLs @Inject()(
         _ <- transactionFeedbacksInsertOrUpdate(setACL)
         fromAccountID <- getAccountID(setACL.from)
         organization <- getTraderOrganization(trader.organizationID)
-        _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_TRADER_SUCCESSFUL, blockResponse.txhash)
-        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.name)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.accountID, trader.name, organization.name)
+        _ <- utilitiesNotification.send(accountID, constants.Notification.TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash)
+        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash, trader.name)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.accountID, trader.name, organization.name)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -247,9 +247,9 @@ class SetACLs @Inject()(
         zoneAccountID <- getAccountID(setACL.from)
         trader <- getTrader(traderAccountID)
         organization <- getTraderOrganization(trader.organizationID)
-        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.ADD_TRADER_FAILED, message)
-        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ADD_TRADER_FAILED, message, trader.name)
-        _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.ZONE_NOTIFY_ADD_TRADER_FAILED, message, trader.accountID, trader.name, organization.name)
+        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_FAILED, message)
+        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_FAILED, message, trader.name)
+        _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED, message, trader.accountID, trader.name, organization.name)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
