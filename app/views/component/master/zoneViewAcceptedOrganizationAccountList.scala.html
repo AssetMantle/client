@@ -9,7 +9,7 @@
         @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
         @commonTextInfo(constants.View.NAME, organization.name)
         @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
-        @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.zoneViewAcceptedOrganizationAccountDetails, 'parameters -> s"'${organization.id}'")
-        @commonModalButton(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL, routes.javascript.ComponentViewController.zoneViewOrganizationBankAccountDetail, 'parameters -> s"'${organization.id}'")
+        @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.zoneViewAcceptedOrganizationAccount, 'parameters -> s"'${organization.id}'")
+        @commonModalButton(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL, routes.javascript.ComponentViewController.zoneViewOrganizationBankAccount, 'parameters -> s"'${organization.id}'")
     }
 }

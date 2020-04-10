@@ -4,7 +4,7 @@ import java.util.Date
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object Identification {
+object AddIdentification {
   val form = Form(
     mapping(
       constants.FormField.FIRST_NAME.name -> constants.FormField.FIRST_NAME.field,

@@ -15,40 +15,40 @@
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="zoneViewOrganizationAccountsList"></div>
+                    <div id="zoneViewOrganizationAccountList"></div>
                 </div>
 
             </div>
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="zoneViewTraderAccountsList"></div>
+                    <div id="zoneViewTraderAccountList"></div>
                 </div>
 
             </div>
             <script>
-                    componentResource('zoneViewOrganizationAccountsList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountsList());
-                    componentResource('zoneViewTraderAccountsList', jsRoutes.controllers.ComponentViewController.zoneViewTraderAccountsList());
+                    componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
+                    componentResource('zoneViewTraderAccountList', jsRoutes.controllers.ComponentViewController.zoneViewTraderAccountList());
             </script>
         }
         case constants.User.ORGANIZATION => {
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="organizationViewTraderAccountsList"></div>
+                    <div id="organizationViewTraderAccountList"></div>
                 </div>
 
             </div>
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="organizationSubscriptionDetails"></div>
+                    <div id="organizationSubscription"></div>
                 </div>
 
             </div>
             <script>
-                    componentResource('organizationViewTraderAccountsList', jsRoutes.controllers.ComponentViewController.organizationViewTraderAccountsList());
-                    componentResource('organizationSubscriptionDetails', jsRoutes.controllers.ComponentViewController.organizationSubscriptionDetails());
+                    componentResource('organizationViewTraderAccountList', jsRoutes.controllers.ComponentViewController.organizationViewTraderAccountList());
+                    componentResource('organizationSubscription', jsRoutes.controllers.ComponentViewController.organizationSubscription());
             </script>
         }
         case constants.User.TRADER => {
@@ -62,13 +62,13 @@
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
-                    <div id="traderSubscriptionDetails"></div>
+                    <div id="traderSubscription"></div>
                 </div>
 
             </div>
             <script>
                     componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
-                    componentResource('traderSubscriptionDetails', jsRoutes.controllers.ComponentViewController.traderSubscriptionDetails());
+                    componentResource('traderSubscription', jsRoutes.controllers.ComponentViewController.traderSubscription());
             </script>
         }
         case constants.User.GENESIS => {

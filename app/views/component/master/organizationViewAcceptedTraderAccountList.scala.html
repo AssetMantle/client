@@ -9,7 +9,7 @@
         @commonTextInfo(constants.View.TRADER_ID, trader.id)
         @commonTextInfo(constants.View.NAME, trader.name)
         @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-        @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountDetails, 'parameters -> s"'${trader.id}'")
+        @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'parameters -> s"'${trader.id}'")
         @commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
     }
 }

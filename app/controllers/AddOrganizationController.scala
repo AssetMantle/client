@@ -291,7 +291,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def addOrUpdateOrganizationBankAccountDetailForm(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateOrganizationBankAccountForm(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -300,18 +300,18 @@ class AddOrganizationController @Inject()(
       (for {
         organizationID <- organizationID
         organizationBankAccountDetail <- getOrganizationBankAccountDetail(organizationID)
-        result <- withUsernameToken.Ok(views.html.component.master.addOrganizationBankAccountDetail(views.companion.master.AddOrUpdateOrganizationBankAccountDetail.form.fill(views.companion.master.AddOrUpdateOrganizationBankAccountDetail.Data(accountHolder = organizationBankAccountDetail.accountHolder, nickName = organizationBankAccountDetail.nickName, accountNumber = organizationBankAccountDetail.accountNumber, bankName = organizationBankAccountDetail.bankName, swiftAddress = organizationBankAccountDetail.swiftAddress, streetAddress = organizationBankAccountDetail.address, country = organizationBankAccountDetail.country, zipCode = organizationBankAccountDetail.zipCode))))
+        result <- withUsernameToken.Ok(views.html.component.master.addOrUpdateOrganizationBankAccount(views.companion.master.AddOrUpdateOrganizationBankAccount.form.fill(views.companion.master.AddOrUpdateOrganizationBankAccount.Data(accountHolder = organizationBankAccountDetail.accountHolder, nickName = organizationBankAccountDetail.nickName, accountNumber = organizationBankAccountDetail.accountNumber, bankName = organizationBankAccountDetail.bankName, swiftAddress = organizationBankAccountDetail.swiftAddress, streetAddress = organizationBankAccountDetail.address, country = organizationBankAccountDetail.country, zipCode = organizationBankAccountDetail.zipCode))))
       } yield result
         ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addOrganizationBankAccountDetail())
+        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addOrUpdateOrganizationBankAccount())
       }
   }
 
-  def addOrUpdateOrganizationBankAccountDetail(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateOrganizationBankAccount(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.AddOrUpdateOrganizationBankAccountDetail.form.bindFromRequest().fold(
+      views.companion.master.AddOrUpdateOrganizationBankAccount.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addOrganizationBankAccountDetail(formWithErrors)))
+          Future(BadRequest(views.html.component.master.addOrUpdateOrganizationBankAccount(formWithErrors)))
         },
         organizationBankAccountDetailData => {
           val id = masterOrganizations.Service.tryGetID(loginState.username)
@@ -787,32 +787,6 @@ class AddOrganizationController @Inject()(
         _ <- updateFile(oldDocumentFileName, organizationID)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def viewOrganizationsInZone: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zoneID = masterZones.Service.tryGetID(loginState.username)
-
-      def organizationsInZone(zoneID: String): Future[Seq[Organization]] = masterOrganizations.Service.getOrganizationsInZone(zoneID)
-
-      (for {
-        zoneID <- zoneID
-        organizationsInZone <- organizationsInZone(zoneID)
-      } yield Ok(views.html.component.master.viewOrganizationsInZone(organizationsInZone))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def viewOrganizationsInZoneForGenesis(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationsInZone = masterOrganizations.Service.getOrganizationsInZone(zoneID)
-      (for {
-        organizationsInZone <- organizationsInZone
-      } yield Ok(views.html.component.master.viewOrganizationsInZoneForGenesis(organizationsInZone))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

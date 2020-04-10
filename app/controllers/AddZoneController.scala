@@ -464,18 +464,6 @@ class AddZoneController @Inject()(
       )
   }
 
-  def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zones = masterZones.Service.getAllVerified
-      (for {
-        zones <- zones
-        result <- withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(zones))
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def uploadZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.storeZoneKYC), documentType))
   }

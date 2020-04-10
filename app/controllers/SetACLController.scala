@@ -466,7 +466,7 @@ class SetACLController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
-      def getVerifyTraderRequestsForZone(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getVerifyTraderRequestsForZone(zoneID)
+      def getVerifyTraderRequestsForZone(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneVerifyTraderRequestList(zoneID)
 
       for {
         zoneID <- zoneID
@@ -827,7 +827,7 @@ class SetACLController @Inject()(
 
       def getResult(organizationZoneID: String, userZoneID: String): Future[Result] = {
         if (organizationZoneID == userZoneID) {
-          val verifiedTradersForOrganization = masterTraders.Service.getAcceptedTradersInOrganization(organizationID)
+          val verifiedTradersForOrganization = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
           for {
             verifiedTradersForOrganization <- verifiedTradersForOrganization
           } yield Ok(views.html.component.master.viewTradersInOrganization(verifiedTradersForOrganization))
@@ -848,7 +848,7 @@ class SetACLController @Inject()(
 
   def viewTradersInOrganizationForGenesis(organizationID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val verifiedTradersForOrganization = masterTraders.Service.getAcceptedTradersInOrganization(organizationID)
+      val verifiedTradersForOrganization = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
       for {
         verifiedTradersForOrganization <- verifiedTradersForOrganization
       } yield Ok(views.html.component.master.viewTradersInOrganization(verifiedTradersForOrganization))

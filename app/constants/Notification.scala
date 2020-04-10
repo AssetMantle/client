@@ -48,7 +48,7 @@ object Notification {
   val FORGOT_PASSWORD_OTP = new Notification(notificationType = "FORGOT_PASSWORD_OTP", sendEmail = true, sendPushNotification = false, sendSMS = false)
   val CONTACT_UPDATED = new Notification(notificationType = "CONTACT_UPDATED", sendEmail = true, sendPushNotification = false, sendSMS = false)
 
-  //userReviewIdentificationDetails
+  //userReviewIdentification
   val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = true, sendPushNotification = true, sendSMS = false)
 
   //inviteTrader

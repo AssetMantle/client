@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.TRADERS) {
+    @commonFormButton(constants.Form.INVITE_TRADER)
+}{
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.ORGANIZATION_VIEW_ACCEPTED_TRADER_REQUESTS -> routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountList,
+        constants.View.ORGANIZATION_VIEW_PENDING_TRADER_REQUESTS -> routes.javascript.ComponentViewController.organizationViewPendingTraderRequestList,
+        constants.View.ORGANIZATION_VIEW_REJECTED_TRADER_REQUESTS -> routes.javascript.ComponentViewController.organizationViewRejectedTraderRequestList,
+    ))
+}

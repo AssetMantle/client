@@ -89,15 +89,12 @@
                                 }
                                 case constants.User.ZONE => {
                                     <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                    <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                 }
                                 case constants.User.ORGANIZATION => {
                                     <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                    <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                 }
                                 case constants.User.GENESIS => {
                                     <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                    <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                 }
                                 case _ => {}
                             }

@@ -26,7 +26,7 @@
             }
             </div>
             <div class="cmuk-width-1-2@@m">
-                <div id="viewIdentificationDetails" class="identificationDetails"></div>
+                <div id="identification" class="identificationDetails"></div>
             </div>
             <div class="cmuk-width-1-2@@m">
                 <div id="contact" class="contactDetails"></div>
@@ -51,27 +51,27 @@
                     <div class="cmuk-width-1-2@@m accountDetails">
                     @commonCard(constants.Form.ORGANIZATION_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-org-details") {
                     } {
-                        <div id="traderViewOrganizationDetails"></div>
+                        <div id="traderViewOrganization"></div>
                     }
 
                     </div>
 
                     <div class="cmuk-width-1-2@@m">
-                        <div id="traderViewOrganizationBankAccountDetail"></div>
+                        <div id="traderViewOrganizationBankAccount"></div>
                     </div>
 
                     <script>
-                    componentResource('traderViewOrganizationDetails', jsRoutes.controllers.ComponentViewController.traderViewOrganizationDetails());
-                    componentResource('traderViewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccountDetail());
+                    componentResource('traderViewOrganization', jsRoutes.controllers.ComponentViewController.traderViewOrganization());
+                    componentResource('traderViewOrganizationBankAccount', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccount());
                 </script>
                 }
                 case constants.User.ORGANIZATION => {
                     <div class="cmuk-width-1-2@@m">
-                        <div id="viewOrganizationDetails" class="organizationDetails"></div>
+                        <div id="organization" class="organizationDetails"></div>
                     </div>
 
                     <div class="cmuk-width-1-2@@m">
-                        <div id="viewOrganizationBankAccountDetail"></div>
+                        <div id="organizationBankAccount"></div>
                     </div>
                     <div class="cmuk-width-1-2@@m">
                         <div id="viewOrganizationUBOs" class="organizationUbos"></div>
@@ -82,8 +82,8 @@
                     </div>
 
                     <script>
-                    componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
-                    componentResource('viewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.viewOrganizationBankAccountDetail());
+                    componentResource('organization', jsRoutes.controllers.ComponentViewController.organization());
+                    componentResource('organizationBankAccount', jsRoutes.controllers.ComponentViewController.organizationBankAccount());
                     componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
                     componentResource('organizationDeclarations', jsRoutes.controllers.ComponentViewController.organizationDeclarations());
                 </script>
@@ -95,6 +95,6 @@
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('contact', jsRoutes.controllers.ContactController.contact());
-            componentResource('viewIdentificationDetails', jsRoutes.controllers.ComponentViewController.viewIdentificationDetails());
+            componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
     </script>
 }
