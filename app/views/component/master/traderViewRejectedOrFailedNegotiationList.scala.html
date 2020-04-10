@@ -33,7 +33,7 @@
         @commonVerticalIntInfo(constants.View.PRICE, rejectedNegotiation.price)
         @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedNegotiation.quantity.toString(), rejectedNegotiation.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.COMMENT, rejectedNegotiation.comment.getOrElse(""))
-        @commonVerticalTextInfo(constants.View.STATUS, rejectedNegotiation.status)
+        @commonVerticalTextInfo(constants.View.STATUS, Messages(rejectedNegotiation.status))
     </li>
 }
 <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>

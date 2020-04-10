@@ -9,7 +9,13 @@
             <input type="text" id="mnemonicElement-@i" name="mnemonicElement-@i" class="cmuk-input" value="@str" autocomplete="off" readonly>
         </div>
     }
-    </div><br/>
+    </div>
+    <div class="mnemonicNote">
+        <div><span class="mnemonicInfoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info-rounded")"/></svg></span></div>
+        <div class="mnemonicNoteText">
+        @Messages(constants.View.MNEMONIC_NOTE)
+        </div>
+    </div>
     <div id="errorMnemonicInput" class="errorMnemonicInput">
     @Messages(constants.Form.INVALID_INPUT)
     </div>
