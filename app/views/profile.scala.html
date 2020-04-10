@@ -6,111 +6,92 @@
 @views.html.base.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
-    <div class="cmuk-container cmuk-margin-bottom">
-    @commonCard(constants.View.DETAILS) {
-    } {
-        <div class="cmuk-grid-medium cmuk-grid cmuk-grid-match" cmuk-grid>
-            <div class="cmuk-width-1-1@@s cmuk-width-1-3@@m">
+    <div class="cmuk-container cmuk-margin-bottom profileContainer">
+        <div class="cmuk-grid-small" cmuk-grid>
+            <div class="cmuk-width-1-2@@m profileDetails">
+            @commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
+            } {
                 <div>
-                    <div id="profilePhoto" class="centerText"></div>
+                    <div>
+                        <div id="profilePhoto" class="cmuk-text-center"></div>
+                    </div>
+                    <div>
+                        @commonTextInfo(constants.User.USER_NAME, loginState.username)
+                        @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
+                        @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress")
+                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)
+                            <span class="editIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-edit")"/></svg></span></button>
+                    </div>
                 </div>
+            }
             </div>
-            <div class="cmuk-width-1-1 cmuk-width-expand@@m">
-                <div>
-                    <h3>@loginState.username</h3>
-                    @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
-                    @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress", 'class -> "hashCode infoRowValue")
-                    <a class="toolTip" onclick="copyToClipboard('blockchainAddress')"><span class="toolTipText" id="toolTip">@Messages(constants.View.COPY_TO_CLIPBOARD)</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy()"></span></a>
-                    <br>
-                    <span><button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)</button></span>
-                </div>
+            <div class="cmuk-width-1-2@@m">
+                <div id="viewIdentificationDetails" class="identificationDetails"></div>
             </div>
-        </div>
-    }
-    </div>
-    <div class="cmuk-container cmuk-margin-bottom">
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-            <div class="cmuk-width-expand@@m">
-                <div id="contact"></div>
+            <div class="cmuk-width-1-2@@m">
+                <div id="contact" class="contactDetails"></div>
             </div>
+            @loginState.userType match {
+                case constants.User.USER => {
 
-            <div class="cmuk-width-expand@@m">
-                <div id="viewIdentificationDetails"></div>
-            </div>
-
-        </div>
-        @loginState.userType match {
-            case constants.User.USER => {
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-                    <div class="cmuk-width-expand@@m">
+                    <div class="cmuk-width-1-2@@m">
                         <div id="userViewPendingRequests"></div>
                     </div>
 
                     <div class="cmuk-width-expand@@m">
                         <div id="userViewOrganizationUBOs"></div>
                     </div>
-
-                </div>
-                <script>
+                    <script>
                     componentResource('userViewPendingRequests', jsRoutes.controllers.ComponentViewController.userViewPendingRequests());
                     componentResource('userViewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.userViewOrganizationUBOs());
                 </script>
 
-            }
-            case constants.User.TRADER => {
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-                    <div class="cmuk-width-expand@@m">
+                }
+                case constants.User.TRADER => {
+                    <div class="cmuk-width-1-2@@m accountDetails">
+                    @commonCard(constants.Form.ORGANIZATION_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-org-details") {
+                    } {
                         <div id="traderViewOrganizationDetails"></div>
+                    }
+
                     </div>
 
-                    <div class="cmuk-width-expand@@m">
+                    <div class="cmuk-width-1-2@@m">
                         <div id="traderViewOrganizationBankAccountDetail"></div>
                     </div>
 
-                </div>
-                <script>
+                    <script>
                     componentResource('traderViewOrganizationDetails', jsRoutes.controllers.ComponentViewController.traderViewOrganizationDetails());
                     componentResource('traderViewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccountDetail());
                 </script>
-            }
-            case constants.User.ORGANIZATION => {
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-                    <div class="cmuk-width-expand@@m">
-                        <div id="viewOrganizationDetails"></div>
+                }
+                case constants.User.ORGANIZATION => {
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="viewOrganizationDetails" class="organizationDetails"></div>
                     </div>
 
-                    <div class="cmuk-width-expand@@m">
+                    <div class="cmuk-width-1-2@@m">
                         <div id="viewOrganizationBankAccountDetail"></div>
                     </div>
-
-                </div>
-                <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-                    <div class="cmuk-width-expand@@m">
-                        <div id="viewOrganizationUBOs"></div>
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="viewOrganizationUBOs" class="organizationUbos"></div>
                     </div>
 
-                </div>
-                <script>
+                    <script>
                     componentResource('viewOrganizationDetails', jsRoutes.controllers.ComponentViewController.viewOrganizationDetails());
                     componentResource('viewOrganizationBankAccountDetail', jsRoutes.controllers.ComponentViewController.viewOrganizationBankAccountDetail());
                     componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
                 </script>
+                }
+                case _ => {}
+
             }
-            case _ => {}
-
-        }
-
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+            <div class="cmuk-width-1-2@@m">
             @if(loginState.userType == constants.User.TRADER) {
-                <div id="traderRelationList"></div>
+                <div id="traderRelationList" class="traderRelationList"></div>
             }
+            </div>
         </div>
-
 
     </div>
     <script>

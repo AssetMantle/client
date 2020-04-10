@@ -7,82 +7,65 @@
 
 @left = {
     <div class="leftTradeFinancial">
-    <div id="traderFinancials"></div>
-    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+        <div id="traderFinancials"></div>
+        <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
     </div>
+    <script>
+            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+    </script>
 }
 
 @center = {
-    @if(loginState.userType == constants.User.TRADER){
-        <div class="salesQuoteList">
-        @commonCard(constants.View.SALES_QUOTE_LIST){
-            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SalesQuoteController.commodityDetailsForm())">@Messages(constants.Form.CREATE_SALES_QUOTE)</button>
-            <div class="salesQuoteCardHeader">
-                <ul class="cmuk-subnav" cmuk-switcher="connect: #salesQuoteTab; animation: cmuk-animation-fade">
-                    <li><a href="#">@Messages(constants.View.BUY)</a></li>
-                    <li><a href="#">@Messages(constants.View.SELL)</a></li>
-                </ul>
+    <div class="cmuk-container cmuk-margin-bottom">
+    @loginState.userType match {
+        case constants.User.TRADER => {
+            <div class="tradeList cmuk-margin-bottom">
+                    <div id="traderViewAcceptedNegotiationList"></div>
             </div>
-        }{
-            <ul id="salesQuoteTab" class="cmuk-switcher cmuk-margin">
-                <li>
-                    <div id="salesQuoteList"></div>
-                </li>
-                <li>Hello</li>
-            </ul>
-        }
-        </div>
-        <div class="tradeList">
-        @commonCard(constants.View.TRADE_ROOMS){
-            <div class="tradeCardHeader">
-                <ul class="cmuk-subnav" cmuk-switcher="connect: #tradeListTab; animation: cmuk-animation-fade">
-                    <li><a href="#">@Messages(constants.View.ACTIVE)</a></li>
-                    <li><a href="#">@Messages(constants.View.COMPLETED)</a></li>
-                </ul>
+
+            <div class="salesQuoteList">
+                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
             </div>
-        }{
-            <ul id="tradeListTab" class="cmuk-switcher cmuk-margin">
-                <li>
-                    <div id="tradeList">
-                    </div>
-                </li>
-                <li>Hello</li>
-            </ul>
+
+            <script>
+                    componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
+                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
+            </script>
         }
-        </div>
-
-
+        case constants.User.ORGANIZATION => {}
+        case constants.User.ZONE => {}
+        case constants.User.GENESIS => {}
+        case _ => {}
     }
-
+    </div>
 }
 
-@right={
+@right = {
     <div class="recentActivity">
         <div class="recentActivityContainer">
-            @commonCard(constants.View.RECENT_ACTIVITY) {
-            } {
-                <div class="scroller">
-                    <div id="recentActivity">
-                    </div>
-                    <div class="cover-bar"></div>
-                </div>
-            }
+        @commonCard(constants.View.RECENT_ACTIVITY) {
+        } {
+            <div class="scroller">
+                <div id="recentActivity"></div>
+                <div class="cover-bar"></div>
+            </div>
+        }
         </div>
     </div>
-        }
-
     <script>
-        @if(loginState.userType == constants.User.TRADER){
-                componentResource('salesQuoteList', jsRoutes.controllers.ComponentViewController.salesQuoteList());
-                componentResource('tradeList', jsRoutes.controllers.TradeRoomController.tradeList());
+        @loginState.userType match {
+            case constants.User.TRADER => {
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
-                componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-
             }
-        @if(loginState.userType == constants.User.ORGANIZATION){
+            case constants.User.ORGANIZATION => {
                 componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
             }
-</script>
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
+}
 <script type="text/javascript">
         var fiatCometMessage = function (event) {
             componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());

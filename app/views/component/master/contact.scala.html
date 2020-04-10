@@ -4,34 +4,36 @@
 
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.CONTACT_DETAILS) {
+@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
 } {
     @userContact match {
         case Some(contact) => {
-            <p>
-                @Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
-                @if(contact.emailAddressVerified) {
-                    <span cmuk-icon="check"></span>
-                } else {
-                    <span cmuk-icon="close"></span>
-                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
-                }
-            </p>
-            <p>
-                @Messages(constants.Form.MOBILE_NUMBER): <span>@contact.mobileNumber</span>
-                @if(contact.mobileNumberVerified) {
-                    <span cmuk-icon="check"></span>
-                } else {
-                    <span cmuk-icon="close"></span>
-                    <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
-                }
-            </p>
-            <br>
-            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+            @commonInfoBox() {
+                <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
+                    @commonTextInfo(constants.Form.EMAIL_ADDRESS, contact.emailAddress)
+                    @if(contact.emailAddressVerified) {
+                        <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
+                    } else {
+                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
+                    }
+
+                </div>
+            }
+            @commonInfoBox() {
+                <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
+                    @commonTextInfo(constants.Form.MOBILE_NUMBER, contact.mobileNumber)
+                    @if(contact.mobileNumberVerified) {
+                        <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
+                    } else {
+                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
+                    }
+                </div>
+            }
+            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small buttonUpdate" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
         }
         case _ => {
             <div class="cmuk-position-center">
-                @commonFormButton(constants.Form.UPDATE_CONTACT)
+            @commonFormButton(constants.Form.UPDATE_CONTACT)
             </div>
         }
     }

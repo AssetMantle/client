@@ -3,10 +3,8 @@
 
 @(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.ZONE_KYC_FILES)</h4>
-</div>
 <div class="centerText">
+    <h4>@Messages(constants.Form.ZONE_KYC_FILES)</h4>
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>

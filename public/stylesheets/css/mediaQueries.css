@@ -1,3 +1,35 @@
+@media (max-width: 600px) {
+  .pageContent {
+    margin: 20px; }
+
+  .MnemonicQuiz {
+    max-width: 500px; }
+
+  .bannerText {
+    width: 100%; }
+
+  .mobile .cmuk-offcanvas-bar {
+    padding: 30px; }
+
+  .mobile .cmuk-button {
+    background-color: #0862BE; } }
+@media (min-width: 600px) {
+  .modalBody form {
+    width: 500px;
+    text-align: center; }
+
+  form hr {
+    margin-top: 10px; }
+
+  .MnemonicQuiz {
+    text-align: center;
+    width: 500px; }
+
+  .kycDocumentsView {
+    display: flex; } }
+@media (min-width: 960px) {
+  .verticalDataTabsData {
+    display: flex; } }
 @media screen and (max-width: 768px) {
   .timeline {
     margin: 30px;
@@ -13,20 +45,36 @@
       right: inherit; }
     .timeline .timeline-item .timeline-icon {
       left: 0; } }
+@media (min-width: 1200px) {
+  .pageContainer .leftSide {
+    height: 100%;
+    float: left;
+    left: 0;
+    margin-right: 1%;
+    width: 24%; }
+  .pageContainer .middle {
+    width: 50%;
+    height: calc(100% - 128px);
+    float: left; }
+  .pageContainer .rightSide {
+    height: 100%;
+    width: 24%;
+    float: left;
+    right: 0; } }
 @media (min-width: 992px) and (max-width: 1600px) {
+  .modal .modalContent {
+    max-height: 470px; }
+
   .leftTradeFinancial .financial {
     margin-bottom: 15px; }
   .leftTradeFinancial .cmuk-card-header {
-    padding: 10px 15px;
     font-size: 12px; }
   .leftTradeFinancial .financial .cmuk-card-body {
     height: 210px; }
-    .leftTradeFinancial .financial .cmuk-card-body .refresh {
-      font-size: 10px; }
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
-  .leftTradeFinancial .financial .cmuk-comment-meta, .leftTradeFinancial .financial .ctitle {
-    font-size: 10px; }
+    .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .wallet .ctitle {
+      font-size: 12px; }
   .leftTradeFinancial .addBalanceButton {
     text-transform: capitalize;
     font-family: "Rubik", sans-serif;
@@ -48,7 +96,6 @@
     .recentActivity .recentActivityContainer .cmuk-card-body {
       height: 210px; }
     .recentActivity .recentActivityContainer .cmuk-card-header {
-      padding: 10px 15px;
       font-size: 12px; }
   .recentActivity .chatRoom .cmuk-card-body {
     height: 300px; }
@@ -56,7 +103,40 @@
       height: 190px; }
 
   .timeline {
-    margin: 20px 0px; } }
+    margin: 20px 0px; }
+
+  .switcherViewCard .cmuk-subnav li a {
+    padding: 11px; }
+
+  .comdex .cmuk-height-medium {
+    height: 210px; } }
+@media (max-width: 1600px) {
+  .commonList .listItemChild {
+    font-size: 12px; }
+
+  .leftTradeFinancial .financial ul li .ctitle {
+    font-size: 12px; }
+
+  .timeline .timeline-item .timeline-content .activityContent {
+    font-size: 12px; }
+
+  .profileContainer .infoRow {
+    font-size: 12px; }
+
+  .cmuk-card-body .cmuk-subnav li a {
+    font-size: 10px; }
+
+  .modal .modalContent {
+    top: 10%;
+    max-height: 400px; }
+
+  .tabsSection .cmuk-grid-divider {
+    display: block; }
+  .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin {
+    margin: 10px 0px 0px 0px; }
+  .tabsSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
+  .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
+    border: none; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

@@ -4,27 +4,29 @@
 
 @(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
+<div id='@arguments.toMap.get('containerDivID).map(_.toString).getOrElse("")' class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("commonSelect")'>
 @defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
-        @defining(
-            sequentialNestedFormfield match {
-                case Some(field: Field) => {
-                    //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
-                    field.apply(formField.name)
-                }
-                case None => {
-                    nestedFormField match {
-                        case Some(field: NestedFormField) => {
-                            //This case handles nested fields. See AddOrganization for example.
-                            formData(Seq(field.name, formField.name).mkString("."))
-                        }
-                        case None => {
-                            //This case handles generic fields.
-                            formData(formField.name)
-                        }
+    @defining(
+        sequentialNestedFormfield match {
+            case Some(field: Field) => {
+                //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
+                field.apply(formField.name)
+            }
+            case None => {
+                nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        //This case handles nested fields. See AddOrganization for example.
+                        formData(Seq(field.name, formField.name).mkString("."))
+                    }
+                    case None => {
+                        //This case handles generic fields.
+                        formData(formField.name)
                     }
                 }
             }
-        ) { field =>
-            @select(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
         }
+    ) { field =>
+        @select(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
     }
+}
+</div>

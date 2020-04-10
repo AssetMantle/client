@@ -11,7 +11,7 @@
         <div>
             @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = traderKYC)
         </div>
-        <br>
+        <div>
         <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):
             @traderKYC.zoneStatus match {
                 case Some(status: Boolean) => {
@@ -24,5 +24,6 @@
                 case None => {}
             }
         </span>
+        </div>
     }
 }

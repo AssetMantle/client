@@ -117,7 +117,6 @@ function unReadBar(count) {
     if ($('#unRead').length == 0) {
         let c=count+2;
         const loadMore = $(".chatMessages .chatMessage:nth-last-child("+c+")");
-        console.log(c, count, loadMore);
         loadMore.after('<div id="unRead" class="unRead">un read message</div>');
     } else {
     }

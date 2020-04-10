@@ -4,6 +4,7 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.master.Negotiations
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -12,7 +13,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterTransactionNegotiationRequests: masterTransaction.NegotiationRequests, blockchainNegotiations: blockchain.Negotiations, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsChangeBuyerBid: transactions.ChangeBuyerBid, blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids)(implicit executionContext: ExecutionContext, configuration: Configuration, withUsernameToken: WithUsernameToken) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, masterNegotiations: Negotiations, blockchainNegotiations: blockchain.Negotiations, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsChangeBuyerBid: transactions.ChangeBuyerBid, blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids)(implicit executionContext: ExecutionContext, configuration: Configuration, withUsernameToken: WithUsernameToken) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -20,26 +21,15 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
 
   private implicit val module: String = constants.Module.CONTROLLERS_CHANGE_BUYER_BID
 
-  def changeBuyerBidForm(sellerAddress: String, pegHash: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByPegHashAndBuyerAccountID(pegHash, loginState.username)
-      (for {
-        negotiation <- negotiation
-      } yield {
-        negotiation match {
-          case Some(negotiationRequest) => Ok(views.html.component.master.changeBuyerBid(requestID = negotiationRequest.id, sellerAddress = sellerAddress, bid = negotiationRequest.amount, pegHash = pegHash))
-          case None => Ok(views.html.component.master.changeBuyerBid(requestID = "", sellerAddress = sellerAddress, bid = 0, pegHash = pegHash))
-        }
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+  def changeBuyerBidForm(): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.changeBuyerBid())
   }
 
   def changeBuyerBid: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ChangeBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.changeBuyerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name))))
+          Future(BadRequest(views.html.component.master.changeBuyerBid(formWithErrors)))
         },
         changeBuyerBidData => {
           val requestID = changeBuyerBidData.requestID match {
@@ -57,12 +47,9 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
           )
           val id = masterAccounts.Service.getId(changeBuyerBidData.sellerAddress)
 
-          def insertOrUpdate(id: String): Future[Int] = masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, id, changeBuyerBidData.pegHash, changeBuyerBidData.bid)
-
           (for {
             _ <- transactionProcess
             id <- id
-            _ <- insertOrUpdate(id)
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
           } yield result
             ).recover {

@@ -4,8 +4,7 @@
 
 @(traderOrganization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.Form.ORGANIZATION_DETAILS) {
-    } {
+@commonInfoBox() {
         @commonTextInfo(constants.Form.ORGANIZATION_NAME, traderOrganization.name)
         @commonTextInfo(constants.Form.ABBREVIATION, traderOrganization.abbreviation.getOrElse(""))
         @commonTextInfo(constants.Form.ORGANIZATION_ID, traderOrganization.id)

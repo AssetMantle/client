@@ -453,17 +453,120 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
     PRIMARY KEY ("ticketID")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."Zone"
+CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
-    "id"                 VARCHAR NOT NULL,
-    "accountID"          VARCHAR NOT NULL UNIQUE,
-    "name"               VARCHAR NOT NULL,
-    "currency"           VARCHAR NOT NULL,
-    "address"            VARCHAR NOT NULL,
-    "completionStatus"   BOOLEAN NOT NULL,
-    "verificationStatus" BOOLEAN,
+    "id"             VARCHAR NOT NULL,
+    "secretHash"     VARCHAR NOT NULL,
+    "accountAddress" VARCHAR NOT NULL,
+    "language"       VARCHAR NOT NULL,
+    "userType"       VARCHAR NOT NULL,
+    "status"         VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
+
+CREATE TABLE IF NOT EXISTS MASTER."AccountFile"
+(
+    "id"           VARCHAR NOT NULL,
+    "documentType" VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL,
+    "file"         BYTEA,
+    PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
+(
+    "id"           VARCHAR NOT NULL,
+    "documentType" VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
+    "file"         BYTEA,
+    "status"       BOOLEAN,
+    PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Asset"
+(
+    "id"               VARCHAR NOT NULL,
+    "ownerID"          VARCHAR NOT NULL,
+    "ticketID"         VARCHAR,
+    "pegHash"          VARCHAR,
+    "assetType"        VARCHAR NOT NULL,
+    "description"      VARCHAR NOT NULL,
+    "documentHash"     VARCHAR NOT NULL UNIQUE,
+    "quantity"         INT     NOT NULL,
+    "quantityUnit"     VARCHAR NOT NULL,
+    "price"            INT     NOT NULL,
+    "moderated"        BOOLEAN NOT NULL,
+    "shippingPeriod"   INT     NOT NULL,
+    "portOfLoading"    VARCHAR NOT NULL,
+    "portOfDischarge"  VARCHAR NOT NULL,
+    "status"           VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Contact"
+(
+    "id"                   VARCHAR NOT NULL,
+    "mobileNumber"         VARCHAR NOT NULL UNIQUE,
+    "mobileNumberVerified" BOOLEAN NOT NULL,
+    "emailAddress"         VARCHAR NOT NULL UNIQUE,
+    "emailAddressVerified" BOOLEAN NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Identification"
+(
+    "accountID"          VARCHAR NOT NULL,
+    "firstName"          VARCHAR NOT NULL,
+    "lastName"           VARCHAR NOT NULL,
+    "dateOfBirth"        DATE    NOT NULL,
+    "idNumber"           VARCHAR NOT NULL,
+    "idType"             VARCHAR NOT NULL,
+    "completionStatus"   BOOLEAN NOT NULL,
+    "verificationStatus" BOOLEAN,
+    PRIMARY KEY ("accountID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
+(
+    "id"                            VARCHAR NOT NULL,
+    "negotiationID"                 VARCHAR,
+    "ticketID"                      VARCHAR,
+    "buyerTraderID"                 VARCHAR NOT NULL,
+    "sellerTraderID"                VARCHAR NOT NULL,
+    "assetID"                       VARCHAR NOT NULL,
+    "assetDescription"              VARCHAR NOT NULL,
+    "price"                         INT     NOT NULL,
+    "quantity"                      INT     NOT NULL,
+    "quantityUnit"                  VARCHAR NOT NULL,
+    "shippingPeriod"                INT     NOT NULL,
+    "time"                          INT,
+    "buyerAcceptedAssetDescription" BOOLEAN NOT NULL,
+    "buyerAcceptedPrice"            BOOLEAN NOT NULL,
+    "buyerAcceptedQuantity"         BOOLEAN NOT NULL,
+    "buyerAcceptedShippingPeriod"   BOOLEAN NOT NULL,
+    "advancePayment"                BOOLEAN,
+    "advancePercentage"             DECIMAL(4, 2),
+    "credit"                        BOOLEAN,
+    "tenure"                        INT,
+    "tentativeDate"                 DATE,
+    "reference"                     VARCHAR,
+    "buyerAcceptedAdvancePayment"   BOOLEAN NOT NULL,
+    "buyerAcceptedCredit"           BOOLEAN NOT NULL,
+    "billOfExchange"                BOOLEAN,
+    "coo"                           BOOLEAN,
+    "coa"                           BOOLEAN,
+    "otherDocuments"                VARCHAR,
+    "buyerAcceptedBillOfExchange"   BOOLEAN NOT NULL,
+    "buyerAcceptedCOO"              BOOLEAN NOT NULL,
+    "buyerAcceptedCOA"              BOOLEAN NOT NULL,
+    "buyerAcceptedOtherDocuments"   BOOLEAN NOT NULL,
+    "chatID"                        VARCHAR UNIQUE,
+    "status"                        VARCHAR,
+    "comment"                       VARCHAR,
+    PRIMARY KEY ("id"),
+    UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
+);
+
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
@@ -482,64 +585,28 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."Trader"
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 (
-    "id"                 VARCHAR NOT NULL,
-    "zoneID"             VARCHAR NOT NULL,
-    "organizationID"     VARCHAR NOT NULL,
-    "accountID"          VARCHAR NOT NULL UNIQUE,
-    "name"               VARCHAR NOT NULL,
-    "completionStatus"   BOOLEAN NOT NULL,
-    "verificationStatus" BOOLEAN,
+    "id"            VARCHAR NOT NULL,
+    "accountHolder" VARCHAR NOT NULL,
+    "nickName"      VARCHAR NOT NULL,
+    "accountNumber" VARCHAR NOT NULL,
+    "bankName"      VARCHAR NOT NULL,
+    "swiftAddress"  VARCHAR NOT NULL,
+    "address"       VARCHAR NOT NULL,
+    "country"       VARCHAR NOT NULL,
+    "zipCode"       VARCHAR NOT NULL,
+    "status"        VARCHAR,
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."Account"
-(
-    "id"             VARCHAR NOT NULL,
-    "secretHash"     VARCHAR NOT NULL,
-    "accountAddress" VARCHAR NOT NULL,
-    "language"       VARCHAR NOT NULL,
-    "userType"       VARCHAR NOT NULL,
-    "status"         VARCHAR NOT NULL,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
-(
-    "id"     VARCHAR NOT NULL,
-    "fromID" VARCHAR NOT NULL,
-    "toID"   VARCHAR NOT NULL,
-    "status" BOOLEAN,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."Contact"
-(
-    "id"                   VARCHAR NOT NULL,
-    "mobileNumber"         VARCHAR NOT NULL UNIQUE,
-    "mobileNumberVerified" BOOLEAN NOT NULL,
-    "emailAddress"         VARCHAR NOT NULL UNIQUE,
-    "emailAddressVerified" BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
     "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
     "status"       BOOLEAN,
-    PRIMARY KEY ("id", "documentType")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."AccountFile"
-(
-    "id"           VARCHAR NOT NULL,
-    "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL,
-    "file"         BYTEA,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -553,7 +620,19 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
     PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
+CREATE TABLE IF NOT EXISTS MASTER."Trader"
+(
+    "id"                 VARCHAR NOT NULL,
+    "zoneID"             VARCHAR NOT NULL,
+    "organizationID"     VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "completionStatus"   BOOLEAN NOT NULL,
+    "verificationStatus" BOOLEAN,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
@@ -574,70 +653,59 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
     PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
+CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
 (
-    "id"           VARCHAR NOT NULL,
-    "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL UNIQUE,
-    "file"         BYTEA,
-    "status"       BOOLEAN,
-    PRIMARY KEY ("id", "documentType")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
-(
-    "id"           VARCHAR NOT NULL,
-    "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL UNIQUE,
-    "file"         BYTEA,
-    "status"       BOOLEAN,
-    PRIMARY KEY ("id", "documentType")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
-(
-    "id"            VARCHAR NOT NULL,
-    "accountHolder" VARCHAR NOT NULL,
-    "nickName"      VARCHAR NOT NULL,
-    "accountNumber" VARCHAR NOT NULL,
-    "bankName"      VARCHAR NOT NULL,
-    "swiftAddress"  VARCHAR NOT NULL,
-    "address"       VARCHAR NOT NULL,
-    "country"       VARCHAR NOT NULL,
-    "zipCode"       VARCHAR NOT NULL,
-    "status"        VARCHAR,
+    "id"     VARCHAR NOT NULL,
+    "fromID" VARCHAR NOT NULL,
+    "toID"   VARCHAR NOT NULL,
+    "status" BOOLEAN,
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."Asset"
-(
-    "pegHash" VARCHAR NOT NULL,
-    "status"  VARCHAR NOT NULL,
-    PRIMARY KEY ("pegHash")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."Identification"
-(
-    "accountID"          VARCHAR NOT NULL,
-    "firstName"          VARCHAR NOT NULL,
-    "lastName"           VARCHAR NOT NULL,
-    "dateOfBirth"        DATE    NOT NULL,
-    "idNumber"           VARCHAR NOT NULL,
-    "idType"             VARCHAR NOT NULL,
-    "completionStatus"   BOOLEAN NOT NULL,
-    "verificationStatus" BOOLEAN,
-    PRIMARY KEY ("accountID")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."TradeRoom"
+CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
     "id"                 VARCHAR NOT NULL,
-    "salesQuoteID"       VARCHAR NOT NULL,
-    "buyerAccountID"     VARCHAR NOT NULL,
-    "sellerAccountID"    VARCHAR NOT NULL,
-    "financierAccountID" VARCHAR,
-    "chatID"             VARCHAR NOT NULL UNIQUE,
-    "status"             VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "currency"           VARCHAR NOT NULL,
+    "address"            VARCHAR NOT NULL,
+    "completionStatus"   BOOLEAN NOT NULL,
+    "verificationStatus" BOOLEAN,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
+(
+    "id"           VARCHAR NOT NULL,
+    "documentType" VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
+    "file"         BYTEA,
+    "status"       BOOLEAN,
+    PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
+(
+    "id"              VARCHAR NOT NULL,
+    "documentType"    VARCHAR NOT NULL,
+    "fileName"        VARCHAR NOT NULL UNIQUE,
+    "file"            BYTEA,
+    "documentContent" VARCHAR,
+    "status"          BOOLEAN,
+    PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
+(
+    "id"        VARCHAR NOT NULL,
+    "accountID" VARCHAR NOT NULL,
+    PRIMARY KEY ("id", "accountID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
+(
+    "id"         VARCHAR NOT NULL,
+    "secretHash" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -653,16 +721,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
-(
-    "id"             VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
-    "inviteeEmailAddress"   VARCHAR NOT NULL,
-    "status"         VARCHAR NOT NULL,
-    PRIMARY KEY ("id"),
-    UNIQUE ("organizationID", "inviteeEmailAddress")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 (
     "id"                          VARCHAR NOT NULL,
@@ -675,48 +733,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
     "assetQuantity"               INT     NOT NULL,
     "assetPrice"                  INT     NOT NULL,
     "takerAddress"                VARCHAR,
-    "shipmentDetails"             VARCHAR NOT NULL,
     "physicalDocumentsHandledVia" VARCHAR,
     "paymentTerms"                VARCHAR NOT NULL,
     "completionStatus"            BOOLEAN NOT NULL,
     "verificationStatus"          BOOLEAN,
     "comment"                     VARCHAR,
     PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
-(
-    "id"              VARCHAR NOT NULL,
-    "documentType"    VARCHAR NOT NULL,
-    "fileName"        VARCHAR NOT NULL UNIQUE,
-    "file"            BYTEA,
-    "documentContent" VARCHAR,
-    "status"          BOOLEAN,
-    PRIMARY KEY ("id", "documentType")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationRequest"
-(
-    "id"              VARCHAR NOT NULL,
-    "negotiationID"   VARCHAR,
-    "buyerAccountID"  VARCHAR NOT NULL,
-    "sellerAccountID" VARCHAR NOT NULL,
-    "pegHash"         VARCHAR NOT NULL,
-    "amount"          VARCHAR NOT NULL,
-    "status"          VARCHAR NOT NULL,
-    "comment"         VARCHAR,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
-(
-    "id"              VARCHAR NOT NULL,
-    "documentType"    VARCHAR NOT NULL,
-    "fileName"        VARCHAR NOT NULL UNIQUE,
-    "file"            BYTEA,
-    "documentContent" VARCHAR,
-    "status"          BOOLEAN,
-    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
@@ -733,71 +755,34 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SalesQuote"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Message"
 (
-    "id"               VARCHAR NOT NULL,
-    "accountID"        VARCHAR NOT NULL,
-    "assetType"        VARCHAR NOT NULL,
-    "assetDescription" VARCHAR NOT NULL,
-    "assetQuantity"    INT     NOT NULL,
-    "assetPrice"       INT     NOT NULL,
-    "shippingDetails"  VARCHAR,
-    "paymentTerms"     VARCHAR,
-    "documents"        VARCHAR,
-    "buyerAccountID"   VARCHAR,
-    "completionStatus" BOOLEAN NOT NULL,
-    "invitationStatus" BOOLEAN ,
+    "id"            VARCHAR   NOT NULL,
+    "fromAccountID" VARCHAR   NOT NULL,
+    "chatID"        VARCHAR   NOT NULL,
+    "text"          VARCHAR   NOT NULL,
+    "replyToID"     VARCHAR,
+    "createdAt"     TIMESTAMP NOT NULL,
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeTerm"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MessageRead"
 (
-    "id"                           VARCHAR NOT NULL,
-    "assetType"                    VARCHAR NOT NULL,
-    "assetDescriptionValue"        VARCHAR NOT NULL,
-    "assetDescriptionStatus"       BOOLEAN NOT NULL,
-    "assetQuantityValue"           INT     NOT NULL,
-    "assetQuantityStatus"          BOOLEAN NOT NULL,
-    "assetPriceValue"              INT     NOT NULL,
-    "assetPriceStatus"             BOOLEAN NOT NULL,
-    "shipmentPeriodValue"          INT     NOT NULL,
-    "shipmentPeriodStatus"         BOOLEAN NOT NULL,
-    "portOfLoadingValue"           VARCHAR NOT NULL,
-    "portOfLoadingStatus"          BOOLEAN NOT NULL,
-    "portOfDischargeValue"         VARCHAR NOT NULL,
-    "portOfDischargeStatus"        BOOLEAN NOT NULL,
-    "advancePaymentValue"          BOOLEAN NOT NULL,
-    "advancePercentage"            NUMERIC,
-    "advancePaymentStatus"         BOOLEAN NOT NULL,
-    "creditTermsValue"             BOOLEAN NOT NULL,
-    "tenure"                       VARCHAR,
-    "tentativeDate"                DATE,
-    "refrence"                     VARCHAR,
-    "creditTermsStatus"            BOOLEAN NOT NULL,
-    "billOfExchangeRequiredValue"  BOOLEAN NOT NULL,
-    "billOfExchangeRequiredStatus" BOOLEAN NOT NULL,
-    "obl"                          BOOLEAN NOT NULL,
-    "invoice"                      BOOLEAN NOT NULL,
-    "coo"                          BOOLEAN NOT NULL,
-    "coa"                          BOOLEAN NOT NULL,
-    "otherDocuments"               VARCHAR NOT NULL,
-    "primaryDocumentsStatus"       BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
+    "messageID" VARCHAR NOT NULL,
+    "accountID" VARCHAR NOT NULL,
+    "readAt"    TIMESTAMP,
+    PRIMARY KEY ("messageID", "accountID")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
 (
-    "id"               VARCHAR NOT NULL,
-    "sessionTokenHash" VARCHAR NOT NULL,
-    "sessionTokenTime" BIGINT  NOT NULL,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
-(
-    "id"    VARCHAR NOT NULL,
-    "token" VARCHAR NOT NULL,
-    PRIMARY KEY ("id")
+    "id"              VARCHAR NOT NULL,
+    "documentType"    VARCHAR NOT NULL,
+    "fileName"        VARCHAR NOT NULL UNIQUE,
+    "file"            BYTEA,
+    "documentContent" VARCHAR,
+    "status"          BOOLEAN,
+    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
@@ -811,6 +796,21 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
+(
+    "id"    VARCHAR NOT NULL,
+    "token" VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
+(
+    "id"               VARCHAR NOT NULL,
+    "sessionTokenHash" VARCHAR NOT NULL,
+    "sessionTokenTime" BIGINT  NOT NULL,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 (
     "id"         VARCHAR NOT NULL,
@@ -818,44 +818,21 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
-(
-    "id"         VARCHAR NOT NULL,
-    "secretHash" VARCHAR NOT NULL,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ChatParticipant"
-(
-    "accountID"    VARCHAR NOT NULL,
-    "chatID" VARCHAR NOT NULL,
-    PRIMARY KEY ("accountID", "chatID")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Message"
-(
-    "id"            VARCHAR   NOT NULL,
-    "fromAccountID" VARCHAR   NOT NULL,
-    "chatID"  VARCHAR   NOT NULL,
-    "text" VARCHAR NOT NULL,
-    "replyToID"     VARCHAR,
-    "createdAt"     TIMESTAMP NOT NULL,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MessageReceive"
-(
-    "messageID"      VARCHAR   NOT NULL,
-    "accountID" VARCHAR   NOT NULL,
-    "readAt"      TIMESTAMP,
-    PRIMARY KEY ("messageID", "accountID")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
-    "notificationID"         VARCHAR NOT NULL,
-    "tradeRoomID" VARCHAR NOT NULL,
-    PRIMARY KEY ("notificationID","tradeRoomID")
+    "notificationID" VARCHAR NOT NULL,
+    "negotiationID"    VARCHAR NOT NULL,
+    PRIMARY KEY ("notificationID", "negotiationID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
+(
+    "id"                  VARCHAR NOT NULL,
+    "organizationID"      VARCHAR NOT NULL,
+    "inviteeEmailAddress" VARCHAR NOT NULL,
+    "status"              VARCHAR NOT NULL,
+    PRIMARY KEY ("id"),
+    UNIQUE ("organizationID", "inviteeEmailAddress")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
@@ -918,10 +895,20 @@ ALTER TABLE MASTER."AccountFile"
     ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Asset"
+    ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 ALTER TABLE MASTER."Contact"
     ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Negotiation"
+    ADD CONSTRAINT Negotiation_BCNegotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
+ALTER TABLE MASTER."Negotiation"
+    ADD CONSTRAINT Negotiation_MasterTrader_buyerTraderID FOREIGN KEY ("buyerTraderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."Negotiation"
+    ADD CONSTRAINT Negotiation_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."Negotiation"
+    ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
 ALTER TABLE MASTER."Organization"
     ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Organization"
@@ -953,16 +940,14 @@ ALTER TABLE MASTER."ZoneKYC"
 
 ALTER TABLE MASTER_TRANSACTION."AssetFile"
     ADD CONSTRAINT AssetFile_IssueAssetRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."IssueAssetRequest" ("id");
-
-ALTER TABLE MASTER_TRANSACTION."ChatParticipant"
-    ADD CONSTRAINT ChatParticipant_TradeRoom_chatID FOREIGN KEY ("chatID") REFERENCES MASTER."TradeRoom"("chatID");
+ALTER TABLE MASTER_TRANSACTION."Chat"
+    ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Message"
-    ADD CONSTRAINT Message_ChatParticipant_accountIDChatWindowID FOREIGN KEY ("fromAccountID","chatID") REFERENCES MASTER_TRANSACTION."ChatParticipant"("accountID","chatID");
+    ADD CONSTRAINT Message_Chat_accountIDChatWindowID FOREIGN KEY ("fromAccountID", "chatID") REFERENCES MASTER_TRANSACTION."Chat" ("accountID", "id");
 ALTER TABLE MASTER_TRANSACTION."Message"
-    ADD CONSTRAINT Message_Message_replyToID FOREIGN KEY ("replyToID") REFERENCES MASTER_TRANSACTION."Message"("id");
-ALTER TABLE MASTER_TRANSACTION."MessageReceive"
-    ADD CONSTRAINT MessageReceive_Message_messageID FOREIGN KEY ("messageID") REFERENCES MASTER_TRANSACTION."Message"("id");
-
+    ADD CONSTRAINT Message_Message_replyToID FOREIGN KEY ("replyToID") REFERENCES MASTER_TRANSACTION."Message" ("id");
+ALTER TABLE MASTER_TRANSACTION."MessageRead"
+    ADD CONSTRAINT MessageRead_Message_messageID FOREIGN KEY ("messageID") REFERENCES MASTER_TRANSACTION."Message" ("id");
 ALTER TABLE MASTER_TRANSACTION."EmailOTP"
     ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
@@ -972,25 +957,21 @@ ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
 ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
     ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
-    ADD CONSTRAINT NegotiationFile_NegotiationRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."NegotiationRequest" ("id");
+    ADD CONSTRAINT NegotiationFile_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
     ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."SalesQuote"
-    ADD CONSTRAINT SalesQuote_Trader_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Trader" ("accountID");
-ALTER TABLE MASTER_TRANSACTION."SalesQuote"
-    ADD CONSTRAINT SalesQuote_Trader_buyerAccountID FOREIGN KEY ("buyerAccountID") REFERENCES MASTER."Trader" ("accountID");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
-    ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_TradeRoom_TradeRoomID FOREIGN KEY ("tradeRoomID") REFERENCES MASTER."TradeRoom"("id");
+    ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
+ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
+    ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 /*Initial State*/
 
@@ -1041,8 +1022,10 @@ DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback" CASCADE;
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."Asset" CASCADE;
 DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
+DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
@@ -1051,29 +1034,26 @@ DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
-DROP TABLE IF EXISTS MASTER."TradeRoom" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."Chat" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."Invitation" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueAssetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueFiatRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."Message" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."MessageRead" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."PushNotificationToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."SalesQuote" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeTerm" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."ChatParticipant" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."Message" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."MessageReceive" CASCADE;
-
+DROP TABLE IF EXISTS MASTER_TRANSACTION."TraderInvitation" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."WURTCBRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction" CASCADE;
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;

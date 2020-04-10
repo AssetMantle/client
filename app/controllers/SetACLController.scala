@@ -87,7 +87,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val trader = masterTraders.Service.getByAccountID(loginState.username)
+      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
       (for {
         trader <- trader
         result <- withUsernameToken.Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(organizationID = trader.organizationID))))
@@ -247,7 +247,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def userReviewAddTraderRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val trader = masterTraders.Service.getByAccountID(loginState.username)
+      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def getResult(trader: Trader): Future[Result] = {
         val organization = masterOrganizations.Service.get(trader.organizationID)
@@ -274,7 +274,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       views.companion.master.ReviewAddTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          val trader = masterTraders.Service.getByAccountID(loginState.username)
+          val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
           def getResult(trader: Trader): Future[Result] = {
             val organization = masterOrganizations.Service.get(trader.organizationID)
@@ -296,7 +296,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         },
         userReviewAddTraderRequestData => {
-          val trader = masterTraders.Service.getByAccountID(loginState.username)
+          val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
           def allKYCFileTypesExists(id: String): Future[Boolean] = masterTraderKYCs.Service.checkAllKYCFileTypesExists(id)
 
@@ -435,7 +435,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userZoneID = masterZones.Service.getID(loginState.username)
-      val traderZoneID = masterTraders.Service.getZoneID(traderID)
+      val traderZoneID = masterTraders.Service.tryGetZoneID(traderID)
 
       def getResult(userZoneID: String, traderZoneID: String): Future[Result] = {
         if (userZoneID == traderZoneID) {
@@ -471,13 +471,13 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         updateTraderKYCDocumentZoneStatusData => {
           val userZoneID = masterZones.Service.getID(loginState.username)
-          val traderZoneID = masterTraders.Service.getZoneID(updateTraderKYCDocumentZoneStatusData.traderID)
+          val traderZoneID = masterTraders.Service.tryGetZoneID(updateTraderKYCDocumentZoneStatusData.traderID)
 
           def getResult(userZoneID: String, traderZoneID: String): Future[Result] = {
             if (userZoneID == traderZoneID) {
               val verifyOrReject = if (updateTraderKYCDocumentZoneStatusData.zoneStatus) {
                 val zoneVerify = masterTraderKYCs.Service.zoneVerify(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
                 for {
                   _ <- zoneVerify
                   traderID <- traderID
@@ -485,7 +485,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 } yield {}
               } else {
                 val zoneReject = masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentZoneStatusData.traderID)
                 for {
                   _ <- zoneReject
                   traderID <- traderID
@@ -676,7 +676,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userOrganizationID = masterOrganizations.Service.tryGetID(loginState.username)
-      val traderOrganizationID = masterTraders.Service.getOrganizationID(traderID)
+      val traderOrganizationID = masterTraders.Service.tryGetOrganizationID(traderID)
 
       def getResult(userOrganizationID: String, traderOrganizationID: String): Future[Result] = {
         if (userOrganizationID == traderOrganizationID) {
@@ -711,13 +711,13 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         updateTraderKYCDocumentOrganizationStatusData => {
           val userOrganizationID = masterOrganizations.Service.tryGetID(loginState.username)
-          val traderOrganizationID = masterTraders.Service.getOrganizationID(updateTraderKYCDocumentOrganizationStatusData.traderID)
+          val traderOrganizationID = masterTraders.Service.tryGetOrganizationID(updateTraderKYCDocumentOrganizationStatusData.traderID)
 
           def verifyOrRejectAndGetResult(userOrganizationID: String, traderOrganizationID: String): Future[Result] = {
             if (userOrganizationID == traderOrganizationID) {
               val verifyOrReject = if (updateTraderKYCDocumentOrganizationStatusData.organizationStatus) {
                 val organizationVerify = masterTraderKYCs.Service.organizationVerify(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
                 for {
                   _ <- organizationVerify
                   traderID <- traderID
@@ -725,7 +725,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 } yield {}
               } else {
                 val organizationReject = masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
-                val traderID = masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
+                val traderID = masterTraders.Service.tryGetAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
                 for {
                   _ <- organizationReject
                   traderID <- traderID

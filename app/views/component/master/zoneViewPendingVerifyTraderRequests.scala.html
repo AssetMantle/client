@@ -15,11 +15,10 @@
                 @commonTextInfo(constants.Form.ORGANIZATION_ID, traderVerificationRequest.organizationID)
                 @commonTextInfo(constants.Form.ACCOUNT_ID, traderVerificationRequest.accountID)
                 @commonTextInfo(constants.Form.NAME, traderVerificationRequest.name)
-                @Messages(constants.Form.DOCUMENTS):<br>
+                @Messages(constants.Form.DOCUMENTS):
                 <span id = "traderKYCDocuments@traderVerificationRequest.accountID">
                     <script>componentResource('traderKYCDocuments@traderVerificationRequest.accountID', jsRoutes.controllers.SetACLController.zoneViewKYCDocuments('@traderVerificationRequest.id'))</script>
                 </span>
-                <br>
                 <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile('@traderVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
                 <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.zoneRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
             </div>

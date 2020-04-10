@@ -10,7 +10,6 @@ function componentResource(source, route){
             },
             401: function (data) {
                 replaceDocument(data.responseText);
-
             },
             500: function (data) {
                 replaceDocument(data.responseText);

@@ -22,7 +22,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_ASSET
+  private implicit val module: String = constants.Module.MASTER_IDENTIFICATION
 
   import databaseConfig.profile.api._
 
