@@ -30,7 +30,7 @@
         }
         @commonVerticalIntInfo(constants.View.PRICE, sellNegotiation.price)
         @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString(), sellNegotiation.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.STATUS, Messages(sellNegotiation.status))
+        @commonVerticalTextInfo(constants.View.STATUS, sellNegotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">
             @Messages(constants.View.ACTION)

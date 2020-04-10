@@ -1929,6 +1929,9 @@ header:before,
   .cmuk-button-link{
     font-size: $paragraphFontSizeSmall;
     font-family: $fontFamilySecondary;
+    font-weight: bold;
+    margin: 5px;
+    text-decoration: none;
   }
 }
 

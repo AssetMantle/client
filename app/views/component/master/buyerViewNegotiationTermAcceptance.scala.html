@@ -11,7 +11,7 @@
     </div>
     <div class="termStatus">
         <div>@value</div>
-        <div @Seq(negotiationID, termType).mkString("") >
+        <div id='@Seq(negotiationID, termType).mkString("")'>
         @views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiationID, termType = termType, status =  status)
         </div>
     </div>
