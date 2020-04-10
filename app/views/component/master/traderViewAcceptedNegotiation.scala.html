@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.{Asset, Negotiation}
-@import views.html.component.master.sellerTermView
 @import views.html.component.master.buyerViewNegotiationTermAcceptance
 
 @(traderID: String, negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
