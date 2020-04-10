@@ -336,9 +336,11 @@ rightText {
     margin: 10px 0px;
     font-family:$fontFamilySecondary;
     font-weight: bold;
-  }
-  .footer a {
-    color: $paragraphFontSizeLarge;
+    color:$colorSecondary;
+    a{
+      text-decoration: none;
+      color:$colorSecondary;
+    }
   }
 }
 
@@ -877,7 +879,8 @@ font-family: $fontFamilyPrimary;
     display: inline-block;
     .modalBody {
       padding: 20px;
-      text-align:left ;
+      text-align:left;
+      font-family: $fontFamilySecondary;
       .infoRowLabel{
         text-align: left;
         font-family: $fontFamilySecondary;
@@ -1667,19 +1670,23 @@ font-family: $fontFamilyPrimary;
 }
 
 .documentItem{
-  background: #EBF2F9;
-  border-radius: $buttonBorderRadius;
-  border: 1px solid #DDE8F3;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 5px 0px;
   flex-wrap: wrap;
+  border: 1px solid #EDEDED;
+  border-radius: 5px;
+  padding: 0px 15px;
+  background: #ffffff;
   .documentContentTop{
     font-size: $paragraphFontSizeMedium;
     font-family: $fontFamilySecondary;
-    color:$colorPrimary;
     margin: 10px;
+    a{
+      color:$colorSecondary;
+      text-decoration: none;
+    }
   }
   .documentThumbnail{
     margin: 10px;
@@ -1694,7 +1701,13 @@ font-family: $fontFamilyPrimary;
     text-align: left;
   }
 }
-
+.identificationDetails{
+  .documentContentBottom{
+    .infoRowLabel{
+      display: none;
+    }
+  }
+}
 .timeline .timeline-item:after,
 header:before,
 .timeline .timeline-item:before {
@@ -2309,8 +2322,21 @@ header:before,
   .cmuk-card-default{
     margin-bottom: 5px;
   }
+  .cmuk-card-header{
+    padding: 13px 20px;
+  }
   .cmuk-card-body{
     position: relative;
+    .cmuk-card {
+      border: 1px solid #EDEDED;
+      border-radius: 5px;
+      box-shadow: none;
+      .cmuk-card-body {
+        padding: 10px 15px;
+        border-radius: 5px;
+        background-color: #FFFFFF;
+      }
+    }
   }
 }
 

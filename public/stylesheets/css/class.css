@@ -268,9 +268,11 @@ rightText {
   .footer .copyright {
     margin: 10px 0px;
     font-family: Oxygen;
-    font-weight: bold; }
-  .footer .footer a {
-    color: 18px; }
+    font-weight: bold;
+    color: #053C75; }
+    .footer .copyright a {
+      text-decoration: none;
+      color: #053C75; }
 
 .status {
   width: 20px;
@@ -692,7 +694,8 @@ rightText {
     display: inline-block; }
     .modal .modalContent .modalBody {
       padding: 20px;
-      text-align: left; }
+      text-align: left;
+      font-family: Oxygen; }
       .modal .modalContent .modalBody .infoRowLabel {
         text-align: left;
         font-family: Oxygen; }
@@ -1281,19 +1284,22 @@ rightText {
     font-weight: bold; }
 
 .documentItem {
-  background: #EBF2F9;
-  border-radius: 3px;
-  border: 1px solid #DDE8F3;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 5px 0px;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  border: 1px solid #EDEDED;
+  border-radius: 5px;
+  padding: 0px 15px;
+  background: #ffffff; }
   .documentItem .documentContentTop {
     font-size: 16px;
     font-family: Oxygen;
-    color: #0862BE;
     margin: 10px; }
+    .documentItem .documentContentTop a {
+      color: #053C75;
+      text-decoration: none; }
   .documentItem .documentThumbnail {
     margin: 10px; }
   .documentItem .documentThumbnail img {
@@ -1303,6 +1309,9 @@ rightText {
     margin: 10px;
     font-size: 14px;
     text-align: left; }
+
+.identificationDetails .documentContentBottom .infoRowLabel {
+  display: none; }
 
 .timeline .timeline-item:after,
 header:before,
@@ -1495,7 +1504,10 @@ header:before,
     font-size: 14px; }
 .loginForm .cmuk-button-link {
   font-size: 14px;
-  font-family: Oxygen; }
+  font-family: Oxygen;
+  font-weight: bold;
+  margin: 5px;
+  text-decoration: none; }
 
 .infoRow {
   line-height: 1.8;
@@ -1778,8 +1790,18 @@ header:before,
   margin-left: 10px; }
 .contactDetails .cmuk-card-default {
   margin-bottom: 5px; }
+.contactDetails .cmuk-card-header {
+  padding: 13px 20px; }
 .contactDetails .cmuk-card-body {
   position: relative; }
+  .contactDetails .cmuk-card-body .cmuk-card {
+    border: 1px solid #EDEDED;
+    border-radius: 5px;
+    box-shadow: none; }
+    .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
+      padding: 10px 15px;
+      border-radius: 5px;
+      background-color: #FFFFFF; }
 
 .toolTip {
   position: relative;
