@@ -8,7 +8,7 @@
 @import views.html.component.master.streetAddress
 @(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 <div>
-    <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_DETAILS)</div>>
+    <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_DETAILS)</div>
     @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
     @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
     @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)

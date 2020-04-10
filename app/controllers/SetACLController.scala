@@ -104,7 +104,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
             if (status) {
               val name = masterIdentifications.Service.getName(loginState.username)
-              val organization: Future[Organization] = masterOrganizations.Service.get(addTraderData.organizationID)
+              val organization: Future[Organization] = masterOrganizations.Service.tryGet(addTraderData.organizationID)
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
@@ -245,7 +245,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def getResult(trader: Trader): Future[Result] = {
-        val organization = masterOrganizations.Service.get(trader.organizationID)
+        val organization = masterOrganizations.Service.tryGet(trader.organizationID)
         val zone = masterZones.Service.get(trader.zoneID)
         val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
         for {
@@ -272,7 +272,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
           def getResult(trader: Trader): Future[Result] = {
-            val organization = masterOrganizations.Service.get(trader.organizationID)
+            val organization = masterOrganizations.Service.tryGet(trader.organizationID)
             val zone = masterZones.Service.get(trader.zoneID)
             val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
             for {
@@ -295,7 +295,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
           def allKYCFileTypesExists(id: String): Future[Boolean] = masterTraderKYCs.Service.checkAllKYCFileTypesExists(id)
 
-          def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
+          def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           def getResult(trader: Trader, allKYCFileTypesExists: Boolean, traderOrganization: Organization): Future[Result] = {
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
@@ -764,7 +764,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         rejectVerifyTraderRequestData => {
           val rejectTrader = masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
-          val organizationAccountID = masterOrganizations.Service.getAccountId(rejectVerifyTraderRequestData.traderID)
+          val organizationAccountID = masterOrganizations.Service.tryGetAccountID(rejectVerifyTraderRequestData.traderID)
 
           def organizationRejectAll(organizationAccountID: String): Future[Int] = masterTraderKYCs.Service.organizationRejectAll(organizationAccountID)
 

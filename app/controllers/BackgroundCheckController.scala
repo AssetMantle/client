@@ -180,7 +180,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
       def allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
 
-      val organization = masterOrganizations.Service.get(organizationID)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
         _ <- storeFile
@@ -211,7 +211,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
       def allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
 
-      val organization = masterOrganizations.Service.get(organizationID)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
         oldDocumentFileName <- getOldDocumentFileName
@@ -230,7 +230,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.getID(loginState.username)
-      val organization = masterOrganizations.Service.get(organizationID)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
       val allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
       (for {
         allDocuments <- allDocuments

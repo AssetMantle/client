@@ -62,8 +62,8 @@ POST        /negotiation/request                                                
 GET         /negotiation/paymentTerms                                                       controllers.NegotiationController.paymentTermsForm(id: String)
 POST        /negotiation/paymentTerms                                                       controllers.NegotiationController.paymentTerms
 
-GET         /negotiation/documentsCheckList                                                 controllers.NegotiationController.documentsCheckListForm(id: String)
-POST        /negotiation/documentsCheckList                                                 controllers.NegotiationController.documentsCheckList
+GET         /negotiation/documentsList                                                      controllers.NegotiationController.documentsListForm(id: String)
+POST        /negotiation/documentsList                                                      controllers.NegotiationController.documentsList
 
 GET         /negotiation/reviewRequest                                                      controllers.NegotiationController.reviewRequestForm(id: String)
 POST        /negotiation/reviewRequest                                                      controllers.NegotiationController.reviewRequest
@@ -77,11 +77,14 @@ POST        /negotiation/rejectRequest                                          
 GET         /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTermsForm(id: String)
 POST        /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTerms
 
+GET         /negotiation/updateAssetOtherDetails                                            controllers.NegotiationController.updateAssetOtherDetailsForm(id: String)
+POST        /negotiation/updateAssetOtherDetails                                            controllers.NegotiationController.updateAssetOtherDetails
+
 GET         /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTermsForm(id: String)
 POST        /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTerms
 
-GET         /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckListForm(id: String)
-POST        /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckList
+GET         /negotiation/updateDocumentsList                                                controllers.NegotiationController.updateDocumentsListForm(id: String)
+POST        /negotiation/updateDocumentsList                                                controllers.NegotiationController.updateDocumentsList
 
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms

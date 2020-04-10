@@ -172,7 +172,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       def createOrganizationAndSendNotification(addOrganization: AddOrganization): Future[Unit] = {
         val create = blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         val verifyOrganization = masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
-        val organizationAccountId = masterOrganizations.Service.getAccountId(addOrganization.organizationID)
+        val organizationAccountId = masterOrganizations.Service.tryGetAccountID(addOrganization.organizationID)
 
         def updateUserType(organizationAccountId: String): Future[Int] = masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
 

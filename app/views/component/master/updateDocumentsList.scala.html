@@ -1,0 +1,20 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import views.companion.master.DocumentsList
+
+@(updateDocumentsListForm: Form[DocumentsList.Data] = DocumentsList.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.UPDATE_DOCUMENTS_CHECKLIST, updateDocumentsListForm) {
+    @commonInputText(updateDocumentsListForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @repeatWithIndex(updateDocumentsListForm(constants.FormField.DOCUMENTS_LIST.name), min = updateDocumentsListForm(constants.FormField.DOCUMENTS_LIST.name).indexes.length + 1) { (documentField, i) =>
+        @defining(Option(documentField)) { implicit sequentialFormField =>
+            <div id='@Seq(constants.FormField.DOCUMENTS_LIST.name, i).mkString("_")'>
+                @commonInputText(updateDocumentsListForm, constants.FormField.DOCUMENT_TYPE)
+                @commonJavascriptButton(constants.Form.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
+            </div>
+        }
+    }
+    @commonJavascriptButton(constants.View.ADD, JavaScript("""onDocumentListIncomplete(this)"""))
+    @commonCheckbox(updateDocumentsListForm, constants.FormField.DOCUMENTS_LIST_COMPLETED, 'containerDivClass -> "hidden", 'id -> "negotiationDocumentsListCompleted")
+}
+<script src="@routes.Assets.versioned("javascripts/documentsList.js")" type="text/javascript"></script>

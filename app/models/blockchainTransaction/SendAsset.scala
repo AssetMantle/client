@@ -179,7 +179,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendAsset = Service.getTransaction(ticketID)
 
-      def getNegotiationID(sendAsset: SendAsset): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
+      def getNegotiationID(sendAsset: SendAsset): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
       def insertOrUpdate(negotiationID: String): Future[Int] = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
 

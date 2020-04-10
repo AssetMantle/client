@@ -115,6 +115,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         updateUBOsData => {
           val id = masterOrganizations.Service.tryGetID(loginState.username)
 
+          logger.info(updateUBOsData.ubos.toString())
+
           def updateUBOs(id: String): Future[Int] = {
             if (updateUBOsData.ubos.filter(_.isDefined).map(uboData => uboData.get.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
             masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map(uboData => UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
@@ -508,7 +510,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
           def processTransactionAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
-              val accountId = masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)
+              val accountId = masterOrganizations.Service.tryGetAccountID(verifyOrganizationData.organizationID)
 
               def organizationAccountAddress(accountId: String): Future[String] = masterAccounts.Service.getAddress(accountId)
 
@@ -602,7 +604,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           def verifyOrReject: Future[Unit] = {
             if (updateOrganizationKYCDocumentStatusData.status) {
               val verifyOrganizationKYCs = masterOrganizationKYCs.Service.verify(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
-              val organizationID = masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID)
+              val organizationID = masterOrganizations.Service.tryGetAccountID(updateOrganizationKYCDocumentStatusData.organizationID)
               for {
                 _ <- verifyOrganizationKYCs
                 organizationID <- organizationID
@@ -610,7 +612,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               } yield {}
             } else {
               val rejectOrganizationKYCs = masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
-              val organizationID = masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID)
+              val organizationID = masterOrganizations.Service.tryGetAccountID(updateOrganizationKYCDocumentStatusData.organizationID)
               for {
                 _ <- rejectOrganizationKYCs
                 organizationID <- organizationID
@@ -657,7 +659,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         rejectVerifyOrganizationRequestData => {
           val rejectOrganization = masterOrganizations.Service.rejectOrganization(rejectVerifyOrganizationRequestData.organizationID)
-          val organizationAccountID = masterOrganizations.Service.getAccountId(rejectVerifyOrganizationRequestData.organizationID)
+          val organizationAccountID = masterOrganizations.Service.tryGetAccountID(rejectVerifyOrganizationRequestData.organizationID)
 
           def rejectAll(organizationAccountID: String): Future[Int] = masterOrganizationKYCs.Service.rejectAll(organizationAccountID)
 

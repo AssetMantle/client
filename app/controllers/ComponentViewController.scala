@@ -429,7 +429,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val trader: Future[Trader] = masterTraders.Service.tryGetByAccountID(loginState.username)
 
-      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
       (for {
         trader <- trader

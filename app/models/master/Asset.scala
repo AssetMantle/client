@@ -2,21 +2,30 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.common.Serializable.{AssetOtherDetails, ShipmentDetails, ShippingDetails}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(id: String, ownerID: String, ticketID: Option[String] = None, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, status: String)
+case class Asset(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, otherDetails: AssetOtherDetails, status: String)
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
+  case class AssetSerializable(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, otherDetails: String, status: String) {
+    def deserialize(): Asset = Asset(id = id, ownerID = ownerID,pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = moderated, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status)
+  }
+
+  def serialize(asset: Asset): AssetSerializable = AssetSerializable(id = asset.id, ownerID = asset.ownerID,pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity, quantityUnit = asset.quantityUnit, price = asset.price, moderated = asset.moderated, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
 
   private[models] val assetTable = TableQuery[AssetTable]
@@ -27,7 +36,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   import databaseConfig.profile.api._
 
-  private def add(asset: Asset): Future[(String, String)] = db.run((assetTable returning assetTable.map(x => (x.id, x.documentHash)) += asset).asTry).map {
+  private def add(assetSerializable: AssetSerializable): Future[String] = db.run((assetTable returning assetTable.map(_.documentHash) += assetSerializable).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -35,7 +44,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def findByID(id: String): Future[Asset] = db.run(assetTable.filter(_.id === id).result.head.asTry).map {
+  private def findByID(id: String): Future[AssetSerializable] = db.run(assetTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -43,7 +52,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def findPegHashByID(id: String): Future[Option[String]] = db.run(assetTable.filter(_.id === id).map(_.pegHash.?).result.head.asTry).map {
+  private def findIDByPegHash(pegHash: String): Future[String] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -51,13 +60,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def findByTicketID(ticketID: Option[String]): Future[Asset] = db.run(assetTable.filter(_.ticketID.? === ticketID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findPegHashByID(id: String): Future[Option[String]] = db.run(assetTable.filter(_.id === id).map(_.pegHash).result.headOption)
 
   private def findStatusByID(id: String): Future[String] = db.run(assetTable.filter(_.id === id).map(_.status).result.head.asTry).map {
     case Success(result) => result
@@ -67,13 +70,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def findAllByTraderID(ownerID: String): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerID === ownerID).result)
+  private def findAllByTraderID(ownerID: String): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.ownerID === ownerID).result)
 
-  private def findAllByTraderIDAndStatuses(ownerID: String, statuses: String*): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerID === ownerID).filter(_.status.inSet(statuses)).result)
+  private def findAllByTraderIDAndStatuses(ownerID: String, statuses: String*): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.ownerID === ownerID).filter(_.status.inSet(statuses)).result)
 
-  private def findAllByIDs(ids: Seq[String]): Future[Seq[Asset]] = db.run(assetTable.filter(_.id.inSet(ids)).result)
+  private def findAllByIDs(ids: Seq[String]): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.id.inSet(ids)).result)
 
-  private def findAllByOwnerIDsAndStatus(ownerIDs: Seq[String], status: String): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerID.inSet(ownerIDs)).filter(_.status === status).result)
+  private def findAllByOwnerIDsAndStatus(ownerIDs: Seq[String], status: String): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.ownerID.inSet(ownerIDs)).filter(_.status === status).result)
 
   private def checkByIDAndStatus(id: String, status: String): Future[Boolean] = db.run(assetTable.filter(_.id === id).filter(_.status === status).exists.result)
 
@@ -107,27 +110,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateTicketIDByID(id: String, ticketID: Option[String]): Future[Int] = db.run(assetTable.filter(_.id === id).map(_.ticketID.?).update(ticketID).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def generateDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean): String = utilities.String.sha256Sum(Seq(assetID, ownerID, assetType, description, quantity.toString(), quantity, price.toString(), moderated.toString()).mkString(""))
 
-  private def createDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): String = utilities.String.sha256Sum(Seq(assetID, ownerID, assetType, description, quantity.toString(), quantity, price.toString(), moderated.toString(), shippingPeriod.toString(), portOfLoading, portOfDischarge).mkString(""))
+  private[models] class AssetTable(tag: Tag) extends Table[AssetSerializable](tag, "Asset") {
 
-  private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset") {
-
-    def * = (id, ownerID, ticketID.?, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, shippingPeriod, portOfLoading, portOfDischarge, status) <> (Asset.tupled, Asset.unapply)
+    def * = (id, ownerID, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, otherDetails, status) <> (AssetSerializable.tupled, AssetSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def ownerID = column[String]("ownerID")
-
-    def ticketID = column[String]("ticketID")
 
     def pegHash = column[String]("pegHash")
 
@@ -139,17 +130,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def quantity = column[Int]("quantity")
 
-    def moderated = column[Boolean]("moderated")
-
     def quantityUnit = column[String]("quantityUnit")
 
     def price = column[Int]("price")
 
-    def shippingPeriod = column[Int]("shippingPeriod")
+    def moderated = column[Boolean]("moderated")
 
-    def portOfLoading = column[String]("portOfLoading")
-
-    def portOfDischarge = column[String]("portOfDischarge")
+    def otherDetails = column[String]("otherDetails")
 
     def status = column[String]("status")
 
@@ -157,31 +144,29 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def insertModeratedAssetAndGetIDAndDocumentHash(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[(String, String)] = {
+    def insertModeratedAsset(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
-      val documentHash = createDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)
-      add(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge, status = constants.Status.Asset.REQUESTED_TO_ZONE))
+      val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true)
+      add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.REQUESTED_TO_ZONE)))
     }
 
-    def insertUnmoderatedAssetAndGetIDAndDocumentHash(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[(String, String)] = {
+    def insertUnmoderatedAsset(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
-      val documentHash = createDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)
-      add(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge, status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE))
+      val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false)
+      add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)))
     }
 
-    def tryGet(id: String): Future[Asset] = findByID(id)
+    def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
 
     def tryGetPegHash(id: String): Future[String] = findPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
-    def tryGetByTicketID(ticketID: String): Future[Asset] = findByTicketID(Option(ticketID))
+    def tryGetIDByPegHash(pegHash: String): Future[String] = findIDByPegHash(pegHash)
 
-    def updateTicketID(id: String, ticketID: String): Future[Int] = updateTicketIDByID(id = id, ticketID = Option(ticketID))
+    def getAllAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderID(ownerID).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
-    def getAllAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderID(ownerID)
+    def getAllTradableAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderIDAndStatuses(ownerID = ownerID, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED, constants.Status.Asset.TRADE_COMPLETED).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
-    def getAllTradableAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderIDAndStatuses(ownerID = ownerID, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED, constants.Status.Asset.TRADE_COMPLETED)
-
-    def getAllAssetsByID(ids: Seq[String]): Future[Seq[Asset]] = findAllByIDs(ids)
+    def getAllAssetsByID(ids: Seq[String]): Future[Seq[Asset]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
     def tryGetStatus(id: String): Future[String] = findStatusByID(id)
 
@@ -193,7 +178,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markTradeCompletedByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.TRADE_COMPLETED)
 
-    def getPendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(ownerIDs = traderIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE)
+    def getPendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(ownerIDs = traderIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
     def verifyAssetPendingRequestStatus(id: String): Future[Boolean] = checkByIDAndStatus(id = id, status = constants.Status.Asset.REQUESTED_TO_ZONE)
 

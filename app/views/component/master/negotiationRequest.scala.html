@@ -11,7 +11,7 @@
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @tradableAssets.map { asset =>
-            <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.portOfLoading, asset.portOfDischarge, asset.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
+            <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.otherDetails.shippingDetails.shippingPeriod, asset.otherDetails.shippingDetails.portOfDischarge, asset.otherDetails.shippingDetails.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
                 @asset.id | @asset.description | @Messages(asset.status)</li>
         }
         </ul>

@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.UpdateNegotiationAssetOtherDetails
+
+@(updateNegotiationAssetOtherDetailsForm: Form[UpdateNegotiationAssetOtherDetails.Data] = UpdateNegotiationAssetOtherDetails.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.UPDATE_ASSET_OTHER_DETAILS, updateNegotiationAssetOtherDetailsForm) {
+    @commonInputText(updateNegotiationAssetOtherDetailsForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputInt(updateNegotiationAssetOtherDetailsForm, constants.FormField.SHIPPING_PERIOD)
+    @commonInputText(updateNegotiationAssetOtherDetailsForm, constants.FormField.PORT_OF_LOADING)
+    @commonInputText(updateNegotiationAssetOtherDetailsForm, constants.FormField.PORT_OF_DISCHARGE)
+}

@@ -54,7 +54,7 @@ class TraderController @Inject()(
 
           def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
-          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
           def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.verificationStatus.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
             masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
@@ -120,7 +120,7 @@ class TraderController @Inject()(
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+          def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
           def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization, traderRelation: TraderRelation): Future[Result] = {
             if (acceptOrRejectTraderRelationData.status) {

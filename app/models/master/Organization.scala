@@ -250,7 +250,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getNameByAccountID(accountID: String): Future[String] = findNameByAccountID(accountID)
 
-    def get(id: String): Future[Organization] = findById(id).map { organizationSerialized => organizationSerialized.deserialize }
+    def tryGet(id: String): Future[Organization] = findById(id).map { organizationSerialized => organizationSerialized.deserialize }
 
     def getOrNone(id: String): Future[Option[Organization]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
@@ -266,7 +266,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def verifyOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
-    def getAccountId(id: String): Future[String] = getAccountIDByID(id)
+    def tryGetAccountID(id: String): Future[String] = getAccountIDByID(id)
 
     def getVerifyOrganizationRequests(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map { organizations => organizations.map(_.deserialize) }
 

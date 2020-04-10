@@ -15,26 +15,25 @@
             } {
                 <div class="cmuk-flex cmuk-flex-column">
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-                    @negotiation.buyerAcceptedAssetDetails.description
+                    @negotiation.buyerAcceptedAssetDescription
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
-                    @negotiation.buyerAcceptedAssetDetails.price
+                    @negotiation.buyerAcceptedPrice
                     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
-                    @negotiation.buyerAcceptedAssetDetails.quantity
-                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.shippingPeriod)
-                    @negotiation.buyerAcceptedAssetDetails.shippingPeriod
-                    @commonTextInfo(constants.View.LOAD_PORT, asset.portOfLoading)
-                    @commonTextInfo(constants.View.DISCHARGE_PORT, asset.portOfDischarge)
+                    @negotiation.buyerAcceptedQuantity
+                    @commonIntInfo(constants.View.ASSET_OTHER_DETAILS, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+                    @negotiation.buyerAcceptedAssetOtherDetails
+                    @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                    @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 </div>
-                }
+            }
 
             @commonCard(constants.View.PAYMENT_TERMS) {
+                @negotiation.buyerAcceptedPaymentTerms
                 @commonFormButton(constants.Form.UPDATE_PAYMENT_TERMS, 'parameters -> s"'${negotiation.id}'")
             } {
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment.getOrElse(false)))
-                @negotiation.buyerAcceptedPaymentTerms.advancePayment
+                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
                 @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit.getOrElse(false)))
-                @negotiation.buyerAcceptedPaymentTerms.credit
+                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
                 @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
                 @negotiation.paymentTerms.tentativeDate match {
                     case Some(date) => {
@@ -47,51 +46,47 @@
                 @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
             }
 
-            @commonCard(constants.View.DOCUMENTS_CHECKLIST) {
+            @commonCard(constants.View.DOCUMENTS_LIST) {
+                @negotiation.buyerAcceptedDocumentsList
                 @commonFormButton(constants.Form.UPDATE_DOCUMENTS_CHECKLIST, 'parameters -> s"'${negotiation.id}'")
             } {
-                @commonBooleanInfo(constants.View.BILL_OF_EXCHANGE, Option(negotiation.documentsCheckList.billOfExchange.getOrElse(false)))
-                @negotiation.buyerAcceptedDocumentsCheckList.billOfExchange
-                @commonBooleanInfo(constants.View.COO, Option(negotiation.documentsCheckList.coo.getOrElse(false)))
-                @negotiation.buyerAcceptedDocumentsCheckList.coo
-                @commonBooleanInfo(constants.View.COA, Option(negotiation.documentsCheckList.coa.getOrElse(false)))
-                @negotiation.buyerAcceptedDocumentsCheckList.coa
-                @commonTextInfo(constants.View.OTHER_DOCUMENTS, negotiation.documentsCheckList.otherDocuments.getOrElse(""))
-                @if(negotiation.documentsCheckList.otherDocuments.getOrElse("") != "") {
-                    @negotiation.buyerAcceptedDocumentsCheckList.otherDocuments
+                @negotiation.documentsList.documents.map { document =>
+                    @document
+                    <br>
                 }
             }
         }
         case negotiation.buyerTraderID => {
             @commonCard(constants.View.ASSET_DETAILS) {
             } {
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDetails.description, iconPath = "./images/icons/doc.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "./images/icons/doc.svg") {
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                 }
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedAssetDetails.price, iconPath = "./images/icons/contract.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "./images/icons/contract.svg") {
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
                 }
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedAssetDetails.quantity, iconPath = "./images/icons/quantity.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "./images/icons/quantity.svg") {
                     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
                 }
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.SHIPPING_PERIOD, status = negotiation.buyerAcceptedAssetDetails.shippingPeriod, iconPath = "./images/icons/shipment.svg") {
-                    @commonIntInfo(constants.View.SHIPPING_PERIOD, negotiation.shippingPeriod)
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "./images/icons/shipment.svg") {
+                    @commonIntInfo(constants.View.SHIPPING_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+                    @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                    @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 }
-                @commonTextInfo(constants.View.LOAD_PORT, asset.portOfLoading)
-                @commonTextInfo(constants.View.DISCHARGE_PORT, asset.portOfDischarge)
             }
 
             @commonCard(constants.View.PAYMENT_TERMS) {
+                @negotiation.buyerAcceptedPaymentTerms
             } {
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.ADVANCE_PAYMENT, status = negotiation.buyerAcceptedAssetDetails.price, iconPath = "./images/icons/advancePayment.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.ADVANCE_PAYMENT, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "./images/icons/advancePayment.svg") {
                     @Messages(constants.View.ADVANCE_PAYMENT)
-                    @if(negotiation.paymentTerms.advancePayment.getOrElse(false)) {
+                    @if(negotiation.paymentTerms.advancePayment) {
                         @negotiation.paymentTerms.advancePercentage %
                     } else {
                         @Messages(constants.View.NO)
                     }
                 }
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.CREDIT, status = negotiation.paymentTerms.credit.getOrElse(false), iconPath = "./images/icons/creditTerms.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.CREDIT, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "./images/icons/creditTerms.svg") {
                     @Messages(constants.View.CREDIT_TERMS)
                     <div class="creditTerms">
                     @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
@@ -114,43 +109,32 @@
                 }
             }
 
-            @commonCard(constants.View.DOCUMENTS_CHECKLIST) {
+            @commonCard(constants.View.DOCUMENTS_LIST) {
+                @negotiation.buyerAcceptedDocumentsList
             } {
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.BILL_OF_EXCHANGE, status = negotiation.buyerAcceptedDocumentsCheckList.billOfExchange, iconPath = "./images/icons/doc.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.BILL_OF_EXCHANGE, status = negotiation.buyerAcceptedDocumentsList, iconPath = "./images/icons/doc.svg") {
                     @Messages(constants.View.BILL_OF_EXCHANGE)
-                    @if(negotiation.documentsCheckList.billOfExchange) {
+                    @if(negotiation.buyerAcceptedDocumentsList) {
                         @Messages(constants.View.YES)
                     } else {
                         @Messages(constants.View.NO)
                     }
                 }
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.COO, status = negotiation.buyerAcceptedDocumentsCheckList.coo, iconPath = "./images/icons/doc.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.COO, status = negotiation.buyerAcceptedDocumentsList, iconPath = "./images/icons/doc.svg") {
                     @Messages(constants.View.COO)
-                    @if(negotiation.documentsCheckList.coo) {
+                    @if(negotiation.buyerAcceptedDocumentsList) {
                         @Messages(constants.View.YES)
                     } else {
                         @Messages(constants.View.NO)
                     }
                 }
-                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.COA, status = negotiation.buyerAcceptedDocumentsCheckList.coa, iconPath = "./images/icons/doc.svg") {
+                @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.COA, status = negotiation.buyerAcceptedDocumentsList, iconPath = "./images/icons/doc.svg") {
                     @Messages(constants.View.COA)
-                    @if(negotiation.documentsCheckList.coa) {
+                    @if(negotiation.buyerAcceptedDocumentsList) {
                         @Messages(constants.View.YES)
                     } else {
                         @Messages(constants.View.NO)
                     }
-                }
-                @negotiation.documentsCheckList.otherDocuments match {
-                    case Some(documentsList) => {
-                        @if(documentsList != "") {
-                            @Messages(constants.View.OTHER_DOCUMENTS)
-                            @negotiation.documentsCheckList.otherDocuments.getOrElse("")
-                            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.OTHER_DOCUMENTS, status = negotiation.buyerAcceptedDocumentsCheckList.otherDocuments, iconPath = "./images/icons/doc.svg") {
-                                @negotiation.buyerAcceptedDocumentsCheckList.otherDocuments
-                            }
-                        }
-                    }
-                    case None => {}
                 }
             }
         }

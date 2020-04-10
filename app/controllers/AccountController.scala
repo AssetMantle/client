@@ -152,7 +152,7 @@ class AccountController @Inject()(
               } yield result
             case constants.User.ORGANIZATION => val organizationID = blockchainOrganizations.Service.getID(loginState.address)
 
-              def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
+              def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
               for {
                 organizationID <- organizationID
@@ -162,7 +162,7 @@ class AccountController @Inject()(
             case constants.User.TRADER => val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
               val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
 
-              def organization(aclAccount: ACLAccount): Future[Organization] = masterOrganizations.Service.get(aclAccount.organizationID)
+              def organization(aclAccount: ACLAccount): Future[Organization] = masterOrganizations.Service.tryGet(aclAccount.organizationID)
 
               def zone(aclAccount: ACLAccount): Future[Zone] = masterZones.Service.get(aclAccount.zoneID)
 
