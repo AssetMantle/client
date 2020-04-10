@@ -145,7 +145,8 @@ class AccountController @Inject()(
                 _ <- updateUserType
                 result <- withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
               } yield result
-            case _ => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
+            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
           }
         }
 
