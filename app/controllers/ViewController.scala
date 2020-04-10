@@ -143,6 +143,15 @@ class ViewController @Inject()(
       }
   }
 
+  def transactions: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.transactions())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def tradeRoom(id: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       (for {

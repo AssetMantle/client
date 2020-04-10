@@ -1,12 +1,11 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 @import views.html.base._
-@import views.html.component.blockchain._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
+@left = {
     <div class="leftTradeFinancial">
         <div id="financials"></div>
     </div>
@@ -22,14 +21,14 @@
         }
     </script>
     @*For iframes*@
-    @loginState.userType match {
-        case constants.User.TRADER => {
-            <script type="text/javascript">
-                        var fiatCometMessage = function (event) {
-                            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-                        }
-                </script>
-            <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+@loginState.userType match {
+    case constants.User.TRADER => {
+        <script type="text/javascript">
+                    var fiatCometMessage = function (event) {
+                        componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+                    }
+            </script>
+        <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
         }
         case constants.User.ORGANIZATION => {}
         case constants.User.ZONE => {}
@@ -40,7 +39,6 @@
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom"></div>
-
 }
 
 @right = {

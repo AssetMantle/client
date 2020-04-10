@@ -3,7 +3,39 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@views.html.base.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+@views.html.base.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+        <div class="leftTradeFinancial">
+            <div id="financials"></div>
+        </div>
+        <script>
+            @loginState.userType match {
+                case constants.User.TRADER => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
+                case constants.User.ORGANIZATION => {}
+                case constants.User.ZONE => {}
+                case constants.User.GENESIS => {}
+                case _ => {}
+            }
+        </script>
+        @*For iframes*@
+    @loginState.userType match {
+        case constants.User.TRADER => {
+            <script type="text/javascript">
+                    var fiatCometMessage = function (event) {
+                        componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+                    }
+            </script>
+            <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+        }
+        case constants.User.ORGANIZATION => {}
+        case constants.User.ZONE => {}
+        case constants.User.GENESIS => {}
+        case _ => {}
+    }
+}
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom profileContainer">
@@ -101,5 +133,32 @@
 
             @*//TODO Remove when shifting to account *@
             componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
+    </script>
+}
+
+@right = {
+    <div class="recentActivity">
+        <div class="recentActivityContainer">
+        @commonCard(constants.View.RECENT_ACTIVITY) {
+        } {
+            <div class="scroller">
+                <div id="recentActivity"></div>
+                <div class="cover-bar"></div>
+            </div>
+        }
+        </div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
+            }
+            case constants.User.ORGANIZATION => {
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
+            }
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
     </script>
 }
