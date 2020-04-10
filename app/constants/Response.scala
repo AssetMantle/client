@@ -4,7 +4,6 @@ package constants
 import controllers.routes
 import play.api.routing.JavaScriptReverseRoute
 
-
 object Response {
 
   lazy val PREFIX = "RESPONSE."
@@ -146,9 +145,9 @@ object Response {
   val CHAT_ROOM_NOT_FOUND = new Failure("CHAT_ROOM_NOT_FOUND")
   val ALL_ORGANIZATION_BACKGROUND_CHECK_FILES_NOT_VERFIED = new Failure("ALL_ORGANIZATION_BACKGROUND_CHECK_FILES_NOT_VERFIED")
   val ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED = new Failure("ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED")
-  val ZONE_ID_DIFFERENT_THAN_TRADER_REQUEST_ZONE_ID = new Failure("ZONE_ID_DIFFERENT_THAN_TRADER_REQUEST_ZONE_ID")
-  val ORGANIZATION_ID_DIFFERENT_THAN_TRADER_REQUEST_ORGANIZATION_ID = new Failure("ORGANIZATION_ID_DIFFERENT_THAN_TRADER_REQUEST_ORGANIZATION_ID")
-  val ZONE_INVITATION_DOES_NOT_EXISTS = new Failure("ZONE_INVITATION_DOES_NOT_EXISTS")
+  val ZONE_ID_MISMATCH = new Failure("ZONE_ID_MISMATCH")
+  val ORGANIZATION_ID_MISMATCH = new Failure("ORGANIZATION_ID_MISMATCH")
+  val ZONE_INVITATION_NOT_FOUND = new Failure("ZONE_INVITATION_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

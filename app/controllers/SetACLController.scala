@@ -413,7 +413,7 @@ class SetACLController @Inject()(
 
           def checkAllKYCFilesVerified(trader: Trader, zoneID: String): Future[Boolean] = {
             if (trader.zoneID != zoneID) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (trader.organizationID != verifyTraderData.organizationID) throw new BaseException(constants.Response.ORGANIZATION_ID_DIFFERENT_THAN_TRADER_REQUEST_ORGANIZATION_ID)
+            if (trader.organizationID != verifyTraderData.organizationID) throw new BaseException(constants.Response.ORGANIZATION_ID_MISMATCH)
             masterTraderKYCs.Service.checkAllKYCFilesVerified(trader.id)
           }
 
@@ -610,7 +610,7 @@ class SetACLController @Inject()(
 
           def checkAllKYCFilesVerified(trader: Trader, traderOrganization: Organization, organization: Organization): Future[Boolean] = {
             if (trader.organizationID != verifyTraderData.organizationID || traderOrganization.id != organization.id) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_DIFFERENT_THAN_TRADER_REQUEST_ZONE_ID)
+            if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_MISMATCH)
             masterTraderKYCs.Service.checkAllKYCFilesVerified(trader.id)
           }
 
