@@ -1,6 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import transactions.responses.TruliooVerifyResponse
-
-@(accountID: String, details: TruliooVerifyResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@accountID : @details
