@@ -140,46 +140,12 @@ class AccountController @Inject()(
           implicit val loginState = loginStateValue
           val contactWarnings = utilities.Contact.getWarnings(status)
           loginState.userType match {
-            case constants.User.GENESIS => withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
-            case constants.User.ZONE => val zoneID = blockchainZones.Service.getID(loginState.address)
-
-              def zone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
-
-              for {
-                zoneID <- zoneID
-                zone <- zone(zoneID)
-                result <- withUsernameToken.Ok(views.html.zoneIndex(zone = zone, warnings = contactWarnings))
-              } yield result
-            case constants.User.ORGANIZATION => val organizationID = blockchainOrganizations.Service.getID(loginState.address)
-
-              def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
-
-              for {
-                organizationID <- organizationID
-                organization <- organization(organizationID)
-                result <- withUsernameToken.Ok(views.html.organizationIndex(organization = organization, warnings = contactWarnings))
-              } yield result
-            case constants.User.TRADER => val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
-              val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
-
-              def organization(aclAccount: ACLAccount): Future[Organization] = masterOrganizations.Service.get(aclAccount.organizationID)
-
-              def zone(aclAccount: ACLAccount): Future[Zone] = masterZones.Service.get(aclAccount.zoneID)
-
-              for {
-                aclAccount <- aclAccount
-                fiatPegWallet <- fiatPegWallet
-                organization <- organization(aclAccount)
-                zone <- zone(aclAccount)
-                result <- withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization, warnings = contactWarnings))
-              } yield result
-            case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
-            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
             case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.USER)
               for {
                 _ <- updateUserType
-                result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+                result <- withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
               } yield result
+            case _ => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
           }
         }
 
