@@ -221,7 +221,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueAssetController.issueAssetOBLForm,
         routes.javascript.IssueAssetController.issueAssetInvoiceForm,
 
-        routes.javascript.IssueFiatController.viewPendingIssueFiatRequests,
+        routes.javascript.IssueFiatController.issueFiatRequestList,
         routes.javascript.IssueFiatController.issueFiatForm,
         routes.javascript.IssueFiatController.issueFiatRequestForm,
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
@@ -266,7 +266,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendCoinController.faucetRequestForm,
         routes.javascript.SendCoinController.approveFaucetRequestsForm,
         routes.javascript.SendCoinController.rejectFaucetRequestForm,
-        routes.javascript.SendCoinController.viewPendingFaucetRequests,
+        routes.javascript.SendCoinController.faucetRequestList,
         routes.javascript.SendCoinController.sendCoinForm,
         routes.javascript.SendCoinController.blockchainSendCoinForm,
 

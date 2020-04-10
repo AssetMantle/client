@@ -408,7 +408,7 @@ GET         /master/orderComet                                                  
 GET         /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequestForm
 POST        /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequest
 
-GET         /master/viewPendingIssueFiatRequests                                            controllers.IssueFiatController.viewPendingIssueFiatRequests
+GET         /master/issueFiatRequestList                                                    controllers.IssueFiatController.issueFiatRequestList
 GET         /master/rejectIssueFiatRequest                                                  controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
 POST        /master/rejectIssueFiatRequest                                                  controllers.IssueFiatController.rejectIssueFiatRequest
 
@@ -441,7 +441,7 @@ POST        /master/sendCoin                                                    
 GET         /master/faucetRequest                                                           controllers.SendCoinController.faucetRequestForm
 POST        /master/faucetRequest                                                           controllers.SendCoinController.faucetRequest
 
-GET         /master/viewPendingFaucetRequests                                               controllers.SendCoinController.viewPendingFaucetRequests
+GET         /master/faucetRequestList                                                       controllers.SendCoinController.faucetRequestList
 GET         /master/approveFaucetRequests                                                   controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
 POST        /master/approveFaucetRequests                                                   controllers.SendCoinController.approveFaucetRequests
 
