@@ -55,10 +55,10 @@
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
-                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.traderRecentActivities(0));
             }
             case constants.User.ORGANIZATION => {
-                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.organizationRecentActivities(0));
             }
             case constants.User.ZONE => {}
             case constants.User.GENESIS => {}

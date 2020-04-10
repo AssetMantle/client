@@ -129,8 +129,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.userViewOrganizationUBOs,
         routes.javascript.ComponentViewController.viewOrganizationUBOs,
         routes.javascript.ComponentViewController.tradeActivities,
-        routes.javascript.ComponentViewController.recentActivityForTrader,
-        routes.javascript.ComponentViewController.recentActivityForOrganization,
+        routes.javascript.ComponentViewController.traderRecentActivities,
+        routes.javascript.ComponentViewController.organizationRecentActivities,
         routes.javascript.ComponentViewController.traderFinancials,
         routes.javascript.ComponentViewController.traderViewAcceptedNegotiation,
 

@@ -4,6 +4,10 @@ import constants.Notification.{Email, PushNotification, SMS}
 
 class Notification(notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
 
+  val title: String = Seq("NOTIFICATION", notificationType, "TITLE").mkString(".")
+
+  val message: String = Seq("NOTIFICATION", notificationType, "MESSAGE").mkString(".")
+
   val email: Option[Email] = if (sendEmail) Option(new Email(notificationType)) else None
 
   val pushNotification: Option[PushNotification] = if (sendPushNotification) Option(new PushNotification(notificationType)) else None

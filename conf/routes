@@ -132,8 +132,8 @@ GET         /component/genesisDetails                                           
 GET         /component/zoneDetails                                                          controllers.ComponentViewController.zoneDetails
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
 GET         /component/tradeActivities                                                      controllers.ComponentViewController.tradeActivities(pageNumber: Int, negotiationID :String)
-GET         /component/recentActivityForTrader                                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
-GET         /component/recentActivityForOrganization                                        controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
+GET         /component/traderRecentActivities                                               controllers.ComponentViewController.traderRecentActivities(pageNumber: Int)
+GET         /component/organizationRecentActivities                                         controllers.ComponentViewController.organizationRecentActivities(pageNumber: Int)
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
 
 GET         /component/traderViewAcceptedNegotiation                                        controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)

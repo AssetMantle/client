@@ -4,19 +4,22 @@ import java.sql.Timestamp
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Database
+import models.common.Serializable.NotificationMessage
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Notification(id: String, accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean)
+case class Notification(id: String, accountID: String, title: String, message: NotificationMessage, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
 
 @Singleton
-class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_NOTIFICATION
 
@@ -24,13 +27,25 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
+  private val nodeID = configuration.get[String]("node.id")
+
+  private val nodeTimezone = configuration.get[String]("node.timezone")
+
+  private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
+
+  case class NotificationSerializable(id: String, accountID: String, title: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
+    def deserialize(): Notification = Notification(id = id, accountID = accountID, title = title, message = utilities.JSON.convertJsonStringToObject[NotificationMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
+  }
+
+  def serialize(notification: Notification): NotificationSerializable =  NotificationSerializable(id = notification.id, accountID = notification.accountID, title = notification.title, message = Json.toJson(notification.message).toString(), read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, timezone = notification.timezone)
+
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += notification).asTry).map {
+  private def add(notificationSerializable: NotificationSerializable): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += notificationSerializable).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -38,7 +53,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
+  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -46,15 +61,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNotificationsByAccountIdAndNotificationIDs(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.id inSet ids).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
+  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.createdOn.desc).drop(offset).take(limit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -90,33 +97,39 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private[models] class NotificationTable(tag: Tag) extends Table[Notification](tag, "Notification") {
+  private[models] class NotificationTable(tag: Tag) extends Table[NotificationSerializable](tag, "Notification") {
 
-    def * = (id, accountID, notificationTitle, notificationMessage, time, read) <> (Notification.tupled, Notification.unapply)
+    def * = (id, accountID, title, message, read, createdOn, createdBy, updatedOn.?, updatedBy.?, timezone) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
-    def notificationTitle = column[String]("notificationTitle")
+    def title = column[String]("title")
 
-    def notificationMessage = column[String]("notificationMessage")
+    def message = column[String]("message")
 
     def read = column[Boolean]("read")
 
-    def time = column[Timestamp]("time")
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdBy = column[String]("createdBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def timezone = column[String]("timezone")
 
   }
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false))
+    def insert(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, title = notification.title, message = NotificationMessage(header = notification.message, parameters = parameters), read = false, createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
-    def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit)
+    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = pageNumber * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
-    def getTradeRoomNotifications(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIdAndNotificationIDs(accountID = accountID, ids, offset = offset, limit = limit)
-
-    def getTradersNotifications(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = offset, limit = limit)
+    def getByAccountIDs(accountIDs: Seq[String], pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = pageNumber * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 

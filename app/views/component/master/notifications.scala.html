@@ -9,8 +9,8 @@
             } else {
                 onclick="markNotificationRead(this, '@notification.id')"
                 }>
-                <div><span class="cmuk-text-bolder">@notification.notificationTitle</span>@notification.notificationMessage</div>
-                <div class="notificationTime">@notification.time</div>
+                <div><span class="cmuk-text-bolder">@Messages(notification.title)</span>@Messages(notification.message.header, notification.message.parameters)</div>
+                <div class="notificationTime">@notification.createdOn @notification.timezone</div>
             </div>
         </li>
     }

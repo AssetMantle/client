@@ -18,11 +18,9 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 
-  private val limit = configuration.get[Int]("notification.notificationsPerPage")
-
   def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val notification = notifications.Service.get(loginState.username, pageNumber * limit, limit)
+      val notification = notifications.Service.get(loginState.username, pageNumber)
       (for {
         notification <- notification
       } yield Ok(views.html.component.master.notifications(notification))

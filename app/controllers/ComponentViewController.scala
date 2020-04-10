@@ -57,8 +57,6 @@ class ComponentViewController @Inject()(
 
   private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
 
-  private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
-
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       (loginState.userType match {
@@ -291,30 +289,30 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationRecentActivities(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
       def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
 
-      def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+      def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getByAccountIDs(traderAccountIDs, pageNumber = pageNumber)
 
       (for {
         organizationID <- organizationID
         tradersInOrganizations <- tradersInOrganizations(organizationID)
         notificationsOfTraders <- notificationsOfTraders(tradersInOrganizations.map(_.accountID))
-      } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
+      } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationRecentActivities)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
-  def recentActivityForTrader(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderRecentActivities(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+      val notifications = masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
       (for {
         notifications <- notifications
-      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTrader), None))
+      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.traderRecentActivities)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -322,11 +320,11 @@ class ComponentViewController @Inject()(
 
   def tradeActivities(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val tradeActivities = masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID)
+      val tradeActivities = masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID = negotiationID, pageNumber = pageNumber)
 
       (for {
         tradeActivities <- tradeActivities
-      } yield Ok(views.html.component.master.tradeActivities(tradeActivities = tradeActivities, loadMoreRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.tradeActivities) ))
+      } yield Ok(views.html.component.master.tradeActivities(tradeActivities = tradeActivities, loadMoreRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.tradeActivities)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
