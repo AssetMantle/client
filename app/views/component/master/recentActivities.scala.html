@@ -1,6 +1,8 @@
 @import controllers.actions.LoginState
+@import models.masterTransaction.Notification
 @import views.html.base._
-@(notifications: Seq[models.masterTransaction.Notification] = Seq(), route: String, negotiationID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@(notifications: Seq[Notification] = Seq(), route: String, negotiationID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <script src="@routes.Assets.versioned("javascripts/recentActivity.js")" type="text/javascript"></script>
 <div class="timeline recentActivityBox">

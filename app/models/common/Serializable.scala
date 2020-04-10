@@ -32,6 +32,12 @@ object Serializable {
 
   implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
 
+  case class TradeActivityMessage(header: String, parameters: Seq[String])
+
+  implicit val tradeActivityMessageReads: Reads[TradeActivityMessage] = Json.reads[TradeActivityMessage]
+
+  implicit val tradeActivityMessageWrites: OWrites[TradeActivityMessage] = Json.writes[TradeActivityMessage]
+
   case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 
   case class Invoice(invoiceNumber: String, invoiceDate: Date) extends DocumentContent

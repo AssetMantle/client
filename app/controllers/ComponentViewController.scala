@@ -320,16 +320,13 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def recentActivityForTradeRoom(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeActivities(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val tradeActivities = masterTransactionTradeActivities.Service.getTradeActivity(negotiationID)
-
-      def notifications(ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(loginState.username, ids, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+      val tradeActivities = masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID)
 
       (for {
         tradeActivities <- tradeActivities
-        notifications <- notifications(tradeActivities.map(_.notificationID))
-      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTradeRoom), Option(negotiationID)))
+      } yield Ok(views.html.component.master.tradeActivities(tradeActivities = tradeActivities, loadMoreRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.tradeActivities) ))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

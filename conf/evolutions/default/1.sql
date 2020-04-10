@@ -485,21 +485,21 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
-    "id"               VARCHAR NOT NULL,
-    "ownerID"          VARCHAR NOT NULL,
-    "ticketID"         VARCHAR,
-    "pegHash"          VARCHAR,
-    "assetType"        VARCHAR NOT NULL,
-    "description"      VARCHAR NOT NULL,
-    "documentHash"     VARCHAR NOT NULL UNIQUE,
-    "quantity"         INT     NOT NULL,
-    "quantityUnit"     VARCHAR NOT NULL,
-    "price"            INT     NOT NULL,
-    "moderated"        BOOLEAN NOT NULL,
-    "shippingPeriod"   INT     NOT NULL,
-    "portOfLoading"    VARCHAR NOT NULL,
-    "portOfDischarge"  VARCHAR NOT NULL,
-    "status"           VARCHAR NOT NULL,
+    "id"              VARCHAR NOT NULL,
+    "ownerID"         VARCHAR NOT NULL,
+    "ticketID"        VARCHAR,
+    "pegHash"         VARCHAR,
+    "assetType"       VARCHAR NOT NULL,
+    "description"     VARCHAR NOT NULL,
+    "documentHash"    VARCHAR NOT NULL UNIQUE,
+    "quantity"        INT     NOT NULL,
+    "quantityUnit"    VARCHAR NOT NULL,
+    "price"           INT     NOT NULL,
+    "moderated"       BOOLEAN NOT NULL,
+    "shippingPeriod"  INT     NOT NULL,
+    "portOfLoading"   VARCHAR NOT NULL,
+    "portOfDischarge" VARCHAR NOT NULL,
+    "status"          VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -820,9 +820,16 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
-    "notificationID" VARCHAR NOT NULL,
-    "negotiationID"    VARCHAR NOT NULL,
-    PRIMARY KEY ("notificationID", "negotiationID")
+    "id"            VARCHAR   NOT NULL,
+    "negotiationID" VARCHAR   NOT NULL,
+    "title"         VARCHAR   NOT NULL,
+    "message"       VARCHAR   NOT NULL,
+    "createdOn"     TIMESTAMP NOT NULL,
+    "createdBy"     VARCHAR   NOT NULL,
+    "updatedOn"     TIMESTAMP,
+    "updatedBy"     VARCHAR,
+    "timezone"      VARCHAR   NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
@@ -966,8 +973,6 @@ ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"

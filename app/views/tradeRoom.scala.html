@@ -35,20 +35,12 @@
     </div>
     <div class="recentActivity">
         <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
-        } {
-            <div class="scroller">
-                <div id="recentActivity">
-                </div>
-                <div class="cover-bar"></div>
-            </div>
-        }
-        </div>
-        <div id="chatRoom" class="chatRoom">
+            <div id="tradeActivities"></div>
         </div>
     </div>
+    <div id="chatRoom" class="chatRoom"></div>
     <script>
-            componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@id'));
+            componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities(0, '@id'));
             componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
     </script>
 }
