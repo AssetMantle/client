@@ -1,15 +1,83 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 @import views.html.base._
-@import views.html.component.blockchain._
+
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.DASHBOARD), failures, warnings, successes, infos)(left)(center)(Html(""))
+@common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
 
 @left={
-
+    <div class="leftTradeFinancial">
+        <div id="financials"></div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
+            case constants.User.ORGANIZATION => {}
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
 }
 
 @center = {
+    @loginState.userType match {
+        case constants.User.ZONE => {}
+        case constants.User.ORGANIZATION => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
 
+                <div class="cmuk-width-expand@@m">
+                    <div id="organizationTradeStatistics"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('organizationTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationTradeStatistics());
+            </script>
+        }
+        case constants.User.TRADER => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderTradeStatistics"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
+            </script>
+        }
+        case constants.User.USER => {}
+        case _ => {}
+    }
+}
+
+@right = {
+    <div class="recentActivity">
+        <div class="recentActivityContainer">
+        @commonCard(constants.View.RECENT_ACTIVITY) {
+        } {
+            <div class="scroller">
+                <div id="recentActivity"></div>
+                <div class="cover-bar"></div>
+            </div>
+        }
+        </div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
+            }
+            case constants.User.ORGANIZATION => {
+                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
+            }
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
 }

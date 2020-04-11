@@ -123,9 +123,9 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   object Service {
 
-    def create(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = add(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file))
+    def create(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = add(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file, status = Option(true)))
 
-    def updateOldDocument(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = upsert(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file))
+    def updateOldDocument(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = upsert(OrganizationBackgroundCheck(id = organizationBackgroundCheck.id, documentType = organizationBackgroundCheck.documentType, fileName = organizationBackgroundCheck.fileName, file = organizationBackgroundCheck.file, status = Option(true)))
 
     def get(id: String, documentType: String): Future[OrganizationBackgroundCheck] = findByIdDocumentType(id = id, documentType = documentType)
 
@@ -146,6 +146,10 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
     def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
+
+    def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES, status = true).map {
+      constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(_).isEmpty
+    }
   }
 
 }

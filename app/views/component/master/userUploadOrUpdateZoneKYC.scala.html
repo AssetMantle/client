@@ -21,7 +21,7 @@
         }
     }
 </div>
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.BACK)</button>
+<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.View.BACK)</button>
 
 @if(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(zoneKYCs.map(_.documentType)).isEmpty) {
     <button type="button" class="cmuk-button cmuk-button-primary" id="getZoneKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddZoneController.userReviewAddZoneRequestForm())">@Messages(constants.Form.NEXT)</button>

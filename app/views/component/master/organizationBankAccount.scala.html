@@ -1,0 +1,29 @@
+@import models.master.OrganizationBankAccountDetail
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(organizationBankAccountDetail: Option[OrganizationBankAccountDetail])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
+    @if(organizationBankAccountDetail.isDefined) {
+        <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT.legend)</button>
+    }
+} {
+    @organizationBankAccountDetail match {
+        case Some(organizationBankAccountDetail) => {
+            @commonTextInfo(constants.Form.ACCOUNT_HOLDER_NAME, organizationBankAccountDetail.accountHolder)
+            @commonTextInfo(constants.Form.NICK_NAME, organizationBankAccountDetail.nickName)
+            @commonTextInfo(constants.Form.ACCOUNT_NUMBER, organizationBankAccountDetail.accountNumber)
+            @commonTextInfo(constants.Form.BANK_NAME, organizationBankAccountDetail.bankName)
+            @commonTextInfo(constants.Form.SWIFT_CODE, organizationBankAccountDetail.swiftAddress)
+            @commonTextInfo(constants.Form.ADDRESS, organizationBankAccountDetail.address)
+            @commonTextInfo(constants.Form.COUNTRY, organizationBankAccountDetail.country)
+            @commonTextInfo(constants.Form.ZIP_CODE, organizationBankAccountDetail.zipCode)
+        }
+        case _ => {
+            <div class="cmuk-position-center">
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT.legend)</button>
+            </div>
+        }
+    }
+}
