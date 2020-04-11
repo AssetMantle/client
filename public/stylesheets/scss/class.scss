@@ -2296,12 +2296,13 @@ header:before,
   .cmuk-badge{
     @extend  %verifiedLabel;
   }
-  .editIcon{
-    .icon{
+  .editIcon,
+  .editIcon .icon, .icon{
       height: 16px;
       width: 16px;
+      margin-right: 5px;
+      margin-bottom: 3px;
     }
-  }
 }
 
 .contactDetails {

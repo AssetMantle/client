@@ -1775,9 +1775,12 @@ header:before,
   height: 11px;
   fill: #0862BE; }
 
-.profileDetails .editIcon .icon {
+.profileDetails .editIcon,
+.profileDetails .editIcon .icon, .profileDetails .icon {
   height: 16px;
-  width: 16px; }
+  width: 16px;
+  margin-right: 5px;
+  margin-bottom: 3px; }
 
 .contactDetails .infoRowBox {
   justify-content: space-between; }
