@@ -76,7 +76,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           val traderDetails = traders.Service.tryGetByAccountID(loginState.username)
           val emailAddress = contacts.Service.getVerifiedEmailAddress(loginState.username)
 
-          def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.get(organizationID)
+          def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.tryGet(organizationID)
 
           (for {
             _ <- create

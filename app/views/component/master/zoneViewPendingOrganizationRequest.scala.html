@@ -1,0 +1,51 @@
+@import controllers.actions.LoginState
+@import models.master.Organization
+@import views.html.base._
+@import models.master.OrganizationKYC
+
+@import views.html.component.master.streetAddress
+@(organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.ORGANIZATION_REQUEST): @organization.id
+</legend>
+<hr>
+<div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+    @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+    @commonTextInfo(constants.Form.ZONE_ID, organization.zoneID)
+    @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
+    @commonTextInfo(constants.View.NAME, organization.name)
+    @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
+    @commonTextInfo(constants.Form.EMAIL, organization.email)
+</div>
+<div>@Messages(constants.FormField.REGISTERED_ADDRESS.name) : <br>
+@streetAddress(organization.registeredAddress)
+</div>
+<div>@Messages(constants.FormField.POSTAL_ADDRESS.name) : <br>
+@streetAddress(organization.postalAddress)
+</div>
+<div>@Messages(constants.View.ORGANIZATION_UBO_DETAIL): <br>
+@for(ubo <- organization.ubos.data) {
+    @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
+    @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
+    @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
+    @commonTextInfo(constants.View.TITLE, ubo.title)
+}
+</div>
+<div>
+    @Messages(constants.Form.DOCUMENTS):<br>
+    @organizationKYCs.map { organizationKYC =>
+        @component.master.commonDocumentViewer(organizationKYC) {
+            @routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)
+        } {
+            <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+        } {
+            @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC)
+        }
+    }
+</div>
+<br>
+@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)
+@commonModalButton(constants.Form.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
+@commonFormButton(constants.Form.REJECT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")

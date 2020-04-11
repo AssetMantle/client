@@ -10,8 +10,8 @@
     } {
         <div>
             <div class="leftText">
-                <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>: @traderFeedbackHistory.sellerAddress <br>
-                <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @traderFeedbackHistory.pegHash <br>
+                @commonTextInfo(constants.Form.SELLER_ADDRESS, traderFeedbackHistory.sellerAddress)
+                @commonTextInfo(constants.Form.PEG_HASH, traderFeedbackHistory.pegHash)
             </div>
             <div class="centerText" >
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm('@traderFeedbackHistory.sellerAddress', '@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button>

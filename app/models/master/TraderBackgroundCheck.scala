@@ -123,9 +123,9 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   object Service {
 
-    def create(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = add(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file, status = traderBackgroundCheck.status))
+    def create(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = add(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file, status = Option(true)))
 
-    def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = upsert(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file, status = traderBackgroundCheck.status))
+    def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = upsert(TraderBackgroundCheck(id = traderBackgroundCheck.id, documentType = traderBackgroundCheck.documentType, fileName = traderBackgroundCheck.fileName, file = traderBackgroundCheck.file, status = Option(true)))
 
     def get(id: String, documentType: String): Future[TraderBackgroundCheck] = findByIdDocumentType(id = id, documentType = documentType)
 
@@ -146,6 +146,10 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
     def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
+
+    def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES, status = true).map {
+      constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(_).isEmpty
+    }
   }
 
 }

@@ -44,6 +44,7 @@ class ComponentViewController @Inject()(
                                          masterAccountKYCs: master.AccountKYCs,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
+                                         masterTraderBackgroundChecks: master.TraderBackgroundChecks,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withZoneLoginAction: WithZoneLoginAction,
@@ -75,48 +76,6 @@ class ComponentViewController @Inject()(
             profilePicture <- profilePicture
             coins <- coins
           } yield Ok(views.html.component.master.commonHome(coins, profilePicture))
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def genesisDetails: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val address = masterAccounts.Service.getAddress(genesisAccountName)
-      (for {
-        address <- address
-      } yield Ok(views.html.component.master.genesisDetails(address))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def zoneDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      (loginState.userType match {
-        case constants.User.ZONE =>
-          val zone = masterZones.Service.getByAccountID(loginState.username)
-          for {
-            zone <- zone
-          } yield Ok(views.html.component.master.zoneDetails(zone))
-        case constants.User.ORGANIZATION =>
-          val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
-
-          def zone(zoneID: String): Future[models.master.Zone] = masterZones.Service.get(zoneID)
-
-          for {
-            zoneID <- zoneID
-            zone <- zone(zoneID)
-          } yield Ok(views.html.component.master.zoneDetails(zone))
-        case constants.User.TRADER =>
-          val zoneID = masterTraders.Service.tryGetZoneIDByAccountID(loginState.username)
-
-          def zone(zoneID: String): Future[models.master.Zone] = masterZones.Service.get(zoneID)
-
-          for {
-            zoneID <- zoneID
-            zone <- zone(zoneID)
-          } yield Ok(views.html.component.master.zoneDetails(zone))
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -223,7 +182,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewReceivedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewReceivedNegotiationRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -238,7 +197,7 @@ class ComponentViewController @Inject()(
         receivedNegotiationList <- receivedNegotiationList(traderID)
         assetsList <- assetsList(receivedNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(receivedNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewReceivedNegotiationList(receivedNegotiationList = receivedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+      } yield Ok(views.html.component.master.traderViewReceivedNegotiationRequestList(receivedNegotiationRequestList = receivedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -265,7 +224,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewRejectedOrFailedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewRejectedAndFailedNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -286,7 +245,7 @@ class ComponentViewController @Inject()(
         failedNegotiationList <- failedNegotiationList(traderID)
         assetsList <- assetsList(buyerRejectedNegotiationList.map(_.assetID) ++ sellerRejectedNegotiationList.map(_.assetID) ++ failedNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(buyerRejectedNegotiationList.map(_.buyerTraderID) ++ sellerRejectedNegotiationList.map(_.buyerTraderID) ++ failedNegotiationList.map(_.buyerTraderID))
-      } yield Ok(views.html.component.master.traderViewRejectedOrFailedNegotiationList(rejectedNegotiationList = buyerRejectedNegotiationList ++ sellerRejectedNegotiationList, failedNegotiationList = failedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+      } yield Ok(views.html.component.master.traderViewRejectedAndFailedNegotiationList(rejectedNegotiationList = buyerRejectedNegotiationList ++ sellerRejectedNegotiationList, failedNegotiationList = failedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -296,15 +255,15 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationID)
+      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
 
-      def notificationsOfTraders(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
+      def getTradersNotifications(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
 
       (for {
         organizationID <- organizationID
         tradersInOrganizations <- tradersInOrganizations(organizationID)
-        notificationsOfTraders <- notificationsOfTraders(tradersInOrganizations.map(_.accountID))
-      } yield Ok(views.html.component.master.recentActivities(notificationsOfTraders, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
+        tradersNotifications <- getTradersNotifications(tradersInOrganizations.map(_.accountID))
+      } yield Ok(views.html.component.master.recentActivities(tradersNotifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -352,21 +311,379 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def viewIdentificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def organizationViewTraderAccountList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationViewTraderAccountList()))
+  }
+
+  def organizationViewAcceptedTraderAccountList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetVerifiedOrganizationID(loginState.username)
+
+      def acceptedTraders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        acceptedTraders <- acceptedTraders(organizationID)
+      } yield Ok(views.html.component.master.organizationViewAcceptedTraderAccountList(acceptedTraders))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def organizationViewAcceptedTraderAccount(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetVerifiedOrganizationID(loginState.username)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def getTraderKYCs(organizationID: String, trader: Trader): Future[Seq[TraderKYC]] = if (trader.organizationID == organizationID) {
+        masterTraderKYCs.Service.getAllDocuments(trader.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        organizationID <- organizationID
+        trader <- trader
+        traderKYCs <- getTraderKYCs(organizationID = organizationID, trader = trader)
+      } yield Ok(views.html.component.master.organizationViewAcceptedTraderAccount(trader = trader, traderKYCs = traderKYCs))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def organizationViewPendingTraderRequestList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def pendingTraderRequests(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationPendingTraderRequestList(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        pendingTraderRequests <- pendingTraderRequests(organizationID)
+      } yield Ok(views.html.component.master.organizationViewPendingTraderRequestList(pendingTraderRequests))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def organizationViewPendingTraderRequest(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetVerifiedOrganizationID(loginState.username)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def getTraderKYCs(organizationID: String, trader: Trader): Future[Seq[TraderKYC]] = if (trader.organizationID == organizationID) {
+        masterTraderKYCs.Service.getAllDocuments(trader.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        organizationID <- organizationID
+        trader <- trader
+        traderKYCs <- getTraderKYCs(organizationID = organizationID, trader = trader)
+      } yield Ok(views.html.component.master.organizationViewPendingTraderRequest(trader = trader, traderKYCs = traderKYCs))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def organizationViewRejectedTraderRequestList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def rejectedTraderRequests(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationRejectedTraderRequestList(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        rejectedTraderRequests <- rejectedTraderRequests(organizationID)
+      } yield Ok(views.html.component.master.organizationViewRejectedTraderRequestList(rejectedTraderRequests))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def organizationViewRejectedTraderRequest(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetVerifiedOrganizationID(loginState.username)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def getTraderKYCs(organizationID: String, trader: Trader): Future[Seq[TraderKYC]] = if (trader.organizationID == organizationID) {
+        masterTraderKYCs.Service.getAllDocuments(trader.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        organizationID <- organizationID
+        trader <- trader
+        traderKYCs <- getTraderKYCs(organizationID = organizationID, trader = trader)
+      } yield Ok(views.html.component.master.organizationViewRejectedTraderRequest(trader = trader, traderKYCs = traderKYCs))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewTraderAccountList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.zoneViewTraderAccountList()))
+  }
+
+  def zoneViewAcceptedTraderAccountList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def acceptedTraders(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        acceptedTraders <- acceptedTraders(zoneID)
+      } yield Ok(views.html.component.master.zoneViewAcceptedTraderAccountList(acceptedTraders))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewAcceptedTraderAccount(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def getTraderKYCs(zoneID: String, trader: Trader): Future[Seq[TraderKYC]] = if (trader.zoneID == zoneID) {
+        masterTraderKYCs.Service.getAllDocuments(trader.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
+
+      (for {
+        zoneID <- zoneID
+        trader <- trader
+        traderKYCs <- getTraderKYCs(zoneID = zoneID, trader = trader)
+        organization <- organization(trader.organizationID)
+      } yield Ok(views.html.component.master.zoneViewAcceptedTraderAccount(trader = trader, traderKYCs = traderKYCs, organization = organization))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewPendingTraderRequestList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def pendingTraderRequests(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZonePendingTraderRequestList(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        pendingTraderRequests <- pendingTraderRequests(zoneID)
+      } yield Ok(views.html.component.master.zoneViewPendingTraderRequestList(pendingTraderRequests))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewPendingTraderRequest(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def getTraderKYCs(zoneID: String, trader: Trader): Future[Seq[TraderKYC]] = if (trader.zoneID == zoneID) {
+        masterTraderKYCs.Service.getAllDocuments(trader.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
+
+      (for {
+        zoneID <- zoneID
+        trader <- trader
+        traderKYCs <- getTraderKYCs(zoneID = zoneID, trader = trader)
+        organization <- organization(trader.organizationID)
+      } yield Ok(views.html.component.master.zoneViewPendingTraderRequest(trader = trader, traderKYCs = traderKYCs, organization = organization))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewRejectedTraderRequestList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def rejectedTraderRequests(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneRejectedTraderRequestList(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        rejectedTraderRequests <- rejectedTraderRequests(zoneID)
+      } yield Ok(views.html.component.master.zoneViewRejectedTraderRequestList(rejectedTraderRequests))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewRejectedTraderRequest(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val trader = masterTraders.Service.tryGet(traderID)
+
+      def getTraderKYCs(zoneID: String, trader: Trader): Future[Seq[TraderKYC]] = if (trader.zoneID == zoneID) {
+        masterTraderKYCs.Service.getAllDocuments(trader.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
+
+      (for {
+        zoneID <- zoneID
+        trader <- trader
+        traderKYCs <- getTraderKYCs(zoneID = zoneID, trader = trader)
+        organization <- organization(trader.organizationID)
+      } yield Ok(views.html.component.master.zoneViewRejectedTraderRequest(trader = trader, traderKYCs = traderKYCs, organization = organization))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewOrganizationAccountList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.zoneViewOrganizationAccountList()))
+  }
+
+  def zoneViewAcceptedOrganizationAccountList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def acceptedOrganizations(zoneID: String): Future[Seq[Organization]] = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        acceptedOrganizations <- acceptedOrganizations(zoneID)
+      } yield Ok(views.html.component.master.zoneViewAcceptedOrganizationAccountList(acceptedOrganizations))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewAcceptedOrganizationAccount(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
+
+      def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
+        masterOrganizationKYCs.Service.getAllDocuments(organization.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        zoneID <- zoneID
+        organization <- organization
+        organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
+      } yield Ok(views.html.component.master.zoneViewAcceptedOrganizationAccount(organization = organization, organizationKYCs = organizationKYCs))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewPendingOrganizationRequestList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def pendingOrganizationRequests(zoneID: String): Future[Seq[Organization]] = masterOrganizations.Service.getZonePendingOrganizationRequestList(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        pendingOrganizationRequests <- pendingOrganizationRequests(zoneID)
+      } yield Ok(views.html.component.master.zoneViewPendingOrganizationRequestList(pendingOrganizationRequests))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewPendingOrganizationRequest(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
+
+      def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
+        masterOrganizationKYCs.Service.getAllDocuments(organization.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        zoneID <- zoneID
+        organization <- organization
+        organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
+      } yield Ok(views.html.component.master.zoneViewPendingOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewRejectedOrganizationRequestList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def rejectedOrganizationRequests(zoneID: String): Future[Seq[Organization]] = masterOrganizations.Service.getZoneRejectedOrganizationRequestList(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        rejectedOrganizationRequests <- rejectedOrganizationRequests(zoneID)
+      } yield Ok(views.html.component.master.zoneViewRejectedOrganizationRequestList(rejectedOrganizationRequests))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def zoneViewRejectedOrganizationRequest(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
+
+      def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
+        masterOrganizationKYCs.Service.getAllDocuments(organization.id)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        zoneID <- zoneID
+        organization <- organization
+        organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
+      } yield Ok(views.html.component.master.zoneViewRejectedOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.account())
+      }
+  }
+
+  def organizationSubscription(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationSubscription()))
+  }
+
+  def traderSubscription(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.traderSubscription()))
+  }
+
+  def identification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
-      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      val identification = masterIdentifications.Service.get(loginState.username)
       for {
         accountKYC <- accountKYC
         identification <- identification
-      } yield Ok(views.html.component.master.viewIdentificationDetails(identification = identification, accountKYC = accountKYC))
+      } yield Ok(views.html.component.master.identification(identification = identification, accountKYC = accountKYC))
   }
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountStatus: Future[String] = masterAccounts.Service.getStatus(loginState.username)
 
-      def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.getOrNoneByAccountID(accountID)
+      def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.get(accountID)
 
       def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
 
@@ -392,7 +709,7 @@ class ComponentViewController @Inject()(
             organizationKYCs <- getOrganizationKYCsByOrganization(organization)
           } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
         } else {
-          Future(Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus)))
+          Future(Ok(views.html.component.master.userViewPendingRequests(identification = if (identification.isDefined) Option(identification.get) else None, accountStatus = accountStatus)))
         }
       }
 
@@ -406,22 +723,22 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewOrganizationDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewOrganization: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val trader: Future[Trader] = masterTraders.Service.tryGetByAccountID(loginState.username)
 
-      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+      def getOrganizationByID(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
       (for {
         trader <- trader
         traderOrganization <- getOrganizationByID(trader.organizationID)
-      } yield Ok(views.html.component.master.traderViewOrganizationDetails(traderOrganization))
+      } yield Ok(views.html.component.master.traderViewOrganization(traderOrganization))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
-  def viewOrganizationDetails: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organization: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organization: Future[Organization] = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
@@ -433,7 +750,7 @@ class ComponentViewController @Inject()(
         organization <- organization
         organizationZone <- getZone(organization.zoneID)
         organizationKYCs <- getOrganizationKYCs(organization.id)
-      } yield Ok(views.html.component.master.viewOrganizationDetails(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
+      } yield Ok(views.html.component.master.organization(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
@@ -542,24 +859,28 @@ class ComponentViewController @Inject()(
         }
   }
 
-  def zoneViewOrganizationBankAccountDetail(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewOrganizationBankAccount(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
-      def organizationBankAccountDetail(organizationZoneID: String, zoneID: String): Future[OrganizationBankAccountDetail] = if (organizationZoneID == zoneID) masterOrganizationBankAccountDetails.Service.tryGet(organizationID) else throw new BaseException(constants.Response.UNAUTHORIZED)
+      def organizationBankAccountDetail(organizationZoneID: String, zoneID: String): Future[Option[OrganizationBankAccountDetail]] = if (organizationZoneID == zoneID) {
+        masterOrganizationBankAccountDetails.Service.get(organizationID)
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
 
       (for {
         organizationZoneID <- organizationZoneID
         zoneID <- zoneID
         organizationBankAccountDetail <- organizationBankAccountDetail(organizationZoneID = organizationZoneID, zoneID = zoneID)
-      } yield Ok(views.html.component.master.zoneViewOrganizationBankAccountDetail(organizationBankAccountDetail))
+      } yield Ok(views.html.component.master.zoneViewOrganizationBankAccount(organizationID, organizationBankAccountDetail))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def viewOrganizationBankAccountDetail(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationBankAccount(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -568,13 +889,13 @@ class ComponentViewController @Inject()(
       (for {
         organizationID <- organizationID
         organizationBankAccountDetail <- organizationBankAccountDetail(organizationID)
-      } yield Ok(views.html.component.master.viewOrganizationBankAccountDetail(organizationBankAccountDetail))
+      } yield Ok(views.html.component.master.organizationBankAccount(organizationBankAccountDetail))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
-  def traderViewOrganizationBankAccountDetail(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewOrganizationBankAccount(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
@@ -583,7 +904,7 @@ class ComponentViewController @Inject()(
       (for {
         organizationID <- organizationID
         organizationBankAccountDetail <- organizationBankAccountDetail(organizationID)
-      } yield Ok(views.html.component.master.traderViewOrganizationBankAccountDetail(organizationBankAccountDetail))
+      } yield Ok(views.html.component.master.traderViewOrganizationBankAccount(organizationBankAccountDetail))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
@@ -636,4 +957,57 @@ class ComponentViewController @Inject()(
       }
   }
 
+  //Dashboard Cards
+
+  def organizationTradeStatistics(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getTraders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
+
+      def getTradeCompletedBuyNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedBuyNegotiationListByTraderIDs(traderIDs)
+
+      def getTradeCompletedSellNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedSellNegotiationListByTraderIDs(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traders <- getTraders(organizationID)
+        tradeCompletedBuyNegotiationList <- getTradeCompletedBuyNegotiationList(traders.map(_.id))
+        tradeCompletedSellNegotiationList <- getTradeCompletedSellNegotiationList(traders.map(_.id))
+      } yield Ok(views.html.component.master.organizationTradeStatistics(
+        tradeCompletedBuyNegotiationList = tradeCompletedBuyNegotiationList.sortBy(_.time).reverse,
+        tradeCompletedSellNegotiationList = tradeCompletedSellNegotiationList.sortBy(_.time).reverse,
+        traders = traders,
+      ))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderTradeStatistics(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def getTradeCompletedBuyNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedBuyNegotiationListByTraderID(traderID)
+
+      def getTradeCompletedSellNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedSellNegotiationListByTraderID(traderID)
+
+      (for {
+        traderID <- traderID
+        tradeCompletedBuyNegotiationList <- getTradeCompletedBuyNegotiationList(traderID)
+        tradeCompletedSellNegotiationList <- getTradeCompletedSellNegotiationList(traderID)
+      } yield Ok(views.html.component.master.traderTradeStatistics(
+        tradeCompletedBuyNegotiationList = tradeCompletedBuyNegotiationList.sortBy(_.time).reverse,
+        tradeCompletedSellNegotiationList = tradeCompletedSellNegotiationList.sortBy(_.time).reverse
+      ))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationDeclarations(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationDeclarations()))
+  }
 }

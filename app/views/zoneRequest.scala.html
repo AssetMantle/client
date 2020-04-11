@@ -3,12 +3,12 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+@common(Messages(constants.View.INDEX))(Html(""))(center)(Html(""))
 
 @center = {
     <ul class="flexContainer" cmuk-accordion>
         <li>
-            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('pendingVerifyOrganizationRequests', jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests(), this)">@Messages(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS)</a>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('pendingVerifyOrganizationRequests', jsRoutes.controllers.ComponentViewController.zoneViewPendingOrganizationRequestList(), this)">@Messages(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS)</a>
             <div class="cmuk-accordion-content">
             <div id="pendingVerifyOrganizationRequests" class="flexContainer"></div>
             </div>
@@ -18,7 +18,7 @@
         <li>
             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.SetACLController.zoneViewPendingVerifyTraderRequests(), this)">@Messages(constants.View.PENDING_SET_ACL)</a>
             <div class="cmuk-accordion-content">
-            <div id="setACLList" class="flexContainer"></div>
+            <div id="setACLList" class="flexContainer cmuk-grid-small" cmuk-grid></div>
             </div>
         </li>
     </ul>
@@ -32,7 +32,7 @@
     </ul>
     <ul cmuk-accordion>
         <li>
-            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('pendingIssueFiatRequests', jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests(), this)">@Messages(constants.View.PENDING_ISSUE_FIAT_REQUESTS)</a>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('pendingIssueFiatRequests', jsRoutes.controllers.IssueFiatController.issueFiatRequestList(), this)">@Messages(constants.View.PENDING_ISSUE_FIAT_REQUESTS)</a>
             <div class="cmuk-accordion-content">
             <div id="pendingIssueFiatRequests" class="flexContainer"></div>
             </div>

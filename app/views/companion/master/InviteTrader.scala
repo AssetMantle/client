@@ -12,6 +12,6 @@ object InviteTrader {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(name:String, emailAddress: String)
+  case class Data(name: String, emailAddress: String)
 
 }

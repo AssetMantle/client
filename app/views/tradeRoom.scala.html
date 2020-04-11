@@ -25,8 +25,9 @@
 
 @right = {
     <div class="right cmuk-flex">
-        <button class="refresh"><img src="@routes.Assets.versioned("./images/icons/amendIcon.svg")">@Messages(constants.View.AMEND)</button>
-        <button class="refresh "><img src="@routes.Assets.versioned("./images/icons/refreshIcon.svg")">@Messages(constants.View.REFRESH)</button>
+        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>@Messages(constants.View.AMEND)</button>
+        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>
+            @Messages(constants.View.REFRESH)</button>
         <div class="cmuk-flex live">
             <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>
@@ -34,7 +35,7 @@
     </div>
     <div class="recentActivity">
         <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY) {
+        @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
         } {
             <div class="scroller">
                 <div id="recentActivity">

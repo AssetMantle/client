@@ -5,5 +5,5 @@
 @(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data] = RejectIssueFiatRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_ISSUE_FIAT_REQUEST, rejectIssueFiatRequestForm) {
     @commonInputText(rejectIssueFiatRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
-    @commonInputText(rejectIssueFiatRequestForm, constants.FormField.COMMENT)
+    @commonInputText(rejectIssueFiatRequestForm, constants.FormField.COMMENT, 'required -> false)
 }
