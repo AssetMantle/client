@@ -139,7 +139,7 @@ object addOrganizationControllerTest {
   val rejectVerifyOrganizationScenario: ScenarioBuilder = scenario("RejectVerifyOrganization")
     .exec(http("RejectVerifyOrganization_GET")
       .get(session=>routes.AddOrganizationController.rejectVerifyOrganizationRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST.legend)).exists)
+      .check(css("legend:contains(%s)".format(constants.Form.REJECT_ORGANIZATION_REQUEST.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("RejectVerifyOrganization_POST")

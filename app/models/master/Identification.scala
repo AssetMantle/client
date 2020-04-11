@@ -23,7 +23,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
   val db = databaseConfig.db
   private[models] val identificationTable = TableQuery[IdentificationTable]
 
-  private def serialize(identification: Identification): IdentificationSerialized = IdentificationSerialized( accountID = identification.accountID, firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = identification.dateOfBirth, idNumber = identification.idNumber, idType = identification.idType, address = Json.toJson(identification.address).toString, completionStatus = identification.completionStatus, verificationStatus = identification.verificationStatus)
+  private def serialize(identification: Identification): IdentificationSerialized = IdentificationSerialized(accountID = identification.accountID, firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = identification.dateOfBirth, idNumber = identification.idNumber, idType = identification.idType, address = Json.toJson(identification.address).toString, completionStatus = identification.completionStatus, verificationStatus = identification.verificationStatus)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -63,23 +63,13 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getIdentificationOrNoneByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
-    case Success(result) => Option(result)
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def getByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption)
 
-  private def getIdentificationByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
+  private def tryGetByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -95,7 +85,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   case class IdentificationSerialized(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
 
-    def deserialize: Identification = Identification(accountID = accountID, firstName=firstName, lastName=lastName, dateOfBirth=dateOfBirth, idNumber=idNumber,idType=idType, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus)
+    def deserialize: Identification = Identification(accountID = accountID, firstName = firstName, lastName = lastName, dateOfBirth = dateOfBirth, idNumber = idNumber, idType = idType, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus)
 
   }
 
@@ -125,7 +115,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: Address): Future[String] = add(serialize(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType,address)))
+    def create(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: Address): Future[String] = add(serialize(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, address)))
 
     def insertOrUpdate(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: Address): Future[Int] = upsert(serialize(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, address)))
 
@@ -133,11 +123,11 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def markIdentificationFormCompleted(accountID: String): Future[Int] = updateCompletionStatusByAccountID(accountID = accountID, completionStatus = true)
 
-    def get(accountID: String): Future[Identification] = getIdentificationByAccountID(accountID).map(_.deserialize)
+    def tryGet(accountID: String): Future[Identification] = tryGetByAccountID(accountID).map(_.deserialize)
 
-    def getOrNoneByAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID).map(_.map(_.deserialize))
+    def get(accountID: String): Future[Option[Identification]] = getByAccountID(accountID).map(_.map(_.deserialize))
 
-    def getName(accountID: String): Future[String] = getIdentificationByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
+    def tryGetName(accountID: String): Future[String] = tryGetByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 
     def getVerificationStatus(accountID: String): Future[Option[Boolean]] = getVerificationStatusByAccountID(accountID)
   }
