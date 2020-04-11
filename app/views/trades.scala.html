@@ -7,12 +7,12 @@
 
 @left = {
     <div class="leftTradeFinancial">
-        <div id="traderFinancials"></div>
+        <div id="financials"></div>
     </div>
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
-            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
             case constants.User.ORGANIZATION => {}
             case constants.User.ZONE => {}
@@ -20,22 +20,6 @@
             case _ => {}
         }
     </script>
-
-    @*For iframes*@
-    @loginState.userType match {
-        case constants.User.TRADER => {
-            <script type="text/javascript">
-                    var fiatCometMessage = function (event) {
-                        componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-                    }
-            </script>
-            <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
-        }
-        case constants.User.ORGANIZATION => {}
-        case constants.User.ZONE => {}
-        case constants.User.GENESIS => {}
-        case _ => {}
-    }
 }
 
 @center = {
@@ -43,11 +27,11 @@
     @loginState.userType match {
         case constants.User.TRADER => {
             <div class="tradeList cmuk-margin-bottom">
-                <div id="traderViewAcceptedNegotiationList"></div>
+                    <div id="traderViewAcceptedNegotiationList"></div>
             </div>
 
             <div class="salesQuoteList">
-                <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
             </div>
 
             <script>

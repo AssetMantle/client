@@ -19,6 +19,7 @@ GET         /market                                                             
 GET         /profile                                                                        controllers.ViewController.profile
 GET         /account                                                                        controllers.ViewController.account
 GET         /trades                                                                         controllers.ViewController.trades
+GET         /transactions                                                                   controllers.ViewController.transactions
 GET         /dashboard                                                                      controllers.ViewController.dashboard
 GET         /tradeRoom                                                                      controllers.ViewController.tradeRoom(id: String)
 
