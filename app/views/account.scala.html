@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
-@import views.html.base.common
 @import views.html.base._
+
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
+@views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
 
 @left={
     <div class="leftTradeFinancial">
@@ -37,7 +37,74 @@
 }
 }
 @center ={
-    <div class="cmuk-container cmuk-margin-bottom"></div>
+    @loginState.userType match {
+        case constants.User.ZONE => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="zoneViewOrganizationAccountList"></div>
+                </div>
+
+            </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="zoneViewTraderAccountList"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
+                    componentResource('zoneViewTraderAccountList', jsRoutes.controllers.ComponentViewController.zoneViewTraderAccountList());
+            </script>
+        }
+        case constants.User.ORGANIZATION => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="organizationViewTraderAccountList"></div>
+                </div>
+
+            </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="organizationSubscription"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('organizationViewTraderAccountList', jsRoutes.controllers.ComponentViewController.organizationViewTraderAccountList());
+                    componentResource('organizationSubscription', jsRoutes.controllers.ComponentViewController.organizationSubscription());
+            </script>
+        }
+        case constants.User.TRADER => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderRelationList"></div>
+                </div>
+
+            </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderSubscription"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
+                    componentResource('traderSubscription', jsRoutes.controllers.ComponentViewController.traderSubscription());
+            </script>
+        }
+        case constants.User.GENESIS => {
+            @commonFormButton(constants.Form.INVITE_ZONE)
+        }
+        case constants.User.USER => {
+        }
+        case _ => {}
+    }
 }
 
 @right = {

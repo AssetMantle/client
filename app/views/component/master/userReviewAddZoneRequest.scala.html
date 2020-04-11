@@ -9,7 +9,7 @@
 
     <div>
         <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_DETAILS):</div>
-        @commonTextInfo(constants.Form.NAME, zone.name)
+        @commonTextInfo(constants.View.NAME, zone.name)
         @commonTextInfo(constants.Form.CURRENCY, zone.currency)
         <div class="cmuk-text-left title">@Messages(constants.Form.ADDRESS)</div>
         @commonTextInfo(constants.FormField.ADDRESS_LINE_1.name, zone.address.addressLine1)
@@ -35,5 +35,5 @@
     </div>
     <br>
     @commonCheckbox(zoneCompletionForm, constants.FormField.COMPLETION)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.Form.BACK)</button>
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.View.BACK)</button>
 }

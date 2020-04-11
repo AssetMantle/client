@@ -195,9 +195,9 @@ EMAIL.LOGIN.MESSAGE = You have logged in {0}
 EMAIL.VERIFY_EMAIL.SUBJECT = Verify Email
 EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP is {0}
 EMAIL.TRADER_INVITATION.SUBJECT = Invitation to become Trader.
-EMAIL.TRADER_INVITATION.MESSAGE = Hi,\
+EMAIL.TRADER_INVITATION.MESSAGE = Hi {0},\
   You have been invited to be a part of Comdex by Organization: {1}.\
-  Please use this id:{0} to add as Trader for this organization. Click on "<a href="192.168.0.147">Comdex</a>.
+  Please use this id:{2} to add as Trader for this organization. Click on <a href="{3}">Comdex</a>.
 
 LATEST_BLOCK_HEIGHT=Latest block height
 AVERAGE_BLOCK_TIME=Average block time
@@ -367,7 +367,7 @@ RESPONSE.FAILURE.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE=Total share pe
 RESPONSE.SUCCESS.UBO_DELETED=UBO successfully deleted
 SMS.VERIFY_PHONE.SUBJECT=Verify Phone
 SMS.VERIFY_PHONE.MESSAGE=Your OTP is {0}
-SMS.PHONE_VERIFIED.MESSAGE=Phone Number is verified 
+SMS.PHONE_VERIFIED.MESSAGE=Phone Number is verified. 
 NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP={0} {1} {2} @ {3} \n Shipping from {4} to {5} in period {6}.
 ISSUE_ASSET_PENDING=Issue Asset Pending, Request will not go if issue asset fails.
 PUSH_NOTIFICATION.NEGOTIATION_REQUEST_ACCEPTED.TITLE=Negotiation Request Accepted
@@ -519,3 +519,6 @@ FORM.ACCEPT_NEGOTIATION_REQUEST.SUBMIT=Submit
 FORM.REJECT_NEGOTIATION_REQUEST.LEGEND=Reject Sales Quote
 FORM.REJECT_NEGOTIATION_REQUEST.SUBMIT=Submit
 COMMENT=Comment
+EMAIL.ZONE_INVITATION.SUBJECT = Invitation to become Zone.
+EMAIL.ZONE_INVITATION.MESSAGE = Hi,\
+  Please go to this <a href="{0}/zone/acceptInvitation?token={1}">link</a>.
