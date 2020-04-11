@@ -11,6 +11,7 @@
         <title>@title</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/Favicon.png")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/fonts.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
             <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
@@ -76,11 +77,10 @@
                                 </a>
                             </li>
                             <li>
-                                <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="lastChild">
+                                <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
                                     @Messages(constants.Form.LOGIN.legend)
                                 </a>
                             </li>
-                            <a class="cmuk-navbar-toggle cmuk-hidden@@m" cmuk-toggle="target: #offcanvas-flip" cmuk-navbar-toggle-icon href="#"></a>
                         }
                         case default => {
                             @loginState.userType match {
@@ -105,19 +105,6 @@
                             </script>
                             <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
-
-                            <li class="notificationDropdown">
-                                <a onclick="componentResource('mobileNotificationSection', jsRoutes.controllers.NotificationController.notificationPage(0))">
-                                    @Messages(constants.Form.INBOX)
-                                <span class="cmuk-badge" id="notificationBadge">0</span>
-                                </a>
-                                <div cmuk-dropdown="mode: click">
-                                    <ul class="cmuk-nav cmuk-dropdown-nav">
-                                        <div id="mobileNotificationSection">
-                                        </div>
-                                    </ul>
-                                </div>
-                            </li>
                             <li>
                                 <a href="@controllers.routes.ViewController.profile()">
                                     @loginState.username
@@ -125,7 +112,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="lastChild">
+                                <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
                                     <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-logout")"/></svg>
                                 </a>
                             </li>
@@ -147,25 +134,29 @@
                         @for(failure <- failures) {
                             <div class="cmuk-alert-danger"  onclick="getForm(@failure.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
-                                <p>@Messages(constants.Form.FAILURE) @Messages(failure.message)</p>
+                                <p><span class="failureIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-fail")"/></svg></span>
+                                    <span class="alretName">@Messages(constants.Form.FAILURE):</span> @Messages(failure.message)</p>
                             </div>
                         }
                         @for(warning <- warnings) {
                             <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
-                                <p>@Messages(constants.Form.WARNING) @Messages(warning.message)</p>
+                                <p><span class="warningIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-warning")"/></svg></span>
+                                    <span class="alretName">@Messages(constants.Form.WARNING):</span> @Messages(warning.message)</p>
                             </div>
                         }
                         @for(success <- successes) {
                             <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
-                                <p>@Messages(constants.Form.SUCCESS) @Messages(success.message)</p>
+                                <p><span class="successIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-success")"/></svg></span>
+                                    <span class="alretName">@Messages(constants.Form.SUCCESS):</span> @Messages(success.message)</p>
                             </div>
                         }
                         @for(info <- infos) {
                             <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
-                                <p>@Messages(constants.Form.INFORMATION) @Messages(info.message)</p>
+                                <p><span class="infoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info")"/></svg></span>
+                                    <span class="alretName">@Messages(constants.Form.INFORMATION):</span> @Messages(info.message)</p>
                             </div>
 
                         }
@@ -248,7 +239,7 @@
                 <div class="copyright">
                             &copy;
                     <script>document.write(new Date().getFullYear())</script>
-                    <a href="" target="_blank">Comdex — All Rights Reserved</a>
+                    <a href="" target="_blank">@Messages(constants.View.FOOTER_TEXT)</a>
                 </div>
             </div>
         </div>

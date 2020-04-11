@@ -25,14 +25,14 @@ function getMnemonic(mnemonic,getQuizButton,getMnemonicButton,verifyMnemonicButt
     $(getQuizButton).show();
     $(getMnemonicButton).hide();
     $(verifyMnemonicButton).hide();
-    $(errorMnemonicInput).hide();
+    $(errorMnemonicInput).fadeOut();
 }
 
 function verifyMnemonic(mnemonic,errorMnemonicInput) {
     const mnemonicElementArray = mnemonic.split(" ");
     for (let i = 0; i < 24; i++) {
         if ($("#mnemonicElement-" + i).val() !== mnemonicElementArray[i]) {
-            $(errorMnemonicInput).show();
+            $(errorMnemonicInput).fadeIn();
             return;
         }
     }
