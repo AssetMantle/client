@@ -35,7 +35,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private val nodeTimezone = configuration.get[String]("node.timezone")
 
-  private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
+  private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class NotificationSerializable(id: String, accountID: String, title: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
     def deserialize(): Notification = Notification(id = id, accountID = accountID, title = title, message = utilities.JSON.convertJsonStringToObject[ActivityMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
@@ -115,9 +115,9 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def insert(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, title = notification.title, message = ActivityMessage(header = notification.message, parameters = parameters), read = false, createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
-    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
-    def getByAccountIDs(accountIDs: Seq[String], pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+    def getByAccountIDs(accountIDs: Seq[String], pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 

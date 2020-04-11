@@ -29,7 +29,7 @@ class NotificationController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 
-  private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
+  private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -55,7 +55,7 @@ class NotificationController @Inject()(
       (for {
         accountNotifications <- accountNotifications
         otherNotifications <- otherNotifications
-      } yield Ok(views.html.component.master.recentActivityMessages(notifications = (accountNotifications ++ otherNotifications).sortWith((t1, t2) => t1.createdOn.compareTo(t2.createdOn) > 0).take(notificationsPerPageLimit)))
+      } yield Ok(views.html.component.master.recentActivityMessages(notifications = (accountNotifications ++ otherNotifications).sortWith((t1, t2) => t1.createdOn.compareTo(t2.createdOn) > 0).take(notificationsPerPage)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

@@ -34,7 +34,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private val nodeTimezone = configuration.get[String]("node.timezone")
 
-  private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
+  private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class TradeActivitySerializable(id: String, negotiationID: String, title: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
     def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, title = title, message = utilities.JSON.convertJsonStringToObject[ActivityMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
@@ -93,7 +93,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
   object Service {
     def insert(negotiationID: String, tradeActivity: constants.TradeActivity, parameters: String*): Future[String] = add(serialize(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, title = tradeActivity.title, message = ActivityMessage(header = tradeActivity.message, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
-    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
+    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
   }
 
 }
