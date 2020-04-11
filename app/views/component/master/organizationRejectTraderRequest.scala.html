@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.RejectTraderRequest
+
+@(rejectTraderRequestForm: Form[RejectTraderRequest.Data] = RejectTraderRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.ORGANIZATION_REJECT_TRADER_REQUEST, rejectTraderRequestForm) {
+    @commonInputText(rejectTraderRequestForm, constants.FormField.TRADER_ID)
+    @commonInputText(rejectTraderRequestForm, constants.FormField.COMMENT, 'required -> false)
+    @if(rejectTraderRequestForm.data(constants.FormField.TRADER_ID.name) != "") {
+        @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewPendingTraderRequest, 'parameters -> s"'${rejectTraderRequestForm.data(constants.FormField.TRADER_ID.name)}'")
+    }
+}

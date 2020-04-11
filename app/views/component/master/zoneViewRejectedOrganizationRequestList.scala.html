@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Organization
+
+@(rejectedOrganizationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@rejectedOrganizationRequests.map { organization =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+        @commonTextInfo(constants.View.NAME, organization.name)
+        @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
+        @commonModalButton(constants.Form.VIEW, routes.javascript.ComponentViewController.zoneViewRejectedOrganizationRequest, 'parameters -> s"'${organization.id}'")
+    }
+}

@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@(coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(coins: String = "0", profilePicture: Array[Byte] = Array())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <div class="cmuk-margin-bottom">
    @commonCard(loginState.username) {
@@ -25,10 +25,3 @@
    }
 
 </div>
-
-<script type="text/javascript">
-        var accountCometMessage = function (event) {
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
-        }
-</script>
-<iframe class="hidden" src="@routes.ComponentViewController.accountComet"></iframe>

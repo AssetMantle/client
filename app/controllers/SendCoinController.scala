@@ -78,12 +78,12 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def faucetRequestList: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val pendingFaucetRequests = masterTransactionFaucetRequests.Service.getPendingFaucetRequests
       (for {
         pendingFaucetRequests <- pendingFaucetRequests
-      } yield Ok(views.html.component.master.viewPendingFaucetRequests(pendingFaucetRequests))
+      } yield Ok(views.html.component.master.faucetRequestList(pendingFaucetRequests))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

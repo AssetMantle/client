@@ -19,7 +19,7 @@
     <div id="errorMnemonicInput" class="errorMnemonicInput">
     @Messages(constants.Form.INVALID_INPUT)
     </div>
-    <button type="button" id="getMnemonic" class="cmuk-button buttonForm hidden" onclick="getMnemonic('@mnemonic','#getQuiz','#getMnemonic','#verifyMnemonic','#errorMnemonicInput')">@Messages(constants.Form.BACK)</button>
+    <button type="button" id="getMnemonic" class="cmuk-button buttonForm hidden" onclick="getMnemonic('@mnemonic','#getQuiz','#getMnemonic','#verifyMnemonic','#errorMnemonicInput')">@Messages(constants.View.BACK)</button>
     <button type="button" id="getQuiz" class="cmuk-button buttonForm" onclick="getQuiz('#getQuiz','#getMnemonic','#verifyMnemonic')">@Messages(constants.Form.MNEMONIC_NOTED)</button>
     <button type="button" id="verifyMnemonic" class="cmuk-button buttonForm hidden" onclick="verifyMnemonic('@mnemonic','#errorMnemonicInput')">@Messages(constants.Form.VERIFY)</button>
     <script src="@routes.Assets.versioned("javascripts/mnemonicQuiz.js")" type="text/javascript"></script>
