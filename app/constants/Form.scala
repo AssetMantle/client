@@ -103,7 +103,7 @@ object Form {
   val UPDATE_ASSET_TERMS = new Form("UPDATE_ASSET_TERMS", routes.NegotiationController.updateAssetTerms(), routes.javascript.NegotiationController.updateAssetTermsForm)
   val UPDATE_ASSET_OTHER_DETAILS = new Form("UPDATE_ASSET_OTHER_DETAILS", routes.NegotiationController.updateAssetOtherDetails(), routes.javascript.NegotiationController.updateAssetOtherDetailsForm)
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
-  val UPDATE_DOCUMENTS_CHECKLIST = new Form("UPDATE_DOCUMENTS_CHECKLIST", routes.NegotiationController.updateDocumentsList(), routes.javascript.NegotiationController.updateDocumentsListForm)
+  val UPDATE_DOCUMENTS_LIST = new Form("UPDATE_DOCUMENTS_LIST", routes.NegotiationController.updateDocumentsList(), routes.javascript.NegotiationController.updateDocumentsListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
 
   //RedeemAssetController

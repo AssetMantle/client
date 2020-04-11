@@ -24,8 +24,8 @@ html, body {
   border-right: 1px solid white; }
 
 .leftTradeFinancial .financial ul li .wallet .walletIcon, .leftTradeFinancial .financial ul li .payable .payableIcon, .leftTradeFinancial .financial ul li .receivable .receivableIcon, .leftTradeFinancial .financial ul li .leftDays .leftDaysIcon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   margin-right: 15px;
   position: relative; }
@@ -38,13 +38,13 @@ html, body {
   -moz-border-radius: 30px;
   border-radius: 30px;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   align-items: center;
   justify-content: center; }
 
 .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .payable .cmuk-comment-meta, .leftTradeFinancial .financial ul li .receivable .cmuk-comment-meta, .leftTradeFinancial .financial ul li .leftDays .cmuk-comment-meta {
   color: #061728;
-  font-size: 12px; }
+  font-size: 16px; }
 
 .leftTradeFinancial .cmuk-card-default {
   background: #FAFAFA;
@@ -53,7 +53,7 @@ html, body {
 
 .profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
   font-weight: bold;
-  font-size: 12px;
+  font-size: 14px;
   text-decoration: none; }
 
 .comdex .cmuk-badge.verified, .comdex .cmuk-badge.rejected, .comdex .cmuk-badge.pending, .profileDetails .cmuk-badge {
@@ -76,7 +76,7 @@ html, body {
   height: auto;
   min-height: 100%;
   background: #F0F0F0;
-  margin: 0 auto -135px; }
+  margin: 0 auto -138px; }
 
 .pageContainer,
 .dataContainer,
@@ -88,11 +88,11 @@ html, body {
   opacity: 1; }
 
 .headerFontSize {
-  font-size: 14px; }
+  font-size: 16px; }
 
 .title {
   font-size: 14px;
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen;
   font-weight: bold; }
 
 .logoutContainer .commonCheckBox {
@@ -263,14 +263,16 @@ rightText {
   margin-top: 20px;
   width: 100%;
   padding: 30px 0px;
-  font-size: 12px;
+  font-size: 14px;
   background: #031221; }
   .footer .copyright {
     margin: 10px 0px;
-    font-family: "Oxygen", sans-serif;
-    font-weight: bold; }
-  .footer .footer a {
-    color: 16px; }
+    font-family: Oxygen;
+    font-weight: bold;
+    color: #053C75; }
+    .footer .copyright a {
+      text-decoration: none;
+      color: #053C75; }
 
 .status {
   width: 20px;
@@ -298,6 +300,11 @@ rightText {
   color: #Fff;
   border-radius: 3px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
+
+.alretName {
+  font-weight: bold;
+  font-size: 14px;
+  font-family: Oxygen; }
 
 .cmuk-accordion-buttons {
   background: #fff;
@@ -366,7 +373,7 @@ rightText {
   .usernameAvailibilty .result {
     position: absolute;
     right: -25px;
-    top: 30px; }
+    top: 40px; }
 
 .mainlist {
   padding: 0px; }
@@ -400,12 +407,12 @@ rightText {
 
 .fileName {
   font-size: 14px;
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen;
   color: #0862BE;
   margin-bottom: 5px; }
 
 .dropBox {
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 
 .profileDocuments {
   display: flex;
@@ -413,7 +420,7 @@ rightText {
   justify-content: space-evenly; }
 
 .mobileNumberUpdate .countryCode {
-  margin-top: 24px;
+  margin-top: 32px;
   width: 80px;
   margin-right: 10px; }
 .mobileNumberUpdate .mobileNumber {
@@ -433,7 +440,7 @@ rightText {
   margin: auto;
   padding: 40px;
   border-radius: 3px;
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen;
   font-size: 14px;
   background: #e6e6e6;
   width: 100px;
@@ -461,29 +468,38 @@ rightText {
   -webkit-box-orient: vertical;
   overflow: hidden; }
 
+.loginButton {
+  font-family: Rubik; }
+
 .comdex .buttonForm {
-  background: #053C75;
+  background: #0862BE;
   color: #FFFFFF;
-  font-size: 12px;
-  font-family: "Oxygen", sans-serif; }
+  font-size: 14px;
+  font-family: Oxygen;
+  font-weight: bold; }
 .comdex .cmuk-input {
+  background: #FFFFFF;
+  box-sizing: border-box;
+  border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
-  font-size: 12px;
-  font-family: "Oxygen", sans-serif; }
+  font-size: 14px;
+  font-family: Oxygen; }
   .comdex .cmuk-input::placeholder {
     color: #848A91;
-    font-size: 12px;
-    font-family: "Oxygen", sans-serif; }
+    font-size: 14px;
+    font-family: Oxygen; }
   .comdex .cmuk-input:focus {
     border: 1px solid rgba(5, 60, 117, 0.22); }
+.comdex .cmuk-input, .comdex .cmuk-select, .comdex .cmuk-textarea {
+  padding: 0px 15px; }
 .comdex input:-webkit-autofill,
 .comdex input:-webkit-autofill:hover,
 .comdex input:-webkit-autofill:focus,
 .comdex input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px white inset; }
 .comdex .error {
-  font-size: 12px;
-  font-family: "Oxygen", sans-serif;
+  font-size: 14px;
+  font-family: Oxygen;
   color: #f0506e; }
 .comdex .cmuk-badge.verified {
   background-color: #49A948; }
@@ -492,27 +508,46 @@ rightText {
 .comdex .cmuk-badge.pending {
   background-color: #faa05a; }
 .comdex .cmuk-button {
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 .comdex .cmuk-button-primary {
   border: none;
-  font-size: 12px; }
+  font-size: 14px; }
 .comdex .primaryFont {
-  font-family: "Rubik", sans-serif; }
+  font-family: Rubik; }
 .comdex .secondaryFont {
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
+.comdex .cmuk-alert-warning p {
+  text-decoration: underline;
+  cursor: pointer; }
+.comdex .cmuk-alert .failureIcon,
+.comdex .cmuk-alert .warningIcon,
+.comdex .cmuk-alert .successIcon,
+.comdex .cmuk-alert .infoIcon {
+  width: 20px;
+  height: 20px; }
+  .comdex .cmuk-alert .failureIcon .icon,
+  .comdex .cmuk-alert .warningIcon .icon,
+  .comdex .cmuk-alert .successIcon .icon,
+  .comdex .cmuk-alert .infoIcon .icon {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 5px; }
 .comdex .cmuk-alert p {
-  font-family: "Oxygen", sans-serif;
-  font-size: 12px; }
+  font-family: Oxygen;
+  font-size: 14px; }
 .comdex .cmuk-card-header {
   color: #061728;
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 .comdex .cmuk-button-link {
   color: #0862BE; }
 .comdex .cmuk-button-primary {
   background-color: #0862BE; }
 .comdex .cmuk-legend {
   font-weight: bold;
-  font-family: "Oxygen", sans-serif;
+  text-align: center;
+  color: #061728;
+  font-weight: bold;
+  font-family: Oxygen;
   font-size: 18px; }
 .comdex .cmuk-spinner > * > * {
   stroke-width: 2 !important;
@@ -548,21 +583,22 @@ rightText {
   max-height: 100px;
   padding: 0px; }
 .comdex .panelHeader {
-  font-size: 14px;
-  font-family: "Oxygen", sans-serif;
+  font-size: 16px;
+  font-family: Oxygen;
   font-weight: normal;
-  color: #272829; }
+  color: #272829;
+  line-height: 2; }
 
 .header {
   background: #053C75; }
   .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
     background: #053C75;
-    padding: 0px 30px; }
+    padding: 0px 0px 0px 35px; }
   .header .cmuk-navbar-item,
   .header .cmuk-navbar-nav > li > a,
   .header .cmuk-navbar-toggle {
     min-height: 60px;
-    font-family: "Oxygen", sans-serif;
+    font-family: Oxygen;
     text-transform: capitalize; }
   .header .cmuk-logo {
     padding: 0px 40px 0px 0px;
@@ -575,12 +611,13 @@ rightText {
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 14px;
+    font-family: Rubik;
     color: #FFFFFF;
     line-height: inherit;
-    padding: 8px 30px;
+    padding: 5px 30px;
     border-radius: 3px; }
-  .header .cmuk-navbar-right .cmuk-navbar-nav li .lastChild {
-    padding: 0px 0px 0px 30px; }
+  .header .cmuk-navbar-right .cmuk-navbar-nav li .loginLink {
+    padding: 0px 45px 0px 45px; }
   .header .cmuk-navbar-right .loginIcon {
     width: 20px;
     height: 20px;
@@ -588,24 +625,24 @@ rightText {
     margin: 0px 5px 5px;
     padding: 3px; }
   .header .cmuk-navbar-nav > li > a {
-    padding: 0px 20px;
+    padding: 0px 25px;
     font-weight: bold;
     color: #FFFFFF;
-    font-size: 12px;
-    box-sizing: border-box; }
+    font-size: 14px;
+    box-sizing: border-box;
+    letter-spacing: 0.4px; }
   .header .dashboardIcon .icon {
-    width: 16px;
-    height: 13px; }
+    width: 20px;
+    height: 16px;
+    margin-bottom: 3px; }
   .header .dashboardIcon, .header .traderIcon, .header .accountIcon, .header .transactionIcon {
-    margi-right: 3px;
+    margin-right: 8px;
     width: 20px;
     height: 20px; }
   .header .icon {
-    width: 17px;
-    height: 15px;
-    fill: #FFFFFF;
-    margin-right: 5px;
-    marign-bottom: 2px; }
+    width: 20px;
+    height: 20px;
+    fill: #FFFFFF; }
   .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {
     color: #FFFFFF; }
   .header .cmuk-navbar-nav > li > a.active {
@@ -644,7 +681,7 @@ rightText {
   .modal .modalContent {
     word-break: break-all;
     top: 20%;
-    border-radius: 0.25rem;
+    border-radius: 3px;
     padding: 20px;
     margin: auto;
     background-color: #FAFAFA;
@@ -657,10 +694,11 @@ rightText {
     display: inline-block; }
     .modal .modalContent .modalBody {
       padding: 20px;
-      text-align: left; }
+      text-align: left;
+      font-family: Oxygen; }
       .modal .modalContent .modalBody .infoRowLabel {
         text-align: left;
-        font-family: "Oxygen", sans-serif; }
+        font-family: Oxygen; }
       .modal .modalContent .modalBody .title {
         margin: 10px 0px; }
 
@@ -670,27 +708,50 @@ rightText {
   display: none;
   color: red;
   padding: 10px;
-  font-size: 12px;
-  font-family: "Oxygen", sans-serif; }
+  font-size: 14px;
+  font-family: Oxygen; }
 .MnemonicQuiz .verifyMnemonic {
   flex-wrap: wrap;
   justify-content: center; }
   .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
     width: 114px;
     height: 38px;
-    font-family: "Oxygen", sans-serif;
+    font-family: Oxygen;
     margin-right: 10px;
     margin-bottom: 10px;
     border-radius: 3px; }
     .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton input {
-      background: #F0F4FA;
-      border: 1px solid #859EB9;
       color: #061728;
       text-align: center; }
     .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .mnemonicField {
       background-color: #FFffff; }
 .MnemonicQuiz .buttonForm {
   font-size: 14px; }
+.MnemonicQuiz .mnemonicNote {
+  background-color: #FF2938;
+  font-family: Oxygen;
+  font-size: 14px;
+  text-align: justify;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 15px;
+  margin: 20px 0px;
+  background-image: url("../../images/note.svg");
+  background-repeat: no-repeat;
+  background-position: 103%;
+  background-size: contain;
+  display: flex;
+  align-items: center; }
+  .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
+    width: 73%; }
+  .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon {
+    padding: 10px 20px 10px 10px;
+    width: 20px;
+    height: 20px; }
+    .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon .icon {
+      width: 20px;
+      height: 20px; }
 
 .bannerContainer {
   background-color: #031221;
@@ -705,17 +766,17 @@ rightText {
   align-items: center;
   text-align: center; }
   .bannerContainer .bannerText {
-    width: 600px;
+    max-width: 600px;
     padding: 50px 0px; }
     .bannerContainer .bannerText h3 {
-      font-family: "Oxygen", sans-serif;
+      font-family: Oxygen;
       margin: 0px;
       font-size: 45px;
       font-weight: normal;
       color: #FFFFFF; }
     .bannerContainer .bannerText p {
-      font-family: "Oxygen", sans-serif;
-      font-size: 18px;
+      font-family: Oxygen;
+      font-size: 20px;
       line-height: 172%;
       letter-spacing: 0.01em;
       color: #627F9F; }
@@ -735,26 +796,27 @@ rightText {
         border: 3px solid red;
         transform: rotate(-45deg); }
       .bannerContainer .cmuk-slider .cmuk-slider-items li span {
-        font-size: 12px;
+        font-size: 14px;
         line-height: 172%;
         letter-spacing: 0.01em; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemName {
         font-weight: bold;
         color: #6C7883;
-        font-family: "Oxygen", sans-serif; }
+        font-family: Oxygen; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemValue {
         font-weight: bold;
         color: #FFFFFF;
-        font-family: "Rubik", sans-serif; }
+        font-family: Rubik; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C;
-        font-family: "Oxygen", sans-serif; }
+        font-family: Oxygen; }
 
 .tabsSection p {
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen;
   font-size: 26px;
   letter-spacing: 0.01em;
-  color: #000000; }
+  color: #000000;
+  margin-bottom: 40px; }
 .tabsSection .cmuk-subnav-pill {
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
   border-radius: 5px; }
@@ -767,9 +829,10 @@ rightText {
     border-radius: 0px 0px 5px 5px; }
   .tabsSection .cmuk-subnav-pill li a {
     background-color: #FAFBFD;
-    padding: 10px 0px 10px 15px;
-    font-family: "Oxygen", sans-serif;
-    font-size: 14px;
+    padding: 15px 0px 15px 20px;
+    font-family: Oxygen;
+    font-size: 18px;
+    text-transform: capitalize;
     color: #0862BE;
     font-weight: bold; }
     .tabsSection .cmuk-subnav-pill li a:before {
@@ -781,7 +844,7 @@ rightText {
       float: right;
       background-repeat: no-repeat;
       background-position: 50% 50%;
-      background-image: url(../../images/chevron-down.svg);
+      background-image: url(../../images/chevron-down-blue.svg);
       padding-left: 25px; }
 .tabsSection .cmuk-subnav-pill > .cmuk-active > a {
   background: #053C75;
@@ -789,8 +852,8 @@ rightText {
   .tabsSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
 .tabsSection .cmuk-switcher li {
-  font-family: "Oxygen", sans-serif;
-  font-size: 16px;
+  font-family: Oxygen;
+  font-size: 18px;
   color: #365575;
   letter-spacing: 0.01em;
   line-height: 1.8; }
@@ -815,9 +878,9 @@ rightText {
   .left .quoteIdTtitle {
     color: #6C7883;
     font-weight: bold;
-    font-size: 12px; }
+    font-size: 14px; }
   .left .quoteId {
-    font-size: 12px; }
+    font-size: 14px; }
 
 .userIcons .userIcon {
   margin-right: -5px; }
@@ -838,7 +901,7 @@ rightText {
     width: 250px;
     padding: 10px 25px 10px 10px;
     margin: 0px;
-    font-size: 14px; }
+    font-size: 16px; }
   .notifications .cmuk-alert-close {
     top: 15px; }
 
@@ -847,7 +910,7 @@ rightText {
   height: 30px;
   justify-content: flex-end; }
   .right .refresh {
-    font-family: "Oxygen", sans-serif;
+    font-family: Oxygen;
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 10px;
@@ -871,7 +934,7 @@ rightText {
   .right .liveText {
     font-weight: bold;
     margin-right: 10px;
-    font-size: 12px;
+    font-size: 14px;
     color: #272829; }
   .right .liveIcon {
     width: 6px;
@@ -881,43 +944,45 @@ rightText {
     box-shadow: 0 0 0 5px #A1ED9F; }
 
 .pageContainer {
-  padding-bottom: 135px; }
+  padding-bottom: 138px; }
   .pageContainer .pageContent {
     padding-top: 10px; }
-  .pageContainer .leftSide {
-    margin-bottom: 5px; }
   .pageContainer .middle .cmuk-card-default {
     background: #FAFAFA;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 3px; }
-  .pageContainer .middle .mainTabs .cmuk-card-header {
+  .pageContainer .middle .mainTabs .cmuk-card-body {
     padding: 0px; }
-    .pageContainer .middle .mainTabs .cmuk-card-header ul {
-      margin: 0px; }
-    .pageContainer .middle .mainTabs .cmuk-card-header ul li {
+    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-switcher {
+      padding: 15px 30px; }
+    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav {
+      margin: 0px;
+      width: 100%;
+      margin: 0px;
+      border-bottom: 1px solid #e5e5e5; }
+    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li {
       padding: 0px;
-      width: 49%; }
-      .pageContainer .middle .mainTabs .cmuk-card-header ul li:first-child {
+      width: 49%;
+      text-align: center; }
+      .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li:first-child {
         border-right: 1px solid #cccccc; }
-      .pageContainer .middle .mainTabs .cmuk-card-header ul li a {
+      .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li a {
         padding: 15px 0px;
-        font-family: "Oxygen", sans-serif;
+        font-family: Oxygen;
         text-transform: capitalize;
-        font-size: 14px; }
-    .pageContainer .middle .mainTabs .cmuk-card-header .cmuk-tab::before {
-      border: none; }
-    .pageContainer .middle .mainTabs .cmuk-card-header .cmuk-tab > .cmuk-active > a {
-      font-family: "Oxygen", sans-serif;
+        font-size: 16px; }
+    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav > .cmuk-active > a {
+      font-family: Oxygen;
       color: #061728;
+      background: none;
       font-weight: bold;
       border-bottom: 2px solid #0862BE; }
-  .pageContainer .middle .mainTabs .cmuk-card-body {
-    padding: 15px 30px; }
   .pageContainer .middle .mainTabs .docViewList a {
     margin-right: -11px; }
   .pageContainer .middle .mainTabs .tradeTerms .traderCommodity {
     display: flex;
-    align-items: center; }
+    align-items: center;
+    margin: 15px 0px; }
     .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage {
       width: 30px;
       height: 30px;
@@ -939,21 +1004,21 @@ rightText {
     .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
       color: #4B4B4B;
       font-weight: bold;
-      font-family: "Oxygen", sans-serif;
-      font-size: 14px; }
+      font-family: Oxygen;
+      font-size: 16px; }
   .pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
     justify-content: space-between;
     border-bottom: 1px solid #E8E8E8;
     padding: 25px 0px 15px 0px;
     margin-bottom: 25px;
-    font-family: "Oxygen", sans-serif;
+    font-family: Oxygen;
     color: #848A91;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold; }
   .pageContainer .middle .mainTabs .tradeTerms .terms .term {
     display: flex;
     justify-content: space-between;
-    padding: 15px 10px;
+    padding: 15px 20px;
     background: #F8F9FC;
     border: 1px solid #E2E4E6;
     box-sizing: border-box;
@@ -963,7 +1028,7 @@ rightText {
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
       color: #859EB9;
       font-family: "Oxygen", sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       margin-right: 10px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
       margin-right: 10px; }
@@ -973,28 +1038,29 @@ rightText {
         margin-bottom: 3px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
       color: #0862BE;
-      font-family: "Oxygen", sans-serif;
-      font-size: 12px;
+      font-family: Oxygen;
+      font-size: 14px;
       font-weight: bold;
-      text-transform: uppercase; }
+      text-transform: uppercase;
+      letter-spacing: 0.01em; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
       color: #061728;
-      font-family: "Oxygen", sans-serif;
-      font-size: 14px;
+      font-family: Oxygen;
+      font-size: 16px;
       margin-right: 10px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
       text-indent: 40px;
       margin-top: 5px; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
-        font-family: "Oxygen", sans-serif;
-        font-size: 14px;
+        font-family: Oxygen;
+        font-size: 16px;
         color: #061728;
         margin: 0px;
         margin-bottom: 5px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
       display: flex;
       align-items: center;
-      font-family: "Oxygen", sans-serif;
+      font-family: Oxygen;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
         width: auto;
@@ -1010,17 +1076,42 @@ rightText {
         background-color: #5EB55C; }
   .pageContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0px; }
-  .pageContainer .rightSide {
-    margin-left: 1%;
-    margin-bottom: 5px; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: #F8F9FC;
+    border: 1px solid #E2E4E6;
+    box-sizing: border-box;
+    border-radius: 3px;
+    margin: 10px 0px;
+    align-items: center; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
+      width: auto;
+      color: #0862BE;
+      font-family: Oxygen;
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: uppercase; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue {
+      font-family: Oxygen;
+      color: #061728;
+      font-size: 14px;
+      margin-left: 20px; }
+  .pageContainer .middle .mainTabs .tradeTerms button {
+    padding: 0 15px;
+    line-height: 28px;
+    font-size: 14px; }
 
 .leftTradeFinancial .financial {
   margin-bottom: 20px; }
 .leftTradeFinancial .cmuk-card-header {
   padding: 15px 20px;
   color: #061728;
-  font-size: 14px;
-  font-family: "Oxygen", sans-serif; }
+  font-size: 16px;
+  font-family: Oxygen; }
+  .leftTradeFinancial .cmuk-card-header .icon {
+    margin-bottom: 2px; }
 .leftTradeFinancial .cmuk-card-body {
   padding: 0px;
   overflow-y: auto; }
@@ -1028,19 +1119,24 @@ rightText {
     padding: 0px;
     margin: 0px; }
   .leftTradeFinancial .cmuk-card-body .refresh {
-    padding: 10px 0px 0px 0px;
-    margin: 0px 15px;
-    color: #848A91;
-    font-family: "Oxygen", sans-serif;
-    font-size: 12px; }
+    padding: 10px 0px 10px 0px;
+    margin: 0px 20px;
+    font-family: Oxygen;
+    font-size: 14px; }
+    .leftTradeFinancial .cmuk-card-body .refresh button {
+      text-decoration: none;
+      color: #848A91;
+      font-weight: bold; }
     .leftTradeFinancial .cmuk-card-body .refresh .refreshIcon .icon {
-      width: 12px;
-      height: 12px;
-      margin-right: 5px; }
+      width: 14px;
+      height: 14px;
+      margin-right: 3px; }
 .leftTradeFinancial .financial ul li {
   justify-content: space-between;
-  padding: 25px 0;
-  margin: 0px 15px; }
+  padding: 15px 0px;
+  margin: 0px 20px; }
+  .leftTradeFinancial .financial ul li:first-child {
+    padding-top: 25px; }
   .leftTradeFinancial .financial ul li:last-child {
     border: 0px; }
   .leftTradeFinancial .financial ul li .wallet {
@@ -1050,8 +1146,9 @@ rightText {
       background: linear-gradient(180deg, #0862BE 0%, #05488C 100%); }
   .leftTradeFinancial .financial ul li .ctitle {
     color: #5C6166;
+    line-height: 2;
     font-size: 14px;
-    font-family: "Oxygen", sans-serif; }
+    font-family: Oxygen; }
   .leftTradeFinancial .financial ul li .payable {
     align-items: center; }
     .leftTradeFinancial .financial ul li .payable .payableIcon {
@@ -1068,15 +1165,19 @@ rightText {
       background: rgba(94, 181, 92, 0.27); }
 .leftTradeFinancial .addBalanceButton {
   text-transform: capitalize;
-  font-family: "Rubik", sans-serif;
+  font-family: Rubik;
   padding: 8px 8px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: normal;
   background: rgba(8, 98, 190, 0.1);
   border-radius: 103px;
   color: #0862BE;
-  font-size: 10px;
+  font-size: 12px;
   border: 0; }
+  .leftTradeFinancial .addBalanceButton .plusIcon .icon {
+    width: 10px;
+    height: 10px;
+    fill: #0862BE; }
 .leftTradeFinancial .walletIcon .icon, .leftTradeFinancial .receivableIcon .icon, .leftTradeFinancial .payableIcon .icon {
   position: absolute;
   left: 2px;
@@ -1094,7 +1195,8 @@ rightText {
     padding: 15px 20px; }
     .recentActivity .recentActivityContainer .cmuk-card-header .icon {
       width: 18px;
-      height: 18px; }
+      height: 18px;
+      margin-bottom: 2px; }
   .recentActivity .recentActivityContainer .cmuk-card-body {
     overflow-y: auto; }
 .recentActivity .cmuk-card-default {
@@ -1102,11 +1204,11 @@ rightText {
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
 .recentActivity .cmuk-card-header {
-  font-size: 14px;
+  font-size: 16px;
   padding: 15px 20px;
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 .recentActivity .cmuk-card-body {
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen;
   padding: 0px 13px; }
 .recentActivity .chatRoom .cmuk-card-body {
   height: 360px; }
@@ -1157,7 +1259,7 @@ rightText {
     position: relative;
     bottom: 50px; }
 .recentActivity .chatContainer .cmuk-card-body {
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen;
   padding: 0px; }
   .recentActivity .chatContainer .cmuk-card-body .chat_history ul {
     margin: 0;
@@ -1177,24 +1279,27 @@ rightText {
     text-transform: capitalize;
     font-weight: bold;
     padding: 0px 20px;
-    font-family: "Oxygen", sans-serif;
-    font-size: 12px;
+    font-family: Oxygen;
+    font-size: 14px;
     font-weight: bold; }
 
 .documentItem {
-  background: #EBF2F9;
-  border-radius: 3px;
-  border: 1px solid #DDE8F3;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 5px 0px;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  border: 1px solid #EDEDED;
+  border-radius: 5px;
+  padding: 0px 15px;
+  background: #ffffff; }
   .documentItem .documentContentTop {
-    font-size: 14px;
-    font-family: "Oxygen", sans-serif;
-    color: #0862BE;
+    font-size: 16px;
+    font-family: Oxygen;
     margin: 10px; }
+    .documentItem .documentContentTop a {
+      color: #053C75;
+      text-decoration: none; }
   .documentItem .documentThumbnail {
     margin: 10px; }
   .documentItem .documentThumbnail img {
@@ -1202,8 +1307,11 @@ rightText {
     height: 20px; }
   .documentItem .documentContentBottom {
     margin: 10px;
-    font-size: 12px;
+    font-size: 14px;
     text-align: left; }
+
+.identificationDetails .documentContentBottom .infoRowLabel {
+  display: none; }
 
 .timeline .timeline-item:after,
 header:before,
@@ -1275,7 +1383,7 @@ header:before,
       transition: all 0.3s ease; }
       .timeline .timeline-item .timeline-content .activityContent {
         color: #000000;
-        font-family: "Oxygen", sans-serif;
+        font-family: Oxygen;
         font-size: 14px; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
@@ -1285,8 +1393,8 @@ header:before,
   .timeline .notification > div {
     padding: 0px; }
   .timeline .NotificationButton {
-    font-size: 12px;
-    font-family: "Oxygen", sans-serif;
+    font-size: 14px;
+    font-family: Oxygen;
     font-weight: bold;
     padding: 0px 0px 0px 40px; }
 
@@ -1299,12 +1407,12 @@ header:before,
   font-family: "Oxygen", sans-serif;
   color: #636363;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 14px;
   border-bottom: 2px solid #0862BE; }
 .docView .documentlist .cmuk-table td {
   padding: 16px 5px;
   vertical-align: top;
-  font-size: 12px; }
+  font-size: 14px; }
 .docView .documentlist .docIcon {
   background: #FFFFFF;
   border: 0.411524px solid #EAEAEA;
@@ -1332,11 +1440,11 @@ header:before,
     .docView .documentlist .table-scroll tbody tr td:first-child {
       padding-left: 15px;
       color: #262525;
-      font-size: 12px; }
+      font-size: 14px; }
     .docView .documentlist .table-scroll tbody tr td:last-child {
       padding-right: 10px; }
 .docView .documentlist .primayDocs {
-  font-size: 14px;
+  font-size: 16px;
   color: #636363; }
 .docView .cmuk-card-default {
   overflow-y: auto;
@@ -1355,8 +1463,8 @@ header:before,
     margin: 0; }
     .docView .cmuk-card-body .cmuk-tab li a {
       padding: 15px 0px;
-      font-size: 12px;
-      font-family: "Oxygen", sans-serif;
+      font-size: 14px;
+      font-family: Oxygen;
       text-transform: capitalize; }
 .docView .cmuk-card-body {
   height: 360px;
@@ -1378,8 +1486,8 @@ header:before,
       border-radius: 10px;
       width: 100%;
       text-transform: capitalize;
-      font-size: 12px;
-      font-family: "Rubik", sans-serif; }
+      font-size: 14px;
+      font-family: Rubik; }
 
 .loginForm .inputField {
   display: flex; }
@@ -1393,17 +1501,20 @@ header:before,
   .loginForm .inputField .inputFieldBody {
     width: 100%; }
   .loginForm .inputField .inputFieldBody input {
-    font-size: 12px; }
+    font-size: 14px; }
 .loginForm .cmuk-button-link {
-  font-size: 12px;
-  font-family: "Oxygen", sans-serif; }
+  font-size: 14px;
+  font-family: Oxygen;
+  font-weight: bold;
+  margin: 5px;
+  text-decoration: none; }
 
 .infoRow {
   line-height: 1.8;
   align-items: flex-start;
   word-break: break-all;
   font-size: 14px;
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
   .infoRow .infoRowLabel {
     color: #4B4B4B;
     width: 125px;
@@ -1425,7 +1536,7 @@ header:before,
 .chat {
   padding: 0px 10px 0px 0px; }
   .chat .chatMessage {
-    font-size: 12px; }
+    font-size: 14px; }
   .chat .chatName {
     color: #FFFFFF;
     background: #193759;
@@ -1435,7 +1546,7 @@ header:before,
     -moz-border-radius: 30px;
     border-radius: 50%;
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     align-items: center;
     justify-content: center; }
   .chat li {
@@ -1467,13 +1578,13 @@ header:before,
       border-right: .5rem solid #E8E8E8; }
     .chat .partner .messageInfo {
       color: #848A91;
-      font-size: 12px; }
+      font-size: 14px; }
     .chat .partner .replytoMessage p {
       border-left: 2px solid #0862BE;
       padding: 0px 10px; }
     .chat .partner .messageContent {
       color: #061728;
-      font-size: 12px; }
+      font-size: 14px; }
       .chat .partner .messageContent p {
         margin: 0px;
         color: #0862BE;
@@ -1500,7 +1611,7 @@ header:before,
       border-right: .5rem solid transparent; }
     .chat .you .messageInfo {
       color: #6CA8E7;
-      font-size: 12px; }
+      font-size: 14px; }
     .chat .you .replytoMessage p {
       border-left: 2px solid #6CA8E7;
       padding: 0px 10px; }
@@ -1520,7 +1631,7 @@ header:before,
     display: block; }
 
 .commonList {
-  padding: 20px;
+  padding: 0px 20px;
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -1529,17 +1640,19 @@ header:before,
   box-sizing: border-box;
   border-radius: 2px;
   margin-bottom: 5px;
-  overflow: auto; }
+  overflow: auto;
+  flex-wrap: wrap; }
   .commonList .listItemChild {
     margin: 0px;
+    padding: 20px 0px;
     font-size: 14px;
-    font-family: "Oxygen", sans-serif;
+    font-family: Oxygen;
     font-weight: bold; }
     .commonList .listItemChild:last-child .listItemChildValue {
       max-width: 100%; }
     .commonList .listItemChild .listItemChildTitle {
       margin: 0px;
-      color: #4B4B4B; }
+      color: #061728; }
     .commonList .listItemChild .listItemChildValue {
       margin: 20px 0px 0px 0px;
       color: #272829;
@@ -1569,7 +1682,7 @@ header:before,
     top: -15px;
     left: -10px;
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     transform: rotate(-45deg);
     display: block; }
@@ -1578,7 +1691,7 @@ header:before,
   margin-bottom: 20px; }
   .switcherViewCard .cmuk-card-header {
     padding: 15px 20px;
-    font-family: "Oxygen", sans-serif; }
+    font-family: Oxygen; }
   .switcherViewCard .cmuk-card-body {
     overflow: auto;
     padding: 0px; }
@@ -1590,8 +1703,8 @@ header:before,
     padding: 0px 30px; }
   .switcherViewCard .salesQuoteCardHeader .cmuk-subnav li a, .switcherViewCard .tradeCardHeader .cmuk-subnav li a {
     padding: 15px;
-    font-size: 12px;
-    font-family: "Oxygen", sans-serif; }
+    font-size: 14px;
+    font-family: Oxygen; }
   .switcherViewCard .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .switcherViewCard .tradeCardHeader .cmuk-subnav > .cmuk-active {
     border-bottom: 2px solid #0862BE; }
     .switcherViewCard .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .switcherViewCard .tradeCardHeader .cmuk-subnav > .cmuk-active a {
@@ -1604,41 +1717,54 @@ header:before,
     padding: 0 15px;
     line-height: 28px; }
 .salesQuoteList .cmuk-card-body {
-  padding-top: 5px; }
+  padding: 0px; }
+  .salesQuoteList .cmuk-card-body .cmuk-card-body {
+    padding: 20px; }
   .salesQuoteList .cmuk-card-body .commonList .cmuk-button {
     padding: 0 15px;
     line-height: 28px; }
   .salesQuoteList .cmuk-card-body .cmuk-subnav {
-    margin-left: 0px;
+    margin: 0px;
     border-bottom: 1px solid #0862BE; }
     .salesQuoteList .cmuk-card-body .cmuk-subnav li {
       width: 25%;
       text-align: center;
       padding: 0;
-      font-family: "Oxygen", sans-serif; }
+      font-family: Oxygen; }
       .salesQuoteList .cmuk-card-body .cmuk-subnav li a {
-        font-size: 12px; }
+        font-size: 14px; }
   .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > .cmuk-active > a {
     background-color: #0862BE;
     color: #FFffff; }
   .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > * > :first-child {
-    color: #0862BE; }
+    color: #0862BE;
+    text-transform: capitalize;
+    font-weight: bold; }
   .salesQuoteList .cmuk-card-body .cmuk-card {
     margin-bottom: 10px; }
+  .salesQuoteList .cmuk-card-body .cmuk-switcher li .title {
+    margin-bottom: 5px; }
+  .salesQuoteList .cmuk-card-body .cmuk-switcher {
+    height: 220px;
+    overflow: auto;
+    padding: 20px; }
 
 .profileContainer .infoRow {
   font-size: 14px;
   line-height: 2; }
 .profileContainer .infoRowLabel {
-  color: #4B4B4B;
-  font-family: "Oxygen", sans-serif; }
+  color: #061728;
+  font-family: Oxygen; }
 .profileContainer .infoRowValue {
   text-align: right;
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 .profileContainer .cmuk-card-header {
-  font-family: "Oxygen", sans-serif; }
-.profileContainer .cmuk-card-body .cmuk-card-body {
-  background-color: #FFFFFF; }
+  font-family: Oxygen;
+  padding: 15px 20px; }
+.profileContainer .cmuk-card-body {
+  font-family: Rubik; }
+  .profileContainer .cmuk-card-body .cmuk-card-body {
+    background-color: #FFFFFF; }
 .profileContainer .icon {
   width: 16px;
   height: 16px;
@@ -1649,9 +1775,12 @@ header:before,
   height: 11px;
   fill: #0862BE; }
 
-.profileDetails .editIcon .icon {
+.profileDetails .editIcon,
+.profileDetails .editIcon .icon, .profileDetails .icon {
   height: 16px;
-  width: 16px; }
+  width: 16px;
+  margin-right: 5px;
+  margin-bottom: 3px; }
 
 .contactDetails .infoRowBox {
   justify-content: space-between; }
@@ -1659,13 +1788,23 @@ header:before,
     width: auto;
     margin-right: 5px; }
 .contactDetails .cmuk-button-link {
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }
 .contactDetails .cmuk-card-default {
   margin-bottom: 5px; }
+.contactDetails .cmuk-card-header {
+  padding: 13px 20px; }
 .contactDetails .cmuk-card-body {
   position: relative; }
+  .contactDetails .cmuk-card-body .cmuk-card {
+    border: 1px solid #EDEDED;
+    border-radius: 5px;
+    box-shadow: none; }
+    .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
+      padding: 10px 15px;
+      border-radius: 5px;
+      background-color: #FFFFFF; }
 
 .toolTip {
   position: relative;
@@ -1752,18 +1891,30 @@ dl .info {
 
 .tradeList .cmuk-card-header {
   padding: 15px 20px;
-  font-family: "Oxygen", sans-serif; }
+  font-family: Oxygen; }
 .tradeList .cmuk-card-body .cmuk-card {
   margin-bottom: 10px; }
+  .tradeList .cmuk-card-body .cmuk-card .cmuk-card-body {
+    padding: 20px; }
+.tradeList .cmuk-card-body button a {
+  color: #FFFFFF; }
 
 .identificationDetails .cmuk-card-body,
 .traderRelationList .cmuk-card-body,
 .tradeList .cmuk-card-body {
-  padding-top: 5px; }
+  padding: 0px; }
+  .identificationDetails .cmuk-card-body .cmuk-card,
+  .traderRelationList .cmuk-card-body .cmuk-card,
+  .tradeList .cmuk-card-body .cmuk-card {
+    margin-bottom: 5px; }
+    .identificationDetails .cmuk-card-body .cmuk-card .cmuk-card-body,
+    .traderRelationList .cmuk-card-body .cmuk-card .cmuk-card-body,
+    .tradeList .cmuk-card-body .cmuk-card .cmuk-card-body {
+      padding: 20px; }
 .identificationDetails .cmuk-subnav,
 .traderRelationList .cmuk-subnav,
 .tradeList .cmuk-subnav {
-  margin-left: 0px;
+  margin: 0px;
   border-bottom: 1px solid #0862BE; }
   .identificationDetails .cmuk-subnav li,
   .traderRelationList .cmuk-subnav li,
@@ -1771,11 +1922,11 @@ dl .info {
     width: 50%;
     text-align: center;
     padding: 0;
-    font-family: "Oxygen", sans-serif; }
+    font-family: Oxygen; }
     .identificationDetails .cmuk-subnav li a,
     .traderRelationList .cmuk-subnav li a,
     .tradeList .cmuk-subnav li a {
-      font-size: 12px; }
+      font-size: 14px; }
 .identificationDetails .cmuk-subnav-pill > .cmuk-active > a,
 .traderRelationList .cmuk-subnav-pill > .cmuk-active > a,
 .tradeList .cmuk-subnav-pill > .cmuk-active > a {
@@ -1784,20 +1935,34 @@ dl .info {
 .identificationDetails .cmuk-subnav-pill > * > :first-child,
 .traderRelationList .cmuk-subnav-pill > * > :first-child,
 .tradeList .cmuk-subnav-pill > * > :first-child {
-  color: #0862BE; }
+  color: #0862BE;
+  text-transform: capitalize;
+  font-weight: bold; }
+.identificationDetails .cmuk-switcher,
+.traderRelationList .cmuk-switcher,
+.tradeList .cmuk-switcher {
+  height: 220px;
+  overflow: auto;
+  padding: 20px; }
 
 .traderRelationList .cmuk-card-header {
-  padding: 18px 20px; }
+  padding: 13px 20px; }
 
 .organizationDetails .cmuk-card-body .cmuk-card-default, .organizationUbos .cmuk-card-body .cmuk-card-default {
   margin-bottom: 5px; }
 
 .cmuk-panel {
   padding: 0px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  background: #FFFFFF;
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 1px solid rgba(5, 60, 117, 0.22);
+  font-size: 14px;
+  font-family: Oxygen; }
   .cmuk-panel ul li {
     font-size: 14px;
-    font-family: "Oxygen", sans-serif;
+    font-family: Oxygen;
     color: #272829;
     text-align: left;
     cursor: pointer;

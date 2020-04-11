@@ -8,7 +8,7 @@
         @commonCard(constants.View.TRADER_RELATION_LIST) {
         @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
     } {
-        @commonHorizontalSwitcher(ListMap(constants.User.TRADER -> routes.javascript.ComponentViewController.acceptedTraderRelationList,
+        @commonHorizontalSwitcher(ListMap(constants.View.ACCEPTED_TRADER_RELATION_LIST -> routes.javascript.ComponentViewController.acceptedTraderRelationList,
             constants.View.PENDING_RELATION_REQUESTS -> routes.javascript.ComponentViewController.pendingTraderRelationList)
         )
     }
