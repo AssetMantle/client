@@ -61,22 +61,7 @@ class ComponentViewController @Inject()(
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      (loginState.userType match {
-        case constants.User.UNKNOWN =>
-          val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
-          for {
-            profilePicture <- profilePicture
-          } yield Ok(views.html.component.master.commonHome(profilePicture = profilePicture))
-        case _ =>
-          val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
-          val coins = blockchainAccounts.Service.getCoins(loginState.address)
-          for {
-            profilePicture <- profilePicture
-            coins <- coins
-          } yield Ok(views.html.component.master.commonHome(coins, profilePicture))
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+      Future(Ok(views.html.component.master.commonHome()))
   }
 
   def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

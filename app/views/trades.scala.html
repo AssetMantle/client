@@ -50,22 +50,16 @@
 @right = {
     <div class="recentActivity">
         <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY) {
-        } {
-            <div class="scroller">
-                <div id="recentActivity"></div>
-                <div class="cover-bar"></div>
-            </div>
-        }
+            <div id="recentActivities"></div>
         </div>
     </div>
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
-                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.traderRecentActivities(0));
+                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.traderRecentActivities(0));
             }
             case constants.User.ORGANIZATION => {
-                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.organizationRecentActivities(0));
+                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.organizationRecentActivities(0));
             }
             case constants.User.ZONE => {}
             case constants.User.GENESIS => {}
