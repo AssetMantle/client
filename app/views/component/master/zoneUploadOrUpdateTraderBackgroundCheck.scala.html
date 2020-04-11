@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.TraderBackgroundCheck
 @import models.master.Trader
+@import views.html.base._
 
 @(traderBackgroundChecks: Seq[TraderBackgroundCheck], trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
@@ -23,6 +24,7 @@
     }
 </div>
 
+@commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
 @if(constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(traderBackgroundChecks.map(_.documentType)).isEmpty) {
-    <button type="button" class="cmuk-button cmuk-button-primary" id="getTraderBackgroundCheckReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.zoneVerifyTraderForm('@trader.accountID','@trader.organizationID'))">@Messages(constants.Form.NEXT)</button>
+    @commonFormButton(constants.Form.ZONE_VERIFY_TRADER, 'parameters -> s"'${trader.id}'")
 }

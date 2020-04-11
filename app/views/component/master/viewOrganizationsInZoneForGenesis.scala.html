@@ -12,13 +12,13 @@
         @commonCard(organization.id) {
         }{
             @commonTextInfo(constants.Form.ID, organization.id)
-            @commonTextInfo(constants.Form.ACCOUNT_ID, organization.accountID)
-            @commonTextInfo(constants.Form.NAME, organization.name)
+            @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
+            @commonTextInfo(constants.View.NAME, organization.name)
             @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
             @commonTextInfo(constants.Form.EMAIL, organization.email)
             <div>
                 <div>
-                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@organization.id', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id'), this)">@Messages(constants.Form.TRADERS)</h4>
+                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@organization.id', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id'), this)">@Messages(constants.View.TRADERS)</h4>
                 </div>
                 <div id="@organization.id" class="flexContainer scrollableThird"></div>
             </div>

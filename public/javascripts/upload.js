@@ -2,10 +2,10 @@ function getFileTypes(documentType) {
     let fileTypes = [];
     switch (documentType) {
         case "PROFILE_PICTURE":
-            fileTypes = ['jpg', 'png', 'jpeg'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG'];
             break;
         default:
-            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG', 'pdf', 'doc', 'docx'];
             break;
     }
     return fileTypes
@@ -37,7 +37,6 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
         let storeDbRoute = storeRoute(file.fileName, documentType, id);
-        console.log(documentType, id, uploadRoute, storeRoute);
 
         $.ajax({
             url: storeDbRoute.url,

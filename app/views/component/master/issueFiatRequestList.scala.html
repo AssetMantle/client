@@ -1,0 +1,24 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.IssueFiatRequest
+@import views.html.base._
+@(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@if(issueFiatRequests.isEmpty){
+    <span>@Messages(constants.View.NO_REQUESTS_FOUND)</span>
+} else {
+    @for(issueFiatRequest <- issueFiatRequests) {
+        <div>
+        @commonCard(issueFiatRequest.accountID){
+        }{
+            <div>
+                @commonTextInfo(constants.View.ACCOUNT_ID, issueFiatRequest.accountID)
+                @commonTextInfo(constants.Form.TRANSACTION_ID, issueFiatRequest.transactionID)
+                @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, issueFiatRequest.transactionAmount.toString)
+                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            </div>
+        }
+
+        </div>
+    }
+
+}
