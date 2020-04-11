@@ -156,6 +156,7 @@ object View {
   val PROFILE = "PROFILE"
   val MARKET = "MARKET"
   val TRADES = "TRADES"
+  val TRANSACTIONS = "TRANSACTIONS"
   val REQUEST = "REQUEST"
   val TEAM = "TEAM"
   val TRADER_ID = "TRADER_ID"

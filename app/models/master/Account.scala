@@ -91,8 +91,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getAddressByIds(ids: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).map(_.accountAddress).result)
 
-  private def filterIDsOnUserType(ids: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).filter(_.userType === userType).map(_.id).result)
-
   private def updateStatusById(id: String, status: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -234,8 +232,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getIDsForAddresses(addresses: Seq[String]): Future[Seq[String]] = getIDsByAddresses(addresses)
 
     def getAddresses(ids: Seq[String]): Future[Seq[String]] = getAddressByIds(ids)
-
-    def filterTraderIDs(ids: Seq[String]): Future[Seq[String]] = filterIDsOnUserType(ids, constants.User.TRADER)
 
     def updateStatusUnverifiedContact(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED)
 

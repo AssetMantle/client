@@ -5,7 +5,7 @@
 
 @views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
 
-    @left = {
+@left = {
         <div class="leftTradeFinancial">
             <div id="financials"></div>
         </div>
@@ -20,22 +20,7 @@
                 case _ => {}
             }
         </script>
-        @*For iframes*@
-    @loginState.userType match {
-        case constants.User.TRADER => {
-            <script type="text/javascript">
-                    var fiatCometMessage = function (event) {
-                        componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-                    }
-            </script>
-            <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
-        }
-        case constants.User.ORGANIZATION => {}
-        case constants.User.ZONE => {}
-        case constants.User.GENESIS => {}
-        case _ => {}
-    }
-    }
+}
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom profileContainer">

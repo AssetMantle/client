@@ -400,11 +400,7 @@ POST        /master/updateAssetDocumentStatus                                   
 GET         /master/issueAsset                                                              controllers.IssueAssetController.issueAssetForm(assetID: String)
 POST        /master/issueAsset                                                              controllers.IssueAssetController.issueAsset
 
-GET         /master/accountComet                                                            controllers.ComponentViewController.accountComet
-GET         /master/assetComet                                                              controllers.ComponentViewController.assetComet
-GET         /master/fiatComet                                                               controllers.ComponentViewController.fiatComet
-GET         /master/negotiationComet                                                        controllers.ComponentViewController.negotiationComet
-GET         /master/orderComet                                                              controllers.ComponentViewController.orderComet
+GET         /component/comet                                                                controllers.ComponentViewController.comet
 
 GET         /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequestForm
 POST        /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequest
@@ -465,9 +461,9 @@ GET         /chat/sendMessage                                                   
 POST        /chat/sendMessage                                                               controllers.ChatController.sendMessage
 GET         /chat/markChatAsRead                                                            controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
-GET         /chat/comet                                                                     controllers.ChatController.sendMessageComet(chatID: String)
 
-POST        /wu/rtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+#DO NOT CHANGE /wurtcb ENDPOINT
+POST        /wurtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm

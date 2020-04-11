@@ -37,7 +37,6 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
         let storeDbRoute = storeRoute(file.fileName, documentType, id);
-        console.log(documentType, id, uploadRoute, storeRoute);
 
         $.ajax({
             url: storeDbRoute.url,

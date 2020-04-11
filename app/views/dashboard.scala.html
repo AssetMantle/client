@@ -21,21 +21,6 @@
             case _ => {}
         }
     </script>
-    @*For iframes*@
-    @loginState.userType match {
-        case constants.User.TRADER => {
-            <script type="text/javascript">
-                        var fiatCometMessage = function (event) {
-                            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-                        }
-                </script>
-            <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
-        }
-        case constants.User.ORGANIZATION => {}
-        case constants.User.ZONE => {}
-        case constants.User.GENESIS => {}
-        case _ => {}
-    }
 }
 
 @center = {

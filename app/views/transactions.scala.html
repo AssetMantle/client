@@ -3,7 +3,7 @@
 @import views.html.base._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.View.TRANSACTIONS), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
     <div class="leftTradeFinancial">
@@ -20,21 +20,6 @@
             case _ => {}
         }
     </script>
-    @*For iframes*@
-@loginState.userType match {
-    case constants.User.TRADER => {
-        <script type="text/javascript">
-                    var fiatCometMessage = function (event) {
-                        componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-                    }
-            </script>
-        <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
-        }
-        case constants.User.ORGANIZATION => {}
-        case constants.User.ZONE => {}
-        case constants.User.GENESIS => {}
-        case _ => {}
-    }
 }
 
 @center = {

@@ -1,9 +1,8 @@
 package models.blockchain
 
-import actors.{MainNegotiationActor, ShutdownActor}
+import actors.{Create, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -20,10 +19,8 @@ import scala.util.{Failure, Success}
 
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean)
 
-case class NegotiationCometMessage(username: String, message: JsValue)
-
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors.Create, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -31,16 +28,11 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
   import databaseConfig.profile.api._
 
-  val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
-
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -187,7 +179,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
     def getSellerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findSellerOrdersInZone(ids, addresses)
 
-    def markDirty(id: String): Future[Int] =updateDirtyBitById(id, dirtyBit = true)
+    def markDirty(id: String): Future[Int] = updateDirtyBitById(id, dirtyBit = true)
 
     def refreshDirty(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Future[Int] = updateNegotiationById(id = id, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = false)
 
@@ -209,13 +201,6 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
     def getNegotiationsForSellerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsBySellerAddresses(addresses)
 
-    def negotiationCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -244,8 +229,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
               _ <- refreshDirty(negotiationResponse)
               (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
-              mainNegotiationActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
-              mainNegotiationActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
+              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

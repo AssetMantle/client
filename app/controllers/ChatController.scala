@@ -246,26 +246,4 @@ class ChatController @Inject()(
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
-
-  //send chat to other person in real time
-  def sendMessageComet(chatWindowID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatWindowID, accountID = loginState.username)
-
-      def getResult(userIsParticipant: Boolean) = {
-        if (userIsParticipant) {
-          Future(Ok.chunked(masterTransactionMessages.Service.messageCometSource(loginState.username).via(Comet.json("parent.chatCometMessage"))).as(ContentTypes.HTML))
-        } else {
-          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
-        }
-      }
-
-      (for {
-        userIsParticipant <- userIsParticipant
-        result <- getResult(userIsParticipant)
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
 }

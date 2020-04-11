@@ -1,9 +1,8 @@
 package models.blockchain
 
-import actors.{MainAssetActor, ShutdownActor}
+import actors.{Create, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -21,19 +20,12 @@ import scala.util.{Failure, Success}
 
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean)
 
-case class AssetCometMessage(username: String, message: JsValue)
-
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-  val mainAssetActor: ActorRef = actorSystem.actorOf(props = MainAssetActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ASSET)
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
@@ -170,14 +162,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true)
 
     def markDirty(pegHash: String): Future[Int] = updateDirtyBitByPegHash(pegHash, dirtyBit = true)
-
-    def assetCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainAssetActor ! actors.CreateAssetChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -205,7 +189,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               _ <- insertOrUpdate(ownerAccount)
               accountID <- accountID
             } yield {
-              mainAssetActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+               actorsCreate.mainActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
             }).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
@@ -214,7 +198,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
                   for {
                     _ <- deleteAssetPegWallet
                     id <- id
-                  } yield mainAssetActor ! AssetCometMessage(username = id, message = Json.toJson(constants.Comet.PING))
+                  } yield actorsCreate.mainActor ! actors.Message.makeCometMessage(username = id, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
                 }
             }
           }
