@@ -389,6 +389,7 @@ object Form {
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
   val FULL_ADDRESS = "FULL_ADDRESS"
+  val COUNTRY_CODES = Map("AUSTRALIA" -> "AU")
 
   //MasterTransaction
   val COUPON = "COUPON"

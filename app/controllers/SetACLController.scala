@@ -6,12 +6,17 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Contact, Organization, Trader, TraderKYC}
+import models.master.{Contact, Identification, Organization, Trader, TraderKYC}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import queries.GetTruliooConsents
+import transactions.TruliooVerify
 import views.companion.master.FileUpload
+import java.util.Calendar
+
+import transactions.responses.TruliooVerifyResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 
