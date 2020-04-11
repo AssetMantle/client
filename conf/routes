@@ -461,7 +461,8 @@ POST        /chat/sendMessage                                                   
 GET         /chat/markChatAsRead                                                            controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
-POST        /wu/rtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+#DO NOT CHANGE /wurtcb ENDPOINT
+POST        /wurtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm
