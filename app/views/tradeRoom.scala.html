@@ -33,14 +33,12 @@
             <div class="liveIcon"></div>
         </div>
     </div>
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-            <div id="tradeActivities"></div>
-        </div>
+    <div class="recentActivityContainer">
+        <div id="tradeActivities"></div>
     </div>
     <div id="chatRoom" class="chatRoom"></div>
     <script>
-            componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities(0, '@id'));
+            componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@id'));
             componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
     </script>
 }

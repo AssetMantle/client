@@ -1,9 +1,9 @@
 function loadMoreActivities(notificationRoute, negotiationID = null) {
     let route;
     if (negotiationID === null) {
-        route = notificationRoute(($(".recentActivityBox").length));
+        route = notificationRoute($(".recentActivityBox").length + 1);
     } else {
-        route = notificationRoute(($(".recentActivityBox").length), negotiationID);
+        route = notificationRoute(negotiationID, $(".recentActivityBox").length + 1);
     }
     $.ajax({
         url: route.url,

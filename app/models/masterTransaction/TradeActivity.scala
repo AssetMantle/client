@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeActivity(id: String, negotiationID: String, title: String, message: TradeActivityMessage, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
+case class TradeActivity(id: String, negotiationID: String, title: String, message: TradeActivityMessage, read: Boolean = false, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
 
 @Singleton
 class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -36,11 +36,11 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
 
-  case class TradeActivitySerializable(id: String, negotiationID: String, title: String, message: String, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
-    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, title = title, message = utilities.JSON.convertJsonStringToObject[TradeActivityMessage](message), createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
+  case class TradeActivitySerializable(id: String, negotiationID: String, title: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
+    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, title = title, message = utilities.JSON.convertJsonStringToObject[TradeActivityMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
   }
 
-  def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, title = tradeActivity.title, message = Json.toJson(tradeActivity.message).toString(), createdOn = tradeActivity.createdOn, createdBy = tradeActivity.createdBy, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, timezone = tradeActivity.timezone)
+  def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, title = tradeActivity.title, message = Json.toJson(tradeActivity.message).toString(), read = tradeActivity.read, createdOn = tradeActivity.createdOn, createdBy = tradeActivity.createdBy, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, timezone = tradeActivity.timezone)
 
   private[models] val tradeActivityTable = TableQuery[TradeActivityTable]
 
@@ -66,7 +66,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class TradeActivityTable(tag: Tag) extends Table[TradeActivitySerializable](tag, "TradeActivity") {
 
-    def * = (id, negotiationID, title, message, createdOn, createdBy, updatedOn.?, updatedBy.?, timezone) <> (TradeActivitySerializable.tupled, TradeActivitySerializable.unapply)
+    def * = (id, negotiationID, title, message, read, createdOn, createdBy, updatedOn.?, updatedBy.?, timezone) <> (TradeActivitySerializable.tupled, TradeActivitySerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -75,6 +75,8 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
     def title = column[String]("title")
 
     def message = column[String]("message")
+
+    def read = column[Boolean]("read")
 
     def createdOn = column[Timestamp]("createdOn")
 
@@ -91,7 +93,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
   object Service {
     def insert(negotiationID: String, tradeActivity: constants.TradeActivity, parameters: String*): Future[String] = add(serialize(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, title = tradeActivity.title, message = TradeActivityMessage(header = tradeActivity.message, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
-    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = pageNumber * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
+    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
   }
 
 }

@@ -830,6 +830,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
     "negotiationID" VARCHAR   NOT NULL,
     "title"         VARCHAR   NOT NULL,
     "message"       VARCHAR   NOT NULL,
+    "read"          BOOLEAN   NOT NULL,
     "createdOn"     TIMESTAMP NOT NULL,
     "createdBy"     VARCHAR   NOT NULL,
     "updatedOn"     TIMESTAMP,

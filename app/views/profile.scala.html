@@ -6,20 +6,20 @@
 @views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-        <div class="leftTradeFinancial">
-            <div id="financials"></div>
-        </div>
-        <script>
-            @loginState.userType match {
-                case constants.User.TRADER => {
+    <div class="leftTradeFinancial">
+        <div id="financials"></div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
             componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
-                case constants.User.ORGANIZATION => {}
-                case constants.User.ZONE => {}
-                case constants.User.GENESIS => {}
-                case _ => {}
-            }
-        </script>
+            case constants.User.ORGANIZATION => {}
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
 }
 
 @center = {
@@ -99,22 +99,10 @@
 }
 
 @right = {
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-            <div id="recentActivities"></div>
-        </div>
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
     </div>
     <script>
-        @loginState.userType match {
-            case constants.User.TRADER => {
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.traderRecentActivities(0));
-            }
-            case constants.User.ORGANIZATION => {
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.organizationRecentActivities(0));
-            }
-            case constants.User.ZONE => {}
-            case constants.User.GENESIS => {}
-            case _ => {}
-        }
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
     </script>
 }

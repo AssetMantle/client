@@ -235,6 +235,22 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def tryGetBuyerTraderIDByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.buyerTraderID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def tryGetSellerTraderIDByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.sellerTraderID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def findAllNegotiationsByBuyerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID === traderID).filter(_.status.inSet(statuses)).result)
 
   private def findAllNegotiationsBySellerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID === traderID).filter(_.status.inSet(statuses)).result)
@@ -538,6 +554,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def updateBuyerAcceptedOtherDocuments(id: String, buyerAcceptedOtherDocuments: Boolean): Future[Int] = updateBuyerAcceptedOtherDocumentsByID(id = id, buyerAcceptedOtherDocuments = buyerAcceptedOtherDocuments)
 
     def checkTraderNegotiationExists(id: String, traderID: String): Future[Boolean] = checkByIDAndTraderID(id = id, traderID = traderID)
+
+    def tryGetBuyerTraderID(id: String): Future[String] = tryGetBuyerTraderIDByID(id)
+
+    def tryGetSellerTraderID(id: String): Future[String] = tryGetSellerTraderIDByID(id)
   }
 
 }

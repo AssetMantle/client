@@ -105,19 +105,6 @@
                             </script>
                             <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
-
-                            <li class="notificationDropdown">
-                                <a onclick="componentResource('mobileNotificationSection', jsRoutes.controllers.NotificationController.notificationPage(0))">
-                                    @Messages(constants.Form.INBOX)
-                                <span class="cmuk-badge" id="notificationBadge">0</span>
-                                </a>
-                                <div cmuk-dropdown="mode: click">
-                                    <ul class="cmuk-nav cmuk-dropdown-nav">
-                                        <div id="mobileNotificationSection">
-                                        </div>
-                                    </ul>
-                                </div>
-                            </li>
                             <li>
                                 <a href="@controllers.routes.ViewController.profile()">
                                     @loginState.username

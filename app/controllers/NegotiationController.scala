@@ -20,21 +20,14 @@ class NegotiationController @Inject()(
                                        masterAssets: master.Assets,
                                        masterTradeRelations: master.TraderRelations,
                                        withTraderLoginAction: WithTraderLoginAction,
-                                       withZoneLoginAction: WithZoneLoginAction,
-                                       transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
-                                       blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
-                                       accounts: master.Accounts,
                                        masterTraders: master.Traders,
-                                       blockchainACLAccounts: blockchain.ACLAccounts,
-                                       blockchainZones: blockchain.Zones,
-                                       blockchainNegotiations: blockchain.Negotiations,
                                        withUsernameToken: WithUsernameToken,
                                        masterNegotiations: master.Negotiations,
-                                       blockchainAssets: blockchain.Assets,
                                        transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
                                        blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
                                        utilitiesNotification: utilities.Notification,
-                                       masterTransactionChats: masterTransaction.Chats
+                                       masterTransactionChats: masterTransaction.Chats,
+                                       masterTransactionTradeActivities: masterTransaction.TradeActivities
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -543,6 +536,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
+            _ <- masterTransactionTradeActivities.Service.insert(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateAssetTermsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield result
             ).recover {
@@ -598,6 +592,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
+            _ <- masterTransactionTradeActivities.Service.insert(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updatePaymentTermsData.id, successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
           } yield result
             ).recover {
@@ -653,6 +648,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
+            _ <- masterTransactionTradeActivities.Service.insert(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateDocumentCheckListData.id, successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
           } yield result
             ).recover {

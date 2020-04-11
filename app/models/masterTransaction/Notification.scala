@@ -53,21 +53,9 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result)
 
-  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.createdOn.desc).drop(offset).take(limit).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.createdOn.desc).drop(offset).take(limit).result)
 
   private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === status).length.result.asTry).map {
     case Success(result) => result
@@ -127,9 +115,9 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def insert(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, title = notification.title, message = NotificationMessage(header = notification.message, parameters = parameters), read = false, createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
-    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = pageNumber * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
-    def getByAccountIDs(accountIDs: Seq[String], pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = pageNumber * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+    def getByAccountIDs(accountIDs: Seq[String], pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 

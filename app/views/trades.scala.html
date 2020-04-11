@@ -22,16 +22,16 @@
     </script>
 }
 
-@center = {
+    @center = {
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.TRADER => {
             <div class="tradeList cmuk-margin-bottom">
-                    <div id="traderViewAcceptedNegotiationList"></div>
+                <div id="traderViewAcceptedNegotiationList"></div>
             </div>
 
             <div class="salesQuoteList">
-                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+                <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
             </div>
 
             <script>
@@ -48,22 +48,10 @@
 }
 
 @right = {
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-            <div id="recentActivities"></div>
-        </div>
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
     </div>
     <script>
-        @loginState.userType match {
-            case constants.User.TRADER => {
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.traderRecentActivities(0));
-            }
-            case constants.User.ORGANIZATION => {
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.organizationRecentActivities(0));
-            }
-            case constants.User.ZONE => {}
-            case constants.User.GENESIS => {}
-            case _ => {}
-        }
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
     </script>
 }

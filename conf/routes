@@ -102,9 +102,10 @@ POST        /trader/acceptOrRejectTraderRelation                                
 GET         /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTraderForm(accountID: String)
 POST        /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTrader
 
-GET         /master/notifications                                                           controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount                                                 controllers.NotificationController.unreadNotificationCount
-GET         /master/markNotificationAsRead                                                  controllers.NotificationController.markNotificationRead(notificationID: String)
+GET         /notification/recentActivityMessages                                            controllers.NotificationController.recentActivityMessages(pageNumber: Int)
+GET         /notification/tradeActivityMessages                                             controllers.NotificationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
+GET         /notification/unreadNotificationCount                                           controllers.NotificationController.unreadNotificationCount
+GET         /notification/markNotificationAsRead                                            controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                                        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
@@ -137,9 +138,8 @@ GET         /component/zoneViewOrganizationBankAccount                          
 
 GET         /component/commonHome                                                           controllers.ComponentViewController.commonHome
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
-GET         /component/tradeActivities                                                      controllers.ComponentViewController.tradeActivities(pageNumber: Int, negotiationID :String)
-GET         /component/traderRecentActivities                                               controllers.ComponentViewController.traderRecentActivities(pageNumber: Int)
-GET         /component/organizationRecentActivities                                         controllers.ComponentViewController.organizationRecentActivities(pageNumber: Int)
+GET         /component/tradeActivities                                                      controllers.ComponentViewController.tradeActivities(negotiationID :String)
+GET         /component/recentActivities                                                     controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
 
 GET         /component/traderViewAcceptedNegotiation                                        controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
@@ -463,7 +463,7 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 #DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+POST        /wurtcb                                                                         controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm

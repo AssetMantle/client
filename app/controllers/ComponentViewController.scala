@@ -22,29 +22,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComponentViewController @Inject()(
                                          actorsCreate: actors.Create,
                                          messagesControllerComponents: MessagesControllerComponents,
-                                         masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs,
+                                         masterTraders: master.Traders,
                                          masterOrganizationKYCs: master.OrganizationKYCs,
                                          masterTraderKYCs: master.TraderKYCs,
                                          masterAssets: master.Assets,
-                                         masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests,
-                                         masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                         blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
                                          masterTransactionNotifications: masterTransaction.Notifications,
                                          masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                          masterNegotiations: master.Negotiations,
                                          masterAccounts: master.Accounts,
                                          masterAccountFiles: master.AccountFiles,
-                                         blockchainAssets: blockchain.Assets,
                                          blockchainFiats: blockchain.Fiats,
-                                         blockchainNegotiations: blockchain.Negotiations,
                                          masterOrganizations: master.Organizations,
                                          masterZones: master.Zones,
-                                         blockchainOrders: blockchain.Orders,
-                                         blockchainAccounts: blockchain.Accounts,
                                          masterAccountKYCs: master.AccountKYCs,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
-                                         masterTraderBackgroundChecks: master.TraderBackgroundChecks,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withZoneLoginAction: WithZoneLoginAction,
@@ -234,45 +226,14 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def organizationRecentActivities(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def recentActivities(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-
-      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
-
-      def getTradersNotifications(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getByAccountIDs(traderAccountIDs, pageNumber = pageNumber)
-
-      (for {
-        organizationID <- organizationID
-        tradersInOrganizations <- tradersInOrganizations(organizationID)
-        tradersNotifications <- getTradersNotifications(tradersInOrganizations.map(_.accountID))
-      } yield Ok(views.html.component.master.recentActivities(tradersNotifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.organizationRecentActivities)))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+      Future(Ok(views.html.component.master.recentActivities()))
   }
 
-  def traderRecentActivities(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeActivities(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val notifications = masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
-      (for {
-        notifications <- notifications
-      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.traderRecentActivities)))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def tradeActivities(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val tradeActivities = masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID = negotiationID, pageNumber = pageNumber)
-
-      (for {
-        tradeActivities <- tradeActivities
-      } yield Ok(views.html.component.master.tradeActivities(tradeActivities = tradeActivities, loadMoreRoute = utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.tradeActivities)))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+      Future(Ok(views.html.component.master.tradeActivities(negotiationID)))
   }
 
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
