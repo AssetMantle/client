@@ -545,3 +545,5 @@ REJECTED=Rejected
 MNEMONIC_NOTE=It is advised that multiple copies of the passphrase be maintained and stored in non-digital/electronic form. Without the passphrase Comdex cannot help to recover forgotten passwords & can result in a permanent loss of your account.
 INVALID_INPUT=Invalid Input
 FOOTER_TEXT=Comdex — All Rights Reserved
+PENDING_TRADER_REQUESTS=Pending Trader Requests
+COMPLETE_ORGANIZATION_DETAILS_REQUEST=Complete Organization Details Request

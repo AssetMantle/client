@@ -36,6 +36,14 @@
   .kycDocumentsView{
     display: flex;
   }
+  .cmuk-card-body {
+    .cmuk-subnav {
+      li a {
+        font-size: 12px;
+        text-transform: capitalize;
+      }
+    }
+  }
 }
 @media (min-width: 960px) {
   .verticalDataTabsData {
@@ -246,6 +254,7 @@
     .cmuk-subnav {
       li a {
         font-size:12px;
+        text-transform: capitalize;
       }
     }
   }
@@ -265,7 +274,9 @@
       border: none;
     }
   }
-
+  .headerFontSize {
+    font-size: 14px;
+  }
 }
 
 @media (max-width:1920px){

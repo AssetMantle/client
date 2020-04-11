@@ -26,7 +26,11 @@
     max-width: 750px; }
 
   .kycDocumentsView {
-    display: flex; } }
+    display: flex; }
+
+  .cmuk-card-body .cmuk-subnav li a {
+    font-size: 12px;
+    text-transform: capitalize; } }
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex; } }
@@ -151,7 +155,8 @@
         margin-right: 5px; }
 
   .cmuk-card-body .cmuk-subnav li a {
-    font-size: 12px; }
+    font-size: 12px;
+    text-transform: capitalize; }
 
   .modal .modalContent {
     top: 10%;
@@ -163,7 +168,10 @@
     margin: 10px 0px 0px 0px; }
   .tabsSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
   .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
-    border: none; } }
+    border: none; }
+
+  .headerFontSize {
+    font-size: 14px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }
