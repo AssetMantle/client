@@ -207,14 +207,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield Unit
       }
 
-      def getIDs(confirmSellerBid: ConfirmSellerBid): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(confirmSellerBid.to)
-        val fromAccountID = masterAccounts.Service.getId(confirmSellerBid.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -223,7 +216,8 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         negotiationResponse <- negotiationResponse(negotiationID, confirmSellerBid)
         _ <- insertOrUpdate(negotiationResponse)
         _ <- markDirty(confirmSellerBid)
-        (toAccountID, fromAccountID) <- getIDs(confirmSellerBid)
+        fromAccountID <- getID(confirmSellerBid.from)
+        toAccountID <- getID(confirmSellerBid.to)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
@@ -246,20 +240,14 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield {}
       }
 
-      def getIDs(confirmSellerBid: ConfirmSellerBid): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(confirmSellerBid.to)
-        val fromAccountID = masterAccounts.Service.getId(confirmSellerBid.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionFailed
         confirmSellerBid <- confirmSellerBid
         _ <- markDirty(confirmSellerBid)
-        (toAccountID, fromAccountID) <- getIDs(confirmSellerBid)
+        fromAccountID <- getID(confirmSellerBid.from)
+        toAccountID <- getID(confirmSellerBid.to)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {

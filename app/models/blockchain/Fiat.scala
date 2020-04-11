@@ -1,9 +1,8 @@
 package models.blockchain
 
-import actors.{MainFiatActor, ShutdownActor}
+import actors.{Create, MainActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -22,18 +21,12 @@ import scala.util.{Failure, Success}
 
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
-case class FiatCometMessage(username: String, message: JsValue)
-
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create, actorSystem: ActorSystem, shutdownActors: ShutdownActor, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
-  val mainFiatActor: ActorRef = actorSystem.actorOf(props = MainFiatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_FIAT)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -41,13 +34,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
   import databaseConfig.profile.api._
 
   private[models] val fiatTable = TableQuery[FiatTable]
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
@@ -149,14 +138,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def getDirtyFiats: Future[Seq[Fiat]] = getFiatsByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
-
-    def fiatCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainFiatActor ! actors.CreateFiatChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
   }
 
   object Utility {
@@ -182,7 +163,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               accountOwnerAddress <- accountOwnerAddress
               fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
               accountID <- accountID
-            } yield mainFiatActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
+            } yield actorsCreate.mainActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.FIAT, messageContent = actors.Message.Fiat(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
               ).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
@@ -191,7 +172,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
                   for {
                     _ <- deleteFiatPegWallet
                     id <- id
-                  } yield mainFiatActor ! FiatCometMessage(username = id, message = Json.toJson("0"))
+                  } yield actorsCreate.mainActor ! actors.Message.makeCometMessage(username = id, messageType = constants.Comet.FIAT, messageContent = actors.Message.Fiat("0"))
                 }
             }
           }

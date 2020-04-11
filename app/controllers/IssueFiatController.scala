@@ -44,9 +44,9 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       )
   }
 
-  def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def issueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def addressesUnderZone(zoneID: String): Future[Seq[String]] = blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
 
@@ -59,7 +59,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         addressesUnderZone <- addressesUnderZone(zoneID)
         iDsForAddresses <- iDsForAddresses(addressesUnderZone)
         pendingIssueFiatRequests <- pendingIssueFiatRequests(iDsForAddresses)
-      } yield Ok(views.html.component.master.viewPendingIssueFiatRequests(pendingIssueFiatRequests))
+      } yield Ok(views.html.component.master.issueFiatRequestList(pendingIssueFiatRequests))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

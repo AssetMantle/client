@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AddIdentification
+
+@(addIdentificationForm: Form[AddIdentification.Data] = AddIdentification.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ADD_IDENTIFICATION, addIdentificationForm) {
+    @commonInputText(addIdentificationForm, constants.FormField.FIRST_NAME)
+    @commonInputText(addIdentificationForm, constants.FormField.LAST_NAME)
+    @commonInputDate(addIdentificationForm, constants.FormField.DATE_OF_BIRTH)
+    @commonInputText(addIdentificationForm, constants.FormField.ID_NUMBER)
+    @commonInputText(addIdentificationForm, constants.FormField.ID_TYPE)
+}
