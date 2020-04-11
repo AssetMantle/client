@@ -1,10 +1,8 @@
 importScripts('assets/javascripts/firebase-app.js');
 importScripts('assets/javascripts/firebase-messaging.js');
 
-let messagingSenderId = getConfiguration("pushNotification.senderID");
-
 firebase.initializeApp({
-    'messagingSenderId': messagingSenderId
+    'messagingSenderId': getConfiguration("pushNotification.senderID")
 });
 
 const messaging = firebase.messaging();
