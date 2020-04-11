@@ -566,6 +566,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "ubos"               VARCHAR,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "comment"            VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -613,6 +614,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "name"               VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "comment"            VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -841,6 +843,15 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction"
     PRIMARY KEY ("transactionReference")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
+(
+    "id"           VARCHAR NOT NULL,
+    "emailAddress" VARCHAR NOT NULL UNIQUE,
+    "accountID"    VARCHAR UNIQUE,
+    "status"       BOOLEAN,
+    PRIMARY KEY ("id")
+);
+
 ALTER TABLE BLOCKCHAIN."Asset_BC"
     ADD CONSTRAINT Asset_BC_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
@@ -956,6 +967,8 @@ ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
+    ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 
 /*Initial State*/
 
@@ -1038,6 +1051,7 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TraderInvitation" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."WURTCBRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."ZoneInvitation" CASCADE;
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;

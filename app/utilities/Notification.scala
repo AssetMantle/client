@@ -9,8 +9,8 @@ import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
-import play.api.libs.mailer.{Email, MailerClient}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.mailer._
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}

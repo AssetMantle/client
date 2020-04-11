@@ -214,13 +214,7 @@ class AccountController @Inject()(
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           def shutdownActorsAndGetResult = {
-            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
-            if (loginState.userType == constants.User.TRADER) {
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ASSET, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_FIAT, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
-            }
+            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN, loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
@@ -339,13 +333,13 @@ class AccountController @Inject()(
     } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
-  def identificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addIdentificationForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      val identification = masterIdentifications.Service.get(loginState.username)
 
       def getResult(identification: Option[Identification]): Future[Result] = identification match {
-        case Some(identity) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(views.companion.master.Identification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType))))
-        case None => withUsernameToken.Ok(views.html.component.master.identification())
+        case Some(identity) => withUsernameToken.Ok(views.html.component.master.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType))))
+        case None => withUsernameToken.Ok(views.html.component.master.addIdentification())
       }
 
       for {
@@ -354,21 +348,21 @@ class AccountController @Inject()(
       } yield result
   }
 
-  def identification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addIdentification(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.Identification.form.bindFromRequest().fold(
+      views.companion.master.AddIdentification.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.identification(formWithErrors)))
+          Future(BadRequest(views.html.component.master.addIdentification(formWithErrors)))
         },
-        identificationData => {
-          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, identificationData.firstName, identificationData.lastName, utilities.Date.utilDateToSQLDate(identificationData.dateOfBirth), identificationData.idNumber, identificationData.idType)
+        addIdentificationData => {
+          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType)
 
           def accountKYC(): Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
 
           (for {
             _ <- add
             accountKYC <- accountKYC()
-            result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, constants.File.IDENTIFICATION))
+            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -377,38 +371,38 @@ class AccountController @Inject()(
       )
   }
 
-  def userUploadOrUpdateIdentificationView: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       for {
         accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.userUploadOrUpdateIdentificationView(accountKYC, constants.File.IDENTIFICATION))
+        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
       } yield result
   }
 
-  def userReviewIdentificationDetailsForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userReviewIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+      val identification = masterIdentifications.Service.get(loginState.username)
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       (for {
         identification <- identification
         accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.userReviewIdentificationDetails(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+        result <- withUsernameToken.Ok(views.html.component.master.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def userReviewIdentificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userReviewIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.UserReviewIdentificationDetails.form.bindFromRequest().fold(
+      views.companion.master.UserReviewIdentification.form.bindFromRequest().fold(
         formWithErrors => {
-          val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+          val identification = masterIdentifications.Service.get(loginState.username)
           val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
           (for {
             identification <- identification
             accountKYC <- accountKYC
-          } yield BadRequest(views.html.component.master.userReviewIdentificationDetails(formWithErrors, identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+          } yield BadRequest(views.html.component.master.userReviewIdentification(formWithErrors, identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -432,12 +426,12 @@ class AccountController @Inject()(
                 result <- getResult
               } yield result
             } else {
-              val identification = masterIdentifications.Service.getOrNoneByAccountID(loginState.username)
+              val identification = masterIdentifications.Service.get(loginState.username)
               val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
               for {
                 identification <- identification
                 accountKYC <- accountKYC
-              } yield BadRequest(views.html.component.master.userReviewIdentificationDetails(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+              } yield BadRequest(views.html.component.master.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
             }
           }
 

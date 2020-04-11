@@ -171,25 +171,25 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
       def createOrganizationAndSendNotification(addOrganization: AddOrganization): Future[Unit] = {
         val create = blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-        val verifyOrganization = masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
-        val organizationAccountId = masterOrganizations.Service.tryGetAccountID(addOrganization.organizationID)
+        val markAccepted = masterOrganizations.Service.markAccepted(addOrganization.organizationID)
+        val organizationAccountID = masterOrganizations.Service.tryGetAccountID(addOrganization.organizationID)
 
         def updateUserType(organizationAccountId: String): Future[Int] = masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
 
         def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addOrganization.from)
 
-        def fromAccountID(address: String): Future[String] = masterAccounts.Service.getId(addOrganization.from)
+        def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
         for {
           _ <- create
-          _ <- verifyOrganization
-          organizationAccountId <- organizationAccountId
-          _ <- updateUserType(organizationAccountId)
+          _ <- markAccepted
+          organizationAccountID <- organizationAccountID
+          _ <- updateUserType(organizationAccountID)
           _ <- markDirty
-          fromAccountID <- fromAccountID(addOrganization.from)
-          _ <- utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-          _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        } yield {}
+          fromAccountID <- getID(addOrganization.from)
+          _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ADD_ORGANIZATION_SUCCESSFUL, blockResponse.txhash)
+          _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ADD_ORGANIZATION_SUCCESSFUL, organizationAccountID, blockResponse.txhash)
+        } yield ()
       }
 
       (for {
@@ -206,21 +206,15 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
 
-      def getIDs(addOrganization: AddOrganization): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(addOrganization.to)
-        val fromAccountID = masterAccounts.Service.getId(addOrganization.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionFailed
         addOrganization <- addOrganization
-        (toAccountID, fromAccountID) <- getIDs(addOrganization)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        fromAccountID <- getID(addOrganization.from)
+        toAccountID <- getID(addOrganization.to)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ADD_ORGANIZATION_FAILED, toAccountID, message)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ADD_ORGANIZATION_FAILED, message)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

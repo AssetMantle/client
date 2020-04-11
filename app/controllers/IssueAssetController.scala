@@ -300,7 +300,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def traderIDsUnderZone(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
@@ -329,7 +329,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def updateAssetDocumentStatusForm(requestID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       val id = masterTransactionIssueAssetRequests.Service.getAccountID(requestID)
 
       def traderZoneID(id: String): Future[String] = masterTraders.Service.tryGetZoneIDByAccountID(id)

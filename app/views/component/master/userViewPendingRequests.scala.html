@@ -29,18 +29,18 @@
                                     case Some(organization) => {
                                         trader match {
                                             case Some(trader) =>{
-                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs),
-                                                    constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader, traderOrganization.get, traderKYCs))
+                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganization(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs),
+                                                    constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get, traderKYCs))
                                             }
                                             case _ => {
-                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationDetails(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs))
+                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganization(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs))
                                             }
                                         }
                                     }
                                     case _ => {
                                         trader match {
                                             case Some(trader) =>{
-                                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderDetails(trader, traderOrganization.get, traderKYCs))
+                                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get, traderKYCs))
                                             }
                                             case _ => {
                                                 ListMap()

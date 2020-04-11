@@ -3,12 +3,12 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+@common(Messages(constants.View.INDEX))(Html(""))(center)(Html(""))
 
 @center = {
     <ul cmuk-accordion="multiple: true" class="flexContainer">
         <li>
-            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.SetACLController.organizationViewVerifyTraderRequests(), this)">@Messages(constants.View.PENDING_SET_ACL)</a>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.ComponentViewController.organizationViewPendingTraderRequests(), this)">@Messages(constants.View.PENDING_SET_ACL)</a>
             <div class="cmuk-accordion-content">
                 <div id="setACLList" class="flexContainer cmuk-grid-small" cmuk-grid></div>
             </div>

@@ -24,7 +24,9 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                                            masterTraders: master.Traders,
                                            masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                            blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
-                                           withUsernameToken: WithUsernameToken)
+                                           withUsernameToken: WithUsernameToken,
+                                           masterAssets: master.Assets
+                                          )
                                           (implicit executionContext: ExecutionContext,
                                            configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -117,20 +119,20 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           }
         },
         confirmBidTransactionData => {
-          val masterNegotiation = masterNegotiations.Service.tryGet(confirmBidTransactionData.requestID)
+          val negotiation = masterNegotiations.Service.tryGet(confirmBidTransactionData.requestID)
 
-          def getResult(masterNegotiation: Negotiation): Future[Result] = {
-            if (masterNegotiation.sellerTraderID == loginState.username) {
-              val buyerAddress = masterAccounts.Service.getAddress(masterNegotiation.buyerTraderID)
+          def getResult(negotiation: Negotiation): Future[Result] = {
+            if (negotiation.sellerTraderID == loginState.username) {
+              val buyerAddress = masterAccounts.Service.getAddress(negotiation.buyerTraderID)
               val negotiationFiles = masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransactionData.requestID, Seq(constants.File.SELLER_CONTRACT))
-              //TODO
-              val pegHash = "34"
+              val pegHash = masterAssets.Service.tryGetPegHash(negotiation.assetID)
+
               def sellerContractHash(negotiationFiles: Seq[NegotiationFile]): String = utilities.FileOperations.combinedHash(negotiationFiles)
 
-              def transactionProcess(buyerAddress: String, sellerContractHash: String): Future[String] = transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
-                entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = masterNegotiation.price, time = confirmBidTransactionData.time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = confirmBidTransactionData.gas, ticketID = "", mode = transactionMode),
+              def transactionProcess(buyerAddress: String, sellerContractHash: String, pegHash: String): Future[String] = transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
+                entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = negotiation.price, time = confirmBidTransactionData.time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = confirmBidTransactionData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
-                request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmBidTransactionData.gas.toString), to = buyerAddress, password = confirmBidTransactionData.password, bid = masterNegotiation.price.toString, time = confirmBidTransactionData.time.toString, pegHash = pegHash, sellerContractHash = sellerContractHash, mode = transactionMode),
+                request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmBidTransactionData.gas.toString), to = buyerAddress, password = confirmBidTransactionData.password, bid = negotiation.price.toString, time = confirmBidTransactionData.time.toString, pegHash = pegHash, sellerContractHash = sellerContractHash, mode = transactionMode),
                 action = transactionsConfirmSellerBid.Service.post,
                 onSuccess = blockchainTransactionConfirmSellerBids.Utility.onSuccess,
                 onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,
@@ -140,7 +142,8 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
               for {
                 buyerAddress <- buyerAddress
                 negotiationFiles <- negotiationFiles
-                _ <- transactionProcess(buyerAddress, sellerContractHash(negotiationFiles))
+                pegHash <- pegHash
+                _ <- transactionProcess(buyerAddress, sellerContractHash(negotiationFiles), pegHash)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
               } yield result
             } else {
@@ -149,8 +152,8 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           }
 
           (for {
-            masterNegotiation <- masterNegotiation
-            result <- getResult(masterNegotiation)
+            negotiation <- negotiation
+            result <- getResult(negotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

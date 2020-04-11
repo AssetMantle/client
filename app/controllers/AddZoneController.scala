@@ -8,7 +8,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
 import models.master.ZoneKYC
-import models.{blockchain, blockchainTransaction, master}
+import models.masterTransaction.ZoneInvitation
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -17,13 +18,85 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, fileResourceManager: utilities.FileResourceManager, withZoneLoginAction: WithZoneLoginAction, transaction: utilities.Transaction, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(
+                                   messagesControllerComponents: MessagesControllerComponents,
+                                   fileResourceManager: utilities.FileResourceManager,
+                                   withZoneLoginAction: WithZoneLoginAction,
+                                   transaction: utilities.Transaction,
+                                   utilitiesNotification: utilities.Notification,
+                                   blockchainAccounts: blockchain.Accounts,
+                                   masterZoneKYCs: master.ZoneKYCs,
+                                   transactionsAddZone: transactions.AddZone,
+                                   blockchainZones: models.blockchain.Zones,
+                                   blockchainTransactionAddZones: blockchainTransaction.AddZones,
+                                   masterAccounts: master.Accounts,
+                                   masterZones: master.Zones,
+                                   withUserLoginAction: WithUserLoginAction,
+                                   withGenesisLoginAction: WithGenesisLoginAction,
+                                   withUsernameToken: WithUsernameToken,
+                                   masterTransactionZoneInvitations: masterTransaction.ZoneInvitations
+                                 )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
+
+  private val comdexURL: String = configuration.get[String]("comdex.url")
+
+  def inviteZoneForm(): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(views.html.component.master.inviteZone())
+  }
+
+  def inviteZone(): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.InviteZone.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.inviteZone(formWithErrors)))
+        },
+        inviteZoneData => {
+
+          val token = masterTransactionZoneInvitations.Service.create(inviteZoneData.emailAddress)
+
+          def sendEmailNotificationsAndGetResult(token: String): Future[Result] = {
+            utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteZoneData.emailAddress, email = constants.Notification.ZONE_INVITATION, comdexURL, token)
+            utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.ZONE_INVITATION_SENT)
+            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+          }
+
+          (for {
+            token <- token
+            result <- sendEmailNotificationsAndGetResult(token)
+          } yield result).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def acceptInvitation(token: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val invitation = masterTransactionZoneInvitations.Service.tryGet(token)
+
+      def updateStatus(invitation: ZoneInvitation): Future[Int] = {
+        if (invitation.accountID.isDefined) {
+          if (invitation.accountID.get != loginState.username) throw new BaseException(constants.Response.UNAUTHORIZED) else Future(0)
+        } else {
+          masterTransactionZoneInvitations.Service.markInvitationAccepted(id = token, accountID = loginState.username)
+        }
+      }
+
+      (for {
+        invitation <- invitation
+        _ <- updateStatus(invitation)
+        result <- withUsernameToken.Ok(views.html.component.master.userAcceptZoneInvitation())
+      } yield result
+        ).recoverWith {
+        case baseException: BaseException => withUsernameToken.Ok(views.html.account(failures = Seq(baseException.failure)))
+      }
+  }
 
   def addZoneForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -62,7 +135,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userUploadOrUpdateZoneKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def zoneKYCs(zoneID: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(zoneID)
 
@@ -102,7 +175,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userStoreZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
         name = name,
@@ -131,7 +204,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userUpdateZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
@@ -191,7 +264,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           }
         },
         userReviewAddZoneRequestData => {
-          val id = masterZones.Service.getID(loginState.username)
+          val id = masterZones.Service.tryGetID(loginState.username)
 
           def allKYCFileTypesExists(id: String): Future[Boolean] = masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)
 
@@ -391,18 +464,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zones = masterZones.Service.getAllVerified
-      (for {
-        zones <- zones
-        result <- withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(zones))
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def uploadZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.storeZoneKYC), documentType))
   }
@@ -429,7 +490,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def storeZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
         name = name,
@@ -455,7 +516,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def updateZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val id = masterZones.Service.getID(loginState.username)
+      val id = masterZones.Service.tryGetID(loginState.username)
 
       def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 

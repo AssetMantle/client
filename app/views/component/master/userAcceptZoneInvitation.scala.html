@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@views.html.account()
+<script>
+        getForm(jsRoutes.controllers.AddZoneController.addZoneForm());
+</script>
