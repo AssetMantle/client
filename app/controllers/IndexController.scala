@@ -38,7 +38,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case constants.User.ORGANIZATION =>
           val id = blockchainOrganizations.Service.getID(loginState.address)
 
-          def organization(id: String): Future[Organization] = masterOrganizations.Service.get(id)
+          def organization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
           for {
             id <- id
@@ -51,7 +51,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
           def getZoneAndOrganization(aclAccount: ACLAccount): Future[(Zone, Organization)] = {
             val zone = masterZones.Service.get(aclAccount.zoneID)
-            val organization = masterOrganizations.Service.get(aclAccount.organizationID)
+            val organization = masterOrganizations.Service.tryGet(aclAccount.organizationID)
             for {
               zone <- zone
               organization <- organization

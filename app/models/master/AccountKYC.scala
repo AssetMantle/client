@@ -52,13 +52,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[Option[AccountKYC]] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def findByIDAndDocumentType(id: String, documentType: String): Future[Option[AccountKYC]] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption)
 
   private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
@@ -122,7 +116,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def updateOldDocument(accountKYC: AccountKYC): Future[Int] = upsert(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, fileName = accountKYC.fileName, file = accountKYC.file))
 
-    def get(id: String, documentType: String): Future[Option[AccountKYC]] = findByIdDocumentType(id = id, documentType = documentType)
+    def get(id: String, documentType: String): Future[Option[AccountKYC]] = findByIDAndDocumentType(id = id, documentType = documentType)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 

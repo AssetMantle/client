@@ -12,17 +12,15 @@ GET         /blockExplorer/stakingValidators                                    
 GET         /blockExplorer/transactionHash                                                  controllers.BlockExplorerController.transactionHash(txHash: String)
 
 GET         /genesisRequest                                                                 controllers.ViewController.genesisRequest
-GET         /genesisInformation                                                             controllers.ViewController.genesisInformation
 GET         /zoneRequest                                                                    controllers.ViewController.zoneRequest
-GET         /zoneInformation                                                                controllers.ViewController.zoneInformation
 GET         /organizationRequest                                                            controllers.ViewController.organizationRequest
-GET         /organizationInformation                                                        controllers.ViewController.organizationInformation
 GET         /market                                                                         controllers.ViewController.market
+
 GET         /profile                                                                        controllers.ViewController.profile
 GET         /account                                                                        controllers.ViewController.account
 GET         /trades                                                                         controllers.ViewController.trades
 GET         /dashboard                                                                      controllers.ViewController.dashboard
-GET         /traderRoom                                                                     controllers.ViewController.tradeRoom(id: String)
+GET         /tradeRoom                                                                      controllers.ViewController.tradeRoom(id: String)
 
 GET         /profilePicture                                                                 controllers.ComponentViewController.profilePicture
 
@@ -47,11 +45,11 @@ POST        /account/forgotPassword                                             
 
 GET         /account/checkUsernameAvailable                                                 controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /account/identification                                                         controllers.AccountController.identificationForm
-POST        /account/identification                                                         controllers.AccountController.identification
-GET         /account/userUploadOrUpdateIdentificationView                                   controllers.AccountController.userUploadOrUpdateIdentificationView
-GET         /account/userReviewIdentificationDetails                                        controllers.AccountController.userReviewIdentificationDetailsForm
-POST        /account/userReviewIdentificationDetails                                        controllers.AccountController.userReviewIdentificationDetails
+GET         /account/addIdentification                                                      controllers.AccountController.addIdentificationForm
+POST        /account/addIdentification                                                      controllers.AccountController.addIdentification
+GET         /account/userViewUploadOrUpdateIdentification                                   controllers.AccountController.userViewUploadOrUpdateIdentification
+GET         /account/userReviewIdentification                                               controllers.AccountController.userReviewIdentificationForm
+POST        /account/userReviewIdentification                                               controllers.AccountController.userReviewIdentification
 
 GET         /asset/issue                                                                    controllers.AssetController.issueForm
 POST        /asset/issue                                                                    controllers.AssetController.issue
@@ -88,11 +86,20 @@ POST        /negotiation/acceptOrRejectNegotiationTerms                         
 
 GET         /contact                                                                        controllers.ContactController.contact
 
+GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
+POST        /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequest
+
+GET         /trader/zoneRejectRequest                                                       controllers.TraderController.zoneRejectRequestForm(traderID: String)
+POST        /trader/zoneRejectRequest                                                       controllers.TraderController.zoneRejectRequest
+
 GET         /trader/traderRelationRequest                                                   controllers.TraderController.traderRelationRequestForm
 POST        /trader/traderRelationRequest                                                   controllers.TraderController.traderRelationRequest
 
 GET         /trader/acceptOrRejectTraderRelation                                            controllers.TraderController.acceptOrRejectTraderRelationForm(fromID: String, toID: String)
 POST        /trader/acceptOrRejectTraderRelation                                            controllers.TraderController.acceptOrRejectTraderRelation
+
+GET         /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTraderForm(accountID: String)
+POST        /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTrader
 
 GET         /master/notifications                                                           controllers.NotificationController.notificationPage(pageNumber:Int)
 GET         /master/unreadNotificationCount                                                 controllers.NotificationController.unreadNotificationCount
@@ -106,16 +113,16 @@ GET         /component/traderViewAcceptedSellNegotiationList                    
 
 GET         /component/traderViewSentReceivedIncompleteRejectedFailedNegotiationList        controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList
 GET         /component/traderViewSentNegotiationRequestList                                 controllers.ComponentViewController.traderViewSentNegotiationRequestList
-GET         /component/traderViewReceivedNegotiationList                                    controllers.ComponentViewController.traderViewReceivedNegotiationList
+GET         /component/traderViewReceivedNegotiationRequestList                             controllers.ComponentViewController.traderViewReceivedNegotiationRequestList
 GET         /component/traderViewIncompleteNegotiationList                                  controllers.ComponentViewController.traderViewIncompleteNegotiationList
-GET         /component/traderViewRejectedOrFailedNegotiationList                            controllers.ComponentViewController.traderViewRejectedOrFailedNegotiationList
+GET         /component/traderViewRejectedAndFailedNegotiationList                           controllers.ComponentViewController.traderViewRejectedAndFailedNegotiationList
 
-GET         /component/viewIdentificationDetails                                            controllers.ComponentViewController.viewIdentificationDetails
+GET         /component/identification                                                       controllers.ComponentViewController.identification
 GET         /component/userViewPendingRequests                                              controllers.ComponentViewController.userViewPendingRequests
-GET         /component/traderViewOrganizationDetails                                        controllers.ComponentViewController.traderViewOrganizationDetails
-GET         /component/viewOrganizationDetails                                              controllers.ComponentViewController.viewOrganizationDetails
-GET         /component/viewOrganizationBankAccountDetail                                    controllers.ComponentViewController.viewOrganizationBankAccountDetail
-GET         /component/traderViewOrganizationBankAccountDetail                              controllers.ComponentViewController.traderViewOrganizationBankAccountDetail
+GET         /component/traderViewOrganization                                               controllers.ComponentViewController.traderViewOrganization
+GET         /component/organization                                                         controllers.ComponentViewController.organization
+GET         /component/organizationBankAccount                                              controllers.ComponentViewController.organizationBankAccount
+GET         /component/traderViewOrganizationBankAccount                                    controllers.ComponentViewController.traderViewOrganizationBankAccount
 GET         /component/userViewOrganizationUBOs                                             controllers.ComponentViewController.userViewOrganizationUBOs
 GET         /component/viewOrganizationUBOs                                                 controllers.ComponentViewController.viewOrganizationUBOs
 
@@ -125,11 +132,9 @@ GET         /component/pendingTraderRelationList                                
 GET         /component/acceptedTraderRelation                                               controllers.ComponentViewController.acceptedTraderRelation(fromID: String, toID: String)
 GET         /component/pendingSentTraderRelation                                            controllers.ComponentViewController.pendingSentTraderRelation(toID: String)
 GET         /component/pendingReceivedTraderRelation                                        controllers.ComponentViewController.pendingReceivedTraderRelation(fromID: String)
-GET         /master/zoneViewOrganizationBankAccountDetail                                   controllers.ComponentViewController.zoneViewOrganizationBankAccountDetail(organizationID: String)
+GET         /component/zoneViewOrganizationBankAccount                                      controllers.ComponentViewController.zoneViewOrganizationBankAccount(organizationID: String)
 
 GET         /component/commonHome                                                           controllers.ComponentViewController.commonHome
-GET         /component/genesisDetails                                                       controllers.ComponentViewController.genesisDetails
-GET         /component/zoneDetails                                                          controllers.ComponentViewController.zoneDetails
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
 GET         /component/recentActivityForTradeRoom                                           controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, negotiationID :String)
 GET         /component/recentActivityForTrader                                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
@@ -138,17 +143,49 @@ GET         /component/traderFinancials                                         
 
 GET         /component/traderViewAcceptedNegotiation                                        controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
 
-GET         /component/releaseAssetList                                                     controllers.ReleaseAssetController.releaseAssetList
-GET         /component/buyerExecuteOrderList                                                controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
-GET         /component/sellerExecuteOrderList                                               controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderList
-GET         /component/setBuyerFeedbackList                                                 controllers.SetBuyerFeedbackController.buyerFeedbackList
-GET         /component/setSellerFeedbackList                                                controllers.SetSellerFeedbackController.sellerFeedbackList
-GET         /component/viewTradersInOrganization                                            controllers.SetACLController.viewTradersInOrganization
-GET         /component/viewTradersInOrganizationForZone                                     controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
-GET         /component/viewTradersInOrganizationForGenesis                                  controllers.SetACLController.viewTradersInOrganizationForGenesis(organizationID: String)
-GET         /component/viewOrganizationsInZone                                              controllers.AddOrganizationController.viewOrganizationsInZone
-GET         /component/viewOrganizationsInZoneForGenesis                                    controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis(zoneID: String)
-GET         /component/viewZonesInGenesis                                                   controllers.AddZoneController.viewZonesInGenesis
+GET         /component/organizationViewTraderAccountList                                    controllers.ComponentViewController.organizationViewTraderAccountList
+GET         /component/organizationViewAcceptedTraderAccountList                            controllers.ComponentViewController.organizationViewAcceptedTraderAccountList
+GET         /component/organizationViewAcceptedTraderAccount                                controllers.ComponentViewController.organizationViewAcceptedTraderAccount(traderID: String)
+GET         /component/organizationViewPendingTraderRequestList                             controllers.ComponentViewController.organizationViewPendingTraderRequestList
+GET         /component/organizationViewPendingTraderRequest                                 controllers.ComponentViewController.organizationViewPendingTraderRequest(traderID: String)
+GET         /component/organizationViewRejectedTraderRequestList                            controllers.ComponentViewController.organizationViewRejectedTraderRequestList
+GET         /component/organizationViewRejectedTraderRequest                                controllers.ComponentViewController.organizationViewRejectedTraderRequest(traderID: String)
+
+GET         /component/zoneViewTraderAccountList                                            controllers.ComponentViewController.zoneViewTraderAccountList
+GET         /component/zoneViewAcceptedTraderAccountList                                    controllers.ComponentViewController.zoneViewAcceptedTraderAccountList
+GET         /component/zoneViewAcceptedTraderAccount                                        controllers.ComponentViewController.zoneViewAcceptedTraderAccount(traderID: String)
+GET         /component/zoneViewPendingTraderRequestList                                     controllers.ComponentViewController.zoneViewPendingTraderRequestList
+GET         /component/zoneViewPendingTraderRequest                                         controllers.ComponentViewController.zoneViewPendingTraderRequest(traderID: String)
+GET         /component/zoneViewRejectedTraderRequestList                                    controllers.ComponentViewController.zoneViewRejectedTraderRequestList
+GET         /component/zoneViewRejectedTraderRequest                                        controllers.ComponentViewController.zoneViewRejectedTraderRequest(traderID: String)
+
+GET         /component/zoneViewOrganizationAccountList                                      controllers.ComponentViewController.zoneViewOrganizationAccountList
+GET         /component/zoneViewAcceptedOrganizationAccountList                              controllers.ComponentViewController.zoneViewAcceptedOrganizationAccountList
+GET         /component/zoneViewAcceptedOrganizationAccount                                  controllers.ComponentViewController.zoneViewAcceptedOrganizationAccount(organizationID: String)
+GET         /component/zoneViewPendingOrganizationRequestList                               controllers.ComponentViewController.zoneViewPendingOrganizationRequestList
+GET         /component/zoneViewPendingOrganizationRequest                                   controllers.ComponentViewController.zoneViewPendingOrganizationRequest(organizationID: String)
+GET         /component/zoneViewRejectedOrganizationRequestList                              controllers.ComponentViewController.zoneViewRejectedOrganizationRequestList
+GET         /component/zoneViewRejectedOrganizationRequest                                  controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
+
+GET         /component/organizationSubscription                                             controllers.ComponentViewController.organizationSubscription
+GET         /component/traderSubscription                                                   controllers.ComponentViewController.traderSubscription
+
+GET         /component/organizationTradeStatistics                                          controllers.ComponentViewController.organizationTradeStatistics
+GET         /component/traderTradeStatistics                                                controllers.ComponentViewController.traderTradeStatistics
+
+GET         /component/organizationDeclarations                                             controllers.ComponentViewController.organizationDeclarations
+
+GET         /zone/inviteZone                                                                controllers.AddZoneController.inviteZoneForm
+POST        /zone/inviteZone                                                                controllers.AddZoneController.inviteZone
+GET         /zone/acceptInvitation                                                          controllers.AddZoneController.acceptInvitation(token: String)
+
+GET         /master/component/releaseAssetList                                              controllers.ReleaseAssetController.releaseAssetList
+GET         /master/component/buyerExecuteOrderList                                         controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
+GET         /master/component/sellerExecuteOrderList                                        controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderList
+GET         /master/component/setBuyerFeedbackList                                          controllers.SetBuyerFeedbackController.buyerFeedbackList
+GET         /master/component/setSellerFeedbackList                                         controllers.SetSellerFeedbackController.sellerFeedbackList
+GET         /master/component/viewTradersInOrganizationForZone                              controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
+GET         /master/component/viewTradersInOrganizationForGenesis                           controllers.SetACLController.viewTradersInOrganizationForGenesis(organizationID: String)
 
 GET         /master/getGenesisAccessedFile                                                  controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                                         controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
@@ -208,25 +245,17 @@ GET         /master/userUpdateTraderKYC                                         
 GET         /master/userReviewAddTraderRequest                                              controllers.SetACLController.userReviewAddTraderRequestForm
 POST        /master/userReviewAddTraderRequest                                              controllers.SetACLController.userReviewAddTraderRequest
 
-GET         /master/zoneVerifyTrader                                                        controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
+GET         /master/zoneVerifyTrader                                                        controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
 POST        /master/zoneVerifyTrader                                                        controllers.SetACLController.zoneVerifyTrader
 GET         /master/zoneViewTraderKYCDocuments                                              controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
-GET         /master/updateTraderKYCDocumentZoneStatus                                       controllers.SetACLController.updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
-POST        /master/updateTraderKYCDocumentZoneStatus                                       controllers.SetACLController.updateTraderKYCDocumentZoneStatus
+GET         /master/zoneAcceptOrRejectTraderKYCDocument                                     controllers.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm(traderID: String, documentType: String)
+POST        /master/zoneAcceptOrRejectTraderKYCDocument                                     controllers.SetACLController.zoneAcceptOrRejectTraderKYCDocument
 GET         /master/zoneViewVerifyTraderRequests                                            controllers.SetACLController.zoneViewPendingVerifyTraderRequests
-GET         /master/zoneRejectVerifyTraderRequest                                           controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
-POST        /master/zoneRejectVerifyTraderRequest                                           controllers.SetACLController.zoneRejectVerifyTraderRequest
 
-GET         /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
+GET         /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                                controllers.SetACLController.organizationVerifyTrader
-GET         /master/organizationModifyTrader                                                controllers.SetACLController.organizationModifyTraderForm(accountID: String)
-POST        /master/organizationModifyTrader                                                controllers.SetACLController.organizationModifyTrader
-GET         /master/organzationViewTraderKYCDocuments                                       controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
-GET         /master/updateTraderKYCDocumentOrganizationStatus                               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
-POST        /master/updateTraderKYCDocumentOrganizationStatus                               controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
-GET         /master/organizationViewVerifyTraderRequests                                    controllers.SetACLController.organizationViewVerifyTraderRequests
-GET         /master/organizationRejectVerifyTraderRequest                                   controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
-POST        /master/organizationRejectVerifyTraderRequest                                   controllers.SetACLController.organizationRejectVerifyTraderRequest
+GET         /master/organizationAcceptOrRejectTraderKYCDocument                             controllers.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm(traderID: String, documentType: String)
+POST        /master/organizationAcceptOrRejectTraderKYCDocument                             controllers.SetACLController.organizationAcceptOrRejectTraderKYCDocument
 
 GET         /traderUpload                                                                   controllers.SetACLController.uploadTraderKYCForm(documentType: String)
 POST        /traderUpload/file                                                              controllers.SetACLController.uploadTraderKYC(documentType: String)
@@ -283,8 +312,8 @@ POST        /master/userDeleteUBO                                               
 GET         /master/deleteUBO                                                               controllers.AddOrganizationController.deleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String)
 POST        /master/deleteUBO                                                               controllers.AddOrganizationController.deleteUBO
 
-GET         /master/addOrUpdateOrganizationBankAccountDetail                                controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm
-POST        /master/addOrUpdateOrganizationBankAccountDetail                                controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail
+GET         /master/addOrUpdateOrganizationBankAccount                                      controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm
+POST        /master/addOrUpdateOrganizationBankAccount                                      controllers.AddOrganizationController.addOrUpdateOrganizationBankAccount
 GET         /master/userUploadOrUpdateOrganizationKYCView                                   controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView
 GET         /master/userUploadOrganizationKYC                                               controllers.AddOrganizationController.userUploadOrganizationKYCForm(documentType: String)
 POST        /master/userUploadOrganizationKYCDocument                                       controllers.AddOrganizationController.userUploadOrganizationKYC(documentType: String)
@@ -294,14 +323,12 @@ GET         /master/userUpdateOrganizationKYCDocument                           
 
 GET         /master/userReviewAddOrganizationRequest                                        controllers.AddOrganizationController.userReviewAddOrganizationRequestForm
 POST        /master/userReviewAddOrganizationRequest                                        controllers.AddOrganizationController.userReviewAddOrganizationRequest
-GET         /master/viewVerifyOrganizationRequests                                          controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
-GET         /master/viewOrganizationKYCDocuments                                            controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
 GET         /master/updateOrganizationKYCDocumentStatus                                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String)
 POST        /master/updateOrganizationKYCDocumentStatus                                     controllers.AddOrganizationController.updateOrganizationKYCDocumentStatus
-GET         /master/rejectVerifyOrganizationRequest                                         controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
-POST        /master/rejectVerifyOrganizationRequest                                         controllers.AddOrganizationController.rejectVerifyOrganizationRequest
-GET         /master/verifyOrganization                                                      controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
-POST        /master/verifyOrganization                                                      controllers.AddOrganizationController.verifyOrganization
+GET         /organization/rejectRequest                                                     controllers.AddOrganizationController.rejectRequestForm(organizationID: String)
+POST        /organization/rejectRequest                                                     controllers.AddOrganizationController.rejectRequest
+GET         /organization/acceptRequest                                                     controllers.AddOrganizationController.acceptRequestForm(organizationID: String)
+POST        /organization/acceptRequest                                                     controllers.AddOrganizationController.acceptRequest
 GET         /organizationUpload                                                             controllers.AddOrganizationController.uploadOrganizationKYCForm(documentType: String)
 POST        /organizationUpload/file                                                        controllers.AddOrganizationController.uploadOrganizationKYC(documentType: String)
 GET         /organizationUpload/storeFile                                                   controllers.AddOrganizationController.storeOrganizationKYC(name: String, documentType: String)
@@ -381,7 +408,7 @@ GET         /master/orderComet                                                  
 GET         /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequestForm
 POST        /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequest
 
-GET         /master/viewPendingIssueFiatRequests                                            controllers.IssueFiatController.viewPendingIssueFiatRequests
+GET         /master/issueFiatRequestList                                                    controllers.IssueFiatController.issueFiatRequestList
 GET         /master/rejectIssueFiatRequest                                                  controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
 POST        /master/rejectIssueFiatRequest                                                  controllers.IssueFiatController.rejectIssueFiatRequest
 
@@ -414,7 +441,7 @@ POST        /master/sendCoin                                                    
 GET         /master/faucetRequest                                                           controllers.SendCoinController.faucetRequestForm
 POST        /master/faucetRequest                                                           controllers.SendCoinController.faucetRequest
 
-GET         /master/viewPendingFaucetRequests                                               controllers.SendCoinController.viewPendingFaucetRequests
+GET         /master/faucetRequestList                                                       controllers.SendCoinController.faucetRequestList
 GET         /master/approveFaucetRequests                                                   controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
 POST        /master/approveFaucetRequests                                                   controllers.SendCoinController.approveFaucetRequests
 

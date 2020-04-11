@@ -1,4 +1,6 @@
 @import controllers.actions.LoginState
+@import views.html.base._
+
 @(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">
@@ -45,11 +47,11 @@
                         case default => {
                             <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
                                 <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-dashboard")"/></svg>
-                            </span> @Messages(constants.Form.DASHBOARD)</a>
+                            </span> @Messages(constants.View.DASHBOARD)</a>
                             </li>
                             <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
                                 <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
-                            </span>@Messages(constants.Form.TRADES)</a>
+                            </span>@Messages(constants.View.TRADES)</a>
                             </li>
                            <li>
                                <a><span class="transactionIcon">
@@ -58,7 +60,7 @@
                             </li>
                             <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
                                 <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
-                            </span>@Messages(constants.Form.ACCOUNT)</a>
+                            </span>@Messages(constants.View.ACCOUNT)</a>
                             </li>
                         }
                     }
@@ -70,7 +72,7 @@
                         case null => {
                             <li>
                                 <a onclick="getForm(jsRoutes.controllers.AccountController.noteAndVerifyMnemonic())">
-                                    <button class="cmuk-button buttonRegister">@Messages(constants.Form.SIGN_UP.legend)</button>
+                                    @commonFormButton(constants.Form.SIGN_UP, 'class -> "buttonRegister")
                                 </a>
                             </li>
                             <li>
@@ -83,19 +85,16 @@
                         case default => {
                             @loginState.userType match {
                                 case constants.User.TRADER => {
-                                    <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.View.MARKET)</a></li>
                                 }
                                 case constants.User.ZONE => {
-                                    <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                    <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
                                 }
                                 case constants.User.ORGANIZATION => {
-                                    <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                    <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.View.REQUEST)</a></li>
                                 }
                                 case constants.User.GENESIS => {
-                                    <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                    <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                    <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
                                 }
                                 case _ => {}
                             }
