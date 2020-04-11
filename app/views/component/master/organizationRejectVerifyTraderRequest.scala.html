@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import views.companion.master.RejectVerifyTraderRequest
-
-@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data] = RejectVerifyTraderRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@commonForm(constants.Form.ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST, rejectVerifyTraderRequestForm) {
-    @commonInputText(rejectVerifyTraderRequestForm, constants.FormField.TRADER_ID)
-}

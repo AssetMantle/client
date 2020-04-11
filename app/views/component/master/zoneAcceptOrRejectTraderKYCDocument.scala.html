@@ -1,0 +1,42 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import models.master.TraderKYC
+@import views.companion.master.ZoneAcceptOrRejectTraderKYCDocument
+
+@(zoneAcceptOrRejectTraderKYCDocumentForm: Form[ZoneAcceptOrRejectTraderKYCDocument.Data] = views.companion.master.ZoneAcceptOrRejectTraderKYCDocument.form, traderKYC: TraderKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
+<div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
+@form(action = routes.SetACLController.zoneAcceptOrRejectTraderKYCDocument, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    @CSRF.formField
+    @commonInputText(zoneAcceptOrRejectTraderKYCDocumentForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(zoneAcceptOrRejectTraderKYCDocumentForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonCheckbox(zoneAcceptOrRejectTraderKYCDocumentForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
+
+    @if(zoneAcceptOrRejectTraderKYCDocumentForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- zoneAcceptOrRejectTraderKYCDocumentForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <span class="red">@Messages(constants.View.ZONE_STATUS):
+        @traderKYC.zoneStatus match {
+            case Some(status: Boolean) => {
+                @if(status) {
+                    <span cmuk-icon="check"></span>
+                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                } else {
+                    <span cmuk-icon="close"></span>
+                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                }
+            }
+            case None => {
+                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+            }
+        }
+    </span>
+}
+</div>

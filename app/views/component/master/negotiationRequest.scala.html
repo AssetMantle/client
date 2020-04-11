@@ -7,6 +7,7 @@
 @(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
+    <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @tradableAssets.map { asset =>
@@ -16,7 +17,7 @@
         </ul>
     </div>
     @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'readonly -> true)
-
+    <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_COUNTER_PARTY)</div>
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @counterPartyTraders.map { trader =>

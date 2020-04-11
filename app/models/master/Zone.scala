@@ -64,13 +64,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-    }
-  }
+  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.headOption)
 
   private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -167,7 +161,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getOrNone(id: String): Future[Option[Zone]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
-    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+    def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
     def getByAccountID(accountID: String): Future[Zone] = findByAccountID(accountID).map(_.deserialize)
 

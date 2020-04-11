@@ -1,6 +1,6 @@
 function noActivity() {
     if ($(".recentActivityBox .notification").length === 1) {
-        $(".recentActivityBox").html("<p class='cmuk-position-center'>No Activities Found</p>");
+        $(".recentActivityBox").parent().html("<p class='cmuk-position-center'>No Activities Found</p>");
         $("head").append("<style>.timeline:before{height: 0%}</style>")
     }
 }

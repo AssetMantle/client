@@ -3,10 +3,8 @@
 
 @(negotiationFile: Option[NegotiationFile] = None, negotiationRequestID: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER.legend)</h4>
-</div>
 <div class="centerText">
+    <h4>@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER.legend)</h4>
         <div id="upload@documentType">
             <button onclick="getForm(jsRoutes.controllers.FileController.uploadZoneNegotiationForm('@documentType', '@negotiationRequestID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>

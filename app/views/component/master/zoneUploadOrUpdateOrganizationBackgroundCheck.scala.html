@@ -1,13 +1,12 @@
 @import controllers.actions.LoginState
 @import models.master.OrganizationBackgroundCheck
 @import models.master.Organization
+@import views.html.base._
 
 @(organizationBackgroundChecks: Seq[OrganizationBackgroundCheck], organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_BACKGROUND_CHECK)</h4>
-</div>
 <div class="centerText">
+    <h4>@Messages(constants.Form.ORGANIZATION_BACKGROUND_CHECK)</h4>
     @for(documentType <- constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm('@documentType', '@organization.id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
@@ -25,6 +24,7 @@
     }
 </div>
 
+@commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organization.id}'")
 @if(constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(organizationBackgroundChecks.map(_.documentType)).isEmpty) {
-    <button type="button" class="cmuk-button cmuk-button-primary" id="getOrganizationBackgroundCheckReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organization.id','@organization.zoneID'))">@Messages(constants.Form.NEXT)</button>
+    @commonFormButton(constants.Form.ACCEPT_ORGANIZATION_REQUEST, 'parameters -> s"'${organization.id}'")
 }

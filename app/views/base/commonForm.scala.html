@@ -1,4 +1,5 @@
 @import helper._
+@import views.html.base._
 
 @(formTemplate: constants.Form, formData: Form[_])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
@@ -17,6 +18,6 @@
             }
             </ul>
         }
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(formTemplate.submit)</button>
+        @commonJavascriptButton(formTemplate.submit, JavaScript("""submitForm(this)"""))
     </fieldset>
 }

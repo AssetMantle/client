@@ -7,11 +7,11 @@
     @notifications.map { notification =>
         <div class="timeline-item notification">
             <div class="timeline-icon">
-                <img src="@routes.Assets.versioned("./images/icons/contractIcon.svg")" alt="">
+                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-contract")"/></svg>
             </div>
             <div class="timeline-content right">
                 <div>
-                    <div class="textLineOverflow"><span class="cmuk-text-bolder">@notification.notificationTitle</span>
+                    <div class="textLineOverflow activityContent" title="@notification.notificationMessage"><span class="cmuk-text-bolder">@notification.notificationTitle</span>
                         @notification.notificationMessage</div>
                     <div class="notificationTime">@notification.time</div>
                 </div>
@@ -21,5 +21,6 @@
     <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
 </div>
 <script>
+@*    TODO @Puneet/Raju Correct this noActivity to correct name. noActivity is state not action*@
         noActivity()
 </script>

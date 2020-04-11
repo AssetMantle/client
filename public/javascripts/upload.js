@@ -2,10 +2,10 @@ function getFileTypes(documentType) {
     let fileTypes = [];
     switch (documentType) {
         case "PROFILE_PICTURE":
-            fileTypes = ['jpg', 'png', 'jpeg'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG'];
             break;
         default:
-            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG', 'pdf', 'doc', 'docx'];
             break;
     }
     return fileTypes

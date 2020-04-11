@@ -85,6 +85,10 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors
 
   private def getNegotiationsBySellerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.sellerAddress === address).result)
 
+  private def getNegotiationsByBuyerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerAddress.inSet(addresses)).result)
+
+  private def getNegotiationsBySellerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerAddress.inSet(addresses)).result)
+
   private def getNegotiationIDsByBuyerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address).map(_.id).result)
 
   private def getNegotiationIDsBySellerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation => negotiation.sellerAddress === address).map(_.id).result)
@@ -192,6 +196,18 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors
     def getNegotiationIDsForSellerAddress(address: String): Future[Seq[String]] = getNegotiationIDsBySellerAddress(address)
 
     def deleteNegotiations(pegHash: String): Future[Int] = deleteNegotiationsByPegHash(pegHash)
+
+    def getNegotiationsForBuyerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsByBuyerAddresses(addresses)
+
+    def getNegotiationsForSellerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsBySellerAddresses(addresses)
+
+    def negotiationCometSource(username: String) = {
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
+      Thread.sleep(cometActorSleepTime)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
+      source
+    }
   }
 
   object Utility {

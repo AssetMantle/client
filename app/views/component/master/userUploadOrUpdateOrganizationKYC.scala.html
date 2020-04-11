@@ -4,7 +4,7 @@
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <div class="centerText">
-    <h4 >@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
+    <h4>@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
@@ -21,7 +21,7 @@
         }
     }
 </div>
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
+<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.View.BACK)</button>
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
     <button type="button" class="cmuk-button cmuk-button-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userReviewAddOrganizationRequestForm())">@Messages(constants.Form.NEXT)</button>
 }

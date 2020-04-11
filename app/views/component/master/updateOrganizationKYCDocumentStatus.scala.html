@@ -4,7 +4,7 @@
 @import models.master.OrganizationKYC
 @import views.companion.master.UpdateOrganizationKYCDocumentStatus
 
-@(updateOrganizationKYCDocumentStatusForm: Form[UpdateOrganizationKYCDocumentStatus.Data] = UpdateOrganizationKYCDocumentStatus.form, organizationKYC: OrganizationKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(updateOrganizationKYCDocumentStatusForm: Form[UpdateOrganizationKYCDocumentStatus.Data] = UpdateOrganizationKYCDocumentStatus.form, organizationKYC: OrganizationKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(organizationKYC.id, organizationKYC.documentType).mkString("")">

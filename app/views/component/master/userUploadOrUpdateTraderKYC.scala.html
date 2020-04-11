@@ -2,11 +2,8 @@
 @import models.master.TraderKYC
 
 @(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.TRADER_KYC_FILES)</h4>
-</div>
 <div class="centerText">
+    <h4>@Messages(constants.Form.TRADER_KYC_FILES)</h4>
     @for(documentType <- constants.File.TRADER_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadTraderKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
@@ -23,7 +20,7 @@
         }
     }
 </div>
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.BACK)</button>
+<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.View.BACK)</button>
 
 @if(constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(traderKYCs.map(_.documentType)).isEmpty) {
     <button type="button" class="cmuk-button cmuk-button-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.userReviewAddTraderRequestForm())">@Messages(constants.Form.NEXT)</button>
