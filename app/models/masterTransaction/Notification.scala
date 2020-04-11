@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Database
-import models.common.Serializable.NotificationMessage
+import models.common.Serializable.ActivityMessage
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,7 +16,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Notification(id: String, accountID: String, title: String, message: NotificationMessage, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
+case class Notification(id: String, accountID: String, title: String, message: ActivityMessage, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
 
 @Singleton
 class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -38,7 +38,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
   private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
 
   case class NotificationSerializable(id: String, accountID: String, title: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
-    def deserialize(): Notification = Notification(id = id, accountID = accountID, title = title, message = utilities.JSON.convertJsonStringToObject[NotificationMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
+    def deserialize(): Notification = Notification(id = id, accountID = accountID, title = title, message = utilities.JSON.convertJsonStringToObject[ActivityMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
   }
 
   def serialize(notification: Notification): NotificationSerializable =  NotificationSerializable(id = notification.id, accountID = notification.accountID, title = notification.title, message = Json.toJson(notification.message).toString(), read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, timezone = notification.timezone)
@@ -113,7 +113,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def insert(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, title = notification.title, message = NotificationMessage(header = notification.message, parameters = parameters), read = false, createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
+    def insert(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, title = notification.title, message = ActivityMessage(header = notification.message, parameters = parameters), read = false, createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
     def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 

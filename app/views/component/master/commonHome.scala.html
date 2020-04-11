@@ -2,7 +2,6 @@
 @import views.html.base._
 @(coins: String = "0", profilePicture: Array[Byte] = Array())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="cmuk-width-1-2@@m profileDetails">
 @commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
 } {
     <div>
@@ -18,7 +17,6 @@
         </div>
     </div>
 }
-</div>
 <script>
         componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
 </script>

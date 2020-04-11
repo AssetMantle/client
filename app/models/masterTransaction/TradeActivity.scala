@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Database
-import models.common.Serializable.TradeActivityMessage
+import models.common.Serializable.ActivityMessage
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeActivity(id: String, negotiationID: String, title: String, message: TradeActivityMessage, read: Boolean = false, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
+case class TradeActivity(id: String, negotiationID: String, title: String, message: ActivityMessage, read: Boolean = false, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, timezone: String) extends Database
 
 @Singleton
 class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -37,7 +37,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
   private val notificationsPerPageLimit = configuration.get[Int]("notification.notificationsPerPage")
 
   case class TradeActivitySerializable(id: String, negotiationID: String, title: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, updatedOn: Option[Timestamp], updatedBy: Option[String], timezone: String) {
-    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, title = title, message = utilities.JSON.convertJsonStringToObject[TradeActivityMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
+    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, title = title, message = utilities.JSON.convertJsonStringToObject[ActivityMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, updatedBy = updatedBy, updatedOn = updatedOn, timezone = timezone)
   }
 
   def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, title = tradeActivity.title, message = Json.toJson(tradeActivity.message).toString(), read = tradeActivity.read, createdOn = tradeActivity.createdOn, createdBy = tradeActivity.createdBy, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, timezone = tradeActivity.timezone)
@@ -91,7 +91,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
   }
 
   object Service {
-    def insert(negotiationID: String, tradeActivity: constants.TradeActivity, parameters: String*): Future[String] = add(serialize(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, title = tradeActivity.title, message = TradeActivityMessage(header = tradeActivity.message, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
+    def insert(negotiationID: String, tradeActivity: constants.TradeActivity, parameters: String*): Future[String] = add(serialize(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, title = tradeActivity.title, message = ActivityMessage(header = tradeActivity.message, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, timezone = nodeTimezone)))
 
     def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPageLimit, limit = notificationsPerPageLimit).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
   }

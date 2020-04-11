@@ -32,17 +32,11 @@ object Serializable {
 
   implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
 
-  case class TradeActivityMessage(header: String, parameters: Seq[String])
+  case class ActivityMessage(header: String, parameters: Seq[String])
 
-  implicit val tradeActivityMessageReads: Reads[TradeActivityMessage] = Json.reads[TradeActivityMessage]
+  implicit val activityMessageReads: Reads[ActivityMessage] = Json.reads[ActivityMessage]
 
-  implicit val tradeActivityMessageWrites: OWrites[TradeActivityMessage] = Json.writes[TradeActivityMessage]
-
-  case class NotificationMessage(header: String, parameters: Seq[String])
-
-  implicit val notificationMessageReads: Reads[NotificationMessage] = Json.reads[NotificationMessage]
-
-  implicit val notificationMessageWrites: OWrites[NotificationMessage] = Json.writes[NotificationMessage]
+  implicit val activityMessageWrites: OWrites[ActivityMessage] = Json.writes[ActivityMessage]
 
   case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 
