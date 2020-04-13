@@ -62,14 +62,14 @@ class NotificationController @Inject()(
 
       (for {
         buyerTraderID <- buyerTraderID
-        sellerTraderID <- sellerTraderID
         buyerOrganizationID <- getOrganizationID(buyerTraderID)
-        sellerOrganizationID <- getOrganizationID(sellerTraderID)
         buyerZoneID <- getZoneID(buyerTraderID)
-        sellerZoneID <- getZoneID(sellerTraderID)
         buyerAccountID <- getTraderAccountID(buyerTraderID)
         buyerOrganizationAccountID <- getOrganizationAccountID(buyerOrganizationID)
         buyerZoneAccountID <- getZoneAccountID(buyerZoneID)
+        sellerTraderID <- sellerTraderID
+        sellerOrganizationID <- getOrganizationID(sellerTraderID)
+        sellerZoneID <- getZoneID(sellerTraderID)
         sellerAccountID <- getTraderAccountID(sellerTraderID)
         sellerOrganizationAccountID <- getOrganizationAccountID(sellerOrganizationID)
         sellerZoneAccountID <- getZoneAccountID(sellerZoneID)
