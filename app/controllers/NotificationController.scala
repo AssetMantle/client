@@ -29,33 +29,14 @@ class NotificationController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 
-  private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val accountNotifications = masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
-      val otherNotifications: Future[Seq[Notification]] = loginState.userType match {
-        case constants.User.ZONE => Future(Seq())
-        case constants.User.ORGANIZATION => {
-          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-
-          def getOrganizationTraders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
-
-          def getTradersNotifications(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getByAccountIDs(traderAccountIDs, pageNumber = pageNumber)
-
-          for {
-            organizationID <- organizationID
-            organizationTraders <- getOrganizationTraders(organizationID)
-            tradersNotifications <- getTradersNotifications(organizationTraders.map(_.accountID))
-          } yield tradersNotifications
-        }
-        case _ => Future(Seq())
-      }
+      val notifications = masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
 
       (for {
-        accountNotifications <- accountNotifications
-        otherNotifications <- otherNotifications
-      } yield Ok(views.html.component.master.recentActivityMessages(notifications = (accountNotifications ++ otherNotifications).sortWith((t1, t2) => t1.createdOn.compareTo(t2.createdOn) > 0).take(notificationsPerPage)))
+        notifications <- notifications
+      } yield Ok(views.html.component.master.recentActivityMessages(notifications = notifications))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
