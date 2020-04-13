@@ -35,7 +35,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.headOption.asTry).map {
+  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -43,7 +43,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.headOption.asTry).map {
+  private def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -59,7 +59,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  def findEmailAddressById(id: String, emailAddressVerified: Boolean): Future[Option[String]] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified === emailAddressVerified).map(_.emailAddress).result.headOption.asTry).map {
+  private def findEmailAddressById(id: String, emailAddressVerified: Boolean): Future[Option[String]] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified === emailAddressVerified).map(_.emailAddress).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

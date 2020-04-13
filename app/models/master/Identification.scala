@@ -63,7 +63,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  def getByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption)
+  private def getByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption)
 
   private def tryGetByAccountID(accountID: String): Future[IdentificationSerialized] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
@@ -73,7 +73,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  def getVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(identificationTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
+  private def getVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(identificationTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
