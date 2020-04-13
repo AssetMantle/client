@@ -35,21 +35,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.headOption.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.headOption)
 
-  private def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.headOption.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.headOption)
 
   private def tryGetEmailAddressById(id: String, emailAddressVerified: Boolean): Future[String] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified === emailAddressVerified).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
@@ -59,15 +47,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findEmailAddressById(id: String, emailAddressVerified: Boolean): Future[Option[String]] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified === emailAddressVerified).map(_.emailAddress).result.headOption.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def getEmailAddressById(id: String, emailAddressVerified: Boolean): Future[Option[String]] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified === emailAddressVerified).map(_.emailAddress).result.headOption)
 
-  private def findMobileNumberById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.mobileNumber).result.head.asTry).map {
+  private def tryGetMobileNumberById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.mobileNumber).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -75,7 +57,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findAccountIDByEmailAddress(emailAddress: String): Future[String] = db.run(contactTable.filter(_.emailAddress === emailAddress).map(_.id).result.head.asTry).map {
+  private def tryGetAccountIDByEmailAddress(emailAddress: String): Future[String] = db.run(contactTable.filter(_.emailAddress === emailAddress).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -102,7 +84,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.mobileNumberVerified).update(verificationStatus).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match{
+      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _=>  result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -110,7 +96,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateEmailAddressVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.emailAddressVerified).update(verificationStatus).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match{
+      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _=>  result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -118,7 +108,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateEmailAddressAndStatusByID(id: String, emailAddress: String, emailAddressVerified: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(x => (x.emailAddress, x.emailAddressVerified)).update((emailAddress, emailAddressVerified)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match{
+      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _=>  result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -126,7 +120,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateMobileNumberAndStatusByID(id: String, mobileNumber: String, mobileNumberVerified: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(x => (x.mobileNumber, x.mobileNumberVerified)).update((mobileNumber, mobileNumberVerified)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match{
+      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _=>  result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -171,11 +169,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def tryGetVerifiedEmailAddress(id: String): Future[String] = tryGetEmailAddressById(id = id, emailAddressVerified = true)
 
-    def getVerifiedEmailAddress(id: String): Future[Option[String]] = findEmailAddressById(id = id, emailAddressVerified = true)
+    def getVerifiedEmailAddress(id: String): Future[Option[String]] = getEmailAddressById(id = id, emailAddressVerified = true)
 
     def tryGetUnverifiedEmailAddress(id: String): Future[String] = tryGetEmailAddressById(id = id, emailAddressVerified = false)
 
-    def tryGetMobileNumber(id: String): Future[String] = findMobileNumberById(id)
+    def tryGetMobileNumber(id: String): Future[String] = tryGetMobileNumberById(id)
 
     def checkEmailAddressUnavailableForUser(emailAddress: String, id: String): Future[Boolean] = checkEmailAddressUnavailableForUserByID(emailAddress, id)
 

@@ -48,18 +48,26 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
   }
 
   private def updateVerificationStatusByAccountID(accountID: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(identificationTable.filter(_.accountID === accountID).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+    case Success(result) => result match{
+      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _=>  result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
   private def updateCompletionStatusByAccountID(accountID: String, completionStatus: Boolean): Future[Int] = db.run(identificationTable.filter(_.accountID === accountID).map(_.completionStatus).update(completionStatus).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+    case Success(result) => result match{
+      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _=>  result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -73,11 +81,11 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(identificationTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
+  private def tryGetVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(identificationTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -127,7 +135,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def tryGetName(accountID: String): Future[String] = tryGetByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 
-    def getVerificationStatus(accountID: String): Future[Option[Boolean]] = getVerificationStatusByAccountID(accountID)
+    def getVerificationStatus(accountID: String): Future[Option[Boolean]] = tryGetVerificationStatusByAccountID(accountID)
   }
 
 }
