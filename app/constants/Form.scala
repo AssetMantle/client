@@ -7,6 +7,7 @@ import play.api.routing.JavaScriptReverseRoute
 class Form(template: String, val route: Call, val get: JavaScriptReverseRoute) {
   val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
   val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
+  val button: String = Seq("FORM", template, "BUTTON").mkString(".")
 }
 
 object Form {
