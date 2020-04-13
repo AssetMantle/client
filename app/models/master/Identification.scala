@@ -65,7 +65,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   def getByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption)
 
-  private def tryGetByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
+  private def tryGetByAccountID(accountID: String): Future[IdentificationSerialized] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)

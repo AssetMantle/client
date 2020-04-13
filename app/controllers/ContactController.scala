@@ -8,7 +8,7 @@ import models.master
 import models.master.Contact
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
 import views.companion.master.UpdateContact
 
@@ -52,11 +52,10 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           Future(BadRequest(views.html.component.master.updateContact(formWithErrors)))
         },
         updateContactData => {
-
           val emailAddressUnavailableForUser = masterContacts.Service.checkEmailAddressUnavailableForUser(updateContactData.emailAddress, loginState.username)
           val mobileNumberUnavailableForUser = masterContacts.Service.checkMobileNumberUnavailableForUser(updateContactData.countryCode + updateContactData.mobileNumber, loginState.username)
 
-          def getResult(emailAddressUnavailableForUser: Boolean, mobileNumberUnavailableForUser: Boolean) = {
+          def getResult(emailAddressUnavailableForUser: Boolean, mobileNumberUnavailableForUser: Boolean): Future[Result] = {
             if (emailAddressUnavailableForUser && mobileNumberUnavailableForUser) {
               Future(BadRequest(views.html.component.master.updateContact(views.companion.master.UpdateContact.form.fill(value = views.companion.master.UpdateContact.Data(emailAddress = updateContactData.emailAddress, mobileNumber = updateContactData.mobileNumber, countryCode = updateContactData.countryCode)).withError(constants.FormField.EMAIL_ADDRESS.name, constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE.message).withError(constants.FormField.MOBILE_NUMBER.name, constants.Response.MOBILE_NUMBER_ALREADY_IN_USE.message))))
             }
