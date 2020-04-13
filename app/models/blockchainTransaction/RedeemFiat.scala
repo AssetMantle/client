@@ -24,7 +24,7 @@ case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int, sta
 @Singleton
 class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionRedeemFiat: transactions.RedeemFiat, blockchainFiats: blockchain.Fiats, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
+  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

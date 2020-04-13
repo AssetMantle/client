@@ -18,7 +18,7 @@ class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvi
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_ORGANIZATION_BANK_ACCOUNT_DETAIL
+  private implicit val module: String = constants.Module.MASTER_ORGANIZATION_BANK_ACCOUNT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

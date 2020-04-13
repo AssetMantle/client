@@ -22,7 +22,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_FIAT_REQUESTS
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_FIAT_REQUEST
 
   import databaseConfig.profile.api._
 

@@ -26,7 +26,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_ORGANIZATION_KYC
+  private implicit val module: String = constants.Module.MASTER_TRADER_KYC
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
