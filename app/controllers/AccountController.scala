@@ -5,9 +5,9 @@ import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.{ACL, ACLAccount}
+import models.blockchain.ACL
 import models.common.Serializable.Address
-import models.master.{Identification, Organization, Zone}
+import models.master.Identification
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
@@ -15,7 +15,6 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import services.SFTPScheduler
 import views.companion.master.AddIdentification.AddressData
-import views.companion.master.Identification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -312,10 +311,13 @@ class AccountController @Inject()(
         case None => withUsernameToken.Ok(views.html.component.master.addIdentification())
       }
 
-      for {
+      (for {
         identification <- identification
         result <- getResult(identification)
       } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
   }
 
   def addIdentification(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

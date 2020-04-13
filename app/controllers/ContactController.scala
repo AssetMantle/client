@@ -54,7 +54,6 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         updateContactData => {
 
           val emailAddressUnavailableForUser = masterContacts.Service.checkEmailAddressUnavailableForUser(updateContactData.emailAddress, loginState.username)
-
           val mobileNumberUnavailableForUser = masterContacts.Service.checkMobileNumberUnavailableForUser(updateContactData.countryCode + updateContactData.mobileNumber, loginState.username)
 
           def getResult(emailAddressUnavailableForUser: Boolean, mobileNumberUnavailableForUser: Boolean) = {
@@ -78,9 +77,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
                     for {
                       _ <- updateEmailAddress
                       _ <- updateMobileNumber
-                    } yield {
-                      0
-                    }
+                    } yield 0
                   }
                   case None => masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
                 }

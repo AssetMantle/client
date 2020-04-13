@@ -43,11 +43,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def findByEmailAddress(emailAddress: String): Future[Option[Contact]] = db.run(contactTable.filter(_.emailAddress === emailAddress).result.headOption.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -106,8 +106,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -116,8 +114,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -126,8 +122,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -136,8 +130,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -189,9 +181,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def checkMobileNumberUnavailableForUser(mobileNumber: String, id: String): Future[Boolean] = checkMobileNumberUnavailableForUserByID(mobileNumber, id)
 
-    def updateEmailAddressAndStatus(id: String, emailAddress: String): Future[Int]  = updateEmailAddressAndStatusByID(id = id, emailAddress = emailAddress, emailAddressVerified = false)
+    def updateEmailAddressAndStatus(id: String, emailAddress: String): Future[Int] = updateEmailAddressAndStatusByID(id = id, emailAddress = emailAddress, emailAddressVerified = false)
 
-    def updateMobileNumberAndStatus(id: String, mobileNumber: String): Future[Int]  = updateMobileNumberAndStatusByID(id = id, mobileNumber = mobileNumber, mobileNumberVerified = false)
+    def updateMobileNumberAndStatus(id: String, mobileNumber: String): Future[Int] = updateMobileNumberAndStatusByID(id = id, mobileNumber = mobileNumber, mobileNumberVerified = false)
   }
 
 }

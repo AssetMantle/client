@@ -27,6 +27,6 @@ object AddIdentification {
 
   case class AddressData(addressLine1: String, addressLine2: String, landmark: Option[String], city: String, country: String, zipCode: String, phone: String)
 
-  case class Data(firstName: String, lastName:String, dateOfBirth: Date, idNumber: String, idType: String, address: AddressData)
+  case class Data(firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: AddressData)
 
 }
