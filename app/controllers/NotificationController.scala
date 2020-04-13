@@ -29,7 +29,6 @@ class NotificationController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 
-
   def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val notifications = masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
