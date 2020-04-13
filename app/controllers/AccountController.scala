@@ -6,7 +6,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.{ACL, ACLAccount}
-import models.master.{Identification, Organization, Zone}
+import models.master.{Account, Identification, Organization, Zone}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
@@ -111,9 +111,16 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
-        val userType = masterAccounts.Service.getUserType(loginData.username)
-        val address = masterAccounts.Service.getAddress(loginData.username)
-        val status = masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password)
+        val status = masterAccounts.Service.validateLoginAndGetStatus(username = loginData.username, password = loginData.password)
+
+        def account: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
+
+        def updateUserType(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
+          val updateWithoutLogin = masterAccounts.Service.updateUserType(id = loginData.username, userType = constants.User.USER)
+          for {
+            _ <- updateWithoutLogin
+          } yield constants.User.USER
+        } else Future(oldUserType)
 
         def getLoginState(address: String, userType: String): Future[LoginState] = {
           if (userType == constants.User.TRADER) {
@@ -124,8 +131,8 @@ class AccountController @Inject()(
             for {
               aclHash <- aclHash
               acl <- acl(aclHash)
-            } yield LoginState(loginData.username, userType, address, Option(acl))
-          } else Future(LoginState(loginData.username, userType, address, None))
+            } yield LoginState(username = loginData.username, userType = userType, address = address, acl = Option(acl))
+          } else Future(LoginState(username = loginData.username, userType = userType, address = address, acl = None))
         }
 
         def sendNotification(loginState: LoginState): Future[Unit] = {
@@ -133,30 +140,25 @@ class AccountController @Inject()(
           for {
             _ <- pushNotificationTokenUpdate
             _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
-          } yield {}
+          } yield Unit
         }
 
         def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
-          implicit val loginState = loginStateValue
+          implicit val loginState: LoginState = loginStateValue
           val contactWarnings = utilities.Contact.getWarnings(status)
           loginState.userType match {
-            case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.USER)
-              for {
-                _ <- updateUserType
-                result <- withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
-              } yield result
             case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
             case _ => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
           }
         }
 
         (for {
-          userType <- userType
-          address <- address
-          loginState <- getLoginState(address, userType)
           status <- status
+          account <- account
+          userType <- updateUserType(account.userType)
+          loginState <- getLoginState(address = account.accountAddress, userType = userType)
           _ <- sendNotification(loginState)
-          result <- getResult(status, loginState)
+          result <- getResult(status = status, loginStateValue = loginState)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

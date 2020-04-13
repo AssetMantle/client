@@ -201,9 +201,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)).map { _ => accountAddress }
     }
 
-    def getAccount(username: String): Account = Await.result(findById(username), Duration.Inf)
-
-    def getAccountAsync(username: String): Future[Account] = findById(username)
+    def tryGet(username: String): Future[Account] = findById(username)
 
     def getLanguage(id: String): String = Await.result(getLanguageById(id), Duration.Inf)
 
