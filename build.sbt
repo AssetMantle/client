@@ -24,17 +24,17 @@ scalaVersion := "2.12.11"
 
 libraryDependencies ++= Seq(ehcache, ws, specs2 % Test, guice)
 
-libraryDependencies += "com.typesafe.play" %% "play-slick" % "3.0.1"
+libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
 
-libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.1"
+libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
 
-libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.2.8"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.0"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "8.0.0"
 
-libraryDependencies += "com.twilio.sdk" % "twilio" % "7.15.5"
+libraryDependencies += "com.twilio.sdk" % "twilio" % "7.49.0"
 
 libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.1.1" % "test"
 
@@ -48,8 +48,8 @@ libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-io-extra" % "2.1.8"
 
 libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.8"
 
-libraryDependencies += "commons-codec" % "commons-codec" % "1.11"
+libraryDependencies += "commons-codec" % "commons-codec" % "1.14"
 
 libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "1.1.2"
 
-libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.64"
+libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.65"
