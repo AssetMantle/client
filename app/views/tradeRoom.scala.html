@@ -23,7 +23,13 @@
                     ),
                         'VIEW_TERMS_PARAMETERS -> s"'${id}'")
                 }
-                case constants.User.ZONE => {}
+                case constants.User.ZONE => {
+                    @commonHorizontalSwitcher(ListMap(
+                        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.zoneViewAcceptedNegotiation,
+                        constants.View.VIEW_DOCUMENTS -> commonCard(constants.View.VIEW_DOCUMENTS)(Html(""))(Html("")),
+                    ),
+                        'VIEW_TERMS_PARAMETERS -> s"'${id}'")
+                }
                 case _ => {}
             }
         </div>

@@ -170,6 +170,7 @@ GET         /component/zoneViewRejectedOrganizationRequest                      
 
 GET         /component/zoneViewAcceptedNegotiationList                                      controllers.ComponentViewController.zoneViewAcceptedNegotiationList
 GET         /component/zoneViewRecentActivityForTradeRoom                                      controllers.ComponentViewController.zoneViewRecentActivityForTradeRoom(pageNumber: Int, negotiationID: String)
+GET         /component/zoneViewAcceptedNegotiation                                        controllers.ComponentViewController.zoneViewAcceptedNegotiation(id: String)
 
 GET         /component/organizationSubscription                                             controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                   controllers.ComponentViewController.traderSubscription

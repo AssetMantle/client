@@ -1058,4 +1058,28 @@ class ComponentViewController @Inject()(
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
+
+  def zoneViewAcceptedNegotiation(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(id)
+      def traderZoneIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetZoneIDs(traderIDs)
+      def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
+
+      def getResult(zoneID: String, traderZoneIDs: Seq[String], negotiation: Negotiation, asset: Asset): Result = if (traderZoneIDs contains zoneID) {
+        Ok(views.html.component.master.zoneViewAcceptedNegotiation(negotiation = negotiation, asset = asset))
+      } else {
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+
+      (for {
+        zoneID <- zoneID
+        negotiation <- negotiation
+        traderZoneIDs <- traderZoneIDs(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
+        asset <- getAsset(negotiation.assetID)
+      } yield getResult(zoneID = zoneID, traderZoneIDs = traderZoneIDs, negotiation = negotiation, asset = asset)
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+      }
+  }
 }
