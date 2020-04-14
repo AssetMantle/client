@@ -118,9 +118,9 @@ class AccountController @Inject()(
         def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
 
         def firstLoginUserTypeUpdate(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
-          val updateWithoutLogin = masterAccounts.Service.updateUserType(id = loginData.username, userType = constants.User.USER)
+          val markUserTypeUser = masterAccounts.Service.markUserTypeUser(id = loginData.username)
           for {
-            _ <- updateWithoutLogin
+            _ <- markUserTypeUser
           } yield constants.User.USER
         } else Future(oldUserType)
 

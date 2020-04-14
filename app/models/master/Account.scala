@@ -213,9 +213,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddress(id: String): Future[String] = getAddressById(id)
 
-    def updateUserType(id: String, userType: String): Future[Int] = updateUserTypeById(id, userType)
+    def markUserTypeTrader(id: String): Future[Int] = updateUserTypeById(id, constants.User.TRADER)
 
-    def updateUserTypeOnAddress(address: String, userType: String): Future[Int] = updateUserTypeByAddress(address, userType)
+    def markUserTypeZone(id: String): Future[Int] = updateUserTypeById(id, constants.User.ZONE)
+
+    def markUserTypeOrganization(id: String): Future[Int] = updateUserTypeById(id, constants.User.ORGANIZATION)
+
+    def markUserTypeUser(id: String): Future[Int] = updateUserTypeById(id, constants.User.USER)
 
     def getUserType(id: String): Future[String] = getUserTypeById(id)
 
