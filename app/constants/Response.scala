@@ -144,6 +144,8 @@ object Response {
   val UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE = new Failure("UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE")
   val ASSET_PEG_NOT_FOUND = new Failure("ASSET_PEG_NOT_FOUND")
   val CHAT_ROOM_NOT_FOUND = new Failure("CHAT_ROOM_NOT_FOUND")
+  val ALL_NEGOTIATION_TERMS_NOT_CONFIRMED = new Failure("ALL_NEGOTIATION_TERMS_NOT_CONFIRMED")
+  val ALL_NEGOTIATION_TERMS_CONFIRMED = new Failure("ALL_NEGOTIATION_TERMS_CONFIRMED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

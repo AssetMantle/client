@@ -150,6 +150,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def findTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = db.run(traderTable.filter(_.zoneID === zoneID).map(_.id).result)
 
+  private def findTraderIDsByOrganizationID(organizationID: String): Future[Seq[String]] = db.run(traderTable.filter(_.organizationID === organizationID).map(_.id).result)
+
   private def checkOrganizationIDTraderIDExists(traderID: String, organizationID: String): Future[Boolean] = db.run(traderTable.filter(_.id === traderID).filter(_.organizationID === organizationID).exists.result)
 
   private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(traderTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
@@ -267,6 +269,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = getTradersByTraderIDs(traderIDs)
 
     def getTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = findTraderIDsByZoneID(zoneID)
+
+    def getTraderIDsByOrganizationID(organizationID: String): Future[Seq[String]] = findTraderIDsByOrganizationID(organizationID)
   }
 
 }

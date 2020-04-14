@@ -1,0 +1,96 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(buyerRejectedNegotiationList: Seq[Negotiation], sellerRejectedNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+<div class="cmuk-text-left title">@Messages(constants.View.BUYER_REJECTED_NEGOTIATION_LIST)</div>
+@buyerRejectedNegotiationList.map { buyerRejectedNegotiation =>
+    <li class="commonList">
+        @defining(traders.find(_.id == buyerRejectedNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
+            @organizationTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_ID, buyerRejectedNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @defining(counterPartyTraders.find(_.id == buyerRejectedNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.Form.SELLER_TRADER_ID, buyerRejectedNegotiation.sellerTraderID)
+                }
+            }
+        }
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, buyerRejectedNegotiation.assetDescription)
+        @commonVerticalIntInfo(constants.View.PRICE, buyerRejectedNegotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(buyerRejectedNegotiation.quantity.toString, buyerRejectedNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.COMMENT, buyerRejectedNegotiation.comment.getOrElse(""))
+    </li>
+}
+<div class="cmuk-text-left title">@Messages(constants.View.SELLER_REJECTED_NEGOTIATION_LIST)</div>
+@sellerRejectedNegotiationList.map { sellerRejectedNegotiation =>
+    <li class="commonList">
+        @defining(traders.find(_.id == sellerRejectedNegotiation.sellerTraderID)) { organizationTrader: Option[Trader] =>
+            @organizationTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.SELLER_TRADER_ID, sellerRejectedNegotiation.sellerTraderID)
+                }
+            }
+        }
+        @defining(counterPartyTraders.find(_.id == sellerRejectedNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_ID, sellerRejectedNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, sellerRejectedNegotiation.assetDescription)
+        @commonVerticalIntInfo(constants.View.PRICE, sellerRejectedNegotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellerRejectedNegotiation.quantity.toString, sellerRejectedNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.COMMENT, sellerRejectedNegotiation.comment.getOrElse(""))
+    </li>
+}
+<div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
+@failedNegotiationList.map { failedNegotiation =>
+    <li class="commonList">
+        @defining(traders.find(_.id == failedNegotiation.sellerTraderID)) { organizationTrader: Option[Trader] =>
+            @organizationTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.SELLER_TRADER_ID, failedNegotiation.sellerTraderID)
+                }
+            }
+        }
+        @defining(counterPartyTraders.find(_.id == failedNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_ID, failedNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, failedNegotiation.assetDescription)
+        @commonVerticalIntInfo(constants.View.PRICE, failedNegotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(failedNegotiation.quantity.toString, failedNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.STATUS, failedNegotiation.status)
+    </li>
+}

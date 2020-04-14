@@ -67,6 +67,14 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
 
+  private val uploadTraderNegotiationOBLPath: String = configuration.get[String]("upload.negotiation.obl")
+
+  private val uploadTraderNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
+
+  private val uploadTraderNegotiationInsurancePath: String = configuration.get[String]("upload.negotiation.insurance")
+
+  private val uploadTraderNegotiationOtherPath: String = configuration.get[String]("upload.negotiation.other")
+
   private val uploadTraderNegotiationBuyerContractPath: String = configuration.get[String]("upload.negotiation.buyerContract")
 
   private val uploadTraderNegotiationSellerContractOtherPath: String = configuration.get[String]("upload.negotiation.sellerContract")
@@ -142,6 +150,10 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.SELLER_CONTRACT => uploadTraderNegotiationSellerContractOtherPath
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
+      case constants.File.OBL => uploadTraderNegotiationOBLPath
+      case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
+      case constants.File.INSURANCE => uploadTraderNegotiationInsurancePath
+      case constants.File.OTHER => uploadTraderNegotiationOtherPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }

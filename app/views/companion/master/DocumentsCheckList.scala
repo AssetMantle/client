@@ -7,13 +7,14 @@ object DocumentsCheckList {
   val form = Form(
     mapping(
       constants.FormField.ID.name -> constants.FormField.ID.field,
-      constants.FormField.BILL_OF_EXCHANGE.name -> constants.FormField.BILL_OF_EXCHANGE.field,
+      constants.FormField.BILL_OF_EXCHANGE_REQUIRED.name -> constants.FormField.BILL_OF_EXCHANGE_REQUIRED.field,
+      constants.FormField.OBL.name -> constants.FormField.OBL.field,
       constants.FormField.COO.name -> constants.FormField.COO.field,
       constants.FormField.COA.name -> constants.FormField.COA.field,
       constants.FormField.OTHER_DOCUMENTS.name -> optional(constants.FormField.OTHER_DOCUMENTS.field),
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, billOfExchange: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String])
+  case class Data(id: String, billOfExchangeRequired: Boolean, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String])
 
 }

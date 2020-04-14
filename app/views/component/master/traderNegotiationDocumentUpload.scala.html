@@ -1,0 +1,34 @@
+
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.IssueAssetOBL
+@import models.masterTransaction.NegotiationFile
+
+@(id: String, negotiationFiles: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="centerText">
+    @for(documentType <- constants.File.TRADER_NEGOTIATION_DOCUMENTS) {
+        <div id="upload@documentType">
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(file <- negotiationFiles) {
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.tradingFile(id, file.fileName, file.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@file.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+            @file.documentType match{
+                case constants.File.OBL=>{@commonFormButton(constants.Form.OBL_DETAILS, 'parameters -> s"'${id}'")}
+                case constants.File.INVOICE=>{@commonFormButton(constants.Form.INVOICE_DETAILS, 'parameters -> s"'${id}'")}
+                case _=>{}
+            }
+            <script>hideElement('upload@file.documentType')</script>
+        }
+    }
+</div>
+
+@if(constants.File.TRADER_NEGOTIATION_DOCUMENTS.forall(negotiationFiles.map(_.documentType).contains)) {
+    <td><li><a href="@controllers.routes.ViewController.tradeRoom(id)">@Messages(constants.Form.SUBMIT)</a></li></td>
+}

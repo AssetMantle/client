@@ -5,7 +5,7 @@
 @(documentsCheckListForm: Form[DocumentsCheckList.Data] = DocumentsCheckList.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.NEGOTIATION_DOCUMENTS_CHECKLIST, documentsCheckListForm) {
     @commonInputText(documentsCheckListForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonCheckbox(documentsCheckListForm, constants.FormField.BILL_OF_EXCHANGE)
+    @commonCheckbox(documentsCheckListForm, constants.FormField.BILL_OF_EXCHANGE_REQUIRED)
     @commonCheckbox(documentsCheckListForm, constants.FormField.COO)
     @commonCheckbox(documentsCheckListForm, constants.FormField.COA)
     @commonInputText(documentsCheckListForm, constants.FormField.OTHER_DOCUMENTS, 'required -> false)

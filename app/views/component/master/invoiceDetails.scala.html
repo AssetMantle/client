@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction
+@import views.companion.master.InvoiceDetails
+
+@(invoiceDetailsForm: Form[InvoiceDetails.Data] = InvoiceDetails.form, id:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@commonForm(constants.Form.INVOICE_DETAILS, invoiceDetailsForm) {
+    @commonInputText(invoiceDetailsForm, constants.FormField.ID, 'value -> id,'containerDivClass -> "hidden")
+    @commonInputText(invoiceDetailsForm, constants.FormField.INVOICE_NUMBER)
+    @commonInputDate(invoiceDetailsForm, constants.FormField.INVOICE_DATE)
+}
+

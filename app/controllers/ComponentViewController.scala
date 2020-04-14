@@ -30,6 +30,7 @@ class ComponentViewController @Inject()(
                                          blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories,
                                          masterTransactionNotifications: masterTransaction.Notifications,
                                          masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                         masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          masterNegotiations: master.Negotiations,
                                          masterAccounts: master.Accounts,
                                          masterAccountFiles: master.AccountFiles,
@@ -286,6 +287,165 @@ class ComponentViewController @Inject()(
         assetsList <- assetsList(buyerRejectedNegotiationList.map(_.assetID) ++ sellerRejectedNegotiationList.map(_.assetID) ++ failedNegotiationList.map(_.assetID))
         counterPartyTraders <- counterPartyTraders(buyerRejectedNegotiationList.map(_.buyerTraderID) ++ sellerRejectedNegotiationList.map(_.buyerTraderID) ++ failedNegotiationList.map(_.buyerTraderID))
       } yield Ok(views.html.component.master.traderViewRejectedOrFailedNegotiationList(rejectedNegotiationList = buyerRejectedNegotiationList ++ sellerRejectedNegotiationList, failedNegotiationList = failedNegotiationList, assets = assetsList, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewAcceptedNegotiationList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.organizationViewAcceptedNegotiationList())
+  }
+
+  def organizationViewAcceptedBuyNegotiationList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID= masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationTradersIDs(organizationID: String)= masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def buyNegotiationList(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs)
+
+      def getTraders(traderIDs: Seq[String])= masterTraders.Service.getTraders(traderIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        organizationTradersIDs<-getOrganizationTradersIDs(organizationID)
+        buyNegotiationList <- buyNegotiationList(organizationTradersIDs)
+        traders <- getTraders(organizationTradersIDs)
+        counterPartyTraders <- counterPartyTraders(buyNegotiationList.map(_.sellerTraderID))
+      } yield Ok(views.html.component.master.organizationViewAcceptedBuyNegotiationList(buyNegotiationList = buyNegotiationList, traders = traders, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewAcceptedSellNegotiationList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID= masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationTradersIDs(organizationID: String)= masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def sellNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllAcceptedSellNegotiationListByTraderIDs(traderIDs)
+
+      def getTraders(traderIDs: Seq[String])= masterTraders.Service.getTraders(traderIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        organizationTradersIDs<-getOrganizationTradersIDs(organizationID)
+        sellNegotiationList <- sellNegotiationList(organizationTradersIDs)
+        traders <- getTraders(organizationTradersIDs)
+        counterPartyTraders <- counterPartyTraders(sellNegotiationList.map(_.buyerTraderID))
+      } yield Ok(views.html.component.master.organizationViewAcceptedSellNegotiationList(sellNegotiationList = sellNegotiationList, traders = traders, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewSentReceivedIncompleteRejectedFailedNegotiationList: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList())
+  }
+
+  def organizationViewSentNegotiationRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val organizationID= masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationTradersIDs(organizationID: String)= masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def sentNegotiationRequestList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllSentNegotiationRequestListByTraderIDs(traderIDs)
+
+      def getTraders(traderIDs: Seq[String])= masterTraders.Service.getTraders(traderIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        organizationTradersIDs<-getOrganizationTradersIDs(organizationID)
+        sentNegotiationRequestList <- sentNegotiationRequestList(organizationTradersIDs)
+        traders <- getTraders(organizationTradersIDs)
+        counterPartyTraders <- counterPartyTraders(sentNegotiationRequestList.map(_.buyerTraderID))
+      } yield Ok(views.html.component.master.organizationViewSentNegotiationRequestList(sentNegotiationRequestList = sentNegotiationRequestList, traders = traders, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewReceivedNegotiationList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID= masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationTradersIDs(organizationID: String)= masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def receivedNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllReceivedNegotiationListByTraderIDs(traderIDs)
+
+      def getTraders(traderIDs: Seq[String])= masterTraders.Service.getTraders(traderIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        organizationTradersIDs<-getOrganizationTradersIDs(organizationID)
+        receivedNegotiationList <- receivedNegotiationList(organizationTradersIDs)
+        traders <- getTraders(organizationTradersIDs)
+        counterPartyTraders <- counterPartyTraders(receivedNegotiationList.map(_.sellerTraderID))
+      } yield Ok(views.html.component.master.organizationViewReceivedNegotiationList(receivedNegotiationList = receivedNegotiationList, traders = traders, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewIncompleteNegotiationList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID= masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationTradersIDs(organizationID: String)= masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def incompleteNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllIncompleteNegotiationListByTraderIDs(traderIDs)
+
+      def getTraders(traderIDs: Seq[String])= masterTraders.Service.getTraders(traderIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        organizationTradersIDs<-getOrganizationTradersIDs(organizationID)
+        incompleteNegotiationList <- incompleteNegotiationList(organizationTradersIDs)
+        traders <- getTraders(organizationTradersIDs)
+        counterPartyTraders <- counterPartyTraders(incompleteNegotiationList.map(_.buyerTraderID))
+      } yield Ok(views.html.component.master.organizationViewIncompleteNegotiationList(incompleteNegotiationList = incompleteNegotiationList, traders = traders, counterPartyTraders = counterPartyTraders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewRejectedOrFailedNegotiationList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID= masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationTradersIDs(organizationID: String)= masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def buyerRejectedNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllRejectedNegotiationListByBuyerTraderIDs(traderIDs)
+
+      def sellerRejectedNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllRejectedNegotiationListBySellerTraderIDs(traderIDs)
+
+      def failedNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllFailedNegotiationListBySellerTraderIDs(traderIDs)
+
+      def getTraders(traderIDs: Seq[String])= masterTraders.Service.getTraders(traderIDs)
+
+      def counterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        organizationTradersIDs<-getOrganizationTradersIDs(organizationID)
+        buyerRejectedNegotiationList <- buyerRejectedNegotiationList(organizationTradersIDs)
+        sellerRejectedNegotiationList <- sellerRejectedNegotiationList(organizationTradersIDs)
+        failedNegotiationList <- failedNegotiationList(organizationTradersIDs)
+        traders <- getTraders(organizationTradersIDs)
+        counterPartyTraders <- counterPartyTraders(buyerRejectedNegotiationList.map(_.sellerTraderID) ++ sellerRejectedNegotiationList.map(_.buyerTraderID) ++ failedNegotiationList.map(_.buyerTraderID))
+      } yield Ok(views.html.component.master.organizationViewRejectedOrFailedNegotiationList(buyerRejectedNegotiationList = buyerRejectedNegotiationList, sellerRejectedNegotiationList=sellerRejectedNegotiationList, failedNegotiationList = failedNegotiationList, traders = traders, counterPartyTraders = counterPartyTraders))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -634,13 +794,23 @@ class ComponentViewController @Inject()(
 
   def traderViewAcceptedNegotiation(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val traderID= masterTraders.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(id)
+      for{
+        traderID <- traderID
+        negotiation <- negotiation
+      }yield Ok(views.html.component.master.traderViewAcceptedNegotiation(id=id, traderID=traderID, negotiation=negotiation))
+  }
+
+  def traderViewAcceptedNegotiationTerms(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
       def getResult(traderID: String, negotiation: Negotiation, asset: Asset): Result = if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
-        Ok(views.html.component.master.traderViewAcceptedNegotiation(traderID = traderID, negotiation = negotiation, asset = asset))
+        Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, asset = asset))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -653,6 +823,51 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
+  }
+
+
+  def viewNegotiationFiles(id:String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID= masterTraders.Service.tryGetID(loginState.username)
+      def checkTraderNegotiationExists(traderID :String)= masterNegotiations.Service.checkTraderNegotiationExists(id, traderID )
+
+      def  getResult(traderNegotiationExists:Boolean)={
+        if(traderNegotiationExists){
+          val negotiationFiles= masterTransactionNegotiationFiles.Service.getAllDocuments(id)
+          for{
+            negotiationFiles<-negotiationFiles
+          }yield Ok(views.html.component.master.negotiationDocumentList(id= id, files= negotiationFiles))
+        }else{
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
+
+      (for{
+        traderID<-traderID
+        checkTraderNegotiationExists<-checkTraderNegotiationExists(traderID)
+        result<- getResult(checkTraderNegotiationExists)
+      }yield result
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewNegotiationFile(id:String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val negotiationFile = masterTransactionNegotiationFiles.Service.getOrNone(id,documentType)
+      for{
+        negotiationFile<-negotiationFile
+      }yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationFile))
+  }
+
+  def tradeDocumentList(id:String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID= masterTraders.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(id)
+      for{
+        traderID<-traderID
+        negotiation<-negotiation
+      }yield Ok(views.html.component.master.tradeDocumentList(id, traderID, negotiation))
   }
 
 }

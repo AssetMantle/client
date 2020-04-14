@@ -1,5 +1,7 @@
 package constants
 
+import constants.File.INSURANCE
+
 object File {
 
   val KEY_FILE = "file"
@@ -21,6 +23,7 @@ object File {
   val CONTRACT = "CONTRACT"
   val OBL = "OBL"
   val INVOICE = "INVOICE"
+  val INSURANCE = "INSURANCE"
   val PACKING_LIST = "PACKING_LIST"
   val COO = "COO"
   val COA = "COA"
@@ -53,6 +56,7 @@ object File {
   val TRADER_ASSET_DOCUMENT_TYPES: Seq[String] = Seq(CONTRACT, OBL, INVOICE, PACKING_LIST, COO, COA, OTHER)
   val TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE: Seq[String] = Seq(CONTRACT, PACKING_LIST, COO, COA, OTHER)
   val TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE_NEXT: Seq[String] = Seq(CONTRACT, PACKING_LIST, COO, COA)
+  val TRADER_NEGOTIATION_DOCUMENTS: Seq[String] = Seq(OBL, INVOICE, INSURANCE, OTHER)
 
   //Seq
   val ZONE_KYC_DOCUMENT_TYPES: Seq[String] = Seq(IDENTIFICATION, BANK_ACCOUNT_DETAIL)

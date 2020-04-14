@@ -1,0 +1,37 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(buyNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@buyNegotiationList.map { buyNegotiation =>
+    @commonInfoBox() {
+        @defining(traders.find(_.id == buyNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
+            @organizationTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.BUYER_TRADER_ID, buyNegotiation.buyerTraderID)
+                }
+            }
+        }
+        @defining(counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.Form.SELLER_TRADER_ID, buyNegotiation.sellerTraderID)
+                }
+            }
+        }
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetDescription)
+        @commonIntInfo(constants.View.PRICE, buyNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.quantity.toString, buyNegotiation.quantityUnit).mkString(" "))
+        @commonTextInfo(constants.View.STATUS, buyNegotiation.status)
+        <a class="cmuk-link" href="@routes.ViewController.tradeRoom(buyNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+    }
+}

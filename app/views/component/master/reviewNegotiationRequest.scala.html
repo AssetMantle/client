@@ -30,7 +30,7 @@
         @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
 
     <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENTS_CHECKLIST)</div>
-        @commonBooleanInfo(constants.View.BILL_OF_EXCHANGE, negotiation.documentsCheckList.billOfExchange)
+        @commonBooleanInfo(constants.View.BILL_OF_EXCHANGE_REQUIRED, negotiation.documentsCheckList.billOfExchangeRequired)
         @commonBooleanInfo(constants.View.COA, negotiation.documentsCheckList.coa)
         @commonBooleanInfo(constants.View.COO, negotiation.documentsCheckList.coo)
         @commonTextInfo(constants.View.OTHER_DOCUMENTS, negotiation.documentsCheckList.otherDocuments.getOrElse(""))

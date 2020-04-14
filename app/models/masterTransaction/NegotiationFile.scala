@@ -2,17 +2,20 @@ package models.masterTransaction
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Document
+import models.Trait.{Document, DocumentContent}
+import models.common.Serializable
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
+import models.common.Serializable._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class NegotiationFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) extends Document[NegotiationFile] {
+case class NegotiationFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[DocumentContent], status: Option[Boolean]) extends Document[NegotiationFile] {
   def updateFile(newFile: Option[Array[Byte]]): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = fileName, file = newFile, documentContent = documentContent, status = status)
 
   def updateFileName(newFileName: String): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = newFileName, file = file, documentContent = documentContent, status = status)
@@ -31,13 +34,15 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
+  private def serialize(negotiationFile: NegotiationFile): NegotiationFileSerialized = NegotiationFileSerialized(negotiationFile.id, negotiationFile.documentType, negotiationFile.fileName, negotiationFile.file, negotiationFile.documentContent.map(Json.toJson(_).toString), negotiationFile.status)
+
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
 
   private[models] val negotiationFileTable = TableQuery[NegotiationFileTable]
 
-  private def add(file: NegotiationFile): Future[String] = db.run((negotiationFileTable returning negotiationFileTable.map(_.id) += file).asTry).map {
+  private def add(file: NegotiationFileSerialized): Future[String] = db.run((negotiationFileTable returning negotiationFileTable.map(_.id) += file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -45,7 +50,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def upsert(file: NegotiationFile): Future[Int] = db.run(negotiationFileTable.insertOrUpdate(file).asTry).map {
+  private def upsert(file: NegotiationFileSerialized): Future[Int] = db.run(negotiationFileTable.insertOrUpdate(file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -65,7 +70,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def upsertContext(file: NegotiationFile): Future[Int] = db.run(negotiationFileTable.map(x => (x.id, x.documentType, x.fileName, x.documentContent.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.documentContent).asTry).map {
+  private def upsertContext(file: NegotiationFileSerialized): Future[Int] = db.run(negotiationFileTable.map(x => (x.id, x.documentType, x.fileName, x.documentContent.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.documentContent).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -105,7 +110,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[NegotiationFile] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def findByIdDocumentType(id: String, documentType: String): Future[NegotiationFileSerialized] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -113,7 +118,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
+  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -140,9 +145,9 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def getAllDocumentsById(id: String): Future[Seq[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).result)
+  private def getAllDocumentsById(id: String): Future[Seq[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).result)
 
-  private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[NegotiationFile]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
+  private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
 
   private def deleteById(id: String) = db.run(negotiationFileTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -154,13 +159,27 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
+  private def updateDocumentContentByID(id: String, documentType: String, documentContent: Option[String]): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContent.?).update(documentContent).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
   private def getIDAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
   private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(negotiationFileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
 
-  private[models] class NegotiationFileTable(tag: Tag) extends Table[NegotiationFile](tag, "NegotiationFile") {
+  case class NegotiationFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) {
+    def deSerialize: NegotiationFile = NegotiationFile(id, documentType, fileName, file, documentContent.map(x=>utilities.JSON.convertJsonStringToObject[DocumentContent](x)), status)
+  }
 
-    def * = (id, documentType, fileName, file.?, documentContent.?, status.?) <> (NegotiationFile.tupled, NegotiationFile.unapply)
+  private[models] class NegotiationFileTable(tag: Tag) extends Table[NegotiationFileSerialized](tag, "NegotiationFile") {
+
+    def * = (id, documentType, fileName, file.?, documentContent.?, status.?) <> (NegotiationFileSerialized.tupled, NegotiationFileSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -177,38 +196,40 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
 
-    def create(file: NegotiationFile): Future[String] = add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
+    def create(file: NegotiationFile): Future[String] = add(NegotiationFileSerialized(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
     def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map { negotiationFile =>
       negotiationFile match {
-        case Some(negotiation) => negotiation
+        case Some(negotiation) => negotiation.deSerialize
         case None => NegotiationFile("", "", "", None, None, None)
       }
     }
 
-    def get(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType)
+    def get(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType).map(_.deSerialize)
 
-    def getOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = findByIdDocumentTypeOrNone(id = id, documentType = documentType)
+    def getOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map(_.map(_.deSerialize))
 
-    def getConfirmBidDocuments(id: String): Future[Seq[NegotiationFile]] = getDocumentsByID(id = id, documents = Seq(constants.File.BUYER_CONTRACT, constants.File.SELLER_CONTRACT))
+    def getConfirmBidDocuments(id: String): Future[Seq[NegotiationFile]] = getDocumentsByID(id = id, documents = Seq(constants.File.BUYER_CONTRACT, constants.File.SELLER_CONTRACT)).map(_.map(_.deSerialize))
 
     def insertOrUpdateOldDocument(file: NegotiationFile): Future[Int] = upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
-
-    def insertOrUpdateContext(file: NegotiationFile): Future[String] = upsertContext(file).map(_.toString)
 
     def updateFileStatus(id: String, documentType: String, status: Boolean): Future[Int] = updateStatus(id, documentType, status)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
-    def getAllDocuments(id: String): Future[Seq[NegotiationFile]] = getAllDocumentsById(id = id)
+    def getAllDocuments(id: String): Future[Seq[NegotiationFile]] = getAllDocumentsById(id = id).map(_.map(_.deSerialize))
 
-    def getDocuments(id: String, documents: Seq[String]): Future[Seq[NegotiationFile]] = getDocumentsByID(id, documents)
+    def getDocuments(id: String, documents: Seq[String]): Future[Seq[NegotiationFile]] = getDocumentsByID(id, documents).map(_.map(_.deSerialize))
 
     def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
     def checkFileExists(id: String, documentType: String): Future[Boolean] = getIDAndDocumentType(id, documentType)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
+
+    def updateDocumentContent(id:String, documentType: String, documentContent: DocumentContent): Future[Int] = updateDocumentContentByID(id, documentType, Some(Json.toJson(documentContent).toString))
+
+    def getDocumentContent(id:String, documentType: String)= findByIdDocumentType(id = id, documentType = documentType).map(_.deSerialize).map(_.documentContent)
   }
 
 }

@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.NegotiationFile
+
+@(id:String, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<script src="@routes.Assets.versioned("javascripts/switcher.js")" type="text/javascript"></script>
+@for(file<- files){
+    <div>
+        <a onclick="viewDocument('@file.id','@file.documentType')">@Messages(file.documentType)</a>
+        @file.documentType match{
+            case constants.File.OBL | constants.File.INVOICE=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.NegotiationController.negotiationDocumentContent('@id','@file.documentType'))")></td>}
+            case _=>{}
+        }
+    </div>
+}
+
+<script>
+
+        function viewDocument(id, documentType) {
+
+            var switcherContentID= 'switcherContent'+'@constants.View.VIEW_DOCUMENTS';
+            var switcherHeaderID= 'switcherHeader'+'@constants.View.VIEW_DOCUMENTS';
+            var ulELement=$('#'+switcherHeaderID).closest("ul");
+            cmukUIkit.switcher(ulELement).show(1);
+
+            componentResource(switcherContentID, jsRoutes.controllers.ComponentViewController.traderViewNegotiationFile(id, documentType));
+        }
+</script>

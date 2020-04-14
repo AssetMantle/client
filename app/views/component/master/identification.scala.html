@@ -9,4 +9,13 @@
     @commonInputDate(identificationForm, constants.FormField.DATE_OF_BIRTH)
     @commonInputText(identificationForm, constants.FormField.ID_NUMBER)
     @commonInputText(identificationForm, constants.FormField.ID_TYPE)
+    @defining(Option(constants.FormField.ADDRESS)) { implicit nestedFormField =>
+        @commonInputText(identificationForm, constants.FormField.ADDRESS_LINE_1)
+        @commonInputText(identificationForm, constants.FormField.ADDRESS_LINE_2)
+        @commonInputText(identificationForm, constants.FormField.LANDMARK, 'required -> false)
+        @commonInputText(identificationForm, constants.FormField.CITY)
+        @commonInputText(identificationForm, constants.FormField.COUNTRY)
+        @commonInputText(identificationForm, constants.FormField.ZIP_CODE)
+        @commonInputText(identificationForm, constants.FormField.PHONE)
+    }
 }

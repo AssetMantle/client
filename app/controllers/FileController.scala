@@ -349,6 +349,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
+  def negotiationDocumentUpload(id:String)=withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
+      for{
+        negotiationFiles <- negotiationFiles
+        result<- withUsernameToken.Ok(views.html.component.master.traderNegotiationDocumentUpload(id, negotiationFiles))
+      }yield result
+  }
+
   def uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderNegotiation), documentType, negotiationRequestID))
   }
@@ -413,6 +423,30 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               negotiationFiles <- negotiationFiles
               result <- withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrderDocument(negotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
             } yield result
+          case constants.File.OBL =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
+          case constants.File.INVOICE =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
+          case constants.File.INSURANCE =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
+          case constants.File.OTHER =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
           case _ => withUsernameToken.Ok(views.html.index())
         }
       }
@@ -428,7 +462,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType)
+      val oldDocumentFileName = masterTransactionNegotiationFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType)
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
         name = name,
@@ -465,6 +499,30 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               optionNegotiationFiles <- optionNegotiationFiles
               result <- withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
             } yield result
+          case constants.File.OBL =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
+          case constants.File.INVOICE =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
+          case constants.File.INSURANCE =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
+          case constants.File.OTHER =>
+            val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationRequestID)
+            for{
+              negotiationFiles <- negotiationFiles
+              result<- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(negotiationRequestID, negotiationFiles))
+            }yield result
           case _ => withUsernameToken.Ok(views.html.index())
         }
       }
@@ -841,12 +899,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def path(traderID: String): Future[String] = documentType match {
-        case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE | constants.File.COO | constants.File.COA | constants.File.OTHER =>
+        case constants.File.CONTRACT | constants.File.PACKING_LIST =>
           val accountId = masterTransactionIssueAssetRequests.Service.getAccountID(id)
           for {
             accountId <- accountId
           } yield if (accountId == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-        case constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF =>
+        case constants.File.OBL | constants.File.INVOICE | constants.File.INSURANCE | constants.File.COO | constants.File.COA | constants.File.OTHER | constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF =>
           val checkNegotiationAndAccountIDExists = masterNegotiations.Service.checkTraderNegotiationExists(id = id, traderID = traderID)
           for {
             checkNegotiationAndAccountIDExists <- checkNegotiationAndAccountIDExists

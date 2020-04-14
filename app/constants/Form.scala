@@ -102,6 +102,9 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENTS_CHECKLIST = new Form("UPDATE_DOCUMENTS_CHECKLIST", routes.NegotiationController.updateDocumentCheckList(), routes.javascript.NegotiationController.updateDocumentCheckListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
+  val OBL_DETAILS = new Form("OBL_DETAILS", routes.NegotiationController.oblDetails(), routes.javascript.NegotiationController.oblDetailsForm)
+  val INVOICE_DETAILS = new Form("INVOICE_DETAILS", routes.NegotiationController.invoiceDetails(), routes.javascript.NegotiationController.invoiceDetailsForm)
+  val CONFIRM_ALL_NEGOTIATION_TERMS= new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
@@ -378,6 +381,8 @@ object Form {
   val ID = "ID"
   val ACCOUNT_ID = "ACCOUNT_ID"
   val TRADER_ID = "TRADER_ID"
+  val SELLER_TRADER_ID = "SELLER_TRADER_ID"
+  val BUYER_TRADER_ID = "BUYER_TRADER_ID"
   val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
   val USERNAME = "USERNAME"

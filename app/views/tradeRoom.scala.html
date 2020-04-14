@@ -8,19 +8,42 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
+    <div class="leftTradeFinancial secondaryFont">
+        <div id="tradeFinancials"></div>
+        <div id="tradeDocuments"></div>
+    </div>
+    <script type="text/javascript">
+    @loginState.userType match {
+                case constants.User.TRADER => {
+                    componentResource('tradeDocuments', jsRoutes.controllers.ComponentViewController.tradeDocumentList('@id'));
+                }
+                case constants.User.ORGANIZATION => {
 
+                }
+    }
+    </script>
 }
 
 @center = {
     <div class="cmuk-card cmuk-card-default">
         <div class="cmuk-card-body">
-        @commonHorizontalSwitcher(ListMap(
-            constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.traderViewAcceptedNegotiation,
-            constants.View.VIEW_DOCUMENTS -> commonCard(constants.View.VIEW_DOCUMENTS)(Html(""))(Html("")),
-        ),
-            'VIEW_TERMS_PARAMETERS -> s"'${id}'")
+         <div id="acceptedNegotiation">
+
+         </div>
         </div>
     </div>
+    <iframe class="hidden" src="@routes.NegotiationController.negotiationTermsComet(id)"></iframe>
+    <script type="text/javascript">
+        @loginState.userType match {
+                case constants.User.TRADER => {
+                    componentResource('acceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@id'));
+        }
+                case constants.User.ORGANIZATION => {}
+        }
+            var tradeTermsCometMessage = function (event) {
+                componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@id'));
+            }
+    </script>
 }
 
 @right = {
@@ -50,5 +73,6 @@
     <script>
             componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@id'));
             componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
+
     </script>
 }

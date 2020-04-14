@@ -86,6 +86,22 @@ POST        /negotiation/updateDocumentCheckList                                
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
+GET         /negotiation/oblDetails                                                         controllers.NegotiationController.oblDetailsForm(id: String)
+POST        /negotiation/oblDetails                                                         controllers.NegotiationController.oblDetails
+
+GET         /negotiation/invoiceDetails                                                     controllers.NegotiationController.invoiceDetailsForm(id: String)
+POST        /negotiation/invoiceDetails                                                     controllers.NegotiationController.invoiceDetails
+
+GET         /negotiation/updateNegotiationTerms                                             controllers.NegotiationController.invoiceDetailsForm(id: String)
+POST        /negotiation/updateNegotiationTerms                                             controllers.NegotiationController.invoiceDetails
+
+GET         /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTermsForm(id: String)
+POST        /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTerms
+
+GET         /negotiation/negotiationTermsComet                                              controllers.NegotiationController.negotiationTermsComet(id: String)
+GET         /negotiation/files                                                              controllers.NegotiationController.negotiationDocumentList(id: String)
+GET         /negotiation/documentContent                                                    controllers.NegotiationController.negotiationDocumentContent(id: String, documentType: String)
+
 GET         /contact                                                                        controllers.ContactController.contact
 
 GET         /trader/traderRelationRequest                                                   controllers.TraderController.traderRelationRequestForm
@@ -109,6 +125,16 @@ GET         /component/traderViewSentNegotiationRequestList                     
 GET         /component/traderViewReceivedNegotiationList                                    controllers.ComponentViewController.traderViewReceivedNegotiationList
 GET         /component/traderViewIncompleteNegotiationList                                  controllers.ComponentViewController.traderViewIncompleteNegotiationList
 GET         /component/traderViewRejectedOrFailedNegotiationList                            controllers.ComponentViewController.traderViewRejectedOrFailedNegotiationList
+
+GET         /component/organizationViewAcceptedNegotiationList                              controllers.ComponentViewController.organizationViewAcceptedNegotiationList
+GET         /component/organizationViewAcceptedBuyNegotiationList                           controllers.ComponentViewController.organizationViewAcceptedBuyNegotiationList
+GET         /component/organizationViewAcceptedSellNegotiationList                          controllers.ComponentViewController.organizationViewAcceptedSellNegotiationList
+
+GET         /component/organizationViewSentReceivedIncompleteRejectedFailedNegotiationList  controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList
+GET         /component/organizationViewSentNegotiationRequestList                           controllers.ComponentViewController.organizationViewSentNegotiationRequestList
+GET         /component/organizationViewReceivedNegotiationList                              controllers.ComponentViewController.organizationViewReceivedNegotiationList
+GET         /component/organizationViewIncompleteNegotiationList                            controllers.ComponentViewController.organizationViewIncompleteNegotiationList
+GET         /component/organizationViewRejectedOrFailedNegotiationList                      controllers.ComponentViewController.organizationViewRejectedOrFailedNegotiationList
 
 GET         /component/viewIdentificationDetails                                            controllers.ComponentViewController.viewIdentificationDetails
 GET         /component/userViewPendingRequests                                              controllers.ComponentViewController.userViewPendingRequests
@@ -135,7 +161,11 @@ GET         /component/recentActivityForTradeRoom                               
 GET         /component/recentActivityForTrader                                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
 GET         /component/recentActivityForOrganization                                        controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
+GET         /component/negotiationFiles                                                     controllers.ComponentViewController.viewNegotiationFiles(id:String)
+GET         /component/viewNegotiationFile                                                  controllers.ComponentViewController.traderViewNegotiationFile(id:String, documentType: String)
+GET         /component/tradeDocumentList                                                    controllers.ComponentViewController.tradeDocumentList(id:String)
 
+GET         /component/traderViewAcceptedNegotiationTerms                                   controllers.ComponentViewController.traderViewAcceptedNegotiationTerms(id: String)
 GET         /component/traderViewAcceptedNegotiation                                        controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
 
 GET         /component/releaseAssetList                                                     controllers.ReleaseAssetController.releaseAssetList
@@ -257,6 +287,7 @@ GET         /traderUpload/storeAssetDocument                                    
 GET         /traderUpdate/assetForm                                                         controllers.FileController.updateTraderAssetForm(documentType: String, issueAssetRequestID :String)
 GET         /traderUpdate/assetDocument                                                     controllers.FileController.updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
 
+GET         /traderUpload/negotiationDocumentUpload                                         controllers.FileController.negotiationDocumentUpload(id:String)
 GET         /traderUpload/negotiationForm                                                   controllers.FileController.uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String)
 POST        /traderUpload/negotiationDocument                                               controllers.FileController.uploadTraderNegotiation(documentType: String)
 GET         /traderUpload/storeNegotiationDocument                                          controllers.FileController.storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
