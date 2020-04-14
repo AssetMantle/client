@@ -64,7 +64,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     val twilioInit = Future {
       Twilio.init(smsAccountSID, smsAuthToken)
     }
-    val mobileNumber = masterContacts.Service.getMobileNumber(accountID)
+    val mobileNumber = masterContacts.Service.tryGetMobileNumber(accountID)
     (for {
       _ <- twilioInit
       mobileNumber <- mobileNumber
@@ -121,7 +121,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   def sendEmailByAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
 
-    val toEmailAddress: Future[String] = masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+    val toEmailAddress: Future[String] = masterContacts.Service.tryGetVerifiedEmailAddress(toAccountID)
 
     (for {
       toEmailAddress <- toEmailAddress

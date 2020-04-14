@@ -70,7 +70,7 @@ class SetACLController @Inject()(
         },
         inviteTraderData => {
 
-          val contact: Future[Option[Contact]] = masterContacts.Service.getOrNoneContactByEmail(inviteTraderData.emailAddress)
+          val contact: Future[Option[Contact]] = masterContacts.Service.getContactByEmail(inviteTraderData.emailAddress)
 
           def inviteeUserType(contact: Option[Contact]): Future[String] = if (contact.isDefined) {
             masterAccounts.Service.getUserType(contact.get.id)
@@ -140,7 +140,7 @@ class SetACLController @Inject()(
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
@@ -333,7 +333,7 @@ class SetACLController @Inject()(
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getOrNoneVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = traderOrganization.id, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
