@@ -85,7 +85,7 @@ class AssetController @Inject()(
                       result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
                     } yield result
                   } else {
-                    val documentHash = masterAssets.Service.insertUnmoderatedAsset(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val insertUnmoderatedAsset = masterAssets.Service.insertUnmoderatedAsset(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
                     def getTicketID(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                       entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
@@ -98,7 +98,7 @@ class AssetController @Inject()(
                     )
 
                     for {
-                      documentHash <- documentHash
+                      documentHash <- insertUnmoderatedAsset
                       ticketID <- getTicketID(documentHash)
                       tradableAssets <- getAllTradableAssets(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
@@ -107,7 +107,6 @@ class AssetController @Inject()(
                     } yield result
                   }
                 }
-
 
                 for {
                   traderID <- traderID
