@@ -8,19 +8,19 @@
 
 @buyNegotiationList.map { buyNegotiation =>
     <li class="commonList">
-        @defining(counterPartyTraders.find(_.id == buyNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
+        @defining(counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
                     @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
                 }
                 case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, buyNegotiation.buyerTraderID)
+                    @commonVerticalTextInfo(constants.View.TRADER_ID, buyNegotiation.sellerTraderID)
                 }
             }
         }
         @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetDescription)
         @commonVerticalIntInfo(constants.View.PRICE, buyNegotiation.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.quantity.toString(), buyNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.quantity.toString, buyNegotiation.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.STATUS, buyNegotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">

@@ -209,7 +209,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
         negotiations.map { negotiation =>
-          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING || negotiation.status == constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET) {
+          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING) {
             val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
 
             for {
@@ -274,7 +274,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
         negotiations.map { negotiation =>
-          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING || negotiation.status == constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET) {
+          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING) {
             val markStatusIssueAssetRequestFailed = masterNegotiations.Service.markStatusIssueAssetRequestFailed(negotiation.id)
 
             for {

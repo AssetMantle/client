@@ -355,7 +355,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markStatusIssueAssetRequestFailed(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.ISSUE_ASSET_FAILED)
 
-    def markStatusIssueAssetPendingRequestSent(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET)
+    def markStatusIssueAssetPending(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.ISSUE_ASSET_PENDING)
 
     def markTradeCompletedByNegotiationID(negotiationID: String): Future[Int] = updateStatusByNegotiationID(negotiationID = negotiationID, status = constants.Status.Negotiation.TRADE_COMPLETED)
 

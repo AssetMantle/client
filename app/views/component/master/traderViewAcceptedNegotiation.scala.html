@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.{Asset, Negotiation}
-@import views.html.component.master.buyerViewNegotiationTermAcceptance
+@import views.html.component.master.buyerViewNegotiationTerm
 
 @(traderID: String, negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -35,10 +35,17 @@
             @negotiation.buyerAcceptedQuantity
             </div>
             </div>
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
+                @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
+            </div>
             <div class="sellerTerm">
                 @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+            <br>
                 @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
+            <br>
                 @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+            <br>
             <div>
             @negotiation.buyerAcceptedAssetOtherDetails
             </div>
@@ -52,9 +59,13 @@
             </div>
             <div class="sellerTerm">
                 @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
+                <br>
                 @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
+            <br>
                 @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
+            <br>
                 @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
+            <br>
                 @negotiation.paymentTerms.tentativeDate match {
                     case Some(date) => {
                         @commonDateInfo(constants.View.TENTATIVE_DATE, date)
@@ -63,6 +74,7 @@
                         @commonTextInfo(constants.View.TENTATIVE_DATE, "")
                     }
                 }
+            <br>
                 @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
             <div>
             @negotiation.buyerAcceptedPaymentTerms
@@ -87,42 +99,41 @@
         }
         case negotiation.buyerTraderID => {
 
-            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "icon-description") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "icon-description") {
                 @Messages(constants.View.ASSET_DESCRIPTION)
             } {
                 @negotiation.assetDescription
             }
-            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "icon-contract-price") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "icon-contract-price") {
                 @Messages(constants.View.PRICE)
             } {
                 @negotiation.price
             }
-            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "icon-quantity") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "icon-quantity") {
                 @Messages(constants.View.QUANTITY)
             } {
                 @Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" ")
             }
 
-            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.SHIPPING_PERIOD, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "icon-shipment-period") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.SHIPPING_PERIOD, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "icon-shipment-period") {
                 @Messages(constants.View.ASSET_OTHER_DETAILS)
+                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
+                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
             } {
-                <div class="sellerTerm">
-                    @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
-                    @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
-                </div>
             }
             <hr>
 
-            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "icon-advance-payment") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "icon-advance-payment") {
                 @Messages(constants.View.PAYMENT_TERMS)
-            } {
+                <br>
+                <p>@Messages(constants.View.ADVANCE_PERCENTAGE) - <span class="cmuk-text-bold">
                 @if(negotiation.paymentTerms.advancePayment) {
                     @negotiation.paymentTerms.advancePercentage %
                 } else {
                     @Messages(constants.View.NO)
                 }
-                <div class="creditTerms">
+                </span></p>
                 @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
                     <p>@Messages(constants.View.TENURE)
                         - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
@@ -139,11 +150,13 @@
                     }
                     </span></p>
                 }
-                </div>
+            } {
             }
 
             <hr>
-            @buyerViewNegotiationTermAcceptance(negotiationID = negotiation.id, termType = constants.View.DOCUMENTS_LIST, status = negotiation.buyerAcceptedDocumentsList, iconPath = "icon-document") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENTS_LIST, status = negotiation.buyerAcceptedDocumentsList, iconPath = "icon-document") {
+                @Messages(constants.View.DOCUMENTS_LIST)
+                <br>
                 @negotiation.documentsList.documents.map { document =>
                     @document
                     <br>
