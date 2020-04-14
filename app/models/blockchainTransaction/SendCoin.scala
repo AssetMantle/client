@@ -192,7 +192,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
       def toAccount(toAddress: String): Future[Account] = masterAccounts.Service.getAccountByAddress(toAddress)
 
-      def updateUserType(toAccount: Account): Future[Int] = {
+      def unknownUserTypeUpdate(toAccount: Account): Future[Int] = {
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.markUserTypeUser(toAccount.id)
         } else Future(0)
@@ -205,7 +205,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         sendCoin <- sendCoin
         _ <- markDirty(sendCoin)
         toAccount <- toAccount(sendCoin.to)
-        _ <- updateUserType(toAccount)
+        _ <- unknownUserTypeUpdate(toAccount)
         fromAccountID <- fromAccountID(sendCoin.from)
         _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
