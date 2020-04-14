@@ -115,9 +115,9 @@ class AccountController @Inject()(
       loginData => {
         val status = masterAccounts.Service.validateLoginAndGetStatus(username = loginData.username, password = loginData.password)
 
-        def account: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
+        def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
 
-        def updateUserType(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
+        def firstLoginUserTypeUpdate(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
           val updateWithoutLogin = masterAccounts.Service.updateUserType(id = loginData.username, userType = constants.User.USER)
           for {
             _ <- updateWithoutLogin
@@ -145,8 +145,7 @@ class AccountController @Inject()(
           } yield Unit
         }
 
-        def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
-          implicit val loginState: LoginState = loginStateValue
+        def getResult(status: String)(implicit loginState: LoginState): Future[Result] = {
           val contactWarnings = utilities.Contact.getWarnings(status)
           loginState.userType match {
             case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
@@ -156,11 +155,11 @@ class AccountController @Inject()(
 
         (for {
           status <- status
-          account <- account
-          userType <- updateUserType(account.userType)
+          account <- getAccount
+          userType <- firstLoginUserTypeUpdate(account.userType)
           loginState <- getLoginState(address = account.accountAddress, userType = userType)
           _ <- sendNotification(loginState)
-          result <- getResult(status = status, loginStateValue = loginState)
+          result <- getResult(status = status)(loginState)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
