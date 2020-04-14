@@ -160,6 +160,8 @@ object View {
   val REQUEST = "REQUEST"
   val TEAM = "TEAM"
   val TRADER_ID = "TRADER_ID"
+  val BUYER_TRADER_ID = "BUYER_TRADER_ID"
+  val SELLER_TRADER_ID = "SELLER_TRADER_ID"
   val NAME = "NAME"
   val TRADERS = "TRADERS"
   val TRADER = "TRADER"

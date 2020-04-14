@@ -54,7 +54,9 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
+  private def findNotificationsByAccountIdsAndNotificationIDs(accountIDs: Seq[String], ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).filter(_.id inSet ids).sortBy(_.time.desc).drop(offset).take(limit).result)
+
+    private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -115,6 +117,8 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit)
 
     def getTradeRoomNotifications(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIdAndNotificationIDs(accountID = accountID, ids, offset = offset, limit = limit)
+
+    def getTradeRoomNotifications(accountIDs: Seq[String], ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIdsAndNotificationIDs(accountIDs = accountIDs, ids, offset = offset, limit = limit)
 
     def getTradersNotifications(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = offset, limit = limit)
 

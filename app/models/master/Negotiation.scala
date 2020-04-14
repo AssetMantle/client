@@ -234,6 +234,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+  private def findAllNegotiationsByTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[Negotiation]] = db.run((negotiationTable.filter(_.buyerTraderID inSet traderIDs) union negotiationTable.filter(_.sellerTraderID inSet traderIDs)).filter(_.status.inSet(statuses)).result)
 
   private def findAllNegotiationsByBuyerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID === traderID).filter(_.status.inSet(statuses)).result)
 
@@ -488,6 +489,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def markAcceptedAndUpdateNegotiationID(id: String, negotiationID: String): Future[Int] = updateNegotiationIDAndStatusByID(id = id, negotiationID = negotiationID, status = constants.Status.Negotiation.NEGOTIATION_STARTED)
 
     def getAllByAssetID(assetID: String): Future[Seq[Negotiation]] = findAllByAssetID(assetID)
+
+    def getAllAcceptedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
 
     def getAllAcceptedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
 
