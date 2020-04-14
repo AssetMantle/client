@@ -5,14 +5,16 @@ import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.{ACL, ACLAccount}
-import models.master.{Identification, Organization, Zone}
+import models.blockchain.ACL
+import models.common.Serializable.Address
+import models.master.Identification
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import services.SFTPScheduler
+import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -300,19 +302,22 @@ class AccountController @Inject()(
     } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
-  def addIdentificationForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
 
       def getResult(identification: Option[Identification]): Future[Result] = identification match {
-        case Some(identity) => withUsernameToken.Ok(views.html.component.master.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType))))
+        case Some(identity) => withUsernameToken.Ok(views.html.component.master.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType, address = AddressData(identity.address.addressLine1, identity.address.addressLine2, identity.address.landmark, identity.address.city, identity.address.country, identity.address.zipCode, identity.address.phone)))))
         case None => withUsernameToken.Ok(views.html.component.master.addIdentification())
       }
 
-      for {
+      (for {
         identification <- identification
         result <- getResult(identification)
       } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
   }
 
   def addIdentification(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -322,7 +327,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.addIdentification(formWithErrors)))
         },
         addIdentificationData => {
-          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType)
+          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType, Address(addressLine1 = addIdentificationData.address.addressLine1, addressLine2 = addIdentificationData.address.addressLine2, landmark = addIdentificationData.address.landmark, city = addIdentificationData.address.city, country = addIdentificationData.address.country, zipCode = addIdentificationData.address.zipCode, phone = addIdentificationData.address.phone))
 
           def accountKYC(): Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
 

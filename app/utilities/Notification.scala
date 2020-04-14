@@ -63,7 +63,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
-    val mobileNumber = masterContacts.Service.getMobileNumber(accountID)
+    val mobileNumber = masterContacts.Service.tryGetMobileNumber(accountID)
     (for {
       mobileNumber <- mobileNumber
     } yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
@@ -121,7 +121,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   def sendEmailByAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
 
-    val toEmailAddress: Future[String] = masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+    val toEmailAddress: Future[String] = masterContacts.Service.tryGetVerifiedEmailAddress(toAccountID)
 
     (for {
       toEmailAddress <- toEmailAddress

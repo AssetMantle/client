@@ -22,7 +22,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val emailAddress: Future[String] = masterContacts.Service.getUnverifiedEmailAddress(loginState.username)
+      val emailAddress: Future[String] = masterContacts.Service.tryGetUnverifiedEmailAddress(loginState.username)
       val otp = emailOTPs.Service.sendOTP(loginState.username)
 
       def sendNotificationAndGetResult(emailAddress: String, otp: String): Future[Result] = {

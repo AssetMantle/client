@@ -518,6 +518,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     "dateOfBirth"        DATE    NOT NULL,
     "idNumber"           VARCHAR NOT NULL,
     "idType"             VARCHAR NOT NULL,
+    "address"            VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     PRIMARY KEY ("accountID")
