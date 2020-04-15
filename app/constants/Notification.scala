@@ -2,11 +2,7 @@ package constants
 
 import constants.Notification.{Email, PushNotification, SMS}
 
-class Notification(notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
-
-  val title: String = Seq("NOTIFICATION", notificationType, "TITLE").mkString(".")
-
-  val message: String = Seq("NOTIFICATION", notificationType, "MESSAGE").mkString(".")
+class Notification(val notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
 
   val email: Option[Email] = if (sendEmail) Option(new Email(notificationType)) else None
 
@@ -18,12 +14,12 @@ class Notification(notificationType: String, sendEmail: Boolean, sendPushNotific
 
 object Notification {
 
-  private val EMAIL_PREFIX = "EMAIL"
-  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
-  private val SMS_PREFIX = "SMS"
-  private val SUBJECT_SUFFIX = "SUBJECT"
-  private val MESSAGE_SUFFIX = "MESSAGE"
-  private val TITLE_SUFFIX = "TITLE"
+  val EMAIL_PREFIX = "EMAIL"
+  val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
+  val SMS_PREFIX = "SMS"
+  val SUBJECT_SUFFIX = "SUBJECT"
+  val MESSAGE_SUFFIX = "MESSAGE"
+  val TITLE_SUFFIX = "TITLE"
 
   class SMS(private val notificationType: String) {
     val message: String = Seq(SMS_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")

@@ -85,6 +85,8 @@ POST        /negotiation/updateDocumentCheckList                                
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
+GET         /negotiation/tradeActivityMessages                                              controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
+
 GET         /contact                                                                        controllers.ContactController.contact
 
 GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
@@ -103,7 +105,6 @@ GET         /trader/organizationModifyTrader                                    
 POST        /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTrader
 
 GET         /notification/recentActivityMessages                                            controllers.NotificationController.recentActivityMessages(pageNumber: Int)
-GET         /notification/tradeActivityMessages                                             controllers.NotificationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 GET         /notification/unreadNotificationCount                                           controllers.NotificationController.unreadNotificationCount
 GET         /notification/markNotificationAsRead                                            controllers.NotificationController.markNotificationRead(notificationID: String)
 

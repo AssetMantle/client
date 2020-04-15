@@ -237,9 +237,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.updatePaymentTermsForm,
         routes.javascript.NegotiationController.updateDocumentCheckListForm,
         routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm,
+        routes.javascript.NegotiationController.tradeActivityMessages,
 
         routes.javascript.NotificationController.recentActivityMessages,
-        routes.javascript.NotificationController.tradeActivityMessages,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
 

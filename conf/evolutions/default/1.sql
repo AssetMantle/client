@@ -790,16 +790,16 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
-    "id"        VARCHAR   NOT NULL,
-    "accountID" VARCHAR   NOT NULL,
-    "title"     VARCHAR   NOT NULL,
-    "message"   VARCHAR   NOT NULL,
-    "read"      BOOLEAN   NOT NULL,
-    "createdOn" TIMESTAMP NOT NULL,
-    "createdBy" VARCHAR   NOT NULL,
-    "updatedOn" TIMESTAMP,
-    "updatedBy" VARCHAR,
-    "timezone"  VARCHAR   NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "accountID"         VARCHAR   NOT NULL,
+    "message"           VARCHAR   NOT NULL,
+    "read"              BOOLEAN   NOT NULL,
+    "createdBy"         VARCHAR   NOT NULL,
+    "createdOn"         TIMESTAMP NOT NULL,
+    "createdOnTimezone" VARCHAR   NOT NULL,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimezone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -827,16 +827,16 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
-    "id"            VARCHAR   NOT NULL,
-    "negotiationID" VARCHAR   NOT NULL,
-    "title"         VARCHAR   NOT NULL,
-    "message"       VARCHAR   NOT NULL,
-    "read"          BOOLEAN   NOT NULL,
-    "createdOn"     TIMESTAMP NOT NULL,
-    "createdBy"     VARCHAR   NOT NULL,
-    "updatedOn"     TIMESTAMP,
-    "updatedBy"     VARCHAR,
-    "timezone"      VARCHAR   NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "negotiationID"     VARCHAR   NOT NULL,
+    "message"           VARCHAR   NOT NULL,
+    "read"              BOOLEAN   NOT NULL,
+    "createdBy"         VARCHAR   NOT NULL,
+    "createdOn"         TIMESTAMP NOT NULL,
+    "createdOnTimezone" VARCHAR   NOT NULL,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimezone" VARCHAR,
     PRIMARY KEY ("id")
 );
 

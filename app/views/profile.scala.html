@@ -12,7 +12,7 @@
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
-            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+                componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
             case constants.User.ORGANIZATION => {}
             case constants.User.ZONE => {}
@@ -91,7 +91,6 @@
                 case _ => {}
             }
         </div>
-    </div>
     </div>
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());

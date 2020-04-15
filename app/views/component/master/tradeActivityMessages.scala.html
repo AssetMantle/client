@@ -14,14 +14,14 @@
                 <div class="timeline-content right">
                     <div>
                         <div class="textLineOverflow activityContent" title="@tradeActivity.title"><span class="cmuk-text-bolder">@Messages(tradeActivity.title)</span>
-                            @Messages(tradeActivity.message.header, tradeActivity.message.parameters: _*)
+                            @Messages(tradeActivity.messageTemplate, tradeActivity.messageParameters: _*)
                         </div>
-                        <div class="notificationTime">@tradeActivity.createdOn @tradeActivity.timezone</div>
+                        <div class="notificationTime">@tradeActivity.createdOn @tradeActivity.createdOnTimezone</div>
                     </div>
                 </div>
             </div>
         }
-        <div class = "notification NotificationButton"><a onclick="loadMoreActivities(jsRoutes.controllers.NotificationController.tradeActivityMessages, '@tradeActivities.head.negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
+        <div class = "notification NotificationButton"><a onclick="loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, '@tradeActivities.head.negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
     } else {
         <p class='cmuk-position-center'>@Messages(constants.View.NO_TRADE_ACTIVITIES_FOUND)</p>
     }

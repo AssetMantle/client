@@ -14,9 +14,9 @@
                 <div class="timeline-content right">
                     <div>
                         <div class="textLineOverflow activityContent" title="@notification.title"><span class="cmuk-text-bolder">@Messages(notification.title)</span>
-                            @Messages(notification.message.header, notification.message.parameters: _*)
+                            @Messages(notification.messageTemplate, notification.messageParameters: _*)
                         </div>
-                        <div class="notificationTime">@notification.createdOn @notification.timezone</div>
+                        <div class="notificationTime">@notification.createdOn @notification.createdOnTimezone</div>
                     </div>
                 </div>
             </div>

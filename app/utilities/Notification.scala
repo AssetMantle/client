@@ -135,7 +135,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Future[String] = {
     try {
-      val notificationID = masterTransactionNotifications.Service.insert( accountID, notification = notification, messagesParameters: _*)
+      val notificationID = masterTransactionNotifications.Service.create( accountID, notification = notification, messagesParameters: _*)
       if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future(None)
       if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
       if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)

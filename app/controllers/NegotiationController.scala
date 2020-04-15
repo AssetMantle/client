@@ -1,10 +1,11 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Asset, Negotiation, Trader}
+import models.masterTransaction.TradeActivity
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
@@ -27,7 +28,10 @@ class NegotiationController @Inject()(
                                        blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
                                        utilitiesNotification: utilities.Notification,
                                        masterTransactionChats: masterTransaction.Chats,
-                                       masterTransactionTradeActivities: masterTransaction.TradeActivities
+                                       masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                       withLoginAction: WithLoginAction,
+                                       masterOrganizations: master.Organizations,
+                                       masterZones: master.Zones,
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -536,7 +540,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
-            _ <- masterTransactionTradeActivities.Service.insert(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, negotiation.sellerTraderID)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateAssetTermsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield result
             ).recover {
@@ -592,7 +596,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
-            _ <- masterTransactionTradeActivities.Service.insert(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, negotiation.sellerTraderID)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updatePaymentTermsData.id, successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
           } yield result
             ).recover {
@@ -648,7 +652,7 @@ class NegotiationController @Inject()(
             _ <- update(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
-            _ <- masterTransactionTradeActivities.Service.insert(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, negotiation.sellerTraderID)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateDocumentCheckListData.id, successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
           } yield result
             ).recover {
@@ -719,5 +723,44 @@ class NegotiationController @Inject()(
           }
         }
       )
+  }
+
+  def tradeActivityMessages(negotiationID: String, pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val buyerTraderID = masterNegotiations.Service.tryGetBuyerTraderID(negotiationID)
+      val sellerTraderID = masterNegotiations.Service.tryGetSellerTraderID(negotiationID)
+
+      def getOrganizationID(traderID: String): Future[String] = masterTraders.Service.tryGetOrganizationID(traderID)
+
+      def getZoneID(traderID: String): Future[String] = masterTraders.Service.tryGetZoneID(traderID)
+
+      def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+
+      def getOrganizationAccountID(organizationID: String): Future[String] = masterOrganizations.Service.tryGetAccountID(organizationID)
+
+      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.getAccountId(zoneID)
+
+      def getTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivity]] = if (accountIDs.contains(loginState.username)) {
+        masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID = negotiationID, pageNumber = pageNumber)
+      } else throw new BaseException(constants.Response.UNAUTHORIZED)
+
+      (for {
+        buyerTraderID <- buyerTraderID
+        buyerOrganizationID <- getOrganizationID(buyerTraderID)
+        buyerZoneID <- getZoneID(buyerTraderID)
+        buyerAccountID <- getTraderAccountID(buyerTraderID)
+        buyerOrganizationAccountID <- getOrganizationAccountID(buyerOrganizationID)
+        buyerZoneAccountID <- getZoneAccountID(buyerZoneID)
+        sellerTraderID <- sellerTraderID
+        sellerOrganizationID <- getOrganizationID(sellerTraderID)
+        sellerZoneID <- getZoneID(sellerTraderID)
+        sellerAccountID <- getTraderAccountID(sellerTraderID)
+        sellerOrganizationAccountID <- getOrganizationAccountID(sellerOrganizationID)
+        sellerZoneAccountID <- getZoneAccountID(sellerZoneID)
+        tradeActivityMessages <- getTradeActivityMessages(buyerAccountID, buyerOrganizationAccountID, buyerZoneAccountID, sellerAccountID, sellerOrganizationAccountID, sellerZoneAccountID)
+      } yield Ok(views.html.component.master.tradeActivityMessages(tradeActivities = tradeActivityMessages))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 }
