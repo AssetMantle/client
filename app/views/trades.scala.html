@@ -42,7 +42,10 @@
         case constants.User.ORGANIZATION => {}
         case constants.User.ZONE => {
             <div class="tradeList cmuk-margin-bottom">
+            @commonCard(constants.View.TRADERS) {
+            }{
                 <div id="zoneViewAcceptedNegotiationList"></div>
+            }
             </div>
             <script>
                      componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());

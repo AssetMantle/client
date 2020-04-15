@@ -33,7 +33,7 @@
                 </div>
 
             </div>
-            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+            <div class="cmuk-grid-match cmuk-grid cmuk-margin-bottom" cmuk-grid>
 
                 <div class="cmuk-width-expand@@m">
                     <div id="zoneViewOrganizationAccountList"></div>
@@ -41,7 +41,12 @@
 
             </div>
             <div class="tradeList cmuk-margin-bottom">
+
+            @commonCard(constants.View.TRADERS) {
+            } {
                 <div id="zoneViewAcceptedNegotiationList"></div>
+            }
+
             </div>
             <script>
                     componentResource('zoneTradeStatistics', jsRoutes.controllers.ComponentViewController.zoneTradeStatistics());

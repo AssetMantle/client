@@ -8,7 +8,9 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
+    <div class="leftTradeFinancial">
     <div id="financial"></div>
+    </div>
     <script>
         @loginState.userType match {
             case constants.User.ZONE => {
