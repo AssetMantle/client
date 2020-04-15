@@ -240,4 +240,5 @@ object View {
   val FOOTER_TEXT = "FOOTER_TEXT"
   val ASSET_OTHER_DETAILS = "ASSET_OTHER_DETAILS"
   val ADD = "ADD"
+  val REGISTER = "REGISTER"
 }

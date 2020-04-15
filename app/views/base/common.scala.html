@@ -72,9 +72,7 @@
                     @loginState match {
                         case null => {
                             <li>
-                                <a onclick="getForm(jsRoutes.controllers.AccountController.noteAndVerifyMnemonic())">
-                                    @commonFormButton(constants.Form.SIGN_UP, 'class -> "buttonRegister")
-                                </a>
+                                @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.noteAndVerifyMnemonic, 'class -> "buttonRegister")
                             </li>
                             <li>
                                 <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
