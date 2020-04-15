@@ -7,30 +7,39 @@
 @(sellNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellNegotiationList.map { sellNegotiation =>
-    @commonInfoBox() {
+    <li class="commonList">
         @defining(counterPartyTraders.filter(_.id == sellNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
-                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
                 }
                 case None => {
-                    @commonTextInfo(constants.Form.TRADER_ID, sellNegotiation.buyerTraderID)
+                    @commonVerticalTextInfo(constants.View.TRADER_ID, sellNegotiation.buyerTraderID)
                 }
             }
         }
         @defining(assets.filter(_.id == sellNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
             @rejectedNegotiationAsset match {
                 case Some(asset) => {
-                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                    @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
                 }
                 case None => {
-                    @commonTextInfo(constants.View.ASSET_ID, sellNegotiation.assetID)
+                    @commonVerticalTextInfo(constants.View.ASSET_ID, sellNegotiation.assetID)
                 }
             }
         }
-        @commonIntInfo(constants.View.PRICE, sellNegotiation.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString(), sellNegotiation.quantityUnit).mkString(" "))
-        @commonTextInfo(constants.View.STATUS, sellNegotiation.status)
-        <a class="cmuk-link" href="@routes.ViewController.tradeRoom(sellNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
-    }
+        @commonVerticalIntInfo(constants.View.PRICE, sellNegotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString(), sellNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.STATUS, sellNegotiation.status)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+                <button class="cmuk-button cmuk-button-primary cmuk-button-small">
+                    <a class="cmuk-link secondaryFont" href="@routes.ViewController.tradeRoom(sellNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+                </button>
+            </p>
+        </div>
+    </li>
 }

@@ -10,40 +10,50 @@
 @left = {
     <div class="leftTradeFinancial secondaryFont">
         <div id="tradeFinancials"></div>
-        <div id="tradeDocuments"></div>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                <div id="traderViewNegotiationDocuments"></div>
+                <script type="text/javascript">
+                    componentResource('traderViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationFiles('@id'));
+                </script>
+            }
+            case constants.User.ORGANIZATION => {
+                <div id="organizationViewNegotiationDocuments"></div>
+                <script type="text/javascript">
+                    componentResource('organizationViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles('@id'));
+                </script>
+            }
+            case constants.User.ZONE => {}
+            case _ => {}
+        }
     </div>
-    <script type="text/javascript">
-    @loginState.userType match {
-                case constants.User.TRADER => {
-                    componentResource('tradeDocuments', jsRoutes.controllers.ComponentViewController.tradeDocumentList('@id'));
-                }
-                case constants.User.ORGANIZATION => {
-
-                }
-    }
-    </script>
 }
 
 @center = {
+    <div class="mainTabs">
     <div class="cmuk-card cmuk-card-default">
         <div class="cmuk-card-body">
-         <div id="acceptedNegotiation">
-
-         </div>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                <div id="traderViewAcceptedNegotiation">
+                </div>
+                <script type="text/javascript">
+                    componentResource('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@id'));
+                </script>
+            }
+            case constants.User.ORGANIZATION => {
+                <div id="organizationViewAcceptedNegotiation">
+                </div>
+                <script type="text/javascript">
+                    componentResource('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation('@id'));
+                </script>
+            }
+            case constants.User.ZONE => {}
+            case _ => {}
+        }
         </div>
     </div>
-    <iframe class="hidden" src="@routes.NegotiationController.negotiationTermsComet(id)"></iframe>
-    <script type="text/javascript">
-        @loginState.userType match {
-                case constants.User.TRADER => {
-                    componentResource('acceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@id'));
-        }
-                case constants.User.ORGANIZATION => {}
-        }
-            var tradeTermsCometMessage = function (event) {
-                componentResource('tradeTerms', jsRoutes.controllers.TradeRoomController.tradeTerms('@id'));
-            }
-    </script>
+    </div>
 }
 
 @right = {
@@ -55,24 +65,48 @@
             <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>
         </div>
-    </div>
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
-        } {
-            <div class="scroller">
-                <div id="recentActivity">
+    </div>@loginState.userType match {
+    case constants.User.TRADER => {
+        <div class="recentActivity">
+            <div class="recentActivityContainer">
+            @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
+            } {
+                <div class="scroller">
+                    <div id="traderViewRecentActivity">
+                    </div>
+                    <div class="cover-bar"></div>
                 </div>
-                <div class="cover-bar"></div>
+            }
             </div>
-        }
+            <div id="chatRoom" class="chatRoom">
         </div>
-        <div id="chatRoom" class="chatRoom">
         </div>
-    </div>
-    <script>
-            componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@id'));
+        <script>
+            componentResource('traderViewRecentActivity', jsRoutes.controllers.ComponentViewController.traderViewRecentActivityForTradeRoom(0, '@id'));
             componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
 
     </script>
+    }
+    case constants.User.ORGANIZATION => {
+        <div class="recentActivity">
+            <div class="recentActivityContainer">
+            @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
+            } {
+                <div class="scroller">
+                    <div id="organizationViewRecentActivity">
+                    </div>
+                    <div class="cover-bar"></div>
+                </div>
+            }
+            </div>
+        </div>
+        <script>
+               //tradeRoom Recent Activity  for organization to be added
+    </script>
+    }
+    case constants.User.ZONE => {}
+    case _ => {}
+}
+
+
 }

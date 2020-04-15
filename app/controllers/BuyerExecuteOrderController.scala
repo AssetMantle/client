@@ -28,7 +28,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
-      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
+      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.FIAT_PROOF)
 
       (for {
         requestID <- requestID
@@ -125,7 +125,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
       def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
-      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
+      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.FIAT_PROOF)
 
       (for {
         negotiationID <- negotiationID

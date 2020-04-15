@@ -26,7 +26,7 @@ class ChangePassword @Inject()(wsClient: WSClient)(implicit configuration: Confi
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(username: String, request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + username).put(Json.toJson(request)))
+  private def action(username: String, request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + username).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 

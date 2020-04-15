@@ -21,10 +21,11 @@ dl {
   text-align: left; }
 
 label {
-  font-size: 14px;
-  font-family: "Oxygen", sans-serif;
+  font-size: 16px;
+  font-family: Oxygen;
   font-weight: normal;
-  color: #272829; }
+  color: #272829;
+  line-height: 2; }
 
 @media (max-width: 600px) {
   table thead {

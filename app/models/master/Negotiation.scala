@@ -36,20 +36,13 @@ case class BuyerAcceptedDocumentsCheckList(billOfExchangeRequired: Boolean = fal
 case class NegotiationTermsCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor)(implicit executionContext: ExecutionContext ,configuration: Configuration) {
+class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
-  val mainNegotiationTermsActor: ActorRef = actorSystem.actorOf(props = MainNegotiationTermsActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION_TERMS)
-
 
   private implicit val module: String = constants.Module.MASTER_NEGOTIATION
 
@@ -187,7 +180,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateDocumentsCheckListByID(id: String, billOfExchangeRequired: Option[Boolean], obl:Option[Boolean], coo: Option[Boolean], coa: Option[Boolean], otherDocuments: Option[String], buyerAcceptedDocumentsCheckList: BuyerAcceptedDocumentsCheckList): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchangeRequired.?, x.obl.?, x.coo.?, x.coa.?, x.otherDocuments.?, x.buyerAcceptedBillOfExchangeRequired, x.buyerAcceptedDocumentList )).update((billOfExchangeRequired, obl, coo, coa, otherDocuments, buyerAcceptedDocumentsCheckList.billOfExchangeRequired, buyerAcceptedDocumentsCheckList.documentList)).asTry).map {
+  private def updateDocumentsCheckListByID(id: String, billOfExchangeRequired: Option[Boolean], obl: Option[Boolean], coo: Option[Boolean], coa: Option[Boolean], otherDocuments: Option[String], buyerAcceptedDocumentsCheckList: BuyerAcceptedDocumentsCheckList): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchangeRequired.?, x.obl.?, x.coo.?, x.coa.?, x.otherDocuments.?, x.buyerAcceptedBillOfExchangeRequired, x.buyerAcceptedDocumentList)).update((billOfExchangeRequired, obl, coo, coa, otherDocuments, buyerAcceptedDocumentsCheckList.billOfExchangeRequired, buyerAcceptedDocumentsCheckList.documentList)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -255,19 +248,20 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findAllNegotiationsByBuyerTraderIDAndStatuses(traderID: String, statuses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID === traderID).filter(_.status.inSet(statuses)).result)
+  private def findAllNegotiationsByBuyerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID === traderID).filter(_.status.inSet(statuses)).result)
 
-  private def findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs:  Seq[String], statuses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
 
-  private def findAllNegotiationsBySellerTraderIDAndStatuses(traderID: String, statuses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID === traderID).filter(_.status.inSet(statuses)).result)
-
-  private def findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
+  private def findAllNegotiationsBySellerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID === traderID).filter(_.status.inSet(statuses)).result)
 
   private def findAllNegotiationsByTraderIDAndStatus(traderID: String, status: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(x => x.sellerTraderID === traderID || x.buyerTraderID === traderID).filter(_.status === status).result)
 
+  private def findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
+
+  private def findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
+
   private def findAllByAssetID(assetID: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.assetID === assetID).result)
 
-  private def updateAssetDescriptionAndStatusByID(id: String, assetDescription: String,buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.assetDescription,x.buyerAcceptedAssetDescription)).update((assetDescription, buyerAcceptedAssetDescription)).asTry).map {
+  private def updateAssetDescriptionAndStatusByID(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.buyerAcceptedAssetDescription)).update((assetDescription, buyerAcceptedAssetDescription)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -287,7 +281,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updatePriceAndStatusByID(id: String, price: Int,buyerAcceptedPrice: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.price,x.buyerAcceptedPrice)).update((price, buyerAcceptedPrice)).asTry).map {
+  private def updatePriceAndStatusByID(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.price, x.buyerAcceptedPrice)).update((price, buyerAcceptedPrice)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -307,7 +301,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateQuantityAndStatusByID(id: String, quantity: Int,buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.quantity,x.buyerAcceptedQuantity)).update((quantity, buyerAcceptedQuantity)).asTry).map {
+  private def updateQuantityAndStatusByID(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.quantity, x.buyerAcceptedQuantity)).update((quantity, buyerAcceptedQuantity)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -327,7 +321,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateShippingPeriodAndStatusByID(id: String, shippingPeriod: Int,buyerAcceptedShippingPeriod: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.shippingPeriod,x.buyerAcceptedShippingPeriod)).update((shippingPeriod, buyerAcceptedShippingPeriod)).asTry).map {
+  private def updateShippingPeriodAndStatusByID(id: String, shippingPeriod: Int, buyerAcceptedShippingPeriod: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.shippingPeriod, x.buyerAcceptedShippingPeriod)).update((shippingPeriod, buyerAcceptedShippingPeriod)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -347,7 +341,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateAdvancePaymentAndStatusByID(id: String, advancePayment: Boolean, advancePercentage: Option[Double], buyerAcceptedAdvancePayment: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.advancePayment,x.advancePercentage.?,x.buyerAcceptedAdvancePayment)).update((advancePayment, advancePercentage, buyerAcceptedAdvancePayment)).asTry).map {
+  private def updateAdvancePaymentAndStatusByID(id: String, advancePayment: Boolean, advancePercentage: Option[Double], buyerAcceptedAdvancePayment: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.advancePayment, x.advancePercentage.?, x.buyerAcceptedAdvancePayment)).update((advancePayment, advancePercentage, buyerAcceptedAdvancePayment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -367,7 +361,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateCreditAndStatusByID(id: String, credit: Boolean, tentativeDate: Option[Date], tenure: Option[Int], reference: Option[String], buyerAcceptedCredit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.credit,x.tentativeDate.?, x.tenure.?, x.reference.?,x.buyerAcceptedCredit)).update((credit, tentativeDate, tenure, reference, buyerAcceptedCredit)).asTry).map {
+  private def updateCreditAndStatusByID(id: String, credit: Boolean, tentativeDate: Option[Date], tenure: Option[Int], reference: Option[String], buyerAcceptedCredit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.credit, x.tentativeDate.?, x.tenure.?, x.reference.?, x.buyerAcceptedCredit)).update((credit, tentativeDate, tenure, reference, buyerAcceptedCredit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -387,7 +381,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateBillOfExchangeRequiredAndStatusByID(id: String, billOfExchangeRequired: Boolean, buyerAcceptedBillOfExchangeRequired: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.billOfExchangeRequired,x.buyerAcceptedBillOfExchangeRequired)).update((billOfExchangeRequired, buyerAcceptedBillOfExchangeRequired)).asTry).map {
+  private def updateBillOfExchangeRequiredAndStatusByID(id: String, billOfExchangeRequired: Boolean, buyerAcceptedBillOfExchangeRequired: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchangeRequired, x.buyerAcceptedBillOfExchangeRequired)).update((billOfExchangeRequired, buyerAcceptedBillOfExchangeRequired)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -407,7 +401,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateDocumentListAndStatusByID(id: String, obl: Boolean, coo:Boolean, coa:Boolean, otherDocuments: Option[String],buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x=>(x.obl, x.coo, x.coa, x.otherDocuments.?,x.buyerAcceptedDocumentList)).update((obl, coa, coa , otherDocuments, buyerAcceptedDocumentList)).asTry).map {
+  private def updateDocumentListAndStatusByID(id: String, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String], buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.obl, x.coo, x.coa, x.otherDocuments.?, x.buyerAcceptedDocumentList)).update((obl, coa, coa, otherDocuments, buyerAcceptedDocumentList)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -553,7 +547,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetDocumentsCheckList(id: String): Future[DocumentsCheckList] = findDocumentsCheckListByID(id)
 
-    def updateDocumentsCheckList(id: String, billOfExchangeRequired: Boolean, obl:Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = updateDocumentsCheckListByID(id = id, billOfExchangeRequired = Option(billOfExchangeRequired), obl=Option(obl), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments, buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList())
+    def updateDocumentsCheckList(id: String, billOfExchangeRequired: Boolean, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = updateDocumentsCheckListByID(id = id, billOfExchangeRequired = Option(billOfExchangeRequired), obl = Option(obl), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments, buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList())
 
     def updatePriceAndQuantity(id: String, price: Int, quantity: Int): Future[Int] = updatePriceAndQuantityByID(id = id, price = price, quantity = quantity)
 
@@ -581,43 +575,51 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markAcceptedAndUpdateNegotiationID(id: String, negotiationID: String): Future[Int] = updateNegotiationIDAndStatusByID(id = id, negotiationID = negotiationID, status = constants.Status.Negotiation.NEGOTIATION_STARTED)
 
-    def markBuyerAcceptedAllNegotiationTerms(id: String)=updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS)
+    def markBuyerAcceptedAllNegotiationTerms(id: String) = updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS)
 
     def getAllByAssetID(assetID: String): Future[Seq[Negotiation]] = findAllByAssetID(assetID)
 
-    def getAllAcceptedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS,constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE))
+    def getAllAcceptedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
 
-    def getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE))
+    def getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
 
-    def getAllAcceptedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE))
+    def getAllAcceptedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
 
-    def getAllAcceptedSellNegotiationListByTraderIDs(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE))
+    def getAllAcceptedSellNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
 
-    def getAllRejectedNegotiationListByBuyerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.REJECTED))
+    def getAllRejectedNegotiationListByBuyerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REJECTED)
 
-    def getAllRejectedNegotiationListByBuyerTraderIDs(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.REJECTED))
+    def getAllRejectedNegotiationListByBuyerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REJECTED)
 
-    def getAllRejectedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.REJECTED))
+    def getAllRejectedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REJECTED)
 
-    def getAllRejectedNegotiationListBySellerTraderIDs(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.REJECTED))
+    def getAllRejectedNegotiationListBySellerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REJECTED)
 
-    def getAllFailedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT))
+    def getAllFailedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT)
 
-    def getAllFailedNegotiationListBySellerTraderIDs(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT))
+    def getAllFailedNegotiationListBySellerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT)
 
-    def getAllReceivedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.REQUEST_SENT))
+    def getAllReceivedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REQUEST_SENT)
 
-    def getAllReceivedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.REQUEST_SENT))
+    def getAllReceivedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REQUEST_SENT)
 
-    def getAllSentNegotiationRequestListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.REQUEST_SENT))
+    def getAllSentNegotiationRequestListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REQUEST_SENT)
 
-    def getAllSentNegotiationRequestListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.REQUEST_SENT))
+    def getAllSentNegotiationRequestListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REQUEST_SENT)
 
-    def getAllIncompleteNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = Seq(constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING))
+    def getAllIncompleteNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING)
 
-    def getAllIncompleteNegotiationListByTraderIDs(traderIDs:  Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, statuses = Seq(constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING))
+    def getAllIncompleteNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING)
 
     def getAllConfirmedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByTraderIDAndStatus(traderID = traderID, status = constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
+
+    def getAllTradeCompletedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.TRADE_COMPLETED)
+
+    def getAllTradeCompletedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.TRADE_COMPLETED)
+
+    def getAllTradeCompletedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.TRADE_COMPLETED)
+
+    def getAllTradeCompletedSellNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.TRADE_COMPLETED)
 
     def insertChatID(id: String, chatID: String): Future[Int] = updateChatIDByID(id = id, chatID = chatID)
 
@@ -639,37 +641,29 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def checkTraderNegotiationExists(id: String, traderID: String): Future[Boolean] = checkByIDAndTraderID(id = id, traderID = traderID)
 
-    def updateAssetDescriptionAndStatus(id:String, assetDescription: String, buyerAcceptedAssetDescription: Boolean)= updateAssetDescriptionAndStatusByID(id, assetDescription, buyerAcceptedAssetDescription)
+    def updateAssetDescriptionAndStatus(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean) = updateAssetDescriptionAndStatusByID(id, assetDescription, buyerAcceptedAssetDescription)
 
-    def updateQuantityAndStatus(id:String, quantity: Int, buyerAcceptedQuantity: Boolean)= updateQuantityAndStatusByID(id, quantity, buyerAcceptedQuantity)
+    def updateQuantityAndStatus(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = updateQuantityAndStatusByID(id, quantity, buyerAcceptedQuantity)
 
-    def updatePriceAndStatus(id:String, price: Int, buyerAcceptedPrice: Boolean)= updatePriceAndStatusByID(id, price, buyerAcceptedPrice)
+    def updatePriceAndStatus(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = updatePriceAndStatusByID(id, price, buyerAcceptedPrice)
 
-    def updateShippingPeriodAndStatus(id:String, shippingPeriod: Int, buyerAcceptedShippingPeriod: Boolean)= updateShippingPeriodAndStatusByID(id, shippingPeriod, buyerAcceptedShippingPeriod)
+    def updateShippingPeriodAndStatus(id: String, shippingPeriod: Int, buyerAcceptedShippingPeriod: Boolean) = updateShippingPeriodAndStatusByID(id, shippingPeriod, buyerAcceptedShippingPeriod)
 
-    def updateAdvancePaymentAndStatus(id:String, advancePayment: Boolean, advancePercentage: Option[Double], buyerAcceptedAdvancePayment: Boolean)= updateAdvancePaymentAndStatusByID(id, advancePayment, advancePercentage, buyerAcceptedAdvancePayment)
+    def updateAdvancePaymentAndStatus(id: String, advancePayment: Boolean, advancePercentage: Option[Double], buyerAcceptedAdvancePayment: Boolean) = updateAdvancePaymentAndStatusByID(id, advancePayment, advancePercentage, buyerAcceptedAdvancePayment)
 
-    def updateCreditAndStatus(id:String, credit: Boolean, tentativeDate: Option[Date], tenure:Option[Int], reference:Option[String], buyerAcceptedCredit: Boolean)= updateCreditAndStatusByID(id, credit, tentativeDate, tenure, reference, buyerAcceptedCredit)
+    def updateCreditAndStatus(id: String, credit: Boolean, tentativeDate: Option[Date], tenure: Option[Int], reference: Option[String], buyerAcceptedCredit: Boolean) = updateCreditAndStatusByID(id, credit, tentativeDate, tenure, reference, buyerAcceptedCredit)
 
-    def updateBillOfExchangeRequiredAndStatus(id:String, billOfExchangeRequired: Boolean, buyerAcceptedBillOfExchangeRequired: Boolean)= updateBillOfExchangeRequiredAndStatusByID(id, billOfExchangeRequired, buyerAcceptedBillOfExchangeRequired)
+    def updateBillOfExchangeRequiredAndStatus(id: String, billOfExchangeRequired: Boolean, buyerAcceptedBillOfExchangeRequired: Boolean) = updateBillOfExchangeRequiredAndStatusByID(id, billOfExchangeRequired, buyerAcceptedBillOfExchangeRequired)
 
-    def updateDocumentListAndStatus(id:String, obl: Boolean, coo:Boolean, coa: Boolean, otherDocuments:Option[String], buyerAcceptedDocumentList: Boolean)= updateDocumentListAndStatusByID(id, obl, coo, coa, otherDocuments, buyerAcceptedDocumentList)
+    def updateDocumentListAndStatus(id: String, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String], buyerAcceptedDocumentList: Boolean) = updateDocumentListAndStatusByID(id, obl, coo, coa, otherDocuments, buyerAcceptedDocumentList)
 
-    def tryGetSellerTraderID(id:String)= findSellerTraderIDByID(id)
+    def tryGetSellerTraderID(id: String) = findSellerTraderIDByID(id)
 
-    def tryGetBuyerTraderID(id:String)= findBuyerTraderIDByID(id)
+    def tryGetBuyerTraderID(id: String) = findBuyerTraderIDByID(id)
 
-    def updateStatus(id: String, status:String)= updateStatusByID(id, status)
+    def updateStatus(id: String, status: String): Future[Int] = updateStatusByID(id, status)
 
-    def negotiationTermsCometSource(username: String) = {
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION_TERMS, username)
-      Thread.sleep(cometActorSleepTime)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainNegotiationTermsActor ! actors.CreateNegotiationTermsChildActorMessage(username = username, actorRef = systemUserActor)
-      source
-    }
-
-    def sendMessageToNegotiationTermsActor(accountID:String): Unit =  mainNegotiationTermsActor ! NegotiationTermsCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+    def sendMessageToNegotiationTermsActor(accountID: String, id: String): Unit = actorsCreate.mainActor ! actors.Message.makeCometMessage(accountID, constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(id)))
   }
 
 }

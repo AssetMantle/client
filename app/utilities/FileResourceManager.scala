@@ -75,6 +75,8 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderNegotiationOtherPath: String = configuration.get[String]("upload.negotiation.other")
 
+  private val uploadTraderNegotiationContractPath: String = configuration.get[String]("upload.negotiation.contract")
+
   private val uploadTraderNegotiationBuyerContractPath: String = configuration.get[String]("upload.negotiation.buyerContract")
 
   private val uploadTraderNegotiationSellerContractOtherPath: String = configuration.get[String]("upload.negotiation.sellerContract")
@@ -154,6 +156,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
       case constants.File.INSURANCE => uploadTraderNegotiationInsurancePath
       case constants.File.OTHER => uploadTraderNegotiationOtherPath
+      case constants.File.CONTRACT => uploadTraderNegotiationContractPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
@@ -176,7 +179,9 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
   def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
-        case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+        case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
+             constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE
+        => utilities.ImageProcess.convertToThumbnail(name, path)
         case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
     }
@@ -200,7 +205,9 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
   def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
-        case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+        case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
+             constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE
+        => utilities.ImageProcess.convertToThumbnail(name, path)
         case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
     }

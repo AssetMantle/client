@@ -18,7 +18,7 @@ object profileControllerTest {
 
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Detail_Form")
-        .get(routes.AccountController.identificationForm().url)
+        .get(routes.AccountController.addIdentificationForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .feed(NameFeeder.nameFeed)
@@ -26,7 +26,7 @@ object profileControllerTest {
     .feed(AddressDataFeeder.addressDataFeed)
     .pause(2)
     .exec(http("IdentificationDetail_Post")
-      .post(routes.AccountController.identification().url)
+      .post(routes.AccountController.addIdentification().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.FIRST_NAME -> "${%s}".format(Test.TEST_FIRST_NAME),
@@ -68,12 +68,12 @@ object profileControllerTest {
     )
     .pause(2)
     .exec(http("AddIdentificationForm")
-      .get(routes.AccountController.userReviewIdentificationDetailsForm().url)
+      .get(routes.AccountController.userReviewIdentificationForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(2)
     .exec(http("IdentificationDetail_Post")
-      .post(routes.AccountController.userReviewIdentificationDetails().url)
+      .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.COMPLETION -> true

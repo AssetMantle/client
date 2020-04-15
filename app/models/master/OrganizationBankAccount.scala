@@ -87,7 +87,7 @@ class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvi
 
     def insertOrUpdate(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, country: String, address: String, zipCode: String): Future[Int] = upsert(OrganizationBankAccountDetail(id = id, accountHolder = accountHolder, nickName = nickName, accountNumber = accountNumber, bankName = bankName, swiftAddress = swiftAddress, country = country, address = address, zipCode = zipCode))
 
-    def tryGet(id: String): Future[OrganizationBankAccountDetail] = findById(id).map{ detail=> detail.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))}
+    def tryGet(id: String): Future[OrganizationBankAccountDetail] = findById(id).map { detail => detail.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
     def get(id: String): Future[Option[OrganizationBankAccountDetail]] = findById(id)
   }

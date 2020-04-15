@@ -118,13 +118,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def getByIdDocumentType(id: String, documentType: String): Future[Option[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption)
 
   private def getFileByIdDocumentType(id: String, documentType: String): Future[Array[Byte]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.file).result.head.asTry).map {
     case Success(result) => result
@@ -198,16 +192,16 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def create(file: NegotiationFile): Future[String] = add(NegotiationFileSerialized(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
-    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map { negotiationFile =>
+    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = getByIdDocumentType(id = id, documentType = documentType).map { negotiationFile =>
       negotiationFile match {
         case Some(negotiation) => negotiation.deSerialize
         case None => NegotiationFile("", "", "", None, None, None)
       }
     }
 
-    def get(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType).map(_.deSerialize)
+    def tryGet(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType).map(_.deSerialize)
 
-    def getOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map(_.map(_.deSerialize))
+    def get(id: String, documentType: String): Future[Option[NegotiationFile]] = getByIdDocumentType(id = id, documentType = documentType).map(_.map(_.deSerialize))
 
     def getConfirmBidDocuments(id: String): Future[Seq[NegotiationFile]] = getDocumentsByID(id = id, documents = Seq(constants.File.BUYER_CONTRACT, constants.File.SELLER_CONTRACT)).map(_.map(_.deSerialize))
 

@@ -3,14 +3,14 @@
 @import views.html.base._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.TRADES), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
 @loginState.userType match {
     case constants.User.TRADER => {
         <div class="leftTradeFinancial">
             <div id="traderFinancials"></div>
-            <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+
         </div>
         <script>
             componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
@@ -71,7 +71,7 @@
 @right = {
     <div class="recentActivity">
         <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY) {
+        @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
         } {
             <div class="scroller">
                 <div id="recentActivity"></div>

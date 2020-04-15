@@ -18,8 +18,8 @@ object Form {
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword(), routes.javascript.AccountController.changePasswordForm)
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword(), routes.javascript.AccountController.emailOTPForgotPasswordForm)
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword(), routes.javascript.AccountController.forgotPasswordForm)
-  val IDENTIFICATION = new Form("IDENTIFICATION", routes.AccountController.identification(), routes.javascript.AccountController.identificationForm)
-  val REVIEW_IDENTIFICATION_ON_COMPLETION = new Form("REVIEW_IDENTIFICATION_ON_COMPLETION", routes.AccountController.userReviewIdentificationDetails(), routes.javascript.AccountController.userReviewIdentificationDetailsForm)
+  val ADD_IDENTIFICATION = new Form("ADD_IDENTIFICATION", routes.AccountController.addIdentification(), routes.javascript.AccountController.addIdentificationForm)
+  val USER_REVIEW_IDENTIFICATION = new Form("USER_REVIEW_IDENTIFICATION", routes.AccountController.userReviewIdentification(), routes.javascript.AccountController.userReviewIdentificationForm)
 
   //AddKeyController
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey(), routes.javascript.AddKeyController.blockchainAddKeyForm)
@@ -31,16 +31,17 @@ object Form {
   val USER_DELETE_UBO = new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO(), routes.javascript.AddOrganizationController.userDeleteUBOForm)
   val ADD_UBO = new Form("ADD_UBO", routes.AddOrganizationController.addUBO(), routes.javascript.AddOrganizationController.addUBOForm)
   val USER_ADD_UBO = new Form("USER_ADD_UBO", routes.AddOrganizationController.userAddUBO(), routes.javascript.AddOrganizationController.userAddUBOForm)
-  val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.addOrUpdateOrganizationBankAccountDetail(), routes.javascript.AddOrganizationController.addOrUpdateOrganizationBankAccountDetailForm)
+  val ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT = new Form("ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT", routes.AddOrganizationController.addOrUpdateOrganizationBankAccount(), routes.javascript.AddOrganizationController.addOrUpdateOrganizationBankAccountForm)
   val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest(), routes.javascript.AddOrganizationController.userReviewAddOrganizationRequestForm)
-  val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization(), routes.javascript.AddOrganizationController.verifyOrganizationForm)
-  val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest(), routes.javascript.AddOrganizationController.rejectVerifyOrganizationRequestForm)
+  val ACCEPT_ORGANIZATION_REQUEST = new Form("ACCEPT_ORGANIZATION_REQUEST", routes.AddOrganizationController.acceptRequest(), routes.javascript.AddOrganizationController.acceptRequestForm)
+  val REJECT_ORGANIZATION_REQUEST = new Form("REJECT_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectRequest(), routes.javascript.AddOrganizationController.rejectRequestForm)
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization(), routes.javascript.AddOrganizationController.blockchainAddOrganizationForm)
 
   //AssetController
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
 
   //AddZoneController
+  val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone(), routes.javascript.AddZoneController.addZoneForm)
   val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.userReviewAddZoneRequest(), routes.javascript.AddZoneController.userReviewAddZoneRequestForm)
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone(), routes.javascript.AddZoneController.verifyZoneForm)
@@ -143,10 +144,7 @@ object Form {
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader(), routes.javascript.SetACLController.addTraderForm)
   val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest(), routes.javascript.SetACLController.userReviewAddTraderRequestForm)
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
-  val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest(), routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)
-  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.SetACLController.organizationModifyTrader(), routes.javascript.SetACLController.organizationModifyTraderForm)
-  val ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.organizationRejectVerifyTraderRequest(), routes.javascript.SetACLController.organizationRejectVerifyTraderRequestForm)
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL(), routes.javascript.SetACLController.blockchainSetACLForm)
 
   //SetBuyerFeedbackController
@@ -158,7 +156,10 @@ object Form {
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback(), routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm)
 
   //TraderController
+  val ORGANIZATION_REJECT_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_TRADER_REQUEST", routes.TraderController.organizationRejectRequest(), routes.javascript.TraderController.organizationRejectRequestForm)
+  val ZONE_REJECT_TRADER_REQUEST = new Form("ZONE_REJECT_TRADER_REQUEST", routes.TraderController.zoneRejectRequest(), routes.javascript.TraderController.zoneRejectRequestForm)
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
+  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
 
   //VerifyEmailAddressController
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress(), routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm)
@@ -166,14 +167,9 @@ object Form {
   //VerifyMobileNumberController
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber(), routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
 
-  val INDEX = "INDEX"
-  val DASHBOARD = "DASHBOARD"
-  val COMMIT = "COMMIT"
-  val PROFILE = "PROFILE"
-  val MARKET = "MARKET"
-  val ACCOUNT = "ACCOUNT"
-  val TRADES = "TRADES"
-  val REQUEST = "REQUEST"
+  val ACCOUNT_ID="ACCOUNT_ID"
+  val ORGANIZATION_ID="ORGANIZATION_ID"
+  val TRADER_ID="TRADER_ID"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
   val BLOCKS = "BLOCKS"
@@ -192,13 +188,10 @@ object Form {
   val ACL = "ACL"
   val LATEST_BLOCK_HEIGHT = "LATEST_BLOCK_HEIGHT"
   val AVERAGE_BLOCK_TIME = "AVERAGE_BLOCK_TIME"
-  val BACK = "BACK"
   val INVALID_BLOCK_HEIGHT = "INVALID_BLOCK_HEIGHT"
   val INVALID_TRANSACTION_HASH = "INVALID_TRANSACTION_HASH"
   val LOAD_MORE_NOTIFICATIONS = "LOAD_MORE_NOTIFICATIONS"
-  val ORGANIZATIONS = "ORGANIZATIONS"
   val ZONES = "ZONES"
-  val TRADERS = "TRADERS"
   val INBOX = "INBOX"
   val NEGOTIATE = "NEGOTIATE"
   val ON_GOING_NEGOTIATIONS = "ON_GOING_NEGOTIATIONS"
@@ -311,6 +304,8 @@ object Form {
   val UPDATE_BUYER_CONTRACT = "UPDATE_BUYER_CONTRACT"
   val UPLOAD_SELLER_CONTRACT = "UPLOAD_SELLER_CONTRACT"
   val UPDATE_SELLER_CONTRACT = "UPDATE_SELLER_CONTRACT"
+  val UPLOAD_CONTRACT = "UPLOAD_CONTRACT"
+
 
   val HEIGHT = "HEIGHT"
   val FEE = "FEE"
@@ -329,19 +324,18 @@ object Form {
   val TAKER_ADDRESS = "TAKER_ADDRESS"
   val BLOCKCHAIN_ADDRESS = "BLOCKCHAIN_ADDRESS"
   val PUBLIC_KEY = "PUBLIC_KEY"
-  val NAME = "NAME"
   val MNEMONIC = "MNEMONIC"
   val PASSWORD = "PASSWORD"
   val CONFIRM_PASSWORD = "CONFIRM_PASSWORD"
   val FROM = "FROM"
   val TO = "TO"
-  val ORGANIZATION = "ORGANIZATION"
   val ZONE = "ZONE"
   val GENESIS = "GENESIS"
   val GENESIS_ADDRESS = "GENESIS_ADDRESS"
   val ORGANIZATION_NAME = "ORGANIZATION_NAME"
   val ORGANIZATION_USERNAME = "ORGANIZATION_USERNAME"
   val ZONE_ID = "ZONE_ID"
+  val NAME ="NAME"
   val BUYER_ADDRESS = "BUYER_ADDRESS"
   val BUYER_ID = "BUYER_ID"
   val SELLER_ADDRESS = "SELLER_ADDRESS"
@@ -379,11 +373,6 @@ object Form {
   val PHONE = "PHONE"
   val EMAIL = "EMAIL"
   val ID = "ID"
-  val ACCOUNT_ID = "ACCOUNT_ID"
-  val TRADER_ID = "TRADER_ID"
-  val SELLER_TRADER_ID = "SELLER_TRADER_ID"
-  val BUYER_TRADER_ID = "BUYER_TRADER_ID"
-  val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
   val USERNAME = "USERNAME"
   val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"

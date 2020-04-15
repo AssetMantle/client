@@ -23,10 +23,14 @@
 
   .MnemonicQuiz {
     text-align: center;
-    width: 500px; }
+    max-width: 750px; }
 
   .kycDocumentsView {
-    display: flex; } }
+    display: flex; }
+
+  .cmuk-card-body .cmuk-subnav li a {
+    font-size: 12px;
+    text-transform: capitalize; } }
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex; } }
@@ -50,8 +54,9 @@
     height: 100%;
     float: left;
     left: 0;
-    margin-right: 1%;
-    width: 24%; }
+    margin-right: 0.5%;
+    width: 24%;
+    margin-bottom: 5px; }
   .pageContainer .middle {
     width: 50%;
     height: calc(100% - 128px);
@@ -60,7 +65,14 @@
     height: 100%;
     width: 24%;
     float: left;
-    right: 0; } }
+    margin-left: 0.5%;
+    right: 0;
+    margin-bottom: 5px; } }
+@media (max-width: 992px) {
+  .MnemonicQuiz .mnemonicNote {
+    background-image: none; }
+    .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
+      width: 100%; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
     max-height: 470px; }
@@ -74,10 +86,10 @@
   .leftTradeFinancial .financial ul li {
     padding: 10px 0; }
     .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .wallet .ctitle {
-      font-size: 12px; }
+      font-size: 14px; }
   .leftTradeFinancial .addBalanceButton {
     text-transform: capitalize;
-    font-family: "Rubik", sans-serif;
+    font-family: Rubik;
     padding: 8px 8px;
     font-size: 12px;
     line-height: normal;
@@ -109,22 +121,42 @@
     padding: 11px; }
 
   .comdex .cmuk-height-medium {
-    height: 210px; } }
+    height: 210px; }
+
+  .identificationDetails .cmuk-switcher,
+  .traderRelationList .cmuk-switcher,
+  .tradeList .cmuk-switcher {
+    height: 140px; }
+
+  .salesQuoteList .cmuk-card-body .cmuk-switcher {
+    height: 138px; } }
 @media (max-width: 1600px) {
   .commonList .listItemChild {
-    font-size: 12px; }
+    font-size: 14px; }
 
   .leftTradeFinancial .financial ul li .ctitle {
-    font-size: 12px; }
+    font-size: 14px; }
 
   .timeline .timeline-item .timeline-content .activityContent {
-    font-size: 12px; }
+    font-size: 14px; }
 
   .profileContainer .infoRow {
-    font-size: 12px; }
+    font-size: 14px; }
+  .profileContainer .identificationDetails .documentItem {
+    padding: 10px; }
+    .profileContainer .identificationDetails .documentItem .documentContentTop {
+      margin: 0px 7px 0px 0px; }
+    .profileContainer .identificationDetails .documentItem .documentThumbnail {
+      margin: 0px 7px 0px 0px; }
+    .profileContainer .identificationDetails .documentItem .documentContentBottom {
+      margin: 0px; }
+      .profileContainer .identificationDetails .documentItem .documentContentBottom .infoRowLabel {
+        width: auto;
+        margin-right: 5px; }
 
   .cmuk-card-body .cmuk-subnav li a {
-    font-size: 10px; }
+    font-size: 12px;
+    text-transform: capitalize; }
 
   .modal .modalContent {
     top: 10%;
@@ -136,7 +168,10 @@
     margin: 10px 0px 0px 0px; }
   .tabsSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
   .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
-    border: none; } }
+    border: none; }
+
+  .headerFontSize {
+    font-size: 14px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

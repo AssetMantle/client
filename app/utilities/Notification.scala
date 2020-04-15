@@ -9,8 +9,8 @@ import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
-import play.api.libs.mailer.{Email, MailerClient}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.mailer._
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -64,7 +64,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     val twilioInit = Future {
       Twilio.init(smsAccountSID, smsAuthToken)
     }
-    val mobileNumber = masterContacts.Service.getMobileNumber(accountID)
+    val mobileNumber = masterContacts.Service.tryGetMobileNumber(accountID)
     (for {
       _ <- twilioInit
       mobileNumber <- mobileNumber
@@ -123,7 +123,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   def sendEmailByAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
 
-    val toEmailAddress: Future[String] = masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+    val toEmailAddress: Future[String] = masterContacts.Service.tryGetVerifiedEmailAddress(toAccountID)
 
     (for {
       toEmailAddress <- toEmailAddress

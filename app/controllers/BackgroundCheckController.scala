@@ -1,14 +1,12 @@
 package controllers
 
 import java.nio.file.Files
-import java.util.Date
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.common.Serializable
-import models.master.{Trader}
+import models.master.{OrganizationBackgroundCheck, Trader}
 import models.masterTransaction.AssetFile
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -117,7 +115,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   def uploadOrUpdateTraderBackgroundCheckFile(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
       val trader = masterTraders.Service.tryGet(traderID)
 
       def allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
@@ -170,17 +168,17 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val storeFile = fileResourceManager.storeFile[master.OrganizationBackgroundCheck](
+      val storeFile = fileResourceManager.storeFile[OrganizationBackgroundCheck](
         name = name,
         documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None, status = Option(true)),
+        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None, status = Option(true)),
         masterCreate = masterOrganizationBackgroundChecks.Service.create
       )
 
       def allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
 
-      val organization = masterOrganizations.Service.get(organizationID)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
         _ <- storeFile
@@ -211,7 +209,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
       def allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
 
-      val organization = masterOrganizations.Service.get(organizationID)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
         oldDocumentFileName <- getOldDocumentFileName
@@ -229,8 +227,8 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   def uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneID = masterZones.Service.getID(loginState.username)
-      val organization = masterOrganizations.Service.get(organizationID)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val organization = masterOrganizations.Service.tryGet(organizationID)
       val allDocuments = masterOrganizationBackgroundChecks.Service.getAllDocuments(organizationID)
       (for {
         allDocuments <- allDocuments
@@ -251,8 +249,8 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   def zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       (for {
         organizationZoneID <- organizationZoneID
         userZoneID <- userZoneID
@@ -270,7 +268,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderZoneID = masterTraders.Service.tryGetZoneID(traderID)
-      val userZoneID = masterZones.Service.getID(loginState.username)
+      val userZoneID = masterZones.Service.tryGetID(loginState.username)
       (for {
         traderZoneID <- traderZoneID
         userZoneID <- userZoneID

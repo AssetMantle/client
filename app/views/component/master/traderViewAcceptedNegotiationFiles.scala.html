@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import scala.collection.immutable.ListMap
+
+@(id:String, traderID:String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="docView">
+    @commonCard(Messages(constants.Form.DOCUMENTS)){
+        @if(traderID == negotiation.sellerTraderID && negotiation.status == constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS) {
+            @commonModalButton(constants.Form.UPLOAD, routes.javascript.ComponentViewController.negotiationDocumentUpload, 'parameters -> s"'${id}'")
+        }
+    }{
+        @commonHorizontalSwitcher(ListMap(
+            constants.View.DOCUMENT_LIST -> routes.javascript.ComponentViewController.traderViewNegotiationFiles,
+            constants.View.UPLOAD_HISTORY -> commonCard(constants.View.UPLOAD_HISTORY)(Html(""))(Html("")),
+        ),
+            'DOCUMENT_LIST_PARAMETERS -> s"'${id}'")
+    }
+</div>

@@ -1,34 +1,24 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@(coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(coins: String = "0", profilePicture: Array[Byte] = Array())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="cmuk-margin-bottom">
-   @commonCard(loginState.username) {
-   }{
-       <div class="cmuk-grid-medium cmuk-grid cmuk-grid-match" cmuk-grid>
-           <div class="cmuk-width-1-1@@s cmuk-width-1-3@@m">
-               <div>
-               @views.html.profilePicture(profilePicture)
-               </div>
-           </div>
-           <div class="cmuk-width-1-1 cmuk-width-expand@@m">
-               <div class="commonHomeData">
-                   <h3>@loginState.username <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN.legend)</button></h3>
-                   <p> @Messages(constants.Form.COINS): @coins</p>
-                   <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
-                   <p> @Messages(constants.Form.BLOCKCHAIN_ADDRESS): <span id="blockchainAddress" class="hashCode" title="@loginState.address">@loginState.address</span>
-                       <a class="toolTip"  onclick="copyToClipboard('blockchainAddress')"><span class="toolTipText" id="toolTip">Copy to clipboard</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy()"></span></a>
-                   </p>
-               </div>
-           </div>
-       </div>
-   }
-
+<div class="cmuk-width-1-2@@m profileDetails">
+@commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
+} {
+    <div>
+        <div>
+            <div id="profilePhoto" class="cmuk-text-center"></div>
+        </div>
+        <div>
+            @commonTextInfo(constants.User.USER_NAME, loginState.username)
+            @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
+            @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress")
+            <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)
+                <span class="editIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-edit")"/></svg></span></button>
+        </div>
+    </div>
+}
 </div>
-
-<script type="text/javascript">
-        var accountCometMessage = function (event) {
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
-        }
+<script>
+        componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
 </script>
-<iframe class="hidden" src="@routes.ComponentViewController.accountComet"></iframe>

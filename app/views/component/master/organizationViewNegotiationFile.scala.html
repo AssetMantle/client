@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.NegotiationFile
+
+@(negotiationFile: Option[NegotiationFile])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@negotiationFile match{
+    case Some(file)=> {
+        @utilities.FileOperations.fileExtensionFromName(file.fileName) match {
+            case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
+                <img src="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">
+            }
+            case _ => {
+                <iframe src="@routes.FileController.organizationAccessedTradingFile(file.id, file.fileName, file.documentType)" width="100%" height="100%"></iframe>
+            }
+        }
+    }
+    case None=> { @Messages(constants.View.NEGOTIATION_FILES_NOT_UPLOADED)}
+    }

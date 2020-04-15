@@ -28,7 +28,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
-      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.AWB_PROOF)
+      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.AWB_PROOF)
 
       (for {
         requestID <- requestID
@@ -125,7 +125,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
 
       def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
-      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.AWB_PROOF)
+      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.AWB_PROOF)
 
       (for {
         negotiationID <- negotiationID

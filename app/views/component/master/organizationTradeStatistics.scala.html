@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Trader
+
+@(tradeCompletedBuyNegotiationList: Seq[Negotiation], tradeCompletedSellNegotiationList: Seq[Negotiation], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.ORGANIZATION_TRADE_STATISTICS){
+}{
+
+}
