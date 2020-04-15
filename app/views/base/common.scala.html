@@ -13,7 +13,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/fonts.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
-            <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
         <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
@@ -34,91 +34,99 @@
     </head>
     <body class="comdex">
         <div class="bodyContainer">
-        @* Header *@
+            @* Header *@
             <div class="header"
             cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
-            <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
-                <div class="cmuk-navbar-left">
-                    <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
-                        <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
-                    </a>
-                    <ul class="cmuk-navbar-nav">
-                    @loginState match {
-                        case null => {}
-                        case default => {
-                            <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
-                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-dashboard")"/></svg>
-                            </span> @Messages(constants.View.DASHBOARD)</a>
-                            </li>
-                            <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
-                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
-                            </span>@Messages(constants.View.TRADES)</a>
-                            </li>
-                           <li>
-                               <a href="@controllers.routes.ViewController.transactions()"><span class="transactionIcon">
-                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>
-                            </span>@Messages(constants.Form.TRANSACTIONS)</a>
-                            </li>
-                            <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
-                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
-                            </span>@Messages(constants.View.ACCOUNT)</a>
-                            </li>
-                        }
-                    }
-                </ul>
-                </div>
-                <div class="cmuk-navbar-right">
-                    <ul class="cmuk-navbar-nav">
-                    @loginState match {
-                        case null => {
-                            <li>
-                                @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.noteAndVerifyMnemonic, 'class -> "buttonRegister")
-                            </li>
-                            <li>
-                                <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
-                                    @Messages(constants.Form.LOGIN.legend)
+                <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
+                    <div class="cmuk-navbar-left">
+                        <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
+                            <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
+                        </a>
+                        <ul class="cmuk-navbar-nav">
+                        @loginState match {
+                            case null => {}
+                            case default => {
+                                <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
+                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-dashboard")"/></svg>
+                                </span>
+                                    @Messages(constants.View.DASHBOARD)
                                 </a>
-                            </li>
-                        }
-                        case default => {
-                            @loginState.userType match {
-                                case constants.User.TRADER => {
-                                    <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.View.MARKET)</a></li>
-                                }
-                                case constants.User.ZONE => {
-                                    <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                }
-                                case constants.User.ORGANIZATION => {
-                                    <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                }
-                                case constants.User.GENESIS => {
-                                    <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                }
-                                case _ => {}
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
+                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
+                                </span>
+                                    @Messages(constants.View.TRADES)
+                                </a>
+                                </li>
+                                <li>
+                                    <a href="@controllers.routes.ViewController.transactions()"><span class="transactionIcon">
+                                        <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>
+                                    </span>
+                                        @Messages(constants.Form.TRANSACTIONS)
+                                    </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
+                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
+                                </span>
+                                    @Messages(constants.View.ACCOUNT)
+                                </a>
+                                </li>
                             }
-                            <script type="text/javascript">
+                        }
+                        </ul>
+                    </div>
+                    <div class="cmuk-navbar-right">
+                        <ul class="cmuk-navbar-nav">
+                        @loginState match {
+                            case null => {
+                                <li>
+                                    @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.noteAndVerifyMnemonic, 'class -> "buttonRegister")
+                                </li>
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
+                                    @Messages(constants.Form.LOGIN.legend)
+                                    </a>
+                                </li>
+                            }
+                            case default => {
+                                @loginState.userType match {
+                                    case constants.User.TRADER => {
+                                        <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.View.MARKET)</a></li>
+                                    }
+                                    case constants.User.ZONE => {
+                                        <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                    }
+                                    case constants.User.ORGANIZATION => {
+                                        <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                    }
+                                    case constants.User.GENESIS => {
+                                        <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                    }
+                                    case _ => {}
+                                }
+                                <script type="text/javascript">
                                 var cometMessage = function (message) {
                                     cometMessageHandler(message);
                                 }
                             </script>
-                            <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
+                                <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
-                            <li>
-                                <a href="@controllers.routes.ViewController.profile()">
-                                    @loginState.username
-                                <span cmuk-icon="user" class="loginIcon"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-logout")"/></svg>
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="@controllers.routes.ViewController.profile()">
+                                        @loginState.username
+                                    <span cmuk-icon="user" class="loginIcon"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
+                                        <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-logout")"/></svg>
+                                    </a>
+                                </li>
 
+                            }
                         }
-                    }
-                    </ul>
-                </div>
+                        </ul>
+                    </div>
 
                 </nav>
             </div>
@@ -130,31 +138,35 @@
                 <div class="dataContainer">
                     <div class="cmuk-text-center">
                         @for(failure <- failures) {
-                            <div class="cmuk-alert-danger"  onclick="getForm(@failure.action)" cmuk-alert>
+                            <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="failureIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-fail")"/></svg></span>
-                                    <span class="alretName">@Messages(constants.Form.FAILURE):</span> @Messages(failure.message)</p>
+                                    <span class="alretName">@Messages(constants.Form.FAILURE):</span>
+                                    @Messages(failure.message)</p>
                             </div>
                         }
                         @for(warning <- warnings) {
                             <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="warningIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-warning")"/></svg></span>
-                                    <span class="alretName">@Messages(constants.Form.WARNING):</span> @Messages(warning.message)</p>
+                                    <span class="alretName">@Messages(constants.Form.WARNING):</span>
+                                    @Messages(warning.message)</p>
                             </div>
                         }
                         @for(success <- successes) {
                             <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="successIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-success")"/></svg></span>
-                                    <span class="alretName">@Messages(constants.Form.SUCCESS):</span> @Messages(success.message)</p>
+                                    <span class="alretName">@Messages(constants.Form.SUCCESS):</span>
+                                    @Messages(success.message)</p>
                             </div>
                         }
                         @for(info <- infos) {
                             <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="infoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info")"/></svg></span>
-                                    <span class="alretName">@Messages(constants.Form.INFORMATION):</span> @Messages(info.message)</p>
+                                    <span class="alretName">@Messages(constants.Form.INFORMATION):</span>
+                                    @Messages(info.message)</p>
                             </div>
 
                         }
@@ -164,10 +176,10 @@
                     @loginState match {
                         case null => {
                             <div class="bannerContainer cmuk-container">
-                                    <div class="bannerText">
-                                        <h3>@Messages(constants.View.INDEX_1)</h3>
-                                        <p>@Messages(constants.View.INDEX_2)</p>
-                                    </div>
+                                <div class="bannerText">
+                                    <h3>@Messages(constants.View.INDEX_1)</h3>
+                                    <p>@Messages(constants.View.INDEX_2)</p>
+                                </div>
                             </div>
 
                             <div class="pageContent cmuk-container">
@@ -209,8 +221,8 @@
 
                     <div class ="modal" id="loading">
                         <div class="centerScreen">
-                        <div cmuk-spinner="ratio: 2.5"></div>
-                    </div>
+                            <div cmuk-spinner="ratio: 2.5"></div>
+                        </div>
                     </div>
 
                 </div>
