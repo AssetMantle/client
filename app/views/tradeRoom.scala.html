@@ -8,7 +8,15 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-
+    <div id="financial"></div>
+    <script>
+        @loginState.userType match {
+            case constants.User.ZONE => {
+            componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@id'));
+            }
+            case _ => {}
+        }
+    </script>
 }
 
 @center = {
@@ -61,6 +69,7 @@
         <div id="chatRoom" class="chatRoom">
         </div>
     </div>
+    <div id="orderActions"></div>
     <script>
         @loginState.userType match {
          case constants.User.TRADER => {
@@ -69,6 +78,7 @@
             }
          case constants.User.ZONE => {
              componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.zoneViewRecentActivityForTradeRoom(0, '@id'));
+             componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@id'));
         }
         case _ => {}
         }

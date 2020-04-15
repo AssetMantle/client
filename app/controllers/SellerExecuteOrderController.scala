@@ -118,20 +118,14 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
       }
   }
 
-  //TODO username instead of Addresses
-  def moderatedSellerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def moderatedSellerExecuteOrderDocument(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress, sellerAddress, pegHash)
 
-      def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
-
-      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.AWB_PROOF)
+      val negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(negotiationID, constants.File.AWB_PROOF)
 
       (for {
-        negotiationID <- negotiationID
-        requestID <- getNegotiationRequestID(negotiationID)
-        negotiationFiles <- negotiationFiles(requestID)
-        result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderDocument(negotiationFiles, requestID, constants.File.AWB_PROOF))
+        negotiationFiles <- negotiationFiles
+        result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderDocument(negotiationFiles, negotiationID, constants.File.AWB_PROOF))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

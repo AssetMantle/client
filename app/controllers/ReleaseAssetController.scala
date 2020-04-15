@@ -5,15 +5,27 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.Asset
-import models.{blockchain, blockchainTransaction}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, transactionsReleaseAsset: transactions.ReleaseAsset, blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                       transaction: utilities.Transaction,
+                                       blockchainAssets: blockchain.Assets,
+                                       blockchainACLAccounts: blockchain.ACLAccounts,
+                                       blockchainZones: blockchain.Zones,
+                                       masterAccounts: master.Accounts,
+                                       masterZones: master.Zones,
+                                       masterTraders: master.Traders,
+                                       masterAssets: master.Assets,
+                                       withZoneLoginAction: WithZoneLoginAction,
+                                       transactionsReleaseAsset: transactions.ReleaseAsset,
+                                       blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
+                                       withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -21,9 +33,28 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
 
-  //TODO username instead of address
-  def releaseAssetForm(blockchainAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.releaseAsset(blockchainAddress = blockchainAddress, pegHash = pegHash))
+  def releaseAssetForm(assetID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+      val asset = masterAssets.Service.tryGet(assetID)
+      def trader(traderID: String): Future[master.Trader] = masterTraders.Service.tryGet(traderID)
+      def getResult(zoneID: String, trader: master.Trader, asset: master.Asset): Future[Result] = {
+        if(trader.zoneID == zoneID){
+          val blockchainAddress = masterAccounts.Service.getAddress(trader.accountID)
+          for {
+            blockchainAddress <- blockchainAddress
+          } yield Ok(views.html.component.master.releaseAsset(blockchainAddress = blockchainAddress, pegHash = asset.pegHash.getOrElse("")))
+      } else {
+          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
+        }}
+      (for{
+        zoneID <- zoneID
+        asset <- asset
+        trader <- trader(asset.ownerID)
+        result <- getResult(zoneID, trader, asset)
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+      }
   }
 
   def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>

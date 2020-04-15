@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(zoneID: String, traders: Seq[Trader], negotiaion: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.ORDER_ACTIONS){
+}{
+    @traders.map { trader =>
+        @if(trader.zoneID == zoneID && trader.id == negotiaion.buyerTraderID){
+            @commonJavascriptButton(constants.View.MODERATED_BUYER_EXECUTE_ORDER_DOCUMENT, JavaScript(s"getForm(jsRoutes.controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument('${negotiaion.id}'))"))
+        }
+        @if(trader.zoneID == zoneID && trader.id == negotiaion.sellerTraderID){
+            @commonJavascriptButton(constants.View.MODERATED_SELLER_EXECUTE_ORDER_DOCUMENT, JavaScript(s"getForm(jsRoutes.controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument('${negotiaion.id}'))"))
+            @if(asset.moderated){
+                @commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")
+            }
+        }
+    }
+
+}

@@ -169,8 +169,13 @@ GET         /component/zoneViewRejectedOrganizationRequestList                  
 GET         /component/zoneViewRejectedOrganizationRequest                                  controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
 
 GET         /component/zoneViewAcceptedNegotiationList                                      controllers.ComponentViewController.zoneViewAcceptedNegotiationList
-GET         /component/zoneViewRecentActivityForTradeRoom                                      controllers.ComponentViewController.zoneViewRecentActivityForTradeRoom(pageNumber: Int, negotiationID: String)
-GET         /component/zoneViewAcceptedNegotiation                                        controllers.ComponentViewController.zoneViewAcceptedNegotiation(id: String)
+GET         /component/zoneViewRecentActivityForTradeRoom                                   controllers.ComponentViewController.zoneViewRecentActivityForTradeRoom(pageNumber: Int, negotiationID: String)
+GET         /component/zoneViewAcceptedNegotiation                                          controllers.ComponentViewController.zoneViewAcceptedNegotiation(negotiationID: String)
+GET         /component/zoneTradeStatistics                                                  controllers.ComponentViewController.zoneTradeStatistics
+GET         /component/zoneViewTradeRoomFinancialAndChecks                                  controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/zoneViewTradeRoomFinancial                                           controllers.ComponentViewController.zoneViewTradeRoomFinancial(negotiationID: String)
+GET         /component/zoneViewTradeRoomChecks                                              controllers.ComponentViewController.zoneViewTradeRoomChecks(negotiationID: String)
+GET         /component/zoneOrderActions                                                     controllers.ComponentViewController.zoneOrderActions(negotiationID: String)
 
 GET         /component/organizationSubscription                                             controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                   controllers.ComponentViewController.traderSubscription
@@ -360,7 +365,7 @@ GET         /master/buyerExecuteOrderDocument                                   
 GET         /master/buyerExecuteOrder                                                       controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(requestID: String)
 POST        /master/buyerExecuteOrder                                                       controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /master/moderatedBuyerExecuteOrderDocument                                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument(buyerAddress:String, sellerAddress:String, pegHash:String)
+GET         /master/moderatedBuyerExecuteOrderDocument                                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument(negotiationID: String)
 GET         /master/moderatedBuyerExecuteOrder                                              controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(requestID: String)
 POST        /master/moderatedBuyerExecuteOrder                                              controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
 
@@ -422,14 +427,14 @@ POST        /master/redeemAsset                                                 
 GET         /master/redeemFiat                                                              controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                              controllers.RedeemFiatController.redeemFiat
 
-GET         /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAssetForm(blockchainAddress: String, pegHash: String)
+GET         /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAssetForm(assetID: String)
 POST        /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAsset
 
 GET         /master/sellerExecuteOrderDocument                                              controllers.SellerExecuteOrderController.sellerExecuteOrderDocument(orderID:String)
 GET         /master/sellerExecuteOrder                                                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm(requestID:String)
 POST        /master/sellerExecuteOrder                                                      controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /master/moderatedSellerExecuteOrderDocument                                     controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument(buyerAddress:String, sellerAddress:String, pegHash:String)
+GET         /master/moderatedSellerExecuteOrderDocument                                     controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument(negotiationID: String)
 GET         /master/moderatedSellerExecuteOrder                                             controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(requestID: String)
 POST        /master/moderatedSellerExecuteOrder                                             controllers.SellerExecuteOrderController.moderatedSellerExecuteOrder
 
