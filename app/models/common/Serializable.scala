@@ -50,11 +50,11 @@ object Serializable {
 
   implicit val paymentTermsWrites: OWrites[PaymentTerms] = Json.writes[PaymentTerms]
 
-  case class DocumentsList(documents: Seq[String])
+  case class DocumentList(documents: Seq[String])
 
-  implicit val documentsListReads: Reads[DocumentsList] = Json.reads[DocumentsList]
+  implicit val documentListReads: Reads[DocumentList] = Json.reads[DocumentList]
 
-  implicit val documentsListWrites: OWrites[DocumentsList] = Json.writes[DocumentsList]
+  implicit val documentListWrites: OWrites[DocumentList] = Json.writes[DocumentList]
 
   case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 

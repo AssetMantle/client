@@ -84,16 +84,16 @@
             <hr>
 
             <div class="cmuk-flex cmuk-flex-between">
-                <div class="title"> @Messages(constants.View.DOCUMENTS_LIST)</div>
-                @commonFormButton(constants.Form.UPDATE_DOCUMENTS_LIST, 'parameters -> s"'${negotiation.id}'")
+                <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
+                @commonFormButton(constants.Form.UPDATE_DOCUMENT_LIST, 'parameters -> s"'${negotiation.id}'")
             </div>
             <div class="sellerTerm">
-                @negotiation.documentsList.documents.map { document =>
+                @negotiation.documentList.documents.map { document =>
                     @document
                     <br>
                 }
             <div>
-            @negotiation.buyerAcceptedDocumentsList
+            @negotiation.buyerAcceptedDocumentList
             </div>
             </div>
         }
@@ -154,10 +154,10 @@
             }
 
             <hr>
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENTS_LIST, status = negotiation.buyerAcceptedDocumentsList, iconPath = "icon-document") {
-                @Messages(constants.View.DOCUMENTS_LIST)
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.buyerAcceptedDocumentList, iconPath = "icon-document") {
+                @Messages(constants.View.DOCUMENT_LIST)
                 <br>
-                @negotiation.documentsList.documents.map { document =>
+                @negotiation.documentList.documents.map { document =>
                     @document
                     <br>
                 }

@@ -2,7 +2,7 @@ package constants
 
 import play.api.data.validation._
 import views.companion.master.{AddTrader, TraderRelationRequest, SignUp}
-import views.companion.master.{IssueAsset, SignUp, DocumentsList}
+import views.companion.master.{IssueAsset, SignUp, DocumentList}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -24,10 +24,10 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val negotiationDocumentsListConstraint: Constraint[DocumentsList.Data] = Constraint("constraints.negotiationDocumentsList")({ documentsListData: DocumentsList.Data =>
+  val negotiationDocumentListConstraint: Constraint[DocumentList.Data] = Constraint("constraints.negotiationDocumentList")({ documentListData: DocumentList.Data =>
     val errors = {
-      if (documentsListData.documentsList.isEmpty) Seq(ValidationError(constants.Response.DOCUMENTS_LIST_EMPTY.message))
-      else if (documentsListData.documentsList.filter(_.isDefined).map(_.get).length <= 2) Seq(ValidationError(constants.Response.DOCUMENTS_LIST_LESS_THAN_REQUIRED.message))
+      if (documentListData.documentList.isEmpty) Seq(ValidationError(constants.Response.DOCUMENT_LIST_EMPTY.message))
+      else if (documentListData.documentList.flatten.length <= 2) Seq(ValidationError(constants.Response.DOCUMENT_LIST_LESS_THAN_REQUIRED.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

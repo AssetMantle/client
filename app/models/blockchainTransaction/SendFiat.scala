@@ -177,7 +177,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
 
-      def negotiationID(sendFiat: SendFiat): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+      def getNegotiationID(sendFiat: SendFiat): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND)))
 
       def insertOrUpdate(negotiationID: String): Future[Int] = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
 
@@ -213,7 +213,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       (for {
         _ <- markTransactionSuccessful
         sendFiat <- sendFiat
-        negotiationID <- negotiationID(sendFiat)
+        negotiationID <- getNegotiationID(sendFiat)
         _ <- insertOrUpdate(negotiationID)
         orderResponse <- orderResponse(negotiationID)
         _ <- insertOrUpdateFiats(orderResponse, negotiationID)

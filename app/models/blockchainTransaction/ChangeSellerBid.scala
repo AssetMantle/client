@@ -23,7 +23,6 @@ case class ChangeSellerBid(from: String, to: String, bid: Int, time: Int, pegHas
   def mutateTicketID(newTicketID: String): ChangeSellerBid = ChangeSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
 class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, masterNegotiations: Negotiations, blockchainNegotiations: blockchain.Negotiations, transactionChangeSellerBid: transactions.ChangeSellerBid, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets, masterTraders: master.Traders, masterOrganizations: master.Organizations, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -204,7 +203,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
       def getAssetID(pegHash: String): Future[String] = masterAssets.Service.tryGetIDByPegHash(pegHash)
 
-      def negotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
+      def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
       def markNegotiationAcceptedAndUpdateNegotiationID(negotiation: Negotiation, negotiationID: String): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
         masterNegotiations.Service.markAcceptedAndUpdateNegotiationID(id = negotiation.id, negotiationID = negotiationID)
@@ -262,7 +261,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         buyer <- getTrader(buyerAccountID)
         seller <- getTrader(sellerAccountID)
         assetID <- getAssetID(negotiationResponse.value.pegHash)
-        negotiation <- negotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
+        negotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
         _ <- markDirty(changeSellerBid)
         _ <- markNegotiationAcceptedAndUpdateNegotiationID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
         _ <- updateAssetTerms(negotiation = negotiation, price = negotiationResponse.value.bid.toInt)

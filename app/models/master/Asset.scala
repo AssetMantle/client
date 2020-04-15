@@ -144,13 +144,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def insertModeratedAsset(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
+    def addModerated(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
       val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true)
       add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.REQUESTED_TO_ZONE)))
     }
 
-    def insertUnmoderatedAsset(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
+    def addUnmoderated(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
       val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false)
       add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)))

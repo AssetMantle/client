@@ -181,14 +181,14 @@ object FormField {
   val BUYER_ADVANCE_PAYMENT = new BooleanFormField("BUYER_ADVANCE_PAYMENT")
   val BUYER_CREDIT = new BooleanFormField("BUYER_CREDIT")
   val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
-  val DOCUMENTS_LIST_COMPLETED = new BooleanFormField("DOCUMENTS_LIST_COMPLETED")
+  val DOCUMENT_LIST_COMPLETED = new BooleanFormField("DOCUMENT_LIST_COMPLETED")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
   val POSTAL_ADDRESS = new NestedFormField("POSTAL_ADDRESS")
   val ADDRESS = new NestedFormField("ADDRESS")
   val UBOS = new NestedFormField("UBOS")
-  val DOCUMENTS_LIST = new NestedFormField("DOCUMENTS_LIST")
+  val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

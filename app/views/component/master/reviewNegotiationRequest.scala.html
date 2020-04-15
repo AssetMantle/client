@@ -29,12 +29,12 @@
     @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTerms.tentativeDate.toString())
     @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
 
-    <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENTS_LIST)</div>
-    @negotiation.documentsList.documents.map { document =>
+    <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
+    @negotiation.documentList.documents.map { document =>
         @document
         <br>
     }
 
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENTS_LIST.get, 'parameters -> s"'${negotiation.id}'")
+    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'parameters -> s"'${negotiation.id}'")
 }

@@ -75,17 +75,17 @@ class AssetController @Inject()(
                   def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
                   if (issueAssetData.moderated) {
-                    val insertModeratedAsset = masterAssets.Service.insertModeratedAsset(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
                     for {
-                      _ <- insertModeratedAsset
+                      _ <- addModeratedAsset
                       tradableAssets <- getAllTradableAssets(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
                       counterPartyTraders <- getCounterPartyTraders(counterPartyList)
                       result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
                     } yield result
                   } else {
-                    val insertUnmoderatedAsset = masterAssets.Service.insertUnmoderatedAsset(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
                     def getTicketID(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                       entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
@@ -98,7 +98,7 @@ class AssetController @Inject()(
                     )
 
                     for {
-                      documentHash <- insertUnmoderatedAsset
+                      documentHash <- addUnmoderatedAsset
                       ticketID <- getTicketID(documentHash)
                       tradableAssets <- getAllTradableAssets(traderID)
                       counterPartyList <- getCounterPartyList(traderID)

@@ -23,7 +23,6 @@ case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash
   def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
 class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, transactionChangeBuyerBid: transactions.ChangeBuyerBid, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterNegotiations: Negotiations, masterAssets: master.Assets, masterTraders: master.Traders, masterOrganizations: master.Organizations, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -205,7 +204,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
       def getAssetID(pegHash: String): Future[String] = masterAssets.Service.tryGetIDByPegHash(pegHash)
 
-      def negotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
+      def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
       def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Unit] = {
         val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(changeBuyerBid.from)
@@ -263,7 +262,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         buyer <- getTrader(buyerAccountID)
         seller <- getTrader(sellerAccountID)
         assetID <- getAssetID(negotiationResponse.value.pegHash)
-        negotiation <- negotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
+        negotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
         _ <- markDirty(changeBuyerBid)
         _ <- markNegotiationAcceptedAndUpdateNegotiationID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
         _ <- updateAssetTerms(negotiation, negotiationResponse.value.bid.toInt)

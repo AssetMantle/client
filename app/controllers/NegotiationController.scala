@@ -4,7 +4,7 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.common.Serializable.{AssetOtherDetails, DocumentsList, PaymentTerms, ShippingDetails}
+import models.common.Serializable.{AssetOtherDetails, DocumentList, PaymentTerms, ShippingDetails}
 import models.master.{Asset, Negotiation, Trader}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -169,7 +169,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             assetStatus <- assetStatus(negotiation.assetID)
             _ <- update(traderID = traderID, assetStatus = assetStatus, negotiation = negotiation)
-            result <- withUsernameToken.PartialContent(views.html.component.master.documentsList(views.companion.master.DocumentsList.form.fill(views.companion.master.DocumentsList.Data(id = negotiation.id, documentsList = if (negotiation.documentsList.documents.nonEmpty) negotiation.documentsList.documents.map(document => Option(document)) else constants.File.NEGOTIATION_DEFAULT_DOCUMENTS.map(document => Option(document)), documentsListCompleted = true)), id = negotiation.id))
+            result <- withUsernameToken.PartialContent(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = negotiation.id, documentList = if (negotiation.documentList.documents.nonEmpty) negotiation.documentList.documents.map(document => Option(document)) else constants.File.NEGOTIATION_DEFAULT_DOCUMENTS.map(document => Option(document)), documentListCompleted = true)), id = negotiation.id))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -178,14 +178,13 @@ class NegotiationController @Inject()(
       )
   }
 
-  def documentsListForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def documentListForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.documentsList(views.companion.master.DocumentsList.form.fill(views.companion.master.DocumentsList.Data(id = id, documentsList = if (negotiation.documentsList.documents.nonEmpty) negotiation.documentsList.documents.map(document => Option(document)) else constants.File.NEGOTIATION_DEFAULT_DOCUMENTS.map(document => Option(document)), documentsListCompleted = true
-        )), id = id))
+        withUsernameToken.Ok(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = if (negotiation.documentList.documents.nonEmpty) negotiation.documentList.documents.map(document => Option(document)) else constants.File.NEGOTIATION_DEFAULT_DOCUMENTS.map(document => Option(document)), documentListCompleted = true)), id = id))
       } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
       (for {
@@ -198,15 +197,15 @@ class NegotiationController @Inject()(
       }
   }
 
-  def documentsList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def documentList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.DocumentsList.form.bindFromRequest().fold(
+      views.companion.master.DocumentList.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.documentsList(formWithErrors, id = formWithErrors.data(constants.FormField.ID.name))))
+          Future(BadRequest(views.html.component.master.documentList(formWithErrors, id = formWithErrors.data(constants.FormField.ID.name))))
         },
-        documentsListData => {
+        documentListData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val negotiation = masterNegotiations.Service.tryGet(documentsListData.id)
+          val negotiation = masterNegotiations.Service.tryGet(documentListData.id)
           def assetStatus(id: String): Future[String] = masterAssets.Service.tryGetStatus(id)
 
           def update(traderID: String, assetStatus: String, negotiation: Negotiation): Future[Int] = {
@@ -214,7 +213,7 @@ class NegotiationController @Inject()(
             negotiation.status match {
               case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
                 assetStatus match {
-                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADE_COMPLETED => masterNegotiations.Service.updateDocumentsList(id = documentsListData.id, documentsList = DocumentsList(documentsListData.documentsList.filter(_.isDefined).map(_.get)))
+                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADE_COMPLETED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(documentListData.documentList.flatten))
                   case _ => throw new BaseException(constants.Response.ASSET_PEG_NOT_FOUND)
                 }
               case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -225,10 +224,10 @@ class NegotiationController @Inject()(
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getResult(asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader): Future[Result] = if (documentsListData.documentsListCompleted) {
+          def getResult(asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader): Future[Result] = if (documentListData.documentListCompleted) {
             withUsernameToken.PartialContent(views.html.component.master.reviewNegotiationRequest(asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
           } else {
-            withUsernameToken.PartialContent(views.html.component.master.documentsList(views.companion.master.DocumentsList.form.fill(views.companion.master.DocumentsList.Data(id = documentsListData.id, documentsList = documentsListData.documentsList, documentsListCompleted = true)), id = negotiation.id))
+            withUsernameToken.PartialContent(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = documentListData.id, documentList = documentListData.documentList, documentListCompleted = true)), id = negotiation.id))
           }
 
           (for {
@@ -665,13 +664,13 @@ class NegotiationController @Inject()(
       )
   }
 
-  def updateDocumentsListForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateDocumentListForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateDocumentsList(views.companion.master.DocumentsList.form.fill(views.companion.master.DocumentsList.Data(id = id, documentsList = negotiation.documentsList.documents.map(document => Option(document)), documentsListCompleted = true))))
+        withUsernameToken.Ok(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = negotiation.documentList.documents.map(document => Option(document)), documentListCompleted = true))))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -686,26 +685,26 @@ class NegotiationController @Inject()(
       }
   }
 
-  def updateDocumentsList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateDocumentList(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.DocumentsList.form.bindFromRequest().fold(
+      views.companion.master.DocumentList.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.updateDocumentsList(formWithErrors)))
+          Future(BadRequest(views.html.component.master.updateDocumentList(formWithErrors)))
         },
-        updateDocumentsListData => {
+        updateDocumentListData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val negotiation = masterNegotiations.Service.tryGet(updateDocumentsListData.id)
+          val negotiation = masterNegotiations.Service.tryGet(updateDocumentListData.id)
 
           def update(traderID: String, negotiation: Negotiation): Future[Int] = if (traderID == negotiation.sellerTraderID) {
-            masterNegotiations.Service.updateDocumentsList(id = updateDocumentsListData.id, documentsList = DocumentsList(updateDocumentsListData.documentsList.filter(_.isDefined).map(_.get)))
+            masterNegotiations.Service.updateDocumentList(id = updateDocumentListData.id, documentList = DocumentList(updateDocumentListData.documentList.flatten))
           } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getResult(negotiation: Negotiation): Future[Result] = if (updateDocumentsListData.documentsListCompleted) {
+          def getResult(negotiation: Negotiation): Future[Result] = if (updateDocumentListData.documentListCompleted) {
             withUsernameToken.Ok(views.html.tradeRoom(id = negotiation.id, successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
           } else {
-            withUsernameToken.PartialContent(views.html.component.master.updateDocumentsList(views.companion.master.DocumentsList.form.fill(views.companion.master.DocumentsList.Data(id = negotiation.id, documentsList = negotiation.documentsList.documents.map(document => Option(document)), documentsListCompleted = true))))
+            withUsernameToken.PartialContent(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = negotiation.id, documentList = negotiation.documentList.documents.map(document => Option(document)), documentListCompleted = true))))
           }
 
           (for {
@@ -762,7 +761,7 @@ class NegotiationController @Inject()(
               case constants.View.QUANTITY => masterNegotiations.Service.updateBuyerAcceptedQuantity(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
               case constants.View.ASSET_OTHER_DETAILS => masterNegotiations.Service.updateBuyerAcceptedAssetOtherDetails(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
               case constants.View.PAYMENT_TERMS => masterNegotiations.Service.updateBuyerAcceptedPaymentTerms(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
-              case constants.View.DOCUMENTS_LIST => masterNegotiations.Service.updateBuyerAcceptedDocumentsList(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
+              case constants.View.DOCUMENT_LIST => masterNegotiations.Service.updateBuyerAcceptedDocumentList(acceptOrRejectNegotiationTermsData.id, acceptOrRejectNegotiationTermsData.status)
               case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
             }
 

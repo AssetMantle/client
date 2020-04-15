@@ -96,14 +96,14 @@ object Form {
   //NegotiationController
   val NEGOTIATION_REQUEST = new Form("NEGOTIATION_REQUEST", routes.NegotiationController.request(), routes.javascript.NegotiationController.requestForm)
   val NEGOTIATION_PAYMENT_TERMS = new Form("NEGOTIATION_PAYMENT_TERMS", routes.NegotiationController.paymentTerms(), routes.javascript.NegotiationController.paymentTermsForm)
-  val NEGOTIATION_DOCUMENTS_LIST = new Form("NEGOTIATION_DOCUMENTS_LIST", routes.NegotiationController.documentsList(), routes.javascript.NegotiationController.documentsListForm)
+  val NEGOTIATION_DOCUMENT_LIST = new Form("NEGOTIATION_DOCUMENT_LIST", routes.NegotiationController.documentList(), routes.javascript.NegotiationController.documentListForm)
   val REVIEW_NEGOTIATION_REQUEST = new Form("REVIEW_NEGOTIATION_REQUEST", routes.NegotiationController.reviewRequest(), routes.javascript.NegotiationController.reviewRequestForm)
   val ACCEPT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.acceptRequest(), routes.javascript.NegotiationController.acceptRequestForm)
   val REJECT_NEGOTIATION_REQUEST = new Form("REJECT_NEGOTIATION_REQUEST", routes.NegotiationController.rejectRequest(), routes.javascript.NegotiationController.rejectRequestForm)
   val UPDATE_ASSET_TERMS = new Form("UPDATE_ASSET_TERMS", routes.NegotiationController.updateAssetTerms(), routes.javascript.NegotiationController.updateAssetTermsForm)
   val UPDATE_ASSET_OTHER_DETAILS = new Form("UPDATE_ASSET_OTHER_DETAILS", routes.NegotiationController.updateAssetOtherDetails(), routes.javascript.NegotiationController.updateAssetOtherDetailsForm)
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
-  val UPDATE_DOCUMENTS_LIST = new Form("UPDATE_DOCUMENTS_LIST", routes.NegotiationController.updateDocumentsList(), routes.javascript.NegotiationController.updateDocumentsListForm)
+  val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
 
   //RedeemAssetController

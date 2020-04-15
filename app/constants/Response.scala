@@ -148,8 +148,9 @@ object Response {
   val ZONE_ID_MISMATCH = new Failure("ZONE_ID_MISMATCH")
   val ORGANIZATION_ID_MISMATCH = new Failure("ORGANIZATION_ID_MISMATCH")
   val ZONE_INVITATION_NOT_FOUND = new Failure("ZONE_INVITATION_NOT_FOUND")
-  val DOCUMENTS_LIST_EMPTY = new Failure("DOCUMENTS_LIST_EMPTY")
-  val DOCUMENTS_LIST_LESS_THAN_REQUIRED = new Failure("DOCUMENTS_LIST_LESS_THAN_REQUIRED")
+  val DOCUMENT_LIST_EMPTY = new Failure("DOCUMENT_LIST_EMPTY")
+  val DOCUMENT_LIST_LESS_THAN_REQUIRED = new Failure("DOCUMENT_LIST_LESS_THAN_REQUIRED")
+  val NEGOTIATION_NOT_FOUND = new Failure("NEGOTIATION_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

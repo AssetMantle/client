@@ -62,7 +62,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.SellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), loginState.address, formWithErrors.data(constants.FormField.PEG_HASH.name)).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+          val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), loginState.address, formWithErrors.data(constants.FormField.PEG_HASH.name)).map(_.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND)))
 
           def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
@@ -121,7 +121,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   //TODO username instead of Addresses
   def moderatedSellerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress, sellerAddress, pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+      val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress, sellerAddress, pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND)))
 
       def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
@@ -160,7 +160,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.ModeratedSellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+          val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)).map(_.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND)))
 
           def getNegotiationRequestID(negotiationID: String): Future[String] = masterNegotiations.Service.tryGetNegotiationIDByID(negotiationID)
 
