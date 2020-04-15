@@ -21,14 +21,16 @@
         @pendingBoolean match {
             case Some(status: Boolean) => {
                 @if(status) {
-                    @Messages(constants.View.ACCEPTED)
+                    <span cmuk-icon="check"></span>
+                    @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
                 } else {
-                    @Messages(constants.View.REJECTED)
+                    <span cmuk-icon="close"></span>
+                    @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
                 }
             }
             case None => {
-                @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyReject(this,'${Seq("#", target).mkString("")}',true)"))
-                @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyReject(this,'${Seq("#", target).mkString("")}',false)"))
+                @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
+                @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
             }
         }
     </fieldset>

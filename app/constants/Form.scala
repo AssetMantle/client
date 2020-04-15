@@ -47,6 +47,7 @@ object Form {
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone(), routes.javascript.AddZoneController.verifyZoneForm)
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest(), routes.javascript.AddZoneController.rejectVerifyZoneRequestForm)
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
+  val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
   //BuyerExecuteOrderController
   val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.buyerExecuteOrder(), routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderForm)
