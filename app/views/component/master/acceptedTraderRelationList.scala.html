@@ -7,7 +7,7 @@
 <div>
     @acceptedTraderRelationList.map { acceptedTraderRelation =>
         @defining(Seq(acceptedTraderRelation.fromID, acceptedTraderRelation.toID, constants.View.TRADER_RELATION_LIST).mkString("")) { componentID =>
-            @commonInfoBox(componentID) {
+            @commonVerticalInfoBox(componentID) {
                 <script>
                         componentResource('@componentID', jsRoutes.controllers.ComponentViewController.acceptedTraderRelation('@acceptedTraderRelation.fromID', '@acceptedTraderRelation.toID'))
                 </script>

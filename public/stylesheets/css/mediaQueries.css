@@ -1,19 +1,23 @@
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .pageContent {
     margin: 20px; }
 
   .MnemonicQuiz {
     max-width: 500px; }
 
-  .bannerText {
-    width: 100%; }
+  .bannerContainer {
+    background-size: contain; }
+    .bannerContainer .bannerText {
+      width: 100%; }
+      .bannerContainer .bannerText h3 {
+        font-size: 30px; }
 
   .mobile .cmuk-offcanvas-bar {
     padding: 30px; }
 
   .mobile .cmuk-button {
     background-color: #0862BE; } }
-@media (min-width: 600px) {
+@media (min-width: 640px) {
   .modalBody form {
     width: 500px;
     text-align: center; }
@@ -33,7 +37,11 @@
     text-transform: capitalize; } }
 @media (min-width: 960px) {
   .verticalDataTabsData {
-    display: flex; } }
+    display: flex; }
+
+  .comdex .mobileNavigation {
+    display: flex;
+    flex: auto; } }
 @media screen and (max-width: 768px) {
   .timeline {
     margin: 30px;
@@ -123,9 +131,7 @@
   .comdex .cmuk-height-medium {
     height: 210px; }
 
-  .identificationDetails .cmuk-switcher,
-  .traderRelationList .cmuk-switcher,
-  .tradeList .cmuk-switcher {
+  .switcherCard .cmuk-switcher {
     height: 140px; }
 
   .salesQuoteList .cmuk-card-body .cmuk-switcher {
@@ -160,7 +166,7 @@
 
   .modal .modalContent {
     top: 10%;
-    max-height: 400px; }
+    max-height: 530px; }
 
   .tabsSection .cmuk-grid-divider {
     display: block; }
@@ -178,5 +184,30 @@
 @media (min-width: 1921px) {
   .comdex .cmuk-container {
     max-width: 1920px; } }
+@media (max-width: 960px) {
+  .comdex .mobileNavigationHeader {
+    display: flex; }
+  .comdex .mobileNavigation {
+    display: none; }
+    .comdex .mobileNavigation li a {
+      justify-content: left;
+      padding: 0px; }
+  .comdex .header .cmuk-logo {
+    border: none; }
+  .comdex .header .buttonRegister {
+    background-color: #FE4350;
+    font-size: 14px;
+    font-family: Rubik;
+    color: #FFFFFF;
+    line-height: inherit;
+    padding: 5px 30px;
+    border-radius: 3px; }
+  .comdex .header .cmuk-navbar {
+    display: block; }
+  .comdex .header .cmuk-navbar-nav {
+    display: block; }
+  .comdex .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
+    border: none;
+    padding: 0px; } }
 
 /*# sourceMappingURL=mediaQueries.css.map */

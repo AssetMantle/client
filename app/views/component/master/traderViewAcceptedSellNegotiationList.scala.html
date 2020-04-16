@@ -7,7 +7,7 @@
 @(sellNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellNegotiationList.map { sellNegotiation =>
-    <li class="commonList">
+    co@commonVerticalInfoBox() {
         @defining(counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
@@ -32,5 +32,5 @@
                 </button>
             </p>
         </div>
-    </li>
+    }
 }

@@ -5,11 +5,25 @@
 @(acceptedTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @acceptedTraders.map { trader =>
-    @commonInfoBox() {
-        @commonTextInfo(constants.View.TRADER_ID, trader.id)
-        @commonTextInfo(constants.View.NAME, trader.name)
-        @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-        @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'parameters -> s"'${trader.id}'")
-        @commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.TRADER_ID, trader.id)
+        @commonVerticalTextInfo(constants.View.NAME, trader.name)
+        @commonVerticalTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+            @commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'parameters -> s"'${trader.id}'")
+            </p>
+        </div>
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+            @commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
+            </p>
+        </div>
     }
 }

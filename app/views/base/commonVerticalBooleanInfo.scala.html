@@ -1,0 +1,21 @@
+@(key: String, status: Option[Boolean], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div class="listItemChild">
+    <p class="listItemChildTitle">
+        @Messages(key)
+    </p>
+    <p id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("listItemChildValue")'>
+    @status match {
+        case Some(status) => {
+            @if(status) {
+                <span cmuk-icon="check"></span>
+            } else {
+                <span cmuk-icon="close"></span>
+            }
+        }
+        case _ => {
+            <span>@Messages(constants.View.PENDING)</span>
+        }
+    }
+    </p>
+</div>
