@@ -148,6 +148,7 @@ object Response {
   val ZONE_ID_MISMATCH = new Failure("ZONE_ID_MISMATCH")
   val ORGANIZATION_ID_MISMATCH = new Failure("ORGANIZATION_ID_MISMATCH")
   val ZONE_INVITATION_NOT_FOUND = new Failure("ZONE_INVITATION_NOT_FOUND")
+  val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

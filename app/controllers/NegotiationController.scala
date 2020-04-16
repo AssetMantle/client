@@ -740,9 +740,11 @@ class NegotiationController @Inject()(
 
       def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.getAccountId(zoneID)
 
-      def getTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivity]] = if (accountIDs.contains(loginState.username)) {
+      def getTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivity]] = {
+        if (!accountIDs.contains(loginState.username)) throw new BaseException(constants.Response.UNAUTHORIZED)
+        if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER)
         masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID = negotiationID, pageNumber = pageNumber)
-      } else throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
 
       (for {
         buyerTraderID <- buyerTraderID

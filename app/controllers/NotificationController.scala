@@ -26,7 +26,8 @@ class NotificationController @Inject()(
 
   def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val notifications = masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
+
+      val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
 
       (for {
         notifications <- notifications
