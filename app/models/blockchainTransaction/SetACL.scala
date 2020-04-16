@@ -198,7 +198,7 @@ class SetACLs @Inject()(
 
       def aclAccountInsertOrUpdate(setACL: SetACL, acl: ACL): Future[Int] = blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, acl, dirtyBit = true)
 
-      def updateUserTypeOnAddress(setACL: SetACL): Future[Int] = masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
+      def markUserTypeTrader(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeTrader(accountID)
 
       def markAccepted(traderID: String): Future[Int] = masterTraders.Service.markAccepted(traderID)
 
@@ -211,17 +211,17 @@ class SetACLs @Inject()(
       (for {
         _ <- markTransactionSuccessful
         setACL <- setACL
-        accountID <- getAccountID(setACL.aclAddress)
-        trader <- getTrader(accountID)
+        traderAccountID <- getAccountID(setACL.aclAddress)
+        trader <- getTrader(traderAccountID)
         acl <- getAcl(setACL.aclHash)
         _ <- aclAccountInsertOrUpdate(setACL, acl)
-        _ <- updateUserTypeOnAddress(setACL)
+        _ <- markUserTypeTrader(traderAccountID)
         _ <- markAccepted(trader.id)
         _ <- markDirty(setACL.from)
         _ <- transactionFeedbacksInsertOrUpdate(setACL)
         fromAccountID <- getAccountID(setACL.from)
         organization <- getTraderOrganization(trader.organizationID)
-        _ <- utilitiesNotification.send(accountID, constants.Notification.TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash)
+        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash)
         _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash, trader.name)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.accountID, trader.name, organization.name)
       } yield ()).recover {
