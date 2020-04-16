@@ -61,11 +61,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
             def createContact: Future[String] = masterContacts.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateData.countryCode, addOrUpdateData.mobileNumber).mkString(""), emailAddress = addOrUpdateData.emailAddress)
 
-            def updateEmailAddress: Future[Int] = if (emailAddressAccount.isEmpty) {
+            def updateEmailAddress(): Future[Int] = if (emailAddressAccount.isEmpty) {
               masterContacts.Service.updateEmailAddress(id = loginState.username, emailAddress = addOrUpdateData.emailAddress)
             } else if (emailAddressAccount.get != loginState.username) throw new BaseException(constants.Response.EMAIL_ADDRESS_TAKEN) else Future(0)
 
-            def updateMobileNumber: Future[Int] = if (mobileNumberAccount.isEmpty) {
+            def updateMobileNumber(): Future[Int] = if (mobileNumberAccount.isEmpty) {
               masterContacts.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateData.countryCode + addOrUpdateData.mobileNumber)
             } else if (mobileNumberAccount.get != loginState.username) throw new BaseException(constants.Response.MOBILE_NUMBER_TAKEN) else Future(0)
 
@@ -75,8 +75,8 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
               } yield Unit
             } else {
               for {
-                _ <- updateEmailAddress
-                _ <- updateMobileNumber
+                _ <- updateEmailAddress()
+                _ <- updateMobileNumber()
               } yield Unit
             }
           }
