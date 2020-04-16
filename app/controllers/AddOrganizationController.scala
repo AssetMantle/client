@@ -138,8 +138,8 @@ class AddOrganizationController @Inject()(
           val id = masterOrganizations.Service.tryGetID(loginState.username)
 
           def updateUBOs(id: String): Future[Int] = {
-            if (updateUBOsData.ubos.filter(_.isDefined).map(uboData => uboData.get.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map(uboData => UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
+            if (updateUBOsData.ubos.flatten.map(uboData => uboData.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
+            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.flatten.map(uboData => UBO(personName = uboData.personName, sharePercentage = uboData.sharePercentage, relationship = uboData.relationship, title = uboData.title)))
           }
 
           def getUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)

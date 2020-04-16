@@ -64,9 +64,9 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
     } yield {}
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        for{
-          ticketID<-ticketID
-        }yield onFailure(ticketID, baseException.failure.message)
+        for {
+          ticketID <- ticketID
+        } yield onFailure(ticketID, baseException.failure.message)
     }
     ticketID
   }
@@ -117,14 +117,14 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
             blockResponse <- getBlockResponse(transactionHash)
           } yield blockResponse
         }
-        val forComplete=(for {
+        val forComplete = (for {
           blockResponse <- blockResponse
           _ <- executeSuccessOrFailure(blockResponse, ticketID)
         } yield Unit
-          ).recover{
+          ).recover {
           case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorTransactionHashNotFound)) onFailure(ticketID, baseException.failure.message) else logger.info(baseException.failure.message, baseException)
         }
-        Await.result(forComplete,Duration.Inf)
+        Await.result(forComplete, Duration.Inf)
       }
 
     for {

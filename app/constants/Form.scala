@@ -7,6 +7,7 @@ import play.api.routing.JavaScriptReverseRoute
 class Form(template: String, val route: Call, val get: JavaScriptReverseRoute) {
   val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
   val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
+  val button: String = Seq("FORM", template, "BUTTON").mkString(".")
 }
 
 object Form {
@@ -36,6 +37,7 @@ object Form {
   val ACCEPT_ORGANIZATION_REQUEST = new Form("ACCEPT_ORGANIZATION_REQUEST", routes.AddOrganizationController.acceptRequest(), routes.javascript.AddOrganizationController.acceptRequestForm)
   val REJECT_ORGANIZATION_REQUEST = new Form("REJECT_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectRequest(), routes.javascript.AddOrganizationController.rejectRequestForm)
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization(), routes.javascript.AddOrganizationController.blockchainAddOrganizationForm)
+  val UPDATE_ORGANIZATION_KYC_DOCUMENT_STATUS = new Form("UPDATE_ORGANIZATION_KYC_DOCUMENT_STATUS", routes.AddOrganizationController.updateOrganizationKYCDocumentStatus(), routes.javascript.AddOrganizationController.updateOrganizationKYCDocumentStatusForm)
 
   //AssetController
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
@@ -47,6 +49,7 @@ object Form {
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone(), routes.javascript.AddZoneController.verifyZoneForm)
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest(), routes.javascript.AddZoneController.rejectVerifyZoneRequestForm)
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
+  val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
   //ChangeBuyerBidController
   val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid(), routes.javascript.ChangeBuyerBidController.changeBuyerBidForm)
@@ -80,6 +83,7 @@ object Form {
   val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest(), routes.javascript.IssueAssetController.rejectIssueAssetRequestForm)
   val ZONE_ISSUE_ASSET = new Form("ZONE_ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
+  val UPDATE_ASSET_DOCUMENT_STATUS = new Form("UPDATE_ASSET_DOCUMENT_STATUS", routes.IssueAssetController.updateAssetDocumentStatus(), routes.javascript.IssueAssetController.updateAssetDocumentStatusForm)
 
   //IssueFiatController
   val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect(), routes.javascript.IssueFiatController.issueFiatRequestForm)
@@ -90,13 +94,14 @@ object Form {
   //NegotiationController
   val NEGOTIATION_REQUEST = new Form("NEGOTIATION_REQUEST", routes.NegotiationController.request(), routes.javascript.NegotiationController.requestForm)
   val NEGOTIATION_PAYMENT_TERMS = new Form("NEGOTIATION_PAYMENT_TERMS", routes.NegotiationController.paymentTerms(), routes.javascript.NegotiationController.paymentTermsForm)
-  val NEGOTIATION_DOCUMENTS_CHECKLIST = new Form("NEGOTIATION_DOCUMENTS_CHECKLIST", routes.NegotiationController.documentsCheckList(), routes.javascript.NegotiationController.documentsCheckListForm)
+  val NEGOTIATION_DOCUMENT_LIST = new Form("NEGOTIATION_DOCUMENT_LIST", routes.NegotiationController.documentList(), routes.javascript.NegotiationController.documentListForm)
   val REVIEW_NEGOTIATION_REQUEST = new Form("REVIEW_NEGOTIATION_REQUEST", routes.NegotiationController.reviewRequest(), routes.javascript.NegotiationController.reviewRequestForm)
   val ACCEPT_NEGOTIATION_REQUEST = new Form("ACCEPT_NEGOTIATION_REQUEST", routes.NegotiationController.acceptRequest(), routes.javascript.NegotiationController.acceptRequestForm)
   val REJECT_NEGOTIATION_REQUEST = new Form("REJECT_NEGOTIATION_REQUEST", routes.NegotiationController.rejectRequest(), routes.javascript.NegotiationController.rejectRequestForm)
   val UPDATE_ASSET_TERMS = new Form("UPDATE_ASSET_TERMS", routes.NegotiationController.updateAssetTerms(), routes.javascript.NegotiationController.updateAssetTermsForm)
+  val UPDATE_ASSET_OTHER_DETAILS = new Form("UPDATE_ASSET_OTHER_DETAILS", routes.NegotiationController.updateAssetOtherDetails(), routes.javascript.NegotiationController.updateAssetOtherDetailsForm)
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
-  val UPDATE_DOCUMENTS_CHECKLIST = new Form("UPDATE_DOCUMENTS_CHECKLIST", routes.NegotiationController.updateDocumentCheckList(), routes.javascript.NegotiationController.updateDocumentCheckListForm)
+  val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
 
   //OrderController
@@ -141,6 +146,8 @@ object Form {
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL(), routes.javascript.SetACLController.blockchainSetACLForm)
+  val ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("", routes.SetACLController.organizationAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm)
+  val ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.zoneAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm)
 
   //SetBuyerFeedbackController
   val SET_BUYER_FEEDBACK = new Form("SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.setBuyerFeedback(), routes.javascript.SetBuyerFeedbackController.setBuyerFeedbackForm)
@@ -155,6 +162,7 @@ object Form {
   val ZONE_REJECT_TRADER_REQUEST = new Form("ZONE_REJECT_TRADER_REQUEST", routes.TraderController.zoneRejectRequest(), routes.javascript.TraderController.zoneRejectRequestForm)
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
+  val ACCEPT_REJECT_TRADER_RELATION = new Form("ACCEPT_REJECT_TRADER_RELATION", routes.TraderController.acceptOrRejectTraderRelation(), routes.javascript.TraderController.acceptOrRejectTraderRelationForm)
 
   //VerifyEmailAddressController
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress(), routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm)
@@ -220,7 +228,6 @@ object Form {
   val ZONE_KYC_FILES = "ZONE_KYC_FILES"
   val UPDATE_ZONE_KYC_STATUS = "UPDATE_ZONE_KYC_STATUS"
   val UPDATE_ORGANIZATION_KYC_STATUS = "UPDATE_ORGANIZATION_KYC_STATUS"
-  val UPDATE_ASSET_DOCUMENT_STATUS = "UPDATE_ASSET_DOCUMENT_STATUS"
   val UPDATE_STATUS = "UPDATE_STATUS"
   val STATUS_UPDATED = "STATUS_UPDATED"
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
