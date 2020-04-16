@@ -22,15 +22,15 @@
             case Some(status: Boolean) => {
                 @if(status) {
                     <span cmuk-icon="check"></span>
-                    @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
+                    @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyReject(this,'${Seq("#", targetElementID).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
                 } else {
                     <span cmuk-icon="close"></span>
-                    @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
+                    @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyReject(this,'${Seq("#", targetElementID).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
                 }
             }
             case None => {
-                @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
-                @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
+                @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyReject(this,'${Seq("#", targetElementID).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
+                @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyReject(this,'${Seq("#", targetElementID).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
             }
         }
     </fieldset>
