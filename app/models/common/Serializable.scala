@@ -56,17 +56,17 @@ object Serializable {
 
   implicit val documentListWrites: OWrites[DocumentList] = Json.writes[DocumentList]
 
-  case class NotificationMessage(template: String, parameters: Seq[String])
+  case class NotificationTemplate(template: String, parameters: Seq[String])
 
-  implicit val notificationMessageReads: Reads[NotificationMessage] = Json.reads[NotificationMessage]
+  implicit val notificationTemplateReads: Reads[NotificationTemplate] = Json.reads[NotificationTemplate]
 
-  implicit val notificationMessageWrites: OWrites[NotificationMessage] = Json.writes[NotificationMessage]
+  implicit val notificationTemplateWrites: OWrites[NotificationTemplate] = Json.writes[NotificationTemplate]
 
-  case class TradeActivityMessage(template: String, parameters: Seq[String])
+  case class TradeActivityTemplate(template: String, parameters: Seq[String])
 
-  implicit val tradeActivityMessageReads: Reads[TradeActivityMessage] = Json.reads[TradeActivityMessage]
+  implicit val tradeActivityTemplateReads: Reads[TradeActivityTemplate] = Json.reads[TradeActivityTemplate]
 
-  implicit val tradeActivityMessageWrites: OWrites[TradeActivityMessage] = Json.writes[TradeActivityMessage]
+  implicit val tradeActivityTemplateWrites: OWrites[TradeActivityTemplate] = Json.writes[TradeActivityTemplate]
 
   case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 

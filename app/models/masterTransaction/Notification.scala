@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Serializable.NotificationMessage
+import models.common.Serializable.NotificationTemplate
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,12 +15,11 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Notification(id: String, accountID: String, message: NotificationMessage, read: Boolean = false, createdOn: Timestamp, createdBy: String, createdOnTimezone: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
-  val title: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, message.template, constants.Notification.TITLE_SUFFIX).mkString(".")
+case class Notification(id: String, accountID: String, notificationTemplate: NotificationTemplate, read: Boolean = false, createdOn: Timestamp, createdBy: String, createdOnTimezone: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  val title: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, notificationTemplate.template, constants.Notification.TITLE_SUFFIX).mkString(".")
 
-  val messageTemplate: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, message.template, constants.Notification.MESSAGE_SUFFIX).mkString(".")
+  val template: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, notificationTemplate.template, constants.Notification.MESSAGE_SUFFIX).mkString(".")
 
-  val messageParameters: Seq[String] = message.parameters
 }
 
 @Singleton
@@ -42,15 +41,15 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
-  case class NotificationSerializable(id: String, accountID: String, message: String, read: Boolean, createdOn: Timestamp, createdBy: String, createdOnTimezone: String, updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Notification = Notification(id = id, accountID = accountID, message = utilities.JSON.convertJsonStringToObject[NotificationMessage](message), read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimezone = createdOnTimezone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class NotificationSerializable(id: String, accountID: String, notificationTemplateJson: String, read: Boolean, createdOn: Timestamp, createdBy: String, createdOnTimezone: String, updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson), read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimezone = createdOnTimezone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, message = Json.toJson(notification.message).toString(), read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimezone = notification.createdOnTimezone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
+  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimezone = notification.createdOnTimezone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
 
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(accountID: String, template: String, parameters: String*): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, message = NotificationMessage(template = template, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, createdOnTimezone = nodeTimezone))).asTry).map {
+  private def add(accountID: String, template: String, parameters: String*): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTemplate = NotificationTemplate(template = template, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, createdOnTimezone = nodeTimezone))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -78,7 +77,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def deleteById(accountID: String) = db.run(notificationTable.filter(_.accountID === accountID).delete.asTry).map {
+  private def deleteById(accountID: String): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -90,13 +89,13 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class NotificationTable(tag: Tag) extends Table[NotificationSerializable](tag, "Notification") {
 
-    def * = (id, accountID, message, read, createdOn, createdBy, createdOnTimezone, updatedOn.?, updatedBy.?, updatedOnTimezone.?) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
+    def * = (id, accountID, notificationTemplateJson, read, createdOn, createdBy, createdOnTimezone, updatedOn.?, updatedBy.?, updatedOnTimezone.?) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
-    def message = column[String]("message")
+    def notificationTemplateJson = column[String]("notificationTemplateJson")
 
     def read = column[Boolean]("read")
 

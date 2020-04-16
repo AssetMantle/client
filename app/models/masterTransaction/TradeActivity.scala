@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Serializable.TradeActivityMessage
+import models.common.Serializable.TradeActivityTemplate
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,14 +15,12 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeActivity(id: String, negotiationID: String, message: TradeActivityMessage, read: Boolean = false, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
-  val title: String = Seq(constants.TradeActivity.PREFIX, message.template, constants.TradeActivity.TITLE_SUFFIX).mkString(".")
+case class TradeActivity(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  val title: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.TITLE_SUFFIX).mkString(".")
 
-  val messageTemplate: String = Seq(constants.TradeActivity.PREFIX, message.template, constants.TradeActivity.MESSAGE_SUFFIX).mkString(".")
+  val template: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.MESSAGE_SUFFIX).mkString(".")
 
-  val messageParameters: Seq[String] = message.parameters
 }
-
 
 @Singleton
 class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -43,15 +41,15 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
-  case class TradeActivitySerializable(id: String, negotiationID: String, message: String, read: Boolean, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, message = utilities.JSON.convertJsonStringToObject[TradeActivityMessage](message), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimezone = createdOnTimezone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class TradeActivitySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimezone = createdOnTimezone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, message = Json.toJson(tradeActivity.message).toString(), read = tradeActivity.read, createdBy = tradeActivity.createdBy, createdOn = tradeActivity.createdOn, createdOnTimezone = tradeActivity.createdOnTimezone, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, updatedOnTimeZone = tradeActivity.updatedOnTimeZone)
+  def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivity.tradeActivityTemplate).toString, read = tradeActivity.read, createdBy = tradeActivity.createdBy, createdOn = tradeActivity.createdOn, createdOnTimezone = tradeActivity.createdOnTimezone, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, updatedOnTimeZone = tradeActivity.updatedOnTimeZone)
 
   private[models] val tradeActivityTable = TableQuery[TradeActivityTable]
 
-  private def add(negotiationID: String, template: String, parameters: String*): Future[String] = db.run((tradeActivityTable returning tradeActivityTable.map(_.id) += serialize(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, message = TradeActivityMessage(template = template, parameters = parameters), createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone))).asTry).map {
+  private def add(negotiationID: String, template: String, parameters: String*): Future[String] = db.run((tradeActivityTable returning tradeActivityTable.map(_.id) += serialize(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, tradeActivityTemplate = TradeActivityTemplate(template = template, parameters = parameters), createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -73,13 +71,13 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class TradeActivityTable(tag: Tag) extends Table[TradeActivitySerializable](tag, "TradeActivity") {
 
-    def * = (id, negotiationID, message, read, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TradeActivitySerializable.tupled, TradeActivitySerializable.unapply)
+    def * = (id, negotiationID, tradeActivityTemplateJson, read, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TradeActivitySerializable.tupled, TradeActivitySerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def negotiationID = column[String]("negotiationID")
 
-    def message = column[String]("message")
+    def tradeActivityTemplateJson = column[String]("tradeActivityTemplateJson")
 
     def read = column[Boolean]("read")
 
