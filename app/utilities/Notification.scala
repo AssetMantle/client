@@ -48,6 +48,8 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
+  private val twilioInit = Twilio.init(smsAccountSID, smsAuthToken)
+
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
 
   private val pushNotificationAuthorizationKey = configuration.get[String]("pushNotification.authorizationKey")
@@ -61,12 +63,8 @@ class Notification @Inject()(masterContacts: master.Contacts,
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
-    val twilioInit = Future {
-      Twilio.init(smsAccountSID, smsAuthToken)
-    }
     val mobileNumber = masterContacts.Service.tryGetMobileNumber(accountID)
     (for {
-      _ <- twilioInit
       mobileNumber <- mobileNumber
     } yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
       ).recover {

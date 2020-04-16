@@ -61,8 +61,8 @@ POST        /negotiation/request                                                
 GET         /negotiation/paymentTerms                                                       controllers.NegotiationController.paymentTermsForm(id: String)
 POST        /negotiation/paymentTerms                                                       controllers.NegotiationController.paymentTerms
 
-GET         /negotiation/documentsCheckList                                                 controllers.NegotiationController.documentsCheckListForm(id: String)
-POST        /negotiation/documentsCheckList                                                 controllers.NegotiationController.documentsCheckList
+GET         /negotiation/documentList                                                       controllers.NegotiationController.documentListForm(id: String)
+POST        /negotiation/documentList                                                       controllers.NegotiationController.documentList
 
 GET         /negotiation/reviewRequest                                                      controllers.NegotiationController.reviewRequestForm(id: String)
 POST        /negotiation/reviewRequest                                                      controllers.NegotiationController.reviewRequest
@@ -76,11 +76,14 @@ POST        /negotiation/rejectRequest                                          
 GET         /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTermsForm(id: String)
 POST        /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTerms
 
+GET         /negotiation/updateAssetOtherDetails                                            controllers.NegotiationController.updateAssetOtherDetailsForm(id: String)
+POST        /negotiation/updateAssetOtherDetails                                            controllers.NegotiationController.updateAssetOtherDetails
+
 GET         /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTermsForm(id: String)
 POST        /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTerms
 
-GET         /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckListForm(id: String)
-POST        /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckList
+GET         /negotiation/updateDocumentList                                                 controllers.NegotiationController.updateDocumentListForm(id: String)
+POST        /negotiation/updateDocumentList                                                 controllers.NegotiationController.updateDocumentList
 
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
@@ -463,7 +466,7 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 #DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+POST        /wurtcb                                                                         controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm

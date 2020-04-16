@@ -181,18 +181,23 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val confirmSellerBid = Service.getTransaction(ticketID)
 
-      def negotiationID(confirmSellerBid: ConfirmSellerBid): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
+      def negotiationID(confirmSellerBid: ConfirmSellerBid): Future[Option[String]] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
 
-      def negotiationResponse(negotiationID: String, confirmSellerBid: ConfirmSellerBid): Future[NegotiationResponse.Response] = if (negotiationID == "") {
-        val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = confirmSellerBid.from, sellerAddress = confirmSellerBid.to, pegHash = confirmSellerBid.pegHash)
+      def negotiationResponse(negotiationID: Option[String], confirmSellerBid: ConfirmSellerBid): Future[NegotiationResponse.Response] = {
+        negotiationID match {
+          case Some(id) => getNegotiation.Service.get(id)
+          case None => {
+            val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
 
-        def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
+            def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
 
-        for {
-          negotiationIDResponse <- negotiationIDResponse
-          negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
-        } yield negotiation
-      } else getNegotiation.Service.get(negotiationID)
+            for {
+              negotiationIDResponse <- negotiationIDResponse
+              negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
+            } yield negotiation
+          }
+        }
+      }
 
       def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
 
