@@ -215,8 +215,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
             for {
               _ <- markStatusRequestSent
               buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
-              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
-              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
+              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
             } yield Unit
           }
         }
@@ -245,9 +245,9 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         _ <- markAccountDirty(issueAsset.from)
         fromAccountID <- getIDByAddress(issueAsset.from)
         traderOrganization <- getOrganization(seller.organizationID)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
-        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ASSET_ISSUED, blockResponse.txhash, seller.name, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
-        _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ASSET_ISSUED, blockResponse.txhash, traderOrganization.name, seller.name, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString()) else Future(None)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
+        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ASSET_ISSUED, blockResponse.txhash, seller.name, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
+        _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ASSET_ISSUED, blockResponse.txhash, traderOrganization.name, seller.name, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString) else Future(None)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -302,9 +302,9 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         _ <- markIssueAssetRejected(asset.id)
         fromAccountID <- getIDByAddress(issueAsset.from)
         traderOrganization <- getOrganization(seller.organizationID)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
-        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, seller.name, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString())
-        _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString(), asset.quantityUnit, asset.price.toString()) else Future(None)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
+        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, seller.name, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
+        _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString) else Future(None)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
