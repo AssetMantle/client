@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.TradeActivity
+
+@(tradeActivities: Seq[TradeActivity])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="timeline recentActivityBox">
+    @if(tradeActivities.nonEmpty) {
+        @tradeActivities.map { tradeActivity =>
+            <div class="timeline-item notification">
+                <div class="timeline-icon">
+                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-contract")"/></svg>
+                </div>
+                <div class="timeline-content right">
+                    <div>
+                        <div class="textLineOverflow activityContent" title="@tradeActivity.title"><span class="cmuk-text-bolder">@Messages(tradeActivity.title)</span>
+                            @Messages(tradeActivity.template, tradeActivity.tradeActivityTemplate.parameters: _*)
+                        </div>
+                        <div class="notificationTime">@tradeActivity.createdOn @tradeActivity.createdOnTimezone</div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class = "notification NotificationButton"><a onclick="loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, '@tradeActivities.head.negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
+    } else {
+        <p class='cmuk-position-center'>@Messages(constants.View.NO_TRADE_ACTIVITIES_FOUND)</p>
+    }
+</div>

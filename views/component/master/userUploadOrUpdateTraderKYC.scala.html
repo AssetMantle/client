@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import models.master.TraderKYC
+
+@(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+<div class="centerText">
+    <h4>@Messages(constants.Form.TRADER_KYC_FILES)</h4>
+    @for(documentType <- constants.File.TRADER_KYC_DOCUMENT_TYPES) {
+        <div id="upload@documentType">
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadTraderKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(traderKYC <- traderKYCs) {
+        @component.master.commonDocumentViewer(traderKYC) {
+            @routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)
+        } {
+            <a href="@routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
+        } {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUpdateTraderKYCForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>
+            <script>hideElement('upload@traderKYC.documentType')</script>
+        }
+    }
+</div>
+<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.View.BACK)</button>
+
+@if(constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(traderKYCs.map(_.documentType)).isEmpty) {
+    <button type="button" class="cmuk-button cmuk-button-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.userReviewAddTraderRequestForm())">@Messages(constants.Form.NEXT)</button>
+}

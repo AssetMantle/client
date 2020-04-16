@@ -1,0 +1,15 @@
+@import views.companion.blockchain.ConfirmSellerBid
+@import views.html.base._
+
+@(confirmSellerBidForm: Form[ConfirmSellerBid.Data] = ConfirmSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_CONFIRM_SELLER_BID, confirmSellerBidForm) {
+    @commonInputText(confirmSellerBidForm, constants.FormField.FROM)
+    @commonInputText(confirmSellerBidForm, constants.FormField.TO)
+    @commonInputInt(confirmSellerBidForm, constants.FormField.BID)
+    @commonInputInt(confirmSellerBidForm, constants.FormField.TIME)
+    @commonInputText(confirmSellerBidForm, constants.FormField.PEG_HASH)
+    @commonInputText(confirmSellerBidForm, constants.FormField.SELLER_CONTRACT_HASH)
+    @commonInputInt(confirmSellerBidForm, constants.FormField.GAS)
+    @commonSelect(confirmSellerBidForm, constants.FormField.MODE)
+    @commonInputPassword(confirmSellerBidForm, constants.FormField.PASSWORD)
+}

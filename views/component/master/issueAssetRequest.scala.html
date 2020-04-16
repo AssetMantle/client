@@ -1,0 +1,17 @@
+@import controllers.actions.LoginState
+@import views.companion.master.IssueAssetRequest
+@import views.html.base._
+
+@(issueAssetRequestForm: Form[IssueAssetRequest.Data] = IssueAssetRequest.form, asset: masterTransaction.IssueAssetRequest, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<div id="assetDetail"></div>
+@commonForm(constants.Form.ISSUE_ASSET_REQUEST, issueAssetRequestForm) {
+    @commonInputText(issueAssetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @asset.physicalDocumentsHandledVia match {
+        case constants.Form.COMDEX => {}
+        case _ => {
+            @commonInputInt(issueAssetRequestForm, constants.FormField.GAS)
+            @commonInputPassword(issueAssetRequestForm, constants.FormField.PASSWORD)
+        }
+    }
+}
+<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@asset.id'))</script>

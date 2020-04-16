@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import models.blockchain.Asset
+@import views.html.base._
+@(releaseAssetList: Seq[Asset])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@for(releaseAsset <- releaseAssetList) {
+   <div>
+   @commonCard(releaseAsset.ownerAddress){
+   }{
+       @commonTextInfo(constants.Form.OWNER_ADDRESS, releaseAsset.ownerAddress)
+       @commonTextInfo(constants.Form.PEG_HASH, releaseAsset.pegHash)
+       <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
+   }
+   </div>
+}

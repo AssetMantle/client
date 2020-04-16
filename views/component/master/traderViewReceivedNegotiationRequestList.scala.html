@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@receivedNegotiationRequestList.map { receivedNegotiationRequest =>
+    @commonInfoBox() {
+        @defining(counterPartyTraders.find(_.id == receivedNegotiationRequest.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
+            @counterPartyTrader match {
+                case Some(trader) => {
+                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                }
+                case None => {
+                    @commonTextInfo(constants.View.TRADER_ID, receivedNegotiationRequest.sellerTraderID)
+                }
+            }
+        }
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, receivedNegotiationRequest.assetDescription)
+        @commonIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" "))
+        @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+        @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+    }
+}

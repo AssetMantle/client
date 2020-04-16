@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.OrganizationKYC
+@import views.companion.master.UpdateOrganizationKYCDocumentStatus
+
+@(updateOrganizationKYCDocumentStatusForm: Form[UpdateOrganizationKYCDocumentStatus.Data] = UpdateOrganizationKYCDocumentStatus.form, organizationKYC: OrganizationKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div id="@Seq(organizationKYC.id, organizationKYC.documentType).mkString("")">
+@commonAcceptOrRejectForm(constants.Form.UPDATE_ORGANIZATION_KYC_DOCUMENT_STATUS, updateOrganizationKYCDocumentStatusForm, Seq(organizationKYC.id, organizationKYC.documentType).mkString(""), organizationKYC.status) {
+    @commonInputText(updateOrganizationKYCDocumentStatusForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationKYC.id, 'containerDivClass -> "hidden", 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateOrganizationKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> organizationKYC.documentType, 'containerDivClass -> "hidden", 'class -> "hidden", 'readonly -> true)
+}
+</div>

@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base.common
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+@center = {
+    <div>
+        <div id="commonHome"></div>
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendCoinController.faucetRequestForm())">@Messages(constants.Form.FAUCET_REQUEST.legend)</button>
+    </div>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
+    </script>
+}

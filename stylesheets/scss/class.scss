@@ -1,0 +1,2531 @@
+
+@import "variables.scss";
+
+html, body{
+  height: 100%;
+  background: #F0F0F0;
+  scroll-behavior: smooth;
+}
+
+.scroller{
+  scrollbar-color: #7f7f7f white;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: white;
+}
+
+::-webkit-scrollbar,
+::-webkit-scrollbar-thumb {
+  overflow:visible;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7f7f7f;
+  border-right: 1px solid white;
+}
+
+%iconBackground{
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin-right: 15px;
+  position: relative;
+}
+
+%iconLetter{
+  display: inline-flex;
+  height: 26px;
+  width: 26px;
+  line-height: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  text-align: center;
+  font-size: $paragraphFontSizeSmall;
+  align-items: center;
+  justify-content: center;
+}
+
+%cmuk-comment-meta{
+  color: #061728;
+  font-size: $paragraphFontSizeMedium;
+}
+
+%cmuk-card-default{
+  background: #FAFAFA;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: $buttonBorderRadius;
+}
+
+%cmuk-button-link {
+  font-weight: bold;
+  font-size: $paragraphFontSizeSmall;
+  text-decoration: none;
+}
+
+%verifiedLabel{
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 10px;
+}
+
+%buttonPrimary{
+  background-color: $colorPrimary;
+  font-family: $fontFamilyPrimary;
+  border-radius: $buttonBorderRadius;
+  color: #FFFFFF;
+  font-weight: normal;
+}
+
+.wordBreak{
+  word-break: break-all;
+}
+
+.centerScreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.bodyContainer{
+  height:auto;
+  min-height: 100%;
+  background: #F0F0F0;
+  margin: 0 auto -138px;
+}
+
+.pageContainer,
+.dataContainer,
+.pageContent{
+  height: 100%;
+}
+
+.toolTip:hover .toolTipText {
+  visibility: visible;
+  opacity: 1;
+}
+
+.headerFontSize{
+  font-size:$paragraphFontSizeMedium;
+}
+
+.title{
+  font-size: $paragraphFontSizeSmall;
+  font-family: $fontFamilySecondary;
+  font-weight: bold;
+}
+
+.logoutContainer {
+  .commonCheckBox {
+    justify-content: center;
+  }
+}
+
+.MnemonicQuiz .hidden,
+.hidden{
+  display: none;
+}
+
+.flexContainer {
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.flexItem {
+  text-align: center;
+  padding-top: 15px;
+}
+
+.flexBox {
+  padding: 5px;
+  margin: 10px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexGraph {
+  width: 95%;
+}
+
+.flexGrowth {
+  flex-grow: 1;
+}
+
+.box {
+  background: lightblue;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
+  margin: 0px 5px 10px 0px;
+  border-radius: 5px;
+  padding-bottom: 15px;
+}
+
+.firstBox {
+  width: 30%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+
+.secondBox {
+  width: 100%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+
+.thirdBox {
+  width: 200px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+
+.toggleElement {
+  text-align: center;
+  background-color:$colorPrimary;
+  color:#FFFFFF;
+}
+
+.showToggleElement {
+  background-color: $colorPrimary;
+  cursor: pointer;
+  color: #10292e;
+}
+
+.toggleElement:hover {
+  cursor: pointer;
+  color: #FFFFFF;
+}
+
+.leftText {
+  text-align: left;
+  word-break: break-all;
+}
+
+rightText {
+  text-align: right;
+}
+
+.centerText {
+  text-align: center;
+}
+
+.scrollableFirst {
+  min-height: min-content;
+  max-height: 85vh;
+  overflow-y: scroll;
+}
+
+.scrollableSecond {
+  min-height: min-content;
+  max-height: 50vh;
+  overflow-y: scroll;
+}
+
+.scrollableThird {
+  min-height: min-content;
+  max-height: 20vh;
+  overflow-y: scroll;
+}
+
+.progressContainer {
+  width: 100%;
+  border-radius: $buttonBorderRadius;
+  background-color: #ddd;
+  height: 13px;
+  margin-bottom: 5px;
+}
+
+.progressBar {
+  width: 0;
+  border-radius: $buttonBorderRadius;
+  height: 13px;
+  background-color: #5eaf50;
+}
+
+.profilePicture {
+  height: 100px;
+  width: 100px;
+}
+
+.profilePictureContainer{
+  border-radius: 50%;
+}
+
+.uploadBar {
+  display: flex;
+  justify-content: space-around;
+  min-width: 200px;
+  width: 30%;
+  height: 50px;
+  margin: auto;
+}
+
+.uploadBar img {
+  height: 32px;
+}
+
+.uploadProgress {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  width: 30%;
+  margin-top: 20px;
+  margin: auto;
+}
+
+.uploadProgressOuter {
+  background-color: #20201F;
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.uploadProgressOuter > div {
+  text-align: center;
+  background-color: #2196F3;
+  height: 16px;
+  border-radius: 10px;
+}
+
+.approve {
+  background-color: #4CAF50;
+}
+
+.reject {
+  background-color: #f44336;
+}
+
+.lightBlue {
+  background-color: #a8b1ff !important;
+}
+
+.red {
+  color: rgba(131, 0, 4, 0.71);
+}
+
+.hashCode {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  width:120px;
+}
+
+.footer {
+  margin-top: 20px;
+  width: 100%;
+  padding: 30px 0px;
+  font-size: $paragraphFontSizeSmall;
+  background: #031221;
+  .copyright{
+    margin: 10px 0px;
+    font-family:$fontFamilySecondary;
+    font-weight: bold;
+    color:$colorSecondary;
+    a{
+      text-decoration: none;
+      color:$colorSecondary;
+    }
+  }
+}
+
+.status {
+  width: 20px;
+  height: 20px;
+}
+
+.copyIcon{
+  cursor: pointer;
+}
+
+.leftSide .leftSideMenuIcon{
+  color:#fff;
+}
+
+.tableName{
+  background:#d2edef;
+}
+
+.backButton{
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.cmuk-accordion li{
+  margin:0px 5px 5px 0px;
+  background: #F9F9F9;
+  flex-grow: 1;
+  padding: 0px;
+  color: #Fff;
+  border-radius: 3px;
+  box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+
+.alretName{
+  font-weight: bold;
+  font-size: $paragraphFontSizeSmall;
+  font-family: $fontFamilySecondary;
+}
+
+.cmuk-accordion-buttons{
+  background: #fff;
+  padding:10px;
+}
+
+
+.profileDropdown li{
+  padding: 5px 20px;
+}
+
+.tablePadding tr td,
+.tablePadding tr th{
+  padding: 5px 12px;
+}
+
+.tablePadding tr th{
+  font-weight:700;
+}
+
+.profileDocuments{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.document{
+  width: 100px;
+  height: 90px;
+  border: 3px solid #1e87f0;
+  text-align: center;
+  padding: 5px;
+  margin:5px;
+}
+
+.documentImage img{
+  width:80px;
+  height: 50px;
+  padding: 10px 0px;
+}
+
+.registerButton button {
+  font-size: 14px;
+  line-height: 230%;
+  text-align: center;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  border-radius: 2px;
+  text-transform: capitalize;
+}
+
+.passphraseMessage{
+  color : red;
+}
+
+.dataContainer .cmuk-alert{
+  margin:0px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 37.76px;
+  height: 21.13px;
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.signupErrorList{
+  padding: 0px;
+  list-style: none;
+  li{
+    text-align: left;
+  }
+}
+
+.usernameAvailibilty {
+  position: relative;
+  .result {
+    position: absolute;
+    right: -25px;
+    top:40px;
+  }
+}
+
+.mainlist{
+  padding:0px;
+}
+
+.listItem{
+  display: inline-flex;
+  background: #cccc;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.listItemchild{
+  margin: 10px;
+}
+
+.listItemchildhTitle{
+  font-weight: bold;
+  color: black;
+}
+
+.Editdropdown{
+  display: none;
+  position: absolute;
+  z-index: 1020;
+  box-sizing: border-box;
+  width: 200px;
+  padding: 25px;
+  background: #fff;
+  color: #666;
+  box-shadow: 0 5px 12px rgba(0,0,0,.15);
+}
+
+.hiddenLabel label{
+  display: none;
+}
+
+.fileName{
+  font-size: $paragraphFontSizeSmall;
+  font-family: $fontFamilySecondary;
+  color: $colorPrimary;
+  margin-bottom: 5px;
+}
+
+.dropBox{
+  font-family: $fontFamilySecondary;
+}
+
+.profileDocuments{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.mobileNumberUpdate {
+  .countryCode {
+    margin-top: 32px;
+    width: 80px;
+    margin-right: 10px;
+  }
+  .mobileNumber{
+    width:100%;
+  }
+  .mobileNumber label{
+    margin-left: -77px;
+  }
+}
+
+.commonhomeData{
+  font-size: $paragraphFontSizeSmall;
+  p, h3{
+    margin:5px 0px;
+  }
+}
+
+.connectionError{
+  height: 100px;
+  position: relative;
+  top:25%;
+  margin: auto;
+  padding: 40px;
+  border-radius: $buttonBorderRadius;
+  font-family: $fontFamilySecondary;
+  font-size: $paragraphFontSizeSmall;
+  background: #e6e6e6;
+  width: 100px;
+  color: red;
+}
+
+.commonCheckBox{
+  dt{
+    width: 200px;
+    word-break: break-word;
+  }
+}
+
+.unRead{
+  color: #1e87f0;
+  background: lightblue;
+  text-align: center;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+.graphCard{
+  .cmuk-card-header{
+    padding: 15px 20px;
+  }
+  margin-bottom: 20px;
+}
+
+.textLineOverflow{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.loginButton{
+font-family: $fontFamilyPrimary;
+}
+
+.comdex {
+  .buttonForm {
+    background:$colorPrimary;
+    color: #FFFFFF;
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    font-weight: bold;
+  }
+  .cmuk-input {
+    background: #FFFFFF;
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1px solid rgba(5, 60, 117, 0.22);
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    &::placeholder {
+      color: #848A91;
+      font-size: $paragraphFontSizeSmall;
+      font-family: $fontFamilySecondary;
+    }
+    &:focus {
+      border: 1px solid rgba(5, 60, 117, 0.22);
+    }
+  }
+  .cmuk-input, .cmuk-select, .cmuk-textarea{
+    padding:0px 15px
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+  }
+  .error {
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    color: #f0506e;
+  }
+  .cmuk-badge.verified{
+    @extend  %verifiedLabel;
+    background-color: #49A948;
+  }
+  .cmuk-badge.rejected{
+    @extend  %verifiedLabel;
+    background-color: #FE4350;
+  }
+  .cmuk-badge.pending{
+    @extend %verifiedLabel;
+    background-color: #faa05a;
+  }
+  .cmuk-button{
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-button-primary{
+    border: none;
+    font-size: $paragraphFontSizeSmall;
+  }
+  .primaryFont{
+    font-family:$fontFamilyPrimary;
+  }
+  .secondaryFont{
+    font-family:$fontFamilySecondary;
+  }
+  .cmuk-alert-warning p{
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .cmuk-alert{
+    .failureIcon,
+    .warningIcon,
+    .successIcon,
+    .infoIcon{
+      width: 20px;
+      height: 20px;
+      .icon{
+        width:20px;
+        height: 20px;
+        margin-bottom: 5px;
+      }
+    }
+    p{
+      font-family: $fontFamilySecondary;
+      font-size: $paragraphFontSizeSmall;
+    }
+  }
+  .cmuk-card-header{
+    color:#061728;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-button-link{
+    color: $colorPrimary;
+  }
+  .cmuk-button-primary{
+    background-color: $colorPrimary;
+  }
+  .cmuk-legend{
+    font-weight: bold;
+    text-align: center;
+    color: #061728;
+    font-weight: bold;
+    font-family: $fontFamilySecondary;
+    font-size: $paragraphFontSizeLarge;
+  }
+  .cmuk-spinner>*>*{
+    stroke-width:2 !important;
+    stroke:$colorPrimary !important;
+  }
+  .cmuk-accordion-title::before{
+    background-image:url('../../images/chevron-up.svg');
+  }
+  .cmuk-open>.cmuk-accordion-title::before{
+    background-image:url("../../images/chevron-down.svg");
+  }
+  .cmuk-table th, .cmuk-button{
+    text-transform: capitalize;
+  }
+  .modalBody{
+    .cmuk-button{
+      margin-bottom: 5px;
+    }
+    .infoRowValue{
+      text-align: left;
+      margin-left: 30px;
+    }
+  }
+  .cmuk-accordion>:nth-child(n+2){
+    margin-top:0px;
+  }
+  .cmuk-accordion-title{
+    padding: 15px;
+    color:#373E46;
+  }
+  .cmuk-accordion-content{
+    margin-top: 0px;
+    background: #fff;
+    color: #272829;
+    padding: 8px;
+  }
+  .cmuk-accordion-title:focus,
+  .cmuk-accordion-title:hover{
+    color:#373E46;
+  }
+  .errorInput{
+    border: 1px solid red;
+  }
+  .cmuk-panel-scrollable{
+    resize: none;
+    max-height:100px;
+    padding: 0px;
+  }
+  .panelHeader{
+    font-size: $paragraphFontSizeMedium;
+    font-family: $fontFamilySecondary;
+    font-weight: normal;
+    color: #272829;
+    line-height: 2;
+  }
+}
+
+.header{
+  background: $colorSecondary;
+  .cmuk-navbar-container:not(.cmuk-navbar-transparent){
+    background: $colorSecondary;
+    padding: 0px 0px 0px 35px;
+  }
+  .cmuk-navbar-item,
+  .cmuk-navbar-nav>li>a,
+  .cmuk-navbar-toggle{
+    min-height:60px;
+    font-family: $fontFamilySecondary;
+    text-transform: capitalize;
+  }
+  .cmuk-logo{
+    padding: 0px 40px 0px 0px;
+    border-right: 1px solid #1C5998;
+    img{
+      width: 120px;
+    }
+  }
+  .cmuk-navbar-right{
+    .cmuk-navbar-nav>li>a{
+      padding:0px 25px;
+      border-left: 1px solid #1C5998;
+    }
+    .cmuk-navbar-nav {
+      .buttonRegister{
+        background-color: #FE4350;
+        font-size: $paragraphFontSizeSmall;
+        font-family: $fontFamilyPrimary;
+        color: #FFFFFF;
+        line-height: inherit;
+        padding: 5px 30px;
+        border-radius: $buttonBorderRadius;
+      }
+      li .loginLink{
+        padding: 0px 45px 0px 45px;
+      }
+    }
+    .loginIcon{
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin: 0px 5px 5px;
+      padding: 3px;
+    }
+  }
+  .cmuk-navbar-nav>li>a{
+    padding:0px 25px;
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size:$paragraphFontSizeSmall;
+    box-sizing: border-box;
+    letter-spacing: 0.4px;
+  }
+  .dashboardIcon .icon{
+    width: 20px;
+    height: 16px;
+    margin-bottom: 3px;
+  }
+  .dashboardIcon, .traderIcon, .accountIcon, .transactionIcon{
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+  }
+  .icon {
+    width: 20px;
+    height: 20px;
+    fill:#FFFFFF;
+  }
+  .cmuk-navbar-nav>li:hover>a, .cmuk-navbar-nav>li>a.cmuk-open, .cmuk-navbar-nav>li>a:focus{
+    color: #FFFFFF;
+  }
+  .cmuk-navbar-nav>li>a.active{
+    color: #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    padding-top: 3px;
+    .icon {
+      fill: red;
+    }
+  }
+}
+
+.notificationDropdown{
+  .cmuk-dropdown{
+    max-height: 500px;
+    padding: 0px;
+    overflow: scroll;
+  }
+  .dropdownHeader p{
+    justify-content: center;
+    text-align: center;
+    margin:0px;
+    padding: 10px;
+    border-bottom: 1px solid #e7eaf3;
+  }
+  .dropdownBody{
+    padding:0px;
+    height: 400px;
+    overflow-y: scroll;
+  }
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1010;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 30px 30px;
+  text-align: center;
+  .modalContent {
+    word-break: break-all;
+    top: 20%;
+    border-radius:$buttonBorderRadius;
+    padding: 20px;
+    margin: auto;
+    background-color: #FAFAFA;
+    box-sizing: border-box;
+    position: relative;
+    max-width: 100%;
+    width: auto;
+    overflow-y: auto;
+    max-height: 600px;
+    display: inline-block;
+    .modalBody {
+      padding: 20px;
+      text-align:left;
+      font-family: $fontFamilySecondary;
+      .infoRowLabel{
+        text-align: left;
+        font-family: $fontFamilySecondary;
+      }
+      .title{
+        margin: 10px 0px;
+      }
+    }
+  }
+}
+
+.MnemonicQuiz {
+  .titleMnemonic {
+    font-weight: bold;
+  }
+  .errorMnemonicInput {
+    display: none;
+    color: red;
+    padding: 10px;
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+  }
+  .verifyMnemonic {
+    flex-wrap: wrap;
+    justify-content: center;
+    .verifyMnemonicbutton {
+      width: 114px;
+      height: 38px;
+      font-family: $fontFamilySecondary;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      border-radius: $buttonBorderRadius;
+      input{
+        color:#061728;
+        text-align: center;
+      }
+      .mnemonicField{
+        background-color: #FFffff;
+      }
+    }
+  }
+  .buttonForm{
+    font-size: $paragraphFontSizeSmall;
+  }
+  .mnemonicNote{
+    background-color: #FF2938;
+    font-family:$fontFamilySecondary;
+    font-size: $paragraphFontSizeSmall;
+    text-align: justify;
+    letter-spacing: 0.01em;
+    color: #FFFFFF;
+    font-weight: bold;
+    padding: 15px;
+    margin: 20px 0px;
+    background-image: url("../../images/note.svg");
+    background-repeat: no-repeat;
+    background-position: 103%;
+    background-size: contain;
+    display: flex;
+    align-items: center;
+    .mnemonicNoteText{
+      width: 73%;
+    }
+    .mnemonicInfoIcon{
+      padding:10px 20px 10px 10px;
+      width: 20px;
+      height: 20px;
+      .icon{
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+.bannerContainer {
+  background-color: #031221;
+  background-image: url("../../images/bannerImage.svg");
+  background-repeat: no-repeat;
+  background-position: 80% 8%;
+  height: 363px;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  .bannerText {
+    max-width: 600px;
+    padding: 50px 0px;
+    h3 {
+      font-family: $fontFamilySecondary;
+      margin: 0px;
+      font-size: 45px;
+      font-weight: normal;
+      color: #FFFFFF;
+    }
+    p {
+      font-family: $fontFamilySecondary;
+      font-size: $headingFontSizeSmall;
+      line-height: 172%;
+      letter-spacing: 0.01em;
+      color: #627F9F;
+    }
+  }
+  .cmuk-slider {
+    position: absolute;
+    bottom: 0px;
+    .cmuk-slider-items {
+      height: 37.63px;
+      align-items: center;
+      li{
+        &:before{
+          content: ' ';
+          position: absolute;
+          width:0px;
+          height: 0px;
+          left:  -20px;
+          top: 7px;
+          border: 3px solid red;
+          transform: rotate(-45deg);
+        }
+      }
+      li span {
+        font-size: $paragraphFontSizeSmall;
+        line-height: 172%;
+        letter-spacing: 0.01em;
+      }
+      li .sliderItemName {
+        font-weight: bold;
+        color: #6C7883;
+        font-family: $fontFamilySecondary;
+      }
+      li .sliderItemValue {
+        font-weight: bold;
+        color: #FFFFFF;
+        font-family: $fontFamilyPrimary;
+      }
+      li .sliderItemPercentage {
+        color: #5EB55C;
+        font-family: $fontFamilySecondary;
+      }
+    }
+  }
+}
+
+.tabsSection {
+  p {
+    font-family:$fontFamilySecondary;
+    font-size:$headingFontSizeLarge;
+    letter-spacing: 0.01em;
+    color: #000000;
+    margin-bottom: 40px;
+  }
+  .cmuk-subnav-pill{
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    li {
+      &:first-child a{
+        border-radius: 5px 5px 0px 0px;
+      }
+      &:nth-child(2){
+        border-top: 1px solid #e7eaf3;
+        border-bottom: 1px solid #e7eaf3;
+      }
+      &:last-child a{
+        border-radius: 0px 0px 5px 5px;
+      }
+      a{
+        background-color: #FAFBFD;
+        padding: 15px 0px 15px 20px;
+        font-family: $fontFamilySecondary;
+        font-size: $paragraphFontSizeLarge;
+        text-transform: capitalize;
+        color:#0862BE;
+        font-weight: bold;
+        &:before{
+          content: "";
+          width: 1.4em;
+          height: 1.4em;
+          padding-right: 0px;
+          margin-left: 25px;
+          float: right;
+          background-repeat: no-repeat;
+          background-position: 50% 50%;
+          background-image: url(../../images/chevron-down-blue.svg);
+          padding-left: 25px;
+        }
+      }
+    }
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    background: $colorSecondary;
+    color:#FFFFFF;
+    &:before{
+      background-image: url(../../images/chevron-right.svg);
+    }
+  }
+  .cmuk-switcher{
+    li{
+      font-family: $fontFamilySecondary;
+      font-size: $paragraphFontSizeLarge;
+      color: #365575;
+      letter-spacing: 0.01em;
+      line-height: 1.8;
+      div >div{
+        text-align: justify;
+      }
+    }
+  }
+}
+
+.left{
+  height: 30px;
+  align-items: center;
+  padding:0px 0px 15px 0px;
+  word-break: break-all;
+  justify-content: space-between;
+  .backIcon{
+    width: 31px;
+    height: 31px;
+    background: #E4E4E4;
+    display:flex;
+    justify-content: center;
+    border-radius: 50%;
+    color: $colorSecondary;
+    font-weight: bold;
+  }
+  .quoteIdTtitle{
+    color: #6C7883;
+    font-weight: bold;
+    font-size: $paragraphFontSizeSmall;
+  }
+  .quoteId{
+    font-size: $paragraphFontSizeSmall  ;
+  }
+}
+
+.userIcons  {
+  .userIcon {
+    margin-right: -5px;
+  }
+  .buyerIcon {
+    background: #FFD5D7;
+    color: #061728;
+    @extend %iconLetter;
+  }
+  .sellerIcon {
+    background: #9ECCFB;
+    @extend %iconLetter;
+  }
+  .financierIcon {
+    background: #A7FFC0;
+    @extend %iconLetter;
+  }
+}
+
+.notifications{
+  width: 600px;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  .cmuk-alert{
+    width: 250px;
+    padding: 10px 25px 10px 10px;
+    margin: 0px;
+    font-size: $paragraphFontSizeMedium;
+  }
+  .cmuk-alert-close{
+    top: 15px;
+  }
+}
+
+.right{
+  padding:0px 0px  15px 0px;
+  height: 30px;
+  justify-content: flex-end;
+  .refresh {
+    font-family: $fontFamilySecondary;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    background: #FFFFFF;
+    border: 0.908233px solid #EDEDED;
+    box-sizing: border-box;
+    border-radius: 37.2375px;
+    margin-right: 10px;
+    color: #061728;
+    cursor: pointer;
+    transition: .1s ease-in-out;
+    transition-property: color,background-color,border-color;
+    outline: none;
+    span{
+      padding:0px 5px;
+    }
+    .icon {
+      width: 13px;
+      height: 13px;
+    }
+  }
+  .live {
+    align-items: center;
+  }
+  .liveText {
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: $paragraphFontSizeSmall;
+    color: #272829;
+  }
+  .liveIcon {
+    width: 6px;
+    height: 6px;
+    background-color: #5EB55C;
+    border-radius: 50%;
+    box-shadow: 0 0 0 5px #A1ED9F;
+  }
+}
+
+.pageContainer{
+  padding-bottom: 138px;
+  .pageContent{
+    padding-top: 10px;
+  }
+  .middle{
+    .cmuk-card-default{
+      background: #FAFAFA;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+    }
+    .mainTabs{
+      .cmuk-card-body{
+        padding: 0px;
+        .cmuk-switcher{
+          padding: 15px 30px;
+        }
+        .cmuk-subnav{
+          margin:0px;
+          width: 100%;
+          margin: 0px;
+          border-bottom: 1px solid #e5e5e5;
+        }
+        .cmuk-subnav li{
+          &:first-child{
+            border-right: 1px solid #cccccc;
+          }
+          padding: 0px;
+          width: 49%;
+          text-align: center;
+          a{
+            padding: 15px 0px;
+            font-family: $fontFamilySecondary;
+            text-transform: capitalize;
+            font-size: $paragraphFontSizeMedium;
+          }
+        }
+        .cmuk-subnav>.cmuk-active>a{
+          font-family: $fontFamilySecondary;
+          color: #061728;
+          background: none;
+          font-weight: bold;
+          border-bottom: 2px solid #0862BE;
+        }
+      }
+      .docViewList{
+        a{
+          margin-right: -11px;
+        }
+      }
+      .tradeTerms{
+        .traderCommodity{
+          display: flex;
+          align-items: center;
+          margin: 15px 0px;
+          .commodityImage{
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            background: #cccc;
+            position: relative;
+            text-align: center;
+            border-radius: 50%;
+            align-items: center;
+            margin-right: 15px;
+            justify-content: center;
+            img{
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              margin: auto;
+            }
+          }
+          .tradeName{
+            color: #4B4B4B;
+            font-weight: bold;
+            font-family: $fontFamilySecondary;
+            font-size: $paragraphFontSizeMedium;
+          }
+        }
+        .tradeTermsData{
+          justify-content: space-between;
+          border-bottom: 1px solid #E8E8E8;
+          padding: 25px 0px 15px 0px;
+          margin-bottom: 25px;
+          font-family: $fontFamilySecondary;
+          color: #848A91;
+          font-size: $paragraphFontSizeSmall;
+          font-weight: bold;
+
+        }
+        .terms{
+          .term{
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #F8F9FC;
+            border: 1px solid #E2E4E6;
+            box-sizing: border-box;
+            border-radius: 3px;
+            margin: 10px 0px;
+            align-items: center;
+            .serialNumber{
+              color: #859EB9;
+              font-family: "Oxygen", sans-serif;
+              font-size: $paragraphFontSizeMedium;
+              margin-right: 10px;
+            }
+            .termIcon{
+              margin-right: 10px;
+              .icon{
+                width: 16px;
+                height: 16px;
+                margin-bottom: 3px;
+              }
+            }
+            .termName{
+              color: #0862BE;
+              font-family: $fontFamilySecondary;
+              font-size: $paragraphFontSizeSmall;
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 0.01em;
+            }
+            .termValue{
+              color: #061728;
+              font-family: $fontFamilySecondary;
+              font-size: $paragraphFontSizeMedium;
+              margin-right: 10px;
+            }
+            .creditTerms{
+              text-indent: 40px;
+              margin-top: 5px;
+              p{
+                font-family: $fontFamilySecondary;
+                font-size: $paragraphFontSizeMedium;
+                color: #061728;
+                margin: 0px;
+                margin-bottom: 5px;
+              }
+            }
+            .termStatus{
+              display: flex;
+              align-items: center;
+              font-family: $fontFamilySecondary;
+              color:#061728;
+              .commonCheckBox dt{
+                width: auto;
+                display: none;
+              }
+              .commonCheckBox dl{
+                margin-bottom: 0px;
+              }
+              .cmuk-checkbox{
+                height: 20px;
+                width: 20px;
+              }
+              .cmuk-checkbox:focus, .cmuk-radio:focus{
+                border-color: #5EB55C;
+              }
+              .cmuk-checkbox:checked, .cmuk-checkbox:indeterminate, .cmuk-radio:checked{
+                background-color: #5EB55C;
+              }
+            }
+
+          }
+          hr{
+            margin: 15px 0px;
+          }
+        }
+        .sellerTerm{
+          display: flex;
+          justify-content: space-between;
+          padding: 15px 20px;
+          background: #F8F9FC;
+          border: 1px solid #E2E4E6;
+          box-sizing: border-box;
+          border-radius: 3px;
+          margin: 10px 0px;
+          align-items: center;
+          .infoRowLabel{
+            width: auto;
+            color: #0862BE;
+            font-family: $fontFamilySecondary;
+            font-size: $paragraphFontSizeSmall;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+          .infoRowValue{
+            font-family: Oxygen;
+            color: #061728;
+            font-size: $paragraphFontSizeSmall;
+            margin-left: 20px;
+          }
+        }
+        button{
+          padding: 0 15px;
+          line-height: 28px;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+.leftTradeFinancial{
+  .financial{
+    margin-bottom: 20px;
+  }
+  .cmuk-card-default{
+    @extend %cmuk-card-default;
+  }
+  .cmuk-card-header{
+    padding: 15px 20px;
+    color: #061728;
+    font-size: $paragraphFontSizeMedium;
+    font-family: $fontFamilySecondary;
+    .icon{
+      margin-bottom: 2px;
+    }
+  }
+  .cmuk-card-body{
+    padding:0px;
+    overflow-y: auto;
+    ul{
+      padding: 0px;
+      margin: 0px;
+    }
+    .refresh{
+      padding: 10px 0px 10px 0px;
+      margin: 0px 20px;
+      font-family: $fontFamilySecondary;
+      font-size: $paragraphFontSizeSmall;
+      button{
+        text-decoration: none;
+        color: #848A91;
+        font-weight: bold;
+      }
+      .refreshIcon{
+        .icon{
+          width: 14px;
+          height: 14px;
+          margin-right: 3px;
+        }
+      }
+    }
+  }
+  .financial {
+    ul li{
+      justify-content: space-between;
+      padding: 15px 0px;
+      margin: 0px 20px;
+      &:first-child{
+        padding-top: 25px;
+      }
+      &:last-child{
+        border: 0px;
+      }
+      .wallet{
+        align-items: center;
+        .walletIcon{
+          @extend %iconBackground;
+          opacity: 0.7;
+          background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
+        }
+        .cmuk-comment-meta{
+          @extend %cmuk-comment-meta;
+        }
+      }
+      .ctitle{
+        color: #5C6166;
+        line-height: 2;
+        font-size: $paragraphFontSizeSmall;
+        font-family: $fontFamilySecondary;
+      }
+      .payable{
+        align-items: center;
+        .payableIcon{
+          @extend %iconBackground;
+          opacity: 0.7;
+          background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
+        }
+        .cmuk-comment-meta{
+          @extend %cmuk-comment-meta;
+        }
+      }
+      .receivable{
+        align-items: center;
+        .receivableIcon{
+          @extend %iconBackground;
+          opacity: 0.7;
+          background: linear-gradient(180deg, #37CE34 0%, #1D8C1A 100%);
+        }
+        .cmuk-comment-meta{
+          @extend %cmuk-comment-meta;
+        }
+      }
+      .leftDays{
+        align-items: center;
+        .leftDaysIcon{
+          @extend %iconBackground;
+          background: rgba(94, 181, 92, 0.27);
+        }
+        .cmuk-comment-meta{
+          @extend %cmuk-comment-meta;
+        }
+      }
+    }
+  }
+  .addBalanceButton{
+    text-transform: capitalize;
+    font-family: $fontFamilyPrimary;
+    padding: 8px 8px;
+    font-size: $paragraphFontSizeSmall;
+    line-height:normal;
+    background: rgba(8, 98, 190, 0.1);
+    border-radius: 103px;
+    color: $colorPrimary;
+    font-size: 12px;
+    border: 0;
+    .plusIcon .icon{
+      width: 10px;
+      height: 10px;
+      fill:$colorPrimary;
+    }
+  }
+  .walletIcon .icon, .receivableIcon .icon, .payableIcon .icon{
+    position: absolute;
+    left: 2px;
+    top: 0px;
+    margin: auto;
+    right: 0;
+    bottom: 2px;
+  }
+  .icon{
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.recentActivity{
+  .recentActivityContainer{
+    margin-bottom: 20px;
+    .cmuk-card-header{
+      padding:15px 20px;
+      .icon{
+        width: 18px;
+        height: 18px;
+        margin-bottom: 2px;
+      }
+    }
+    .cmuk-card-body{
+      overflow-y: auto;
+    }
+  }
+  .cmuk-card-default{
+    background: #FAFAFA;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+  .cmuk-card-header{
+    font-size: $paragraphFontSizeMedium;
+    padding:15px 20px;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-card-body{
+    font-family: $fontFamilySecondary;
+    padding: 0px 13px;
+  }
+  .chatRoom .cmuk-card-body{
+    height: 360px;
+    .chatList{
+      padding: 5px 0px;
+      button
+      {
+        padding: 5px 10px;
+        margin: 0px 5px;
+      }
+    }
+    .chatMessages{
+      height: 250px;
+      overflow: auto;
+    }
+    .chatform{
+      .sendFormField{
+        position: relative;
+      }
+      .sendFormField input{
+        outline: none;
+        border-color: #e5e5e5;
+      }
+      .sendIconButton{
+        background: none;
+        padding: 0px 10px;
+        margin: 0;
+        position: absolute;
+        top:0;
+        right:0;
+        .icon{
+          width: 17px;
+          height: 17px;
+        }
+      }
+      .replyBox{
+        background-color: #FFffff;
+        position: absolute;
+        left:0;
+        right:0;
+        top:-65px;
+        padding: 10px 10px;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .replyAccount{
+        font-size: 12px;
+        font-weight: bold;
+        color: #3f7fc9;
+      }
+      .replyMessage{
+        width: 100px;
+        overflow: hidden;
+        display: inline-block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+      }
+    }
+    .chatMoveTop{
+      position: relative;
+      bottom: 50px;
+    }
+  }
+  .chatContainer{
+    .cmuk-card-body
+    {
+      font-family: $fontFamilySecondary;
+      padding: 0px;
+      .chat_history ul{
+        margin: 0;
+        padding: 0 20px 10px;
+        max-height: 270px;
+        overflow-y:auto;
+      }
+      .chat_history .overview{
+        width: 100%;
+      }
+    }
+  }
+}
+
+.documentcontainer{
+  .documentcontainerbutton{
+    margin: 10px 0px;
+    .cmuk-button{
+      background: #5EB55C;
+      border-radius: 3px;
+      color: #ffffff;
+      line-height: 2;
+      text-transform: capitalize;
+      font-weight: bold;
+      padding: 0px 20px;
+      font-family: $fontFamilySecondary;
+      font-size: $paragraphFontSizeSmall;
+      font-weight: bold;
+    }
+  }
+}
+
+.documentItem{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0px;
+  flex-wrap: wrap;
+  border: 1px solid #EDEDED;
+  border-radius: 5px;
+  padding: 0px 15px;
+  background: #ffffff;
+  .documentContentTop{
+    font-size: $paragraphFontSizeMedium;
+    font-family: $fontFamilySecondary;
+    margin: 10px;
+    a{
+      color:$colorSecondary;
+      text-decoration: none;
+    }
+  }
+  .documentThumbnail{
+    margin: 10px;
+  }
+  .documentThumbnail img{
+    width: 20px;
+    height: 20px;
+  }
+  .documentContentBottom{
+    margin: 10px;
+    font-size: $paragraphFontSizeSmall;
+    text-align: left;
+  }
+}
+.identificationDetails{
+  .documentContentBottom{
+    .infoRowLabel{
+      display: none;
+    }
+  }
+}
+.timeline .timeline-item:after,
+header:before,
+.timeline .timeline-item:before {
+  content: '';
+  display: block;
+  width: 100%;
+  clear: both;
+}
+
+.timeline,
+.timeline *,
+.timeline *:before,
+.timeline *:after {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+.timeline {
+  line-height: 1.5em;
+  position: relative;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  margin: 10px 0px;
+  transition: all 0.4s ease;
+  &:before {
+    content: "";
+    width: 0px;
+    height: 100%;
+    border-right:2px dashed #CECECE;
+    left: 30px;
+    top: 0;
+    position: absolute; }
+  .timeline-item {
+    margin-bottom: 20px;
+    height: 55px;
+    position: relative;
+    .timeline-icon {
+      background: #E4EBF2;
+      box-sizing: border-box;
+      width: 40px;
+      height: 40px;
+      position: relative;
+      top: 0;
+      display: inline-block;
+      left: 10px;
+      overflow: hidden;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      -ms-border-radius: 50%;
+      border-radius: 50%; }
+    .timeline-icon .icon {
+      fill:#0862BE;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      width: 15px;
+      height: 15px;}
+    .timeline-content {
+      width: 80%;
+      padding: 0px;
+      position: relative;
+      -webkit-transition: all 0.3s ease;
+      -moz-transition: all 0.3s ease;
+      -ms-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+      .activityContent{
+        color: #000000;
+        font-family: $fontFamilySecondary;
+        font-size: $paragraphFontSizeSmall;
+      }
+    }
+    .timeline-content.right {
+      float: right; }
+    .timeline-content.right:before {
+      left: -5px;
+      right: inherit;
+    }
+  }
+  .notification > div{
+    padding: 0px;
+  }
+  .NotificationButton{
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    font-weight: bold;
+    padding:0px 0px 0px 40px;
+  }
+}
+
+.docView{
+  .cmuk-card-header, .cmuk-card-body, .documentlist{
+    padding:0px;
+  }
+  .documentlist{
+    height: 200px;
+    overflow-y:scroll;
+  }
+  .cmuk-tab>.cmuk-active>a{
+    font-family: "Oxygen", sans-serif;
+    color: #636363;
+    font-weight: bold;
+    font-size: $paragraphFontSizeSmall;
+    border-bottom: 2px solid #0862BE;
+  }
+  .documentlist{
+    .cmuk-table td {
+      padding: 16px 5px;
+      vertical-align: top;
+      font-size: $paragraphFontSizeSmall;
+    }
+    .docIcon {
+      background: #FFFFFF;
+      border: 0.411524px solid #EAEAEA;
+      box-sizing: border-box;
+      padding: 5px;
+      border-radius: 1.6461px;
+      margin-right: 5px;
+      .icon{
+        width: 12px;
+        height: 15px;
+      }
+    }
+    .moreIcon span{
+      width: 15px;
+    }
+    .seenIcon{
+      padding: 5px;
+      background: #DDE8F3;
+      border-radius: 2px;
+      .icon{
+        width: 20px;
+        height: 16px;
+      }
+    }
+    .table-scroll tbody{
+      height: 200px;
+      tr{
+        padding: 6px 0px;
+        border-bottom: 1px solid #E0E0E0;
+        td:first-child{
+          padding-left: 15px;
+          color: #262525;
+          font-size: $paragraphFontSizeSmall;
+        }
+        td:last-child{
+          padding-right: 10px;
+        }
+      }
+    }
+    .primayDocs{
+      font-size: $paragraphFontSizeMedium;
+      color: #636363;
+    }
+  }
+  .cmuk-card-default{
+    overflow-y:auto;
+    height: calc(100% - 400px);
+  }
+  .cmuk-card-body .cmuk-tab{
+    width: 100%;
+    margin: 0px;
+    border-bottom: 1px solid #e5e5e5;
+    &::before{
+      border: none;
+    }
+    .first{
+      border-right: 1px solid #cccccc;
+    }
+    li{
+      width: 49%;
+      padding:0px;
+      margin: 0;
+      a{
+        padding:15px 0px;
+        font-size: $paragraphFontSizeSmall;
+        font-family: $fontFamilySecondary;
+        text-transform: capitalize;
+      }
+    }
+  }
+  .cmuk-card-body{
+    height: 360px;
+    overflow-y: auto;
+    .uploadDoc{
+      position: absolute;
+      bottom: 0px;
+      right: 0;
+      left: 0;
+      background: #fff;
+      padding: 15px 10px;
+      margin: auto;
+    }
+    .js-upload{
+      width: 100%;
+      .cmuk-button{
+        background:#EDEDED;
+        border: 1px dashed #848A91;
+        box-sizing: border-box;
+        border-radius: 10px;
+        width: 100%;
+        text-transform: capitalize;
+        font-size: $paragraphFontSizeSmall;
+        font-family: $fontFamilyPrimary;
+      }
+    }
+  }
+}
+
+.loginForm {
+  .inputField {
+    display: flex;
+    .inputFieldIcon {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      background: #ebebeb;
+      margin-top: 19px;
+      padding: 0px 10px;
+    }
+    .inputFieldBody {
+      width: 100%;
+    }
+    .inputFieldBody input {
+      font-size: $paragraphFontSizeSmall;
+    }
+  }
+  .cmuk-button-link{
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    font-weight: bold;
+    margin: 5px;
+    text-decoration: none;
+  }
+}
+
+.infoRow {
+  line-height: 1.8;
+  align-items: flex-start;
+  word-break: break-all;
+  font-size: $paragraphFontSizeSmall;
+  font-family: $fontFamilySecondary;
+  .infoRowLabel {
+    color: #4B4B4B;
+    width: 125px;
+    height: min-content;
+    word-break: break-word;
+  }
+  .infoRowValue {
+    flex: 1 1;
+    color: #767f8d;
+    font-weight: 400;
+    height: min-content;
+  }
+}
+
+.fixedElement {
+  background-color: #c0c0c0;
+  position:fixed;
+  top:0;
+  width:100%;
+  z-index:100;
+}
+
+.chat{
+  .chatMessage{
+    font-size:$paragraphFontSizeSmall;
+  }
+  .chatName{
+    color:#FFFFFF;
+    background: #193759;
+    display: inline-flex;
+    height: 26px;
+    width: 26px;
+    -moz-border-radius: 30px;
+    border-radius:50%;
+    text-align: center;
+    font-size: $paragraphFontSizeSmall;
+    align-items: center;
+    justify-content: center;
+  }
+  li{
+    list-style: none;
+  }
+  .sender{
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+  .receiver{
+    align-items: flex-end;
+  }
+  padding: 0px 10px 0px 0px;
+  li{
+    display: flex;
+    list-style: none;
+  }
+  .partner{
+    word-break: break-all;
+    padding: 10px;
+    border-radius: 10px;
+    margin:10px;
+    background: #E8E8E8;
+    position: relative;
+    border-bottom-left-radius:0px;
+    &::after {
+      position: absolute;
+      left: -8px;
+      bottom:  0;
+      content: "";
+      border-top: .5rem solid transparent;
+      border-bottom: .5rem solid #E8E8E8;
+      border-left: .5rem solid transparent;
+      border-right: .5rem solid #E8E8E8;
+    }
+    .messageInfo{
+      color: #848A91;
+      font-size: $paragraphFontSizeSmall;
+    }
+    .replytoMessage p{
+      border-left: 2px solid #0862BE;
+      padding: 0px 10px;
+    }
+    .messageContent{
+      color: #061728;
+      font-size: $paragraphFontSizeSmall;
+      p{
+        margin:0px;
+        color: #0862BE;
+        text-align: left;
+      }
+    }
+    p{
+      margin: 0px;
+    }
+  }
+  .you{
+    word-break: break-all;
+    padding: 10px;
+    border-radius: 10px;
+    margin:10px;
+    background: #0862BE;
+    color:#fff;
+    position: relative;
+    border-bottom-right-radius: 0px;
+    &::after {
+      position: absolute;
+      right: -8px;
+      bottom: 0;
+      content: "";
+      border-top: .5rem solid transparent;
+      border-bottom: .5rem solid #0862BE;
+      border-left: .5rem solid #0862BE;
+      border-right: .5rem solid transparent;
+    }
+    .messageInfo{
+      color: #6CA8E7;
+      font-size: $paragraphFontSizeSmall;
+    }
+    .replytoMessage p{
+      border-left: 2px solid #6CA8E7;
+      padding: 0px 10px;
+    }
+    .messageContent{
+      color: #FFFFFF;
+      font-size: $paragraphFontSizeSmall;
+      p{
+        margin:0px;
+        color: #6CA8E7;
+        text-align: left;
+      }
+    }
+    p{
+      margin: 0px;
+    }
+  }
+  .chatSubmit{
+    width: 92%;
+    margin: auto;
+    padding: 10px 0px;
+    display: block;
+  }
+}
+
+.commonList{
+  padding: 0px 20px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid rgba(5, 60, 117, 0.12);
+  box-sizing: border-box;
+  border-radius: 2px;
+  margin-bottom: 5px;
+  overflow:auto;
+  flex-wrap: wrap;
+  .listItemChild{
+    margin: 0px;
+    padding: 20px 0px;
+    font-size: $paragraphFontSizeSmall;
+    font-family: $fontFamilySecondary;
+    font-weight: bold;
+    &:last-child .listItemChildValue{
+      max-width: 100%;
+    }
+    .listItemChildTitle
+    {
+      margin: 0px;
+      color: #061728;
+    }
+    .listItemChildValue{
+      margin:20px 0px 0px 0px;
+      color: #272829;
+      font-weight: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width:120px;
+    }
+    .listItemButton{
+      margin-bottom: 0px;
+    }
+    button{
+      a, a:hover{
+        text-decoration: none;
+        color:#fff;
+      }
+    }
+  }
+}
+
+.accountName{
+  position:absolute;
+  top: 0px;
+  left: 0px;
+  color: #FFFFFF;
+  margin: 0px;
+  width: 0;
+  height: 0;
+  border: 15px solid;
+  border-color: #5EB55C transparent transparent #5EB55C;
+  span {
+    position:absolute;
+    top: -15px;
+    left: -10px;
+    text-align: center;
+    font-size:$paragraphFontSizeSmall;
+    font-weight: bold;
+    transform: rotate(-45deg);
+    display:block;
+  }
+}
+
+.switcherViewCard {
+  margin-bottom: 20px;
+  .cmuk-card-header{
+    padding: 15px 20px;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-card-body{
+    overflow: auto;
+    padding: 0px;
+    ul{
+      padding: 15px 20px;
+    }
+  }
+  .salesQuoteCardHeader, .tradeCardHeader {
+    .cmuk-subnav {
+      margin: 0px;
+    }
+    .cmuk-subnav>*{
+      padding:0px 30px;
+    }
+    .cmuk-subnav li a{
+      padding: 15px;
+      font-size: $paragraphFontSizeSmall;
+      font-family: $fontFamilySecondary;
+    }
+
+    .cmuk-subnav > .cmuk-active {
+      border-bottom: 2px solid #0862BE;
+      a{
+        font-weight: bold;
+        color: #343C44
+      }
+    }
+  }
+}
+
+.salesQuoteList{
+  .cmuk-card-header{
+    padding: 15px 20px;
+    .cmuk-button{
+      padding: 0 15px;
+      line-height: 28px;
+    }
+  }
+  .cmuk-card-body {
+    padding:0px;
+    .cmuk-card-body{
+      padding: 20px;
+    }
+    .commonList .cmuk-button {
+      padding: 0 15px;
+      line-height: 28px;
+    }
+    .cmuk-subnav{
+      margin:0px;
+      border-bottom: 1px solid $colorPrimary;
+      li{
+        width: 25%;
+        text-align: center;
+        padding: 0;
+        font-family: $fontFamilySecondary;
+        a{
+          font-size: $paragraphFontSizeSmall;
+        }
+      }
+    }
+    .cmuk-subnav-pill>.cmuk-active>a{
+      background-color: $colorPrimary;
+      color: #FFffff;
+    }
+    .cmuk-subnav-pill>*>:first-child{
+      color:$colorPrimary;
+      text-transform: capitalize;
+      font-weight: bold;
+    }
+    .cmuk-card{
+      margin-bottom: 10px;
+    }
+    .cmuk-switcher li .title{
+      margin-bottom: 5px;
+    }
+    .cmuk-switcher{
+      height: 220px;
+      overflow: auto;
+      padding: 20px;
+    }
+  }
+}
+
+.profileContainer{
+  .infoRow{
+    font-size: $paragraphFontSizeSmall;
+    line-height: 2;
+  }
+  .infoRowLabel{
+    color:#061728;
+    font-family: $fontFamilySecondary;
+  }
+  .infoRowValue{
+    text-align: right;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-card-header{
+    font-family: $fontFamilySecondary;
+    padding: 15px 20px;
+  }
+  .cmuk-card-body {
+    font-family: $fontFamilyPrimary;
+    .cmuk-card-body {
+      background-color: #FFFFFF;
+    }
+  }
+  .icon{
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    margin-bottom: 3px;
+  }
+  .plusIcon .icon{
+    width: 11px;
+    height: 11px;
+    fill: $colorPrimary;
+  }
+}
+
+.profileDetails{
+  .cmuk-button-link{
+    @extend %cmuk-button-link;
+  }
+  .cmuk-badge{
+    @extend  %verifiedLabel;
+  }
+  .editIcon,
+  .editIcon .icon, .icon{
+      height: 16px;
+      width: 16px;
+      margin-right: 5px;
+      margin-bottom: 3px;
+    }
+}
+
+.contactDetails {
+  .infoRowBox{
+    .infoRowLabel{
+      width: auto;
+      margin-right: 5px;
+    }
+    justify-content: space-between;
+  }
+  .cmuk-button-link{
+    @extend %cmuk-button-link;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-badge{
+    margin-left: 10px;
+  }
+  .cmuk-card-default{
+    margin-bottom: 5px;
+  }
+  .cmuk-card-header{
+    padding: 13px 20px;
+  }
+  .cmuk-card-body{
+    position: relative;
+    .cmuk-card {
+      border: 1px solid #EDEDED;
+      border-radius: 5px;
+      box-shadow: none;
+      .cmuk-card-body {
+        padding: 10px 15px;
+        border-radius: 5px;
+        background-color: #FFFFFF;
+      }
+    }
+  }
+}
+
+.toolTip {
+  position: relative;
+  display: inline-block;
+  .toolTipText {
+    visibility: hidden;
+    width: 140px;
+    background-color: $colorPrimary;
+    color: #fff;
+    text-align: center;
+    border-radius: $buttonBorderRadius;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: $colorPrimary transparent transparent transparent;
+    }
+  }
+}
+
+.toolTip:hover .toolTipText {
+  visibility: visible;
+  opacity: 1;
+}
+
+.notification {
+  word-break: break-all;
+  transition: all 1s ease-in-out;
+  list-style: none;
+  margin-bottom: 1px;
+  .read{
+    background-color: #fff2e8;
+  }
+  .notificationTime{
+    font-size: 10px;
+  }
+}
+
+.notification > div, .NotificationButton {
+  padding: 15px 25px;
+}
+
+.NotificationButton{
+  border-bottom: none;
+}
+
+dl .info {
+  background-color: #dadada;
+  color: #838383;
+  text-align: center;
+  border-radius: 6px;
+  position: relative;
+  top: 5px;
+  float: right;
+  font-size: smaller;
+  padding: 0;
+  display: none;
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 17px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #dadada transparent;
+  }
+}
+
+.notificationDropdown .cmuk-navbar-dropdown,
+.profileDropdown .cmuk-navbar-dropdown {
+  padding:0px;
+  border-radius:$buttonBorderRadius;
+  top:60px;
+  border:1px solid #e7eaf3;
+}
+.commonCheckBox {
+  display: flex;
+  input {
+    margin-left: 10px;
+  }
+  dl{
+    display: flex;
+  }
+}
+
+.tradeList{
+  .cmuk-card-header{
+    padding: 15px 20px;
+    font-family: $fontFamilySecondary;
+  }
+  .cmuk-card-body{
+    .cmuk-card{
+      margin-bottom: 10px;
+      .cmuk-card-body{
+        padding: 20px ;
+      }
+    }
+    button a{
+      color:#FFFFFF;
+    }
+  }
+}
+.identificationDetails,
+.traderRelationList,
+.tradeList{
+  .cmuk-card-body{
+    padding:0px;
+    .cmuk-card {
+      margin-bottom: 5px;
+      .cmuk-card-body {
+        padding: 20px;
+      }
+    }
+  }
+  .cmuk-subnav{
+    margin:0px;
+    border-bottom: 1px solid $colorPrimary;
+    li{
+      width: 50%;
+      text-align: center;
+      padding: 0;
+      font-family: $fontFamilySecondary;
+      a{
+        font-size: $paragraphFontSizeSmall;
+      }
+    }
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    background-color: $colorPrimary;
+    color: #FFffff;
+  }
+  .cmuk-subnav-pill>*>:first-child{
+    color:$colorPrimary;
+    text-transform: capitalize;
+    font-weight: bold;
+  }
+  .cmuk-switcher{
+    height: 220px;
+    overflow: auto;
+    padding: 20px;
+  }
+}
+.traderRelationList{
+  .cmuk-card-header{
+    padding: 13px 20px;
+  }
+}
+.organizationDetails, .organizationUbos{
+  .cmuk-card-body{
+    .cmuk-card-default{
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.cmuk-panel{
+  padding: 0px;
+  margin-bottom: 10px;
+  background: #FFFFFF;
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 1px solid rgba(5, 60, 117, 0.22);
+  font-size: 14px;
+  font-family: Oxygen;
+  ul{
+    li{
+      font-size:$paragraphFontSizeSmall;
+      font-family: $fontFamilySecondary;
+      color: #272829;
+      text-align: left;
+      cursor: pointer;
+      padding: 10px;
+      background: #e7eaf3;
+    }
+  }
+}

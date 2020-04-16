@@ -1,0 +1,25 @@
+@()(implicit messagesProvider: MessagesProvider)
+@import views.html.base._
+<div id="txHashBottomDivision">
+    <a onclick='back()' ><span cmuk-icon="arrow-left" title="Back"></span>@Messages(constants.View.BACK)</a>
+    @commonInfoBox() {
+        <div class="cmuk-overflow-auto">
+            <table class="cmuk-table cmuk-table-divider">
+                <tbody>
+                    <tr>
+                        <th><span id="txHashPageHash"></span></th>
+                    </tr>
+                    <tr>
+                        <th>@Messages(constants.Form.HEIGHT):</th>
+                        <td><span id="txHashPageHeight"></span></td>
+                    </tr>
+                    <tr>
+                        <th>@Messages(constants.Form.FEE) :</th>
+                        <td><span id="txHashPageFee"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>

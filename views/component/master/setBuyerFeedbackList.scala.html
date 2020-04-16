@@ -1,0 +1,26 @@
+@import controllers.actions.LoginState
+@import models.blockchain.TraderFeedbackHistory
+@import views.html.base._
+@(traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+<div class="cmuk-container">
+    <div class="cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
+@for(traderFeedbackHistory <- traderFeedbackHistories) {
+    <div>
+    @commonCard(traderFeedbackHistory.sellerAddress) {
+    } {
+        <div>
+            <div class="leftText">
+                @commonTextInfo(constants.Form.SELLER_ADDRESS, traderFeedbackHistory.sellerAddress)
+                @commonTextInfo(constants.Form.PEG_HASH, traderFeedbackHistory.pegHash)
+            </div>
+            <div class="centerText" >
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm('@traderFeedbackHistory.sellerAddress', '@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button>
+                <br>
+            </div>
+        </div>
+    }
+    </div>
+
+}
+    </div>
+</div>

@@ -1,0 +1,13 @@
+@import views.companion.blockchain.SetSellerFeedback
+@import views.html.base._
+
+@(setSellerFeedbackForm: Form[SetSellerFeedback.Data] = SetSellerFeedback.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_SET_SELLER_FEEDBACK, setSellerFeedbackForm) {
+    @commonInputText(setSellerFeedbackForm, constants.FormField.FROM)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.TO)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.PEG_HASH)
+    @commonInputInt(setSellerFeedbackForm, constants.FormField.RATING)
+    @commonInputInt(setSellerFeedbackForm, constants.FormField.GAS)
+    @commonSelect(setSellerFeedbackForm, constants.FormField.MODE)
+    @commonInputPassword(setSellerFeedbackForm, constants.FormField.PASSWORD)
+}

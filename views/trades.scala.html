@@ -1,0 +1,67 @@
+@import controllers.actions.LoginState
+@import views.html.base.common
+@import views.html.base._
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+    <div class="leftTradeFinancial">
+        <div id="financials"></div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
+            case constants.User.ORGANIZATION => {}
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
+}
+
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom">
+    @loginState.userType match {
+        case constants.User.TRADER => {
+            <div class="tradeList cmuk-margin-bottom">
+                    <div id="traderViewAcceptedNegotiationList"></div>
+            </div>
+
+            <div class="salesQuoteList">
+                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+            </div>
+
+            <script>
+                    componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
+                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
+            </script>
+        }
+        case constants.User.ORGANIZATION => {}
+        case constants.User.ZONE => {
+            <div class="tradeList cmuk-margin-bottom">
+            @commonCard(constants.View.TRADE_ROOMS) {
+            }{
+                <div id="zoneViewAcceptedNegotiationList"></div>
+            }
+            </div>
+            <script>
+                     componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
+            </script>
+        }
+        case constants.User.GENESIS => {}
+        case _ => {}
+    }
+    </div>
+}
+
+@right = {
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+    </script>
+}

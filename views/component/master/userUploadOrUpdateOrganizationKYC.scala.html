@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import models.master.OrganizationKYC
+
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="centerText">
+    <h4>@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
+    @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
+        <div id="upload@documentType">
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(organizationKYC <- organizationKYCs) {
+        @component.master.commonDocumentViewer(organizationKYC) {
+            @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+        } {
+            <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+        } {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKYCForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
+            <script>hideElement('upload@organizationKYC.documentType')</script>
+        }
+    }
+</div>
+<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.View.BACK)</button>
+@if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
+    <button type="button" class="cmuk-button cmuk-button-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userReviewAddOrganizationRequestForm())">@Messages(constants.Form.NEXT)</button>
+}

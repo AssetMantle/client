@@ -1,0 +1,35 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction
+@import views.companion.master.IssueAssetInvoice
+
+@(issueAssetInvoiceForm: Form[IssueAssetInvoice.Data] = IssueAssetInvoice.form, file: Option[masterTransaction.AssetFile] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="centerText">
+    <div id='@Seq("upload", constants.File.INVOICE).mkString("")'>
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
+    </div>
+    @file match {
+        case Some(fileView) => {
+            @component.master.commonDocumentViewer(fileView) {
+                @routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
+            } {
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+                <script>hideElement('@Seq("upload", fileView.documentType).mkString("")')</script>
+            }
+        }
+        case _ => {}
+    }
+</div>
+@file match {
+    case Some(file) => {
+        @commonForm(constants.Form.ISSUE_ASSET_INVOICE, issueAssetInvoiceForm) {
+            @commonInputText(issueAssetInvoiceForm, constants.FormField.REQUEST_ID, 'containerDivClass -> "hidden")
+            @commonInputText(issueAssetInvoiceForm, constants.FormField.INVOICE_NUMBER)
+            @commonInputDate(issueAssetInvoiceForm, constants.FormField.INVOICE_DATE)
+        }
+    }
+    case None => {}
+}

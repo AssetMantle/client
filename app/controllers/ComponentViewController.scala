@@ -213,36 +213,9 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.recentActivities()))
   }
 
-  def tradeActivities(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeActivities(negotiationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.tradeActivities(negotiationID)))
-  }
-
-  def zoneViewRecentActivityForTradeRoom(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zoneID = masterZones.Service.tryGetID(loginState.username)
-      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      val tradeActivities = masterTransactionTradeActivities.Service.getTradeActivity(negotiationID)
-
-      def traders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
-
-      def notifications(accountIDs: Seq[String], ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(accountIDs, ids, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
-
-      (for {
-        zoneID <- zoneID
-        negotiation <- negotiation
-        traders <- traders(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
-        tradeActivities <- tradeActivities
-        notifications <- notifications(traders.map(_.accountID) ,tradeActivities.map(_.notificationID))
-      } yield {
-        if (traders.map(_.zoneID) contains zoneID) {
-          Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.zoneViewRecentActivityForTradeRoom), Option(negotiationID)))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      }).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
   }
 
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

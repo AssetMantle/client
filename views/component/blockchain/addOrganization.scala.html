@@ -1,0 +1,13 @@
+@import views.companion.blockchain.AddOrganization
+@import views.html.base._
+
+@(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_ADD_ORGANIZATION, addOrganizationForm) {
+    @commonInputText(addOrganizationForm, constants.FormField.FROM)
+    @commonInputText(addOrganizationForm, constants.FormField.TO)
+    @commonInputText(addOrganizationForm, constants.FormField.ORGANIZATION_ID)
+    @commonInputText(addOrganizationForm, constants.FormField.ZONE_ID)
+    @commonInputInt(addOrganizationForm, constants.FormField.GAS)
+    @commonSelect(addOrganizationForm, constants.FormField.MODE)
+    @commonInputPassword(addOrganizationForm, constants.FormField.PASSWORD)
+}

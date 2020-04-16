@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.IssueFiat
+
+@(issueFiatForm: Form[IssueFiat.Data] = IssueFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ISSUE_FIAT, issueFiatForm) {
+    @commonInputText(issueFiatForm, constants.FormField.REQUEST_ID)
+    @commonInputText(issueFiatForm, constants.FormField.ACCOUNT_ID)
+    @commonInputText(issueFiatForm, constants.FormField.TRANSACTION_ID)
+    @commonInputInt(issueFiatForm, constants.FormField.TRANSACTION_AMOUNT)
+    @commonInputInt(issueFiatForm, constants.FormField.GAS)
+    @commonInputPassword(issueFiatForm, constants.FormField.PASSWORD)
+}

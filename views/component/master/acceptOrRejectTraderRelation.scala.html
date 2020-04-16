@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import views.companion.master.AcceptOrRejectTraderRelation
+@import models.master.TraderRelation
+
+@(acceptOrRejectTraderRelationForm: Form[AcceptOrRejectTraderRelation.Data] = AcceptOrRejectTraderRelation.form, traderRelation: TraderRelation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div id="@traderRelation.id">
+@commonAcceptOrRejectForm(constants.Form.ACCEPT_REJECT_TRADER_RELATION, acceptOrRejectTraderRelationForm, traderRelation.id, traderRelation.status) {
+    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.FROM_ID, 'value -> traderRelation.fromID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(acceptOrRejectTraderRelationForm, constants.FormField.TO_ID, 'value -> traderRelation.toID, 'containerDivClass -> "hidden", 'readonly -> true)
+}
+</div>

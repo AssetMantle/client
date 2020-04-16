@@ -1,0 +1,39 @@
+@import controllers.actions.LoginState
+@import models.master.{Zone, ZoneKYC}
+@import play.api.Logger
+@import views.companion.master.ReviewAddZoneRequest
+@import views.html.base._
+
+@(zoneCompletionForm: Form[ReviewAddZoneRequest.Data] = ReviewAddZoneRequest.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
+
+    <div>
+        <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_DETAILS):</div>
+        @commonTextInfo(constants.View.NAME, zone.name)
+        @commonTextInfo(constants.Form.CURRENCY, zone.currency)
+        <div class="cmuk-text-left title">@Messages(constants.Form.ADDRESS)</div>
+        @commonTextInfo(constants.FormField.ADDRESS_LINE_1.name, zone.address.addressLine1)
+        @commonTextInfo(constants.FormField.ADDRESS_LINE_2.name, zone.address.addressLine2)
+        @commonTextInfo(constants.FormField.LANDMARK.name, zone.address.landmark.getOrElse(""))
+        @commonTextInfo(constants.FormField.CITY.name, zone.address.city)
+        @commonTextInfo(constants.FormField.COUNTRY.name, zone.address.country)
+        @commonTextInfo(constants.FormField.ZIP_CODE.name, zone.address.zipCode)
+        @commonTextInfo(constants.Form.PHONE, zone.address.phone)
+    </div>
+    <br>
+    <div id="zoneKYCs">
+        <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_KYC_FILES)</div>
+        @for(zoneKYC <- zoneKYCs) {
+            @component.master.commonDocumentViewer(zoneKYC) {
+                @routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)
+            } {
+
+            } {
+                <span>@zoneKYC.documentType</span>
+            }
+        }
+    </div>
+    <br>
+    @commonCheckbox(zoneCompletionForm, constants.FormField.COMPLETION)
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.View.BACK)</button>
+}

@@ -1,0 +1,37 @@
+@import controllers.actions.LoginState
+@import views.html.base.common
+@import views.html.base._
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.View.TRANSACTIONS), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+    <div class="leftTradeFinancial">
+        <div id="financials"></div>
+    </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
+            case constants.User.ORGANIZATION => {}
+            case constants.User.ZONE => {}
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
+}
+
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom">
+    </div>
+}
+
+@right = {
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+    </script>
+}

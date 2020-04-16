@@ -1,0 +1,18 @@
+@import views.companion.blockchain.IssueAsset
+@import views.html.base._
+
+@(issueAssetForm: Form[IssueAsset.Data] = IssueAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_ISSUE_ASSET, issueAssetForm) {
+    @commonInputText(issueAssetForm, constants.FormField.FROM)
+    @commonInputText(issueAssetForm, constants.FormField.TO)
+    @commonInputText(issueAssetForm, constants.FormField.DOCUMENT_HASH)
+    @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)
+    @commonInputInt(issueAssetForm, constants.FormField.ASSET_PRICE)
+    @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
+    @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
+    @commonCheckbox(issueAssetForm, constants.FormField.MODERATED)
+    @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS, 'required -> false)
+    @commonInputInt(issueAssetForm, constants.FormField.GAS)
+    @commonSelect(issueAssetForm, constants.FormField.MODE)
+    @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD)
+}

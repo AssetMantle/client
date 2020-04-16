@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.SendAsset
+
+@(sendAssetForm: Form[SendAsset.Data] = SendAsset.form, buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.SEND_ASSET, sendAssetForm) {
+    @commonInputText(sendAssetForm, constants.FormField.BUYER_ADDRESS, 'value -> buyerAddress)
+    @commonInputText(sendAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputInt(sendAssetForm, constants.FormField.GAS)
+    @commonInputPassword(sendAssetForm, constants.FormField.PASSWORD)
+}

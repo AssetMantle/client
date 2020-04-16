@@ -132,7 +132,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewRejectedOrganizationRequest,
 
         routes.javascript.ComponentViewController.zoneViewAcceptedNegotiationList,
-        routes.javascript.ComponentViewController.zoneViewRecentActivityForTradeRoom,
         routes.javascript.ComponentViewController.zoneViewAcceptedNegotiation,
         routes.javascript.ComponentViewController.zoneTradeStatistics,
         routes.javascript.ComponentViewController.zoneViewTradeRoomFinancialAndChecks,

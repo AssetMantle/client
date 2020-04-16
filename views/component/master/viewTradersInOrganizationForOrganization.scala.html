@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Trader
+
+@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+<div class="cmuk-container">
+    <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
+        @if(traders.isEmpty){
+            <span>@Messages(constants.View.NO_TRADERS_FOUND)</span>
+        } else {
+            @for(trader <- traders) {
+                <div>
+                @commonCard(trader.id) {
+                } {
+                    @commonTextInfo(constants.Form.ID, trader.id)
+                    @commonTextInfo(constants.View.ACCOUNT_ID, trader.id)
+                    @commonTextInfo(constants.View.NAME, trader.id)
+                }
+                </div>
+            }
+        }
+ </div>
+</div>

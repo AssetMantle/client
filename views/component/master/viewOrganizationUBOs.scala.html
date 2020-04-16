@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+@import models.master.Organization
+@import views.html.base._
+
+@(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.UBOS) {
+    @if(organization.ubos.data.nonEmpty) {
+        <button type="button" class="cmuk-button cmuk-button-small cmuk-button-link" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addUBOForm())">
+        <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>@Messages(constants.Form.ADD_UBO.legend)</button>
+    }
+} {
+    @if(organization.ubos.data.isEmpty) {
+        <div class="cmuk-position-center">
+            <button type="button" class="cmuk-button cmuk-button-small cmuk-button-link" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addUBOForm())">
+            <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>@Messages(constants.Form.ADD_UBO.legend)</button>
+        </div>
+    } else {
+        @organization.ubos.data.map{ubo =>
+            @commonInfoBox(){
+                @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
+                @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
+                @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
+                @commonTextInfo(constants.View.TITLE, ubo.title)
+                <button class="cmuk-button cmuk-button-link cmuk-text-bold secondaryFont" onclick="getForm(jsRoutes.controllers.AddOrganizationController.deleteUBOForm('@ubo.personName', @ubo.sharePercentage, '@ubo.relationship', '@ubo.title'))">@Messages(constants.View.DELETE)</button>
+            }
+        }
+    }
+}

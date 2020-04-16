@@ -1,0 +1,21 @@
+@import controllers.actions.LoginState
+@import views.html.base.common
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.View.MARKET))(Html(""))(center)(Html(""))
+
+@center = {
+    <ul class="flexContainer" cmuk-accordion>
+        <li>
+            <a class="cmuk-accordion-title" href="#" >@Messages(constants.Form.ASSETS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="availableAssetListWithLogin" class="flexContainer">
+                </div>
+            </div>
+        </li>
+    </ul>
+    <script>
+            componentResource('availableAssetListWithLogin', jsRoutes.controllers.ComponentViewController.availableAssetListWithLogin('@loginState.username'));
+    </script>
+}

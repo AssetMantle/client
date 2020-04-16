@@ -1,0 +1,14 @@
+@import views.companion.blockchain.SellerExecuteOrder
+@import views.html.base._
+
+@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.FROM)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.SELLER_ADDRESS)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.AWB_PROOF_HASH)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.PEG_HASH)
+    @commonInputInt(sellerExecuteOrderForm, constants.FormField.GAS)
+    @commonSelect(sellerExecuteOrderForm, constants.FormField.MODE)
+    @commonInputPassword(sellerExecuteOrderForm, constants.FormField.PASSWORD)
+}
