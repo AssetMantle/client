@@ -69,9 +69,9 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case constants.User.USER => withUsernameToken.Ok(views.html.userIndex())
         case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex())
         case constants.User.WITHOUT_LOGIN =>
-          val updateUserType = masterAccounts.Service.updateUserType(loginState.username, constants.User.USER)
+          val markUserTypeUser = masterAccounts.Service.markUserTypeUser(loginState.username)
           for {
-            _ <- updateUserType
+            _ <- markUserTypeUser
             result <- withUsernameToken.Ok(views.html.dashboard())
           } yield result
       }).recover {

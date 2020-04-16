@@ -178,26 +178,20 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         val create = blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         val verifyZone = masterZones.Service.verifyZone(addZone.zoneID)
 
-        def updateUserTypeOnAddress: Future[Int] = masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
+        def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+
+        def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
 
         def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addZone.from)
-
-        def getIDs(addZone: AddZone): Future[(String, String)] = {
-          val toAccountID = masterAccounts.Service.getId(addZone.to)
-          val fromAccountID = masterAccounts.Service.getId(addZone.from)
-          for {
-            toAccountID <- toAccountID
-            fromAccountID <- fromAccountID
-          } yield (toAccountID, fromAccountID)
-        }
 
         for {
           _ <- create
           _ <- verifyZone
-          _ <- updateUserTypeOnAddress
+          zoneAccountID <- getAccountID(addZone.to)
+          _ <- markUserTypeZone(zoneAccountID)
           _ <- markDirty
-          (toAccountID, fromAccountID) <- getIDs(addZone)
-          _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+          fromAccountID <- getAccountID(addZone.from)
+          _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
           _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         } yield {}
       }
@@ -216,19 +210,13 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addZone = Service.getTransaction(ticketID)
 
-      def getIDs(addZone: AddZone): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(addZone.to)
-        val fromAccountID = masterAccounts.Service.getId(addZone.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionFailed
         addZone <- addZone
-        (toAccountID, fromAccountID) <- getIDs(addZone)
+        fromAccountID <- getAccountID(addZone.from)
+        toAccountID <- getAccountID(addZone.to)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
