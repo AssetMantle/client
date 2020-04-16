@@ -1,26 +1,16 @@
 @import controllers.actions.LoginState
+@import models.masterTransaction.Notification
 @import views.html.base._
-@(notifications: Seq[models.masterTransaction.Notification] = Seq(), route: String, negotiationID: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<script src="@routes.Assets.versioned("javascripts/recentActivity.js")" type="text/javascript"></script>
-<div class="timeline recentActivityBox">
-    @notifications.map { notification =>
-        <div class="timeline-item notification">
-            <div class="timeline-icon">
-                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-contract")"/></svg>
-            </div>
-            <div class="timeline-content right">
-                <div>
-                    <div class="textLineOverflow activityContent" title="@notification.notificationMessage"><span class="cmuk-text-bolder">@notification.notificationTitle</span>
-                        @notification.notificationMessage</div>
-                    <div class="notificationTime">@notification.time</div>
-                </div>
-            </div>
-        </div>
-    }
-    <div class = "notification NotificationButton"><a onclick="loadMoreActivities(@route, '@negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
-</div>
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.RECENT_ACTIVITY) {
+} {
+    <div class="scroller">
+        <div id="recentActivityMessages"></div>
+        <div class="cover-bar"></div>
+    </div>
+}
 <script>
-@*    TODO @Puneet/Raju Correct this noActivity to correct name. noActivity is state not action*@
-        noActivity()
+    componentResource('recentActivityMessages', jsRoutes.controllers.NotificationController.recentActivityMessages(1));
 </script>

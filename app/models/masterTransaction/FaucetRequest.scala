@@ -22,7 +22,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_FAUCET_REQUESTS
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_FAUCET_REQUEST
 
   import databaseConfig.profile.api._
 

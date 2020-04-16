@@ -151,6 +151,7 @@ object Response {
   val DOCUMENT_LIST_EMPTY = new Failure("DOCUMENT_LIST_EMPTY")
   val DOCUMENT_LIST_LESS_THAN_REQUIRED = new Failure("DOCUMENT_LIST_LESS_THAN_REQUIRED")
   val NEGOTIATION_NOT_FOUND = new Failure("NEGOTIATION_NOT_FOUND")
+  val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
