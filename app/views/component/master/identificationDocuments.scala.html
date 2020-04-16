@@ -9,7 +9,7 @@
         @component.master.commonDocumentViewer(file) {
             @routes.FileController.getAccountKYCFile(file.fileName, file.documentType)
         } {
-            <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
+            <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)" target="_blank">@Messages(file.documentType)</a>
         } {
             @commonBooleanInfo(constants.View.STATUS, file.status)
         }

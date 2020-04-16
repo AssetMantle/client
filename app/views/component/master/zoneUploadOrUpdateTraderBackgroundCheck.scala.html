@@ -16,7 +16,7 @@
         @component.master.commonDocumentViewer(traderBackgroundCheck) {
             @routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName,traderBackgroundCheck.documentType)
         } {
-            <a href="@routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName, traderBackgroundCheck.documentType)">@Messages(traderBackgroundCheck.documentType)</a>
+            <a href="@routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName, traderBackgroundCheck.documentType)" target="_blank">@Messages(traderBackgroundCheck.documentType)</a>
         } {
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm('@traderBackgroundCheck.documentType','@trader.id'))">@Messages(constants.Form.UPDATE) @Messages(traderBackgroundCheck.documentType)</button>
             <script>hideElement('upload@traderBackgroundCheck.documentType')</script>

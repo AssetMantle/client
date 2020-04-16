@@ -3,9 +3,7 @@
 
 @(accountID: String, traderName: String, organizationName: String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-<div>
-    @commonTextInfo(key = constants.View.ACCOUNT_ID, accountID)
-    @commonTextInfo(key = constants.View.TRADER_NAME, traderName)
-    @commonTextInfo(key = constants.View.ORGANIZATION_NAME, organizationName)
-    @commonBooleanInfo(key = constants.View.STATUS, None)
-</div>
+    @commonVerticalTextInfo(key = constants.View.ACCOUNT_ID, accountID)
+    @commonVerticalTextInfo(key = constants.View.TRADER_NAME, traderName)
+    @commonVerticalTextInfo(key = constants.View.ORGANIZATION_NAME, organizationName)
+    @commonVerticalBooleanInfo(key = constants.View.STATUS, None)

@@ -5,10 +5,17 @@
 @(pendingOrganizationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @pendingOrganizationRequests.map { organization =>
-    @commonInfoBox() {
-        @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
-        @commonTextInfo(constants.View.NAME, organization.name)
-        @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
-        @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organization.id}'")
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+        @commonVerticalTextInfo(constants.View.NAME, organization.name)
+        @commonVerticalTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organization.id}'")
+            </p>
+        </div>
     }
 }

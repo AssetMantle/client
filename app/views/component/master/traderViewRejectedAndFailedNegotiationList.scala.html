@@ -8,7 +8,7 @@
 <div>
     <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)
         @rejectedReceivedNegotiationList.map { rejectedReceivedNegotiation =>
-            <li class="commonList">
+            @commonVerticalInfoBox() {
                 @defining(counterPartyTraders.find(_.id == rejectedReceivedNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
                     @counterPartyTrader match {
                         case Some(trader) => {
@@ -24,13 +24,13 @@
                 @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedReceivedNegotiation.quantity.toString, rejectedReceivedNegotiation.quantityUnit).mkString(" "))
                 @commonVerticalTextInfo(constants.View.COMMENT, rejectedReceivedNegotiation.comment.getOrElse(""))
                 @commonVerticalTextInfo(constants.View.STATUS, rejectedReceivedNegotiation.status)
-            </li>
+            }
         }
     </div>
 
     <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)
         @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
-            <li class="commonList">
+            @commonVerticalInfoBox() {
                 @defining(counterPartyTraders.find(_.id == rejectedSentNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
                     @counterPartyTrader match {
                         case Some(trader) => {
@@ -46,13 +46,13 @@
                 @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" "))
                 @commonVerticalTextInfo(constants.View.COMMENT, rejectedSentNegotiation.comment.getOrElse(""))
                 @commonVerticalTextInfo(constants.View.STATUS, rejectedSentNegotiation.status)
-            </li>
+            }
         }
     </div>
 
     <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)
         @failedNegotiationList.map { failedNegotiation =>
-            <li class="commonList">
+            @commonVerticalInfoBox() {
                 @defining(counterPartyTraders.find(_.id == failedNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
                     @counterPartyTrader match {
                         case Some(trader) => {
@@ -67,7 +67,7 @@
                 @commonVerticalIntInfo(constants.View.PRICE, failedNegotiation.price)
                 @commonVerticalTextInfo(constants.View.QUANTITY, Seq(failedNegotiation.quantity.toString(), failedNegotiation.quantityUnit).mkString(" "))
                 @commonVerticalTextInfo(constants.View.STATUS, failedNegotiation.status)
-            </li>
+            }
         }
     </div>
 </div>

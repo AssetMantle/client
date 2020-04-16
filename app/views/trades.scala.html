@@ -26,12 +26,12 @@
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.TRADER => {
-            <div class="tradeList cmuk-margin-bottom">
+            <div class="tradeList switcherCard">
                     <div id="traderViewAcceptedNegotiationList"></div>
             </div>
 
             <div class="salesQuoteList">
-                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
             </div>
 
             <script>

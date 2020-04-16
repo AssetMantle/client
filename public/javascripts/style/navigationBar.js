@@ -1,8 +1,11 @@
 $(document).ready(function () {
-    $("#NavigationBarMenuButton").click(function () {
-        $("#navigationBarLinks").slideToggle("slow");
+    $(window).resize(function() {
+        if ($(window).width() > 960) {
+            $(".mobileNavigation").removeAttr("style");
+        }
     });
-    if ($(window).width() > 639) {
-        $(".mobileNotification").removeAttr("id");
-    }
 });
+function  mobileNavigation() {
+    $('#mobileNavigation').slideToggle();
+
+}
