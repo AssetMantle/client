@@ -131,12 +131,12 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         },
         issueAssetDetailData => {
           val id = if (issueAssetDetailData.requestID.isEmpty) utilities.IDGenerator.requestID() else issueAssetDetailData.requestID.get
-          val insertOrUpdate = masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = None, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = issueAssetDetailData.takerAddress, shipmentDetails = Serializable.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, completionStatus = false, verificationStatus = null)
+          val insertOrUpdate = masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = None, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = issueAssetDetailData.takerAddress, shipmentDetails = Serializable.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, utilities.Date.utilDateToSQLDate(issueAssetDetailData.shipmentDate)), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, completionStatus = false, verificationStatus = null)
           val assetFile = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL)
           val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)
 
           def getResult(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-            val obl = assetFile.documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
+            val obl = assetFile.documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", utilities.Date.utilDateToSQLDate(new Date), "", 0, 0)).asInstanceOf[Serializable.OBL]
             withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), optionAssetFile))
           }
 
@@ -162,7 +162,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)
 
           def result(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-            val obl = assetFile.documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
+            val obl = assetFile.documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", utilities.Date.utilDateToSQLDate(new Date), "", 0, 0)).asInstanceOf[Serializable.OBL]
             withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), optionAssetFile))
           }
 
@@ -196,12 +196,12 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
           def getResult(checkFileExists: Boolean): Future[Result] = {
             if (checkFileExists) {
-              val insertOrUpdate = masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetOBLData.requestID, constants.File.OBL, "", None, Option(Serializable.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)), None))
+              val insertOrUpdate = masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetOBLData.requestID, constants.File.OBL, "", None, Option(Serializable.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(issueAssetOBLData.shipmentDate), issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)), None))
               val assetFile = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE)
               val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(issueAssetOBLData.requestID, constants.File.INVOICE)
 
               def result(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-                val invoice = assetFile.documentContent.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+                val invoice = assetFile.documentContent.getOrElse(Serializable.Invoice("", utilities.Date.utilDateToSQLDate(new Date))).asInstanceOf[Serializable.Invoice]
                 withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetOBLData.requestID, invoice.invoiceNumber, invoice.invoiceDate)), optionAssetFile))
               }
 
@@ -237,7 +237,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)
 
           def result(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-            val invoice = assetFile.documentContent.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+            val invoice = assetFile.documentContent.getOrElse(Serializable.Invoice("", utilities.Date.utilDateToSQLDate(new Date))).asInstanceOf[Serializable.Invoice]
             withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), optionAssetFile))
           }
 
@@ -275,7 +275,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
             def getResult(checkFileExists: Boolean): Future[Result] = {
               if (checkFileExists) {
-                val insertOrUpdate = masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Serializable.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)), None))
+                val insertOrUpdate = masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Serializable.Invoice(issueAssetInvoiceData.invoiceNumber, utilities.Date.utilDateToSQLDate(issueAssetInvoiceData.invoiceDate))), None))
                 val documents = masterTransactionAssetFiles.Service.getDocuments(issueAssetInvoiceData.requestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)
                 for {
                   _ <- insertOrUpdate
@@ -464,11 +464,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
               )
 
-              def updateTicketID(ticketID: String): Future[Int] = masterAssets.Service.updateTicketID(issueAssetData.id, ticketID)
-
               for {
                 ticketID <- ticketID
-                _ <- updateTicketID(ticketID)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
               } yield result
             } else {

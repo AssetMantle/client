@@ -6,39 +6,9 @@
 
 @(updateZoneKYCDocumentStatusForm: Form[UpdateZoneKYCDocumentStatus.Data] = views.companion.master.UpdateZoneKYCDocumentStatus.form, zoneKYC: ZoneKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(zoneKYC.id, zoneKYC.documentType).mkString("")">
-@form(action = routes.AddZoneController.updateZoneKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    @CSRF.formField
+@commonAcceptOrRejectForm(constants.Form.UPDATE_ZONE_KYC_DOCUMENT_STATUS, updateZoneKYCDocumentStatusForm, Seq(zoneKYC.id, zoneKYC.documentType).mkString(""), zoneKYC.status) {
     @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.ZONE_ID, 'value -> zoneKYC.id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> zoneKYC.documentType, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonCheckbox(updateZoneKYCDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(zoneKYC.id, zoneKYC.documentType, constants.FormField.STATUS.name).mkString(""))
-
-    @if(updateZoneKYCDocumentStatusForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- updateZoneKYCDocumentStatusForm.globalErrors) {
-            <li>@error.format</li>
-        }
-        </ul>
-    }
-    <span class="red">@Messages(constants.FormField.STATUS.name):</span>
-    @zoneKYC.status match {
-        case Some(status: Boolean) => {
-            @if(status) {
-                <span cmuk-icon="check"></span>
-                <br>
-                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", zoneKYC.id, zoneKYC.documentType).mkString("")', '@Seq(zoneKYC.id, zoneKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
-            } else {
-                <span cmuk-icon="close"></span>
-                <br>
-                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", zoneKYC.id, zoneKYC.documentType).mkString("")', '@Seq(zoneKYC.id, zoneKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
-            }
-        }
-        case None => {
-            <br>
-            <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", zoneKYC.id, zoneKYC.documentType).mkString("")', '@Seq(zoneKYC.id, zoneKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
-            <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", zoneKYC.id, zoneKYC.documentType).mkString("")', '@Seq(zoneKYC.id, zoneKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
-        }
-    }
 }
 </div>

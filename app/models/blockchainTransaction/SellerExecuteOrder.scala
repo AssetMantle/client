@@ -176,7 +176,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sellerExecuteOrder = Service.getTransaction(ticketID)
 
-      def negotiationID(sellerExecuteOrder: SellerExecuteOrder) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, pegHash = sellerExecuteOrder.pegHash)
+      def negotiationID(sellerExecuteOrder: SellerExecuteOrder) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, pegHash = sellerExecuteOrder.pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
       def markDirty(negotiationID: String, sellerExecuteOrder: SellerExecuteOrder) = {
         val markDirtyNegotiationID = blockchainOrders.Service.markDirty(id = negotiationID)

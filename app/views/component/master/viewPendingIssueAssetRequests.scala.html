@@ -18,11 +18,6 @@
                     @commonIntInfo(constants.Form.ASSET_PRICE, assetRequest.price)
                     @commonBooleanInfo(constants.Form.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
-                    <span>@Messages(constants.Form.SHIPMENT_DETAILS)</span>
-                    <br>
-                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, assetRequest.shippingPeriod)
-                    @commonTextInfo(constants.View.LOAD_PORT, assetRequest.portOfLoading)
-                    @commonTextInfo(constants.View.DISCHARGE_PORT, assetRequest.portOfDischarge)
                     <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@assetRequest.id'))">@Messages(constants.Form.APPROVE)</button>
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>
                     <div id = "assetDocuments@assetRequest.id">

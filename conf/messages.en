@@ -636,7 +636,7 @@ COMPLETE_ORGANIZATION_DETAILS_REQUEST=Complete Organization Details Request
 EMAIL.ZONE_INVITATION.SUBJECT = Invitation to become Zone.
 EMAIL.ZONE_INVITATION.MESSAGE = Hi,\
   Please go to this <a href="{0}/zone/acceptInvitation?token={1}">link</a>.
-
+REGISTER=Register
 TRADE_ACTIVITY.NEGOTIATION_STARTED.TITLE=Negotiation Started
 TRADE_ACTIVITY.NEGOTIATION_STARTED.MESSAGE=Negotiation started with {0} for {2} {1}
 TRADE_ACTIVITY.DOCUMENT_LIST_UPDATED.TITLE=Document List Updated
