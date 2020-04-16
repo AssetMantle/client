@@ -484,21 +484,18 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
-    "id"              VARCHAR NOT NULL,
-    "ownerID"         VARCHAR NOT NULL,
-    "ticketID"        VARCHAR,
-    "pegHash"         VARCHAR,
-    "assetType"       VARCHAR NOT NULL,
-    "description"     VARCHAR NOT NULL,
-    "documentHash"    VARCHAR NOT NULL UNIQUE,
-    "quantity"        INT     NOT NULL,
-    "quantityUnit"    VARCHAR NOT NULL,
-    "price"           INT     NOT NULL,
-    "moderated"       BOOLEAN NOT NULL,
-    "shippingPeriod"  INT     NOT NULL,
-    "portOfLoading"   VARCHAR NOT NULL,
-    "portOfDischarge" VARCHAR NOT NULL,
-    "status"          VARCHAR NOT NULL,
+    "id"           VARCHAR NOT NULL,
+    "ownerID"      VARCHAR NOT NULL,
+    "pegHash"      VARCHAR UNIQUE,
+    "assetType"    VARCHAR NOT NULL,
+    "description"  VARCHAR NOT NULL,
+    "documentHash" VARCHAR NOT NULL UNIQUE,
+    "quantity"     INT     NOT NULL,
+    "quantityUnit" VARCHAR NOT NULL,
+    "price"        INT     NOT NULL,
+    "moderated"    BOOLEAN NOT NULL,
+    "otherDetails" VARCHAR NOT NULL,
+    "status"       VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -528,41 +525,28 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
 
 CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
 (
-    "id"                            VARCHAR NOT NULL,
-    "negotiationID"                 VARCHAR,
-    "ticketID"                      VARCHAR,
-    "buyerTraderID"                 VARCHAR NOT NULL,
-    "sellerTraderID"                VARCHAR NOT NULL,
-    "assetID"                       VARCHAR NOT NULL,
-    "assetDescription"              VARCHAR NOT NULL,
-    "price"                         INT     NOT NULL,
-    "quantity"                      INT     NOT NULL,
-    "quantityUnit"                  VARCHAR NOT NULL,
-    "shippingPeriod"                INT     NOT NULL,
-    "time"                          INT,
-    "buyerAcceptedAssetDescription" BOOLEAN NOT NULL,
-    "buyerAcceptedPrice"            BOOLEAN NOT NULL,
-    "buyerAcceptedQuantity"         BOOLEAN NOT NULL,
-    "buyerAcceptedShippingPeriod"   BOOLEAN NOT NULL,
-    "advancePayment"                BOOLEAN,
-    "advancePercentage"             DECIMAL(4, 2),
-    "credit"                        BOOLEAN,
-    "tenure"                        INT,
-    "tentativeDate"                 DATE,
-    "reference"                     VARCHAR,
-    "buyerAcceptedAdvancePayment"   BOOLEAN NOT NULL,
-    "buyerAcceptedCredit"           BOOLEAN NOT NULL,
-    "billOfExchange"                BOOLEAN,
-    "coo"                           BOOLEAN,
-    "coa"                           BOOLEAN,
-    "otherDocuments"                VARCHAR,
-    "buyerAcceptedBillOfExchange"   BOOLEAN NOT NULL,
-    "buyerAcceptedCOO"              BOOLEAN NOT NULL,
-    "buyerAcceptedCOA"              BOOLEAN NOT NULL,
-    "buyerAcceptedOtherDocuments"   BOOLEAN NOT NULL,
-    "chatID"                        VARCHAR UNIQUE,
-    "status"                        VARCHAR,
-    "comment"                       VARCHAR,
+    "id"                             VARCHAR NOT NULL,
+    "negotiationID"                  VARCHAR UNIQUE,
+    "buyerTraderID"                  VARCHAR NOT NULL,
+    "sellerTraderID"                 VARCHAR NOT NULL,
+    "assetID"                        VARCHAR NOT NULL,
+    "assetDescription"               VARCHAR NOT NULL,
+    "price"                          INT     NOT NULL,
+    "quantity"                       INT     NOT NULL,
+    "quantityUnit"                   VARCHAR NOT NULL,
+    "assetOtherDetails"              VARCHAR NOT NULL,
+    "buyerAcceptedAssetDescription"  BOOLEAN NOT NULL,
+    "buyerAcceptedPrice"             BOOLEAN NOT NULL,
+    "buyerAcceptedQuantity"          BOOLEAN NOT NULL,
+    "buyerAcceptedAssetOtherDetails" BOOLEAN NOT NULL,
+    "time"                           INT,
+    "paymentTerms"                   VARCHAR NOT NULL,
+    "buyerAcceptedPaymentTerms"      BOOLEAN NOT NULL,
+    "documentList"                   VARCHAR NOT NULL,
+    "buyerAcceptedDocumentList"      BOOLEAN NOT NULL,
+    "chatID"                         VARCHAR UNIQUE,
+    "status"                         VARCHAR NOT NULL,
+    "comment"                        VARCHAR,
     PRIMARY KEY ("id"),
     UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
 );
@@ -789,12 +773,16 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
-    "id"                  VARCHAR   NOT NULL,
-    "accountID"           VARCHAR   NOT NULL,
-    "notificationTitle"   VARCHAR   NOT NULL,
-    "notificationMessage" VARCHAR   NOT NULL,
-    "time"                TIMESTAMP NOT NULL,
-    "read"                BOOLEAN   NOT NULL,
+    "id"                       VARCHAR   NOT NULL,
+    "accountID"                VARCHAR   NOT NULL,
+    "notificationTemplateJson" VARCHAR   NOT NULL,
+    "read"                     BOOLEAN   NOT NULL,
+    "createdBy"                VARCHAR   NOT NULL,
+    "createdOn"                TIMESTAMP NOT NULL,
+    "createdOnTimezone"        VARCHAR   NOT NULL,
+    "updatedBy"                VARCHAR,
+    "updatedOn"                TIMESTAMP,
+    "updatedOnTimezone"        VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -822,9 +810,17 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
-    "notificationID" VARCHAR NOT NULL,
-    "negotiationID"  VARCHAR NOT NULL,
-    PRIMARY KEY ("notificationID", "negotiationID")
+    "id"                        VARCHAR   NOT NULL,
+    "negotiationID"             VARCHAR   NOT NULL,
+    "tradeActivityTemplateJson" VARCHAR   NOT NULL,
+    "read"                      BOOLEAN   NOT NULL,
+    "createdBy"                 VARCHAR   NOT NULL,
+    "createdOn"                 TIMESTAMP NOT NULL,
+    "createdOnTimezone"         VARCHAR   NOT NULL,
+    "updatedBy"                 VARCHAR,
+    "updatedOn"                 TIMESTAMP,
+    "updatedOnTimezone"         VARCHAR,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
@@ -977,8 +973,6 @@ ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"

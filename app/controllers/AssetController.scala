@@ -75,17 +75,17 @@ class AssetController @Inject()(
                   def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
                   if (issueAssetData.moderated) {
-                    val insertAndGetIDAndDocumentHash = masterAssets.Service.insertModeratedAssetAndGetIDAndDocumentHash(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
                     for {
-                      _ <- insertAndGetIDAndDocumentHash
+                      _ <- addModeratedAsset
                       tradableAssets <- getAllTradableAssets(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
                       counterPartyTraders <- getCounterPartyTraders(counterPartyList)
                       result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
                     } yield result
                   } else {
-                    val insertAndGetIDAndDocumentHash = masterAssets.Service.insertUnmoderatedAssetAndGetIDAndDocumentHash(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
                     def getTicketID(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                       entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
@@ -97,12 +97,9 @@ class AssetController @Inject()(
                       updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
                     )
 
-                    def updateTicketID(id: String, ticketID: String): Future[Int] = masterAssets.Service.updateTicketID(id = id, ticketID = ticketID)
-
                     for {
-                      (id, documentHash) <- insertAndGetIDAndDocumentHash
+                      documentHash <- addUnmoderatedAsset
                       ticketID <- getTicketID(documentHash)
-                      _ <- updateTicketID(id = id, ticketID = ticketID)
                       tradableAssets <- getAllTradableAssets(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
                       counterPartyTraders <- getCounterPartyTraders(counterPartyList)
@@ -110,7 +107,6 @@ class AssetController @Inject()(
                     } yield result
                   }
                 }
-
 
                 for {
                   traderID <- traderID

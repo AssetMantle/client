@@ -23,32 +23,15 @@
 }
 
 @center = {
-    <div class="cmuk-container cmuk-margin-bottom"></div>
+    <div class="cmuk-container cmuk-margin-bottom">
+    </div>
 }
 
 @right = {
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY) {
-        } {
-            <div class="scroller">
-                <div id="recentActivity"></div>
-                <div class="cover-bar"></div>
-            </div>
-        }
-        </div>
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
     </div>
     <script>
-        @loginState.userType match {
-            case constants.User.TRADER => {
-                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTrader(0));
-            }
-            case constants.User.ORGANIZATION => {
-                componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForOrganization(0));
-            }
-            case constants.User.ZONE => {}
-            case constants.User.GENESIS => {}
-            case _ => {}
-        }
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
     </script>
 }

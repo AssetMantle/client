@@ -4,28 +4,34 @@ import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.masterTransaction.Notifications
+import models.master.Trader
+import models.{master, masterTransaction}
+import models.masterTransaction.{Notification, Notifications, TradeActivity}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NotificationController @Inject()(messagesControllerComponents: MessagesControllerComponents, notifications: Notifications, withLoginAction: WithLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class NotificationController @Inject()(
+                                        messagesControllerComponents: MessagesControllerComponents,
+                                        masterTransactionNotifications: masterTransaction.Notifications,
+                                        withLoginAction: WithLoginAction,
+                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 
-  private val limit = configuration.get[Int]("notification.notificationsPerPage")
-
-  def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val notification = notifications.Service.get(loginState.username, pageNumber * limit, limit)
+
+      val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
+
       (for {
-        notification <- notification
-      } yield Ok(views.html.component.master.notifications(notification))
+        notifications <- notifications
+      } yield Ok(views.html.component.master.recentActivityMessages(notifications = notifications))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -33,7 +39,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val unreadNotificationCount = notifications.Service.getNumberOfUnread(loginState.username)
+      val unreadNotificationCount = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
       (for {
         unreadNotificationCount <- unreadNotificationCount
       } yield Ok(unreadNotificationCount.toString)
@@ -44,8 +50,8 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val markAsRead = notifications.Service.markAsRead(notificationID)
-      val unreadNotificationCount = notifications.Service.getNumberOfUnread(loginState.username)
+      val markAsRead = masterTransactionNotifications.Service.markAsRead(notificationID)
+      val unreadNotificationCount = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
       (for {
         _ <- markAsRead
         unreadNotificationCount <- unreadNotificationCount

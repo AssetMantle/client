@@ -1,7 +1,7 @@
 package models.common
 
 import play.api.libs.functional.syntax._
-import java.util.Date
+import java.sql.Date
 
 import models.Trait.DocumentContent
 import play.api.libs.json.{JsResult, JsValue, Json, OWrites, Reads, Writes}
@@ -31,6 +31,42 @@ object Serializable {
   implicit val shipmentDetailsReads: Reads[ShipmentDetails] = Json.reads[ShipmentDetails]
 
   implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
+
+  case class ShippingDetails(shippingPeriod: Int, portOfLoading: String, portOfDischarge: String)
+
+  implicit val shippingDetailsReads: Reads[ShippingDetails] = Json.reads[ShippingDetails]
+
+  implicit val shippingDetailsWrites: OWrites[ShippingDetails] = Json.writes[ShippingDetails]
+
+  case class AssetOtherDetails(shippingDetails: ShippingDetails)
+
+  implicit val assetOtherDetailsReads: Reads[AssetOtherDetails] = Json.reads[AssetOtherDetails]
+
+  implicit val assetOtherDetailsWrites: OWrites[AssetOtherDetails] = Json.writes[AssetOtherDetails]
+
+  case class PaymentTerms(advancePayment: Boolean = false, advancePercentage: Option[Double] = None, credit: Boolean = false, tenure: Option[Int] = None, tentativeDate: Option[Date] = None, reference: Option[String] = None)
+
+  implicit val paymentTermsReads: Reads[PaymentTerms] = Json.reads[PaymentTerms]
+
+  implicit val paymentTermsWrites: OWrites[PaymentTerms] = Json.writes[PaymentTerms]
+
+  case class DocumentList(documents: Seq[String])
+
+  implicit val documentListReads: Reads[DocumentList] = Json.reads[DocumentList]
+
+  implicit val documentListWrites: OWrites[DocumentList] = Json.writes[DocumentList]
+
+  case class NotificationTemplate(template: String, parameters: Seq[String])
+
+  implicit val notificationTemplateReads: Reads[NotificationTemplate] = Json.reads[NotificationTemplate]
+
+  implicit val notificationTemplateWrites: OWrites[NotificationTemplate] = Json.writes[NotificationTemplate]
+
+  case class TradeActivityTemplate(template: String, parameters: Seq[String])
+
+  implicit val tradeActivityTemplateReads: Reads[TradeActivityTemplate] = Json.reads[TradeActivityTemplate]
+
+  implicit val tradeActivityTemplateWrites: OWrites[TradeActivityTemplate] = Json.writes[TradeActivityTemplate]
 
   case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 

@@ -24,7 +24,6 @@ $(document).ready(function () {
         .then(function (token) {
             $('#PUSH_NOTIFICATION_TOKEN').val(token);
         })
-
         .catch(function (err) {
         });
     messaging.onMessage(function (payload) {

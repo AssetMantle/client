@@ -183,18 +183,23 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
       def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
-      def negotiationID(confirmBuyerBid: ConfirmBuyerBid): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
+      def negotiationID(confirmBuyerBid: ConfirmBuyerBid): Future[Option[String]] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
 
-      def negotiationResponse(negotiationID: String, confirmBuyerBid: ConfirmBuyerBid): Future[NegotiationResponse.Response] = if (negotiationID == "") {
-        val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
+      def negotiationResponse(negotiationID: Option[String], confirmBuyerBid: ConfirmBuyerBid): Future[NegotiationResponse.Response] = {
+        negotiationID match {
+          case Some(id) => getNegotiation.Service.get(id)
+          case None => {
+            val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
 
-        def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
+            def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
 
-        for {
-          negotiationIDResponse <- negotiationIDResponse
-          negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
-        } yield negotiation
-      } else getNegotiation.Service.get(negotiationID)
+            for {
+              negotiationIDResponse <- negotiationIDResponse
+              negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
+            } yield negotiation
+          }
+        }
+      }
 
       def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
 

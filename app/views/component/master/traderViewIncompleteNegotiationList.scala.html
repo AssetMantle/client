@@ -4,11 +4,11 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(incompleteNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(incompleteNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @incompleteNegotiationList.map { incompleteNegotiation =>
     @commonInfoBox() {
-        @defining(counterPartyTraders.filter(_.id == incompleteNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+        @defining(counterPartyTraders.find(_.id == incompleteNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
                     @commonTextInfo(constants.View.TRADER_NAME, trader.name)
@@ -18,16 +18,7 @@
                 }
             }
         }
-        @defining(assets.filter(_.id == incompleteNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
-            @rejectedNegotiationAsset match {
-                case Some(asset) => {
-                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
-                }
-                case None => {
-                    @commonTextInfo(constants.View.ASSET_ID, incompleteNegotiation.assetID)
-                }
-            }
-        }
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString(), incompleteNegotiation.quantityUnit).mkString(" "))
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
