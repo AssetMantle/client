@@ -87,9 +87,9 @@ object Response {
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED =  new Success("NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED")
 
   //Warning- for telling that something important is not done and ask to do it
-  val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
-  val VERIFY_EMAIL_ADDRESS = new Warning("VERIFY_EMAIL_ADDRESS", routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm)
-  val UPDATE_CONTACT_DETAILS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.updateContactForm)
+  val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.ContactController.verifyMobileNumberForm)
+  val VERIFY_EMAIL_ADDRESS = new Warning("VERIFY_EMAIL_ADDRESS", routes.javascript.ContactController.verifyEmailAddressForm)
+  val UPDATE_CONTACT_DETAILS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.addOrUpdateForm)
 
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")
@@ -102,8 +102,8 @@ object Response {
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
-  val EMAIL_ADDRESS_ALREADY_IN_USE = new Failure("EMAIL_ADDRESS_ALREADY_IN_USE")
-  val MOBILE_NUMBER_ALREADY_IN_USE = new Failure("MOBILE_NUMBER_ALREADY_IN_USE")
+  val EMAIL_ADDRESS_TAKEN = new Failure("EMAIL_ADDRESS_TAKEN")
+  val MOBILE_NUMBER_TAKEN = new Failure("MOBILE_NUMBER_TAKEN")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")
@@ -148,6 +148,7 @@ object Response {
   val ZONE_ID_MISMATCH = new Failure("ZONE_ID_MISMATCH")
   val ORGANIZATION_ID_MISMATCH = new Failure("ORGANIZATION_ID_MISMATCH")
   val ZONE_INVITATION_NOT_FOUND = new Failure("ZONE_INVITATION_NOT_FOUND")
+  val USERNAME_OR_PASSWORD_INCORRECT = new Failure("USERNAME_OR_PASSWORD_INCORRECT", routes.javascript.AccountController.loginForm)
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -6,7 +6,7 @@
 
 @commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
     @if(userContact.isDefined) {
-        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small buttonUpdate" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.View.UPDATE_CONTACT)</button>
+        @commonModalButton(constants.View.UPDATE_CONTACT, routes.javascript.ContactController.addOrUpdateForm)
     }
 } {
     @userContact match {
@@ -17,7 +17,7 @@
                     @if(contact.emailAddressVerified) {
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
-                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
+                        @commonFormButton(constants.Form.VERIFY_EMAIL_ADDRESS, 'class -> "cmuk-button-link")
                     }
 
                 </div>
@@ -28,14 +28,14 @@
                     @if(contact.mobileNumberVerified) {
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
-                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
+                        @commonFormButton(constants.Form.VERIFY_MOBILE_NUMBER, 'class -> "cmuk-button-link")
                     }
                 </div>
             }
         }
         case _ => {
             <div class="cmuk-position-center">
-            @commonFormButton(constants.Form.UPDATE_CONTACT)
+            @commonFormButton(constants.Form.ADD_OR_UPDATE_CONTACT)
             </div>
         }
     }

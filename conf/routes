@@ -87,6 +87,15 @@ POST        /negotiation/acceptOrRejectNegotiationTerms                         
 
 GET         /contact                                                                        controllers.ContactController.contact
 
+GET         /contact/addOrUpdate                                                            controllers.ContactController.addOrUpdateForm
+POST        /contact/addOrUpdate                                                            controllers.ContactController.addOrUpdate
+
+GET         /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddressForm
+POST        /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddress
+
+GET         /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumberForm
+POST        /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumber
+
 GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequest
 
@@ -223,15 +232,6 @@ GET         /zoneUpload/updateFile                                              
 GET         /master/userAccessedOrganizationKYCFile                                         controllers.FileController.userAccessedOrganizationKYCFile(documentType: String)
 GET         /master/userAccessedTraderKYCFile                                               controllers.FileController.userAccessedTraderKYCFile(documentType: String)
 GET         /master/userAccessedZoneKYCFile                                                 controllers.FileController.userAccessedZoneKYCFile(documentType: String)
-
-GET         /master/updateContact                                                           controllers.ContactController.updateContactForm
-POST        /master/updateContact                                                           controllers.ContactController.updateContact
-
-GET         /master/verifyMobileNumber                                                      controllers.VerifyMobileNumberController.verifyMobileNumberForm
-POST        /master/verifyMobileNumber                                                      controllers.VerifyMobileNumberController.verifyMobileNumber
-
-GET         /master/verifyEmailAddress                                                      controllers.VerifyEmailAddressController.verifyEmailAddressForm
-POST        /master/verifyEmailAddress                                                      controllers.VerifyEmailAddressController.verifyEmailAddress
 
 GET         /master/inviteTrader                                                            controllers.SetACLController.inviteTraderForm
 POST        /master/inviteTrader                                                            controllers.SetACLController.inviteTrader
@@ -463,7 +463,7 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 #DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+POST        /wurtcb                                                                         controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm

@@ -460,7 +460,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
     "accountAddress" VARCHAR NOT NULL,
     "language"       VARCHAR NOT NULL,
     "userType"       VARCHAR NOT NULL,
-    "status"         VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -997,8 +996,8 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '0',
         true);
 
-INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
+INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType")
+VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS');
 
 # --- !Downs
 

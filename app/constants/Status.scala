@@ -2,7 +2,7 @@ package constants
 
 object Status {
 
-  object Account {
+  object Contact {
     val NO_CONTACT = "NO_CONTACT"
     val CONTACT_UNVERIFIED = "CONTACT_UNVERIFIED"
     val EMAIL_ADDRESS_UNVERIFIED = "EMAIL_ADDRESS_UNVERIFIED"

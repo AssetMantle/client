@@ -636,3 +636,4 @@ COMPLETE_ORGANIZATION_DETAILS_REQUEST=Complete Organization Details Request
 EMAIL.ZONE_INVITATION.SUBJECT = Invitation to become Zone.
 EMAIL.ZONE_INVITATION.MESSAGE = Hi,\
   Please go to this <a href="{0}/zone/acceptInvitation?token={1}">link</a>.
+FORM.ADD_OR_UPDATE_CONTACT.LEGEND=Contact

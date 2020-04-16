@@ -46,6 +46,8 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private val smsAuthToken = configuration.get[String]("twilio.authToken")
 
+  Twilio.init(smsAccountSID, smsAuthToken)
+
   private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
@@ -60,15 +62,11 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
-  private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
-    val twilioInit = Future {
-      Twilio.init(smsAccountSID, smsAuthToken)
-    }
-    val mobileNumber = masterContacts.Service.tryGetMobileNumber(accountID)
+  private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
+    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
     (for {
-      _ <- twilioInit
-      mobileNumber <- mobileNumber
-    } yield Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
+      _ <- send
+    } yield ()
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
@@ -94,19 +92,19 @@ class Notification @Inject()(masterContacts: master.Contacts,
       message <- message
       notificationID <- create(title, message)
       pushNotificationToken <- pushNotificationToken
-      _ <- if(pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
+      _ <- if (pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
     } yield Option(notificationID)).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
   }
 
-  private def sendEmail(toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): String = {
+  private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): String = {
 
     mailerClient.send(Email(
       subject = messagesApi(email.subject),
       from = emailFromAddress,
-      to = Seq(toEmailAddress),
+      to = Seq(emailAddress),
       bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
       charset = Option(emailCharset),
       replyTo = Seq(emailReplyTo),
@@ -115,36 +113,72 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   }
 
-  def sendEmailToEmailAddress(fromAccountID: String, toEmailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(fromAccountID))): Unit = {
-
-    sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
+  def sendEmailToEmailAddress(fromAccountID: String, emailAddress: String, email: constants.Notification.Email, messageParameters: String*): Unit = {
+    val language = masterAccounts.Service.tryGetLanguage(fromAccountID)
+    (for {
+      language <- language
+    } yield {
+      sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))
+    }).recover {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
+    }
 
   }
 
-  def sendEmailByAccountID(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))): Unit = {
+  private def sendEmailByAccountID(accountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Unit = {
 
-    val toEmailAddress: Future[String] = masterContacts.Service.tryGetVerifiedEmailAddress(toAccountID)
+    val emailAddress: Future[String] = masterContacts.Service.tryGetVerifiedEmailAddress(accountID)
 
     (for {
-      toEmailAddress <- toEmailAddress
+      emailAddress <- emailAddress
     } yield {
-      sendEmail(toEmailAddress = toEmailAddress, email = email, messageParameters = messageParameters: _*)
+      sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Future[Option[String]] = {
-    try {
-      //save
+  def sendSMSToMobileNumber(fromAccountID: String, mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*): Future[Unit] = {
+    val language = masterAccounts.Service.tryGetLanguage(fromAccountID)
+    (for {
+      language <- language
+      _ <- sendSMS(mobileNumber = mobileNumber, sms = sms, messageParameters = messageParameters: _*)(Lang(language))
+    } yield ()
+      ).recover {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
+    }
+  }
+
+  private def sendSMSByAccountID(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
+
+    val mobileNumber: Future[String] = masterContacts.Service.tryGetVerifiedMobileNumber(accountID)
+
+    (for {
+      mobileNumber <- mobileNumber
+      _ <- sendSMS(mobileNumber = mobileNumber, sms = sms, messageParameters = messageParameters: _*)
+    } yield ()).recover {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
+    }
+  }
+
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*): Future[Option[String]] = {
+    val language = masterAccounts.Service.tryGetLanguage(accountID)
+
+    def sendNotifications(implicit language: Lang): Future[Option[String]] = {
       val notificationID = if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future(None)
-      if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
-      if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
-      for {
-        notificationID <- notificationID
-      } yield notificationID
-    } catch {
+      if (notification.email.isDefined) sendEmailByAccountID(accountID = accountID, email = notification.email.get, messagesParameters: _*)
+      if (notification.sms.isDefined) sendSMSByAccountID(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
+      notificationID
+    }
+
+    (for {
+      language <- language
+      notificationID <- sendNotifications(Lang(language))
+    } yield notificationID).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }

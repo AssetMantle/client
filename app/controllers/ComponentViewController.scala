@@ -42,6 +42,7 @@ class ComponentViewController @Inject()(
                                          blockchainOrders: blockchain.Orders,
                                          blockchainAccounts: blockchain.Accounts,
                                          masterAccountKYCs: master.AccountKYCs,
+                                         masterContacts: master.Contacts,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
                                          masterTraderBackgroundChecks: master.TraderBackgroundChecks,
@@ -681,9 +682,8 @@ class ComponentViewController @Inject()(
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val accountStatus: Future[String] = masterAccounts.Service.getStatus(loginState.username)
-
-      def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.get(accountID)
+      val contact: Future[Option[Contact]] = masterContacts.Service.get(loginState.username)
+      val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
       def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
 
@@ -697,9 +697,9 @@ class ComponentViewController @Inject()(
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
-      def getUserResult(identification: Option[Identification], accountStatus: String): Future[Result] = {
+      def getUserResult(identification: Option[Identification], contactStatus: String): Future[Result] = {
         val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
-        if (identificationStatus && accountStatus == constants.Status.Account.COMPLETE) {
+        if (identificationStatus && contactStatus == constants.Status.Contact.COMPLETE) {
           for {
             trader <- getTraderOrNoneByAccountID(loginState.username)
             traderOrganization <- getOrganizationOrNoneByTrader(trader)
@@ -707,16 +707,16 @@ class ComponentViewController @Inject()(
             organization <- getOrganizationOrNoneByAccountID(loginState.username)
             organizationZone <- getZoneOrNoneByOrganization(organization)
             organizationKYCs <- getOrganizationKYCsByOrganization(organization)
-          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
+          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, contactStatus = contactStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
         } else {
-          Future(Ok(views.html.component.master.userViewPendingRequests(identification = if (identification.isDefined) Option(identification.get) else None, accountStatus = accountStatus)))
+          Future(Ok(views.html.component.master.userViewPendingRequests(identification = if (identification.isDefined) Option(identification.get) else None, contactStatus = contactStatus)))
         }
       }
 
       (for {
-        accountStatus <- accountStatus
-        identification <- identification(loginState.username)
-        result <- getUserResult(identification, accountStatus)
+        contact <- contact
+        identification <- identification
+        result <- getUserResult(identification, utilities.Contact.getStatus(contact))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))

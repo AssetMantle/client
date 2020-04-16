@@ -70,17 +70,16 @@ class SetACLController @Inject()(
         },
         inviteTraderData => {
 
-          val contact: Future[Option[Contact]] = masterContacts.Service.getContactByEmail(inviteTraderData.emailAddress)
+          val emailAddressAccount: Future[Option[String]] = masterContacts.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
 
-          def inviteeUserType(contact: Option[Contact]): Future[String] = if (contact.isDefined) {
-            masterAccounts.Service.getUserType(contact.get.id)
-          } else {
-            Future(constants.User.USER)
+          def inviteeUserType(emailAddressAccount: Option[String]): Future[String] = emailAddressAccount match {
+            case Some(emailAddressAccount) => masterAccounts.Service.getUserType(emailAddressAccount)
+            case None => Future(constants.User.USER)
           }
 
           def createSendInvitationAndGetResult(inviteeUserType: String): Future[Result] = {
             if (inviteeUserType != constants.User.USER) {
-              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE))))
+              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_TAKEN))))
             } else {
 
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
@@ -88,7 +87,7 @@ class SetACLController @Inject()(
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
               def sendEmailAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
                 withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 
@@ -103,8 +102,8 @@ class SetACLController @Inject()(
           }
 
           (for {
-            contact <- contact
-            inviteeUserType <- inviteeUserType(contact)
+            emailAddressAccount <- emailAddressAccount
+            inviteeUserType <- inviteeUserType(emailAddressAccount)
             result <- createSendInvitationAndGetResult(inviteeUserType)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

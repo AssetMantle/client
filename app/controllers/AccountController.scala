@@ -25,18 +25,9 @@ class AccountController @Inject()(
                                    shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
                                    withUsernameToken: WithUsernameToken,
-                                   queryGetAccount: queries.GetAccount,
-                                   blockchainFiats: blockchain.Fiats,
-                                   blockchainZones: blockchain.Zones,
-                                   blockchainOrders: blockchain.Orders,
-                                   blockchainAssets: blockchain.Assets,
                                    blockchainAccounts: blockchain.Accounts,
                                    blockchainAclHashes: blockchain.ACLHashes,
                                    blockchainAclAccounts: blockchain.ACLAccounts,
-                                   blockchainNegotiations: blockchain.Negotiations,
-                                   blockchainOrganizations: blockchain.Organizations,
-                                   masterOrganizations: master.Organizations,
-                                   masterZones: master.Zones,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
@@ -45,12 +36,8 @@ class AccountController @Inject()(
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
-                                   sftpScheduler: SFTPScheduler,
                                    messagesControllerComponents: MessagesControllerComponents,
-                                   withTraderLoginAction: WithTraderLoginAction,
-                                   masterTraderRelations: master.TraderRelations,
                                    masterContacts: master.Contacts,
-                                   masterTraders: master.Traders,
                                    masterIdentifications: master.Identifications,
                                    masterAccountKYCs: master.AccountKYCs
                                  )
@@ -113,7 +100,7 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
-        val status = masterAccounts.Service.validateLoginAndGetStatus(username = loginData.username, password = loginData.password)
+        val validateLogin = masterAccounts.Service.tryValidatingLogin(username = loginData.username, password = loginData.password)
 
         def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
 
@@ -145,21 +132,28 @@ class AccountController @Inject()(
           } yield Unit
         }
 
-        def getResult(status: String)(implicit loginState: LoginState): Future[Result] = {
-          val contactWarnings = utilities.Contact.getWarnings(status)
+        def getWarnings: Future[Seq[constants.Response.Warning]] = {
+          val contact = masterContacts.Service.get(loginData.username)
+          for {
+            contact <- contact
+          } yield utilities.Contact.getWarnings(contact)
+        }
+
+        def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = {
           loginState.userType match {
-            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
-            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = warnings))
+            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = warnings))
           }
         }
 
         (for {
-          status <- status
+          _ <- validateLogin
           account <- getAccount
           userType <- firstLoginUserTypeUpdate(account.userType)
           loginState <- getLoginState(address = account.accountAddress, userType = userType)
           _ <- sendNotification(loginState)
-          result <- getResult(status = status)(loginState)
+          warnings <- getWarnings
+          result <- getResult(warnings)(loginState)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -212,7 +206,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.changePassword(formWithErrors)))
         },
         changePasswordData => {
-          val validLogin = masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)
+          val validLogin = masterAccounts.Service.tryValidatingLogin(loginState.username, changePasswordData.oldPassword)
 
           def updateAndGetResult(validLogin: Boolean): Future[Result] = if (validLogin) {
             val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
@@ -248,7 +242,7 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.emailOTPForgotPassword(formWithErrors)))
       },
       emailOTPForgotPasswordData => {
-        val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
+        val otp = masterTransactionEmailOTP.Service.get(emailOTPForgotPasswordData.username)
         (for {
           otp <- otp
           _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)

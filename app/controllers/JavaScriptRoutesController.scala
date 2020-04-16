@@ -170,7 +170,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ConfigurationController.queryConfigurationVariable,
 
-        routes.javascript.ContactController.updateContactForm,
+        routes.javascript.ContactController.addOrUpdateForm,
         routes.javascript.ContactController.contact,
 
         routes.javascript.FileController.uploadAccountFileForm,
@@ -311,9 +311,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.TraderController.zoneRejectRequestForm,
         routes.javascript.TraderController.organizationModifyTraderForm,
 
-        routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
+        routes.javascript.ContactController.verifyEmailAddressForm,
 
-        routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
+        routes.javascript.ContactController.verifyMobileNumberForm,
 
         routes.javascript.ViewController.profile,
         routes.javascript.ViewController.account,
