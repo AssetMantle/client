@@ -7,7 +7,7 @@
 @(sentNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sentNegotiationRequestList.map { sentNegotiationRequest =>
-    <li class="commonList">
+    @commonVerticalInfoBox() {
         @defining(counterPartyTraders.find(_.id == sentNegotiationRequest.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
@@ -22,5 +22,5 @@
         @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
         @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString, sentNegotiationRequest.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
+    }
 }
-</li>

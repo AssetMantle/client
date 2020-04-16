@@ -7,21 +7,34 @@
 @(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @receivedNegotiationRequestList.map { receivedNegotiationRequest =>
-    @commonInfoBox() {
+    @commonVerticalInfoBox() {
         @defining(counterPartyTraders.find(_.id == receivedNegotiationRequest.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
-                    @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
                 }
                 case None => {
-                    @commonTextInfo(constants.View.TRADER_ID, receivedNegotiationRequest.sellerTraderID)
+                    @commonVerticalTextInfo(constants.View.TRADER_ID, receivedNegotiationRequest.sellerTraderID)
                 }
             }
         }
-        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, receivedNegotiationRequest.assetDescription)
-        @commonIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" "))
-        @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-        @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+        @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString(), receivedNegotiationRequest.quantityUnit).mkString(" "))
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACCEPT)
+            </p>
+            <p class="listItemChildValue">
+            @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+            </p>
+        </div>
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.REJECT)
+            </p>
+            <p class="listItemChildValue">
+            @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+            </p>
+        </div>
     }
 }

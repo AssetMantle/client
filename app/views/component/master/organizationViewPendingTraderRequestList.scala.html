@@ -5,10 +5,17 @@
 @(pendingTraderRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @pendingTraderRequests.map { trader =>
-    @commonInfoBox() {
-        @commonTextInfo(constants.View.TRADER_ID, trader.id)
-        @commonTextInfo(constants.View.NAME, trader.name)
-        @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-        @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.ComponentViewController.organizationViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.TRADER_ID, trader.id)
+        @commonVerticalTextInfo(constants.View.NAME, trader.name)
+        @commonVerticalTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.ComponentViewController.organizationViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
+            </p>
+        </div>
     }
 }

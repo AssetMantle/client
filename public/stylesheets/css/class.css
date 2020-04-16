@@ -169,7 +169,7 @@ html, body {
   text-align: left;
   word-break: break-all; }
 
-rightText {
+.rightText {
   text-align: right; }
 
 .centerText {
@@ -471,14 +471,19 @@ rightText {
 .loginButton {
   font-family: Rubik; }
 
+.comdex .cmuk-sticky-fixed {
+  width: 100% !important; }
 .comdex .buttonForm {
   background: #0862BE;
   color: #FFFFFF;
   font-size: 14px;
   font-family: Oxygen;
   font-weight: bold; }
+.comdex .buttonForm:active, .comdex .buttonForm.cmuk-active {
+  background-color: #053C75; }
 .comdex .cmuk-input {
   background: #FFFFFF;
+  cursor: auto;
   box-sizing: border-box;
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
@@ -489,7 +494,7 @@ rightText {
     font-size: 14px;
     font-family: Oxygen; }
   .comdex .cmuk-input:focus {
-    border: 1px solid rgba(5, 60, 117, 0.22); }
+    border: 1px solid  #0862BE; }
 .comdex .cmuk-input, .comdex .cmuk-select, .comdex .cmuk-textarea {
   padding: 0px 15px; }
 .comdex input:-webkit-autofill,
@@ -537,7 +542,11 @@ rightText {
   font-size: 14px; }
 .comdex .cmuk-card-header {
   color: #061728;
-  font-family: Oxygen; }
+  font-family: Oxygen;
+  padding: 15px 20px; }
+  .comdex .cmuk-card-header .cmuk-button {
+    padding: 0 15px;
+    line-height: 28px; }
 .comdex .cmuk-button-link {
   color: #0862BE; }
 .comdex .cmuk-button-primary {
@@ -599,7 +608,7 @@ rightText {
   .header .cmuk-navbar-toggle {
     min-height: 60px;
     font-family: Oxygen;
-    text-transform: capitalize; }
+    text-transform: none; }
   .header .cmuk-logo {
     padding: 0px 40px 0px 0px;
     border-right: 1px solid #1C5998; }
@@ -694,13 +703,20 @@ rightText {
     display: inline-block; }
     .modal .modalContent .modalBody {
       padding: 20px;
-      text-align: left;
+      text-align: center;
       font-family: Oxygen; }
       .modal .modalContent .modalBody .infoRowLabel {
         text-align: left;
         font-family: Oxygen; }
       .modal .modalContent .modalBody .title {
         margin: 10px 0px; }
+      .modal .modalContent .modalBody form .cmuk-card-default {
+        background: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none; }
+      .modal .modalContent .modalBody .documentItem form {
+        width: auto; }
 
 .MnemonicQuiz .titleMnemonic {
   font-weight: bold; }
@@ -944,7 +960,7 @@ rightText {
     box-shadow: 0 0 0 5px #A1ED9F; }
 
 .pageContainer {
-  padding-bottom: 138px; }
+  padding-bottom: 137px; }
   .pageContainer .pageContent {
     padding-top: 10px; }
   .pageContainer .middle .cmuk-card-default {
@@ -1305,6 +1321,12 @@ rightText {
   .documentItem .documentThumbnail img {
     width: 20px;
     height: 20px; }
+  .documentItem .documentThumbnail .documentIcon {
+    width: 20px;
+    height: 20px; }
+    .documentItem .documentThumbnail .documentIcon .icon {
+      width: 16px;
+      height: 16px; }
   .documentItem .documentContentBottom {
     margin: 10px;
     font-size: 14px;
@@ -1687,67 +1709,18 @@ header:before,
     transform: rotate(-45deg);
     display: block; }
 
-.switcherViewCard {
-  margin-bottom: 20px; }
-  .switcherViewCard .cmuk-card-header {
-    padding: 15px 20px;
-    font-family: Oxygen; }
-  .switcherViewCard .cmuk-card-body {
-    overflow: auto;
-    padding: 0px; }
-    .switcherViewCard .cmuk-card-body ul {
-      padding: 15px 20px; }
-  .switcherViewCard .salesQuoteCardHeader .cmuk-subnav, .switcherViewCard .tradeCardHeader .cmuk-subnav {
-    margin: 0px; }
-  .switcherViewCard .salesQuoteCardHeader .cmuk-subnav > *, .switcherViewCard .tradeCardHeader .cmuk-subnav > * {
-    padding: 0px 30px; }
-  .switcherViewCard .salesQuoteCardHeader .cmuk-subnav li a, .switcherViewCard .tradeCardHeader .cmuk-subnav li a {
-    padding: 15px;
-    font-size: 14px;
-    font-family: Oxygen; }
-  .switcherViewCard .salesQuoteCardHeader .cmuk-subnav > .cmuk-active, .switcherViewCard .tradeCardHeader .cmuk-subnav > .cmuk-active {
-    border-bottom: 2px solid #0862BE; }
-    .switcherViewCard .salesQuoteCardHeader .cmuk-subnav > .cmuk-active a, .switcherViewCard .tradeCardHeader .cmuk-subnav > .cmuk-active a {
-      font-weight: bold;
-      color: #343C44; }
-
 .salesQuoteList .cmuk-card-header {
   padding: 15px 20px; }
   .salesQuoteList .cmuk-card-header .cmuk-button {
     padding: 0 15px;
     line-height: 28px; }
-.salesQuoteList .cmuk-card-body {
-  padding: 0px; }
-  .salesQuoteList .cmuk-card-body .cmuk-card-body {
-    padding: 20px; }
-  .salesQuoteList .cmuk-card-body .commonList .cmuk-button {
-    padding: 0 15px;
-    line-height: 28px; }
-  .salesQuoteList .cmuk-card-body .cmuk-subnav {
-    margin: 0px;
-    border-bottom: 1px solid #0862BE; }
-    .salesQuoteList .cmuk-card-body .cmuk-subnav li {
-      width: 25%;
-      text-align: center;
-      padding: 0;
-      font-family: Oxygen; }
-      .salesQuoteList .cmuk-card-body .cmuk-subnav li a {
-        font-size: 14px; }
-  .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > .cmuk-active > a {
-    background-color: #0862BE;
-    color: #FFffff; }
-  .salesQuoteList .cmuk-card-body .cmuk-subnav-pill > * > :first-child {
-    color: #0862BE;
-    text-transform: capitalize;
-    font-weight: bold; }
-  .salesQuoteList .cmuk-card-body .cmuk-card {
-    margin-bottom: 10px; }
-  .salesQuoteList .cmuk-card-body .cmuk-switcher li .title {
-    margin-bottom: 5px; }
-  .salesQuoteList .cmuk-card-body .cmuk-switcher {
-    height: 220px;
-    overflow: auto;
-    padding: 20px; }
+.salesQuoteList .cmuk-card-body .commonList .cmuk-button {
+  padding: 0 15px;
+  line-height: 28px; }
+.salesQuoteList .cmuk-card-body .cmuk-card {
+  margin-bottom: 10px; }
+.salesQuoteList .cmuk-card-body .cmuk-switcher li .title {
+  margin-bottom: 5px; }
 
 .profileContainer .infoRow {
   font-size: 14px;
@@ -1794,7 +1767,7 @@ header:before,
 .contactDetails .cmuk-card-default {
   margin-bottom: 5px; }
 .contactDetails .cmuk-card-header {
-  padding: 13px 20px; }
+  padding: 15px 20px; }
 .contactDetails .cmuk-card-body {
   position: relative; }
   .contactDetails .cmuk-card-body .cmuk-card {
@@ -1899,51 +1872,39 @@ dl .info {
 .tradeList .cmuk-card-body button a {
   color: #FFFFFF; }
 
-.identificationDetails .cmuk-card-body,
-.traderRelationList .cmuk-card-body,
-.tradeList .cmuk-card-body {
-  padding: 0px; }
-  .identificationDetails .cmuk-card-body .cmuk-card,
-  .traderRelationList .cmuk-card-body .cmuk-card,
-  .tradeList .cmuk-card-body .cmuk-card {
-    margin-bottom: 5px; }
-    .identificationDetails .cmuk-card-body .cmuk-card .cmuk-card-body,
-    .traderRelationList .cmuk-card-body .cmuk-card .cmuk-card-body,
-    .tradeList .cmuk-card-body .cmuk-card .cmuk-card-body {
-      padding: 20px; }
-.identificationDetails .cmuk-subnav,
-.traderRelationList .cmuk-subnav,
-.tradeList .cmuk-subnav {
-  margin: 0px;
-  border-bottom: 1px solid #0862BE; }
-  .identificationDetails .cmuk-subnav li,
-  .traderRelationList .cmuk-subnav li,
-  .tradeList .cmuk-subnav li {
-    width: 50%;
-    text-align: center;
-    padding: 0;
-    font-family: Oxygen; }
-    .identificationDetails .cmuk-subnav li a,
-    .traderRelationList .cmuk-subnav li a,
-    .tradeList .cmuk-subnav li a {
-      font-size: 14px; }
-.identificationDetails .cmuk-subnav-pill > .cmuk-active > a,
-.traderRelationList .cmuk-subnav-pill > .cmuk-active > a,
-.tradeList .cmuk-subnav-pill > .cmuk-active > a {
-  background-color: #0862BE;
-  color: #FFffff; }
-.identificationDetails .cmuk-subnav-pill > * > :first-child,
-.traderRelationList .cmuk-subnav-pill > * > :first-child,
-.tradeList .cmuk-subnav-pill > * > :first-child {
-  color: #0862BE;
-  text-transform: capitalize;
-  font-weight: bold; }
-.identificationDetails .cmuk-switcher,
-.traderRelationList .cmuk-switcher,
-.tradeList .cmuk-switcher {
-  height: 220px;
-  overflow: auto;
-  padding: 20px; }
+.switcherCard {
+  margin-bottom: 20px; }
+  .switcherCard .cmuk-card-body {
+    padding: 0px; }
+    .switcherCard .cmuk-card-body .cmuk-card {
+      margin-bottom: 5px; }
+      .switcherCard .cmuk-card-body .cmuk-card .cmuk-card-body {
+        padding: 20px; }
+  .switcherCard .cmuk-subnav {
+    margin: 0px;
+    justify-content: center;
+    border-bottom: 1px solid #0862BE; }
+    .switcherCard .cmuk-subnav li {
+      text-align: center;
+      padding: 0;
+      flex: 1;
+      font-family: Oxygen; }
+      .switcherCard .cmuk-subnav li a {
+        font-size: 14px; }
+  .switcherCard .cmuk-subnav-pill > .cmuk-active > a {
+    background-color: #0862BE;
+    color: #FFffff; }
+  .switcherCard .cmuk-subnav-pill > * > :first-child {
+    color: #0862BE;
+    text-transform: capitalize;
+    font-weight: bold; }
+  .switcherCard .cmuk-switcher {
+    height: 220px;
+    overflow: auto;
+    padding: 20px; }
+    .switcherCard .cmuk-switcher .cmuk-button {
+      padding: 0 15px;
+      line-height: 28px; }
 
 .traderRelationList .cmuk-card-header {
   padding: 13px 20px; }

@@ -217,7 +217,7 @@ html, body{
   word-break: break-all;
 }
 
-rightText {
+.rightText {
   text-align: right;
 }
 
@@ -591,6 +591,9 @@ font-family: $fontFamilyPrimary;
 }
 
 .comdex {
+  .cmuk-sticky-fixed{
+    width: 100% !important;
+  }
   .buttonForm {
     background:$colorPrimary;
     color: #FFFFFF;
@@ -598,8 +601,12 @@ font-family: $fontFamilyPrimary;
     font-family: $fontFamilySecondary;
     font-weight: bold;
   }
+  .buttonForm:active, .buttonForm.cmuk-active{
+    background-color: $colorSecondary;
+  }
   .cmuk-input {
     background: #FFFFFF;
+    cursor: auto;
     box-sizing: border-box;
     border-radius: 2px;
     border: 1px solid rgba(5, 60, 117, 0.22);
@@ -611,7 +618,7 @@ font-family: $fontFamilyPrimary;
       font-family: $fontFamilySecondary;
     }
     &:focus {
-      border: 1px solid rgba(5, 60, 117, 0.22);
+      border: 1px solid  #0862BE;
     }
   }
   .cmuk-input, .cmuk-select, .cmuk-textarea{
@@ -678,6 +685,11 @@ font-family: $fontFamilyPrimary;
   .cmuk-card-header{
     color:#061728;
     font-family: $fontFamilySecondary;
+    padding: 15px 20px;
+    .cmuk-button{
+      padding: 0 15px;
+      line-height: 28px;
+    }
   }
   .cmuk-button-link{
     color: $colorPrimary;
@@ -751,6 +763,7 @@ font-family: $fontFamilyPrimary;
 
 .header{
   background: $colorSecondary;
+
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
     background: $colorSecondary;
     padding: 0px 0px 0px 35px;
@@ -760,7 +773,7 @@ font-family: $fontFamilyPrimary;
   .cmuk-navbar-toggle{
     min-height:60px;
     font-family: $fontFamilySecondary;
-    text-transform: capitalize;
+    text-transform: none;
   }
   .cmuk-logo{
     padding: 0px 40px 0px 0px;
@@ -879,7 +892,7 @@ font-family: $fontFamilyPrimary;
     display: inline-block;
     .modalBody {
       padding: 20px;
-      text-align:left;
+      text-align:center;
       font-family: $fontFamilySecondary;
       .infoRowLabel{
         text-align: left;
@@ -887,6 +900,19 @@ font-family: $fontFamilyPrimary;
       }
       .title{
         margin: 10px 0px;
+      }
+      form{
+        .cmuk-card-default{
+          background: none;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+        }
+      }
+      .documentItem{
+        form{
+          width: auto;
+        }
       }
     }
   }
@@ -1200,7 +1226,7 @@ font-family: $fontFamilyPrimary;
 }
 
 .pageContainer{
-  padding-bottom: 138px;
+  padding-bottom: 137px;
   .pageContent{
     padding-top: 10px;
   }
@@ -1691,9 +1717,19 @@ font-family: $fontFamilyPrimary;
   .documentThumbnail{
     margin: 10px;
   }
-  .documentThumbnail img{
-    width: 20px;
-    height: 20px;
+  .documentThumbnail {
+    img{
+      width: 20px;
+      height: 20px;
+    }
+    .documentIcon {
+      width: 20px;
+      height: 20px;
+      .icon {
+        width: 16px;
+        height: 16px;
+      }
+    }
   }
   .documentContentBottom{
     margin: 10px;
@@ -2164,42 +2200,6 @@ header:before,
   }
 }
 
-.switcherViewCard {
-  margin-bottom: 20px;
-  .cmuk-card-header{
-    padding: 15px 20px;
-    font-family: $fontFamilySecondary;
-  }
-  .cmuk-card-body{
-    overflow: auto;
-    padding: 0px;
-    ul{
-      padding: 15px 20px;
-    }
-  }
-  .salesQuoteCardHeader, .tradeCardHeader {
-    .cmuk-subnav {
-      margin: 0px;
-    }
-    .cmuk-subnav>*{
-      padding:0px 30px;
-    }
-    .cmuk-subnav li a{
-      padding: 15px;
-      font-size: $paragraphFontSizeSmall;
-      font-family: $fontFamilySecondary;
-    }
-
-    .cmuk-subnav > .cmuk-active {
-      border-bottom: 2px solid #0862BE;
-      a{
-        font-weight: bold;
-        color: #343C44
-      }
-    }
-  }
-}
-
 .salesQuoteList{
   .cmuk-card-header{
     padding: 15px 20px;
@@ -2209,46 +2209,15 @@ header:before,
     }
   }
   .cmuk-card-body {
-    padding:0px;
-    .cmuk-card-body{
-      padding: 20px;
-    }
     .commonList .cmuk-button {
       padding: 0 15px;
       line-height: 28px;
-    }
-    .cmuk-subnav{
-      margin:0px;
-      border-bottom: 1px solid $colorPrimary;
-      li{
-        width: 25%;
-        text-align: center;
-        padding: 0;
-        font-family: $fontFamilySecondary;
-        a{
-          font-size: $paragraphFontSizeSmall;
-        }
-      }
-    }
-    .cmuk-subnav-pill>.cmuk-active>a{
-      background-color: $colorPrimary;
-      color: #FFffff;
-    }
-    .cmuk-subnav-pill>*>:first-child{
-      color:$colorPrimary;
-      text-transform: capitalize;
-      font-weight: bold;
     }
     .cmuk-card{
       margin-bottom: 10px;
     }
     .cmuk-switcher li .title{
       margin-bottom: 5px;
-    }
-    .cmuk-switcher{
-      height: 220px;
-      overflow: auto;
-      padding: 20px;
     }
   }
 }
@@ -2324,7 +2293,7 @@ header:before,
     margin-bottom: 5px;
   }
   .cmuk-card-header{
-    padding: 13px 20px;
+    padding: 15px 20px;
   }
   .cmuk-card-body{
     position: relative;
@@ -2455,9 +2424,11 @@ dl .info {
     }
   }
 }
-.identificationDetails,
-.traderRelationList,
-.tradeList{
+
+
+
+.switcherCard{
+  margin-bottom: 20px;
   .cmuk-card-body{
     padding:0px;
     .cmuk-card {
@@ -2469,11 +2440,12 @@ dl .info {
   }
   .cmuk-subnav{
     margin:0px;
+    justify-content:center;
     border-bottom: 1px solid $colorPrimary;
     li{
-      width: 50%;
       text-align: center;
       padding: 0;
+      flex: 1;
       font-family: $fontFamilySecondary;
       a{
         font-size: $paragraphFontSizeSmall;
@@ -2493,6 +2465,10 @@ dl .info {
     height: 220px;
     overflow: auto;
     padding: 20px;
+    .cmuk-button{
+      padding: 0 15px;
+      line-height: 28px;
+    }
   }
 }
 .traderRelationList{

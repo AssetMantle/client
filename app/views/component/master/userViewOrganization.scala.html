@@ -9,13 +9,13 @@
 @(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 <div>
     @commonInfoBox() {
-        <div class="title"> <span>@Messages(constants.Form.ZONE_DETAILS)</span></div>
+        <div class="title cmuk-text-left"> <span>@Messages(constants.Form.ZONE_DETAILS)</span></div>
         @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
         @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
         @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
     }
     @commonInfoBox() {
-        <div class="title"> <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
+        <div class="title cmuk-text-left"> <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
         @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
         @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
         @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
@@ -23,15 +23,15 @@
         @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
     }
     @commonInfoBox() {
-        <div class="title">@Messages(constants.View.REGISTERED_ADDRESS)</div>
+        <div class="title cmuk-text-left">@Messages(constants.View.REGISTERED_ADDRESS)</div>
         @streetAddress(organization.registeredAddress)
     }
     @commonInfoBox() {
-        <div class="title">@Messages(constants.View.POSTAL_ADDRESS)</div>
+        <div class="title cmuk-text-left">@Messages(constants.View.POSTAL_ADDRESS)</div>
         @streetAddress(organization.postalAddress)
     }
     @commonInfoBox() {
-        <div class="title">@Messages(constants.View.ORGANIZATION_DOCUMENTS)</div>
+        <div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_DOCUMENTS)</div>
         @for(organizationKYC <- organizationKYCs) {
             @commonDocumentViewer(organizationKYC) {
                 @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)

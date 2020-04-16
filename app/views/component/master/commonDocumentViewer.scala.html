@@ -8,10 +8,15 @@
         @if(document.documentType != constants.File.PROFILE_PICTURE) {
             @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
                 case constants.File.PNG | constants.File.JPEG | constants.File.JPG | constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE => {
-                    <a href="@documentLink"><img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType"></a>
+                    <a href="@documentLink" target="_blank"><img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType" ></a>
                 }
                 case _ => {
-                    <a href="@documentLink"><img src="@routes.Assets.versioned("images/document.png")" alt="@document.documentType"></a>
+                    <a href="@documentLink" target="_blank">
+                        <span class="documentIcon">
+                            <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-doc2")"/></svg>
+                        </span>
+                        @Messages(constants.View.TRADES)
+                    </a>
                 }
             }
         }
