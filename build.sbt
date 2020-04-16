@@ -11,7 +11,7 @@ lazy val GatlingTest = config("gatling") extend Test
 
 scalaSource in GatlingTest := baseDirectory.value / "gatling/simulation"
 
-lazy val commitCentral = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .enablePlugins(GatlingPlugin)
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)

@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import views.companion.master.VerifyMobileNumber
-
-@(verifyMobileNumberForm: Form[VerifyMobileNumber.Data] = VerifyMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@commonForm(constants.Form.VERIFY_MOBILE_NUMBER, verifyMobileNumberForm) {
-    @commonInputText(verifyMobileNumberForm, constants.FormField.OTP)
-}

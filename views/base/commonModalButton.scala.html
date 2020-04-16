@@ -1,9 +1,0 @@
-@import play.api.routing.JavaScriptReverseRoute
-
-@(name: String, route: JavaScriptReverseRoute, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
-
-<button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("buttonForm")).mkString(" ")'  onclick="getForm(@utilities.String.getJsRouteString(route, arguments.toMap.get('parameters).map(_.toString).getOrElse("")))">
-@Messages(name)
-</button>
-
-@*Example Usage: @commonModalButton(constants.View.NAME, routes.javascript.AccountController.identificationForm, 'parameters -> "'Abhinav', 1996") *@
