@@ -774,12 +774,16 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
-    "id"                  VARCHAR   NOT NULL,
-    "accountID"           VARCHAR   NOT NULL,
-    "notificationTitle"   VARCHAR   NOT NULL,
-    "notificationMessage" VARCHAR   NOT NULL,
-    "time"                TIMESTAMP NOT NULL,
-    "read"                BOOLEAN   NOT NULL,
+    "id"                       VARCHAR   NOT NULL,
+    "accountID"                VARCHAR   NOT NULL,
+    "notificationTemplateJson" VARCHAR   NOT NULL,
+    "read"                     BOOLEAN   NOT NULL,
+    "createdBy"                VARCHAR   NOT NULL,
+    "createdOn"                TIMESTAMP NOT NULL,
+    "createdOnTimezone"        VARCHAR   NOT NULL,
+    "updatedBy"                VARCHAR,
+    "updatedOn"                TIMESTAMP,
+    "updatedOnTimezone"        VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -807,9 +811,17 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 (
-    "notificationID" VARCHAR NOT NULL,
-    "negotiationID"  VARCHAR NOT NULL,
-    PRIMARY KEY ("notificationID", "negotiationID")
+    "id"                        VARCHAR   NOT NULL,
+    "negotiationID"             VARCHAR   NOT NULL,
+    "tradeActivityTemplateJson" VARCHAR   NOT NULL,
+    "read"                      BOOLEAN   NOT NULL,
+    "createdBy"                 VARCHAR   NOT NULL,
+    "createdOn"                 TIMESTAMP NOT NULL,
+    "createdOnTimezone"         VARCHAR   NOT NULL,
+    "updatedBy"                 VARCHAR,
+    "updatedOn"                 TIMESTAMP,
+    "updatedOnTimezone"         VARCHAR,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
@@ -962,8 +974,6 @@ ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Notification_NotificationID FOREIGN KEY ("notificationID") REFERENCES MASTER_TRANSACTION."Notification" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
     ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"

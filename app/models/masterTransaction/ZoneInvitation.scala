@@ -15,7 +15,7 @@ case class ZoneInvitation(id: String, emailAddress: String, accountID: Option[St
 @Singleton
 class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_TRADER_INVITATION
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ZONE_INVITATION
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

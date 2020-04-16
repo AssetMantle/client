@@ -77,23 +77,21 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang): Future[Option[String]] = {
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
 
     val title = Future(messagesApi(pushNotification.title))
     val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
     val pushNotificationToken = masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
-
-    def create(title: String, message: String): Future[String] = masterTransactionNotifications.Service.create(accountID, title, message)
 
     def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
 
     (for {
       title <- title
       message <- message
-      notificationID <- create(title, message)
       pushNotificationToken <- pushNotificationToken
       _ <- if(pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
-    } yield Option(notificationID)).recover {
+    } yield ()
+      ).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
@@ -133,10 +131,10 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Future[Option[String]] = {
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Future[String] = {
     try {
-      //save
-      val notificationID = if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future(None)
+      val notificationID = masterTransactionNotifications.Service.create( accountID, notification = notification, messagesParameters: _*)
+      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future(None)
       if (notification.email.isDefined) sendEmailByAccountID(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
       if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
       for {

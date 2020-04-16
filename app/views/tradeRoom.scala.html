@@ -57,32 +57,22 @@
             <div class="liveIcon"></div>
         </div>
     </div>
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-        @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
-        } {
-            <div class="scroller">
-                <div id="recentActivity">
-                </div>
-                <div class="cover-bar"></div>
-            </div>
-        }
-        </div>
-        <div id="chatRoom" class="chatRoom">
-        </div>
+    <div class="recentActivityContainer">
+        <div id="tradeActivities"></div>
     </div>
+    <div id="chatRoom" class="chatRoom"></div>
     <div id="orderActions"></div>
     <script>
-        @loginState.userType match {
-         case constants.User.TRADER => {
-            componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.recentActivityForTradeRoom(0, '@id'));
-            componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
+            componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@id'));
+            @loginState.userType match {
+                case constants.User.TRADER => {
+                    componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
+                }
+                case constants.User.ZONE => {
+                    componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.zoneViewRecentActivityForTradeRoom(0, '@id'));
+                    componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@id'));
+                }
+                case _ => {}
             }
-         case constants.User.ZONE => {
-             componentResource('recentActivity', jsRoutes.controllers.ComponentViewController.zoneViewRecentActivityForTradeRoom(0, '@id'));
-             componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@id'));
-        }
-        case _ => {}
-        }
     </script>
 }

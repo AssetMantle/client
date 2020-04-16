@@ -88,6 +88,8 @@ POST        /negotiation/updateDocumentList                                     
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
+GET         /negotiation/tradeActivityMessages                                              controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
+
 GET         /contact                                                                        controllers.ContactController.contact
 
 GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
@@ -105,9 +107,9 @@ POST        /trader/acceptOrRejectTraderRelation                                
 GET         /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTraderForm(accountID: String)
 POST        /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTrader
 
-GET         /master/notifications                                                           controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount                                                 controllers.NotificationController.unreadNotificationCount
-GET         /master/markNotificationAsRead                                                  controllers.NotificationController.markNotificationRead(notificationID: String)
+GET         /notification/recentActivityMessages                                            controllers.NotificationController.recentActivityMessages(pageNumber: Int)
+GET         /notification/unreadNotificationCount                                           controllers.NotificationController.unreadNotificationCount
+GET         /notification/markNotificationAsRead                                            controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                                        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
@@ -140,9 +142,8 @@ GET         /component/zoneViewOrganizationBankAccount                          
 
 GET         /component/commonHome                                                           controllers.ComponentViewController.commonHome
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
-GET         /component/recentActivityForTradeRoom                                           controllers.ComponentViewController.recentActivityForTradeRoom(pageNumber: Int, negotiationID :String)
-GET         /component/recentActivityForTrader                                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
-GET         /component/recentActivityForOrganization                                        controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
+GET         /component/tradeActivities                                                      controllers.ComponentViewController.tradeActivities(negotiationID :String)
+GET         /component/recentActivities                                                     controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
 
 GET         /component/traderViewAcceptedNegotiation                                        controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)

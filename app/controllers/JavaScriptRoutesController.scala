@@ -162,9 +162,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewOrganizationBankAccount,
         routes.javascript.ComponentViewController.userViewOrganizationUBOs,
         routes.javascript.ComponentViewController.viewOrganizationUBOs,
-        routes.javascript.ComponentViewController.recentActivityForTradeRoom,
-        routes.javascript.ComponentViewController.recentActivityForTrader,
-        routes.javascript.ComponentViewController.recentActivityForOrganization,
+        routes.javascript.ComponentViewController.tradeActivities,
+        routes.javascript.ComponentViewController.recentActivities,
         routes.javascript.ComponentViewController.traderFinancials,
         routes.javascript.ComponentViewController.traderViewAcceptedNegotiation,
         routes.javascript.ComponentViewController.organizationDeclarations,
@@ -248,8 +247,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.updatePaymentTermsForm,
         routes.javascript.NegotiationController.updateDocumentListForm,
         routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm,
+        routes.javascript.NegotiationController.tradeActivityMessages,
 
-        routes.javascript.NotificationController.notificationPage,
+        routes.javascript.NotificationController.recentActivityMessages,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
 
