@@ -132,7 +132,7 @@ class AccountController @Inject()(
           } yield Unit
         }
 
-        def getWarnings: Future[Seq[constants.Response.Warning]] = {
+        def getContactWarnings: Future[Seq[constants.Response.Warning]] = {
           val contact = masterContacts.Service.get(loginData.username)
           for {
             contact <- contact
@@ -152,8 +152,8 @@ class AccountController @Inject()(
           userType <- firstLoginUserTypeUpdate(account.userType)
           loginState <- getLoginState(address = account.accountAddress, userType = userType)
           _ <- sendNotification(loginState)
-          warnings <- getWarnings
-          result <- getResult(warnings)(loginState)
+          contactWarnings <- getContactWarnings
+          result <- getResult(contactWarnings)(loginState)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
