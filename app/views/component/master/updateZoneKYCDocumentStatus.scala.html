@@ -6,9 +6,8 @@
 
 @(updateZoneKYCDocumentStatusForm: Form[UpdateZoneKYCDocumentStatus.Data] = views.companion.master.UpdateZoneKYCDocumentStatus.form, zoneKYC: ZoneKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(zoneKYC.id, zoneKYC.documentType).mkString("")">
-@commonAcceptOrRejectForm(constants.Form.UPDATE_ZONE_KYC_DOCUMENT_STATUS, updateZoneKYCDocumentStatusForm,Seq(zoneKYC.id, zoneKYC.documentType).mkString(""), zoneKYC.status) {
+@commonAcceptOrRejectForm(constants.Form.UPDATE_ZONE_KYC_DOCUMENT_STATUS, updateZoneKYCDocumentStatusForm, Seq(zoneKYC.id, zoneKYC.documentType).mkString(""), zoneKYC.status) {
     @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.ZONE_ID, 'value -> zoneKYC.id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(updateZoneKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> zoneKYC.documentType, 'containerDivClass -> "hidden", 'readonly -> true)
 }

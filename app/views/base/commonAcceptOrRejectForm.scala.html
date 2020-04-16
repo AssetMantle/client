@@ -2,7 +2,7 @@
 @import helper._
 
 
-@(formTemplate: constants.Form, formData: Form[_], target: String, pendingBoolean: Option[Boolean])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], targetElementID: String, approvalStatus: Option[Boolean])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 @form(action = formTemplate.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
@@ -17,20 +17,20 @@
             }
             </ul>
         }
-
-        @pendingBoolean match {
+    <span class="red">@Messages(constants.FormField.STATUS.name):</span>
+        @approvalStatus match {
             case Some(status: Boolean) => {
                 @if(status) {
                     <span cmuk-icon="check"></span>
-                    @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
+                    @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
                 } else {
                     <span cmuk-icon="close"></span>
-                    @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
+                    @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
                 }
             }
             case None => {
-                @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
-                @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", target).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
+                @commonJavascriptButton(constants.Form.APPROVE, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',true)"), 'class -> "cmuk-button-success cmuk-button-small")
+                @commonJavascriptButton(constants.Form.REJECT, JavaScript(s"verifyRejectCommonForm(this,'${Seq("#", targetElementID).mkString("")}',false)"), 'class -> "cmuk-button-danger cmuk-button-small")
             }
         }
     </fieldset>
