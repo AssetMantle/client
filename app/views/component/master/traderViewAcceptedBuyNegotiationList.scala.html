@@ -7,7 +7,7 @@
 @(buyNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @buyNegotiationList.map { buyNegotiation =>
-    <li class="commonList">
+    @commonVerticalInfoBox() {
         @defining(counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
@@ -31,6 +31,6 @@
                     <a class="cmuk-link secondaryFont" href="@routes.ViewController.tradeRoom(buyNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
                 </button>
             </p>
-    </div>
-
+        </div>
+    }
 }

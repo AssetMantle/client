@@ -4,26 +4,23 @@
 
 @(sentPendingTraderRelations: Seq[TraderRelation], receivedPendingTraderRelations: Seq[TraderRelation])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-<div>
-    @Messages(constants.View.PENDING_RECEIVED_TRADER_RELATION)
+<div class="title">@Messages(constants.View.PENDING_RECEIVED_TRADER_RELATION)</div>
     @receivedPendingTraderRelations.map { receivedPendingTraderRelation =>
         @defining(Seq(receivedPendingTraderRelation.fromID, receivedPendingTraderRelation.toID, constants.View.PENDING_RECEIVED_TRADER_RELATION).mkString("")) { componentID =>
-            @commonInfoBox(componentID) {
+            @commonVerticalInfoBox(componentID) {
                 <script>
                         componentResource('@componentID', jsRoutes.controllers.ComponentViewController.pendingReceivedTraderRelation('@receivedPendingTraderRelation.fromID'))
                 </script>
             }
         }
     }
-    <br>
-    @Messages(constants.View.PENDING_SENT_TRADER_RELATION)
+    <div class="title"> @Messages(constants.View.PENDING_SENT_TRADER_RELATION)</div>
     @sentPendingTraderRelations.map { sentPendingTraderRelation =>
         @defining(Seq(sentPendingTraderRelation.fromID, sentPendingTraderRelation.toID, constants.View.PENDING_SENT_TRADER_RELATION).mkString("")) { componentID =>
-            @commonInfoBox(componentID) {
+            @commonVerticalInfoBox(componentID) {
                 <script>
                         componentResource('@componentID', jsRoutes.controllers.ComponentViewController.pendingSentTraderRelation('@sentPendingTraderRelation.toID'))
                 </script>
             }
         }
     }
-</div>

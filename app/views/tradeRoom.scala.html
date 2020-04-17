@@ -57,11 +57,13 @@
             <div class="liveIcon"></div>
         </div>
     </div>
+    <div class="recentActivity">
     <div class="recentActivityContainer">
         <div id="tradeActivities"></div>
     </div>
     <div id="chatRoom" class="chatRoom"></div>
-    <div id="orderActions"></div>
+        <div id="orderActions"></div>
+    </div>
     <script>
             componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@id'));
             @loginState.userType match {
