@@ -47,6 +47,7 @@ class ComponentViewController @Inject()(
                                          masterTraderRelations: master.TraderRelations,
                                          masterTraderBackgroundChecks: master.TraderBackgroundChecks,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
+                                         withUsernameToken: results.WithUsernameToken,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withZoneLoginAction: WithZoneLoginAction,
                                          withTraderLoginAction: WithTraderLoginAction,
@@ -1113,12 +1114,14 @@ class ComponentViewController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
+      val contract= masterTransactionNegotiationFiles.Service.get(id, constants.File.CONTRACT)
       for {
         traderID <- traderID
         negotiation <- negotiation
+        contract<-contract
       } yield {
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
-          Ok(views.html.component.master.traderViewAcceptedNegotiation(id = id, traderID = traderID, negotiation = negotiation))
+          Ok(views.html.component.master.traderViewAcceptedNegotiation(id = id, traderID = traderID, negotiation = negotiation, contract=contract ))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1187,9 +1190,13 @@ class ComponentViewController @Inject()(
       def getResult(traderNegotiationExists: Boolean) = {
         if (traderNegotiationExists) {
           val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
+          val negotiation= masterNegotiations.Service.tryGet(id)
+          def assetFiles(assetID:String)= masterTransactionAssetFiles.Service.getAllDocuments(assetID)
           for {
             negotiationFiles <- negotiationFiles
-          } yield Ok(views.html.component.master.traderViewNegotiationFiles(id = id, files = negotiationFiles))
+            negotiation<-negotiation
+            assetFiles<-assetFiles(negotiation.assetID)
+          } yield Ok(views.html.component.master.traderViewNegotiationFiles(id = id, assetFiles=assetFiles,negotiationFiles = negotiationFiles))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1236,11 +1243,34 @@ class ComponentViewController @Inject()(
 
   def traderViewNegotiationFile(id: String, documentType: Option[String] = None): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username)
+      val result= documentType match {
+        case Some(documentType) =>
+          documentType match {
+            case constants.File.OBL | constants.File.COO | constants.File.COA =>
+              val negotiation= masterNegotiations.Service.tryGet(id)
+              def assetFile(assetID :String)= masterTransactionAssetFiles.Service.getOrNone(assetID, documentType)
+              for{
+                negotiation<-negotiation
+                assetFile<-assetFile(negotiation.assetID)
+              }yield Ok(views.html.component.master.traderViewNegotiationFile(assetFile))
+            case constants.File.INVOICE| constants.File.INSURANCE|constants.File.CONTRACT|constants.File.OTHER=>
+              val negotiationFile = masterTransactionNegotiationFiles.Service.get(id, documentType)
+              for {
+                negotiationFile <- negotiationFile
+              } yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationFile))
+          }
+        case None =>
+          val negotiationDocuments = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
+          for {
+            negotiationDocuments <- negotiationDocuments
+          } yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationDocuments.headOption))
+      }
 
-      def checkTraderNegotiationExists(traderID: String) = masterNegotiations.Service.checkTraderNegotiationExists(id, traderID)
+    for{
+      result<-result
+    }yield result
 
-      def getResult(traderNegotiationExists: Boolean) = {
+    /*  def getResult(traderNegotiationExists: Boolean) = {
         if (traderNegotiationExists) {
           documentType match {
             case Some(documentType) =>
@@ -1266,7 +1296,7 @@ class ComponentViewController @Inject()(
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(id = id, failures = Seq(baseException.failure)))
-      }
+      }*/
 
   }
 
@@ -1311,19 +1341,25 @@ class ComponentViewController @Inject()(
     implicit request =>
 
       val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
+      val negotiation = masterNegotiations.Service.tryGet(id)
+      def assetFiles(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
       for {
         negotiationFiles <- negotiationFiles
-      } yield Ok(views.html.component.master.negotiationDocumentUpload(id, negotiationFiles))
+        negotiation<-negotiation
+        assetFiles<-assetFiles(negotiation.assetID)
+      } yield  Ok(views.html.component.master.negotiationDocumentUpload(id,negotiation,assetFiles, negotiationFiles))
   }
 
   def traderViewAcceptedNegotiationFiles(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
+      val contract= masterTransactionNegotiationFiles.Service.get(id, constants.File.CONTRACT)
       for {
         traderID <- traderID
         negotiation <- negotiation
-      } yield Ok(views.html.component.master.traderViewAcceptedNegotiationFiles(id, traderID, negotiation))
+        contract<-contract
+      } yield Ok(views.html.component.master.traderViewAcceptedNegotiationFiles(id, traderID, negotiation, contract))
   }
 
   def organizationViewAcceptedNegotiationFiles(id: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>

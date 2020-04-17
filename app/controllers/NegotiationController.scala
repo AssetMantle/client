@@ -40,7 +40,8 @@ class NegotiationController @Inject()(
                                        blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
                                        utilitiesNotification: utilities.Notification,
                                        masterTransactionChats: masterTransaction.Chats,
-                                       masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles
+                                       masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                       masterTransactionAssetFiles: masterTransaction.AssetFiles
 
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -808,14 +809,18 @@ class NegotiationController @Inject()(
             if (traderID == sellerTraderID) {
               val updateOBLDetails = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateOBLDetailsData.id, constants.File.OBL, Serializable.OBL(updateOBLDetailsData.billOfLadingNumber, updateOBLDetailsData.portOfLoading, updateOBLDetailsData.shipperName, updateOBLDetailsData.shipperAddress, updateOBLDetailsData.notifyPartyName, updateOBLDetailsData.notifyPartyAddress, updateOBLDetailsData.shipmentDate, updateOBLDetailsData.deliveryTerm, updateOBLDetailsData.assetQuantity, updateOBLDetailsData.assetPrice))
               val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(updateOBLDetailsData.id)
+              val negotiation = masterNegotiations.Service.tryGet(updateOBLDetailsData.id)
+              def assetFiles(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(buyerTraderID)
               for {
                 _ <- updateOBLDetails
                 negotiationFiles <- negotiationFiles
+                negotiation<-negotiation
+                assetFiles<-assetFiles(negotiation.assetID)
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.OBL_DETAILS_ADDED, updateOBLDetailsData.id)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.OBL_DETAILS_ADDED, updateOBLDetailsData.id)
-                result <- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(updateOBLDetailsData.id, negotiationFiles))
+                result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentUpload(updateOBLDetailsData.id, negotiation,assetFiles, negotiationFiles))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -873,14 +878,19 @@ class NegotiationController @Inject()(
             if (traderID == sellerTraderID) {
               val updateInvoiceDetails = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateInvoiceDetailsData.id, constants.File.INVOICE, Serializable.Invoice(updateInvoiceDetailsData.invoiceNumber, updateInvoiceDetailsData.invoiceDate))
               val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(updateInvoiceDetailsData.id)
+              val negotiation = masterNegotiations.Service.tryGet(updateInvoiceDetailsData.id)
+              def assetFiles(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+
               val buyerAccountID = masterTraders.Service.tryGetAccountId(buyerTraderID)
               for {
                 _ <- updateInvoiceDetails
                 negotiationFiles <- negotiationFiles
+                negotiation<-negotiation
+                assetFiles<-assetFiles(negotiation.assetID)
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_DETAILS_ADDED, updateInvoiceDetailsData.id)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_DETAILS_ADDED, updateInvoiceDetailsData.id)
-                result <- withUsernameToken.PartialContent(views.html.component.master.traderNegotiationDocumentUpload(updateInvoiceDetailsData.id, negotiationFiles))
+                result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentUpload(updateInvoiceDetailsData.id, negotiation,assetFiles,negotiationFiles))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))

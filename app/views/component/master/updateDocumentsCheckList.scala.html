@@ -6,6 +6,7 @@
 @commonForm(constants.Form.UPDATE_DOCUMENTS_CHECKLIST, updateDocumentsCheckListForm) {
     @commonInputText(updateDocumentsCheckListForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(updateDocumentsCheckListForm, constants.FormField.BILL_OF_EXCHANGE_REQUIRED)
+    @commonCheckbox(updateDocumentsCheckListForm, constants.FormField.OBL)
     @commonCheckbox(updateDocumentsCheckListForm, constants.FormField.COO)
     @commonCheckbox(updateDocumentsCheckListForm, constants.FormField.COA)
     @commonInputText(updateDocumentsCheckListForm, constants.FormField.OTHER_DOCUMENTS, 'required -> false)

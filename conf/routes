@@ -321,7 +321,7 @@ GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile             
 
 GET         /traderUpload/assetForm                                                         controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
 POST        /traderUpload/assetDocument                                                     controllers.FileController.uploadTraderAsset(documentType: String)
-GET         /traderUpload/storeAssetDocument                                                controllers.FileController.storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
+GET         /traderUpload/storeAssetDocument                                                controllers.FileController.storeTraderAsset(name: String, documentType: String, id: String)
 GET         /traderUpdate/assetForm                                                         controllers.FileController.updateTraderAssetForm(documentType: String, issueAssetRequestID :String)
 GET         /traderUpdate/assetDocument                                                     controllers.FileController.updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
 

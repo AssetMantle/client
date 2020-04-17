@@ -8,14 +8,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import java.sql.Date
 
-import actors.{MainNegotiationTermsActor, ShutdownActor}
-
-import scala.concurrent.duration._
-import actors.MainNegotiationTermsActor
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.{ActorMaterializer, OverflowStrategy}
-import akka.stream.scaladsl.Source
-
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future}

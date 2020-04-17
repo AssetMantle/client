@@ -3,15 +3,64 @@
 @import views.html.base._
 @import views.companion.master.IssueAssetOBL
 @import models.masterTransaction.NegotiationFile
+@import models.masterTransaction.AssetFile
+@import models.master.Negotiation
 
-@(id: String, negotiationFiles: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(id: String, negotiation: Negotiation,assetFiles: Seq[AssetFile],negotiationFiles: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div>
+    @Messages(constants.View.ASSET_DOCUMENTS):
+    @if(negotiation.documentsCheckList.obl.getOrElse(false)){
+        <div id="upload_ASSET_OBL">
+        @commonModalButton(constants.Form.UPLOAD_OBL_DOCUMENT, routes.javascript.FileController.uploadTraderAssetForm,  'parameters -> s"'${constants.File.OBL}','${id}'")
+        </div>
+    }
+    @if(negotiation.documentsCheckList.coo.getOrElse(false)){
+        <div id="upload_ASSET_COO">
+        @commonModalButton(constants.Form.UPLOAD_COO_DOCUMENT, routes.javascript.FileController.uploadTraderAssetForm,  'parameters -> s"'${constants.File.COO}','${id}'")
+        </div>
+    }
+    @if(negotiation.documentsCheckList.coa.getOrElse(false)){
+        <div id="upload_ASSET_COA">
+        @commonModalButton(constants.Form.UPLOAD_COA_DOCUMENT, routes.javascript.FileController.uploadTraderAssetForm,  'parameters -> s"'${constants.File.COA}','${id}'")
+        </div>
+    }
+
+    @for(assetFile <- assetFiles) {
+        @component.master.commonDocumentViewer(assetFile) {
+            @routes.FileController.tradingFile(id, assetFile.fileName, assetFile.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)">@Messages(assetFile.documentType)</a>
+        } {
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@assetFile.documentType', '@assetFile.id'))">@Messages(constants.Form.UPDATE) @Messages(assetFile.documentType)</button>
+            @assetFile.documentType match{
+                case constants.File.OBL=>{@commonFormButton(constants.Form.OBL_DETAILS, 'parameters -> s"'${id}'")}
+                case _=>{}
+            }
+            <script>hideElement('upload_ASSET_@assetFile.documentType')</script>
+        }
+    }
+</div>
 
 <div class="centerText">
+    @Messages(constants.View.NEGOTIATION_DOCUMENTS):
+    <div id="upload_NEGOTIATION_INVOICE">
+    @commonModalButton(constants.Form.UPLOAD_INVOICE_DOCUMENT, routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${constants.File.INVOICE}','${id}'")
+    </div>
+    <div id="upload_NEGOTIATION_INSURANCE">
+    @commonModalButton(constants.Form.UPLOAD_INSURANCE_DOCUMENT, routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${constants.File.INSURANCE}','${id}'")
+    </div>
+    <div id="upload_NEGOTIATION_OTHER">
+        @commonModalButton(constants.Form.UPLOAD_OTHER_DOCUMENT, routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${constants.File.OTHER}','${id}'")
+    </div>
+
+@*
     @for(documentType <- constants.File.TRADER_NEGOTIATION_DOCUMENTS) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>
-    }
+    }*@
+
     @for(file <- negotiationFiles.filterNot(_.documentType == constants.File.CONTRACT)) {
         @component.master.commonDocumentViewer(file) {
             @routes.FileController.tradingFile(id, file.fileName, file.documentType)
@@ -24,7 +73,7 @@
                 case constants.File.INVOICE=>{@commonFormButton(constants.Form.INVOICE_DETAILS, 'parameters -> s"'${id}'")}
                 case _=>{}
             }
-            <script>hideElement('upload@file.documentType')</script>
+            <script>hideElement('upload_NEGOTIATION_@file.documentType')</script>
         }
     }
 </div>
