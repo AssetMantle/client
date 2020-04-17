@@ -100,7 +100,7 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
-        val validateLogin = masterAccounts.Service.tryValidatingLogin(username = loginData.username, password = loginData.password)
+        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
 
         def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
 
@@ -146,14 +146,22 @@ class AccountController @Inject()(
           }
         }
 
+        def checkLoginAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+          for {
+            account <- getAccount
+            userType <- firstLoginUserTypeUpdate(account.userType)
+            loginState <- getLoginState(address = account.accountAddress, userType = userType)
+            _ <- sendNotification(loginState)
+            contactWarnings <- getContactWarnings
+            result <- getResult(contactWarnings)(loginState)
+          } yield result
+        } else {
+          Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
+        }
+
         (for {
-          _ <- validateLogin
-          account <- getAccount
-          userType <- firstLoginUserTypeUpdate(account.userType)
-          loginState <- getLoginState(address = account.accountAddress, userType = userType)
-          _ <- sendNotification(loginState)
-          contactWarnings <- getContactWarnings
-          result <- getResult(contactWarnings)(loginState)
+          validateUsernamePassword <- validateUsernamePassword
+          result <- checkLoginAndGetResult(validateUsernamePassword)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -206,16 +214,16 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.changePassword(formWithErrors)))
         },
         changePasswordData => {
-          val validLogin = masterAccounts.Service.tryValidatingLogin(loginState.username, changePasswordData.oldPassword)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(loginState.username, changePasswordData.oldPassword)
 
-          def updateAndGetResult(validLogin: Boolean): Future[Result] = if (validLogin) {
+          def updateAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
             val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
 
-            def updatePassword: Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
+            def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
 
             for {
               _ <- postRequest
-              _ <- updatePassword
+              _ <- updatePassword()
               result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
           } else {
@@ -223,8 +231,8 @@ class AccountController @Inject()(
           }
 
           (for {
-            validLogin <- validLogin
-            result <- updateAndGetResult(validLogin)
+            validateUsernamePassword <- validateUsernamePassword
+            result <- updateAndGetResult(validateUsernamePassword)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

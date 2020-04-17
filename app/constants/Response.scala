@@ -153,6 +153,7 @@ object Response {
   val NEGOTIATION_NOT_FOUND = new Failure("NEGOTIATION_NOT_FOUND")
   val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
   val USERNAME_OR_PASSWORD_INCORRECT = new Failure("USERNAME_OR_PASSWORD_INCORRECT", routes.javascript.AccountController.loginForm)
+  val INCORRECT_PASSWORD = new Failure("INCORRECT_PASSWORD")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
