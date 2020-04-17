@@ -7,7 +7,7 @@
 @(sellNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellNegotiationList.map { sellNegotiation =>
-    co@commonVerticalInfoBox() {
+    @commonVerticalInfoBox() {
         @defining(counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
