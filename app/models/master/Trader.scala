@@ -94,6 +94,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def getZoneIDsByIDs(ids: Seq[String]): Future[Seq[String]] = db.run(traderTable.filter(_.id inSet ids).map(_.zoneID).result)
+
   private def getOrganizationIDByID(id: String): Future[String] = db.run(traderTable.filter(_.id === id).map(_.organizationID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -215,6 +217,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def tryGetByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
 
     def tryGetZoneID(id: String): Future[String] = getZoneIDByID(id)
+
+    def tryGetZoneIDs(ids: Seq[String]): Future[Seq[String]] = getZoneIDsByIDs(ids)
 
     def tryGetOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
 

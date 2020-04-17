@@ -13,7 +13,7 @@
                 @commonTextInfo(constants.Form.TIME, negotiation.time)
             </div>
             <div class="centerText">
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument('@negotiation.buyerAddress', '@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</button>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.OrderController.moderatedBuyerExecuteOrderDocument('@negotiation.buyerAddress', '@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</button>
             </div>
         </div>
     }

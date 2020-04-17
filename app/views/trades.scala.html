@@ -40,7 +40,17 @@
             </script>
         }
         case constants.User.ORGANIZATION => {}
-        case constants.User.ZONE => {}
+        case constants.User.ZONE => {
+            <div class="tradeList cmuk-margin-bottom">
+            @commonCard(constants.View.TRADE_ROOMS) {
+            }{
+                <div id="zoneViewAcceptedNegotiationList"></div>
+            }
+            </div>
+            <script>
+                     componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
+            </script>
+        }
         case constants.User.GENESIS => {}
         case _ => {}
     }

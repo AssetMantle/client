@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@(negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard("") {
+} {
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.FINANCIALS -> routes.javascript.ComponentViewController.zoneViewTradeRoomFinancial,
+        constants.View.CHECKS -> routes.javascript.ComponentViewController.zoneViewTradeRoomChecks,
+    ))
+}
