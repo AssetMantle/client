@@ -1,8 +1,6 @@
 package models.blockchain
 
-import actors.{Create, MainActor, ShutdownActor}
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -19,7 +17,7 @@ import scala.util.{Failure, Success}
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors.Create, masterAccounts: master.Accounts, masterNegotiations: master.Negotiations, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(masterAccounts: master.Accounts, masterNegotiations: master.Negotiations, masterAssets: master.Assets, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -230,8 +228,8 @@ class Orders @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors.Creat
               _ <- insertOrUpdateOrder(orderResponse)
               (buyerAddressID, sellerAddressID) <- ids(negotiation)
             } yield {
-              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
-              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

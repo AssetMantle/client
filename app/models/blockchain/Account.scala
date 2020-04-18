@@ -1,15 +1,11 @@
 package models.blockchain
 
-import actors.{Create, ShutdownActor}
-import akka.NotUsed
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.Response
@@ -22,7 +18,7 @@ import scala.util.{Failure, Success}
 case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -153,7 +149,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
               responseAccount <- responseAccount
               _ <- refreshDirty(responseAccount)
               accountID <- accountID
-            } yield actorsCreate.mainActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ACCOUNT, messageContent = actors.Message.Account())
+            } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ACCOUNT, messageContent = actors.Message.Account())
           }
         }
       }

@@ -1,6 +1,5 @@
 package controllers
 
-import actors.ShutdownActor
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -18,7 +17,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class TraderController @Inject()(
                                   utilitiesNotification: utilities.Notification,
-                                  shutdownActor: ShutdownActor,
                                   withLoginAction: WithLoginAction,
                                   withUsernameToken: WithUsernameToken,
                                   masterOrganizations: master.Organizations,

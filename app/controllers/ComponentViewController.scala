@@ -20,14 +20,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ComponentViewController @Inject()(
-                                         actorsCreate: actors.Create,
                                          messagesControllerComponents: MessagesControllerComponents,
                                          masterTraders: master.Traders,
                                          masterOrganizationKYCs: master.OrganizationKYCs,
                                          masterTraderKYCs: master.TraderKYCs,
                                          masterAssets: master.Assets,
-                                         masterTransactionNotifications: masterTransaction.Notifications,
-                                         masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                          masterNegotiations: master.Negotiations,
                                          masterAccounts: master.Accounts,
                                          masterAccountFiles: master.AccountFiles,
@@ -220,7 +217,7 @@ class ComponentViewController @Inject()(
 
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok.chunked(actorsCreate.Service.cometSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
+      Future(Ok.chunked(actors.Service.createCometSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

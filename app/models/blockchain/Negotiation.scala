@@ -1,26 +1,23 @@
 package models.blockchain
 
-import actors.{Create, MainActor, ShutdownActor}
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.responses.NegotiationResponse.Response
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean)
 
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors.Create, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -223,8 +220,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors
               _ <- refreshDirty(negotiationResponse)
               (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
-              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
-              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
