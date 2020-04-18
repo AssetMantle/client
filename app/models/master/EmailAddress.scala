@@ -87,6 +87,14 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
+  private def updateEmailAddressVerificationStatusOnEmailAddress(emailAddress: String, verificationStatus: Boolean): Future[Int] = db.run(emailAddressTable.filter(_.emailAddress === emailAddress).map(_.status).update(verificationStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
   private def updateEmailAddressAndStatusByID(id: String, emailAddress: String, status: Boolean): Future[Int] = db.run(emailAddressTable.filter(_.id === id).map(x => (x.emailAddress, x.status)).update((emailAddress, status)).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
@@ -119,9 +127,16 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def create(id: String, emailAddress: String): Future[String] = add(EmailAddress(id = id, emailAddress = emailAddress))
 
-    def updateEmailAddressVerificationStatus(id: String, emailAddressVerificationStatus: Boolean): Future[Int] = updateEmailAddressVerificationStatusOnId(id, emailAddressVerificationStatus)
-
-    def verifyEmailAddress(id: String): Future[Int] = updateEmailAddressVerificationStatusOnId(id, verificationStatus = true)
+    def verifyEmailAddress(id: String): Future[Int] = {
+      val email = tryGet(id)
+      val verify = updateEmailAddressVerificationStatusOnId(id, verificationStatus = true)
+      def unVerifyOldEmailAddresses(emailAddress: String): Future[Int] = updateEmailAddressVerificationStatusOnEmailAddress(emailAddress, verificationStatus = false)
+      for {
+        email <- email
+        _ <- unVerifyOldEmailAddresses(email.emailAddress)
+        verify <- verify
+      } yield verify
+    }
 
     def tryGetVerifiedEmailAddress(id: String): Future[String] = tryGetEmailAddressByIDAndStatus(id = id, status = true)
 

@@ -85,6 +85,14 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileNumberTable.filter(_.mobileNumber === mobileNumber).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
   private def updateMobileNumberAndStatusByID(id: String, mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileNumberTable.filter(_.id === id).map(x => (x.mobileNumber, x.status)).update((mobileNumber, status)).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
@@ -116,17 +124,26 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     def tryGet(id: String): Future[MobileNumber] = tryGet(id)
 
     def create(id: String, mobileNumber: String): Future[String] = add(MobileNumber(id = id, mobileNumber = mobileNumber))
-    
+
     def updateMobileNumberVerificationStatus(id: String, mobileNumberVerificationStatus: Boolean): Future[Int] = updateMobileNumberVerificationStatusOnId(id, mobileNumberVerificationStatus)
 
-    def verifyMobileNumber(id: String): Future[Int] = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
+    def verifyMobileNumber(id: String): Future[Int] = {
+      val mobile = tryGet(id)
+      val verify = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
+      def unVerifyOldMobileNumbers(mobileNumber: String): Future[Int] = updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber, status = false)
+      for {
+        mobile <- mobile
+        _ <- unVerifyOldMobileNumbers(mobile.mobileNumber)
+        verify <- verify
+      } yield verify
+    }
 
     def tryGetVerifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = true)
 
     def tryGetUnverifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = false)
-    
+
     def getMobileNumberAccount(mobileNumber: String): Future[Option[String]] = getAccountIDByMobileNumber(mobileNumber)
-    
+
     def updateMobileNumber(id: String, mobileNumber: String): Future[Int] = updateMobileNumberAndStatusByID(id = id, mobileNumber = mobileNumber, status = false)
   }
 
