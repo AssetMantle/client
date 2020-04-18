@@ -184,6 +184,14 @@ GET         /component/zoneViewPendingOrganizationRequest                       
 GET         /component/zoneViewRejectedOrganizationRequestList                              controllers.ComponentViewController.zoneViewRejectedOrganizationRequestList
 GET         /component/zoneViewRejectedOrganizationRequest                                  controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
 
+GET         /component/zoneViewAcceptedNegotiationList                                      controllers.ComponentViewController.zoneViewAcceptedNegotiationList
+GET         /component/zoneViewAcceptedNegotiation                                          controllers.ComponentViewController.zoneViewAcceptedNegotiation(negotiationID: String)
+GET         /component/zoneTradeStatistics                                                  controllers.ComponentViewController.zoneTradeStatistics
+GET         /component/zoneViewTradeRoomFinancialAndChecks                                  controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/zoneViewTradeRoomFinancial                                           controllers.ComponentViewController.zoneViewTradeRoomFinancial(negotiationID: String)
+GET         /component/zoneViewTradeRoomChecks                                              controllers.ComponentViewController.zoneViewTradeRoomChecks(negotiationID: String)
+GET         /component/zoneOrderActions                                                     controllers.ComponentViewController.zoneOrderActions(negotiationID: String)
+
 GET         /component/organizationSubscription                                             controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                   controllers.ComponentViewController.traderSubscription
 
@@ -197,8 +205,8 @@ POST        /zone/inviteZone                                                    
 GET         /zone/acceptInvitation                                                          controllers.AddZoneController.acceptInvitation(token: String)
 
 GET         /master/component/releaseAssetList                                              controllers.ReleaseAssetController.releaseAssetList
-GET         /master/component/buyerExecuteOrderList                                         controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
-GET         /master/component/sellerExecuteOrderList                                        controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderList
+GET         /master/component/buyerExecuteOrderList                                         controllers.OrderController.moderatedBuyerExecuteOrderList
+GET         /master/component/sellerExecuteOrderList                                        controllers.OrderController.moderatedSellerExecuteOrderList
 GET         /master/component/setBuyerFeedbackList                                          controllers.SetBuyerFeedbackController.buyerFeedbackList
 GET         /master/component/setSellerFeedbackList                                         controllers.SetSellerFeedbackController.sellerFeedbackList
 GET         /master/component/viewTradersInOrganizationForZone                              controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
@@ -359,13 +367,13 @@ GET         /master/viewVerifyZoneRequests                                      
 GET         /master/rejectVerifyZoneRequest                                                 controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
 POST        /master/rejectVerifyZoneRequest                                                 controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/buyerExecuteOrderDocument                                               controllers.BuyerExecuteOrderController.buyerExecuteOrderDocument(orderID: String)
-GET         /master/buyerExecuteOrder                                                       controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(requestID: String)
-POST        /master/buyerExecuteOrder                                                       controllers.BuyerExecuteOrderController.buyerExecuteOrder
+GET         /master/buyerExecuteOrderDocument                                               controllers.OrderController.buyerExecuteOrderDocument(orderID: String)
+GET         /master/buyerExecuteOrder                                                       controllers.OrderController.buyerExecuteOrderForm(requestID: String)
+POST        /master/buyerExecuteOrder                                                       controllers.OrderController.buyerExecuteOrder
 
-GET         /master/moderatedBuyerExecuteOrderDocument                                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument(buyerAddress:String, sellerAddress:String, pegHash:String)
-GET         /master/moderatedBuyerExecuteOrder                                              controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(requestID: String)
-POST        /master/moderatedBuyerExecuteOrder                                              controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
+GET         /master/moderatedBuyerExecuteOrderDocument                                      controllers.OrderController.moderatedBuyerExecuteOrderDocument(negotiationID: String)
+GET         /master/moderatedBuyerExecuteOrder                                              controllers.OrderController.moderatedBuyerExecuteOrderForm(requestID: String)
+POST        /master/moderatedBuyerExecuteOrder                                              controllers.OrderController.moderatedBuyerExecuteOrder
 
 GET         /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBidForm
 POST        /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBid
@@ -425,16 +433,16 @@ POST        /master/redeemAsset                                                 
 GET         /master/redeemFiat                                                              controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                              controllers.RedeemFiatController.redeemFiat
 
-GET         /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAssetForm(blockchainAddress: String, pegHash: String)
+GET         /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAssetForm(assetID: String)
 POST        /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAsset
 
-GET         /master/sellerExecuteOrderDocument                                              controllers.SellerExecuteOrderController.sellerExecuteOrderDocument(orderID:String)
-GET         /master/sellerExecuteOrder                                                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm(requestID:String)
-POST        /master/sellerExecuteOrder                                                      controllers.SellerExecuteOrderController.sellerExecuteOrder
+GET         /master/sellerExecuteOrderDocument                                              controllers.OrderController.sellerExecuteOrderDocument(orderID:String)
+GET         /master/sellerExecuteOrder                                                      controllers.OrderController.sellerExecuteOrderForm(requestID:String)
+POST        /master/sellerExecuteOrder                                                      controllers.OrderController.sellerExecuteOrder
 
-GET         /master/moderatedSellerExecuteOrderDocument                                     controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument(buyerAddress:String, sellerAddress:String, pegHash:String)
-GET         /master/moderatedSellerExecuteOrder                                             controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(requestID: String)
-POST        /master/moderatedSellerExecuteOrder                                             controllers.SellerExecuteOrderController.moderatedSellerExecuteOrder
+GET         /master/moderatedSellerExecuteOrderDocument                                     controllers.OrderController.moderatedSellerExecuteOrderDocument(negotiationID: String)
+GET         /master/moderatedSellerExecuteOrder                                             controllers.OrderController.moderatedSellerExecuteOrderForm(requestID: String)
+POST        /master/moderatedSellerExecuteOrder                                             controllers.OrderController.moderatedSellerExecuteOrder
 
 GET         /master/sendAsset                                                               controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
 POST        /master/sendAsset                                                               controllers.SendAssetController.sendAsset
@@ -482,8 +490,8 @@ POST        /blockchain/addOrganization                                         
 GET         /blockchain/addZone                                                             controllers.AddZoneController.blockchainAddZoneForm
 POST        /blockchain/addZone                                                             controllers.AddZoneController.blockchainAddZone
 
-GET         /blockchain/buyerExecuteOrder                                                   controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm
-POST        /blockchain/buyerExecuteOrder                                                   controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrder
+GET         /blockchain/buyerExecuteOrder                                                   controllers.OrderController.blockchainBuyerExecuteOrderForm
+POST        /blockchain/buyerExecuteOrder                                                   controllers.OrderController.blockchainBuyerExecuteOrder
 
 GET         /blockchain/changeBuyerBid                                                      controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm
 POST        /blockchain/changeBuyerBid                                                      controllers.ChangeBuyerBidController.blockchainChangeBuyerBid
@@ -512,8 +520,8 @@ POST        /blockchain/redeemFiat                                              
 GET         /blockchain/releaseAsset                                                        controllers.ReleaseAssetController.blockchainReleaseAssetForm
 POST        /blockchain/releaseAsset                                                        controllers.ReleaseAssetController.blockchainReleaseAsset
 
-GET         /blockchain/sellerExecuteOrder                                                  controllers.SellerExecuteOrderController.blockchainSellerExecuteOrderForm
-POST        /blockchain/sellerExecuteOrder                                                  controllers.SellerExecuteOrderController.blockchainSellerExecuteOrder
+GET         /blockchain/sellerExecuteOrder                                                  controllers.OrderController.blockchainSellerExecuteOrderForm
+POST        /blockchain/sellerExecuteOrder                                                  controllers.OrderController.blockchainSellerExecuteOrder
 
 GET         /blockchain/sendAsset                                                           controllers.SendAssetController.blockchainSendAssetForm
 POST        /blockchain/sendAsset                                                           controllers.SendAssetController.blockchainSendAsset
