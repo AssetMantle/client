@@ -1,0 +1,39 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@(negotiationList: Seq[Negotiation], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@negotiationList.map { negotiation =>
+    <li class="commonList">
+
+        @commonVerticalTextInfo(constants.View.BUYER_TRADER_ID, negotiation.buyerTraderID)
+        @commonVerticalTextInfo(constants.View.SELLER_TRADER_ID, negotiation.sellerTraderID)
+
+        @defining(assets.filter(_.id == negotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
+            @rejectedNegotiationAsset match {
+                case Some(asset) => {
+                    @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+                }
+                case None => {
+                    @commonVerticalTextInfo(constants.View.ASSET_ID, negotiation.assetID)
+                }
+            }
+        }
+        @commonVerticalIntInfo(constants.View.PRICE, negotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString(), negotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.STATUS, negotiation.status)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+                <button class="cmuk-button cmuk-button-primary cmuk-button-small">
+                    <a class="cmuk-link secondaryFont" href="@routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+                </button>
+            </p>
+        </div>
+    </li>
+}

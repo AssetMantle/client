@@ -26,7 +26,35 @@
 @center = {
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
-        case constants.User.ZONE => {}
+        case constants.User.ZONE => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="zoneTradeStatistics"></div>
+                </div>
+
+            </div>
+            <div class="cmuk-grid-match cmuk-grid cmuk-margin-bottom" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="zoneViewOrganizationAccountList"></div>
+                </div>
+
+            </div>
+            <div class="tradeList cmuk-margin-bottom">
+
+            @commonCard(constants.View.TRADE_ROOMS) {
+            } {
+                <div id="zoneViewAcceptedNegotiationList"></div>
+            }
+
+            </div>
+            <script>
+                    componentResource('zoneTradeStatistics', jsRoutes.controllers.ComponentViewController.zoneTradeStatistics());
+                    componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
+                    componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
+            </script>
+        }
         case constants.User.ORGANIZATION => {
             <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
