@@ -48,14 +48,14 @@ html, body{
   -moz-border-radius: 30px;
   border-radius: 30px;
   text-align: center;
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   align-items: center;
   justify-content: center;
 }
 
 %cmuk-comment-meta{
   color: #061728;
-  font-size: $paragraphFontSizeMedium;
+  font-size: var(--paragraphFontSizeMedium);
 }
 
 %cmuk-card-default{
@@ -66,7 +66,7 @@ html, body{
 
 %cmuk-button-link {
   font-weight: bold;
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   text-decoration: none;
 }
 
@@ -116,11 +116,11 @@ html, body{
 }
 
 .headerFontSize{
-  font-size:$paragraphFontSizeMedium;
+  font-size:var(--paragraphFontSizeMedium);
 }
 
 .title{
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   font-family: $fontFamilySecondary;
   font-weight: bold;
 }
@@ -330,7 +330,7 @@ html, body{
   margin-top: 20px;
   width: 100%;
   padding: 30px 0px;
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   background: #031221;
   .copyright{
     margin: 10px 0px;
@@ -379,7 +379,7 @@ html, body{
 
 .alretName{
   font-weight: bold;
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   font-family: $fontFamilySecondary;
 }
 
@@ -506,7 +506,7 @@ html, body{
 }
 
 .fileName{
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   font-family: $fontFamilySecondary;
   color: $colorPrimary;
   margin-bottom: 5px;
@@ -537,7 +537,7 @@ html, body{
 }
 
 .commonhomeData{
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   p, h3{
     margin:5px 0px;
   }
@@ -551,7 +551,7 @@ html, body{
   padding: 40px;
   border-radius: $buttonBorderRadius;
   font-family: $fontFamilySecondary;
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   background: #e6e6e6;
   width: 100px;
   color: red;
@@ -607,7 +607,7 @@ position: relative;
   .buttonForm {
     background:$colorPrimary;
     color: #FFFFFF;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
     font-weight: bold;
   }
@@ -620,11 +620,11 @@ position: relative;
     box-sizing: border-box;
     border-radius: 2px;
     border: 1px solid rgba(5, 60, 117, 0.22);
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
     &::placeholder {
       color: #848A91;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
       font-family: $fontFamilySecondary;
     }
     &:focus {
@@ -641,7 +641,7 @@ position: relative;
     -webkit-box-shadow: 0 0 0 30px white inset;
   }
   .error {
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
     color: #f0506e;
   }
@@ -662,7 +662,7 @@ position: relative;
   }
   .cmuk-button-primary{
     border: none;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
   }
   .primaryFont{
     font-family:$fontFamilyPrimary;
@@ -689,7 +689,7 @@ position: relative;
     }
     p{
       font-family: $fontFamilySecondary;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
   }
   .cmuk-card-header{
@@ -713,7 +713,7 @@ position: relative;
     color: #061728;
     font-weight: bold;
     font-family: $fontFamilySecondary;
-    font-size: $paragraphFontSizeLarge;
+    font-size:  var(--paragraphFontSizeLarge);
   }
   .cmuk-spinner>*>*{
     stroke-width:2 !important;
@@ -763,7 +763,7 @@ position: relative;
     padding: 0px;
   }
   .panelHeader{
-    font-size: $paragraphFontSizeMedium;
+    font-size: var(--paragraphFontSizeMedium);
     font-family: $fontFamilySecondary;
     font-weight: normal;
     color: #272829;
@@ -800,7 +800,7 @@ position: relative;
     .cmuk-navbar-nav {
       .buttonRegister{
         background-color: #FE4350;
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
         font-family: $fontFamilyPrimary;
         color: #FFFFFF;
         line-height: inherit;
@@ -823,7 +823,7 @@ position: relative;
     padding:0px 25px;
     font-weight: bold;
     color: #FFFFFF;
-    font-size:$paragraphFontSizeSmall;
+    font-size:var(--paragraphFontSizeSmall);
     box-sizing: border-box;
     letter-spacing: 0.4px;
   }
@@ -936,7 +936,7 @@ position: relative;
     display: none;
     color: red;
     padding: 10px;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
   }
   .verifyMnemonic {
@@ -959,12 +959,12 @@ position: relative;
     }
   }
   .buttonForm{
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
   }
   .mnemonicNote{
     background-color: #FF2938;
     font-family:$fontFamilySecondary;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     text-align: justify;
     letter-spacing: 0.01em;
     color: #FFFFFF;
@@ -1041,7 +1041,7 @@ position: relative;
         }
       }
       li span {
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
         line-height: 172%;
         letter-spacing: 0.01em;
       }
@@ -1089,7 +1089,7 @@ position: relative;
         background-color: #FAFBFD;
         padding: 15px 0px 15px 20px;
         font-family: $fontFamilySecondary;
-        font-size: $paragraphFontSizeLarge;
+        font-size:  var(--paragraphFontSizeLarge);
         text-transform: capitalize;
         color:#0862BE;
         font-weight: bold;
@@ -1118,7 +1118,7 @@ position: relative;
   .cmuk-switcher{
     li{
       font-family: $fontFamilySecondary;
-      font-size: $paragraphFontSizeLarge;
+      font-size:  var(--paragraphFontSizeLarge);
       color: #365575;
       letter-spacing: 0.01em;
       line-height: 1.8;
@@ -1148,10 +1148,10 @@ position: relative;
   .quoteIdTtitle{
     color: #6C7883;
     font-weight: bold;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
   }
   .quoteId{
-    font-size: $paragraphFontSizeSmall  ;
+    font-size: var(--paragraphFontSizeSmall)  ;
   }
 }
 
@@ -1183,7 +1183,7 @@ position: relative;
     width: 250px;
     padding: 10px 25px 10px 10px;
     margin: 0px;
-    font-size: $paragraphFontSizeMedium;
+    font-size: var(--paragraphFontSizeMedium);
   }
   .cmuk-alert-close{
     top: 15px;
@@ -1223,7 +1223,7 @@ position: relative;
   .liveText {
     font-weight: bold;
     margin-right: 10px;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     color: #272829;
   }
   .liveIcon {
@@ -1269,7 +1269,7 @@ position: relative;
             padding: 15px 0px;
             font-family: $fontFamilySecondary;
             text-transform: capitalize;
-            font-size: $paragraphFontSizeMedium;
+            font-size: var(--paragraphFontSizeMedium);
           }
         }
         .cmuk-subnav>.cmuk-active>a{
@@ -1315,7 +1315,7 @@ position: relative;
             color: #4B4B4B;
             font-weight: bold;
             font-family: $fontFamilySecondary;
-            font-size: $paragraphFontSizeMedium;
+            font-size: var(--paragraphFontSizeMedium);
           }
         }
         .tradeTermsData{
@@ -1325,7 +1325,7 @@ position: relative;
           margin-bottom: 25px;
           font-family: $fontFamilySecondary;
           color: #848A91;
-          font-size: $paragraphFontSizeSmall;
+          font-size: var(--paragraphFontSizeSmall);
           font-weight: bold;
 
         }
@@ -1343,7 +1343,7 @@ position: relative;
             .serialNumber{
               color: #859EB9;
               font-family: "Oxygen", sans-serif;
-              font-size: $paragraphFontSizeMedium;
+              font-size: var(--paragraphFontSizeMedium);
               margin-right: 10px;
             }
             .termIcon{
@@ -1357,7 +1357,7 @@ position: relative;
             .termName{
               color: #0862BE;
               font-family: $fontFamilySecondary;
-              font-size: $paragraphFontSizeSmall;
+              font-size: var(--paragraphFontSizeSmall);
               font-weight: bold;
               text-transform: uppercase;
               letter-spacing: 0.01em;
@@ -1366,7 +1366,7 @@ position: relative;
             .termValue{
               color: #061728;
               font-family: $fontFamilySecondary;
-              font-size: $paragraphFontSizeMedium;
+              font-size: var(--paragraphFontSizeMedium);
               margin-right: 10px;
             }
             .creditTerms{
@@ -1374,7 +1374,7 @@ position: relative;
               margin-top: 5px;
               p{
                 font-family: $fontFamilySecondary;
-                font-size: $paragraphFontSizeMedium;
+                font-size: var(--paragraphFontSizeMedium);
                 color: #061728;
                 margin: 0px;
                 margin-bottom: 5px;
@@ -1437,7 +1437,7 @@ position: relative;
             width: auto;
             color: #0862BE;
             font-family: $fontFamilySecondary;
-            font-size: $paragraphFontSizeSmall;
+            font-size: var(--paragraphFontSizeSmall);
             font-weight: bold;
             text-transform: uppercase;
             margin:2px 0px 3px 0px;
@@ -1445,7 +1445,7 @@ position: relative;
           .infoRowValue{
             font-family: Oxygen;
             color: #061728;
-            font-size: $paragraphFontSizeSmall;
+            font-size: var(--paragraphFontSizeSmall);
             margin-left: 20px;
           }
           .sellerTermStatus{
@@ -1455,7 +1455,7 @@ position: relative;
           .documentTitle{
             color: #061728;
             font-family: $fontFamilySecondary;
-            font-size: $paragraphFontSizeSmall;
+            font-size: var(--paragraphFontSizeSmall);
             margin:0px 0px 5px 0px;
           }
         }
@@ -1479,7 +1479,7 @@ position: relative;
   .cmuk-card-header{
     padding: 15px 20px;
     color: #061728;
-    font-size: $paragraphFontSizeMedium;
+    font-size: var(--paragraphFontSizeMedium);
     font-family: $fontFamilySecondary;
     .icon{
       margin-bottom: 2px;
@@ -1496,7 +1496,7 @@ position: relative;
       padding: 10px 0px 10px 0px;
       margin: 0px 20px;
       font-family: $fontFamilySecondary;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
       button{
         text-decoration: none;
         color: #848A91;
@@ -1536,7 +1536,7 @@ position: relative;
       .ctitle{
         color: #5C6166;
         line-height: 2;
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
         font-family: $fontFamilySecondary;
       }
       .payable{
@@ -1577,7 +1577,7 @@ position: relative;
     text-transform: capitalize;
     font-family: $fontFamilyPrimary;
     padding: 8px 8px;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     line-height:normal;
     background: rgba(8, 98, 190, 0.1);
     border-radius: 103px;
@@ -1619,7 +1619,7 @@ position: relative;
           padding: 15px 0px;
           font-family: $fontFamilySecondary;
           text-transform: capitalize;
-          font-size: $paragraphFontSizeMedium;
+          font-size: var(--paragraphFontSizeMedium);
         }
       }
       }
@@ -1635,7 +1635,7 @@ position: relative;
         overflow: auto;
         .cmuk-comment-meta{
           color: #061728;
-          font-size:$paragraphFontSizeMedium;
+          font-size:var(--paragraphFontSizeMedium);
         }
       }
       .cmuk-switcher>li{
@@ -1670,7 +1670,7 @@ position: relative;
     border-radius: 3px;
   }
   .cmuk-card-header{
-    font-size: $paragraphFontSizeMedium;
+    font-size: var(--paragraphFontSizeMedium);
     padding:15px 20px;
     font-family: $fontFamilySecondary;
   }
@@ -1771,7 +1771,7 @@ position: relative;
       font-weight: bold;
       padding: 0px 20px;
       font-family: $fontFamilySecondary;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
       font-weight: bold;
     }
   }
@@ -1788,7 +1788,7 @@ position: relative;
   padding: 0px 15px;
   background: #ffffff;
   .documentContentTop{
-    font-size: $paragraphFontSizeMedium;
+    font-size: var(--paragraphFontSizeMedium);
     font-family: $fontFamilySecondary;
     margin: 10px;
     a{
@@ -1815,7 +1815,7 @@ position: relative;
   }
   .documentContentBottom{
     margin: 10px;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     text-align: left;
   }
 }
@@ -1899,7 +1899,7 @@ header:before,
       .activityContent{
         color: #000000;
         font-family: $fontFamilySecondary;
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
       }
     }
     .timeline-content.right {
@@ -1913,7 +1913,7 @@ header:before,
     padding: 0px;
   }
   .NotificationButton{
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
     font-weight: bold;
     padding:0px 0px 0px 40px;
@@ -1932,14 +1932,14 @@ header:before,
     font-family: "Oxygen", sans-serif;
     color: #636363;
     font-weight: bold;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     border-bottom: 2px solid #0862BE;
   }
   .documentlist{
     .cmuk-table td {
       padding: 16px 5px;
       vertical-align: top;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
     .docIcon {
       background: #FFFFFF;
@@ -1973,7 +1973,7 @@ header:before,
         td:first-child{
           padding-left: 15px;
           color: #262525;
-          font-size: $paragraphFontSizeSmall;
+          font-size: var(--paragraphFontSizeSmall);
         }
         td:last-child{
           padding-right: 10px;
@@ -1981,7 +1981,7 @@ header:before,
       }
     }
     .primayDocs{
-      font-size: $paragraphFontSizeMedium;
+      font-size: var(--paragraphFontSizeMedium);
       color: #636363;
     }
   }
@@ -2005,7 +2005,7 @@ header:before,
       margin: 0;
       a{
         padding:15px 0px;
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
         font-family: $fontFamilySecondary;
         text-transform: capitalize;
       }
@@ -2032,7 +2032,7 @@ header:before,
         border-radius: 10px;
         width: 100%;
         text-transform: capitalize;
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
         font-family: $fontFamilyPrimary;
       }
     }
@@ -2054,11 +2054,11 @@ header:before,
       width: 100%;
     }
     .inputFieldBody input {
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
   }
   .cmuk-button-link{
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
     font-weight: bold;
     margin: 5px;
@@ -2070,7 +2070,7 @@ header:before,
   line-height: 1.8;
   align-items: flex-start;
   word-break: break-all;
-  font-size: $paragraphFontSizeSmall;
+  font-size: var(--paragraphFontSizeSmall);
   font-family: $fontFamilySecondary;
   .infoRowLabel {
     color: #4B4B4B;
@@ -2096,7 +2096,7 @@ header:before,
 
 .chat{
   .chatMessage{
-    font-size:$paragraphFontSizeSmall;
+    font-size:var(--paragraphFontSizeSmall);
   }
   .chatName{
     color:#FFFFFF;
@@ -2107,7 +2107,7 @@ header:before,
     -moz-border-radius: 30px;
     border-radius:50%;
     text-align: center;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     align-items: center;
     justify-content: center;
   }
@@ -2146,7 +2146,7 @@ header:before,
     }
     .messageInfo{
       color: #848A91;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
     .replytoMessage p{
       border-left: 2px solid #0862BE;
@@ -2154,7 +2154,7 @@ header:before,
     }
     .messageContent{
       color: #061728;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
       p{
         margin:0px;
         color: #0862BE;
@@ -2186,7 +2186,7 @@ header:before,
     }
     .messageInfo{
       color: #6CA8E7;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
     .replytoMessage p{
       border-left: 2px solid #6CA8E7;
@@ -2194,7 +2194,7 @@ header:before,
     }
     .messageContent{
       color: #FFFFFF;
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
       p{
         margin:0px;
         color: #6CA8E7;
@@ -2228,7 +2228,7 @@ header:before,
   .listItemChild{
     margin: 0px;
     padding: 20px 0px;
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     font-family: $fontFamilySecondary;
     font-weight: bold;
     &:last-child .listItemChildValue{
@@ -2275,7 +2275,7 @@ header:before,
     top: -15px;
     left: -10px;
     text-align: center;
-    font-size:$paragraphFontSizeSmall;
+    font-size:var(--paragraphFontSizeSmall);
     font-weight: bold;
     transform: rotate(-45deg);
     display:block;
@@ -2306,7 +2306,7 @@ header:before,
 
 .profileContainer{
   .infoRow{
-    font-size: $paragraphFontSizeSmall;
+    font-size: var(--paragraphFontSizeSmall);
     line-height: 2;
   }
   .infoRowLabel{
@@ -2530,7 +2530,7 @@ dl .info {
       flex: 1;
       font-family: $fontFamilySecondary;
       a{
-        font-size: $paragraphFontSizeSmall;
+        font-size: var(--paragraphFontSizeSmall);
       }
     }
   }
@@ -2577,7 +2577,7 @@ dl .info {
   font-family: Oxygen;
   ul{
     li{
-      font-size:$paragraphFontSizeSmall;
+      font-size:var(--paragraphFontSizeSmall);
       font-family: $fontFamilySecondary;
       color: #272829;
       text-align: left;

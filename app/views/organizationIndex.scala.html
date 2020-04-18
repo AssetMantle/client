@@ -6,23 +6,6 @@
 @import views.html.base._
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 @center = {
-    <div id="commonHome"></div>
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-            <div class="cmuk-width-expand@@m">
-                @commonCard(constants.View.ORGANIZATION) {
-                    <div class="cmuk-inline">
-                        <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
-                        <div id="Edit" class="Editdropdown">
-                            <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
-                            <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
-                        </div>
-                    </div>
-                }{
-                <div id="organization"></div>
-                }
-            </div>
-        </div>
-
     <div class="cmuk-margin-top cmuk-margin-bottom">
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
     </div>

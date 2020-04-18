@@ -6,6 +6,19 @@ $buttonBorderRadius: 3px;
 $headingFontSizeLarge:26px;
 $headingFontSizeMedium:22px;
 $headingFontSizeSmall:20px;
-$paragraphFontSizeLarge:18px;
-$paragraphFontSizeMedium:16px;
-$paragraphFontSizeSmall:14px;
+
+
+@media (min-width: 640px) {
+  :root {
+    --paragraphFontSizeLarge:18px;
+    --paragraphFontSizeMedium:16px;
+    --paragraphFontSizeSmall:14px;
+  }
+}
+@media (max-width: 640px) {
+  :root {
+    --paragraphFontSizeLarge:16px;
+    --paragraphFontSizeMedium:14px;
+    --paragraphFontSizeSmall:12px;
+  }
+}

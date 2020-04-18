@@ -1,3 +1,13 @@
+@media (min-width: 640px) {
+  :root {
+    --paragraphFontSizeLarge: 18px;
+    --paragraphFontSizeMedium: 16px;
+    --paragraphFontSizeSmall: 14px; } }
+@media (max-width: 640px) {
+  :root {
+    --paragraphFontSizeLarge: 16px;
+    --paragraphFontSizeMedium: 14px;
+    --paragraphFontSizeSmall: 12px; } }
 @media (max-width: 640px) {
   .pageContent {
     margin: 20px; }
@@ -6,7 +16,8 @@
     max-width: 500px; }
 
   .bannerContainer {
-    background-size: contain; }
+    background-size: contain;
+    background-position: center bottom; }
     .bannerContainer .bannerText {
       width: 100%; }
       .bannerContainer .bannerText h3 {
@@ -16,7 +27,54 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #0862BE; } }
+    background-color: #0862BE; }
+
+  .switcherCard .cmuk-subnav {
+    flex-wrap: nowrap;
+    justify-content: start;
+    overflow: auto;
+    overflow: -moz-scrollbars-none; }
+    .switcherCard .cmuk-subnav li {
+      flex: none; }
+    .switcherCard .cmuk-subnav::-webkit-scrollbar {
+      height: 0 !important; }
+  .switcherCard .cmuk-subnav-pill > * > :first-child {
+    padding: 5px 20px; }
+
+  .commonList {
+    display: block;
+    padding: 20px; }
+    .commonList .listItemChild {
+      display: flex;
+      padding: 5px 0px; }
+      .commonList .listItemChild .listItemChildTitle {
+        width: 100px; }
+      .commonList .listItemChild .listItemChildValue {
+        margin: 0px;
+        white-space: normal; }
+
+  .modal {
+    padding: 30px 15px; }
+    .modal .modalContent {
+      padding: 15px;
+      min-height: 150px;
+      max-height: calc(100% - 20px);
+      top: auto;
+      transform: translateY(0);
+      margin: 0 auto;
+      width: 600px;
+      transition: .3s linear;
+      transition-property: opacity,transform; }
+      .modal .modalContent form {
+        text-align: center; }
+
+  .MnemonicQuiz {
+    text-align: center; }
+    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
+      width: 95px; }
+
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
+    flex-wrap: wrap; } }
 @media (min-width: 640px) {
   .modalBody form {
     width: 500px;
@@ -35,6 +93,12 @@
   .cmuk-card-body .cmuk-subnav li a {
     font-size: 12px;
     text-transform: capitalize; } }
+@media (min-width: 960px) and (max-width: 1080px) {
+  .header .cmuk-navbar-nav > li > a {
+    padding: 0px 15px; }
+
+  .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
+    padding: 0px 15px; } }
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex; }
@@ -42,21 +106,6 @@
   .comdex .mobileNavigation {
     display: flex;
     flex: auto; } }
-@media screen and (max-width: 768px) {
-  .timeline {
-    margin: 30px;
-    padding: 0; }
-    .timeline:before {
-      left: 0; }
-    .timeline .timeline-item .timeline-content {
-      width: 80%;
-      float: right; }
-    .timeline .timeline-item .timeline-content:before,
-    .timeline .timeline-item .timeline-content.right:before {
-      left: -5px;
-      right: inherit; }
-    .timeline .timeline-item .timeline-icon {
-      left: 0; } }
 @media (min-width: 1200px) {
   .pageContainer .leftSide {
     height: 100%;
@@ -76,6 +125,9 @@
     margin-left: 0.5%;
     right: 0;
     margin-bottom: 5px; } }
+@media (max-width: 1200px) {
+  .pageContainer .middle {
+    margin-bottom: 20px; } }
 @media (max-width: 992px) {
   .MnemonicQuiz .mnemonicNote {
     background-image: none; }
@@ -83,7 +135,8 @@
       width: 100%; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
-    max-height: 470px; }
+    top: 10%;
+    max-height: 530px; }
 
   .leftSideContainer .financial {
     margin-bottom: 15px; }
@@ -94,7 +147,7 @@
   .leftSideContainer .financial ul li {
     padding: 10px 0; }
     .leftSideContainer .financial ul li .wallet .cmuk-comment-meta, .leftSideContainer .financial ul li .wallet .ctitle {
-      font-size: 14px; }
+      font-size: var(--paragraphFontSizeSmall); }
   .leftSideContainer .addBalanceButton {
     text-transform: capitalize;
     font-family: Rubik;
@@ -138,16 +191,16 @@
     height: 138px; } }
 @media (max-width: 1600px) {
   .commonList .listItemChild {
-    font-size: 14px; }
+    font-size: var(--paragraphFontSizeSmall); }
 
   .leftSideContainer .financial ul li .ctitle {
-    font-size: 14px; }
+    font-size: var(--paragraphFontSizeSmall); }
 
   .timeline .timeline-item .timeline-content .activityContent {
-    font-size: 14px; }
+    font-size: var(--paragraphFontSizeSmall); }
 
   .profileContainer .infoRow {
-    font-size: 14px; }
+    font-size: var(--paragraphFontSizeSmall); }
   .profileContainer .identificationDetails .documentItem {
     padding: 10px; }
     .profileContainer .identificationDetails .documentItem .documentContentTop {
@@ -163,10 +216,6 @@
   .cmuk-card-body .cmuk-subnav li a {
     font-size: 12px;
     text-transform: capitalize; }
-
-  .modal .modalContent {
-    top: 10%;
-    max-height: 530px; }
 
   .tabsSection .cmuk-grid-divider {
     display: block; }
@@ -184,7 +233,7 @@
 @media (min-width: 1921px) {
   .comdex .cmuk-container {
     max-width: 1920px; } }
-@media (max-width: 960px) {
+@media (max-width: 959px) {
   .comdex .mobileNavigationHeader {
     display: flex; }
   .comdex .mobileNavigation {

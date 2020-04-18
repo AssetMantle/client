@@ -8,23 +8,80 @@
   }
   .bannerContainer {
     background-size: contain;
-
+    background-position: center bottom;
     .bannerText {
       width: 100%;
-
       h3 {
         font-size: 30px;
       }
     }
   }
-
   .mobile .cmuk-offcanvas-bar{
     padding: 30px;
   }
   .mobile .cmuk-button{
     background-color: $colorPrimary;
   }
+  .switcherCard{
+    .cmuk-subnav{
+      flex-wrap: nowrap;
+      justify-content: start;
+      overflow: auto;
+      overflow: -moz-scrollbars-none;
+      li{
+        flex: none;
+      }
+      &::-webkit-scrollbar {
+        height: 0 !important
+      }
+    }
+    .cmuk-subnav-pill>*>:first-child{
+      padding: 5px 20px;
+    }
+  }
+  .commonList{
+    display: block;
+    padding: 20px;
+    .listItemChild {
+      display: flex;
+      padding: 5px 0px;
+      .listItemChildTitle{
+        width: 100px;
+      }
+      .listItemChildValue {
+        margin: 0px;
+        white-space: normal;
+      }
+    }
+  }
+  .modal{
+    padding: 30px 15px;
+    .modalContent{
+      padding: 15px;
+      min-height: 150px;
+      max-height: calc(100% - 20px);
+      top:auto;
+      transform: translateY(0);
+      margin: 0 auto;
+      width: 600px;
+      transition: .3s linear;
+      transition-property: opacity,transform;
+      form{
+        text-align: center;
+      }
+    }
+  }
+  .MnemonicQuiz {
+    text-align: center;
+    .verifyMnemonic .verifyMnemonicbutton {
+      width: 95px;
+    }
+  }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm{
+    flex-wrap: wrap;
+  }
 }
+
 @media (min-width: 640px) {
   .modalBody{
     form{
@@ -53,6 +110,16 @@
     }
   }
 }
+
+@media (min-width: 960px) and (max-width: 1080px) {
+  .header .cmuk-navbar-nav > li > a{
+    padding: 0px 15px;
+  }
+  .header .cmuk-navbar-right .cmuk-navbar-nav > li > a{
+    padding: 0px 15px;
+  }
+}
+
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex;
@@ -61,29 +128,6 @@
     .mobileNavigation{
       display: flex;
       flex:auto;
-    }
-  }
-}
-@media screen and (max-width: 768px) {
-  .timeline {
-    margin: 30px;
-    padding: 0;
-    &:before {
-      left: 0;
-    }
-    .timeline-item{
-      .timeline-content {
-        width: 80%;
-        float: right;
-      }
-      .timeline-content:before,
-      .timeline-content.right:before {
-        left: -5px;
-        right: inherit;
-      }
-      .timeline-icon {
-        left: 0;
-      }
     }
   }
 }
@@ -98,13 +142,11 @@
       width: 24.5%;
       margin-bottom: 5px;
     }
-
     .middle {
       width: 50%;
       height: calc(100% - 128px);
       float: left;
     }
-
     .rightSide {
       height: 100%;
       width: 24.5%;
@@ -112,6 +154,14 @@
       margin-left: 0.5%;
       right: 0;
       margin-bottom: 5px;
+    }
+  }
+}
+
+@media (max-width:1200px ) {
+  .pageContainer {
+    .middle{
+      margin-bottom: 20px;
     }
   }
 }
@@ -124,9 +174,11 @@
     }
   }
 }
+
 @media (min-width:992px) and (max-width:1600px){
   .modal .modalContent{
-    max-height: 470px;
+    top:10%;
+    max-height: 530px;
   }
   .leftSideContainer{
     .financial{
@@ -135,17 +187,15 @@
     .cmuk-card-header{
       font-size: 12px;;
     }
-
     .financial {
       .cmuk-card-body{
         height:210px;
       }
-
         ul li {
           padding: 10px 0;
           .wallet {
           .cmuk-comment-meta, .ctitle {
-            font-size:$paragraphFontSizeSmall;
+            font-size:var(--paragraphFontSizeSmall);
           }
         }
       }
@@ -187,7 +237,6 @@
         .chatMessages {
           height: 190px;
         }
-
       }
     }
   }
@@ -204,7 +253,6 @@
       height: 210px;
     }
   }
-
   .switcherCard{
     .cmuk-switcher{
       height: 140px;
@@ -218,14 +266,14 @@
 @media (max-width: 1600px){
   .commonList{
     .listItemChild{
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
   }
   .leftSideContainer{
     .financial{
       ul{
         li .ctitle{
-          font-size: $paragraphFontSizeSmall;
+          font-size: var(--paragraphFontSizeSmall);
         }
       }
     }
@@ -235,14 +283,14 @@
     .timeline-item{
       .timeline-content{
         .activityContent{
-          font-size:$paragraphFontSizeSmall;
+          font-size: var(--paragraphFontSizeSmall);
         }
       }
     }
   }
   .profileContainer{
     .infoRow{
-      font-size: $paragraphFontSizeSmall;
+      font-size: var(--paragraphFontSizeSmall);
     }
     .identificationDetails{
       .documentItem{
@@ -270,10 +318,6 @@
         text-transform: capitalize;
       }
     }
-  }
-  .modal .modalContent{
-    top:10%;
-    max-height: 530px;
   }
   .tabsSection{
     .cmuk-grid-divider{
@@ -303,7 +347,7 @@
   }
 }
 
-@media (max-width: 960px){
+@media (max-width: 959px){
   .comdex {
     .mobileNavigationHeader{
       display: flex;
@@ -344,6 +388,5 @@
         }
         }
     }
-
   }
 }
