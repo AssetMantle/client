@@ -35,8 +35,8 @@ class ComponentViewController @Inject()(
                                          masterOrganizations: master.Organizations,
                                          masterZones: master.Zones,
                                          masterAccountKYCs: master.AccountKYCs,
-                                         masterMobileNumbers: master.MobileNumbers,
-                                         masterEmailAddresses: master.EmailAddresses,
+                                         masterMobileNumbers: master.Mobiles,
+                                         masterEmailAddresses: master.Emails,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
@@ -606,8 +606,8 @@ class ComponentViewController @Inject()(
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val mobileNumber: Future[Option[MobileNumber]] = masterMobileNumbers.Service.get(loginState.username)
-      val emailAddress: Future[Option[EmailAddress]] = masterEmailAddresses.Service.get(loginState.username)
+      val mobileNumber: Future[Option[Mobile]] = masterMobileNumbers.Service.get(loginState.username)
+      val emailAddress: Future[Option[Email]] = masterEmailAddresses.Service.get(loginState.username)
       val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
       def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)

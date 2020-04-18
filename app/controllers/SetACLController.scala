@@ -20,7 +20,7 @@ class SetACLController @Inject()(
                                   withTraderLoginAction: WithTraderLoginAction,
                                   transaction: utilities.Transaction,
                                   masterTransactionTraderInvitations: masterTransaction.TraderInvitations,
-                                  masterEmailAddresses: master.EmailAddresses,
+                                  masterEmailAddresses: master.Emails,
                                   fileResourceManager: utilities.FileResourceManager,
                                   blockchainAccounts: blockchain.Accounts,
                                   masterZones: master.Zones,

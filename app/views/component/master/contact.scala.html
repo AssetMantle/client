@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.master.MobileNumber
-@import models.master.EmailAddress
+@import models.master.Mobile
+@import models.master.Email
 @import constants.Status.Contact
 
-@(mobileNumber: Option[MobileNumber], emailAddress: Option[EmailAddress])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(mobileNumber: Option[Mobile], emailAddress: Option[Email])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
     @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm)}

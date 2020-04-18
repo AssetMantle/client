@@ -5,7 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
-import models.master.{EmailAddress, MobileNumber}
+import models.master.{Email, Mobile}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
@@ -17,8 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                   utilitiesNotification: utilities.Notification,
-                                  masterEmailAddresses: master.EmailAddresses,
-                                  masterMobileNumbers: master.MobileNumbers,
+                                  masterEmailAddresses: master.Emails,
+                                  masterMobileNumbers: master.Mobiles,
                                   withLoginAction: WithLoginAction,
                                   masterAccounts: master.Accounts,
                                   masterTransactionEmailOTPs: masterTransaction.EmailOTPs,
@@ -29,8 +29,8 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val module: String = constants.Module.CONTROLLERS_CONTACT
 
-  implicit val emailAddressWrites: OWrites[master.EmailAddress] = Json.writes[master.EmailAddress]
-  implicit val mobileNumberWrites: OWrites[master.MobileNumber] = Json.writes[master.MobileNumber]
+  implicit val emailAddressWrites: OWrites[master.Email] = Json.writes[master.Email]
+  implicit val mobileNumberWrites: OWrites[master.Mobile] = Json.writes[master.Mobile]
 
   def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -59,7 +59,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           def addEmailAddress: Future[String] = masterEmailAddresses.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
           def updateEmailAddress: Future[Int] = masterEmailAddresses.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
 
-          def addOrUpdateEmailAddress(emailAddress: Option[EmailAddress]): Future[Unit] = {
+          def addOrUpdateEmailAddress(emailAddress: Option[Email]): Future[Unit] = {
             emailAddress match {
               case Some(email) => if(email.emailAddress != addOrUpdateEmailAddressData.emailAddress) {
                 for{_ <- updateEmailAddress} yield Unit
@@ -110,7 +110,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
           def updateMobileNumber: Future[Int] = masterMobileNumbers.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber)
 
-          def addOrUpdateMobileNumber(mobileNumber: Option[MobileNumber]): Future[Unit] = {
+          def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
             mobileNumber match {
               case Some(mobile) => if(mobile.mobileNumber != addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber) {
                 for{_ <- updateMobileNumber} yield Unit

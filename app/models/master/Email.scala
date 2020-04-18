@@ -10,10 +10,10 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class EmailAddress(id: String, emailAddress: String, status: Boolean = false)
+case class Email(id: String, emailAddress: String, status: Boolean = false)
 
 @Singleton
-class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_EMAIL_ADDRESS
 
@@ -25,9 +25,9 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private val logger: Logger = Logger(this.getClass)
 
-  private[models] val emailAddressTable = TableQuery[EmailAddressTable]
+  private[models] val emailTable = TableQuery[EmailTable]
 
-  private def add(emailAddress: EmailAddress): Future[String] = db.run((emailAddressTable returning emailAddressTable.map(_.id) += emailAddress).asTry).map {
+  private def add(email: Email): Future[String] = db.run((emailTable returning emailTable.map(_.id) += email).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -35,9 +35,9 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def getByID(id: String): Future[Option[EmailAddress]] = db.run(emailAddressTable.filter(_.id === id).result.headOption)
+  private def getByID(id: String): Future[Option[Email]] = db.run(emailTable.filter(_.id === id).result.headOption)
 
-  private def tryGetByID(id: String): Future[EmailAddress] = db.run(emailAddressTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(id: String): Future[Email] = db.run(emailTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -45,7 +45,7 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def tryGetEmailAddressByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(emailAddressTable.filter(_.id === id).filter(_.status === status).map(_.emailAddress).result.head.asTry).map {
+  private def tryGetEmailAddressByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(emailTable.filter(_.id === id).filter(_.status === status).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -53,11 +53,11 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def getEmailAddressById(id: String, status: Boolean): Future[Option[String]] = db.run(emailAddressTable.filter(_.id === id).filter(_.status === status).map(_.emailAddress).result.headOption)
+  private def getEmailAddressById(id: String, status: Boolean): Future[Option[String]] = db.run(emailTable.filter(_.id === id).filter(_.status === status).map(_.emailAddress).result.headOption)
 
-  private def getAccountIDByEmailAddress(emailAddress: String): Future[Option[String]] = db.run(emailAddressTable.filter(_.emailAddress === emailAddress).map(_.id).result.headOption)
+  private def getAccountIDByEmailAddress(emailAddress: String): Future[Option[String]] = db.run(emailTable.filter(_.emailAddress === emailAddress).map(_.id).result.headOption)
 
-  private def deleteById(id: String) = db.run(emailAddressTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(emailTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -67,7 +67,7 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def upsert(emailAddress: EmailAddress): Future[Int] = db.run(emailAddressTable.insertOrUpdate(emailAddress).asTry).map {
+  private def upsert(email: Email): Future[Int] = db.run(emailTable.insertOrUpdate(email).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -75,7 +75,7 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def updateEmailAddressVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(emailAddressTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
+  private def updateEmailAddressVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(emailTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -87,7 +87,7 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def updateEmailAddressVerificationStatusOnEmailAddress(emailAddress: String, verificationStatus: Boolean): Future[Int] = db.run(emailAddressTable.filter(_.emailAddress === emailAddress).map(_.status).update(verificationStatus).asTry).map {
+  private def updateEmailAddressVerificationStatusOnEmailAddress(emailAddress: String, verificationStatus: Boolean): Future[Int] = db.run(emailTable.filter(_.emailAddress === emailAddress).map(_.status).update(verificationStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -95,7 +95,7 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def updateEmailAddressAndStatusByID(id: String, emailAddress: String, status: Boolean): Future[Int] = db.run(emailAddressTable.filter(_.id === id).map(x => (x.emailAddress, x.status)).update((emailAddress, status)).asTry).map {
+  private def updateEmailAddressAndStatusByID(id: String, emailAddress: String, status: Boolean): Future[Int] = db.run(emailTable.filter(_.id === id).map(x => (x.emailAddress, x.status)).update((emailAddress, status)).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -107,9 +107,9 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private[models] class EmailAddressTable(tag: Tag) extends Table[EmailAddress](tag, "EmailAddress") {
+  private[models] class EmailTable(tag: Tag) extends Table[Email](tag, "Email") {
 
-    def * = (id, emailAddress, status) <> (EmailAddress.tupled, EmailAddress.unapply)
+    def * = (id, emailAddress, status) <> (Email.tupled, Email.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -121,11 +121,11 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def get(id: String): Future[Option[EmailAddress]] = getByID(id)
+    def get(id: String): Future[Option[Email]] = getByID(id)
 
-    def tryGet(id: String): Future[EmailAddress] = tryGetByID(id)
+    def tryGet(id: String): Future[Email] = tryGetByID(id)
 
-    def create(id: String, emailAddress: String): Future[String] = add(EmailAddress(id = id, emailAddress = emailAddress))
+    def create(id: String, emailAddress: String): Future[String] = add(Email(id = id, emailAddress = emailAddress))
 
     def unVerifyOldEmailAddresses(emailAddress: String): Future[Int] = updateEmailAddressVerificationStatusOnEmailAddress(emailAddress, verificationStatus = false)
 

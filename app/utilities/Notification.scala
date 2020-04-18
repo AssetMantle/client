@@ -17,8 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Notification @Inject()(masterTransactionNotifications: masterTransaction.Notifications,
-                             masterEmailAddresses: master.EmailAddresses,
-                             masterMobileNumbers: master.MobileNumbers,
+                             masterEmailAddresses: master.Emails,
+                             masterMobileNumbers: master.Mobiles,
                              mailerClient: MailerClient,
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,

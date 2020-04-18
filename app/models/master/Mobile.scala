@@ -10,10 +10,10 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class MobileNumber(id: String, mobileNumber: String, status: Boolean = false)
+case class Mobile(id: String, mobileNumber: String, status: Boolean = false)
 
 @Singleton
-class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_MOBILE_NUMBER
 
@@ -25,9 +25,9 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private val logger: Logger = Logger(this.getClass)
 
-  private[models] val mobileNumberTable = TableQuery[MobileNumberTable]
+  private[models] val mobileTable = TableQuery[MobileTable]
 
-  private def add(mobileNumber: MobileNumber): Future[String] = db.run((mobileNumberTable returning mobileNumberTable.map(_.id) += mobileNumber).asTry).map {
+  private def add(mobile: Mobile): Future[String] = db.run((mobileTable returning mobileTable.map(_.id) += mobile).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -35,9 +35,9 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getByID(id: String): Future[Option[MobileNumber]] = db.run(mobileNumberTable.filter(_.id === id).result.headOption)
+  private def getByID(id: String): Future[Option[Mobile]] = db.run(mobileTable.filter(_.id === id).result.headOption)
 
-  private def tryGetByID(id: String): Future[MobileNumber] = db.run(mobileNumberTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(id: String): Future[Mobile] = db.run(mobileTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -45,7 +45,7 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def tryGetMobileNumberByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(mobileNumberTable.filter(_.id === id).filter(_.status === status).map(_.mobileNumber).result.head.asTry).map {
+  private def tryGetMobileNumberByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(mobileTable.filter(_.id === id).filter(_.status === status).map(_.mobileNumber).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -53,9 +53,9 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getAccountIDByMobileNumber(mobileNumber: String): Future[Option[String]] = db.run(mobileNumberTable.filter(_.mobileNumber === mobileNumber).map(_.id).result.headOption)
+  private def getAccountIDByMobileNumber(mobileNumber: String): Future[Option[String]] = db.run(mobileTable.filter(_.mobileNumber === mobileNumber).map(_.id).result.headOption)
 
-  private def deleteById(id: String) = db.run(mobileNumberTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(mobileTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -65,7 +65,7 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def upsert(mobileNumber: MobileNumber): Future[Int] = db.run(mobileNumberTable.insertOrUpdate(mobileNumber).asTry).map {
+  private def upsert(mobile: Mobile): Future[Int] = db.run(mobileTable.insertOrUpdate(mobile).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -73,7 +73,7 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(mobileNumberTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
+  private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(mobileTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -85,7 +85,7 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileNumberTable.filter(_.mobileNumber === mobileNumber).map(_.status).update(status).asTry).map {
+  private def updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileTable.filter(_.mobileNumber === mobileNumber).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -93,7 +93,7 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateMobileNumberAndStatusByID(id: String, mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileNumberTable.filter(_.id === id).map(x => (x.mobileNumber, x.status)).update((mobileNumber, status)).asTry).map {
+  private def updateMobileNumberAndStatusByID(id: String, mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileTable.filter(_.id === id).map(x => (x.mobileNumber, x.status)).update((mobileNumber, status)).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -105,9 +105,9 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private[models] class MobileNumberTable(tag: Tag) extends Table[MobileNumber](tag, "MobileNumber") {
+  private[models] class MobileTable(tag: Tag) extends Table[Mobile](tag, "Mobile") {
 
-    def * = (id, mobileNumber, status) <> (MobileNumber.tupled, MobileNumber.unapply)
+    def * = (id, mobileNumber, status) <> (Mobile.tupled, Mobile.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -119,11 +119,11 @@ class MobileNumbers @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def get(id: String): Future[Option[MobileNumber]] = getByID(id)
+    def get(id: String): Future[Option[Mobile]] = getByID(id)
 
-    def tryGet(id: String): Future[MobileNumber] = tryGetByID(id)
+    def tryGet(id: String): Future[Mobile] = tryGetByID(id)
 
-    def create(id: String, mobileNumber: String): Future[String] = add(MobileNumber(id = id, mobileNumber = mobileNumber))
+    def create(id: String, mobileNumber: String): Future[String] = add(Mobile(id = id, mobileNumber = mobileNumber))
 
     def updateMobileNumberVerificationStatus(id: String, mobileNumberVerificationStatus: Boolean): Future[Int] = updateMobileNumberVerificationStatusOnId(id, mobileNumberVerificationStatus)
 
