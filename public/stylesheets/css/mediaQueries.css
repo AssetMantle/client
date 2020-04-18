@@ -163,6 +163,10 @@
     padding: 0px; }
   .leftSideContainer .docView .cmuk-card-body {
     height: 300px; }
+  .leftSideContainer .zoneTradeFinancial .cmuk-card-body {
+    height: auto; }
+    .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
+      height: 210px; }
 
   .rightSideContainer .recentActivityContainer {
     margin-bottom: 15px; }
