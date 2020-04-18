@@ -35,8 +35,8 @@ class ComponentViewController @Inject()(
                                          masterOrganizations: master.Organizations,
                                          masterZones: master.Zones,
                                          masterAccountKYCs: master.AccountKYCs,
-                                         masterMobileNumbers: master.Mobiles,
-                                         masterEmailAddresses: master.Emails,
+                                         masterMobiles: master.Mobiles,
+                                         masterEmails: master.Emails,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
@@ -606,8 +606,8 @@ class ComponentViewController @Inject()(
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val mobileNumber: Future[Option[Mobile]] = masterMobileNumbers.Service.get(loginState.username)
-      val emailAddress: Future[Option[Email]] = masterEmailAddresses.Service.get(loginState.username)
+      val mobile: Future[Option[Mobile]] = masterMobiles.Service.get(loginState.username)
+      val email: Future[Option[Email]] = masterEmails.Service.get(loginState.username)
       val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
       def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
@@ -639,10 +639,10 @@ class ComponentViewController @Inject()(
       }
 
       (for {
-        mobileNumber <- mobileNumber
-        emailAddress <- emailAddress
+        mobile <- mobile
+        email <- email
         identification <- identification
-        result <- getUserResult(identification, utilities.Contact.getStatus(mobileNumber,emailAddress))
+        result <- getUserResult(identification, utilities.Contact.getStatus(mobile,email))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))

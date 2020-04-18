@@ -17,8 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                   utilitiesNotification: utilities.Notification,
-                                  masterEmailAddresses: master.Emails,
-                                  masterMobileNumbers: master.Mobiles,
+                                  masterEmails: master.Emails,
+                                  masterMobiles: master.Mobiles,
                                   withLoginAction: WithLoginAction,
                                   masterAccounts: master.Accounts,
                                   masterTransactionEmailOTPs: masterTransaction.EmailOTPs,
@@ -34,7 +34,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterEmailAddresses.Service.get(loginState.username)
+      val contact = masterEmails.Service.get(loginState.username)
 
       (for {
         contact <- contact
@@ -55,9 +55,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           Future(BadRequest(views.html.component.master.addOrUpdateEmailAddress(formWithErrors)))
         },
         addOrUpdateEmailAddressData => {
-          val emailAddress = masterEmailAddresses.Service.get(loginState.username)
-          def addEmail: Future[String] = masterEmailAddresses.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
-          def updateEmail: Future[Int] = masterEmailAddresses.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
+          val emailAddress = masterEmails.Service.get(loginState.username)
+          def addEmail: Future[String] = masterEmails.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
+          def updateEmail: Future[Int] = masterEmails.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
 
           def addOrUpdateEmailAddress(emailAddress: Option[Email]): Future[Unit] = {
             emailAddress match {
@@ -83,7 +83,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def addOrUpdateMobileNumberForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterMobileNumbers.Service.get(loginState.username)
+      val contact = masterMobiles.Service.get(loginState.username)
 
       (for {
         contact <- contact
@@ -104,11 +104,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           Future(BadRequest(views.html.component.master.addOrUpdateMobileNumber(formWithErrors)))
         },
         addOrUpdateMobileNumberData => {
-          val mobileNumber = masterMobileNumbers.Service.get(loginState.username)
+          val mobileNumber = masterMobiles.Service.get(loginState.username)
 
-          def addMobile: Future[String] = masterMobileNumbers.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString(""))
+          def addMobile: Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString(""))
 
-          def updateMobile: Future[Int] = masterMobileNumbers.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber)
+          def updateMobile: Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber)
 
           def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
             mobileNumber match {
@@ -134,8 +134,8 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val emailAddress = masterEmailAddresses.Service.get(loginState.username)
-      val mobileNumber = masterMobileNumbers.Service.get(loginState.username)
+      val emailAddress = masterEmails.Service.get(loginState.username)
+      val mobileNumber = masterMobiles.Service.get(loginState.username)
       (for {
         emailAddress <- emailAddress
         mobileNumber <- mobileNumber
@@ -147,7 +147,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val emailAddress: Future[String] = masterEmailAddresses.Service.tryGetUnverifiedEmailAddress(loginState.username)
+      val emailAddress: Future[String] = masterEmails.Service.tryGetUnverifiedEmailAddress(loginState.username)
 
       def getOTP: Future[String] = masterTransactionEmailOTPs.Service.get(loginState.username)
 
@@ -174,7 +174,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         verifyEmailAddressData => {
           val verifyOTP = masterTransactionEmailOTPs.Service.verifyOTP(id = loginState.username, otp = verifyEmailAddressData.otp)
 
-          def verifyEmailAddress(otpVerified: Boolean): Future[Int] = if (otpVerified) masterEmailAddresses.Service.verifyEmailAddress(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
+          def verifyEmailAddress(otpVerified: Boolean): Future[Int] = if (otpVerified) masterEmails.Service.verifyEmailAddress(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
 
           (for {
             otpVerified <- verifyOTP
@@ -193,7 +193,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val mobileNumber = masterMobileNumbers.Service.tryGetUnverifiedMobileNumber(loginState.username)
+      val mobileNumber = masterMobiles.Service.tryGetUnverifiedMobileNumber(loginState.username)
 
       def getOTP: Future[String] = masterTransactionSMSOTPs.Service.get(loginState.username)
 
@@ -215,7 +215,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         verifyMobileNumberData => {
           val verifyOTP = masterTransactionSMSOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
-          def verifyMobileNumber(otpVerified: Boolean): Future[Int] = if (otpVerified) masterMobileNumbers.Service.verifyMobileNumber(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
+          def verifyMobileNumber(otpVerified: Boolean): Future[Int] = if (otpVerified) masterMobiles.Service.verifyMobileNumber(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
 
           (for {
             otpVerified <- verifyOTP

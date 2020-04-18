@@ -17,8 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Notification @Inject()(masterTransactionNotifications: masterTransaction.Notifications,
-                             masterEmailAddresses: master.Emails,
-                             masterMobileNumbers: master.Mobiles,
+                             masterEmails: master.Emails,
+                             masterMobiles: master.Mobiles,
                              mailerClient: MailerClient,
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
@@ -123,7 +123,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private def sendEmailByAccountID(accountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Future[String] = {
 
-    val emailAddress: Future[String] = masterEmailAddresses.Service.tryGetVerifiedEmailAddress(accountID)
+    val emailAddress: Future[String] = masterEmails.Service.tryGetVerifiedEmailAddress(accountID)
 
     (for {
       emailAddress <- emailAddress
@@ -148,7 +148,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private def sendSMSByAccountID(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
 
-    val mobileNumber: Future[String] = masterMobileNumbers.Service.tryGetVerifiedMobileNumber(accountID)
+    val mobileNumber: Future[String] = masterMobiles.Service.tryGetVerifiedMobileNumber(accountID)
 
     (for {
       mobileNumber <- mobileNumber

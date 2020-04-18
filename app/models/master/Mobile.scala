@@ -53,8 +53,6 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getAccountIDByMobileNumber(mobileNumber: String): Future[Option[String]] = db.run(mobileTable.filter(_.mobileNumber === mobileNumber).map(_.id).result.headOption)
-
   private def deleteById(id: String) = db.run(mobileTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -125,8 +123,6 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def create(id: String, mobileNumber: String): Future[String] = add(Mobile(id = id, mobileNumber = mobileNumber))
 
-    def updateMobileNumberVerificationStatus(id: String, mobileNumberVerificationStatus: Boolean): Future[Int] = updateMobileNumberVerificationStatusOnId(id, mobileNumberVerificationStatus)
-
     def unVerifyOldMobileNumbers(mobileNumber: String): Future[Int] = updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber, status = false)
 
     def verifyMobileNumber(id: String): Future[Int] = {
@@ -141,8 +137,6 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def tryGetVerifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = true)
 
     def tryGetUnverifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = false)
-
-    def getMobileNumberAccount(mobileNumber: String): Future[Option[String]] = getAccountIDByMobileNumber(mobileNumber)
 
     def updateMobileNumber(id: String, mobileNumber: String): Future[Int] = updateMobileNumberAndStatusByID(id = id, mobileNumber = mobileNumber, status = false)
   }

@@ -37,8 +37,8 @@ class AccountController @Inject()(
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
                                    messagesControllerComponents: MessagesControllerComponents,
-                                   masterEmailAddresses: master.Emails,
-                                   masterMobileNumbers: master.Mobiles,
+                                   masterEmails: master.Emails,
+                                   masterMobiles: master.Mobiles,
                                    masterIdentifications: master.Identifications,
                                    masterAccountKYCs: master.AccountKYCs
                                  )
@@ -134,8 +134,8 @@ class AccountController @Inject()(
         }
 
         def getContactWarnings: Future[Seq[constants.Response.Warning]] = {
-          val email = masterEmailAddresses.Service.get(loginData.username)
-          val mobile = masterMobileNumbers.Service.get(loginData.username)
+          val email = masterEmails.Service.get(loginData.username)
+          val mobile = masterMobiles.Service.get(loginData.username)
           for {
             email <- email
             mobile <- mobile
