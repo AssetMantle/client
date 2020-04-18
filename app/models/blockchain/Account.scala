@@ -30,7 +30,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   import databaseConfig.profile.api._
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private[models] val accountTable = TableQuery[AccountTable]
 

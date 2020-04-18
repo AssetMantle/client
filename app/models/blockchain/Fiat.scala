@@ -31,7 +31,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 

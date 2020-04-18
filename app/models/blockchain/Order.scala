@@ -29,7 +29,7 @@ class Orders @Inject()(masterAccounts: master.Accounts, masterNegotiations: mast
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private[models] val orderTable = TableQuery[OrderTable]
 

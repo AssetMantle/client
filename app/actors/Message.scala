@@ -41,4 +41,10 @@ object Message {
 
   case class ShutdownCometUserActor(username: String)
 
+  case class Email(emailAddress: String, email: constants.Notification.Email, messageParameters: Seq[String])
+
+  case class SMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: Seq[String])
+
+  case class PushNotification(token: String, pushNotification: constants.Notification.PushNotification, messageParameters: Seq[String])
+
 }

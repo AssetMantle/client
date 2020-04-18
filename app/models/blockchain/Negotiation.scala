@@ -28,7 +28,7 @@ class Negotiations @Inject()(masterAccounts: master.Accounts, actorSystem: Actor
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 

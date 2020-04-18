@@ -217,7 +217,7 @@ class ComponentViewController @Inject()(
 
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok.chunked(actors.Service.createCometSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
+      Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

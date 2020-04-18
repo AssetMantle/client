@@ -24,7 +24,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private val sessionTokenTimeout: Long = configuration.get[Long]("play.http.session.token.timeout")
 
@@ -150,7 +150,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
       ids <- ids
     } yield {
       ids.foreach { id =>
-        actors.Service.shutdownCometActor(id)
+        actors.Service.Comet.shutdownUserActor(id)
       }
       Service.deleteSessionTokens(ids)
     }).recover {

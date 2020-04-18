@@ -178,7 +178,7 @@ class AccountController @Inject()(
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           def shutdownActorsAndGetResult = {
-            actors.Service.shutdownCometActor(loginState.username)
+            actors.Service.Comet.shutdownUserActor(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
