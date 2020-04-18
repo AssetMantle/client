@@ -25,7 +25,7 @@
             </div>
             <div class="sellerTerm">
                 @commonIntInfo(constants.View.PRICE, negotiation.price)
-            <div>
+            <div class="sellerTermStatus">
             @negotiation.buyerAcceptedPrice
             </div>
             </div>
@@ -41,7 +41,7 @@
                 @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
             </div>
             <div class="sellerTerm">
-                <div >
+                <div>
                     @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
                     @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                     @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)

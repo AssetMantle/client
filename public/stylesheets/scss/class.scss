@@ -8,7 +8,7 @@ html, body{
 }
 
 .scroller{
-  scrollbar-color: #7f7f7f white;
+  scrollbar-color: #E2E4E6 white;
   scrollbar-width: thin;
 }
 
@@ -28,13 +28,13 @@ html, body{
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #7f7f7f;
+  background: #E2E4E6;
   border-right: 1px solid white;
 }
 
 %iconBackground{
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   margin-right: 15px;
   position: relative;
@@ -1526,8 +1526,8 @@ position: relative;
         align-items: center;
         .walletIcon{
           @extend %iconBackground;
-          opacity: 0.7;
-          background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
+          background:#053C75;
+          box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
         }
         .cmuk-comment-meta{
           @extend %cmuk-comment-meta;
@@ -1543,8 +1543,8 @@ position: relative;
         align-items: center;
         .payableIcon{
           @extend %iconBackground;
-          opacity: 0.7;
-          background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
+          background: #B004DB;
+          box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
         }
         .cmuk-comment-meta{
           @extend %cmuk-comment-meta;
@@ -1554,8 +1554,8 @@ position: relative;
         align-items: center;
         .receivableIcon{
           @extend %iconBackground;
-          opacity: 0.7;
-          background: linear-gradient(180deg, #37CE34 0%, #1D8C1A 100%);
+          background: #0CCB08;
+          box-shadow: 0 0 0 3px rgba(83, 217, 81, 0.25);
         }
         .cmuk-comment-meta{
           @extend %cmuk-comment-meta;
@@ -1592,15 +1592,60 @@ position: relative;
   }
   .walletIcon .icon, .receivableIcon .icon, .payableIcon .icon{
     position: absolute;
-    left: 2px;
+    left: 0px;
     top: 0px;
     margin: auto;
     right: 0;
     bottom: 2px;
   }
   .icon{
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
+  }
+  .zoneTradeFinancial{
+    .cmuk-card-body {
+      padding: 0;
+      .cmuk-subnav {
+        border-bottom: 1px solid #e5e5e5;
+        li{
+        &:first-child {
+          border-right: 1px solid #cccccc;
+        }
+        padding: 0px;
+        flex: 1;
+        text-align: center;
+        margin: 0;
+        a {
+          padding: 15px 0px;
+          font-family: $fontFamilySecondary;
+          text-transform: capitalize;
+          font-size: $paragraphFontSizeMedium;
+        }
+      }
+      }
+      .cmuk-subnav>.cmuk-active>a{
+        font-family: $fontFamilySecondary;
+        color: #061728;
+        background: none;
+        font-weight: bold;
+        border-bottom: 2px solid #0862BE;
+      }
+      .cmuk-switcher{
+        height: 300px;
+        overflow: auto;
+        .cmuk-comment-meta{
+          color: #061728;
+          font-size:$paragraphFontSizeMedium;
+        }
+      }
+      .cmuk-switcher>li{
+        padding: 0px;
+        margin: 0px;
+        li {
+          margin:0 30px;
+        }
+      }
+    }
   }
 }
 
