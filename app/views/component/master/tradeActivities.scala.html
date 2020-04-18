@@ -4,7 +4,7 @@
 
 @(negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.RECENT_ACTIVITY) {
+@commonCard(constants.View.RECENT_ACTIVITY,'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
 } {
     <div class="scroller">
         <div id="tradeActivityMessages"></div>

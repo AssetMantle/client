@@ -10,6 +10,12 @@ object SelectFieldOptions {
   val PAYMENT_TERMS: Seq[String] = Seq(constants.Form.ONLY_SUPPLIER, constants.Form.ONLY_BUYER, constants.Form.BOTH_PARTIES)
   val MODE: Seq[String] = Seq("async", "sync", "block")
   val REFRENCE_DATES: Seq[String] = Seq("INVOICE_DATE", "SHIPPING_DATE")
+  val ASSET_ICON_MAP = Map(
+    "Oil" -> "images/icons/oil.svg",
+    "Coal" -> "images/icons/coal.svg",
+    "Gold" -> "images/icons/gold.svg",
+    "Wheat" -> "images/icons/oil.svg",
+  )
 
   val COUNTRY_CODES: Seq[String] = Seq(
     "+1",

@@ -246,4 +246,5 @@ object View {
   val BANK_ACCOUNT = "BANK_ACCOUNT"
   val ACCEPT = "ACCEPT"
   val REJECT = "REJECT"
+  val MODIFY = "MODIFY"
 }

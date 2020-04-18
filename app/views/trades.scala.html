@@ -6,7 +6,7 @@
 @common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftTradeFinancial">
+    <div class="leftSideContainer">
         <div id="financials"></div>
     </div>
     <script>
@@ -48,8 +48,10 @@
 }
 
 @right = {
+    <div class="rightSideContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
+    </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

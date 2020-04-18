@@ -590,6 +590,16 @@ html, body{
 font-family: $fontFamilyPrimary;
 }
 
+.updateDocumentField{
+position: relative;
+  button{
+    position: absolute;
+    top: 9px;
+    left: 25%;
+    font-weight: bold;
+  }
+}
+
 .comdex {
   .cmuk-sticky-fixed{
     width: 100% !important;
@@ -1253,7 +1263,7 @@ font-family: $fontFamilyPrimary;
             border-right: 1px solid #cccccc;
           }
           padding: 0px;
-          width: 49%;
+          flex:1;
           text-align: center;
           a{
             padding: 15px 0px;
@@ -1281,10 +1291,11 @@ font-family: $fontFamilyPrimary;
           align-items: center;
           margin: 15px 0px;
           .commodityImage{
-            width: 30px;
-            height: 30px;
+            width: 44px;
+            height: 44px;
             display: inline-flex;
-            background: #cccc;
+            background: #F2F2F2;
+            border: 1.51312px solid #E3E3E3;
             position: relative;
             text-align: center;
             border-radius: 50%;
@@ -1350,6 +1361,7 @@ font-family: $fontFamilyPrimary;
               font-weight: bold;
               text-transform: uppercase;
               letter-spacing: 0.01em;
+              font-style: normal;
             }
             .termValue{
               color: #061728;
@@ -1371,7 +1383,7 @@ font-family: $fontFamilyPrimary;
             .termStatus{
               display: flex;
               align-items: center;
-              font-family: $fontFamilySecondary;
+              font-family: $fontFamilyPrimary;
               color:#061728;
               .commonCheckBox dt{
                 width: auto;
@@ -1381,8 +1393,9 @@ font-family: $fontFamilyPrimary;
                 margin-bottom: 0px;
               }
               .cmuk-checkbox{
-                height: 20px;
-                width: 20px;
+                height: 22px;
+                width: 22px;
+                border:1px solid #5EB55C;
               }
               .cmuk-checkbox:focus, .cmuk-radio:focus{
                 border-color: #5EB55C;
@@ -1391,7 +1404,20 @@ font-family: $fontFamilyPrimary;
                 background-color: #5EB55C;
               }
             }
-
+            .subTerms{
+              text-indent:30px;
+              margin-top: 10px;
+              .infoRowLabel{
+                color: #061728;
+                font-weight: normal;
+                width: auto;
+                margin:2px 0px 3px 0px;
+              }
+              .infoRowValue{
+                color: #061728;
+                font-weight: bold;
+              }
+            }
           }
           hr{
             margin: 15px 0px;
@@ -1414,12 +1440,23 @@ font-family: $fontFamilyPrimary;
             font-size: $paragraphFontSizeSmall;
             font-weight: bold;
             text-transform: uppercase;
+            margin:2px 0px 3px 0px;
           }
           .infoRowValue{
             font-family: Oxygen;
             color: #061728;
             font-size: $paragraphFontSizeSmall;
             margin-left: 20px;
+          }
+          .sellerTermStatus{
+            font-family: $fontFamilyPrimary;
+            color:#061728;
+          }
+          .documentTitle{
+            color: #061728;
+            font-family: $fontFamilySecondary;
+            font-size: $paragraphFontSizeSmall;
+            margin:0px 0px 5px 0px;
           }
         }
         button{
@@ -1432,7 +1469,7 @@ font-family: $fontFamilyPrimary;
   }
 }
 
-.leftTradeFinancial{
+.leftSideContainer{
   .financial{
     margin-bottom: 20px;
   }
@@ -1567,7 +1604,7 @@ font-family: $fontFamilyPrimary;
   }
 }
 
-.recentActivity{
+.rightSideContainer{
   .recentActivityContainer{
     margin-bottom: 20px;
     .cmuk-card-header{
@@ -2441,7 +2478,7 @@ dl .info {
   .cmuk-subnav{
     margin:0px;
     justify-content:center;
-    border-bottom: 1px solid $colorPrimary;
+    border-bottom: 1px solid #e7eaf3;
     li{
       text-align: center;
       padding: 0;

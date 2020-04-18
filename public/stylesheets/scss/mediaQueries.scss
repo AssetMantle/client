@@ -95,7 +95,7 @@
       float: left;
       left: 0;
       margin-right: 0.5%;
-      width: 24%;
+      width: 24.5%;
       margin-bottom: 5px;
     }
 
@@ -107,7 +107,7 @@
 
     .rightSide {
       height: 100%;
-      width: 24%;
+      width: 24.5%;
       float: left;
       margin-left: 0.5%;
       right: 0;
@@ -128,7 +128,7 @@
   .modal .modalContent{
     max-height: 470px;
   }
-  .leftTradeFinancial{
+  .leftSideContainer{
     .financial{
       margin-bottom: 15px;
     }
@@ -171,7 +171,7 @@
       }
     }
   }
-  .recentActivity{
+  .rightSideContainer{
     .recentActivityContainer{
       margin-bottom: 15px;
       .cmuk-card-body{
@@ -221,7 +221,7 @@
       font-size: $paragraphFontSizeSmall;
     }
   }
-  .leftTradeFinancial {
+  .leftSideContainer{
     .financial{
       ul{
         li .ctitle{

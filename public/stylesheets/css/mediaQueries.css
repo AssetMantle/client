@@ -63,7 +63,7 @@
     float: left;
     left: 0;
     margin-right: 0.5%;
-    width: 24%;
+    width: 24.5%;
     margin-bottom: 5px; }
   .pageContainer .middle {
     width: 50%;
@@ -71,7 +71,7 @@
     float: left; }
   .pageContainer .rightSide {
     height: 100%;
-    width: 24%;
+    width: 24.5%;
     float: left;
     margin-left: 0.5%;
     right: 0;
@@ -85,17 +85,17 @@
   .modal .modalContent {
     max-height: 470px; }
 
-  .leftTradeFinancial .financial {
+  .leftSideContainer .financial {
     margin-bottom: 15px; }
-  .leftTradeFinancial .cmuk-card-header {
+  .leftSideContainer .cmuk-card-header {
     font-size: 12px; }
-  .leftTradeFinancial .financial .cmuk-card-body {
+  .leftSideContainer .financial .cmuk-card-body {
     height: 210px; }
-  .leftTradeFinancial .financial ul li {
+  .leftSideContainer .financial ul li {
     padding: 10px 0; }
-    .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .wallet .ctitle {
+    .leftSideContainer .financial ul li .wallet .cmuk-comment-meta, .leftSideContainer .financial ul li .wallet .ctitle {
       font-size: 14px; }
-  .leftTradeFinancial .addBalanceButton {
+  .leftSideContainer .addBalanceButton {
     text-transform: capitalize;
     font-family: Rubik;
     padding: 8px 8px;
@@ -106,20 +106,20 @@
     color: #0862BE;
     font-size: 10px;
     border: 0; }
-  .leftTradeFinancial .docView .cmuk-card-header, .leftTradeFinancial .docView .cmuk-card-body, .leftTradeFinancial .docView .documentlist {
+  .leftSideContainer .docView .cmuk-card-header, .leftSideContainer .docView .cmuk-card-body, .leftSideContainer .docView .documentlist {
     padding: 0px; }
-  .leftTradeFinancial .docView .cmuk-card-body {
+  .leftSideContainer .docView .cmuk-card-body {
     height: 300px; }
 
-  .recentActivity .recentActivityContainer {
+  .rightSideContainer .recentActivityContainer {
     margin-bottom: 15px; }
-    .recentActivity .recentActivityContainer .cmuk-card-body {
+    .rightSideContainer .recentActivityContainer .cmuk-card-body {
       height: 210px; }
-    .recentActivity .recentActivityContainer .cmuk-card-header {
+    .rightSideContainer .recentActivityContainer .cmuk-card-header {
       font-size: 12px; }
-  .recentActivity .chatRoom .cmuk-card-body {
+  .rightSideContainer .chatRoom .cmuk-card-body {
     height: 300px; }
-    .recentActivity .chatRoom .cmuk-card-body .chatMessages {
+    .rightSideContainer .chatRoom .cmuk-card-body .chatMessages {
       height: 190px; }
 
   .timeline {
@@ -140,7 +140,7 @@
   .commonList .listItemChild {
     font-size: 14px; }
 
-  .leftTradeFinancial .financial ul li .ctitle {
+  .leftSideContainer .financial ul li .ctitle {
     font-size: 14px; }
 
   .timeline .timeline-item .timeline-content .activityContent {
