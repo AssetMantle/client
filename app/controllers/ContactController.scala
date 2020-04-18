@@ -215,7 +215,6 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         verifyMobileNumberData => {
           val verifyOTP = masterTransactionSMSOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
-
           def verifyMobileNumber(otpVerified: Boolean): Future[Int] = if (otpVerified) masterMobileNumbers.Service.verifyMobileNumber(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
 
           (for {

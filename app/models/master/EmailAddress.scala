@@ -37,7 +37,7 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private def getByID(id: String): Future[Option[EmailAddress]] = db.run(emailAddressTable.filter(_.id === id).result.headOption)
 
-  private def tryGet(id: String): Future[EmailAddress] = db.run(emailAddressTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(id: String): Future[EmailAddress] = db.run(emailAddressTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -123,16 +123,16 @@ class EmailAddresses @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def get(id: String): Future[Option[EmailAddress]] = getByID(id)
 
-    def tryGet(id: String): Future[EmailAddress] = tryGet(id)
+    def tryGet(id: String): Future[EmailAddress] = tryGetByID(id)
 
     def create(id: String, emailAddress: String): Future[String] = add(EmailAddress(id = id, emailAddress = emailAddress))
 
+    def unVerifyOldEmailAddresses(emailAddress: String): Future[Int] = updateEmailAddressVerificationStatusOnEmailAddress(emailAddress, verificationStatus = false)
+
     def verifyEmailAddress(id: String): Future[Int] = {
-      val email = tryGet(id)
-      val verify = updateEmailAddressVerificationStatusOnId(id, verificationStatus = true)
-      def unVerifyOldEmailAddresses(emailAddress: String): Future[Int] = updateEmailAddressVerificationStatusOnEmailAddress(emailAddress, verificationStatus = false)
+      def verify: Future[Int] = updateEmailAddressVerificationStatusOnId(id, verificationStatus = true)
       for {
-        email <- email
+        email <- tryGet(id)
         _ <- unVerifyOldEmailAddresses(email.emailAddress)
         verify <- verify
       } yield verify
