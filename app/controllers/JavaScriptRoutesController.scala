@@ -169,7 +169,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ConfigurationController.queryConfigurationVariable,
 
-        routes.javascript.ContactController.addOrUpdateForm,
+        routes.javascript.ContactController.addOrUpdateEmailAddressForm,
+        routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
 
         routes.javascript.FileController.uploadAccountFileForm,

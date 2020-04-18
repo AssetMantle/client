@@ -92,8 +92,11 @@ GET         /negotiation/tradeActivityMessages                                  
 
 GET         /contact                                                                        controllers.ContactController.contact
 
-GET         /contact/addOrUpdate                                                            controllers.ContactController.addOrUpdateForm
-POST        /contact/addOrUpdate                                                            controllers.ContactController.addOrUpdate
+GET         /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddressForm
+POST        /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddress
+
+GET         /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumberForm
+POST        /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumber
 
 GET         /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddressForm
 POST        /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddress

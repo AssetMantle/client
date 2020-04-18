@@ -499,13 +499,11 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."Contact"
+CREATE TABLE IF NOT EXISTS MASTER."EmailAddress"
 (
     "id"                   VARCHAR NOT NULL,
-    "mobileNumber"         VARCHAR NOT NULL UNIQUE,
-    "mobileNumberVerified" BOOLEAN NOT NULL,
-    "emailAddress"         VARCHAR NOT NULL UNIQUE,
-    "emailAddressVerified" BOOLEAN NOT NULL,
+    "emailAddress"         VARCHAR NOT NULL,
+    "status" BOOLEAN       NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -521,6 +519,14 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     PRIMARY KEY ("accountID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."MobileNumber"
+(
+    "id"                   VARCHAR NOT NULL,
+    "mobileNumber"         VARCHAR NOT NULL,
+    "status" BOOLEAN       NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
@@ -904,8 +910,10 @@ ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Asset"
     ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
-ALTER TABLE MASTER."Contact"
-    ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."EmailAddress"
+    ADD CONSTRAINT EmailAddress_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."MobileNumber"
+    ADD CONSTRAINT MobileNumber_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Negotiation"
@@ -1030,8 +1038,9 @@ DROP TABLE IF EXISTS MASTER."Account" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Asset" CASCADE;
-DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
+DROP TABLE IF EXISTS MASTER."EmailAddress" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
+DROP TABLE IF EXISTS MASTER."MobileNumber" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;

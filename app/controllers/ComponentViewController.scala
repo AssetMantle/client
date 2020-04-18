@@ -35,7 +35,8 @@ class ComponentViewController @Inject()(
                                          masterOrganizations: master.Organizations,
                                          masterZones: master.Zones,
                                          masterAccountKYCs: master.AccountKYCs,
-                                         masterContacts: master.Contacts,
+                                         masterMobileNumbers: master.MobileNumbers,
+                                         masterEmailAddresses: master.EmailAddresses,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
@@ -605,7 +606,8 @@ class ComponentViewController @Inject()(
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact: Future[Option[Contact]] = masterContacts.Service.get(loginState.username)
+      val mobileNumber: Future[Option[MobileNumber]] = masterMobileNumbers.Service.get(loginState.username)
+      val emailAddress: Future[Option[EmailAddress]] = masterEmailAddresses.Service.get(loginState.username)
       val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
       def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
@@ -620,9 +622,9 @@ class ComponentViewController @Inject()(
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
-      def getUserResult(identification: Option[Identification], contactStatus: String): Future[Result] = {
+      def getUserResult(identification: Option[Identification], contactStatus: Seq[String]): Future[Result] = {
         val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
-        if (identificationStatus && contactStatus == constants.Status.Contact.COMPLETE) {
+        if (identificationStatus && contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
           for {
             trader <- getTraderOrNoneByAccountID(loginState.username)
             traderOrganization <- getOrganizationOrNoneByTrader(trader)
@@ -637,9 +639,10 @@ class ComponentViewController @Inject()(
       }
 
       (for {
-        contact <- contact
+        mobileNumber <- mobileNumber
+        emailAddress <- emailAddress
         identification <- identification
-        result <- getUserResult(identification, utilities.Contact.getStatus(contact))
+        result <- getUserResult(identification, utilities.Contact.getStatus(mobileNumber,emailAddress))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))

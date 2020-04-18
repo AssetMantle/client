@@ -5,19 +5,20 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
-import models.master.Contact
+import models.master.{EmailAddress, MobileNumber}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
-import views.companion.master.AddOrUpdateContact
+import views.companion.master.{AddOrUpdateEmailAddress, AddOrUpdateMobileNumber}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                   utilitiesNotification: utilities.Notification,
-                                  masterContacts: master.Contacts,
+                                  masterEmailAddresses: master.EmailAddresses,
+                                  masterMobileNumbers: master.MobileNumbers,
                                   withLoginAction: WithLoginAction,
                                   masterAccounts: master.Accounts,
                                   masterTransactionEmailOTPs: masterTransaction.EmailOTPs,
@@ -28,66 +29,101 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val module: String = constants.Module.CONTROLLERS_CONTACT
 
-  implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
+  implicit val emailAddressWrites: OWrites[master.EmailAddress] = Json.writes[master.EmailAddress]
+  implicit val mobileNumberWrites: OWrites[master.MobileNumber] = Json.writes[master.MobileNumber]
 
-  def addOrUpdateForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.get(loginState.username)
+      val contact = masterEmailAddresses.Service.get(loginState.username)
 
       (for {
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.addOrUpdateContact(views.companion.master.AddOrUpdateContact.form.fill(value = views.companion.master.AddOrUpdateContact.Data(emailAddress = contact.emailAddress, mobileNumber = contact.mobileNumber.takeRight(10), countryCode = contact.mobileNumber.dropRight(10)))))
-          case None => Ok(views.html.component.master.addOrUpdateContact())
+          case Some(contact) => Ok(views.html.component.master.addOrUpdateEmailAddress(views.companion.master.AddOrUpdateEmailAddress.form.fill(value = views.companion.master.AddOrUpdateEmailAddress.Data(emailAddress = contact.emailAddress))))
+          case None => Ok(views.html.component.master.addOrUpdateEmailAddress())
         }
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
-  def addOrUpdate(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateEmailAddress(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      AddOrUpdateContact.form.bindFromRequest().fold(
+      AddOrUpdateEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addOrUpdateContact(formWithErrors)))
+          Future(BadRequest(views.html.component.master.addOrUpdateEmailAddress(formWithErrors)))
         },
-        addOrUpdateData => {
-          val contact = masterContacts.Service.get(loginState.username)
-          val emailAddressAccount = masterContacts.Service.getEmailAddressAccount(addOrUpdateData.emailAddress)
-          val mobileNumberAccount = masterContacts.Service.getMobileNumberAccount(Seq(addOrUpdateData.countryCode, addOrUpdateData.mobileNumber).mkString(""))
+        addOrUpdateEmailAddressData => {
+          val emailAddress = masterEmailAddresses.Service.get(loginState.username)
+          def addEmailAddress: Future[String] = masterEmailAddresses.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
+          def updateEmailAddress: Future[Int] = masterEmailAddresses.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
 
-          def addOrUpdateContact(contact: Option[Contact], emailAddressAccount: Option[String], mobileNumberAccount: Option[String]): Future[Unit] = {
-
-            def createContact: Future[String] = masterContacts.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateData.countryCode, addOrUpdateData.mobileNumber).mkString(""), emailAddress = addOrUpdateData.emailAddress)
-
-            def updateEmailAddress(): Future[Int] = if (emailAddressAccount.isEmpty) {
-              masterContacts.Service.updateEmailAddress(id = loginState.username, emailAddress = addOrUpdateData.emailAddress)
-            } else if (emailAddressAccount.get != loginState.username) throw new BaseException(constants.Response.EMAIL_ADDRESS_TAKEN) else Future(0)
-
-            def updateMobileNumber(): Future[Int] = if (mobileNumberAccount.isEmpty) {
-              masterContacts.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateData.countryCode + addOrUpdateData.mobileNumber)
-            } else if (mobileNumberAccount.get != loginState.username) throw new BaseException(constants.Response.MOBILE_NUMBER_TAKEN) else Future(0)
-
-            if (contact.isEmpty) {
-              for {
-                _ <- createContact
-              } yield Unit
-            } else {
-              for {
-                _ <- updateEmailAddress()
-                _ <- updateMobileNumber()
-              } yield Unit
+          def addOrUpdateEmailAddress(emailAddress: Option[EmailAddress]): Future[Unit] = {
+            emailAddress match {
+              case Some(email) => if(email.emailAddress != addOrUpdateEmailAddressData.emailAddress) {
+                for{_ <- updateEmailAddress} yield Unit
+              } else Future(Unit)
+              case None => for{_ <- addEmailAddress} yield Unit
             }
           }
 
           (for {
-            contact <- contact
-            emailAddressAccount <- emailAddressAccount
-            mobileNumberAccount <- mobileNumberAccount
-            _ <- addOrUpdateContact(contact = contact, emailAddressAccount = emailAddressAccount, mobileNumberAccount = mobileNumberAccount)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTACT_UPDATED, loginState.username)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
+            emailAddress <- emailAddress
+            _ <- addOrUpdateEmailAddress(emailAddress)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_ADDRESS_UPDATED, loginState.username)
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_UPDATED)))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def addOrUpdateMobileNumberForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val contact = masterMobileNumbers.Service.get(loginState.username)
+
+      (for {
+        contact <- contact
+      } yield {
+        contact match {
+          case Some(contact) => Ok(views.html.component.master.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.takeRight(10), countryCode = contact.mobileNumber.dropRight(10)))))
+          case None => Ok(views.html.component.master.addOrUpdateMobileNumber())
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def addOrUpdateMobileNumber(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      AddOrUpdateMobileNumber.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.addOrUpdateMobileNumber(formWithErrors)))
+        },
+        addOrUpdateMobileNumberData => {
+          val mobileNumber = masterMobileNumbers.Service.get(loginState.username)
+
+          def addMobileNumber: Future[String] = masterMobileNumbers.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString(""))
+
+          def updateMobileNumber: Future[Int] = masterMobileNumbers.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber)
+
+          def addOrUpdateMobileNumber(mobileNumber: Option[MobileNumber]): Future[Unit] = {
+            mobileNumber match {
+              case Some(mobile) => if(mobile.mobileNumber != addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber) {
+                for{_ <- updateMobileNumber} yield Unit
+              } else Future(Unit)
+              case None => for{_ <- addMobileNumber} yield Unit
+            }
+          }
+
+          (for {
+            mobileNumber <- mobileNumber
+            _ <- addOrUpdateMobileNumber(mobileNumber)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.MOBILE_NUMBER_UPDATED, loginState.username)
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -98,10 +134,12 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val contact = masterContacts.Service.get(loginState.username)
+      val emailAddress = masterEmailAddresses.Service.get(loginState.username)
+      val mobileNumber = masterMobileNumbers.Service.get(loginState.username)
       (for {
-        contact <- contact
-      } yield Ok(views.html.component.master.contact(contact))
+        emailAddress <- emailAddress
+        mobileNumber <- mobileNumber
+      } yield Ok(views.html.component.master.contact(mobileNumber, emailAddress))
         ).recover {
         case _: BaseException => InternalServerError
       }
@@ -109,7 +147,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val emailAddress: Future[String] = masterContacts.Service.tryGetUnverifiedEmailAddress(loginState.username)
+      val emailAddress: Future[String] = masterEmailAddresses.Service.tryGetUnverifiedEmailAddress(loginState.username)
 
       def getOTP: Future[String] = masterTransactionEmailOTPs.Service.get(loginState.username)
 
@@ -136,7 +174,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         verifyEmailAddressData => {
           val verifyOTP = masterTransactionEmailOTPs.Service.verifyOTP(id = loginState.username, otp = verifyEmailAddressData.otp)
 
-          def verifyEmailAddress(otpVerified: Boolean): Future[Int] = if (otpVerified) masterContacts.Service.verifyEmailAddress(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
+          def verifyEmailAddress(otpVerified: Boolean): Future[Int] = if (otpVerified) masterEmailAddresses.Service.verifyEmailAddress(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
 
           (for {
             otpVerified <- verifyOTP
@@ -155,7 +193,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val mobileNumber = masterContacts.Service.tryGetUnverifiedMobileNumber(loginState.username)
+      val mobileNumber = masterMobileNumbers.Service.tryGetUnverifiedMobileNumber(loginState.username)
 
       def getOTP: Future[String] = masterTransactionSMSOTPs.Service.get(loginState.username)
 
@@ -178,7 +216,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         verifyMobileNumberData => {
           val verifyOTP = masterTransactionSMSOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
 
-          def verifyMobileNumber(otpVerified: Boolean): Future[Int] = if (otpVerified) masterContacts.Service.verifyMobileNumber(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
+          def verifyMobileNumber(otpVerified: Boolean): Future[Int] = if (otpVerified) masterMobileNumbers.Service.verifyMobileNumber(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
 
           (for {
             otpVerified <- verifyOTP

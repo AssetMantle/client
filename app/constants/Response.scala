@@ -32,7 +32,8 @@ object Response {
   val BUYER_FEEDBACK_SET = new Success("BUYER_FEEDBACK_SET")
   val BUYER_ORDER_EXECUTED = new Success("BUYER_ORDER_EXECUTED")
   val COINS_REQUESTED = new Success("COINS_REQUESTED")
-  val CONTACT_UPDATED = new Success("CONTACT_UPDATED")
+  val EMAIL_ADDRESS_UPDATED = new Success("EMAIL_ADDRESS_UPDATED")
+  val MOBILE_NUMBER_UPDATED = new Success("MOBILE_NUMBER_UPDATED")
   val EMAIL_ADDRESS_VERIFIED = new Success("EMAIL_ADDRESS_VERIFIED")
   val FAUCET_REQUEST_APPROVED = new Success("FAUCET_REQUEST_APPROVED")
   val FAUCET_REQUEST_REJECTED = new Success("FAUCET_REQUEST_REJECTED")
@@ -89,7 +90,8 @@ object Response {
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.ContactController.verifyMobileNumberForm)
   val VERIFY_EMAIL_ADDRESS = new Warning("VERIFY_EMAIL_ADDRESS", routes.javascript.ContactController.verifyEmailAddressForm)
-  val UPDATE_CONTACT_DETAILS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.addOrUpdateForm)
+  val UPDATE_MOBILE_NUMBER = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.addOrUpdateMobileNumberForm)
+  val UPDATE_EMAIL_ADDRESS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.addOrUpdateEmailAddressForm)
 
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")

@@ -6,7 +6,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Contact, Identification, Organization, Trader, TraderKYC}
+import models.master.{Identification, Organization, Trader, TraderKYC}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
@@ -20,7 +20,7 @@ class SetACLController @Inject()(
                                   withTraderLoginAction: WithTraderLoginAction,
                                   transaction: utilities.Transaction,
                                   masterTransactionTraderInvitations: masterTransaction.TraderInvitations,
-                                  masterContacts: master.Contacts,
+                                  masterEmailAddresses: master.EmailAddresses,
                                   fileResourceManager: utilities.FileResourceManager,
                                   blockchainAccounts: blockchain.Accounts,
                                   masterZones: master.Zones,
@@ -64,7 +64,7 @@ class SetACLController @Inject()(
         },
         inviteTraderData => {
 
-          val emailAddressAccount: Future[Option[String]] = masterContacts.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
+          val emailAddressAccount: Future[Option[String]] = masterEmailAddresses.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
 
           def inviteeUserType(emailAddressAccount: Option[String]): Future[String] = emailAddressAccount match {
             case Some(emailAddressAccount) => masterAccounts.Service.getUserType(emailAddressAccount)
@@ -133,7 +133,7 @@ class SetACLController @Inject()(
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterEmailAddresses.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
@@ -326,7 +326,7 @@ class SetACLController @Inject()(
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterEmailAddresses.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = traderOrganization.id, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
