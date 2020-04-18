@@ -163,7 +163,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updatePassword(username: String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
 
-    def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username)
+    def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map {
+      !_
+    }
 
     def addLogin(username: String, password: String, accountAddress: String, language: String): Future[String] = add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN)).map { _ => accountAddress }
 
