@@ -2,8 +2,6 @@
 
 @(profilePicture: Array[Byte] = Array[Byte]())(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-&:focus {{
-      text-decor
     @if(profilePicture sameElements Array[Byte]()) {
         <div class="cmuk-inline-clip cmuk-transition-toggle profilePictureContainer" tabindex="0">
             <span cmuk-icon="icon: user; ratio: 10" class="profilePicture"></span>
