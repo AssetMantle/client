@@ -539,6 +539,8 @@ html, body {
     line-height: 28px; }
 .comdex .cmuk-button-link {
   color: #0862BE; }
+  .comdex .cmuk-button-link:hover, .comdex .cmuk-button-link:focus {
+    text-decoration: none; }
 .comdex .cmuk-button-primary {
   background-color: #0862BE; }
 .comdex .cmuk-legend {
@@ -1747,6 +1749,8 @@ header:before,
   height: 11px;
   fill: #0862BE; }
 
+.profileDetails .cmuk-button-link {
+  margin-bottom: 5px; }
 .profileDetails .editIcon,
 .profileDetails .editIcon .icon, .profileDetails .icon {
   height: 16px;

@@ -685,6 +685,9 @@ position: relative;
   }
   .cmuk-button-link{
     color: $colorPrimary;
+    &:hover, &:focus {
+      text-decoration: none;
+    }
   }
   .cmuk-button-primary{
     background-color: $colorPrimary;
@@ -2278,6 +2281,7 @@ header:before,
 .profileDetails{
   .cmuk-button-link{
     @extend %cmuk-button-link;
+    margin-bottom: 5px;
   }
   .cmuk-badge{
     @extend  %verifiedLabel;
