@@ -3,22 +3,31 @@ $fontFamilySecondary:Oxygen;
 $colorPrimary:#0862BE;
 $colorSecondary:#053C75;
 $buttonBorderRadius: 3px;
-$headingFontSizeLarge:26px;
-$headingFontSizeMedium:22px;
-$headingFontSizeSmall:20px;
+$headingFontSizeLarge:1.625rem;
+$headingFontSizeMedium:1.375rem;
+$headingFontSizeSmall:1.25rem;
+$paragraphFontSizeLarge:1.125rem;
+$paragraphFontSizeMedium:1rem;
+$paragraphFontSizeSmall:0.875rem;
 
+:root{
+  font-family: "Oxygen", sans-serif;
+  box-sizing: border-box;
+}
 
-@media (min-width: 640px) {
+*,
+::after,
+::before{
+  box-sizing: border-box;
+}
+
+@media (min-width: 1600px) {
   :root {
-    --paragraphFontSizeLarge:18px;
-    --paragraphFontSizeMedium:16px;
-    --paragraphFontSizeSmall:14px;
+    font-size: 16px;
   }
 }
-@media (max-width: 640px) {
+@media (max-width: 1599px) {
   :root {
-    --paragraphFontSizeLarge:16px;
-    --paragraphFontSizeMedium:14px;
-    --paragraphFontSizeSmall:12px;
+    font-size:14px;
   }
 }

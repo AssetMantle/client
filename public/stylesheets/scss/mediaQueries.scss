@@ -195,7 +195,7 @@
           padding: 10px 0;
           .wallet {
           .cmuk-comment-meta, .ctitle {
-            font-size:var(--paragraphFontSizeSmall);
+            font-size:$paragraphFontSizeSmall;
           }
         }
       }
@@ -204,7 +204,6 @@
       text-transform: capitalize;
       font-family: $fontFamilyPrimary;
       padding: 8px 8px;
-      font-size: 12px;
       line-height:normal;
       background: rgba(8, 98, 190, 0.1);
       border-radius: 103px;
@@ -248,9 +247,6 @@
       }
     }
   }
-  .timeline{
-    margin: 20px 0px;
-  }
   .switcherViewCard {
     .cmuk-subnav li a {
       padding: 11px;
@@ -263,25 +259,25 @@
   }
   .switcherCard{
     .cmuk-switcher{
-      height: 140px;
+      height: 180px;
     }
-  }
-  .salesQuoteList .cmuk-card-body .cmuk-switcher{
-    height: 138px;
   }
 }
 
 @media (max-width: 1600px){
+  .bodyContainer{
+    margin: 0px auto -135px;
+  }
   .commonList{
     .listItemChild{
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: $paragraphFontSizeSmall;
     }
   }
   .leftSideContainer{
     .financial{
       ul{
         li .ctitle{
-          font-size: var(--paragraphFontSizeSmall);
+          font-size: $paragraphFontSizeSmall;
         }
       }
     }
@@ -291,14 +287,14 @@
     .timeline-item{
       .timeline-content{
         .activityContent{
-          font-size: var(--paragraphFontSizeSmall);
+          font-size: $paragraphFontSizeSmall;
         }
       }
     }
   }
   .profileContainer{
     .infoRow{
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: $paragraphFontSizeSmall;
     }
     .identificationDetails{
       .documentItem{
@@ -341,6 +337,9 @@
   }
   .headerFontSize {
     font-size: 14px;
+  }
+  .mobileNumberUpdate .countryCode{
+    margin-top:28px;
   }
 }
 

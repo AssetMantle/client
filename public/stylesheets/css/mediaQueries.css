@@ -1,13 +1,18 @@
-@media (min-width: 640px) {
+:root {
+  font-family: "Oxygen", sans-serif;
+  box-sizing: border-box; }
+
+*,
+::after,
+::before {
+  box-sizing: border-box; }
+
+@media (min-width: 1600px) {
   :root {
-    --paragraphFontSizeLarge: 18px;
-    --paragraphFontSizeMedium: 16px;
-    --paragraphFontSizeSmall: 14px; } }
-@media (max-width: 640px) {
+    font-size: 16px; } }
+@media (max-width: 1599px) {
   :root {
-    --paragraphFontSizeLarge: 16px;
-    --paragraphFontSizeMedium: 14px;
-    --paragraphFontSizeSmall: 12px; } }
+    font-size: 14px; } }
 @media (max-width: 640px) {
   .pageContent {
     margin: 20px; }
@@ -147,12 +152,11 @@
   .leftSideContainer .financial ul li {
     padding: 10px 0; }
     .leftSideContainer .financial ul li .wallet .cmuk-comment-meta, .leftSideContainer .financial ul li .wallet .ctitle {
-      font-size: var(--paragraphFontSizeSmall); }
+      font-size: 0.875rem; }
   .leftSideContainer .addBalanceButton {
     text-transform: capitalize;
     font-family: Rubik;
     padding: 8px 8px;
-    font-size: 12px;
     line-height: normal;
     background: rgba(8, 98, 190, 0.1);
     border-radius: 103px;
@@ -179,9 +183,6 @@
     .rightSideContainer .chatRoom .cmuk-card-body .chatMessages {
       height: 190px; }
 
-  .timeline {
-    margin: 20px 0px; }
-
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
 
@@ -189,22 +190,22 @@
     height: 210px; }
 
   .switcherCard .cmuk-switcher {
-    height: 140px; }
-
-  .salesQuoteList .cmuk-card-body .cmuk-switcher {
-    height: 138px; } }
+    height: 180px; } }
 @media (max-width: 1600px) {
+  .bodyContainer {
+    margin: 0px auto -135px; }
+
   .commonList .listItemChild {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
 
   .leftSideContainer .financial ul li .ctitle {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
 
   .timeline .timeline-item .timeline-content .activityContent {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
 
   .profileContainer .infoRow {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
   .profileContainer .identificationDetails .documentItem {
     padding: 10px; }
     .profileContainer .identificationDetails .documentItem .documentContentTop {
@@ -230,7 +231,10 @@
     border: none; }
 
   .headerFontSize {
-    font-size: 14px; } }
+    font-size: 14px; }
+
+  .mobileNumberUpdate .countryCode {
+    margin-top: 28px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

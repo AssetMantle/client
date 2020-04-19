@@ -7,7 +7,7 @@
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity">
-            <span class="commodityImage"><img src="@routes.Assets.versioned(constants.SelectFieldOptions.ASSET_ICON_MAP(asset.assetType))"></span><span class="tradeName">@asset.assetType</span>
+            <span class="commodityImage" ><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType</span>
         </div>
         <div class="terms">
 

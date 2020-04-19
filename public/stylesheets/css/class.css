@@ -1,20 +1,25 @@
-@media (min-width: 640px) {
+:root {
+  font-family: "Oxygen", sans-serif;
+  box-sizing: border-box; }
+
+*,
+::after,
+::before {
+  box-sizing: border-box; }
+
+@media (min-width: 1600px) {
   :root {
-    --paragraphFontSizeLarge: 18px;
-    --paragraphFontSizeMedium: 16px;
-    --paragraphFontSizeSmall: 14px; } }
-@media (max-width: 640px) {
+    font-size: 16px; } }
+@media (max-width: 1599px) {
   :root {
-    --paragraphFontSizeLarge: 16px;
-    --paragraphFontSizeMedium: 14px;
-    --paragraphFontSizeSmall: 12px; } }
+    font-size: 14px; } }
 html, body {
   height: 100%;
   background: #F0F0F0;
   scroll-behavior: smooth; }
 
 .scroller {
-  scrollbar-color: #E2E4E6 white;
+  scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin; }
 
 ::-webkit-scrollbar {
@@ -22,7 +27,7 @@ html, body {
   height: 7px; }
 
 ::-webkit-scrollbar-track {
-  background: white; }
+  background: #FFFFFF; }
 
 ::-webkit-scrollbar,
 ::-webkit-scrollbar-thumb {
@@ -48,13 +53,13 @@ html, body {
   -moz-border-radius: 30px;
   border-radius: 30px;
   text-align: center;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   align-items: center;
   justify-content: center; }
 
 .leftSideContainer .financial ul li .wallet .cmuk-comment-meta, .leftSideContainer .financial ul li .payable .cmuk-comment-meta, .leftSideContainer .financial ul li .receivable .cmuk-comment-meta, .leftSideContainer .financial ul li .leftDays .cmuk-comment-meta {
   color: #061728;
-  font-size: var(--paragraphFontSizeMedium); }
+  font-size: 1rem; }
 
 .leftSideContainer .cmuk-card-default {
   background: #FAFAFA;
@@ -63,7 +68,7 @@ html, body {
 
 .profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
   font-weight: bold;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   text-decoration: none; }
 
 .comdex .cmuk-badge.verified, .comdex .cmuk-badge.rejected, .comdex .cmuk-badge.pending, .profileDetails .cmuk-badge {
@@ -98,11 +103,10 @@ html, body {
   opacity: 1; }
 
 .headerFontSize {
-  font-size: var(--paragraphFontSizeMedium); }
+  font-size: 1rem; }
 
 .title {
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen;
+  font-size: 0.875rem;
   font-weight: bold; }
 
 .logoutContainer .commonCheckBox {
@@ -135,13 +139,6 @@ html, body {
 
 .flexGrowth {
   flex-grow: 1; }
-
-.box {
-  background: lightblue;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
-  margin: 0px 5px 10px 0px;
-  border-radius: 5px;
-  padding-bottom: 15px; }
 
 .firstBox {
   width: 30%;
@@ -273,11 +270,10 @@ html, body {
   margin-top: 20px;
   width: 100%;
   padding: 30px 0px;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   background: #031221; }
   .footer .copyright {
     margin: 10px 0px;
-    font-family: Oxygen;
     font-weight: bold;
     color: #053C75; }
     .footer .copyright a {
@@ -290,9 +286,6 @@ html, body {
 
 .copyIcon {
   cursor: pointer; }
-
-.leftSide .leftSideMenuIcon {
-  color: #fff; }
 
 .tableName {
   background: #d2edef; }
@@ -311,10 +304,9 @@ html, body {
   border-radius: 3px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
 
-.alretName {
+.alertName {
   font-weight: bold;
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen; }
+  font-size: 0.875rem; }
 
 .cmuk-accordion-buttons {
   background: #fff;
@@ -416,13 +408,9 @@ html, body {
   display: none; }
 
 .fileName {
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen;
+  font-size: 0.875rem;
   color: #0862BE;
   margin-bottom: 5px; }
-
-.dropBox {
-  font-family: Oxygen; }
 
 .profileDocuments {
   display: flex;
@@ -439,7 +427,7 @@ html, body {
   margin-left: -77px; }
 
 .commonhomeData {
-  font-size: var(--paragraphFontSizeSmall); }
+  font-size: 0.875rem; }
   .commonhomeData p, .commonhomeData h3 {
     margin: 5px 0px; }
 
@@ -450,8 +438,7 @@ html, body {
   margin: auto;
   padding: 40px;
   border-radius: 3px;
-  font-family: Oxygen;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   background: #e6e6e6;
   width: 100px;
   color: red; }
@@ -494,8 +481,7 @@ html, body {
 .comdex .buttonForm {
   background: #0862BE;
   color: #FFFFFF;
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen;
+  font-size: 0.875rem;
   font-weight: bold; }
 .comdex .buttonForm:active, .comdex .buttonForm.cmuk-active {
   background-color: #053C75; }
@@ -505,12 +491,10 @@ html, body {
   box-sizing: border-box;
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen; }
+  font-size: 0.875rem; }
   .comdex .cmuk-input::placeholder {
     color: #848A91;
-    font-size: var(--paragraphFontSizeSmall);
-    font-family: Oxygen; }
+    font-size: 0.875rem; }
   .comdex .cmuk-input:focus {
     border: 1px solid  #0862BE; }
 .comdex .cmuk-input, .comdex .cmuk-select, .comdex .cmuk-textarea {
@@ -521,8 +505,7 @@ html, body {
 .comdex input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px white inset; }
 .comdex .error {
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen;
+  font-size: 0.875rem;
   color: #f0506e; }
 .comdex .cmuk-badge.verified {
   background-color: #49A948; }
@@ -530,11 +513,8 @@ html, body {
   background-color: #FE4350; }
 .comdex .cmuk-badge.pending {
   background-color: #faa05a; }
-.comdex .cmuk-button {
-  font-family: Oxygen; }
 .comdex .cmuk-button-primary {
-  border: none;
-  font-size: var(--paragraphFontSizeSmall); }
+  border: none; }
 .comdex .primaryFont {
   font-family: Rubik; }
 .comdex .secondaryFont {
@@ -556,11 +536,9 @@ html, body {
     height: 20px;
     margin-bottom: 5px; }
 .comdex .cmuk-alert p {
-  font-family: Oxygen;
-  font-size: var(--paragraphFontSizeSmall); }
+  font-size: 0.875rem; }
 .comdex .cmuk-card-header {
   color: #061728;
-  font-family: Oxygen;
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
     padding: 0 15px;
@@ -574,8 +552,7 @@ html, body {
   text-align: center;
   color: #061728;
   font-weight: bold;
-  font-family: Oxygen;
-  font-size: var(--paragraphFontSizeLarge); }
+  font-size: 1.125rem; }
 .comdex .cmuk-spinner > * > * {
   stroke-width: 2 !important;
   stroke: #0862BE !important; }
@@ -610,8 +587,7 @@ html, body {
   max-height: 100px;
   padding: 0px; }
 .comdex .panelHeader {
-  font-size: var(--paragraphFontSizeMedium);
-  font-family: Oxygen;
+  font-size: 1rem;
   font-weight: normal;
   color: #272829;
   line-height: 2; }
@@ -625,7 +601,6 @@ html, body {
   .header .cmuk-navbar-nav > li > a,
   .header .cmuk-navbar-toggle {
     min-height: 60px;
-    font-family: Oxygen;
     text-transform: none; }
   .header .cmuk-logo {
     padding: 0px 40px 0px 0px;
@@ -637,7 +612,7 @@ html, body {
     border-left: 1px solid #1C5998; }
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     font-family: Rubik;
     color: #FFFFFF;
     line-height: inherit;
@@ -655,7 +630,7 @@ html, body {
     padding: 0px 25px;
     font-weight: bold;
     color: #FFFFFF;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     box-sizing: border-box;
     letter-spacing: 0.4px; }
   .header .dashboardIcon .icon {
@@ -721,11 +696,9 @@ html, body {
     display: inline-block; }
     .modal .modalContent .modalBody {
       padding: 20px;
-      text-align: center;
-      font-family: Oxygen; }
+      text-align: center; }
       .modal .modalContent .modalBody .infoRowLabel {
-        text-align: left;
-        font-family: Oxygen; }
+        text-align: left; }
       .modal .modalContent .modalBody .title {
         margin: 10px 0px; }
       .modal .modalContent .modalBody form .cmuk-card-default {
@@ -742,15 +715,13 @@ html, body {
   display: none;
   color: red;
   padding: 10px;
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen; }
+  font-size: 0.875rem; }
 .MnemonicQuiz .verifyMnemonic {
   flex-wrap: wrap;
   justify-content: center; }
   .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
     width: 114px;
     height: 38px;
-    font-family: Oxygen;
     margin-right: 10px;
     margin-bottom: 10px;
     border-radius: 3px; }
@@ -760,11 +731,10 @@ html, body {
     .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton .mnemonicField {
       background-color: #FFffff; }
 .MnemonicQuiz .buttonForm {
-  font-size: var(--paragraphFontSizeSmall); }
+  font-size: 0.875rem; }
 .MnemonicQuiz .mnemonicNote {
   background-color: #FF2938;
-  font-family: Oxygen;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   text-align: justify;
   letter-spacing: 0.01em;
   color: #FFFFFF;
@@ -803,14 +773,12 @@ html, body {
     max-width: 600px;
     padding: 50px 0px; }
     .bannerContainer .bannerText h3 {
-      font-family: Oxygen;
       margin: 0px;
       font-size: 45px;
       font-weight: normal;
       color: #FFFFFF; }
     .bannerContainer .bannerText p {
-      font-family: Oxygen;
-      font-size: 20px;
+      font-size: 1.25rem;
       line-height: 172%;
       letter-spacing: 0.01em;
       color: #627F9F; }
@@ -830,24 +798,21 @@ html, body {
         border: 3px solid red;
         transform: rotate(-45deg); }
       .bannerContainer .cmuk-slider .cmuk-slider-items li span {
-        font-size: var(--paragraphFontSizeSmall);
+        font-size: 0.875rem;
         line-height: 172%;
         letter-spacing: 0.01em; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemName {
         font-weight: bold;
-        color: #6C7883;
-        font-family: Oxygen; }
+        color: #6C7883; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemValue {
         font-weight: bold;
         color: #FFFFFF;
         font-family: Rubik; }
       .bannerContainer .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
-        color: #5EB55C;
-        font-family: Oxygen; }
+        color: #5EB55C; }
 
 .tabsSection p {
-  font-family: Oxygen;
-  font-size: 26px;
+  font-size: 1.625rem;
   letter-spacing: 0.01em;
   color: #000000;
   margin-bottom: 40px; }
@@ -863,9 +828,8 @@ html, body {
     border-radius: 0px 0px 5px 5px; }
   .tabsSection .cmuk-subnav-pill li a {
     background-color: #FAFBFD;
-    padding: 15px 0px 15px 20px;
-    font-family: Oxygen;
-    font-size: var(--paragraphFontSizeLarge);
+    padding: 15px 20px;
+    font-size: 1.125rem;
     text-transform: capitalize;
     color: #0862BE;
     font-weight: bold; }
@@ -886,8 +850,7 @@ html, body {
   .tabsSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
 .tabsSection .cmuk-switcher li {
-  font-family: Oxygen;
-  font-size: var(--paragraphFontSizeLarge);
+  font-size: 1.125rem;
   color: #365575;
   letter-spacing: 0.01em;
   line-height: 1.8; }
@@ -912,9 +875,9 @@ html, body {
   .left .quoteIdTtitle {
     color: #6C7883;
     font-weight: bold;
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
   .left .quoteId {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
 
 .userIcons .userIcon {
   margin-right: -5px; }
@@ -935,18 +898,15 @@ html, body {
     width: 250px;
     padding: 10px 25px 10px 10px;
     margin: 0px;
-    font-size: var(--paragraphFontSizeMedium); }
+    font-size: 1rem; }
   .notifications .cmuk-alert-close {
     top: 15px; }
 
 .right {
   padding: 0px 0px  15px 0px;
-  height: 30px;
   justify-content: flex-end; }
   .right .refresh {
-    font-family: Oxygen;
     padding: 5px 10px;
-    border-radius: 20px;
     font-size: 10px;
     background: #FFFFFF;
     border: 0.908233px solid #EDEDED;
@@ -968,7 +928,7 @@ html, body {
   .right .liveText {
     font-weight: bold;
     margin-right: 10px;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     color: #272829; }
   .right .liveIcon {
     width: 6px;
@@ -978,7 +938,7 @@ html, body {
     box-shadow: 0 0 0 5px #A1ED9F; }
 
 .pageContainer {
-  padding-bottom: 137px; }
+  padding-bottom: 136px; }
   .pageContainer .pageContent {
     padding-top: 10px; }
   .pageContainer .middle .cmuk-card-default {
@@ -1002,11 +962,9 @@ html, body {
         border-right: 1px solid #cccccc; }
       .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li a {
         padding: 15px 0px;
-        font-family: Oxygen;
         text-transform: capitalize;
-        font-size: var(--paragraphFontSizeMedium); }
+        font-size: 1rem; }
     .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav > .cmuk-active > a {
-      font-family: Oxygen;
       color: #061728;
       background: none;
       font-weight: bold;
@@ -1039,16 +997,14 @@ html, body {
     .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
       color: #4B4B4B;
       font-weight: bold;
-      font-family: Oxygen;
-      font-size: var(--paragraphFontSizeMedium); }
+      font-size: 1rem; }
   .pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
     justify-content: space-between;
     border-bottom: 1px solid #E8E8E8;
     padding: 25px 0px 15px 0px;
     margin-bottom: 25px;
-    font-family: Oxygen;
     color: #848A91;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     font-weight: bold; }
   .pageContainer .middle .mainTabs .tradeTerms .terms .term {
     display: flex;
@@ -1063,7 +1019,7 @@ html, body {
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
       color: #859EB9;
       font-family: "Oxygen", sans-serif;
-      font-size: var(--paragraphFontSizeMedium);
+      font-size: 1rem;
       margin-right: 10px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
       margin-right: 10px; }
@@ -1073,23 +1029,20 @@ html, body {
         margin-bottom: 3px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
       color: #0862BE;
-      font-family: Oxygen;
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.01em;
       font-style: normal; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
       color: #061728;
-      font-family: Oxygen;
-      font-size: var(--paragraphFontSizeMedium);
+      font-size: 1rem;
       margin-right: 10px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
       text-indent: 40px;
       margin-top: 5px; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
-        font-family: Oxygen;
-        font-size: var(--paragraphFontSizeMedium);
+        font-size: 1rem;
         color: #061728;
         margin: 0px;
         margin-bottom: 5px; }
@@ -1137,23 +1090,20 @@ html, body {
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
       width: auto;
       color: #0862BE;
-      font-family: Oxygen;
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
       margin: 2px 0px 3px 0px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue {
-      font-family: Oxygen;
       color: #061728;
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: 0.875rem;
       margin-left: 20px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
       font-family: Rubik;
       color: #061728; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
       color: #061728;
-      font-family: Oxygen;
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: 0.875rem;
       margin: 0px 0px 5px 0px; }
   .pageContainer .middle .mainTabs .tradeTerms button {
     padding: 0 15px;
@@ -1165,8 +1115,7 @@ html, body {
 .leftSideContainer .cmuk-card-header {
   padding: 15px 20px;
   color: #061728;
-  font-size: var(--paragraphFontSizeMedium);
-  font-family: Oxygen; }
+  font-size: 1rem; }
   .leftSideContainer .cmuk-card-header .icon {
     margin-bottom: 2px; }
 .leftSideContainer .cmuk-card-body {
@@ -1178,8 +1127,7 @@ html, body {
   .leftSideContainer .cmuk-card-body .refresh {
     padding: 10px 0px 10px 0px;
     margin: 0px 20px;
-    font-family: Oxygen;
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
     .leftSideContainer .cmuk-card-body .refresh button {
       text-decoration: none;
       color: #848A91;
@@ -1204,8 +1152,7 @@ html, body {
   .leftSideContainer .financial ul li .ctitle {
     color: #5C6166;
     line-height: 2;
-    font-size: var(--paragraphFontSizeSmall);
-    font-family: Oxygen; }
+    font-size: 0.875rem; }
   .leftSideContainer .financial ul li .payable {
     align-items: center; }
     .leftSideContainer .financial ul li .payable .payableIcon {
@@ -1224,7 +1171,7 @@ html, body {
   text-transform: capitalize;
   font-family: Rubik;
   padding: 8px 8px;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   line-height: normal;
   background: rgba(8, 98, 190, 0.1);
   border-radius: 103px;
@@ -1258,11 +1205,9 @@ html, body {
         border-right: 1px solid #cccccc; }
       .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav li a {
         padding: 15px 0px;
-        font-family: Oxygen;
         text-transform: capitalize;
-        font-size: var(--paragraphFontSizeMedium); }
+        font-size: 1rem; }
   .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav > .cmuk-active > a {
-    font-family: Oxygen;
     color: #061728;
     background: none;
     font-weight: bold;
@@ -1272,7 +1217,7 @@ html, body {
     overflow: auto; }
     .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher .cmuk-comment-meta {
       color: #061728;
-      font-size: var(--paragraphFontSizeMedium); }
+      font-size: 1rem; }
   .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher > li {
     padding: 0px;
     margin: 0px; }
@@ -1294,11 +1239,9 @@ html, body {
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
 .rightSideContainer .cmuk-card-header {
-  font-size: var(--paragraphFontSizeMedium);
-  padding: 15px 20px;
-  font-family: Oxygen; }
+  font-size: 1rem;
+  padding: 15px 20px; }
 .rightSideContainer .cmuk-card-body {
-  font-family: Oxygen;
   padding: 0px 13px; }
 .rightSideContainer .chatRoom .cmuk-card-body {
   height: 360px; }
@@ -1349,7 +1292,6 @@ html, body {
     position: relative;
     bottom: 50px; }
 .rightSideContainer .chatContainer .cmuk-card-body {
-  font-family: Oxygen;
   padding: 0px; }
   .rightSideContainer .chatContainer .cmuk-card-body .chat_history ul {
     margin: 0;
@@ -1369,8 +1311,7 @@ html, body {
     text-transform: capitalize;
     font-weight: bold;
     padding: 0px 20px;
-    font-family: Oxygen;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     font-weight: bold; }
 
 .documentItem {
@@ -1384,8 +1325,7 @@ html, body {
   padding: 0px 15px;
   background: #ffffff; }
   .documentItem .documentContentTop {
-    font-size: var(--paragraphFontSizeMedium);
-    font-family: Oxygen;
+    font-size: 1rem;
     margin: 10px; }
     .documentItem .documentContentTop a {
       color: #053C75;
@@ -1403,7 +1343,7 @@ html, body {
       height: 16px; }
   .documentItem .documentContentBottom {
     margin: 10px;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     text-align: left; }
 
 .identificationDetails .documentContentBottom .infoRowLabel {
@@ -1479,8 +1419,7 @@ header:before,
       transition: all 0.3s ease; }
       .timeline .timeline-item .timeline-content .activityContent {
         color: #000000;
-        font-family: Oxygen;
-        font-size: var(--paragraphFontSizeSmall); }
+        font-size: 0.875rem; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
     .timeline .timeline-item .timeline-content.right:before {
@@ -1489,8 +1428,7 @@ header:before,
   .timeline .notification > div {
     padding: 0px; }
   .timeline .NotificationButton {
-    font-size: var(--paragraphFontSizeSmall);
-    font-family: Oxygen;
+    font-size: 0.875rem;
     font-weight: bold;
     padding: 0px 0px 0px 40px; }
 
@@ -1503,12 +1441,12 @@ header:before,
   font-family: "Oxygen", sans-serif;
   color: #636363;
   font-weight: bold;
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   border-bottom: 2px solid #0862BE; }
 .docView .documentlist .cmuk-table td {
   padding: 16px 5px;
   vertical-align: top;
-  font-size: var(--paragraphFontSizeSmall); }
+  font-size: 0.875rem; }
 .docView .documentlist .docIcon {
   background: #FFFFFF;
   border: 0.411524px solid #EAEAEA;
@@ -1536,11 +1474,11 @@ header:before,
     .docView .documentlist .table-scroll tbody tr td:first-child {
       padding-left: 15px;
       color: #262525;
-      font-size: var(--paragraphFontSizeSmall); }
+      font-size: 0.875rem; }
     .docView .documentlist .table-scroll tbody tr td:last-child {
       padding-right: 10px; }
 .docView .documentlist .primayDocs {
-  font-size: var(--paragraphFontSizeMedium);
+  font-size: 1rem;
   color: #636363; }
 .docView .cmuk-card-default {
   overflow-y: auto;
@@ -1559,8 +1497,7 @@ header:before,
     margin: 0; }
     .docView .cmuk-card-body .cmuk-tab li a {
       padding: 15px 0px;
-      font-size: var(--paragraphFontSizeSmall);
-      font-family: Oxygen;
+      font-size: 0.875rem;
       text-transform: capitalize; }
 .docView .cmuk-card-body {
   height: 360px;
@@ -1582,7 +1519,7 @@ header:before,
       border-radius: 10px;
       width: 100%;
       text-transform: capitalize;
-      font-size: var(--paragraphFontSizeSmall);
+      font-size: 0.875rem;
       font-family: Rubik; }
 
 .loginForm .inputField {
@@ -1597,10 +1534,9 @@ header:before,
   .loginForm .inputField .inputFieldBody {
     width: 100%; }
   .loginForm .inputField .inputFieldBody input {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
 .loginForm .cmuk-button-link {
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen;
+  font-size: 0.875rem;
   font-weight: bold;
   margin: 5px;
   text-decoration: none; }
@@ -1609,8 +1545,7 @@ header:before,
   line-height: 1.8;
   align-items: flex-start;
   word-break: break-all;
-  font-size: var(--paragraphFontSizeSmall);
-  font-family: Oxygen; }
+  font-size: 0.875rem; }
   .infoRow .infoRowLabel {
     color: #4B4B4B;
     width: 125px;
@@ -1632,7 +1567,7 @@ header:before,
 .chat {
   padding: 0px 10px 0px 0px; }
   .chat .chatMessage {
-    font-size: var(--paragraphFontSizeSmall); }
+    font-size: 0.875rem; }
   .chat .chatName {
     color: #FFFFFF;
     background: #193759;
@@ -1642,7 +1577,7 @@ header:before,
     -moz-border-radius: 30px;
     border-radius: 50%;
     text-align: center;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     align-items: center;
     justify-content: center; }
   .chat li {
@@ -1674,13 +1609,13 @@ header:before,
       border-right: .5rem solid #E8E8E8; }
     .chat .partner .messageInfo {
       color: #848A91;
-      font-size: var(--paragraphFontSizeSmall); }
+      font-size: 0.875rem; }
     .chat .partner .replytoMessage p {
       border-left: 2px solid #0862BE;
       padding: 0px 10px; }
     .chat .partner .messageContent {
       color: #061728;
-      font-size: var(--paragraphFontSizeSmall); }
+      font-size: 0.875rem; }
       .chat .partner .messageContent p {
         margin: 0px;
         color: #0862BE;
@@ -1707,13 +1642,13 @@ header:before,
       border-right: .5rem solid transparent; }
     .chat .you .messageInfo {
       color: #6CA8E7;
-      font-size: var(--paragraphFontSizeSmall); }
+      font-size: 0.875rem; }
     .chat .you .replytoMessage p {
       border-left: 2px solid #6CA8E7;
       padding: 0px 10px; }
     .chat .you .messageContent {
       color: #FFFFFF;
-      font-size: var(--paragraphFontSizeSmall); }
+      font-size: 0.875rem; }
       .chat .you .messageContent p {
         margin: 0px;
         color: #6CA8E7;
@@ -1741,8 +1676,7 @@ header:before,
   .commonList .listItemChild {
     margin: 0px;
     padding: 20px 0px;
-    font-size: var(--paragraphFontSizeSmall);
-    font-family: Oxygen;
+    font-size: 0.875rem;
     font-weight: bold; }
     .commonList .listItemChild:last-child .listItemChildValue {
       max-width: 100%; }
@@ -1778,7 +1712,7 @@ header:before,
     top: -15px;
     left: -10px;
     text-align: center;
-    font-size: var(--paragraphFontSizeSmall);
+    font-size: 0.875rem;
     font-weight: bold;
     transform: rotate(-45deg);
     display: block; }
@@ -1797,21 +1731,18 @@ header:before,
   margin-bottom: 5px; }
 
 .profileContainer .infoRow {
-  font-size: var(--paragraphFontSizeSmall);
+  font-size: 0.875rem;
   line-height: 2; }
 .profileContainer .infoRowLabel {
-  color: #061728;
-  font-family: Oxygen; }
+  color: #061728; }
 .profileContainer .infoRowValue {
-  text-align: right;
-  font-family: Oxygen; }
+  text-align: right; }
 .profileContainer .cmuk-card-header {
-  font-family: Oxygen;
   padding: 15px 20px; }
-.profileContainer .cmuk-card-body {
-  font-family: Rubik; }
-  .profileContainer .cmuk-card-body .cmuk-card-body {
-    background-color: #FFFFFF; }
+.profileContainer .cmuk-card-body .cmuk-card {
+  box-shadow: none;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(5, 60, 117, 0.12); }
 .profileContainer .icon {
   width: 16px;
   height: 16px;
@@ -1834,8 +1765,6 @@ header:before,
   .contactDetails .infoRowBox .infoRowLabel {
     width: auto;
     margin-right: 5px; }
-.contactDetails .cmuk-button-link {
-  font-family: Oxygen; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }
 .contactDetails .cmuk-card-default {
@@ -1936,9 +1865,6 @@ dl .info {
   .commonCheckBox dl {
     display: flex; }
 
-.tradeList .cmuk-card-header {
-  padding: 15px 20px;
-  font-family: Oxygen; }
 .tradeList .cmuk-card-body .cmuk-card {
   margin-bottom: 10px; }
   .tradeList .cmuk-card-body .cmuk-card .cmuk-card-body {
@@ -1961,10 +1887,9 @@ dl .info {
     .switcherCard .cmuk-subnav li {
       text-align: center;
       padding: 0;
-      flex: 1;
-      font-family: Oxygen; }
+      flex: 1; }
       .switcherCard .cmuk-subnav li a {
-        font-size: var(--paragraphFontSizeSmall); }
+        font-size: 0.875rem; }
   .switcherCard .cmuk-subnav-pill > .cmuk-active > a {
     background-color: #0862BE;
     color: #FFffff; }
@@ -1973,7 +1898,7 @@ dl .info {
     text-transform: capitalize;
     font-weight: bold; }
   .switcherCard .cmuk-switcher {
-    height: 220px;
+    height: 270px;
     overflow: auto;
     padding: 20px; }
     .switcherCard .cmuk-switcher .cmuk-button {
@@ -1996,8 +1921,7 @@ dl .info {
   font-size: 14px;
   font-family: Oxygen; }
   .cmuk-panel ul li {
-    font-size: var(--paragraphFontSizeSmall);
-    font-family: Oxygen;
+    font-size: 0.875rem;
     color: #272829;
     text-align: left;
     cursor: pointer;

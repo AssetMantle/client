@@ -1,13 +1,18 @@
-@media (min-width: 640px) {
+:root {
+  font-family: "Oxygen", sans-serif;
+  box-sizing: border-box; }
+
+*,
+::after,
+::before {
+  box-sizing: border-box; }
+
+@media (min-width: 1600px) {
   :root {
-    --paragraphFontSizeLarge: 18px;
-    --paragraphFontSizeMedium: 16px;
-    --paragraphFontSizeSmall: 14px; } }
-@media (max-width: 640px) {
+    font-size: 16px; } }
+@media (max-width: 1599px) {
   :root {
-    --paragraphFontSizeLarge: 16px;
-    --paragraphFontSizeMedium: 14px;
-    --paragraphFontSizeSmall: 12px; } }
+    font-size: 14px; } }
 input, select {
   width: 100%; }
 
