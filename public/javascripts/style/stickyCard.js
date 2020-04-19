@@ -5,9 +5,11 @@ $(document).ready(function () {
             "top": 71,
         })
     } else {
-        $(".sticky").css({
-            "position": "static",
-            "top": 0,
-        })
+        $(window).resize(function() {
+            $(".sticky").css({
+                "position": "static",
+                "top": 0,
+            })
+        });
     }
 });

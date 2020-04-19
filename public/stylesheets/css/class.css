@@ -7,12 +7,6 @@
 ::before {
   box-sizing: border-box; }
 
-@media (min-width: 1600px) {
-  :root {
-    font-size: 16px; } }
-@media (max-width: 1599px) {
-  :root {
-    font-size: 14px; } }
 html, body {
   height: 100%;
   background: #F0F0F0;
@@ -1898,7 +1892,7 @@ dl .info {
     text-transform: capitalize;
     font-weight: bold; }
   .switcherCard .cmuk-switcher {
-    height: 270px;
+    height: 268px;
     overflow: auto;
     padding: 20px; }
     .switcherCard .cmuk-switcher .cmuk-button {
