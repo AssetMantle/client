@@ -35,7 +35,7 @@ class ZoneAutomation @Inject()(
 
   private val zonePassword = configuration.get[String]("zone.password")
 
-  private val defaultGas = configuration.get[Int]("zone.gas")
+  private val zoneGas = configuration.get[Int]("zone.gas")
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
@@ -67,9 +67,9 @@ class ZoneAutomation @Inject()(
         }
 
         def sendTransaction(toAddress: String, takerAddress: String): Future[String] = utilitiesTransaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-          entity = blockchainTransaction.IssueAsset(from = zoneWalletAddress, to = toAddress, documentHash = issueAssetRequest.documentHash, assetType = issueAssetRequest.assetType, assetPrice = issueAssetRequest.price, quantityUnit = issueAssetRequest.quantityUnit, assetQuantity = issueAssetRequest.quantity, moderated = true, gas = defaultGas, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
+          entity = blockchainTransaction.IssueAsset(from = zoneWalletAddress, to = toAddress, documentHash = issueAssetRequest.documentHash, assetType = issueAssetRequest.assetType, assetPrice = issueAssetRequest.price, quantityUnit = issueAssetRequest.quantityUnit, assetQuantity = issueAssetRequest.quantity, moderated = true, gas = zoneGas, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
           blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-          request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneWalletAddress, gas = defaultGas.toString), to = toAddress, password = zonePassword, documentHash = issueAssetRequest.documentHash, assetType = issueAssetRequest.assetType, assetPrice = issueAssetRequest.price.toString, quantityUnit = issueAssetRequest.quantityUnit, assetQuantity = issueAssetRequest.quantity.toString, moderated = true, takerAddress = takerAddress, mode = transactionMode),
+          request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneWalletAddress, gas = zoneGas.toString), to = toAddress, password = zonePassword, documentHash = issueAssetRequest.documentHash, assetType = issueAssetRequest.assetType, assetPrice = issueAssetRequest.price.toString, quantityUnit = issueAssetRequest.quantityUnit, assetQuantity = issueAssetRequest.quantity.toString, moderated = true, takerAddress = takerAddress, mode = transactionMode),
           action = transactionsIssueAsset.Service.post,
           onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
           onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
