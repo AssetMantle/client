@@ -225,7 +225,7 @@ class AccountController @Inject()(
               result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
           } else {
-            Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))
+            Future(BadRequest(views.html.component.master.changePassword(views.companion.master.ChangePassword.form.fill(value = views.companion.master.ChangePassword.Data(changePasswordData.oldPassword, changePasswordData.newPassword, changePasswordData.confirmNewPassword)).withError(constants.FormField.OLD_PASSWORD.name, constants.Response.INVALID_PASSWORD.message))))
           }
 
           (for {
