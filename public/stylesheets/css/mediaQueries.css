@@ -202,7 +202,10 @@
     margin-top: 28px; } }
 @media (min-width: 1600px) {
   :root {
-    font-size: 16px; } }
+    font-size: 16px; }
+
+  .showpassword, .checkIcon {
+    top: 37px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

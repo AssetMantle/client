@@ -368,11 +368,32 @@ html, body {
   position: relative; }
   .usernameAvailibilty .result {
     position: absolute;
-    right: -25px;
-    top: 40px; }
+    top: 69px;
+    left: 5px; }
+  .usernameAvailibilty .checkIcon {
+    display: none;
+    position: absolute;
+    right: 15px;
+    top: 35px;
+    width: 20px;
+    height: 20px; }
+    .usernameAvailibilty .checkIcon .icon {
+      width: 20px;
+      height: 20px; }
 
-.mainlist {
-  padding: 0px; }
+.showpassword {
+  position: absolute;
+  right: 15px;
+  top: 35px; }
+  .showpassword .eyeIcon {
+    cursor: pointer;
+    width: 25px;
+    height: 25px; }
+    .showpassword .eyeIcon .icon {
+      width: 25px;
+      height: 25px; }
+  .showpassword .mainlist {
+    padding: 0px; }
 
 .listItem {
   display: inline-flex;
