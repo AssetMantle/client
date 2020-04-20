@@ -794,7 +794,7 @@ class NegotiationController @Inject()(
 
       def getOrganizationAccountID(organizationID: String): Future[String] = masterOrganizations.Service.tryGetAccountID(organizationID)
 
-      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.getAccountId(zoneID)
+      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
       def getTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivity]] = {
         if (!accountIDs.contains(loginState.username)) throw new BaseException(constants.Response.UNAUTHORIZED)

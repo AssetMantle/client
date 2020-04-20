@@ -318,7 +318,7 @@ class AddZoneController @Inject()(
 
           def processTransactionAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
-              val accountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
+              val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
 
               def zoneAccountAddress(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
 
@@ -405,7 +405,7 @@ class AddZoneController @Inject()(
         updateZoneKYCDocumentStatusData => {
           val verifyOrRejectAndSendNotification = if (updateZoneKYCDocumentStatusData.status) {
             val verify = masterZoneKYCs.Service.verify(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- verify
               zoneId <- zoneId
@@ -413,7 +413,7 @@ class AddZoneController @Inject()(
             } yield {}
           } else {
             val reject = masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- reject
               zoneId <- zoneId
@@ -447,7 +447,7 @@ class AddZoneController @Inject()(
         },
         rejectVerifyZoneRequestData => {
           val rejectZone = masterZones.Service.rejectZone(rejectVerifyZoneRequestData.zoneID)
-          val accountID = masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID)
+          val accountID = masterZones.Service.tryGetAccountID(rejectVerifyZoneRequestData.zoneID)
 
           def rejectAll(accountID: String): Future[Int] = masterZoneKYCs.Service.rejectAll(accountID)
 
