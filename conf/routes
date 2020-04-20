@@ -61,8 +61,8 @@ POST        /negotiation/request                                                
 GET         /negotiation/paymentTerms                                                       controllers.NegotiationController.paymentTermsForm(id: String)
 POST        /negotiation/paymentTerms                                                       controllers.NegotiationController.paymentTerms
 
-GET         /negotiation/documentsCheckList                                                 controllers.NegotiationController.documentsCheckListForm(id: String)
-POST        /negotiation/documentsCheckList                                                 controllers.NegotiationController.documentsCheckList
+GET         /negotiation/documentList                                                       controllers.NegotiationController.documentListForm(id: String)
+POST        /negotiation/documentList                                                       controllers.NegotiationController.documentList
 
 GET         /negotiation/reviewRequest                                                      controllers.NegotiationController.reviewRequestForm(id: String)
 POST        /negotiation/reviewRequest                                                      controllers.NegotiationController.reviewRequest
@@ -76,11 +76,14 @@ POST        /negotiation/rejectRequest                                          
 GET         /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTermsForm(id: String)
 POST        /negotiation/updateAssetTerms                                                   controllers.NegotiationController.updateAssetTerms
 
+GET         /negotiation/updateAssetOtherDetails                                            controllers.NegotiationController.updateAssetOtherDetailsForm(id: String)
+POST        /negotiation/updateAssetOtherDetails                                            controllers.NegotiationController.updateAssetOtherDetails
+
 GET         /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTermsForm(id: String)
 POST        /negotiation/updatePaymentTerms                                                 controllers.NegotiationController.updatePaymentTerms
 
-GET         /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckListForm(id: String)
-POST        /negotiation/updateDocumentCheckList                                            controllers.NegotiationController.updateDocumentCheckList
+GET         /negotiation/updateDocumentList                                                 controllers.NegotiationController.updateDocumentListForm(id: String)
+POST        /negotiation/updateDocumentList                                                 controllers.NegotiationController.updateDocumentList
 
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
@@ -98,7 +101,8 @@ GET         /negotiation/confirmAllNegotiationTerms                             
 POST        /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTerms
 
 GET         /negotiation/documentContent                                                    controllers.NegotiationController.negotiationDocumentContent(id: String, documentType: String)
-GET         /negotiation/negotiationContract                                                controllers.NegotiationController.negotiationContract(id: String)
+
+GET         /negotiation/tradeActivityMessages                                              controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 
 GET         /contact                                                                        controllers.ContactController.contact
 
@@ -117,9 +121,9 @@ POST        /trader/acceptOrRejectTraderRelation                                
 GET         /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTraderForm(accountID: String)
 POST        /trader/organizationModifyTrader                                                controllers.TraderController.organizationModifyTrader
 
-GET         /master/notifications                                                           controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount                                                 controllers.NotificationController.unreadNotificationCount
-GET         /master/markNotificationAsRead                                                  controllers.NotificationController.markNotificationRead(notificationID: String)
+GET         /notification/recentActivityMessages                                            controllers.NotificationController.recentActivityMessages(pageNumber: Int)
+GET         /notification/unreadNotificationCount                                           controllers.NotificationController.unreadNotificationCount
+GET         /notification/markNotificationAsRead                                            controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                                        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
@@ -162,9 +166,9 @@ GET         /component/zoneViewOrganizationBankAccount                          
 
 GET         /component/commonHome                                                           controllers.ComponentViewController.commonHome
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
-GET         /component/traderViewRecentActivityForTradeRoom                                 controllers.ComponentViewController.traderViewRecentActivityForTradeRoom(pageNumber: Int, negotiationID :String)
-GET         /component/recentActivityForTrader                                              controllers.ComponentViewController.recentActivityForTrader(pageNumber: Int)
-GET         /component/recentActivityForOrganization                                        controllers.ComponentViewController.recentActivityForOrganization(pageNumber: Int)
+
+GET         /component/tradeActivities                                                      controllers.ComponentViewController.tradeActivities(negotiationID :String)
+GET         /component/recentActivities                                                     controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
 GET         /component/traderViewNegotiationFiles                                           controllers.ComponentViewController.traderViewNegotiationFiles(id:String)
 GET         /component/traderViewNegotiationFile                                            controllers.ComponentViewController.traderViewNegotiationFile(id:String, documentType: Option[String])
@@ -501,7 +505,7 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 #DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                                                        controllers.WesternUnionController.westernUnionRTCB
+POST        /wurtcb                                                                         controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                              controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                                              controllers.AddKeyController.blockchainAddKeyForm

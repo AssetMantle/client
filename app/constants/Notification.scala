@@ -2,7 +2,7 @@ package constants
 
 import constants.Notification.{Email, PushNotification, SMS}
 
-class Notification(notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
+class Notification(val notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
 
   val email: Option[Email] = if (sendEmail) Option(new Email(notificationType)) else None
 
@@ -14,12 +14,12 @@ class Notification(notificationType: String, sendEmail: Boolean, sendPushNotific
 
 object Notification {
 
-  private val EMAIL_PREFIX = "EMAIL"
-  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
-  private val SMS_PREFIX = "SMS"
-  private val SUBJECT_SUFFIX = "SUBJECT"
-  private val MESSAGE_SUFFIX = "MESSAGE"
-  private val TITLE_SUFFIX = "TITLE"
+  val EMAIL_PREFIX = "EMAIL"
+  val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
+  val SMS_PREFIX = "SMS"
+  val SUBJECT_SUFFIX = "SUBJECT"
+  val MESSAGE_SUFFIX = "MESSAGE"
+  val TITLE_SUFFIX = "TITLE"
 
   class SMS(private val notificationType: String) {
     val message: String = Seq(SMS_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
@@ -107,8 +107,12 @@ object Notification {
   val SALES_QUOTE_UPDATED = new Notification(notificationType = "SALES_QUOTE_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val ASSET_ISSUED = new Notification(notificationType = "ASSET_ISSUED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_ASSET_ISSUED = new Notification(notificationType = "ORGANIZATION_NOTIFY_ASSET_ISSUED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ZONE_NOTIFY_ASSET_ISSUED = new Notification(notificationType = "ZONE_NOTIFY_ASSET_ISSUED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_REQUEST_SENT = new Notification(notificationType = "NEGOTIATION_REQUEST_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ISSUE_ASSET_REQUEST_FAILED = new Notification(notificationType = "ISSUE_ASSET_REQUEST_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_ISSUE_ASSET_REQUEST_FAILED = new Notification(notificationType = "ORGANIZATION_NOTIFY_ISSUE_ASSET_REQUEST_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ZONE_NOTIFY_ISSUE_ASSET_REQUEST_FAILED = new Notification(notificationType = "ZONE_NOTIFY_ISSUE_ASSET_REQUEST_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_REQUEST_SENT_FAILED = new Notification(notificationType = "NEGOTIATION_REQUEST_SENT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING = new Notification(notificationType = "NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_REQUEST_REJECTED = new Notification(notificationType = "NEGOTIATION_REQUEST_REJECTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
@@ -119,6 +123,7 @@ object Notification {
   val NEGOTIATION_ASSET_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_ASSET_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val OBL_DETAILS_ADDED = new Notification(notificationType = "OBL_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val INVOICE_DETAILS_ADDED = new Notification(notificationType = "INVOICE_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)

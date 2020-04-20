@@ -7,7 +7,7 @@
 @(buyerRejectedNegotiationList: Seq[Negotiation], sellerRejectedNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 
-<div class="cmuk-text-left title">@Messages(constants.View.BUYER_REJECTED_NEGOTIATION_LIST)</div>
+<div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)</div>
 @buyerRejectedNegotiationList.map { buyerRejectedNegotiation =>
     <li class="commonList">
         @defining(traders.find(_.id == buyerRejectedNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
@@ -36,7 +36,7 @@
         @commonVerticalTextInfo(constants.View.COMMENT, buyerRejectedNegotiation.comment.getOrElse(""))
     </li>
 }
-<div class="cmuk-text-left title">@Messages(constants.View.SELLER_REJECTED_NEGOTIATION_LIST)</div>
+<div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
 @sellerRejectedNegotiationList.map { sellerRejectedNegotiation =>
     <li class="commonList">
         @defining(traders.find(_.id == sellerRejectedNegotiation.sellerTraderID)) { organizationTrader: Option[Trader] =>

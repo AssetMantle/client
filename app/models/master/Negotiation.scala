@@ -2,9 +2,11 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.common.Serializable.{AssetOtherDetails, DocumentList, PaymentTerms}
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 import java.sql.Date
 
@@ -13,19 +15,7 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Negotiation(id: String, negotiationID: Option[String] = None, ticketID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, shippingPeriod: Int, time: Option[Int] = None, buyerAcceptedAssetDetails: BuyerAcceptedAssetDetails, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: BuyerAcceptedPaymentTerms, documentsCheckList: DocumentsCheckList, buyerAcceptedDocumentsCheckList: BuyerAcceptedDocumentsCheckList, chatID: Option[String] = None, status: String, comment: Option[String] = None)
-
-case class PaymentTerms(advancePayment: Option[Boolean] = None, advancePercentage: Option[Double] = None, credit: Option[Boolean] = None, tenure: Option[Int] = None, tentativeDate: Option[Date] = None, reference: Option[String] = None)
-
-case class DocumentsCheckList(billOfExchangeRequired: Option[Boolean] = None, obl: Option[Boolean] = None, coo: Option[Boolean] = None, coa: Option[Boolean] = None, otherDocuments: Option[String] = None)
-
-case class BuyerAcceptedAssetDetails(description: Boolean = false, price: Boolean = false, quantity: Boolean = false, shippingPeriod: Boolean = false)
-
-case class BuyerAcceptedPaymentTerms(advancePayment: Boolean = false, credit: Boolean = false)
-
-case class BuyerAcceptedDocumentsCheckList(billOfExchangeRequired: Boolean = false, documentList: Boolean = false)
-
-case class NegotiationTermsCometMessage(username: String, message: JsValue)
+case class Negotiation(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, chatID: Option[String] = None, status: String, comment: Option[String] = None)
 
 @Singleton
 class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create)(implicit executionContext: ExecutionContext) {
@@ -42,7 +32,13 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
-  private def add(negotiation: Negotiation): Future[String] = db.run((negotiationTable returning negotiationTable.map(_.id) += negotiation).asTry).map {
+  case class NegotiationSerializable(id: String, negotiationID: Option[String], buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: String, buyerAcceptedAssetDescription: Boolean, buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean, buyerAcceptedAssetOtherDetails: Boolean, time: Option[Int], paymentTerms: String, buyerAcceptedPaymentTerms: Boolean, documentList: String, buyerAcceptedDocumentList: Boolean, chatID: Option[String], status: String, comment: Option[String]) {
+    def deserialize: Negotiation = Negotiation(id = id, negotiationID = negotiationID, buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = assetDescription, price = price, quantity = quantity, quantityUnit = quantityUnit, assetOtherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](assetOtherDetails), buyerAcceptedAssetDescription = buyerAcceptedAssetDescription, buyerAcceptedPrice = buyerAcceptedPrice, buyerAcceptedQuantity = buyerAcceptedQuantity, buyerAcceptedAssetOtherDetails = buyerAcceptedAssetOtherDetails, time = time, paymentTerms = utilities.JSON.convertJsonStringToObject[PaymentTerms](paymentTerms), buyerAcceptedPaymentTerms = buyerAcceptedPaymentTerms, documentList = utilities.JSON.convertJsonStringToObject[DocumentList](documentList), buyerAcceptedDocumentList = buyerAcceptedDocumentList, chatID = chatID, status = status, comment = comment)
+  }
+
+  def serialize(negotiation: Negotiation): NegotiationSerializable = NegotiationSerializable(id = negotiation.id, negotiationID = negotiation.negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, assetDescription = negotiation.assetDescription, price = negotiation.price, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, assetOtherDetails = Json.toJson(negotiation.assetOtherDetails).toString(), buyerAcceptedAssetDescription = negotiation.buyerAcceptedAssetDescription, buyerAcceptedPrice = negotiation.buyerAcceptedPrice, buyerAcceptedQuantity = negotiation.buyerAcceptedQuantity, buyerAcceptedAssetOtherDetails = negotiation.buyerAcceptedAssetOtherDetails, time = negotiation.time, paymentTerms = Json.toJson(negotiation.paymentTerms).toString(), buyerAcceptedPaymentTerms = negotiation.buyerAcceptedPaymentTerms, documentList = Json.toJson(negotiation.documentList).toString(), buyerAcceptedDocumentList = negotiation.buyerAcceptedDocumentList, chatID = negotiation.chatID, status = negotiation.status, comment = negotiation.comment)
+
+  private def add(negotiationSerializable: NegotiationSerializable): Future[String] = db.run((negotiationTable returning negotiationTable.map(_.id) += negotiationSerializable).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -50,7 +46,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def find(id: String): Future[Negotiation] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
+  private def find(id: String): Future[NegotiationSerializable] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -58,15 +54,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findByNegotiationID(negotiationID: String): Future[Negotiation] = db.run(negotiationTable.filter(_.negotiationID === negotiationID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findByTicketID(ticketID: String): Future[Negotiation] = db.run(negotiationTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByBuyerSellerTraderIDAndAssetID(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[NegotiationSerializable] = db.run(negotiationTable.filter(_.buyerTraderID === buyerTraderID).filter(_.sellerTraderID === sellerTraderID).filter(_.assetID === assetID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -82,40 +70,16 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findPaymentTermsByID(id: String): Future[PaymentTerms] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.paymentTerms
+  private def findPaymentTermsByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.paymentTerms).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def findDocumentsCheckListByID(id: String): Future[DocumentsCheckList] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.documentsCheckList
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findBuyerAcceptedAssetDetailsByID(id: String): Future[BuyerAcceptedAssetDetails] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.buyerAcceptedAssetDetails
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findBuyerAcceptedPaymentTermsByID(id: String): Future[BuyerAcceptedPaymentTerms] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.buyerAcceptedPaymentTerms
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findBuyerAcceptedDocumentsCheckListByID(id: String): Future[BuyerAcceptedDocumentsCheckList] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.buyerAcceptedDocumentsCheckList
+  private def findDocumentListByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.documentList).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -142,7 +106,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updatePriceAndQuantityByID(id: String, price: Int, quantity: Int): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.price, x.quantity)).update((price, quantity)).asTry).map {
+  private def updateAssetTermsAndBuyerAcceptedTermsByID(id: String, description: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean, buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.price, x.quantity, x.quantityUnit, x.buyerAcceptedAssetDescription, x.buyerAcceptedPrice, x.buyerAcceptedQuantity)).update((description, price, quantity, quantityUnit, buyerAcceptedAssetDescription, buyerAcceptedPrice, buyerAcceptedQuantity)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -152,7 +116,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateAssetTermsByID(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int, buyerAcceptedAssetDetails: BuyerAcceptedAssetDetails): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.price, x.quantity, x.shippingPeriod, x.buyerAcceptedAssetDescription, x.buyerAcceptedPrice, x.buyerAcceptedQuantity, x.buyerAcceptedShippingPeriod)).update((description, price, quantity, shippingPeriod, buyerAcceptedAssetDetails.description, buyerAcceptedAssetDetails.price, buyerAcceptedAssetDetails.quantity, buyerAcceptedAssetDetails.shippingPeriod)).asTry).map {
+  private def updateAssetOtherDetailsByID(id: String, assetOtherDetails: String, buyerAcceptedAssetOtherDetails: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetOtherDetails, x.buyerAcceptedAssetOtherDetails)).update((assetOtherDetails, buyerAcceptedAssetOtherDetails)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -162,7 +126,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updatePaymentTermsByID(id: String, advancePayment: Option[Boolean], advancePercentage: Option[Double], credit: Option[Boolean], tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String], buyerAcceptedPaymentTerms: BuyerAcceptedPaymentTerms): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.advancePayment.?, x.advancePercentage.?, x.credit.?, x.tenure.?, x.tentativeDate.?, x.reference.?, x.buyerAcceptedAdvancePayment, x.buyerAcceptedCredit)).update((advancePayment, advancePercentage, credit, tenure, tentativeDate, refrence, buyerAcceptedPaymentTerms.advancePayment, buyerAcceptedPaymentTerms.credit)).asTry).map {
+  private def updatePaymentTermsAndBuyerAcceptedPaymentTermsByID(id: String, paymentTerms: String, buyerAcceptedPaymentTerms: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.paymentTerms, x.buyerAcceptedPaymentTerms)).update((paymentTerms, buyerAcceptedPaymentTerms)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -172,7 +136,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateDocumentsCheckListByID(id: String, billOfExchangeRequired: Option[Boolean], obl: Option[Boolean], coo: Option[Boolean], coa: Option[Boolean], otherDocuments: Option[String], buyerAcceptedDocumentsCheckList: BuyerAcceptedDocumentsCheckList): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchangeRequired.?, x.obl.?, x.coo.?, x.coa.?, x.otherDocuments.?, x.buyerAcceptedBillOfExchangeRequired, x.buyerAcceptedDocumentList)).update((billOfExchangeRequired, obl, coo, coa, otherDocuments, buyerAcceptedDocumentsCheckList.billOfExchangeRequired, buyerAcceptedDocumentsCheckList.documentList)).asTry).map {
+  private def updateDocumentListAndBuyerAcceptedDocumentListByID(id: String, documentList: String, buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.documentList, x.buyerAcceptedDocumentList)).update((documentList, buyerAcceptedDocumentList)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -181,6 +145,67 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
+  private def updateAssetDescriptionAndBuyerAcceptedAssetDescriptionStatusByID(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.buyerAcceptedAssetDescription)).update((assetDescription, buyerAcceptedAssetDescription)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updatePriceAndBuyerAcceptedPriceStatusByID(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.price, x.buyerAcceptedPrice)).update((price, buyerAcceptedPrice)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateQuantityAndBuyerAcceptedQuantityStatusByID(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.quantity, x.buyerAcceptedQuantity)).update((quantity, buyerAcceptedQuantity)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateAssetOtherDetailsAndBuyerAcceptedAssetOtherDetailsStatusStatusByID(id: String, assetOtherDetails: String, buyerAcceptedAssetOtherDetails: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetOtherDetails, x.buyerAcceptedAssetOtherDetails)).update((assetOtherDetails, buyerAcceptedAssetOtherDetails)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updatePaymentTermsAndBuyerAcceptedPaymentTermsStatusByID(id: String, paymentTerms: String, buyerAcceptedPaymentTerms: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.paymentTerms, x.buyerAcceptedPaymentTerms)).update((paymentTerms, buyerAcceptedPaymentTerms)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateDocumentListAndBuyerAcceptedDocumentListStatusByID(id: String, documentList: String, buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.documentList, x.buyerAcceptedDocumentList)).update((documentList, buyerAcceptedDocumentList)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
 
   private def updateStatusAndCommentByID(id: String, status: String, comment: Option[String]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(negotiation => (negotiation.status, negotiation.comment.?)).update((status, comment)).asTry).map {
     case Success(result) => result
@@ -202,7 +227,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateTicketIDByID(id: String, ticketID: Option[String]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.ticketID.?).update(ticketID).asTry).map {
+  private def updateTimeByID(id: String, time: Option[Int]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.time.?).update(time).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -240,40 +265,35 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findAllNegotiationsByBuyerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID === traderID).filter(_.status.inSet(statuses)).result)
-
-
-  private def findAllNegotiationsBySellerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID === traderID).filter(_.status.inSet(statuses)).result)
-
-  private def findAllNegotiationsByTraderIDAndStatus(traderID: String, status: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(x => x.sellerTraderID === traderID || x.buyerTraderID === traderID).filter(_.status === status).result)
-
-  private def findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.buyerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
-
-  private def findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.sellerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
-
-  private def findAllByAssetID(assetID: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.assetID === assetID).result)
-
-  private def updateAssetDescriptionAndStatusByID(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.buyerAcceptedAssetDescription)).update((assetDescription, buyerAcceptedAssetDescription)).asTry).map {
+  private def tryGetBuyerTraderIDByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.buyerTraderID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
+  private def tryGetSellerTraderIDByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.sellerTraderID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findAllNegotiationsByBuyerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(_.buyerTraderID === traderID).filter(_.status.inSet(statuses)).result)
+
+  private def findAllNegotiationsBySellerTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(_.sellerTraderID === traderID).filter(_.status.inSet(statuses)).result)
+
+  private def findAllNegotiationsByTraderIDAndStatus(traderID: String, status: String): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(x => x.sellerTraderID === traderID || x.buyerTraderID === traderID).filter(_.status === status).result)
+
+  private def findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(_.buyerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
+
+  private def findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(_.sellerTraderID.inSet(traderIDs)).filter(_.status.inSet(statuses)).result)
+
+  private def findAllByAssetID(assetID: String): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(_.assetID === assetID).result)
 
   private def updateBuyerAcceptedAssetDescriptionByID(id: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedAssetDescription).update(buyerAcceptedAssetDescription).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updatePriceAndStatusByID(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.price, x.buyerAcceptedPrice)).update((price, buyerAcceptedPrice)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -293,16 +313,6 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateQuantityAndStatusByID(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.quantity, x.buyerAcceptedQuantity)).update((quantity, buyerAcceptedQuantity)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def updateBuyerAcceptedQuantityByID(id: String, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedQuantity).update(buyerAcceptedQuantity).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -313,7 +323,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateShippingPeriodAndStatusByID(id: String, shippingPeriod: Int, buyerAcceptedShippingPeriod: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.shippingPeriod, x.buyerAcceptedShippingPeriod)).update((shippingPeriod, buyerAcceptedShippingPeriod)).asTry).map {
+  private def updateBuyerAcceptedAssetOtherDetailsByID(id: String, buyerAcceptedAssetOtherDetails: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedAssetOtherDetails).update(buyerAcceptedAssetOtherDetails).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -323,77 +333,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateBuyerAcceptedShippingPeriodByID(id: String, buyerAcceptedShippingPeriod: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedShippingPeriod).update(buyerAcceptedShippingPeriod).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateAdvancePaymentAndStatusByID(id: String, advancePayment: Boolean, advancePercentage: Option[Double], buyerAcceptedAdvancePayment: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.advancePayment, x.advancePercentage.?, x.buyerAcceptedAdvancePayment)).update((advancePayment, advancePercentage, buyerAcceptedAdvancePayment)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateBuyerAcceptedAdvancePaymentByID(id: String, buyerAcceptedAdvancePayment: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedAdvancePayment).update(buyerAcceptedAdvancePayment).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateCreditAndStatusByID(id: String, credit: Boolean, tentativeDate: Option[Date], tenure: Option[Int], reference: Option[String], buyerAcceptedCredit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.credit, x.tentativeDate.?, x.tenure.?, x.reference.?, x.buyerAcceptedCredit)).update((credit, tentativeDate, tenure, reference, buyerAcceptedCredit)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateBuyerAcceptedCreditByID(id: String, buyerAcceptedCredit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedCredit).update(buyerAcceptedCredit).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateBillOfExchangeRequiredAndStatusByID(id: String, billOfExchangeRequired: Boolean, buyerAcceptedBillOfExchangeRequired: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.billOfExchangeRequired, x.buyerAcceptedBillOfExchangeRequired)).update((billOfExchangeRequired, buyerAcceptedBillOfExchangeRequired)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateBuyerAcceptedBillOfExchangeRequiredByID(id: String, buyerAcceptedBillOfExchangeRequired: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedBillOfExchangeRequired).update(buyerAcceptedBillOfExchangeRequired).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateDocumentListAndStatusByID(id: String, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String], buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.obl, x.coo, x.coa, x.otherDocuments.?, x.buyerAcceptedDocumentList)).update((obl, coa, coa, otherDocuments, buyerAcceptedDocumentList)).asTry).map {
+  private def updateBuyerAcceptedPaymentTermsByID(id: String, buyerAcceptedPaymentTerms: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedPaymentTerms).update(buyerAcceptedPaymentTerms).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -413,47 +353,15 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findSellerTraderIDByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.sellerTraderID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findBuyerTraderIDByID(id: String): Future[String] = db.run(negotiationTable.filter(_.id === id).map(_.buyerTraderID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def checkByIDAndTraderID(id: String, traderID: String): Future[Boolean] = db.run(negotiationTable.filter(_.id === id).filter(x => x.buyerTraderID === traderID || x.sellerTraderID === traderID).exists.result)
 
-  private[models] class NegotiationTable(tag: Tag) extends Table[Negotiation](tag, "Negotiation") {
+  private[models] class NegotiationTable(tag: Tag) extends Table[NegotiationSerializable](tag, "Negotiation") {
 
-    def * = (id, negotiationID.?, ticketID.?, buyerTraderID, sellerTraderID, assetID, assetDescription, price, quantity, quantityUnit, shippingPeriod, time.?, (buyerAcceptedAssetDescription, buyerAcceptedPrice, buyerAcceptedQuantity, buyerAcceptedShippingPeriod), (advancePayment.?, advancePercentage.?, credit.?, tenure.?, tentativeDate.?, reference.?), (buyerAcceptedAdvancePayment, buyerAcceptedCredit), (billOfExchangeRequired.?, obl.?, coo.?, coa.?, otherDocuments.?), (buyerAcceptedBillOfExchangeRequired, buyerAcceptedDocumentList), chatID.?, status, comment.?).shaped <> ( {
-      case (id, negotiationID, ticketID, buyerTraderID, sellerTraderID, assetID, assetDescription, price, quantity, quantityUnit, shippingPeriod, time, buyerAcceptedAssetDetails, paymentTerms, buyerAcceptedPaymentTerms, documentsCheckList, buyerAcceptedDocumentsCheckList, chatID, status, comment) => Negotiation(id = id, negotiationID = negotiationID, ticketID = ticketID, buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = assetDescription, price = price, quantity = quantity, quantityUnit = quantityUnit, shippingPeriod = shippingPeriod, time = time, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails.tupled.apply(buyerAcceptedAssetDetails), paymentTerms = PaymentTerms.tupled.apply(paymentTerms), buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms.tupled.apply(buyerAcceptedPaymentTerms), documentsCheckList = DocumentsCheckList.tupled.apply(documentsCheckList), buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList.tupled.apply(buyerAcceptedDocumentsCheckList), chatID = chatID, status = status, comment = comment)
-    }, { negotiation: Negotiation =>
-      def f1(paymentTerms: PaymentTerms) = PaymentTerms.unapply(paymentTerms).get
-
-      def f2(documentsCheckList: DocumentsCheckList) = DocumentsCheckList.unapply(documentsCheckList).get
-
-      def f3(buyerAcceptedAssetDetails: BuyerAcceptedAssetDetails) = BuyerAcceptedAssetDetails.unapply(buyerAcceptedAssetDetails).get
-
-      def f4(buyerAcceptedPaymentTerms: BuyerAcceptedPaymentTerms) = BuyerAcceptedPaymentTerms.unapply(buyerAcceptedPaymentTerms).get
-
-      def f5(buyerAcceptedDocumentsCheckList: BuyerAcceptedDocumentsCheckList) = BuyerAcceptedDocumentsCheckList.unapply(buyerAcceptedDocumentsCheckList).get
-
-      Some((negotiation.id, negotiation.negotiationID, negotiation.ticketID, negotiation.buyerTraderID, negotiation.sellerTraderID, negotiation.assetID, negotiation.assetDescription, negotiation.price, negotiation.quantity, negotiation.quantityUnit, negotiation.shippingPeriod, negotiation.time, f3(negotiation.buyerAcceptedAssetDetails), f1(negotiation.paymentTerms), f4(negotiation.buyerAcceptedPaymentTerms), f2(negotiation.documentsCheckList), f5(negotiation.buyerAcceptedDocumentsCheckList), negotiation.chatID, negotiation.status, negotiation.comment))
-    })
+    def * = (id, negotiationID.?, buyerTraderID, sellerTraderID, assetID, assetDescription, price, quantity, quantityUnit, assetOtherDetails, buyerAcceptedAssetDescription, buyerAcceptedPrice, buyerAcceptedQuantity, buyerAcceptedAssetOtherDetails, time.?, paymentTerms, buyerAcceptedPaymentTerms, documentList, buyerAcceptedDocumentList, chatID.?, status, comment.?) <> (NegotiationSerializable.tupled, NegotiationSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def negotiationID = column[String]("negotiationID")
-
-    def ticketID = column[String]("ticketID")
 
     def buyerTraderID = column[String]("buyerTraderID")
 
@@ -469,9 +377,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def quantityUnit = column[String]("quantityUnit")
 
-    def shippingPeriod = column[Int]("shippingPeriod")
-
-    def time = column[Int]("time")
+    def assetOtherDetails = column[String]("assetOtherDetails")
 
     def buyerAcceptedAssetDescription = column[Boolean]("buyerAcceptedAssetDescription")
 
@@ -479,35 +385,15 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def buyerAcceptedQuantity = column[Boolean]("buyerAcceptedQuantity")
 
-    def buyerAcceptedShippingPeriod = column[Boolean]("buyerAcceptedShippingPeriod")
+    def buyerAcceptedAssetOtherDetails = column[Boolean]("buyerAcceptedAssetOtherDetails")
 
-    def advancePayment = column[Boolean]("advancePayment")
+    def time = column[Int]("time")
 
-    def advancePercentage = column[Double]("advancePercentage")
+    def paymentTerms = column[String]("paymentTerms")
 
-    def credit = column[Boolean]("credit")
+    def buyerAcceptedPaymentTerms = column[Boolean]("buyerAcceptedPaymentTerms")
 
-    def tenure = column[Int]("tenure")
-
-    def tentativeDate = column[Date]("tentativeDate")
-
-    def reference = column[String]("reference")
-
-    def buyerAcceptedAdvancePayment = column[Boolean]("buyerAcceptedAdvancePayment")
-
-    def buyerAcceptedCredit = column[Boolean]("buyerAcceptedCredit")
-
-    def billOfExchangeRequired = column[Boolean]("billOfExchangeRequired")
-
-    def obl = column[Boolean]("obl")
-
-    def coo = column[Boolean]("coo")
-
-    def coa = column[Boolean]("coa")
-
-    def otherDocuments = column[String]("otherDocuments")
-
-    def buyerAcceptedBillOfExchangeRequired = column[Boolean]("buyerAcceptedBillOfExchangeRequired")
+    def documentList = column[String]("documentList")
 
     def buyerAcceptedDocumentList = column[Boolean]("buyerAcceptedDocumentList")
 
@@ -521,37 +407,27 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def createWithIssueAssetPending(buyerTraderID: String, sellerTraderID: String, assetID: String, description: String, price: Int, quantity: Int, quantityUnit: String, shippingPeriod: Int): Future[String] = add(Negotiation(id = utilities.IDGenerator.requestID(), buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = description, price = price, quantity = quantity, quantityUnit = quantityUnit, shippingPeriod = shippingPeriod, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails(), paymentTerms = PaymentTerms(), buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms(), documentsCheckList = DocumentsCheckList(), buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList(), status = constants.Status.Negotiation.ISSUE_ASSET_PENDING))
+    def createWithIssueAssetPending(buyerTraderID: String, sellerTraderID: String, assetID: String, description: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: AssetOtherDetails): Future[String] = add(serialize(Negotiation(id = utilities.IDGenerator.requestID(), buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = description, price = price, quantity = quantity, quantityUnit = quantityUnit, assetOtherDetails = assetOtherDetails, paymentTerms = PaymentTerms(), documentList = DocumentList(Seq[String](), Seq[String]()), status = constants.Status.Negotiation.ISSUE_ASSET_PENDING)))
 
-    def createWithFormIncomplete(buyerTraderID: String, sellerTraderID: String, assetID: String, description: String, price: Int, quantity: Int, quantityUnit: String, shippingPeriod: Int): Future[String] = add(Negotiation(id = utilities.IDGenerator.requestID(), buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = description, price = price, quantity = quantity, quantityUnit = quantityUnit, shippingPeriod = shippingPeriod, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails(), paymentTerms = PaymentTerms(), buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms(), documentsCheckList = DocumentsCheckList(), buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList(), status = constants.Status.Negotiation.FORM_INCOMPLETE))
+    def createWithFormIncomplete(buyerTraderID: String, sellerTraderID: String, assetID: String, description: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: AssetOtherDetails): Future[String] = add(serialize(Negotiation(id = utilities.IDGenerator.requestID(), buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = description, price = price, quantity = quantity, quantityUnit = quantityUnit, assetOtherDetails = assetOtherDetails, paymentTerms = PaymentTerms(), documentList = DocumentList(Seq[String](), Seq[String]()), status = constants.Status.Negotiation.FORM_INCOMPLETE)))
 
-    def tryGet(id: String): Future[Negotiation] = find(id)
+    def tryGet(id: String): Future[Negotiation] = find(id).map(serializedNegotiation => serializedNegotiation.deserialize)
 
-    def tryGetByNegotiationID(negotiationID: String): Future[Negotiation] = findByNegotiationID(negotiationID)
-
-    def tryGetByTicketID(ticketID: String): Future[Negotiation] = findByTicketID(ticketID)
+    def tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = findByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID).map(serializedNegotiation => serializedNegotiation.deserialize)
 
     def tryGetNegotiationIDByID(id: String): Future[String] = findNegotiationID(id)
 
-    def tryGetPaymentTerms(id: String): Future[PaymentTerms] = findPaymentTermsByID(id)
+    def tryGetPaymentTerms(id: String): Future[PaymentTerms] = findPaymentTermsByID(id).map(paymentTerms => utilities.JSON.convertJsonStringToObject[PaymentTerms](paymentTerms))
 
-    def updatePaymentTerms(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String]): Future[Int] = updatePaymentTermsByID(id = id, advancePayment = Option(advancePayment), advancePercentage = advancePercentage, credit = Option(credit), tenure = tenure, tentativeDate = tentativeDate, refrence = refrence, buyerAcceptedPaymentTerms = BuyerAcceptedPaymentTerms())
+    def updatePaymentTerms(id: String, paymentTerms: PaymentTerms): Future[Int] = updatePaymentTermsAndBuyerAcceptedPaymentTermsByID(id = id, paymentTerms = Json.toJson(paymentTerms).toString(), buyerAcceptedPaymentTerms = false)
 
-    def tryGetDocumentsCheckList(id: String): Future[DocumentsCheckList] = findDocumentsCheckListByID(id)
+    def tryGetDocumentList(id: String): Future[DocumentList] = findDocumentListByID(id).map(documentList => utilities.JSON.convertJsonStringToObject[DocumentList](documentList))
 
-    def updateDocumentsCheckList(id: String, billOfExchangeRequired: Boolean, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String]): Future[Int] = updateDocumentsCheckListByID(id = id, billOfExchangeRequired = Option(billOfExchangeRequired), obl = Option(obl), coo = Option(coo), coa = Option(coa), otherDocuments = otherDocuments, buyerAcceptedDocumentsCheckList = BuyerAcceptedDocumentsCheckList())
+    def updateDocumentList(id: String, documentList: DocumentList): Future[Int] = updateDocumentListAndBuyerAcceptedDocumentListByID(id = id, documentList = Json.toJson(documentList).toString(), buyerAcceptedDocumentList = false)
 
-    def updatePriceAndQuantity(id: String, price: Int, quantity: Int): Future[Int] = updatePriceAndQuantityByID(id = id, price = price, quantity = quantity)
+    def updateAssetTerms(id: String, description: String, price: Int, quantity: Int, quantityUnit: String): Future[Int] = updateAssetTermsAndBuyerAcceptedTermsByID(id = id, description = description, price = price, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedAssetDescription = false, buyerAcceptedPrice = false, buyerAcceptedQuantity = false)
 
-    def updateAssetTerms(id: String, description: String, price: Int, quantity: Int, shippingPeriod: Int): Future[Int] = updateAssetTermsByID(id = id, description = description, price = price, quantity = quantity, shippingPeriod = shippingPeriod, buyerAcceptedAssetDetails = BuyerAcceptedAssetDetails())
-
-    def tryGetBuyerAcceptedAssetDetails(id: String): Future[BuyerAcceptedAssetDetails] = findBuyerAcceptedAssetDetailsByID(id)
-
-    def tryGetBuyerAcceptedPaymentTerms(id: String): Future[BuyerAcceptedPaymentTerms] = findBuyerAcceptedPaymentTermsByID(id)
-
-    def tryGetBuyerAcceptedDocumentsCheckList(id: String): Future[BuyerAcceptedDocumentsCheckList] = findBuyerAcceptedDocumentsCheckListByID(id)
-
-    def updateTicketID(id: String, ticketID: String): Future[Int] = updateTicketIDByID(id = id, ticketID = Option(ticketID))
+    def updateAssetOtherDetails(id: String, assetOtherDetails: AssetOtherDetails): Future[Int] = updateAssetOtherDetailsByID(id = id, assetOtherDetails = Json.toJson(assetOtherDetails).toString(), buyerAcceptedAssetOtherDetails = false)
 
     def tryGetStatus(id: String): Future[String] = getStatusByID(id)
 
@@ -559,7 +435,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markStatusIssueAssetRequestFailed(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.ISSUE_ASSET_FAILED)
 
-    def markStatusIssueAssetPendingRequestSent(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.REQUEST_SENDING_WAITING_FOR_ISSUE_ASSET)
+    def markStatusIssueAssetPending(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.ISSUE_ASSET_PENDING)
 
     def markTradeCompletedByNegotiationID(negotiationID: String): Future[Int] = updateStatusByNegotiationID(negotiationID = negotiationID, status = constants.Status.Negotiation.TRADE_COMPLETED)
 
@@ -567,53 +443,37 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markAcceptedAndUpdateNegotiationID(id: String, negotiationID: String): Future[Int] = updateNegotiationIDAndStatusByID(id = id, negotiationID = negotiationID, status = constants.Status.Negotiation.NEGOTIATION_STARTED)
 
-    def markBuyerAcceptedAllNegotiationTerms(id: String) = updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS)
+    def getAllByAssetID(assetID: String): Future[Seq[Negotiation]] = findAllByAssetID(assetID).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllByAssetID(assetID: String): Future[Seq[Negotiation]] = findAllByAssetID(assetID)
+    def getAllAcceptedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllAcceptedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
+    def getAllAcceptedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
+    def getAllRejectedNegotiationListByBuyerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.REJECTED).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllAcceptedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
+    def getAllRejectedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.REJECTED).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllAcceptedSellNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
+    def getAllFailedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllRejectedNegotiationListByBuyerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REJECTED)
+    def getAllReceivedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.REQUEST_SENT).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllRejectedNegotiationListByBuyerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REJECTED)
+    def getAllSentNegotiationRequestListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.REQUEST_SENT).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllRejectedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REJECTED)
+    def getAllIncompleteNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, statuses = constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllRejectedNegotiationListBySellerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REJECTED)
+    def getAllConfirmedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByTraderIDAndStatus(traderID = traderID, status = constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllFailedNegotiationListBySellerTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT)
+    def getAllTradeCompletedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.TRADE_COMPLETED).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllFailedNegotiationListBySellerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT)
+    def getAllTradeCompletedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.TRADE_COMPLETED).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllReceivedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REQUEST_SENT)
+    def getAllTradeCompletedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.TRADE_COMPLETED).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
-    def getAllReceivedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REQUEST_SENT)
-
-    def getAllSentNegotiationRequestListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.REQUEST_SENT)
-
-    def getAllSentNegotiationRequestListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REQUEST_SENT)
-
-    def getAllIncompleteNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING)
-
-    def getAllIncompleteNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING)
-
-    def getAllConfirmedNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByTraderIDAndStatus(traderID = traderID, status = constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE)
-
-    def getAllTradeCompletedBuyNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.TRADE_COMPLETED)
-
-    def getAllTradeCompletedSellNegotiationListByTraderID(traderID: String): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.TRADE_COMPLETED)
-
-    def getAllTradeCompletedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.TRADE_COMPLETED)
-
-    def getAllTradeCompletedSellNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.TRADE_COMPLETED)
+    def getAllTradeCompletedSellNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.TRADE_COMPLETED).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 
     def insertChatID(id: String, chatID: String): Future[Int] = updateChatIDByID(id = id, chatID = chatID)
+
+    def updateTime(id: String, time: Int): Future[Int] = updateTimeByID(id = id, time = Option(time))
 
     def updateBuyerAcceptedAssetDescription(id: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = updateBuyerAcceptedAssetDescriptionByID(id = id, buyerAcceptedAssetDescription = buyerAcceptedAssetDescription)
 
@@ -621,41 +481,49 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def updateBuyerAcceptedQuantity(id: String, buyerAcceptedQuantity: Boolean): Future[Int] = updateBuyerAcceptedQuantityByID(id = id, buyerAcceptedQuantity = buyerAcceptedQuantity)
 
-    def updateBuyerAcceptedShippingPeriod(id: String, buyerAcceptedShippingPeriod: Boolean): Future[Int] = updateBuyerAcceptedShippingPeriodByID(id = id, buyerAcceptedShippingPeriod = buyerAcceptedShippingPeriod)
+    def updateBuyerAcceptedAssetOtherDetails(id: String, buyerAcceptedAssetOtherDetails: Boolean): Future[Int] = updateBuyerAcceptedAssetOtherDetailsByID(id = id, buyerAcceptedAssetOtherDetails = buyerAcceptedAssetOtherDetails)
 
-    def updateBuyerAcceptedAdvancePayment(id: String, buyerAcceptedAdvancePayment: Boolean): Future[Int] = updateBuyerAcceptedAdvancePaymentByID(id = id, buyerAcceptedAdvancePayment = buyerAcceptedAdvancePayment)
-
-    def updateBuyerAcceptedCredit(id: String, buyerAcceptedCredit: Boolean): Future[Int] = updateBuyerAcceptedCreditByID(id = id, buyerAcceptedCredit = buyerAcceptedCredit)
-
-    def updateBuyerAcceptedBillOfExchangeRequired(id: String, buyerAcceptedBillOfExchangeRequired: Boolean): Future[Int] = updateBuyerAcceptedBillOfExchangeRequiredByID(id = id, buyerAcceptedBillOfExchangeRequired = buyerAcceptedBillOfExchangeRequired)
+    def updateBuyerAcceptedPaymentTerms(id: String, buyerAcceptedPaymentTerms: Boolean): Future[Int] = updateBuyerAcceptedPaymentTermsByID(id = id, buyerAcceptedPaymentTerms = buyerAcceptedPaymentTerms)
 
     def updateBuyerAcceptedDocumentList(id: String, buyerAcceptedDocumentList: Boolean): Future[Int] = updateBuyerAcceptedDocumentListByID(id = id, buyerAcceptedDocumentList = buyerAcceptedDocumentList)
 
     def checkTraderNegotiationExists(id: String, traderID: String): Future[Boolean] = checkByIDAndTraderID(id = id, traderID = traderID)
 
-    def updateAssetDescriptionAndStatus(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean) = updateAssetDescriptionAndStatusByID(id, assetDescription, buyerAcceptedAssetDescription)
+    def tryGetBuyerTraderID(id: String): Future[String] = tryGetBuyerTraderIDByID(id)
 
-    def updateQuantityAndStatus(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = updateQuantityAndStatusByID(id, quantity, buyerAcceptedQuantity)
+    def tryGetSellerTraderID(id: String): Future[String] = tryGetSellerTraderIDByID(id)
 
-    def updatePriceAndStatus(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = updatePriceAndStatusByID(id, price, buyerAcceptedPrice)
+    def updateAssetDescriptionAndStatus(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean) = updateAssetDescriptionAndBuyerAcceptedAssetDescriptionStatusByID(id, assetDescription, buyerAcceptedAssetDescription)
 
-    def updateShippingPeriodAndStatus(id: String, shippingPeriod: Int, buyerAcceptedShippingPeriod: Boolean) = updateShippingPeriodAndStatusByID(id, shippingPeriod, buyerAcceptedShippingPeriod)
+    def updateQuantityAndStatus(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = updateQuantityAndBuyerAcceptedQuantityStatusByID(id, quantity, buyerAcceptedQuantity)
 
-    def updateAdvancePaymentAndStatus(id: String, advancePayment: Boolean, advancePercentage: Option[Double], buyerAcceptedAdvancePayment: Boolean) = updateAdvancePaymentAndStatusByID(id, advancePayment, advancePercentage, buyerAcceptedAdvancePayment)
+    def updatePriceAndStatus(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = updatePriceAndBuyerAcceptedPriceStatusByID(id, price, buyerAcceptedPrice)
 
-    def updateCreditAndStatus(id: String, credit: Boolean, tentativeDate: Option[Date], tenure: Option[Int], reference: Option[String], buyerAcceptedCredit: Boolean) = updateCreditAndStatusByID(id, credit, tentativeDate, tenure, reference, buyerAcceptedCredit)
+    def updateAssetOtherDetailsAndStatus(id: String, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetailsStatus: Boolean) = updateAssetOtherDetailsAndBuyerAcceptedAssetOtherDetailsStatusStatusByID(id, Json.toJson(assetOtherDetails).toString, buyerAcceptedAssetOtherDetailsStatus)
 
-    def updateBillOfExchangeRequiredAndStatus(id: String, billOfExchangeRequired: Boolean, buyerAcceptedBillOfExchangeRequired: Boolean) = updateBillOfExchangeRequiredAndStatusByID(id, billOfExchangeRequired, buyerAcceptedBillOfExchangeRequired)
+    def updatePaymentTermsAndStatus(id: String, paymentTerms: PaymentTerms, buyerAcceptedPaymentTermsStatus: Boolean): Future[Int] = updatePaymentTermsAndBuyerAcceptedPaymentTermsStatusByID(id, Json.toJson(paymentTerms).toString, buyerAcceptedPaymentTermsStatus)
 
-    def updateDocumentListAndStatus(id: String, obl: Boolean, coo: Boolean, coa: Boolean, otherDocuments: Option[String], buyerAcceptedDocumentList: Boolean) = updateDocumentListAndStatusByID(id, obl, coo, coa, otherDocuments, buyerAcceptedDocumentList)
-
-    def tryGetSellerTraderID(id: String) = findSellerTraderIDByID(id)
-
-    def tryGetBuyerTraderID(id: String) = findBuyerTraderIDByID(id)
-
-    def updateStatus(id: String, status: String): Future[Int] = updateStatusByID(id, status)
+    def updateDocumentListAndStatus(id: String, documentList: DocumentList, buyerAcceptedDocumentListStatus: Boolean) = updateDocumentListAndBuyerAcceptedDocumentListStatusByID(id, Json.toJson(documentList).toString, buyerAcceptedDocumentListStatus)
 
     def sendMessageToNegotiationTermsActor(accountID: String, id: String): Unit = actorsCreate.mainActor ! actors.Message.makeCometMessage(accountID, constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(id)))
+
+    def getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE).map(_.map(_.deserialize))
+
+    def getAllAcceptedSellNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE).map(_.map(_.deserialize))
+
+    def getAllRejectedNegotiationListByBuyerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REJECTED).map(_.map(_.deserialize))
+
+    def getAllRejectedNegotiationListBySellerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REJECTED).map(_.map(_.deserialize))
+
+    def getAllFailedNegotiationListBySellerTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.ISSUE_ASSET_FAILED, constants.Status.Negotiation.TIMED_OUT).map(_.map(_.deserialize))
+
+    def getAllReceivedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REQUEST_SENT).map(_.map(_.deserialize))
+
+    def getAllSentNegotiationRequestListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.REQUEST_SENT).map(_.map(_.deserialize))
+
+    def getAllIncompleteNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING).map(_.map(_.deserialize))
+
+    def markBuyerAcceptedAllNegotiationTerms(id: String) = updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS)
   }
 
 }

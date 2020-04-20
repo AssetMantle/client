@@ -2,7 +2,7 @@ package constants
 
 import play.api.data.validation._
 import views.companion.master.{AddTrader, TraderRelationRequest, SignUp}
-import views.companion.master.{IssueAsset, SignUp}
+import views.companion.master.{IssueAsset, SignUp, DocumentList}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -15,7 +15,7 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val issueAssetConstraint: Constraint[IssueAsset.Data] = Constraint("constraints.issueAssetConstraint")({ issueAssetData: IssueAsset.Data =>
+  val issueAssetConstraint: Constraint[IssueAsset.Data] = Constraint("constraints.issueAsset")({ issueAssetData: IssueAsset.Data =>
     val errors = {
       if (!issueAssetData.moderated && issueAssetData.password.isEmpty && issueAssetData.gas.isDefined) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
       else if (!issueAssetData.moderated && issueAssetData.password.isDefined && issueAssetData.gas.isEmpty) Seq(ValidationError(constants.Response.GAS_NOT_GIVEN.message))
@@ -23,4 +23,13 @@ object FormConstraint {
     }
     if (errors.isEmpty) Valid else Invalid(errors)
   })
+
+ /* val negotiationDocumentListConstraint: Constraint[DocumentList.Data] = Constraint("constraints.negotiationDocumentList")({ documentListData: DocumentList.Data =>
+    val errors = {
+      if (documentListData.documentList.isEmpty) Seq(ValidationError(constants.Response.DOCUMENT_LIST_EMPTY.message))
+      else if (documentListData.documentList.flatten.length <= 2) Seq(ValidationError(constants.Response.DOCUMENT_LIST_LESS_THAN_REQUIRED.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })*/
 }

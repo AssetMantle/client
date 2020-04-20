@@ -7,7 +7,7 @@ object AddOrUpdateUBOs {
 
   val form = Form(
     mapping(
-      constants.View.UBOS -> seq(optional(mapping(
+      constants.FormField.UBOS.name -> seq(optional(mapping(
         constants.FormField.PERSON_NAME.name -> constants.FormField.PERSON_NAME.field,
         constants.FormField.SHARE_PERCENTAGE.name -> constants.FormField.SHARE_PERCENTAGE.field,
         constants.FormField.RELATIONSHIP.name -> constants.FormField.RELATIONSHIP.field,

@@ -4,11 +4,11 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(sellNegotiationList: Seq[Negotiation], assets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(sellNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellNegotiationList.map { sellNegotiation =>
-    <li class="commonList">
-        @defining(counterPartyTraders.filter(_.id == sellNegotiation.buyerTraderID).headOption) { counterPartyTrader: Option[Trader] =>
+    co@commonVerticalInfoBox() {
+        @defining(counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
             @counterPartyTrader match {
                 case Some(trader) => {
                     @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
@@ -18,18 +18,9 @@
                 }
             }
         }
-        @defining(assets.filter(_.id == sellNegotiation.assetID).headOption) { rejectedNegotiationAsset: Option[Asset] =>
-            @rejectedNegotiationAsset match {
-                case Some(asset) => {
-                    @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
-                }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.ASSET_ID, sellNegotiation.assetID)
-                }
-            }
-        }
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sellNegotiation.assetDescription)
         @commonVerticalIntInfo(constants.View.PRICE, sellNegotiation.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString(), sellNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.STATUS, sellNegotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">
@@ -41,5 +32,5 @@
                 </button>
             </p>
         </div>
-    </li>
+    }
 }

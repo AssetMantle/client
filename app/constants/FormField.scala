@@ -172,9 +172,10 @@ object FormField {
   val CREDIT = new BooleanFormField("CREDIT")
   val OBL = new BooleanFormField("OBL")
   val INVOICE = new BooleanFormField("INVOICE")
+  val INSURANCE = new BooleanFormField("INSURANCE")
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
-  val BILL_OF_EXCHANGE_REQUIRED = new BooleanFormField("BILL_OF_EXCHANGE_REQUIRED")
+  val BILL_OF_EXCHANGE = new BooleanFormField("BILL_OF_EXCHANGE")
   val PRICE = new BooleanFormField("PRICE")
   val QUANTITY = new BooleanFormField("QUANTITY")
   val BUYER_SHIPPING_PERIOD = new BooleanFormField("BUYER_SHIPPING_PERIOD")
@@ -182,11 +183,14 @@ object FormField {
   val BUYER_CREDIT = new BooleanFormField("BUYER_CREDIT")
   val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
   val CONFIRM = new BooleanFormField("CONFIRM")
+  val DOCUMENT_LIST_COMPLETED = new BooleanFormField("DOCUMENT_LIST_COMPLETED")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
   val POSTAL_ADDRESS = new NestedFormField("POSTAL_ADDRESS")
   val ADDRESS = new NestedFormField("ADDRESS")
+  val UBOS = new NestedFormField("UBOS")
+  val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

@@ -1,13 +1,21 @@
 @import "variables.scss";
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .pageContent {
     margin: 20px;
   }
   .MnemonicQuiz{
     max-width: 500px;
   }
-  .bannerText{
-    width: 100%;
+  .bannerContainer {
+    background-size: contain;
+
+    .bannerText {
+      width: 100%;
+
+      h3 {
+        font-size: 30px;
+      }
+    }
   }
 
   .mobile .cmuk-offcanvas-bar{
@@ -17,7 +25,7 @@
     background-color: $colorPrimary;
   }
 }
-@media (min-width: 600px) {
+@media (min-width: 640px) {
   .modalBody{
     form{
       width: 500px;
@@ -48,6 +56,12 @@
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex;
+  }
+  .comdex{
+    .mobileNavigation{
+      display: flex;
+      flex:auto;
+    }
   }
 }
 @media screen and (max-width: 768px) {
@@ -190,9 +204,8 @@
       height: 210px;
     }
   }
-  .identificationDetails,
-  .traderRelationList,
-  .tradeList{
+
+  .switcherCard{
     .cmuk-switcher{
       height: 140px;
     }
@@ -260,7 +273,7 @@
   }
   .modal .modalContent{
     top:10%;
-    max-height: 400px;
+    max-height: 530px;
   }
   .tabsSection{
     .cmuk-grid-divider{
@@ -287,5 +300,50 @@
 @media (min-width:1921px){
   .comdex .cmuk-container{
     max-width:1920px;
+  }
+}
+
+@media (max-width: 960px){
+  .comdex {
+    .mobileNavigationHeader{
+      display: flex;
+    }
+    .mobileNavigation{
+      display: none;
+      li{
+        a{
+          justify-content: left;
+          padding: 0px;
+        }
+      }
+    }
+    .header {
+      .cmuk-logo {
+        border: none;
+      }
+      .buttonRegister {
+        background-color: #FE4350;
+        font-size: 14px;
+        font-family: Rubik;
+        color: #FFFFFF;
+        line-height: inherit;
+        padding: 5px 30px;
+        border-radius: 3px;
+      }
+      .cmuk-navbar{
+        display: block;
+      }
+      .cmuk-navbar-nav{
+        display: block;
+      }
+      .cmuk-navbar-right {
+        .cmuk-navbar-nav > li > a
+        {
+          border:none;
+          padding: 0px;
+        }
+        }
+    }
+
   }
 }

@@ -2,6 +2,11 @@ function formInitializtion(advancePayment,advancePercentage,credit,tentativeDate
     if( $(advancePayment).prop('checked') === false && $(credit).prop('checked') === true  ){
         $(advancePercentage).val('').prop('disabled',true).prop('required',false);
     }
+    if($(credit).prop('checked') === false){
+        $(tentativeDate).prop('disabled',true).prop('required',false);
+        $(tenure).val('').prop('disabled',true).prop('required',false);
+        $(refrence).val('').prop('disabled',true).prop('required',false);
+    }
     if($(tentativeDate).val()){
         $(tenure).val('').prop('disabled',true).prop('required',false);
         $(refrence).val('').prop('disabled',true).prop('required',false);
@@ -19,20 +24,32 @@ function advancePaymentInput(source,advancePercentage,credit){
     }
 }
 
-function advancePercentageInput(source,credit){
+function advancePercentageInput(source,credit,tentativeDate,tenure,refrence){
     if(parseFloat($(source).val()) === 100.0){
         $(credit).prop('checked',false);
+        $(tentativeDate).prop('disabled',true).prop('required',false);
+        $(tenure).val('').prop('disabled',true).prop('required',false);
+        $(refrence).val('').prop('disabled',true).prop('required',false);
     }else{
         $(credit).prop('checked',true);
+        $(tentativeDate).prop('disabled',false).prop('required',true);
+        $(tenure).prop('disabled',false).prop('required',true);
+        $(refrence).prop('disabled',false).prop('required',true);
     }
 }
 
-function creditInput(source,advancePayment,advancePercentage){
+function creditInput(source,advancePayment,advancePercentage,tentativeDate,tenure,refrence){
     $(advancePayment).prop('checked',true);
     if($(source).prop('checked') === false){
         $(advancePercentage).prop('disabled',false).val('100');
+        $(tenure).val('').prop('disabled',true).prop('required',false);
+        $(refrence).val('').prop('disabled',true).prop('required',false);
+        $(tentativeDate).prop('disabled',true).prop('required',false);
     }else{
         $(advancePercentage).prop('disabled',false).val('50');
+        $(tentativeDate).prop('disabled',false).prop('required',true);
+        $(tenure).prop('disabled',false).prop('required',true);
+        $(refrence).prop('disabled',false).prop('required',true);
     }
 }
 

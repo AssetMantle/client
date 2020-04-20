@@ -11,30 +11,30 @@
     @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
     @commonTextInfo(constants.View.ACCOUNT_ID, counterPartyTrader.accountID)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET)</div>
-        @commonTextInfo(constants.Form.ASSET_TYPE, asset.assetType)
-        @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
-        @commonTextInfo(constants.Form.ASSET_QUANTITY, asset.quantityUnit)
-        @commonTextInfo(constants.Form.QUANTITY_UNIT, asset.quantityUnit)
-        @commonIntInfo(constants.Form.ASSET_PRICE, asset.price)
-        @commonBooleanInfo(constants.Form.MODERATED, Option(asset.moderated))
-        @commonIntInfo(constants.Form.SHIPPING_PERIOD, asset.shippingPeriod)
-        @commonTextInfo(constants.Form.PORT_OF_LOADING, asset.portOfLoading)
-        @commonTextInfo(constants.Form.PORT_OF_DISCHARGE, asset.portOfDischarge)
+    @commonTextInfo(constants.Form.ASSET_TYPE, asset.assetType)
+    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
+    @commonTextInfo(constants.Form.ASSET_QUANTITY, asset.quantityUnit)
+    @commonTextInfo(constants.Form.QUANTITY_UNIT, asset.quantityUnit)
+    @commonIntInfo(constants.Form.ASSET_PRICE, asset.price)
+    @commonBooleanInfo(constants.Form.MODERATED, Option(asset.moderated))
+    @commonIntInfo(constants.Form.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
+    @commonTextInfo(constants.Form.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
+    @commonTextInfo(constants.Form.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
     <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS)</div>
-        @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, negotiation.paymentTerms.advancePayment)
-        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-        @commonBooleanInfo(constants.View.CREDIT, negotiation.paymentTerms.credit)
-        @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
-@*//     TODO: commonOptionalDateInfo ???   *@
-        @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTerms.tentativeDate.toString())
-        @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
+    @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
+    @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
+    @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
+    @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
+    @*// TODO: commonOptionalDateInfo ??? *@
+    @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTerms.tentativeDate.toString())
+    @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
 
-    <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENTS_CHECKLIST)</div>
-        @commonBooleanInfo(constants.View.BILL_OF_EXCHANGE_REQUIRED, negotiation.documentsCheckList.billOfExchangeRequired)
-        @commonBooleanInfo(constants.View.COA, negotiation.documentsCheckList.coa)
-        @commonBooleanInfo(constants.View.COO, negotiation.documentsCheckList.coo)
-        @commonTextInfo(constants.View.OTHER_DOCUMENTS, negotiation.documentsCheckList.otherDocuments.getOrElse(""))
+    <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
+   @* @negotiation.documentList.documents.map { document =>
+        @document
+        <br>
+    }*@
 
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENTS_CHECKLIST.get, 'parameters -> s"'${negotiation.id}'")
+    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'parameters -> s"'${negotiation.id}'")
 }

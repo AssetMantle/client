@@ -4,19 +4,26 @@ import java.sql.Timestamp
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
+import models.common.Serializable.NotificationTemplate
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Notification(id: String, accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean)
+case class Notification(id: String, accountID: String, notificationTemplate: NotificationTemplate, read: Boolean = false, createdOn: Timestamp, createdBy: String, createdOnTimezone: String, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  val title: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, notificationTemplate.template, constants.Notification.TITLE_SUFFIX).mkString(".")
+
+  val template: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, notificationTemplate.template, constants.Notification.MESSAGE_SUFFIX).mkString(".")
+
+}
 
 @Singleton
-class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_NOTIFICATION
 
@@ -24,13 +31,25 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
+  private val nodeID = configuration.get[String]("node.id")
+
+  private val nodeTimezone = configuration.get[String]("node.timezone")
+
+  private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
+
+  case class NotificationSerializable(id: String, accountID: String, notificationTemplateJson: String, read: Boolean, createdOn: Timestamp, createdBy: String, createdOnTimezone: String, updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson), read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimezone = createdOnTimezone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimezone = notification.createdOnTimezone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
+
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += notification).asTry).map {
+  private def add(accountID: String, template: String, parameters: String*): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += serialize(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTemplate = NotificationTemplate(template = template, parameters = parameters), createdOn = new Timestamp(System.currentTimeMillis()), createdBy = nodeID, createdOnTimezone = nodeTimezone))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -38,29 +57,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findNotificationsByAccountIdAndNotificationIDs(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.id inSet ids).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findNotificationsByAccountIds(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID inSet accountIDs).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result)
 
   private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === status).length.result.asTry).map {
     case Success(result) => result
@@ -70,7 +67,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateReadById(id: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.id === id).map(_.read).update(status).asTry).map {
+  private def updateReadById(id: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.id === id).map(x => (x.read, x.updatedOn, x.updatedBy, x.updatedOnTimezone)).update((status, new Timestamp(System.currentTimeMillis()), nodeID, nodeTimezone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -80,7 +77,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def deleteById(accountID: String) = db.run(notificationTable.filter(_.accountID === accountID).delete.asTry).map {
+  private def deleteById(accountID: String): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -90,33 +87,36 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private[models] class NotificationTable(tag: Tag) extends Table[Notification](tag, "Notification") {
+  private[models] class NotificationTable(tag: Tag) extends Table[NotificationSerializable](tag, "Notification") {
 
-    def * = (id, accountID, notificationTitle, notificationMessage, time, read) <> (Notification.tupled, Notification.unapply)
+    def * = (id, accountID, notificationTemplateJson, read, createdOn, createdBy, createdOnTimezone, updatedOn.?, updatedBy.?, updatedOnTimezone.?) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
-    def notificationTitle = column[String]("notificationTitle")
-
-    def notificationMessage = column[String]("notificationMessage")
+    def notificationTemplateJson = column[String]("notificationTemplateJson")
 
     def read = column[Boolean]("read")
 
-    def time = column[Timestamp]("time")
+    def createdOn = column[Timestamp]("createdOn")
 
+    def createdBy = column[String]("createdBy")
+
+    def createdOnTimezone = column[String]("createdOnTimezone")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOnTimezone = column[String]("updatedOnTimezone")
   }
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false))
+    def create(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(accountID = accountID, template = notification.notificationType, parameters = parameters: _*)
 
-    def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit)
-
-    def getTradeRoomNotifications(accountID: String, ids: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIdAndNotificationIDs(accountID = accountID, ids, offset = offset, limit = limit)
-
-    def getTradersNotifications(accountIDs: Seq[String], offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountIds(accountIDs = accountIDs, offset = offset, limit = limit)
+    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 
