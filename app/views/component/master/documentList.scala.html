@@ -15,14 +15,12 @@
     @repeatWithIndex(documentsListForm(constants.FormField.DOCUMENT_LIST.name), min = documentsListForm(constants.FormField.DOCUMENT_LIST.name).indexes.length + 1) { (documentField, i) =>
         @defining(Option(documentField)) { implicit sequentialFormField =>
             @if(if(documentField.value.isDefined) constants.File.TRADER_NEGOTIATION_DOCUMENTS.contains(documentField.value.get) || constants.File.TRADER_ASSET_DOCUMENTS.contains(documentField.value.get) else false){
-                    <div id='@Seq(constants.FormField.OTHER_DOCUMENT_LIST.name, i).mkString("_")' class="hidden">
+                    <div id='@Seq(constants.FormField.DOCUMENT_LIST.name, i).mkString("_")' class="hidden">
                         @commonInputText(documentsListForm, constants.FormField.DOCUMENT_TYPE)
                     </div>
-                    <script>
-                    intializeCheckBox('@documentField.value.get')
-                    </script>
+                    <script>intializeCheckBox('@documentField.value.get')</script>
                 }else{
-                    <div id='@Seq(constants.FormField.OTHER_DOCUMENT_LIST.name, i).mkString("_")'>
+                    <div id='@Seq(constants.FormField.DOCUMENT_LIST.name, i).mkString("_")'>
                         @commonInputText(documentsListForm, constants.FormField.DOCUMENT_TYPE)
                         @commonJavascriptButton(constants.Form.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
                     </div>
