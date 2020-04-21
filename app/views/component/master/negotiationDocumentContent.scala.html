@@ -3,7 +3,7 @@
 @import models.masterTransaction.NegotiationFile
 @import models.common.Serializable
 @import models.Trait.DocumentContent
-@(documentType:String, documentContent: Option[DocumentContent] )(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(documentType:String, documentContent: Option[DocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @documentContent match {
     case Some(content)=> {

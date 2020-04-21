@@ -1045,12 +1045,12 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getResult(traderID: String,negotiation: Negotiation)={
+      def getResult(traderID: String, negotiation: Negotiation) = {
         if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
           val getAsset = masterAssets.Service.tryGet(negotiation.assetID)
-          for{
-            asset<-getAsset
-          }yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, asset = asset))
+          for {
+            asset <- getAsset
+          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, asset = asset))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1078,44 +1078,41 @@ class ComponentViewController @Inject()(
 
       def getOrganizationTraderIDs(organizationID: String) = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
 
-      def getResult(organizationTraderIDs: Seq[String], negotiation: Negotiation)={
+      def getResult(organizationTraderIDs: Seq[String], negotiation: Negotiation) = {
         if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) {
           val getAsset = masterAssets.Service.tryGet(negotiation.assetID)
-          for{
-            asset<-getAsset
-          }yield Ok(views.html.component.master.organizationViewAcceptedNegotiationTerms(negotiation = negotiation, asset = asset))
+          for {
+            asset <- getAsset
+          } yield Ok(views.html.component.master.organizationViewAcceptedNegotiationTerms(negotiation = negotiation, asset = asset))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
       }
+
       (for {
         organizationID <- organizationID
         negotiation <- negotiation
         organizationTraderIDs <- getOrganizationTraderIDs(organizationID)
-        result <- getResult(organizationTraderIDs,negotiation)
+        result <- getResult(organizationTraderIDs, negotiation)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
-  def traderViewNegotiationFiles(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewNegotiationFileList(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def checkTraderNegotiationExists(traderID: String) = masterNegotiations.Service.checkTraderNegotiationExists(id, traderID)
-
-      def getResult(traderNegotiationExists: Boolean) = {
-        if (traderNegotiationExists) {
+      def getResult(traderID: String, negotiation: Negotiation) = {
+        if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
-          val negotiation = masterNegotiations.Service.tryGet(id)
-
-          def assetFiles(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+          val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
 
           for {
             negotiationFiles <- negotiationFiles
-            negotiation <- negotiation
-            assetFiles <- assetFiles(negotiation.assetID)
-          } yield Ok(views.html.component.master.traderViewNegotiationFiles(id = id, negotiation = negotiation, assetFiles = assetFiles, negotiationFiles = negotiationFiles))
+            assetFiles <- assetFiles
+          } yield Ok(views.html.component.master.traderViewNegotiationFileList(id = id, negotiation = negotiation, assetFiles = assetFiles, negotiationFiles = negotiationFiles))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1123,15 +1120,15 @@ class ComponentViewController @Inject()(
 
       (for {
         traderID <- traderID
-        checkTraderNegotiationExists <- checkTraderNegotiationExists(traderID)
-        result <- getResult(checkTraderNegotiationExists)
+        negotiation <- negotiation
+        result <- getResult(traderID, negotiation)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
-  def organizationViewNegotiationFiles(id: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationViewNegotiationFileList(id: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
@@ -1141,9 +1138,11 @@ class ComponentViewController @Inject()(
       def getResult(organizationTraderIDs: Seq[String], negotiation: Negotiation) = {
         if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) {
           val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
+          val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
           for {
             negotiationFiles <- negotiationFiles
-          } yield Ok(views.html.component.master.organizationViewNegotiationFiles(id = id, files = negotiationFiles))
+            assetFiles <- assetFiles
+          } yield Ok(views.html.component.master.organizationViewNegotiationFileList(id = id, negotiation = negotiation, assetFiles = assetFiles, negotiationFiles = negotiationFiles))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1178,18 +1177,18 @@ class ComponentViewController @Inject()(
                 for {
                   negotiation <- negotiation
                   assetFile <- assetFile(negotiation.assetID)
-                } yield Ok(views.html.component.master.traderViewNegotiationFile(assetFile))
+                } yield Ok(views.html.component.master.traderViewNegotiationFile(id, assetFile))
               case constants.File.INVOICE | constants.File.INSURANCE | constants.File.CONTRACT | constants.File.OTHER =>
                 val negotiationFile = masterTransactionNegotiationFiles.Service.get(id, documentType)
                 for {
                   negotiationFile <- negotiationFile
-                } yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationFile))
+                } yield Ok(views.html.component.master.traderViewNegotiationFile(id, negotiationFile))
             }
           case None =>
             val negotiationDocuments = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
             for {
               negotiationDocuments <- negotiationDocuments
-            } yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationDocuments.headOption))
+            } yield Ok(views.html.component.master.traderViewNegotiationFile(id, negotiationDocuments.headOption))
         }
       }
       else {
@@ -1226,18 +1225,18 @@ class ComponentViewController @Inject()(
                   for {
                     negotiation <- negotiation
                     assetFile <- assetFile(negotiation.assetID)
-                  } yield Ok(views.html.component.master.traderViewNegotiationFile(assetFile))
+                  } yield Ok(views.html.component.master.traderViewNegotiationFile(id, assetFile))
                 case constants.File.INVOICE | constants.File.INSURANCE | constants.File.CONTRACT | constants.File.OTHER =>
                   val negotiationFile = masterTransactionNegotiationFiles.Service.get(id, documentType)
                   for {
                     negotiationFile <- negotiationFile
-                  } yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationFile))
+                  } yield Ok(views.html.component.master.traderViewNegotiationFile(id, negotiationFile))
               }
             case None =>
               val negotiationDocuments = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
               for {
                 negotiationDocuments <- negotiationDocuments
-              } yield Ok(views.html.component.master.organizationViewNegotiationFile(negotiationDocuments.headOption))
+              } yield Ok(views.html.component.master.organizationViewNegotiationFile(id, negotiationDocuments.headOption))
           }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -1255,7 +1254,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def negotiationDocumentUpload(id: String) = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeDocuments(id: String) = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
       val negotiation = masterNegotiations.Service.tryGet(id)
@@ -1266,7 +1265,7 @@ class ComponentViewController @Inject()(
         negotiationFiles <- negotiationFiles
         negotiation <- negotiation
         assetFiles <- assetFiles(negotiation.assetID)
-      } yield Ok(views.html.component.master.negotiationDocumentUpload(id, negotiation, assetFiles, negotiationFiles))
+      } yield Ok(views.html.component.master.tradeDocuments(id, negotiation, assetFiles, negotiationFiles))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(id = id, failures = Seq(baseException.failure)))
       }

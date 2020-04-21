@@ -41,12 +41,12 @@ function advancePercentageInput(source,credit,tentativeDate,tenure,refrence){
 function creditInput(source,advancePayment,advancePercentage,tentativeDate,tenure,refrence){
     $(advancePayment).prop('checked',true);
     if($(source).prop('checked') === false){
-        $(advancePercentage).prop('disabled',false).val('100');
+        $(advancePercentage).prop('disabled',false).prop('required',true).val('100');
         $(tenure).val('').prop('disabled',true).prop('required',false);
         $(refrence).val('').prop('disabled',true).prop('required',false);
         $(tentativeDate).prop('disabled',true).prop('required',false);
     }else{
-        $(advancePercentage).prop('disabled',false).val('50');
+        $(advancePercentage).prop('disabled',false).prop('required',true).val('50');
         $(tentativeDate).prop('disabled',false).prop('required',true);
         $(tenure).prop('disabled',false).prop('required',true);
         $(refrence).prop('disabled',false).prop('required',true);

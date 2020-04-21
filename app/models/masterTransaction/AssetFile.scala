@@ -108,6 +108,20 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
+  private def updateDocumentContentByID(id: String, documentType: String, documentContent: String): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContent).update(documentContent).asTry).map {
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
   private def findByIdDocumentType(id: String, documentType: String): Future[Option[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -128,6 +142,14 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   }
 
   private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getDocumentContentByIDAndDocumentType(id: String, documentType: String): Future[Option[String]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContent.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -160,7 +182,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   case class AssetFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) {
     def deserialize: AssetFile =
       documentContent match {
-        case Some(content) => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[DocumentContent](content.toString)), status)
+        case Some(content) => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[DocumentContent](content)), status)
         case None => AssetFile(id, documentType, fileName, file, None, status)
       }
 
@@ -220,6 +242,10 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def checkAllAssetFilesVerified(id: String): Future[Boolean] = {
       getStatusForAllDocumentsById(id).map { documentStatuses => if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false }
     }
+
+    def updateDocumentContent(id: String, documentType: String, documentContent: DocumentContent): Future[Int] = updateDocumentContentByID(id, documentType, Json.toJson(documentContent).toString)
+
+    def getDocumentContent(id: String, documentType: String) = getDocumentContentByIDAndDocumentType(id = id, documentType = documentType).map(_.map(content => utilities.JSON.convertJsonStringToObject[DocumentContent](content)))
   }
 
 }

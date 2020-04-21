@@ -124,7 +124,9 @@
             </div>
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
-                @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
+                @if(negotiation.status ==constants.Status.Negotiation.NEGOTIATION_STARTED && negotiation.sellerTraderID ==traderID){
+                    @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
+                }
             </div>
             <div class="sellerTerm">
                 @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)

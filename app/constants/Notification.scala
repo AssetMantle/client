@@ -34,6 +34,7 @@ object Notification {
     val subject: String = Seq(EMAIL_PREFIX, notificationType, SUBJECT_SUFFIX).mkString(".")
     val message: String = Seq(EMAIL_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
+
   //Invitation Emails
   val ZONE_INVITATION = new Email(notificationType = "ZONE_INVITATION")
   val TRADER_INVITATION = new Email(notificationType = "TRADER_INVITATION")

@@ -81,7 +81,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   private def updateAllFilesStatus(id: String, status: Boolean) = db.run(negotiationFileTable.map(x => (x.id, status)).update(id, status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -91,7 +95,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   private def updateDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.status.?)).update((fileName, file, status)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -101,7 +109,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   private def updateStatus(id: String, documentType: String, status: Boolean): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -139,6 +151,14 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
+  private def getDocumentContentByIDAndDocumentType(id: String, documentType: String): Future[Option[String]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContent.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getAllDocumentsById(id: String): Future[Seq[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).result)
 
   private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[NegotiationFileSerialized]] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
@@ -154,7 +174,11 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   private def updateDocumentContentByID(id: String, documentType: String, documentContent: Option[String]): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContent.?).update(documentContent).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -168,7 +192,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
   private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(negotiationFileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
 
   case class NegotiationFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) {
-    def deSerialize: NegotiationFile = NegotiationFile(id, documentType, fileName, file, documentContent.map(x=>utilities.JSON.convertJsonStringToObject[DocumentContent](x)), status)
+    def deSerialize: NegotiationFile = NegotiationFile(id, documentType, fileName, file, documentContent.map(x => utilities.JSON.convertJsonStringToObject[DocumentContent](x)), status)
   }
 
   private[models] class NegotiationFileTable(tag: Tag) extends Table[NegotiationFileSerialized](tag, "NegotiationFile") {
@@ -192,13 +216,6 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def create(file: NegotiationFile): Future[String] = add(NegotiationFileSerialized(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
-    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = getByIdDocumentType(id = id, documentType = documentType).map { negotiationFile =>
-      negotiationFile match {
-        case Some(negotiation) => negotiation.deSerialize
-        case None => NegotiationFile("", "", "", None, None, None)
-      }
-    }
-
     def tryGet(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType).map(_.deSerialize)
 
     def get(id: String, documentType: String): Future[Option[NegotiationFile]] = getByIdDocumentType(id = id, documentType = documentType).map(_.map(_.deSerialize))
@@ -221,9 +238,9 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 
-    def updateDocumentContent(id:String, documentType: String, documentContent: DocumentContent): Future[Int] = updateDocumentContentByID(id, documentType, Some(Json.toJson(documentContent).toString))
+    def updateDocumentContent(id: String, documentType: String, documentContent: DocumentContent): Future[Int] = updateDocumentContentByID(id, documentType, Some(Json.toJson(documentContent).toString))
 
-    def getDocumentContent(id:String, documentType: String)= findByIdDocumentType(id = id, documentType = documentType).map(_.deSerialize).map(_.documentContent)
+    def getDocumentContent(id: String, documentType: String) = getDocumentContentByIDAndDocumentType(id = id, documentType = documentType).map(_.map(content => utilities.JSON.convertJsonStringToObject[DocumentContent](content)))
   }
 
 }

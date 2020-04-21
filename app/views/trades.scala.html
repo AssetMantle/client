@@ -6,28 +6,23 @@
 @common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-@loginState.userType match {
-<div class="leftTradeFinancial">
-    case constants.User.TRADER => {
+    <div class="leftTradeFinancial">
+    @loginState.userType match {
+
+         case constants.User.TRADER => {
             <div id="traderFinancials"></div>
 
         <script>
             componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-
-        var fiatCometMessage = function (event) {
-            componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-        }
         </script>
     }
 
-    case constants.User.ORGANIZATION => {
-
+         case constants.User.ORGANIZATION => {}
+         case constants.User.ZONE => {}
+         case constants.User.GENESIS => {}
+         case _ => {}
     }
-    case constants.User.ZONE => {}
-    case constants.User.GENESIS => {}
-    case _ => {}
 </div>
-    }
 }
 
 @center = {

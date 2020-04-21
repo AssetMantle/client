@@ -47,10 +47,10 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
   }
 
   private def updateVerificationStatusByAccountID(accountID: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(identificationTable.filter(_.accountID === accountID).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -59,10 +59,10 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
   }
 
   private def updateCompletionStatusByAccountID(accountID: String, completionStatus: Boolean): Future[Int] = db.run(identificationTable.filter(_.accountID === accountID).map(_.completionStatus).update(completionStatus).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

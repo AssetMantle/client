@@ -15,18 +15,23 @@ object Message {
   }
 
   case class Account(ping: String = constants.Comet.PING)
+
   implicit val accountWrites: OWrites[Account] = Json.writes[Account]
 
   case class Fiat(ping: String = constants.Comet.PING)
+
   implicit val fiatWrites: OWrites[Fiat] = Json.writes[Fiat]
 
   case class Asset(ping: String = constants.Comet.PING)
+
   implicit val assetWrites: OWrites[Asset] = Json.writes[Asset]
 
   case class Order(ping: String = constants.Comet.PING)
+
   implicit val orderWrites: OWrites[Order] = Json.writes[Order]
 
-  case class Negotiation(id: Option[String]= None)
+  case class Negotiation(id: Option[String] = None)
+
   implicit val negotiationWrites: OWrites[Negotiation] = Json.writes[Negotiation]
 
   //For CHAT/ MESSAGE -> Takes message directly from masterTransaction.Message.scala

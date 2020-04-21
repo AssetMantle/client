@@ -99,8 +99,14 @@ object addOrganizationControllerTest {
 
   val verifyOrganizationScenario: ScenarioBuilder = scenario("VerifyOrganization")
     .feed(GasFeeder.gasFeed)
+    .exec(http("Get_Pending_Verify_Organization_Request")
+      .get(routes.AddOrganizationController.viewPendingVerifyOrganizationRequests().url)
+      .check(substring("${%s}".format(Test.TEST_ORGANIZATION_ID)).exists)
+    )
+    .pause(2)
+
     .foreach(organizationKYCs,"documentType"){
-      exec(http("Organization_KYC_Update_Status"+"${documentType}"+"Form")
+      exec(http("Organization_KYC_Update_Status"+"${documentType}")
         .get(session=>routes.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(session(Test.TEST_ORGANIZATION_ID).as[String],session("documentType").as[String]).url)
         .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
       )
@@ -136,7 +142,7 @@ object addOrganizationControllerTest {
     .pause(3)
 
   val rejectVerifyOrganizationScenario: ScenarioBuilder = scenario("RejectVerifyOrganization")
-    /*.exec(http("RejectVerifyOrganization_GET")
+    .exec(http("RejectVerifyOrganization_GET")
       .get(session=>routes.AddOrganizationController.rejectVerifyOrganizationRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.REJECT_ORGANIZATION_REQUEST.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -147,7 +153,7 @@ object addOrganizationControllerTest {
         Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
       .check(substring("SUCCESS VERIFY_ORGANIZATION_REQUEST_REJECTED").exists)
-    )*/
+    )
 
 
   val blockchainAddOrganizationScenario: ScenarioBuilder = scenario("BlockchainAddOrganization")

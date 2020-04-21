@@ -11,7 +11,7 @@
 <div>
     @Messages(constants.View.ASSET_DOCUMENTS):
     @negotiation.documentList.assetDocuments.map{assetDocuemntType=>
-        <div id='@Seq("upload_ASSET_", assetDocuemntType).mkString("")'>
+        <div id='@Seq("UPLOAD_ASSET_", assetDocuemntType).mkString("")'>
             @commonModalButton(Seq("UPLOAD_", assetDocuemntType).mkString(""), routes.javascript.FileController.uploadTraderAssetForm,  'parameters -> s"'${assetDocuemntType}','${id}'")
         </div>
     }
@@ -26,19 +26,20 @@
                 case constants.File.OBL=>{@commonFormButton(constants.Form.OBL_DETAILS, 'parameters -> s"'${id}'")}
                 case _=>{}
             }
-            <script>hideElement('upload_ASSET_@assetFile.documentType')</script>
+            <script>hideElement('UPLOAD_ASSET_@assetFile.documentType')</script>
         }
     }
 
 
     @Messages(constants.View.NEGOTIATION_DOCUMENTS):
-<div id='@Seq("upload_NEGOTIATION_", constants.File.CONTRACT).mkString("")'>
-@commonModalButton(Seq("UPLOAD_", constants.File.CONTRACT).mkString(""), routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${constants.File.CONTRACT}','${id}'")
-</div>
 
-    @negotiation.documentList.negotiationDocuments.filter(negotiationDocumentType=>constants.File.TRADER_NEGOTIATION_DOCUMENTS.contains(negotiationDocumentType)).map{negotiationDocuemntType=>
-        <div id='@Seq("upload_NEGOTIATION_", negotiationDocuemntType).mkString("")'>
-        @commonModalButton(Seq("UPLOAD_", negotiationDocuemntType).mkString(""), routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${negotiationDocuemntType}','${id}'")
+        <div id='@Seq("UPLOAD_NEGOTIATION_", constants.File.CONTRACT).mkString("")'>
+        @commonModalButton(Seq("UPLOAD_", constants.File.CONTRACT).mkString(""), routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${constants.File.CONTRACT}','${id}'")
+        </div>
+
+    @negotiation.documentList.negotiationDocuments.filter(negotiationDocumentType=>constants.File.TRADER_NEGOTIATION_DOCUMENTS.contains(negotiationDocumentType)).map{negotiationDocumentType=>
+        <div id='@Seq("UPLOAD_NEGOTIATION_", negotiationDocumentType).mkString("")'>
+        @commonModalButton(Seq("UPLOAD_", negotiationDocumentType).mkString(""), routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${negotiationDocumentType}','${id}'")
         </div>
     }
 
@@ -53,7 +54,7 @@
                 case constants.File.INVOICE=>{@commonFormButton(constants.Form.INVOICE_DETAILS, 'parameters -> s"'${id}'")}
                 case _=>{}
             }
-            <script>hideElement('upload_NEGOTIATION_@negotiationFile.documentType')</script>
+            <script>hideElement('UPLOAD_NEGOTIATION_@negotiationFile.documentType')</script>
         }
     }
 

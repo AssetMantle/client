@@ -57,8 +57,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderAssetOBLPath: String = configuration.get[String]("upload.asset.obl")
 
-  private val uploadTraderAssetInvoicePath: String = configuration.get[String]("upload.asset.invoice")
-
   private val uploadTraderAssetPackingListPath: String = configuration.get[String]("upload.asset.packingList")
 
   private val uploadTraderAssetCOOPath: String = configuration.get[String]("upload.asset.coo")
@@ -66,8 +64,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
   private val uploadTraderAssetCOAPath: String = configuration.get[String]("upload.asset.coa")
 
   private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
-
-  private val uploadTraderNegotiationOBLPath: String = configuration.get[String]("upload.negotiation.obl")
 
   private val uploadTraderNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
 
@@ -137,7 +133,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     documentType match {
       case constants.File.CONTRACT => uploadTraderAssetContractPath
       case constants.File.OBL => uploadTraderAssetOBLPath
-      case constants.File.INVOICE => uploadTraderAssetInvoicePath
       case constants.File.PACKING_LIST => uploadTraderAssetPackingListPath
       case constants.File.COO => uploadTraderAssetCOOPath
       case constants.File.COA => uploadTraderAssetCOAPath
@@ -152,7 +147,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.SELLER_CONTRACT => uploadTraderNegotiationSellerContractOtherPath
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
-      case constants.File.OBL => uploadTraderNegotiationOBLPath
       case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
       case constants.File.INSURANCE => uploadTraderNegotiationInsurancePath
       case constants.File.OTHER => uploadTraderNegotiationOtherPath

@@ -1,19 +1,18 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.masterTransaction.NegotiationFile
-
 @import models.Trait.Document
 
-@(negotiationFile: Option[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+@(id:String,negotiationFile: Option[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
 @negotiationFile match{
     case Some(file)=> {
         @utilities.FileOperations.fileExtensionFromName(file.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-                <img src="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)" width="100%" height="100%">
+                <img src="@routes.FileController.tradingFile(id, file.fileName, file.documentType)">
             }
             case _ => {
-                <iframe src="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)" width="100%" height="100%"></iframe>
+                <iframe src="@routes.FileController.tradingFile(id, file.fileName, file.documentType)"></iframe>
             }
         }
     }

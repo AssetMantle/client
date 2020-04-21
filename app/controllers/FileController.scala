@@ -239,7 +239,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             for {
               negotiationFiles <- negotiationFiles
               assetFiles <- assetFiles(negotiation.assetID)
-              result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentUpload(negotiationID, negotiation, assetFiles, negotiationFiles))
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiationID, negotiation, assetFiles, negotiationFiles))
             } yield result
           case _ => withUsernameToken.Ok(views.html.index())
         }
@@ -280,7 +280,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             for {
               negotiationFiles <- negotiationFiles
               assetFiles <- assetFiles(negotiation.assetID)
-              result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentUpload(negotiationID, negotiation, assetFiles, negotiationFiles))
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiationID, negotiation, assetFiles, negotiationFiles))
             } yield result
           case _ => withUsernameToken.Ok(views.html.index())
         }
@@ -347,7 +347,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               negotiationFiles <- negotiationFiles
               negotiation <- negotiation
               assetFiles <- assetFiles(negotiation.assetID)
-              result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentUpload(negotiationID, negotiation, assetFiles, negotiationFiles))
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiationID, negotiation, assetFiles, negotiationFiles))
             } yield result
           case _ => withUsernameToken.Ok(views.html.index())
         }
@@ -387,7 +387,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               negotiationFiles <- negotiationFiles
               negotiation <- negotiation
               assetFiles <- assetFiles(negotiation.assetID)
-              result <- withUsernameToken.PartialContent(views.html.component.master.negotiationDocumentUpload(negotiationID, negotiation, assetFiles, negotiationFiles))
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiationID, negotiation, assetFiles, negotiationFiles))
             } yield result
           case _ => withUsernameToken.Ok(views.html.index())
         }

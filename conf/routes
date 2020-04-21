@@ -171,17 +171,17 @@ GET         /component/traderViewTradeActivities                                
 GET         /component/organizationViewTradeActivities                                      controllers.ComponentViewController.organizationViewTradeActivities(negotiationID :String)
 GET         /component/recentActivities                                                     controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
-GET         /component/traderViewNegotiationFiles                                           controllers.ComponentViewController.traderViewNegotiationFiles(id:String)
+GET         /component/traderViewNegotiationFileList                                        controllers.ComponentViewController.traderViewNegotiationFileList(id:String)
 GET         /component/traderViewNegotiationFile                                            controllers.ComponentViewController.traderViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/traderViewAcceptedNegotiationFiles                                    controllers.ComponentViewController.traderViewAcceptedNegotiationFiles(id:String)
+GET         /component/traderViewAcceptedNegotiationFiles                                   controllers.ComponentViewController.traderViewAcceptedNegotiationFiles(id:String)
 
-GET         /component/organizationViewNegotiationFiles                                     controllers.ComponentViewController.organizationViewNegotiationFiles(id:String)
+GET         /component/organizationViewNegotiationFileList                                  controllers.ComponentViewController.organizationViewNegotiationFileList(id:String)
 GET         /component/organizationViewNegotiationFile                                      controllers.ComponentViewController.organizationViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/organizationViewAcceptedNegotiationFiles                              controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles(id:String)
+GET         /component/organizationViewAcceptedNegotiationFiles                             controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles(id:String)
 
 GET         /component/traderViewAcceptedNegotiationTerms                                   controllers.ComponentViewController.traderViewAcceptedNegotiationTerms(id: String)
 GET         /component/traderViewAcceptedNegotiation                                        controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
-GET         /component/negotiationDocumentUpload                                            controllers.ComponentViewController.negotiationDocumentUpload(id:String)
+GET         /component/tradeDocuments                                                       controllers.ComponentViewController.tradeDocuments(id:String)
 
 GET         /component/organizationViewAcceptedNegotiationTerms                             controllers.ComponentViewController.organizationViewAcceptedNegotiationTerms(id: String)
 GET         /component/organizationViewAcceptedNegotiation                                  controllers.ComponentViewController.organizationViewAcceptedNegotiation(id: String)

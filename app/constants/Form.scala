@@ -110,7 +110,7 @@ object Form {
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
   val OBL_DETAILS = new Form("OBL_DETAILS", routes.NegotiationController.oblDetails(), routes.javascript.NegotiationController.oblDetailsForm)
   val INVOICE_DETAILS = new Form("INVOICE_DETAILS", routes.NegotiationController.invoiceDetails(), routes.javascript.NegotiationController.invoiceDetailsForm)
-  val CONFIRM_ALL_NEGOTIATION_TERMS= new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
+  val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
@@ -175,9 +175,9 @@ object Form {
   //VerifyMobileNumberController
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber(), routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
 
-  val ACCOUNT_ID="ACCOUNT_ID"
-  val ORGANIZATION_ID="ORGANIZATION_ID"
-  val TRADER_ID="TRADER_ID"
+  val ACCOUNT_ID = "ACCOUNT_ID"
+  val ORGANIZATION_ID = "ORGANIZATION_ID"
+  val TRADER_ID = "TRADER_ID"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
   val BLOCKS = "BLOCKS"
@@ -341,7 +341,7 @@ object Form {
   val ORGANIZATION_NAME = "ORGANIZATION_NAME"
   val ORGANIZATION_USERNAME = "ORGANIZATION_USERNAME"
   val ZONE_ID = "ZONE_ID"
-  val NAME ="NAME"
+  val NAME = "NAME"
   val BUYER_ADDRESS = "BUYER_ADDRESS"
   val BUYER_ID = "BUYER_ID"
   val SELLER_ADDRESS = "SELLER_ADDRESS"

@@ -87,10 +87,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.status).update(status).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -99,10 +99,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateStatusByNegotiationID(negotiationID: String, status: String): Future[Int] = db.run(negotiationTable.filter(_.negotiationID === negotiationID).map(_.status).update(status).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -111,10 +111,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateAssetTermsAndBuyerAcceptedTermsByID(id: String, description: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean, buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.price, x.quantity, x.quantityUnit, x.buyerAcceptedAssetDescription, x.buyerAcceptedPrice, x.buyerAcceptedQuantity)).update((description, price, quantity, quantityUnit, buyerAcceptedAssetDescription, buyerAcceptedPrice, buyerAcceptedQuantity)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -123,10 +123,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateAssetOtherDetailsByID(id: String, assetOtherDetails: String, buyerAcceptedAssetOtherDetails: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetOtherDetails, x.buyerAcceptedAssetOtherDetails)).update((assetOtherDetails, buyerAcceptedAssetOtherDetails)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -135,10 +135,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updatePaymentTermsAndBuyerAcceptedPaymentTermsByID(id: String, paymentTerms: String, buyerAcceptedPaymentTerms: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.paymentTerms, x.buyerAcceptedPaymentTerms)).update((paymentTerms, buyerAcceptedPaymentTerms)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -147,10 +147,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateDocumentListAndBuyerAcceptedDocumentListByID(id: String, documentList: String, buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.documentList, x.buyerAcceptedDocumentList)).update((documentList, buyerAcceptedDocumentList)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -159,10 +159,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateAssetDescriptionByID(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.assetDescription, x.buyerAcceptedAssetDescription)).update((assetDescription, buyerAcceptedAssetDescription)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -171,10 +171,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updatePriceByID(id: String, price: Int, buyerAcceptedPrice: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.price, x.buyerAcceptedPrice)).update((price, buyerAcceptedPrice)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -183,10 +183,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateQuantityByID(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.quantity, x.buyerAcceptedQuantity)).update((quantity, buyerAcceptedQuantity)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -195,10 +195,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateStatusAndCommentByID(id: String, status: String, comment: Option[String]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(negotiation => (negotiation.status, negotiation.comment.?)).update((status, comment)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -207,10 +207,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateChatIDByID(id: String, chatID: String): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.chatID).update(chatID).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -229,10 +229,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def updateNegotiationIDAndStatusByID(id: String, negotiationID: String, status: String): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.negotiationID, x.status)).update((negotiationID, status)).asTry).map {
-    case Success(result) => result match{
-      case 0=> logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case _=>  result
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

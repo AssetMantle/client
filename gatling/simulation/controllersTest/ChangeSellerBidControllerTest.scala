@@ -20,11 +20,11 @@ object changeSellerBidControllerTest {
   val changeSellerBidScenario: ScenarioBuilder = scenario("ChangeSellerBid")
     .feed(SellerBidFeeder.sellerBidFeed)
     .feed(TimeFeeder.timeFeed)
-    /*.exec(http("Change_Seller_Bid_GET")
+    .exec(http("Change_Seller_Bid_GET")
       .get(session=>routes.ChangeSellerBidController.changeSellerBidForm(session(Test.TEST_BUYER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.REQUEST_ID), "value").saveAs(Form.REQUEST_ID))
-    )*/
+    )
     .pause(2)
     .exec(http("Change_Seller_Bid_POST")
       .post(routes.ChangeSellerBidController.changeSellerBid().url)

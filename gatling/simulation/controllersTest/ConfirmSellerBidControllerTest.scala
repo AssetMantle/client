@@ -19,12 +19,12 @@ object confirmSellerBidControllerTest {
   val confirmSellerBidScenario: ScenarioBuilder = scenario("ConfirmSellerBid")
 
     .feed(ConfirmBidFeeder.confirmBidFeed)
-   /* .exec(http("Confirm_Seller_Bid_Detail_GET")
+    .exec(http("Confirm_Seller_Bid_Detail_GET")
       .get(session=> routes.ConfirmSellerBidController.confirmSellerBidDetailForm(session(Test.TEST_BUYER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String],950).url)
       .check(css("legend:contains(%s)".format(constants.Form.CONFIRM_SELLER_BID_DETAIL.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.REQUEST_ID), "value").saveAs(Test.TEST_REQUEST_ID))
-    )*/
+    )
     .pause(2)
     .exec(http("Confirm_Seller_Bid_Detail_POST")
       .post(routes.ConfirmSellerBidController.confirmSellerBidDetail().url)

@@ -4,16 +4,16 @@ function onDocumentListIncomplete(source) {
 }
 
 function onDocumentSelect(source) {
-    let selctedDocument = source.id;
+    let selectedDocument = source.id;
     const form = $(source).closest("form");
     if ($(source).prop('checked') === false) {
         const form = $(source).closest("form");
-        let inputElement = form.find("input[value='" + selctedDocument + "']")[0];
+        let inputElement = form.find("input[value='" + selectedDocument + "']")[0];
         inputElement.value = '';
     } else {
         $('#negotiationDocumentListCompleted')[0].checked = false;
-        let elem = form.find("input[value='']")[0];
-        elem.value = selctedDocument;
+        let emptyInputElement = form.find("input[value='']")[0];
+        emptyInputElement.value = selectedDocument;
         submitForm(source);
     }
 }

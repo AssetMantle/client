@@ -97,7 +97,7 @@ object setACLControllerTest {
     .pause(3)
 
   val zoneVerifyTrader=scenario("zoneVerifyTrader")
-    /*.exec(http("Get_Pending_Zone_Verify_Trader_Request")
+    .exec(http("Get_Pending_Zone_Verify_Trader_Request")
       .get(routes.SetACLController.zoneViewPendingVerifyTraderRequests().url)
       .check(substring("${%s}".format(Test.TEST_TRADER_ID)).exists)
     )
@@ -113,13 +113,13 @@ object setACLControllerTest {
         ))
       )
         .pause(1)
-    }*/
+    }
     .pause(1)
-    /*.exec(http("Zone_Verify_Trader_Form_GET")
+    .exec(http("Zone_Verify_Trader_Form_GET")
       .get(session=>routes.SetACLController.zoneVerifyTraderForm(session(Test.TEST_TRADER_USERNAME).as[String],session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.ZONE_VERIFY_TRADER.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-    .pause(2)*/
+    .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(http("Zone_Verify_Trader_POST")
       .post(routes.SetACLController.zoneVerifyTrader().url)
@@ -138,7 +138,7 @@ object setACLControllerTest {
 
 
   val organizationVerifyTrader=scenario("organizationVerifyTrader")
-   /* .exec(http("Get_Organization_Pending_Verify_Trader_Request")
+    .exec(http("Get_Organization_Pending_Verify_Trader_Request")
       .get(routes.SetACLController.organizationViewVerifyTraderRequests().url)
       .check(substring("${%s}".format(Test.TEST_TRADER_ID)).exists)
     )
@@ -154,13 +154,13 @@ object setACLControllerTest {
         ))
       )
         .pause(1)
-    }*/
+    }
     .pause(2)
-    /*.exec(http("Organization_Verify_Trader_GET")
+    .exec(http("Organization_Verify_Trader_GET")
       .get(session=>routes.SetACLController.organizationVerifyTraderForm(session(Test.TEST_TRADER_USERNAME).as[String],session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.ORGANIZATION_VERIFY_TRADER.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-    .pause(2)*/
+    .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(http("Organization_Verify_Trader_POST")
       .post(routes.SetACLController.organizationVerifyTrader().url)
@@ -184,7 +184,7 @@ object setACLControllerTest {
     .exec(http("Get_Zone_Pending_Verify_Trader_Request")
       .get(routes.SetACLController.zoneViewPendingVerifyTraderRequests().url)
     )
-   /* .foreach(traderKYCs,"documentType"){
+    .foreach(traderKYCs,"documentType"){
       exec(http("Zone_Trader_KYC_update_Status"+"${documentType}")
         .post(routes.SetACLController.updateTraderKYCDocumentZoneStatus().url)
         .formParamMap(Map(
@@ -195,26 +195,26 @@ object setACLControllerTest {
         ))
       )
         .pause(1)
-    }*/
+    }
     .exec(session=> session.set(Test.TEST_ACCOUNT_ID,"testTrader1514"))
-    /*.exec(http("ZoneVerifyTrader_GET")
+    .exec(http("ZoneVerifyTrader_GET")
         .get(routes.SetACLController.zoneVerifyTraderForm("${%s}".format(Test.TEST_ACCOUNT_ID),"8875DC578AB26CCB").url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-    .pause(2)*/
+    .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(http("ZoneVerifyTrader_POST")
       .post(routes.SetACLController.zoneVerifyTrader().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
-        "ACCOUNT_ID"-> "${%s}".format(Test.TEST_ACCOUNT_ID),
-        "ORGANIZATION_ID" -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+        Form.ACCOUNT_ID-> "${%s}".format(Test.TEST_ACCOUNT_ID),
+        Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
         Form.ISSUE_ASSET_ACL -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT_ACL -> setACLPrivileges.issueFiat, Form.SEND_ASSET_ACL -> setACLPrivileges.sendAsset, Form.SEND_FIAT_ACL -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET_ACL -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT_ACL -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER_ACL -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER_ACL -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID_ACL -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID_ACL -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID_ACL -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID_ACL -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION_ACL -> setACLPrivileges.negotiation, Form.RELEASE_ASSET_ACL -> setACLPrivileges.releaseAsset,
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.PASSWORD -> "qwerty1234567890"
       )))
     .exec{session=> session.set(Test.TEST_USERNAME,"testOrg1512").set(Test.TEST_PASSWORD,"qwerty1234567890")}
     .exec(loginControllerTest.loginScenario)
-   /* .exec(http("Get_Organization_Pending_Verify_Trader_Request")
+    .exec(http("Get_Organization_Pending_Verify_Trader_Request")
       .get(routes.SetACLController.organizationViewVerifyTraderRequests().url)
     )
     .foreach(traderKYCs,"documentType"){
@@ -228,19 +228,19 @@ object setACLControllerTest {
         ))
       )
         .pause(1)
-    }*/
-   /* .exec(http("Organization_Verify_Trader_GET")
+    }
+    .exec(http("Organization_Verify_Trader_GET")
       .get(routes.SetACLController.organizationVerifyTraderForm("${%s}".format(Test.TEST_ACCOUNT_ID),"8875DC578AB26CCB").url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-    .pause(2)*/
+    .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(session=>session.set(Test.TEST_ISSUE_ASSET,true))
     .exec(http("ZoneVerifyTrader_POST")
       .post(routes.SetACLController.organizationVerifyTrader().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
-        "ACCOUNT_ID"-> "${%s}".format(Test.TEST_ACCOUNT_ID),
-        "ORGANIZATION_ID" -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+        Form.ACCOUNT_ID-> "${%s}".format(Test.TEST_TRADER_USERNAME),
+        Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
         Form.ISSUE_ASSET_ACL -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT_ACL -> setACLPrivileges.issueFiat, Form.SEND_ASSET_ACL -> setACLPrivileges.sendAsset, Form.SEND_FIAT_ACL -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET_ACL -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT_ACL -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER_ACL -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER_ACL -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID_ACL -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID_ACL -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID_ACL -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID_ACL -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION_ACL -> setACLPrivileges.negotiation, Form.RELEASE_ASSET_ACL -> setACLPrivileges.releaseAsset,
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.PASSWORD -> "qwerty1234567890"
