@@ -368,10 +368,10 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def storeFile(organizationID: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
+      def storeFile(organizationID: String): Future[Boolean] = fileResourceManager.storeFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
-        document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
+        document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterOrganizationKYCs.Service.create
       )
 
@@ -398,11 +398,11 @@ class AddOrganizationController @Inject()(
 
       def getOldDocumentFileName(organizationID: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType)
 
-      def updateFile(organizationID: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationKYC](
+      def updateFile(organizationID: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
+        document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 
@@ -741,7 +741,7 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         document = OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
