@@ -46,28 +46,28 @@
                 }
                 </div>
             </div>
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
+            </div>
             <div class="sellerTerm">
+                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+            <br>
+                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
+            <br>
                 @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
-                <div>
-                @if(negotiation.buyerAcceptedAssetOtherDetails){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
-                </div>
+            <br>
+            <div>
+            @if(negotiation.buyerAcceptedAssetOtherDetails){
+                @Messages(constants.View.ACCEPTED)
+            } else{
+                @Messages(constants.View.PENDING)
+            }
             </div>
-            <div class="sellerTerm">
-            @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
             </div>
-            <div class="sellerTerm">
-            @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-            </div>
-
             <hr>
 
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
-
             </div>
             <div class="sellerTerm">
                 @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
@@ -103,40 +103,22 @@
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
             </div>
-            @*  <div class="sellerTerm">
-            @commonBooleanInfo(constants.View.BILL_OF_EXCHANGE_REQUIRED, Option(negotiation.documentsCheckList.billOfExchangeRequired.getOrElse(false)))
+            <div class="sellerTerm">
+                @negotiation.documentList.assetDocuments.map{assetDocument=>
+                    @Messages(assetDocument)
+                }
+                @negotiation.documentList.negotiationDocuments.map{negotiationDocument=>
+                    @Messages(negotiationDocument)
+                }
             <div>
-            @if(negotiation.buyerAcceptedDocumentsCheckList.billOfExchangeRequired){
-            @Messages(constants.View.ACCEPTED)
+            @if(negotiation.buyerAcceptedDocumentList){
+                @Messages(constants.View.ACCEPTED)
             } else{
-            @Messages(constants.View.PENDING)
+                @Messages(constants.View.PENDING)
             }
             </div>
-            </div>*@
-            @*<div class="sellerTerm">
-            @if(negotiation.documentsCheckList.obl.getOrElse(false)) {
-            @Messages(constants.View.OBL)
-            }
-            @if(negotiation.documentsCheckList.coo.getOrElse(false)) {
-            @Messages(constants.View.COO)
-            }
-            @if(negotiation.documentsCheckList.coa.getOrElse(false)) {
-            @Messages(constants.View.COA)
-            }
-            @negotiation.documentsCheckList.otherDocuments match{
-            case Some(documents)=>{
-            @commonTextInfo(constants.View.OTHER_DOCUMENTS, documents)
-            }
-            case None=>{}
-            }
-            <div>
-            @if(negotiation.buyerAcceptedDocumentsCheckList.documentList){
-            @Messages(constants.View.ACCEPTED)
-            } else{
-            @Messages(constants.View.PENDING)
-            }
+
             </div>
-            </div>*@
 
             </div>
         </div>

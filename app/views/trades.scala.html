@@ -7,11 +7,10 @@
 
 @left = {
 @loginState.userType match {
+<div class="leftTradeFinancial">
     case constants.User.TRADER => {
-        <div class="leftTradeFinancial">
             <div id="traderFinancials"></div>
 
-        </div>
         <script>
             componentResource('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
 
@@ -27,7 +26,8 @@
     case constants.User.ZONE => {}
     case constants.User.GENESIS => {}
     case _ => {}
-}
+</div>
+    }
 }
 
 @center = {

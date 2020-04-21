@@ -8,26 +8,25 @@
 
 @buyNegotiationList.map { buyNegotiation =>
     @commonInfoBox() {
-        @defining(traders.find(_.id == buyNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
-            @organizationTrader match {
+
+        @traders.find(_.id == buyNegotiation.buyerTraderID) match {
                 case Some(trader) => {
                     @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
                 }
                 case None => {
                     @commonTextInfo(constants.View.BUYER_TRADER_ID, buyNegotiation.buyerTraderID)
                 }
+        }
+
+        @counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
+            }
+            case None => {
+                @commonTextInfo(constants.View.SELLER_TRADER_ID, buyNegotiation.buyerTraderID)
             }
         }
-        @defining(counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonTextInfo(constants.View.SELLER_TRADER_ID, buyNegotiation.sellerTraderID)
-                }
-            }
-        }
+
         @commonTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, buyNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.quantity.toString, buyNegotiation.quantityUnit).mkString(" "))

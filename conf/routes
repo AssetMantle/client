@@ -167,7 +167,8 @@ GET         /component/zoneViewOrganizationBankAccount                          
 GET         /component/commonHome                                                           controllers.ComponentViewController.commonHome
 GET         /component/fiatList                                                             controllers.ComponentViewController.fiatList
 
-GET         /component/tradeActivities                                                      controllers.ComponentViewController.tradeActivities(negotiationID :String)
+GET         /component/traderViewTradeActivities                                            controllers.ComponentViewController.traderViewTradeActivities(negotiationID :String)
+GET         /component/organizationViewTradeActivities                                      controllers.ComponentViewController.organizationViewTradeActivities(negotiationID :String)
 GET         /component/recentActivities                                                     controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                     controllers.ComponentViewController.traderFinancials
 GET         /component/traderViewNegotiationFiles                                           controllers.ComponentViewController.traderViewNegotiationFiles(id:String)

@@ -65,14 +65,16 @@
             <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
             <div class="liveIcon"></div>
         </div>
-    </div>@loginState.userType match {
+    </div>
+    <div class="tradeActivity">
+@loginState.userType match {
     case constants.User.TRADER => {
-        <div class="recentActivity">
-            <div class="recentActivityContainer">
+
+            <div class="tradeActivityContainer">
             @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
             } {
                 <div class="scroller">
-                    <div id="traderViewRecentActivity">
+                    <div id="traderViewTradeActivity">
                     </div>
                     <div class="cover-bar"></div>
                 </div>
@@ -80,32 +82,31 @@
             </div>
             <div id="chatRoom" class="chatRoom">
         </div>
-        </div>
+
         <script>
-            componentResource('traderViewRecentActivity', jsRoutes.controllers.ComponentViewController.traderViewRecentActivityForTradeRoom(0, '@id'));
+            componentResource('traderViewTradeActivity', jsRoutes.controllers.ComponentViewController.traderViewTradeActivities('@id'));
             componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
 
     </script>
     }
     case constants.User.ORGANIZATION => {
-        <div class="recentActivity">
-            <div class="recentActivityContainer">
+            <div class="tradeActivityContainer">
             @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
             } {
                 <div class="scroller">
-                    <div id="organizationViewRecentActivity">
+                    <div id="organizationViewTradeActivity">
                     </div>
                     <div class="cover-bar"></div>
                 </div>
             }
             </div>
-        </div>
         <script>
-               //tradeRoom Recent Activity  for organization to be added
+             componentResource('organizationViewTradeActivity', jsRoutes.controllers.ComponentViewController.organizationViewTradeActivities('@id'));
     </script>
     }
     case constants.User.ZONE => {}
     case _ => {}
+</div>
 }
 
 

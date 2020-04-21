@@ -8,29 +8,25 @@
 
 @incompleteNegotiationList.map { incompleteNegotiation =>
     @commonInfoBox() {
-        @defining(traders.find(_.id == incompleteNegotiation.sellerTraderID)) { organizationTrader: Option[Trader] =>
-            @organizationTrader match {
-                case Some(trader) => {
-                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonTextInfo(constants.View.SELLER_TRADER_ID, incompleteNegotiation.sellerTraderID)
-                }
+        @traders.find(_.id == incompleteNegotiation.sellerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
+            }
+            case None => {
+                @commonTextInfo(constants.View.SELLER_TRADER_ID, incompleteNegotiation.buyerTraderID)
             }
         }
-        @defining(counterPartyTraders.find(_.id == incompleteNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonTextInfo(constants.View.BUYER_TRADER_ID, incompleteNegotiation.buyerTraderID)
-                }
+        @counterPartyTraders.find(_.id == incompleteNegotiation.buyerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+            }
+            case None => {
+                @commonTextInfo(constants.View.BUYER_TRADER_ID, incompleteNegotiation.buyerTraderID)
             }
         }
         @commonTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString(), incompleteNegotiation.quantityUnit).mkString(" "))
+        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString, incompleteNegotiation.quantityUnit).mkString(" "))
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
     }
 }

@@ -352,7 +352,7 @@ class ComponentViewController @Inject()(
 
       def getFailedNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllFailedNegotiationListBySellerTraderIDs(traderIDs)
 
-      def getTraders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+      def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
       def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
@@ -370,71 +370,17 @@ class ComponentViewController @Inject()(
       }
   }
 
-  /*def recentActivityForOrganization(pageNumber: Int = 0): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-
-      def tradersInOrganizations(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
-
-      def getTradersNotifications(traderAccountIDs: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradersNotifications(traderAccountIDs, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
-
-      (for {
-        organizationID <- organizationID
-        tradersInOrganizations <- tradersInOrganizations(organizationID)
-        tradersNotifications <- getTradersNotifications(tradersInOrganizations.map(_.accountID))
-      } yield Ok(views.html.component.master.recentActivities(tradersNotifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForOrganization), None))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }*/
-
-  /*def recentActivityForTrader(pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val notifications = masterTransactionNotifications.Service.get(loginState.username, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
-      (for {
-        notifications <- notifications
-      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.recentActivityForTrader), None))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }*/
-  /*
-    def traderViewRecentActivityForTradeRoom(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-      implicit request =>
-        val tradeActivities = masterTransactionTradeActivities.Service.getAllTradeActivities(negotiationID)
-
-        def notifications(ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(loginState.username, ids, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
-
-        (for {
-          tradeActivities <- tradeActivities
-          notifications <- notifications(tradeActivities.map(_.notificationID))
-        } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.traderViewRecentActivityForTradeRoom), Option(negotiationID)))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }*/
-
-  /*def organizationViewRecentActivityForTradeRoom(pageNumber: Int = 0, negotiationID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val tradeActivities = masterTransactionTradeActivities.Service.getTradeActivity(negotiationID)
-
-      def notifications(ids: Seq[String]): Future[Seq[Notification]] = masterTransactionNotifications.Service.getTradeRoomNotifications(loginState.username, ids, pageNumber * notificationsPerPageLimit, notificationsPerPageLimit)
-
-      (for {
-        tradeActivities <- tradeActivities
-        notifications <- notifications(tradeActivities.map(_.notificationID))
-      } yield Ok(views.html.component.master.recentActivities(notifications, utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.traderViewRecentActivityForTradeRoom), Option(negotiationID)))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }*/
-
-  def recentActivities(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def recentActivities: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.recentActivities()))
   }
 
-  def tradeActivities(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewTradeActivities(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.tradeActivities(negotiationID)))
+  }
+
+  def organizationViewTradeActivities(negotiationID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.tradeActivities(negotiationID)))
   }
@@ -1099,19 +1045,22 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
-
-      (for {
-        traderID <- traderID
-        negotiation <- negotiation
-        asset <- getAsset(negotiation.assetID)
-      } yield {
+      def getResult(traderID: String,negotiation: Negotiation)={
         if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
-          Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, asset = asset))
+          val getAsset = masterAssets.Service.tryGet(negotiation.assetID)
+          for{
+            asset<-getAsset
+          }yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, asset = asset))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
       }
+
+      (for {
+        traderID <- traderID
+        negotiation <- negotiation
+        result <- getResult(traderID, negotiation)
+      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -1129,20 +1078,22 @@ class ComponentViewController @Inject()(
 
       def getOrganizationTraderIDs(organizationID: String) = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
 
-      def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
-
+      def getResult(organizationTraderIDs: Seq[String], negotiation: Negotiation)={
+        if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) {
+          val getAsset = masterAssets.Service.tryGet(negotiation.assetID)
+          for{
+            asset<-getAsset
+          }yield Ok(views.html.component.master.organizationViewAcceptedNegotiationTerms(negotiation = negotiation, asset = asset))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
       (for {
         organizationID <- organizationID
         negotiation <- negotiation
         organizationTraderIDs <- getOrganizationTraderIDs(organizationID)
-        asset <- getAsset(negotiation.assetID)
-      } yield {
-        if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) {
-          Ok(views.html.component.master.organizationViewAcceptedNegotiationTerms(negotiation = negotiation, asset = asset))
-        } else {
-          throw new BaseException(constants.Response.UNAUTHORIZED)
-        }
-      }).recover {
+        result <- getResult(organizationTraderIDs,negotiation)
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
@@ -1316,7 +1267,7 @@ class ComponentViewController @Inject()(
         negotiation <- negotiation
         assetFiles <- assetFiles(negotiation.assetID)
       } yield Ok(views.html.component.master.negotiationDocumentUpload(id, negotiation, assetFiles, negotiationFiles))
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(id = id, failures = Seq(baseException.failure)))
       }
   }
