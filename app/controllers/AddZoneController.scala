@@ -179,9 +179,8 @@ class AddZoneController @Inject()(
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
         name = name,
-        id = id,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
+        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
 
@@ -210,10 +209,9 @@ class AddZoneController @Inject()(
 
       def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[master.ZoneKYC](
         name = name,
-        id = id,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 
@@ -491,9 +489,8 @@ class AddZoneController @Inject()(
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
         name = name,
-        id = id,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
+        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
 
@@ -519,10 +516,9 @@ class AddZoneController @Inject()(
 
       def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[master.ZoneKYC](
         name = name,
-        id = id,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 

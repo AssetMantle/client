@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.Trait.Document
 
-@(document: Document)(documentLink: Html = Html(""))(documentContentTop: Html = Html(""))(documentContentBottom: Html = Html(""))(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(document: Document[_])(documentLink: Html = Html(""))(documentContentTop: Html = Html(""))(documentContentBottom: Html = Html(""))(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="centerText documentItem">
     <div class="cmuk-flex">
         <div class="documentThumbnail">

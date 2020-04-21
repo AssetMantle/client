@@ -9,11 +9,20 @@ import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-
+import models.common.Node
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document with Logged
+case class AccountKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountKYC] with Logged[AccountKYC] {
+
+  def updateFileName(newFileName: String): AccountKYC = copy(fileName = newFileName)
+
+  def updateFile(newFile: Option[Array[Byte]]): AccountKYC = copy(file = newFile)
+
+  def createLog()(implicit node: Node): AccountKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+
+  def updateLog()(implicit node: Node): AccountKYC = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+}
 
 @Singleton
 class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -28,13 +37,11 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   import databaseConfig.profile.api._
 
-  private val nodeID = configuration.get[String]("node.id")
-
-  private val nodeTimezone = configuration.get[String]("node.timezone")
+  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   private[models] val accountKYCTable = TableQuery[AccountKYCTable]
 
-  private def add(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = db.run((accountKYCTable returning accountKYCTable.map(_.id) += AccountKYC(id = id, documentType = documentType, fileName = fileName, file = file, createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone)).asTry).map {
+  private def add(accountKYC: AccountKYC): Future[String] = db.run((accountKYCTable returning accountKYCTable.map(_.id) += accountKYC.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -42,7 +49,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def update(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((fileName, file, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def update(accountKYC: AccountKYC): Future[Int] = db.run(accountKYCTable.filter(_.id === accountKYC.id).filter(_.documentType === accountKYC.documentType).update(accountKYC.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -62,7 +69,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.status.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((status, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.status.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((status, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -88,7 +95,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private[models] class AccountKYCTable(tag: Tag) extends Table[AccountKYC](tag, "AccountKYC") {
 
-    def * = (id, documentType, fileName, file.?, status.?, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (AccountKYC.tupled, AccountKYC.unapply)
+    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (AccountKYC.tupled, AccountKYC.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -116,9 +123,9 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = add(id = id, documentType = documentType, fileName = fileName, file = file)
+    def create(accountKYC: AccountKYC): Future[String] = add(accountKYC)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = update(id = id, documentType = documentType, fileName = fileName, file = file)
+    def updateOldDocument(accountKYC: AccountKYC): Future[Int] = update(accountKYC)
 
     def get(id: String, documentType: String): Future[Option[AccountKYC]] = findByIDAndDocumentType(id = id, documentType = documentType)
 

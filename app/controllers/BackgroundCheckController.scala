@@ -66,9 +66,8 @@ class BackgroundCheckController @Inject()(
 
       val storeFile = fileResourceManager.storeFile[master.TraderBackgroundCheck](
         name = name,
-        id = traderID,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
+        document = master.TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
         masterCreate = masterTraderBackgroundChecks.Service.create
       )
 
@@ -96,10 +95,9 @@ class BackgroundCheckController @Inject()(
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderBackgroundCheck](
         name = name,
-        id = traderID,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterTraderBackgroundChecks.Service.updateOldDocument
       )
 
@@ -177,9 +175,8 @@ class BackgroundCheckController @Inject()(
 
       val storeFile = fileResourceManager.storeFile[OrganizationBackgroundCheck](
         name = name,
-        id = organizationID,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
+        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
         masterCreate = masterOrganizationBackgroundChecks.Service.create
       )
 
@@ -207,10 +204,9 @@ class BackgroundCheckController @Inject()(
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationBackgroundCheck](
         name = name,
-        id = organizationID,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterOrganizationBackgroundChecks.Service.updateOldDocument
       )
 

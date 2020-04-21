@@ -5,17 +5,26 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
+import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean] = None, organizationStatus: Option[Boolean] = None, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document with Logged {
+case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean] = None, organizationStatus: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderKYC] with Logged[TraderKYC] {
 
   val status: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
+
+  def updateFileName(newFileName: String): TraderKYC = copy(fileName = newFileName)
+
+  def updateFile(newFile: Option[Array[Byte]]): TraderKYC = copy(file = newFile)
+
+  def createLog()(implicit node: Node): TraderKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+
+  def updateLog()(implicit node: Node): TraderKYC = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -30,15 +39,13 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   val db = databaseConfig.db
 
-  private val nodeID = configuration.get[String]("node.id")
-
-  private val nodeTimezone = configuration.get[String]("node.timezone")
+  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   import databaseConfig.profile.api._
 
   private[models] val traderKYCTable = TableQuery[TraderKYCTable]
 
-  private def add(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = db.run((traderKYCTable returning traderKYCTable.map(_.id) += TraderKYC(id = id, documentType = documentType, fileName = fileName, file = file, createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone)).asTry).map {
+  private def add(traderKYC: TraderKYC): Future[String] = db.run((traderKYCTable returning traderKYCTable.map(_.id) += traderKYC.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +53,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def update(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((fileName, file, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def update(traderKYC: TraderKYC): Future[Int] = db.run(traderKYCTable.filter(_.id === traderKYC.id).filter(_.documentType === traderKYC.documentType).update(traderKYC.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -72,7 +79,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def zoneUpdateStatusByIdAndDocumentType(id: String, documentType: String, zoneStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.zoneStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((zoneStatus, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def zoneUpdateStatusByIdAndDocumentType(id: String, documentType: String, zoneStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.zoneStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((zoneStatus, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -82,7 +89,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def organizationUpdateStatusByIdAndDocumentType(id: String, documentType: String, organizationStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.organizationStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((organizationStatus, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def organizationUpdateStatusByIdAndDocumentType(id: String, documentType: String, organizationStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.organizationStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((organizationStatus, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -98,7 +105,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(traderKYC => traderKYC.organizationStatus && traderKYC.zoneStatus && status).map(_.documentType).result)
 
-  private def deleteById(id: String) = db.run(traderKYCTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(traderKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -114,7 +121,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class TraderKYCTable(tag: Tag) extends Table[TraderKYC](tag, "TraderKYC") {
 
-    def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TraderKYC.tupled, TraderKYC.unapply)
+    def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TraderKYC.tupled, TraderKYC.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -144,9 +151,9 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = add(id = id, documentType = documentType, fileName = fileName, file = file)
+    def create(traderKYC: TraderKYC): Future[String] = add(traderKYC)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = update(id = id, documentType = documentType, fileName = fileName, file = file)
+    def updateOldDocument(traderKYC: TraderKYC): Future[Int] = update(traderKYC)
 
     def get(id: String, documentType: String): Future[TraderKYC] = findByIdDocumentType(id = id, documentType = documentType)
 

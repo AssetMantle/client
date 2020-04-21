@@ -5,15 +5,26 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
+import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document with Logged
+case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderBackgroundCheck] with Logged[TraderBackgroundCheck] {
+
+  def updateFileName(newFileName: String): TraderBackgroundCheck = copy(fileName = newFileName)
+
+  def updateFile(newFile: Option[Array[Byte]]): TraderBackgroundCheck = copy(file = newFile)
+
+  def createLog()(implicit node: Node): TraderBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+
+  def updateLog()(implicit node: Node): TraderBackgroundCheck = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+
+}
 
 @Singleton
 class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -26,15 +37,13 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   val db = databaseConfig.db
 
-  private val nodeID = configuration.get[String]("node.id")
-
-  private val nodeTimezone = configuration.get[String]("node.timezone")
+  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   import databaseConfig.profile.api._
 
   private[models] val traderBackgroundCheckTable = TableQuery[TraderBackgroundCheckTable]
 
-  private def add(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = db.run((traderBackgroundCheckTable returning traderBackgroundCheckTable.map(_.id) += TraderBackgroundCheck(id = id, documentType = documentType, fileName = fileName, file = file, createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone)).asTry).map {
+  private def add(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = db.run((traderBackgroundCheckTable returning traderBackgroundCheckTable.map(_.id) += traderBackgroundCheck.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -42,7 +51,7 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
     }
   }
 
-  private def update(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((fileName, file, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def update(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === traderBackgroundCheck.id).filter(_.documentType === traderBackgroundCheck.documentType).update(traderBackgroundCheck.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -64,7 +73,7 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(_.status === status).map(_.documentType).result)
 
-  private def deleteById(id: String) = db.run(traderBackgroundCheckTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -76,7 +85,7 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   private[models] class TraderBackgroundCheckTable(tag: Tag) extends Table[TraderBackgroundCheck](tag, "TraderBackgroundCheck") {
 
-    def * = (id, documentType, fileName, file.?, status.?, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TraderBackgroundCheck.tupled, TraderBackgroundCheck.unapply)
+    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TraderBackgroundCheck.tupled, TraderBackgroundCheck.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -104,9 +113,9 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = add(id = id, documentType = documentType, fileName = fileName, file = file)
+    def create(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = add(traderBackgroundCheck)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = update(id = id, documentType = documentType, fileName = fileName, file = file)
+    def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = update(traderBackgroundCheck)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 

@@ -5,6 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
+import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,7 +15,17 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document with Logged
+case class OrganizationBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationBackgroundCheck] with Logged[OrganizationBackgroundCheck] {
+
+  def updateFileName(newFileName: String): OrganizationBackgroundCheck = copy(fileName = newFileName)
+
+  def updateFile(newFile: Option[Array[Byte]]): OrganizationBackgroundCheck = copy(file = newFile)
+
+  def createLog()(implicit node: Node): OrganizationBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+
+  def updateLog()(implicit node: Node): OrganizationBackgroundCheck = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+
+}
 
 @Singleton
 class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -27,15 +38,13 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   val db = databaseConfig.db
 
-  private val nodeID = configuration.get[String]("node.id")
-
-  private val nodeTimezone = configuration.get[String]("node.timezone")
+  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   import databaseConfig.profile.api._
 
   private[models] val organizationBackgroundCheckTable = TableQuery[OrganizationBackgroundCheckTable]
 
-  private def add(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = db.run((organizationBackgroundCheckTable returning organizationBackgroundCheckTable.map(_.id) += OrganizationBackgroundCheck(id = id, documentType = documentType, fileName = fileName, file = file, createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone)).asTry).map {
+  private def add(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = db.run((organizationBackgroundCheckTable returning organizationBackgroundCheckTable.map(_.id) += organizationBackgroundCheck.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -43,7 +52,7 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
     }
   }
 
-  private def update(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = db.run(organizationBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((fileName, file, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
+  private def update(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = db.run(organizationBackgroundCheckTable.filter(_.id === organizationBackgroundCheck.id).filter(_.documentType === organizationBackgroundCheck.documentType).update(organizationBackgroundCheck.updateLog()).asTry).map {
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -66,7 +75,7 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   private[models] class OrganizationBackgroundCheckTable(tag: Tag) extends Table[OrganizationBackgroundCheck](tag, "OrganizationBackgroundCheck") {
 
-    def * = (id, documentType, fileName, file.?, status.?, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (OrganizationBackgroundCheck.tupled, OrganizationBackgroundCheck.unapply)
+    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (OrganizationBackgroundCheck.tupled, OrganizationBackgroundCheck.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -94,9 +103,9 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = add(id = id, documentType = documentType, fileName = fileName, file = file)
+    def create(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = add(organizationBackgroundCheck)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = update(id = id, documentType = documentType, fileName = fileName, file = file)
+    def updateOldDocument(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = update(organizationBackgroundCheck)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 

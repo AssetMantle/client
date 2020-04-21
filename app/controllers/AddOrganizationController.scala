@@ -375,9 +375,8 @@ class AddOrganizationController @Inject()(
 
       def storeFile(organizationID: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
         name = name,
-        id = organizationID,
-        documentType = documentType,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
+        document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterOrganizationKYCs.Service.create
       )
 
@@ -406,10 +405,9 @@ class AddOrganizationController @Inject()(
 
       def updateFile(organizationID: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationKYC](
         name = name,
-        id = organizationID,
-        documentType = documentType,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 
@@ -750,9 +748,8 @@ class AddOrganizationController @Inject()(
 
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
         name = name,
-        id = id,
-        documentType = documentType,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
+        document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterOrganizationKYCs.Service.create
       )
 
@@ -774,10 +771,9 @@ class AddOrganizationController @Inject()(
 
       def updateFile(oldDocumentFileName: String, organizationID: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationKYC](
         name = name,
-        id = organizationID,
-        documentType = documentType,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 

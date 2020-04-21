@@ -8,7 +8,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.common.Serializable
-import models.master.{AccountKYC, Negotiations, Trader}
+import models.master.{AccountKYC, Asset, Negotiations, Trader}
 import models.masterTransaction.AssetFile
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -40,6 +40,7 @@ class FileController @Inject()(
                                 withOrganizationLoginAction: WithOrganizationLoginAction,
                                 masterTraderKYCs: master.TraderKYCs,
                                 withTraderLoginAction: WithTraderLoginAction,
+                                masterAssets: master.Assets,
                                 withUsernameToken: WithUsernameToken,
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -80,9 +81,8 @@ class FileController @Inject()(
     implicit request =>
       val storeFile = fileResourceManager.storeFile[master.AccountKYC](
         name = name,
-        id = loginState.username,
-        documentType = documentType,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
+        document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterAccountKYCs.Service.create
       )
 
@@ -109,10 +109,9 @@ class FileController @Inject()(
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.AccountKYC](
         name = name,
-        id = loginState.username,
-        documentType = documentType,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterAccountKYCs.Service.updateOldDocument
       )
 
@@ -258,40 +257,25 @@ class FileController @Inject()(
       }
   }
 
-  def zoneAccessedNegotiationFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneAccessedNegotiationFile(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val userZoneID = masterZones.Service.tryGetID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
+
+      def fileName: Future[String] = masterTransactionNegotiationFiles.Service.tryGetFileName(id = id, documentType = documentType)
 
       def getTraderZOneID(id: String): Future[String] = masterTraders.Service.tryGetZoneID(id)
 
       (for {
-        userZoneID <- userZoneID
+        zoneID <- zoneID
         negotiation <- negotiation
+        fileName <- fileName
         sellerTraderZoneID <- getTraderZOneID(negotiation.sellerTraderID)
         buyerTraderZoneID <- getTraderZOneID(negotiation.buyerTraderID)
       } yield {
-        if (sellerTraderZoneID == userZoneID || buyerTraderZoneID == userZoneID) {
+        if (sellerTraderZoneID == zoneID || buyerTraderZoneID == zoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneNegotiationFilePath(documentType), fileName = fileName))
         } else Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def organizationAccessedFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val userOrganizationID = masterOrganizations.Service.tryGetID(loginState.username)
-      val traderOrganizationID = masterTraders.Service.getOrganizationIDByAccountID(accountID)
-      (for {
-        userOrganizationID <- userOrganizationID
-        traderOrganizationID <- traderOrganizationID
-      } yield {
-        if (traderOrganizationID == userOrganizationID) {
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -329,9 +313,8 @@ class FileController @Inject()(
     implicit request =>
       val storeFile = fileResourceManager.storeFile[master.AccountFile](
         name = name,
-        id = loginState.username,
-        documentType = documentType,
         path = fileResourceManager.getAccountFilePath(documentType),
+        document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
         masterCreate = masterAccountFiles.Service.create
       )
       (for {
@@ -349,10 +332,9 @@ class FileController @Inject()(
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.AccountFile](
         name = name,
-        id = loginState.username,
-        documentType = documentType,
         path = fileResourceManager.getAccountFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
+        document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterAccountFiles.Service.updateOldDocument
       )
 

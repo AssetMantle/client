@@ -115,5 +115,5 @@ object FileOperations {
 
   def getFileNameWithoutExtension(fileName: String): String = fileName.split("""\.""")(0)
 
-  def getDocumentsHash(documents: Document*): String = utilities.String.sha256Sum(documents.map(document => Seq(document.documentType, getFileNameWithoutExtension(document.fileName)).mkString(".")).mkString(""))
+  def getDocumentsHash(documents: Document[_]*): String = utilities.String.sha256Sum(documents.map(document => Seq(document.documentType, getFileNameWithoutExtension(document.fileName)).mkString(".")).mkString(""))
 }
