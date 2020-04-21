@@ -1,5 +1,5 @@
 :root {
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen, sans-serif !important;
   box-sizing: border-box; }
 
 *,
@@ -381,18 +381,20 @@ html, body {
       width: 20px;
       height: 20px; }
 
-.showpassword {
+.showPassword {
   position: absolute;
   right: 15px;
   top: 35px; }
-  .showpassword .eyeIcon {
+  .showPassword .eyeIcon {
     cursor: pointer;
     width: 25px;
     height: 25px; }
-    .showpassword .eyeIcon .icon {
-      width: 25px;
-      height: 25px; }
-  .showpassword .mainlist {
+    .showPassword .eyeIcon .icon {
+      fill: #ccc;
+      width: 25px; }
+  .showPassword .eyeIcon.active .icon {
+    fill: #FE4350; }
+  .showPassword .mainlist {
     padding: 0px; }
 
 .listItem {

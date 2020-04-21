@@ -29,7 +29,7 @@
             <div class="usernameAvailibilty">
                 @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, 'oninput -> "checkPasswords()", 'id -> "signUpConfirmPassword")
                 <div id="matchConfirmPasswordsResult" class="result"></div>
-                <div class="showpassword" onclick="showPassword()"><span class="eyeIcon">
+                <div class="showPassword" id="showPassword" onclick="showPassword()"><span class="eyeIcon">
                     <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-eye")"/></svg>
                 </span></div>
             </div>

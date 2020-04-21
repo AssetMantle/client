@@ -2,7 +2,7 @@
 @import "variables.scss";
 
 :root{
-  font-family: "Oxygen", sans-serif;
+  font-family: Oxygen, sans-serif !important;
   box-sizing: border-box;
 }
 
@@ -480,7 +480,7 @@ html, body{
   }
 }
 
-.showpassword{
+.showPassword{
   position: absolute;
   right: 15px;
   top: 35px;
@@ -489,9 +489,12 @@ html, body{
     width: 25px;
     height: 25px;
     .icon{
+      fill:#ccc;
       width:25px;
-      height: 25px;
     }
+  }
+  .eyeIcon.active .icon{
+    fill: #FE4350;
   }
   .mainlist{
     padding:0px;
