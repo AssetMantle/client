@@ -51,11 +51,6 @@ object Form {
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
-  //BuyerExecuteOrderController
-  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.buyerExecuteOrder(), routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderForm)
-  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder(), routes.javascript.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm)
-  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder(), routes.javascript.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm)
-
   //ChangeBuyerBidController
   val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid(), routes.javascript.ChangeBuyerBidController.changeBuyerBidForm)
   val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid(), routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm)
@@ -112,6 +107,14 @@ object Form {
   val INVOICE_DETAILS = new Form("INVOICE_DETAILS", routes.NegotiationController.invoiceDetails(), routes.javascript.NegotiationController.invoiceDetailsForm)
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
 
+  //OrderController
+  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecuteOrder(), routes.javascript.OrderController.buyerExecuteOrderForm)
+  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecuteOrder(), routes.javascript.OrderController.moderatedBuyerExecuteOrderForm)
+  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecuteOrder(), routes.javascript.OrderController.blockchainBuyerExecuteOrderForm)
+  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecuteOrder(), routes.javascript.OrderController.sellerExecuteOrderForm)
+  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecuteOrder(), routes.javascript.OrderController.moderatedSellerExecuteOrderForm)
+  val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecuteOrder(), routes.javascript.OrderController.blockchainSellerExecuteOrderForm)
+
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset(), routes.javascript.RedeemAssetController.blockchainRedeemAssetForm)
@@ -123,11 +126,6 @@ object Form {
   //ReleaseAssetController
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset(), routes.javascript.ReleaseAssetController.releaseAssetForm)
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
-
-  //SellerExecuteOrderController
-  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder(), routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm)
-  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.moderatedSellerExecuteOrder(), routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderForm)
-  val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.blockchainSellerExecuteOrder(), routes.javascript.SellerExecuteOrderController.blockchainSellerExecuteOrderForm)
 
   //SendAssetController
   val SEND_ASSET = new Form("SEND_ASSET", routes.SendAssetController.sendAsset(), routes.javascript.SendAssetController.sendAssetForm)
@@ -151,7 +149,7 @@ object Form {
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL(), routes.javascript.SetACLController.blockchainSetACLForm)
-  val ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("", routes.SetACLController.organizationAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm)
+  val ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.organizationAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm)
   val ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.zoneAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm)
 
   //SetBuyerFeedbackController

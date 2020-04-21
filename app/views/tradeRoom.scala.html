@@ -31,28 +31,28 @@
 
 @center = {
     <div class="mainTabs">
-    <div class="cmuk-card cmuk-card-default">
-        <div class="cmuk-card-body">
-        @loginState.userType match {
-            case constants.User.TRADER => {
-                <div id="traderViewAcceptedNegotiation">
+        <div class="cmuk-card cmuk-card-default">
+            <div class="cmuk-card-body">
+            @loginState.userType match {
+                case constants.User.TRADER => {
+                    <div id="traderViewAcceptedNegotiation">
                 </div>
-                <script type="text/javascript">
+                    <script type="text/javascript">
                     componentResource('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@id'));
                 </script>
-            }
-            case constants.User.ORGANIZATION => {
-                <div id="organizationViewAcceptedNegotiation">
+                }
+                case constants.User.ORGANIZATION => {
+                    <div id="organizationViewAcceptedNegotiation">
                 </div>
-                <script type="text/javascript">
+                    <script type="text/javascript">
                     componentResource('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation('@id'));
                 </script>
+                }
+                case constants.User.ZONE => {}
+                case _ => {}
             }
-            case constants.User.ZONE => {}
-            case _ => {}
-        }
+            </div>
         </div>
-    </div>
     </div>
 }
 
@@ -67,8 +67,8 @@
         </div>
     </div>
     <div class="tradeActivity">
-@loginState.userType match {
-    case constants.User.TRADER => {
+    @loginState.userType match {
+        case constants.User.TRADER => {
 
             <div class="tradeActivityContainer">
             @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
@@ -83,13 +83,13 @@
             <div id="chatRoom" class="chatRoom">
         </div>
 
-        <script>
+            <script>
             componentResource('traderViewTradeActivity', jsRoutes.controllers.ComponentViewController.traderViewTradeActivities('@id'));
             componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
 
     </script>
-    }
-    case constants.User.ORGANIZATION => {
+        }
+        case constants.User.ORGANIZATION => {
             <div class="tradeActivityContainer">
             @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
             } {
@@ -100,14 +100,14 @@
                 </div>
             }
             </div>
-        <script>
+            <script>
              componentResource('organizationViewTradeActivity', jsRoutes.controllers.ComponentViewController.organizationViewTradeActivities('@id'));
     </script>
-    }
-    case constants.User.ZONE => {}
-    case _ => {}
+        }
+        case constants.User.ZONE => {}
+        case _ => {}
 
-}
+    }
     </div>
 
 }
