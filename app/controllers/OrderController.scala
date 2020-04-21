@@ -43,7 +43,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
       val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
-      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
+      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.FIAT_PROOF)
 
       (for {
         requestID <- requestID
@@ -55,10 +55,10 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
       }
   }
 
-  def buyerExecuteOrderForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def buyerExecuteOrderForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(requestID)
-      val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
+      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(id)
+      val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(id, Seq(constants.File.FIAT_PROOF))
 
       def negotiation(negotiationID: String): Future[Negotiation] = blockchainNegotiations.Service.get(negotiationID)
 
@@ -66,7 +66,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
         negotiationID <- negotiationID
         fiatProofDocument <- fiatProofDocument
         negotiation <- negotiation(negotiationID)
-        result <- withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data(negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0, "")), fiatProofDocument))
+        result <- withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data(sellerAddress = negotiation.sellerAddress, fiatProofHash = utilities.FileOperations.getDocumentsHash(fiatProofDocument: _*), pegHash = negotiation.assetPegHash, gas = 0, password = "")), fiatProofDocument))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -137,12 +137,13 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
       def tradersZoneIDs(traderIDs: Seq[String]): Future[Seq[String]] = masterTraders.Service.tryGetZoneIDs(traderIDs)
 
       def getResult(zoneID: String, tradersZoneIDs: Seq[String]): Future[Result] = {
-        if (tradersZoneIDs contains zoneID){
-          val getNegotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(negotiationID, constants.File.FIAT_PROOF)
-          for{
+        if (tradersZoneIDs contains zoneID) {
+          val getNegotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(negotiationID, constants.File.FIAT_PROOF)
+          for {
             negotiationFiles <- getNegotiationFiles
             result <- withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderDocument(negotiationFiles, negotiationID, constants.File.FIAT_PROOF))
           } yield result
@@ -150,7 +151,8 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
           Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
-      (for{
+
+      (for {
         zoneID <- zoneID
         negotiation <- negotiation
         tradersZoneIDs <- tradersZoneIDs(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
@@ -171,7 +173,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
         negotiationID <- negotiationID
         fiatProofDocument <- fiatProofDocument
         negotiation <- negotiation(negotiationID)
-        result <- withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0, "")), fiatProofDocument))
+        result <- withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(buyerAddress = negotiation.buyerAddress, sellerAddress = negotiation.sellerAddress, fiatProofHash = utilities.FileOperations.getDocumentsHash(fiatProofDocument: _*), pegHash = negotiation.assetPegHash, gas = 0, password = "")), fiatProofDocument))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -222,7 +224,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
       val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
-      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.AWB_PROOF)
+      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.AWB_PROOF)
 
       (for {
         requestID <- requestID
@@ -245,7 +247,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
         negotiationID <- negotiationID
         negotiation <- negotiation(negotiationID)
         awbProofDocument <- awbProofDocument
-        result <- withUsernameToken.Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form.fill(views.companion.master.SellerExecuteOrder.Data(negotiation.buyerAddress, utilities.FileOperations.combinedHash(awbProofDocument), negotiation.assetPegHash, 0, "")), awbProofDocument))
+        result <- withUsernameToken.Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form.fill(views.companion.master.SellerExecuteOrder.Data(buyerAddress = negotiation.buyerAddress, awbProofHash = utilities.FileOperations.getDocumentsHash(awbProofDocument: _*), pegHash = negotiation.assetPegHash, gas = 0, password = "")), awbProofDocument))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -316,12 +318,13 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
       def tradersZoneIDs(traderIDs: Seq[String]): Future[Seq[String]] = masterTraders.Service.tryGetZoneIDs(traderIDs)
 
       def getResult(zoneID: String, tradersZoneIDs: Seq[String]): Future[Result] = {
-        if (tradersZoneIDs contains zoneID){
-          val negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(negotiationID, constants.File.AWB_PROOF)
-          for{
+        if (tradersZoneIDs contains zoneID) {
+          val negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(negotiationID, constants.File.AWB_PROOF)
+          for {
             negotiationFiles <- negotiationFiles
             result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderDocument(negotiationFiles, negotiationID, constants.File.AWB_PROOF))
           } yield result
@@ -330,7 +333,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
         }
       }
 
-      (for{
+      (for {
         zoneID <- zoneID
         negotiation <- negotiation
         tradersZoneIDs <- tradersZoneIDs(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
@@ -340,18 +343,18 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
       }
   }
 
-  def moderatedSellerExecuteOrderForm(requestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def moderatedSellerExecuteOrderForm(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(requestID)
+      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(id)
 
       def negotiation(negotiationID: String): Future[Negotiation] = blockchainNegotiations.Service.get(negotiationID)
 
-      val awbProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.AWB_PROOF))
+      val awbProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(id = id, Seq(constants.File.AWB_PROOF))
       (for {
         negotiationID <- negotiationID
         negotiation <- negotiation(negotiationID)
         awbProofDocument <- awbProofDocument
-        result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form.fill(views.companion.master.ModeratedSellerExecuteOrder.Data(negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(awbProofDocument), negotiation.assetPegHash, 0, "")), awbProofDocument))
+        result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form.fill(views.companion.master.ModeratedSellerExecuteOrder.Data(buyerAddress = negotiation.buyerAddress, sellerAddress = negotiation.sellerAddress, awbProofHash = utilities.FileOperations.getDocumentsHash(awbProofDocument: _*), pegHash = negotiation.assetPegHash, gas = 0, password = "")), awbProofDocument))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

@@ -20,7 +20,28 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionAssetFiles: masterTransaction.AssetFiles, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterNegotiations: Negotiations, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class FileController @Inject()(
+                                messagesControllerComponents: MessagesControllerComponents,
+                                withLoginAction: WithLoginAction,
+                                masterAccountFiles: master.AccountFiles,
+                                masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                masterNegotiations: Negotiations,
+                                masterZones: master.Zones,
+                                masterOrganizations: master.Organizations,
+                                masterTraders: master.Traders,
+                                masterAccountKYCs: master.AccountKYCs,
+                                fileResourceManager: utilities.FileResourceManager,
+                                withGenesisLoginAction: WithGenesisLoginAction,
+                                withUserLoginAction: WithUserLoginAction,
+                                masterZoneKYCs: master.ZoneKYCs,
+                                withZoneLoginAction: WithZoneLoginAction,
+                                masterOrganizationKYCs: master.OrganizationKYCs,
+                                withOrganizationLoginAction: WithOrganizationLoginAction,
+                                masterTraderKYCs: master.TraderKYCs,
+                                withTraderLoginAction: WithTraderLoginAction,
+                                withUsernameToken: WithUsernameToken,
+                              )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -59,9 +80,9 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val storeFile = fileResourceManager.storeFile[master.AccountKYC](
         name = name,
+        id = loginState.username,
         documentType = documentType,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
-        document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterAccountKYCs.Service.create
       )
 
@@ -88,10 +109,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.AccountKYC](
         name = name,
+        id = loginState.username,
         documentType = documentType,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterAccountKYCs.Service.updateOldDocument
       )
 
@@ -189,426 +210,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def uploadTraderAssetForm(documentType: String, issueAssetRequestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderAsset), documentType, issueAssetRequestID))
-  }
-
-  def updateTraderAssetForm(documentType: String, issueAssetRequestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderAsset), documentType, issueAssetRequestID))
-  }
-
-  def uploadTraderAsset(documentType: String) = Action(parse.multipartFormData) { implicit request =>
-    FileUpload.form.bindFromRequest.fold(
-      formWithErrors => {
-        BadRequest
-      },
-      fileUploadInfo => {
-        try {
-          request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderAssetFilePath(documentType))
-              Ok
-          }
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
-
-  def storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val storeFile = fileResourceManager.storeFile[masterTransaction.AssetFile](
-        name = name,
-        documentType = documentType,
-        path = fileResourceManager.getTraderAssetFilePath(documentType),
-        document = masterTransaction.AssetFile(id = issueAssetRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
-        masterCreate = masterTransactionAssetFiles.Service.create
-      )
-
-      def getResult: Future[Result] = {
-        documentType match {
-          case constants.File.OBL =>
-            val assetFile = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL)
-            val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)
-
-            def getResult(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-              assetFile.documentContent match {
-                case Some(oblContent: Serializable.OBL) => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), optionAssetFile))
-                case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), optionAssetFile))
-              }
-            }
-
-            for {
-              assetFile <- assetFile
-              optionAssetFile <- optionAssetFile
-              result <- getResult(assetFile, optionAssetFile)
-            } yield result
-
-          case constants.File.INVOICE =>
-            val assetFile = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE)
-            val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)
-
-            def getResult(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-              assetFile.documentContent match {
-                case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), optionAssetFile))
-                case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), optionAssetFile))
-              }
-            }
-
-            for {
-              assetFile <- assetFile
-              optionAssetFile <- optionAssetFile
-              result <- getResult(assetFile, optionAssetFile)
-            } yield result
-
-          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER =>
-            val documents = masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)
-            for {
-              documents <- documents
-              result <- withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, documents))
-            } yield result
-          case _ => withUsernameToken.Ok(views.html.index())
-        }
-      }
-
-      (for {
-        _ <- storeFile
-        result <- getResult
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = issueAssetRequestID, documentType = documentType)
-
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[masterTransaction.AssetFile](
-        name = name,
-        documentType = documentType,
-        path = fileResourceManager.getTraderAssetFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = masterTransaction.AssetFile(id = issueAssetRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
-        updateOldDocument = masterTransactionAssetFiles.Service.insertOrUpdateOldDocument
-      )
-
-      def getResult = {
-        documentType match {
-          case constants.File.OBL =>
-            val assetFile = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL)
-            val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)
-
-            def getResult(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-              assetFile.documentContent match {
-                case Some(oblContent: Serializable.OBL) => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), optionAssetFile))
-                case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), optionAssetFile))
-              }
-            }
-
-            for {
-              assetFile <- assetFile
-              optionAssetFile <- optionAssetFile
-              result <- getResult(assetFile, optionAssetFile)
-            } yield result
-          case constants.File.INVOICE =>
-            val assetFile = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE)
-            val optionAssetFile = masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)
-
-            def getResult(assetFile: AssetFile, optionAssetFile: Option[AssetFile]) = {
-              assetFile.documentContent match {
-                case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), optionAssetFile))
-                case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), optionAssetFile))
-              }
-            }
-
-            for {
-              assetFile <- assetFile
-              optionAssetFile <- optionAssetFile
-              result <- getResult(assetFile, optionAssetFile)
-            } yield result
-          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER =>
-            val documents = masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)
-            for {
-              documents <- documents
-              result <- withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, documents))
-            } yield result
-          case _ => withUsernameToken.Ok(views.html.index())
-        }
-      }
-
-      (for {
-        oldDocumentFileName <- oldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
-        result <- getResult
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderNegotiation), documentType, negotiationRequestID))
-  }
-
-  def updateTraderNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderNegotiation), documentType, negotiationRequestID))
-  }
-
-  def uploadTraderNegotiation(documentType: String) = Action(parse.multipartFormData) { implicit request =>
-    FileUpload.form.bindFromRequest.fold(
-      formWithErrors => {
-        BadRequest
-      },
-      fileUploadInfo => {
-        try {
-          request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderNegotiationFilePath(documentType))
-              Ok
-          }
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
-
-  def storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val storeFile = fileResourceManager.storeFile[masterTransaction.NegotiationFile](
-        name = name,
-        documentType = documentType,
-        path = fileResourceManager.getTraderNegotiationFilePath(documentType),
-        document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
-        masterCreate = masterTransactionNegotiationFiles.Service.create
-      )
-
-      def getResult: Future[Result] = {
-        documentType match {
-          case constants.File.BUYER_CONTRACT =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(negotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
-            } yield result
-          case constants.File.SELLER_CONTRACT =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
-            } yield result
-          case constants.File.FIAT_PROOF =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(negotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
-            } yield result
-          case constants.File.AWB_PROOF =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrderDocument(negotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
-            } yield result
-          case _ => withUsernameToken.Ok(views.html.index())
-        }
-      }
-
-      (for {
-        _ <- storeFile
-        result <- getResult
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType)
-
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
-        name = name,
-        documentType = documentType,
-        path = fileResourceManager.getTraderNegotiationFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
-        updateOldDocument = masterTransactionNegotiationFiles.Service.insertOrUpdateOldDocument
-      )
-
-      def getResult(): Future[Result] = {
-        documentType match {
-          case constants.File.BUYER_CONTRACT =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
-            } yield result
-          case constants.File.SELLER_CONTRACT =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
-            } yield result
-          case constants.File.FIAT_PROOF =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
-            } yield result
-          case constants.File.AWB_PROOF =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
-            } yield result
-          case _ => withUsernameToken.Ok(views.html.index())
-        }
-      }
-
-      (for {
-        oldDocumentFileName <- oldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
-        result <- getResult
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def uploadZoneNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeZoneNegotiation), documentType, negotiationRequestID))
-  }
-
-  def updateZoneNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateZoneNegotiation), documentType, negotiationRequestID))
-  }
-
-  def uploadZoneNegotiation(documentType: String) = Action(parse.multipartFormData) { implicit request =>
-    FileUpload.form.bindFromRequest.fold(
-      formWithErrors => {
-        BadRequest
-      },
-      fileUploadInfo => {
-        try {
-          request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneNegotiationFilePath(documentType))
-              Ok
-          }
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
-
-  def storeZoneNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val storeFile = fileResourceManager.storeFile[masterTransaction.NegotiationFile](
-        name = name,
-        documentType = documentType,
-        path = fileResourceManager.getZoneNegotiationFilePath(documentType),
-        document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
-        masterCreate = masterTransactionNegotiationFiles.Service.create
-      )
-
-      def getResult: Future[Result] = {
-        documentType match {
-          case constants.File.BUYER_CONTRACT =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(negotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
-            } yield result
-          case constants.File.SELLER_CONTRACT =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
-            } yield result
-          case constants.File.FIAT_PROOF =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.moderatedBuyerExecuteOrderDocument(negotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
-            } yield result
-          case constants.File.AWB_PROOF =>
-            val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
-            for {
-              negotiationFiles <- negotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.moderatedSellerExecuteOrderDocument(negotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
-            } yield result
-          case _ => withUsernameToken.Ok(views.html.index())
-        }
-      }
-
-      (for {
-        _ <- storeFile
-        result <- getResult
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def updateZoneNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val oldDocumentFileName = masterTransactionNegotiationFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType)
-
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
-        name = name,
-        documentType = documentType,
-        path = fileResourceManager.getZoneNegotiationFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
-        updateOldDocument = masterTransactionNegotiationFiles.Service.insertOrUpdateOldDocument
-      )
-
-      def getResult: Future[Result] = {
-        documentType match {
-          case constants.File.BUYER_CONTRACT =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
-            } yield result
-          case constants.File.SELLER_CONTRACT =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
-            } yield result
-          case constants.File.FIAT_PROOF =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.moderatedBuyerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
-            } yield result
-          case constants.File.AWB_PROOF =>
-            val optionNegotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
-            for {
-              optionNegotiationFiles <- optionNegotiationFiles
-              result <- withUsernameToken.PartialContent(views.html.component.master.moderatedSellerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
-            } yield result
-          case _ => withUsernameToken.Ok(views.html.index())
-        }
-      }
-
-      (for {
-        oldDocumentFileName <- oldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
-        result <- getResult
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   //TODO Shall we check if exists?
   def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -657,42 +258,20 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def zoneAccessedAssetFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val userZoneID = masterZones.Service.tryGetID(loginState.username)
-      val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
-
-      def traderZoneID(accountID: String): Future[String] = masterTraders.Service.tryGetZoneIDByAccountID(accountID)
-
-      (for {
-        userZoneID <- userZoneID
-        accountID <- accountID
-        traderZoneID <- traderZoneID(accountID)
-      } yield {
-        if (traderZoneID == userZoneID) {
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderAssetFilePath(documentType), fileName = fileName))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def zoneAccessedNegotiationFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userZoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getTrader(id: String): Future[Trader] = masterTraders.Service.tryGet(id)
+      def getTraderZOneID(id: String): Future[String] = masterTraders.Service.tryGetZoneID(id)
 
       (for {
         userZoneID <- userZoneID
         negotiation <- negotiation
-        sellerTrader <- getTrader(negotiation.sellerTraderID)
-        buyerTrader <- getTrader(negotiation.buyerTraderID)
+        sellerTraderZoneID <- getTraderZOneID(negotiation.sellerTraderID)
+        buyerTraderZoneID <- getTraderZOneID(negotiation.buyerTraderID)
       } yield {
-        if (sellerTrader.zoneID == userZoneID || buyerTrader.zoneID == userZoneID) {
+        if (sellerTraderZoneID == userZoneID || buyerTraderZoneID == userZoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneNegotiationFilePath(documentType), fileName = fileName))
         } else Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
       }).recover {
@@ -750,9 +329,9 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val storeFile = fileResourceManager.storeFile[master.AccountFile](
         name = name,
+        id = loginState.username,
         documentType = documentType,
         path = fileResourceManager.getAccountFilePath(documentType),
-        document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
         masterCreate = masterAccountFiles.Service.create
       )
       (for {
@@ -770,10 +349,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
       def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.AccountFile](
         name = name,
+        id = loginState.username,
         documentType = documentType,
         path = fileResourceManager.getAccountFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterAccountFiles.Service.updateOldDocument
       )
 
@@ -830,32 +409,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
       (for {
         path <- path
-      } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def tradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username)
-
-      def path(traderID: String): Future[String] = documentType match {
-        case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE | constants.File.COO | constants.File.COA | constants.File.OTHER =>
-          val accountId = masterTransactionIssueAssetRequests.Service.getAccountID(id)
-          for {
-            accountId <- accountId
-          } yield if (accountId == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-        case constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF =>
-          val checkNegotiationAndAccountIDExists = masterNegotiations.Service.checkTraderNegotiationExists(id = id, traderID = traderID)
-          for {
-            checkNegotiationAndAccountIDExists <- checkNegotiationAndAccountIDExists
-          } yield if (checkNegotiationAndAccountIDExists) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-      }
-
-      (for {
-        traderID <- traderID
-        path <- path(traderID)
       } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

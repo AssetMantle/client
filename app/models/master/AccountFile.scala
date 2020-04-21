@@ -1,10 +1,12 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Document
+import models.Trait.{Document, Logged}
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -12,17 +14,14 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]) extends Document[AccountFile] {
+case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], createdBy: String, createdOn: Timestamp, createdOnTimezone: String, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document with Logged {
 
   val status: Option[Boolean] = Option(true)
 
-  def updateFile(newFile: Option[Array[Byte]]): AccountFile = AccountFile(id = id, documentType = documentType, fileName = fileName, file = newFile)
-
-  def updateFileName(newFileName: String): AccountFile = AccountFile(id = id, documentType = documentType, fileName = newFileName, file = file)
 }
 
 @Singleton
-class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -34,9 +33,13 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   import databaseConfig.profile.api._
 
+  private val nodeID = configuration.get[String]("node.id")
+
+  private val nodeTimezone = configuration.get[String]("node.timezone")
+
   private[models] val accountFileTable = TableQuery[AccountFileTable]
 
-  private def add(accountFile: AccountFile): Future[String] = db.run((accountFileTable returning accountFileTable.map(_.id) += accountFile).asTry).map {
+  private def add(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = db.run((accountFileTable returning accountFileTable.map(_.id) += AccountFile(id = id, documentType = documentType, fileName = fileName, file = file, createdBy = nodeID, createdOn = new Timestamp(System.currentTimeMillis()), createdOnTimezone = nodeTimezone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -44,7 +47,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def upsert(accountFile: AccountFile): Future[Int] = db.run(accountFileTable.insertOrUpdate(accountFile).asTry).map {
+  private def update(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((fileName, file, nodeID, new Timestamp(System.currentTimeMillis()), nodeTimezone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -83,7 +86,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private def getAllDocumentsById(id: String): Future[Seq[AccountFile]] = db.run(accountFileTable.filter(_.id === id).result)
 
-  private def deleteById(id: String) = db.run(accountFileTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(accountFileTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -99,7 +102,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private[models] class AccountFileTable(tag: Tag) extends Table[AccountFile](tag, "AccountFile") {
 
-    def * = (id, documentType, fileName, file.?) <> (AccountFile.tupled, AccountFile.unapply)
+    def * = (id, documentType, fileName, file.?, createdBy, createdOn, createdOnTimezone, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (AccountFile.tupled, AccountFile.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -109,13 +112,25 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def file = column[Array[Byte]]("file")
 
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimezone = column[String]("createdOnTimezone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimezone = column[String]("updatedOnTimezone")
+
   }
 
   object Service {
 
-    def create(accountFile: AccountFile): Future[String] = add(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
+    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[String] = add(id = id, documentType = documentType, fileName = fileName, file = file)
 
-    def updateOldDocument(accountFile: AccountFile): Future[Int] = upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
+    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Future[Int] = update(id = id, documentType = documentType, fileName = fileName, file = file)
 
     def get(id: String, documentType: String): Future[AccountFile] = findByIdDocumentType(id = id, documentType = documentType)
 
@@ -125,7 +140,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
-    def checkFileExists(id: String, documentType: String): Future[Boolean] =checkByIdAndDocumentType(id = id, documentType = documentType)
+    def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
 
     def getProfilePicture(id: String): Future[Array[Byte]] = getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE)
 

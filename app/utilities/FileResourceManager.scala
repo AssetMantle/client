@@ -161,7 +161,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
+  def storeFile[T <: Document](name: String, id: String, documentType: String, path: String, masterCreate: (String, String, String, Option[Array[Byte]]) => Future[String]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -171,7 +171,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       }
     }
 
-    def updateAndCreateFile(fileName: String, encodedBase64: Option[Array[Byte]]): Future[String] = masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
+    def updateAndCreateFile(fileName: String, encodedBase64: Option[Array[Byte]]): Future[String] = masterCreate(id, documentType, fileName, encodedBase64)
 
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64
@@ -187,7 +187,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
+  def updateFile[T <: Document](name: String, id: String, documentType: String, path: String, oldDocumentFileName: String, updateOldDocument: (String, String, String, Option[Array[Byte]]) => Future[Int]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -197,7 +197,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       }
     }
 
-    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(id, documentType, fileName, encodedBase64)
 
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64

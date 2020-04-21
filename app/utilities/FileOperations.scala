@@ -113,11 +113,7 @@ object FileOperations {
     if (!file.exists) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
   }
 
-  def combinedHash(documents: Seq[Document[_]])(implicit executionContext: ExecutionContext): String = {
-    Json.toJson(documents.map { doc =>
-      DocumentBlockchainDetails(doc.documentType, hashExtractor(doc.fileName))
-    }).toString()
-  }
+  def getFileNameWithoutExtension(fileName: String): String = fileName.split("""\.""")(0)
 
-  def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = hashedName.split("""\.""")(0)
+  def getDocumentsHash(documents: Document*): String = utilities.String.sha256Sum(documents.map(document => Seq(document.documentType, getFileNameWithoutExtension(document.fileName)).mkString(".")).mkString(""))
 }
