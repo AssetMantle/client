@@ -1,15 +1,14 @@
 package utilities
 
-import java.io.{File, FileInputStream, IOException, RandomAccessFile}
+import java.io.{File, FileInputStream, FileNotFoundException, IOException, RandomAccessFile}
+import java.nio.file.InvalidPathException
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import exceptions.BaseException
 import models.Trait.Document
-import models.common.Serializable._
 import play.api.Logger
-import play.api.libs.json.Json
 import views.companion.master.FileUpload.FileUploadInfo
 
 import scala.concurrent.ExecutionContext
@@ -31,7 +30,10 @@ object FileOperations {
         partialFile.seek((fileInfo.resumableChunkNumber - 1) * fileInfo.resumableChunkSize.toLong)
         partialFile.write(filePart, 0, filePart.length)
       } catch {
-        case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        case baseException: BaseException => throw baseException
+        case ioException: IOException => logger.error(ioException.getMessage)
+          throw new BaseException(constants.Response.I_O_EXCEPTION)
+        case e: Exception => logger.error(e.getMessage)
           throw new BaseException(constants.Response.GENERIC_EXCEPTION)
       } finally {
         partialFile.close()
@@ -43,8 +45,22 @@ object FileOperations {
         uploadedParts.put(fullFileName, Set(fileInfo))
       }
     } catch {
-      case _: BaseException => throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+      case baseException: BaseException => throw baseException
+      case illegalArgumentException: IllegalArgumentException => logger.error(illegalArgumentException.getMessage)
+        throw new BaseException(constants.Response.FILE_ILLEGAL_ARGUMENT_EXCEPTION)
+      case fileNotFoundException: FileNotFoundException => logger.error(fileNotFoundException.getMessage)
+        throw new BaseException(constants.Response.FILE_NOT_FOUND_EXCEPTION)
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
+      case ioException: IOException => logger.error(ioException.getMessage)
+        throw new BaseException(constants.Response.I_O_EXCEPTION)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case classCastException: ClassCastException => logger.error(classCastException.getMessage)
+        throw new BaseException(constants.Response.CLASS_CAST_EXCEPTION)
+      case unsupportedOperationException: UnsupportedOperationException => logger.error(unsupportedOperationException.getMessage)
+        throw new BaseException(constants.Response.FILE_UNSUPPORTED_OPERATION_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
@@ -54,39 +70,79 @@ object FileOperations {
     else ""
   }
 
-  def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
+  def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean =
+    try {
+      newFile(directory, currentName).renameTo(newFile(directory, newName))
+    } catch {
+      case baseException: BaseException => throw baseException
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case ioException: IOException => logger.error(ioException.getMessage)
+        throw new BaseException(constants.Response.I_O_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
 
-  def fileStreamer(file: File, directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): Source[ByteString, _] = {
-    val source: Source[ByteString, _] = FileIO.fromPath(file.toPath)
-      .watchTermination()((_, downloadDone) => downloadDone.onComplete {
-        case Success(_)
-        => deleteFile(directoryName, fileName)
-        case Failure(t) => logger.info(t.getMessage, t)
-          deleteFile(directoryName, fileName)
-      })
-    source
-  }
+  def fileStreamer(file: File, directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): Source[ByteString, _] =
+    try {
+      val source: Source[ByteString, _] = FileIO.fromPath(file.toPath)
+        .watchTermination()((_, downloadDone) => downloadDone.onComplete {
+          case Success(_) => deleteFile(directoryName, fileName)
+          case Failure(t) => logger.error(t.getMessage, t)
+            deleteFile(directoryName, fileName)
+        })
+      source
+    } catch {
+      case baseException: BaseException => throw baseException
+      case invalidPathException: InvalidPathException => logger.error(invalidPathException.getMessage)
+        throw new BaseException(constants.Response.INVALID_FILE_PATH_EXCEPTION)
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case ioException: IOException => logger.error(ioException.getMessage)
+        throw new BaseException(constants.Response.I_O_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
 
   def deleteFile(directoryName: String, name: String)(implicit executionContext: ExecutionContext): Boolean = {
     try {
       newFile(directoryName, name).delete()
     } catch {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+      case baseException: BaseException => throw baseException
+      case ioException: IOException => logger.error(ioException.getMessage)
+        throw new BaseException(constants.Response.I_O_EXCEPTION)
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 
-  def moveFile(fileName: String, oldPath: String, newPath: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directoryName = oldPath, fileName = fileName).renameTo(newFile(directoryName = newPath, fileName = fileName))
+  def moveFile(fileName: String, oldPath: String, newPath: String)(implicit executionContext: ExecutionContext): Boolean =
+    try {
+      newFile(directoryName = oldPath, fileName = fileName).renameTo(newFile(directoryName = newPath, fileName = fileName))
+    } catch {
+      case baseException: BaseException => throw baseException
+      case ioException: IOException => logger.error(ioException.getMessage)
+        throw new BaseException(constants.Response.I_O_EXCEPTION)
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
 
   def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
     try {
       new File(directoryName, fileName)
     } catch {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+      case baseException: BaseException => throw baseException
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
@@ -99,11 +155,14 @@ object FileOperations {
       fileInputStreamReader.close()
       bytes
     } catch {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case baseException: BaseException => throw baseException
+      case fileNotFoundException: FileNotFoundException => logger.error(fileNotFoundException.getMessage)
+        throw new BaseException(constants.Response.FILE_NOT_FOUND_EXCEPTION)
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
       case ioException: IOException => logger.info(constants.Response.I_O_EXCEPTION.message, ioException)
         throw new BaseException(constants.Response.I_O_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+      case e: Exception => logger.error(e.getMessage)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }

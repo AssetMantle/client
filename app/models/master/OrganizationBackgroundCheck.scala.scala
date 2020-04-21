@@ -53,6 +53,7 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
   }
 
   private def update(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = db.run(organizationBackgroundCheckTable.filter(_.id === organizationBackgroundCheck.id).filter(_.documentType === organizationBackgroundCheck.documentType).update(organizationBackgroundCheck.updateLog()).asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
