@@ -172,7 +172,6 @@ object FormField {
   val CREDIT = new BooleanFormField("CREDIT")
   val OBL = new BooleanFormField("OBL")
   val INVOICE = new BooleanFormField("INVOICE")
-  val INSURANCE = new BooleanFormField("INSURANCE")
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
   val BILL_OF_EXCHANGE = new BooleanFormField("BILL_OF_EXCHANGE")
