@@ -203,13 +203,12 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 
@@ -217,8 +216,8 @@ class AddZoneController @Inject()(
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(oldDocumentFileName, id)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         zoneKYCs <- zoneKYCs(id)
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
       } yield result
@@ -377,7 +376,7 @@ class AddZoneController @Inject()(
 
   def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneKYC = masterZoneKYCs.Service.get(id = zoneID, documentType = documentType)
+      val zoneKYC = masterZoneKYCs.Service.tryGet(id = zoneID, documentType = documentType)
       (for {
         zoneKYC <- zoneKYC
       } yield Ok(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC))
@@ -390,7 +389,7 @@ class AddZoneController @Inject()(
     implicit request =>
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          val zoneKYC = masterZoneKYCs.Service.get(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val zoneKYC = masterZoneKYCs.Service.tryGet(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             zoneKYC <- zoneKYC
           } yield BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors, zoneKYC))
@@ -417,7 +416,7 @@ class AddZoneController @Inject()(
             } yield {}
           }
 
-          def zoneKYC: Future[ZoneKYC] = masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
+          def zoneKYC: Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
 
           (for {
             _ <- verifyOrRejectAndSendNotification
@@ -510,20 +509,19 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(oldDocumentFileName, id)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {

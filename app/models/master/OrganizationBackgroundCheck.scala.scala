@@ -61,7 +61,15 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
     }
   }
 
-  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(organizationBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+  private def tryGetByIDAndDocumentType(id: String, documentType: String): Future[OrganizationBackgroundCheck] = db.run(organizationBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def tryGetFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(organizationBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -107,7 +115,9 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
     def updateOldDocument(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = update(organizationBackgroundCheck)
 
-    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
+    def tryGet(id: String, documentType: String): Future[OrganizationBackgroundCheck] = tryGetByIDAndDocumentType(id = id, documentType = documentType)
+
+    def tryGetFileName(id: String, documentType: String): Future[String] = tryGetFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[OrganizationBackgroundCheck]] = getAllDocumentsById(id = id)
 

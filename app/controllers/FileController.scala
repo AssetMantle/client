@@ -102,13 +102,12 @@ class FileController @Inject()(
 
   def updateAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val oldDocumentFileName = masterAccountKYCs.Service.getFileName(id = loginState.username, documentType = documentType)
+      val oldDocument = masterAccountKYCs.Service.tryGet(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[AccountKYC](
+      def updateFile(oldDocument: AccountKYC): Future[Boolean] = fileResourceManager.updateFile[AccountKYC](
         name = name,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterAccountKYCs.Service.updateOldDocument
       )
 
@@ -120,8 +119,8 @@ class FileController @Inject()(
       }
 
       (for {
-        oldDocumentFileName <- oldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
+        oldDocument <- oldDocument
+        _ <- updateFile(oldDocument)
         accountKYC <- accountKYC
         result <- getResult(accountKYC)
       } yield result
@@ -227,7 +226,7 @@ class FileController @Inject()(
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def fileName(id: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType)
+      def fileName(id: String): Future[String] = masterOrganizationKYCs.Service.tryGetFileName(id = id, documentType = documentType)
 
       (for {
         id <- id
@@ -243,7 +242,7 @@ class FileController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def fileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
+      def fileName(id: String): Future[String] = masterTraderKYCs.Service.tryGetFileName(id = id, documentType = documentType)
 
       (for {
         id <- id
@@ -325,19 +324,18 @@ class FileController @Inject()(
 
   def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val oldDocumentFileName = masterAccountFiles.Service.getFileName(id = loginState.username, documentType = documentType)
+      val oldDocument = masterAccountFiles.Service.tryGet(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[AccountFile](
+      def updateFile(oldDocument: AccountFile): Future[Boolean] = fileResourceManager.updateFile[AccountFile](
         name = name,
         path = fileResourceManager.getAccountFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterAccountFiles.Service.updateOldDocument
       )
 
       (for {
-        oldDocumentFileName <- oldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
+        oldDocument <- oldDocument
+        _ <- updateFile(oldDocument)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {

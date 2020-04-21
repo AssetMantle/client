@@ -239,13 +239,12 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
+      def updateFile(oldDocument: TraderKYC): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
         name = name,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterTraderKYCs.Service.updateOldDocument
       )
 
@@ -253,8 +252,8 @@ class SetACLController @Inject()(
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(id, oldDocumentFileName)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         allDocuments <- allDocuments(id)
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(allDocuments))
       } yield result
@@ -488,7 +487,7 @@ class SetACLController @Inject()(
 
       def getResult(userZoneID: String, traderZoneID: String): Future[Result] = {
         if (userZoneID == traderZoneID) {
-          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = traderID, documentType = documentType)
           for {
             traderKYC <- traderKYC
           } yield Ok(views.html.component.master.zoneAcceptOrRejectTraderKYCDocument(traderKYC = traderKYC))
@@ -509,7 +508,7 @@ class SetACLController @Inject()(
     implicit request =>
       views.companion.master.ZoneAcceptOrRejectTraderKYCDocument.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderKYC = masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             traderKYC <- traderKYC
           } yield BadRequest(views.html.component.master.zoneAcceptOrRejectTraderKYCDocument(formWithErrors, traderKYC))
@@ -541,7 +540,7 @@ class SetACLController @Inject()(
                 } yield {}
               }
 
-              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.get(id = zoneAcceptOrRejectTraderKYCDocumentData.traderID, documentType = zoneAcceptOrRejectTraderKYCDocumentData.documentType)
+              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = zoneAcceptOrRejectTraderKYCDocumentData.traderID, documentType = zoneAcceptOrRejectTraderKYCDocumentData.documentType)
 
               for {
                 _ <- verifyOrReject
@@ -663,7 +662,7 @@ class SetACLController @Inject()(
 
       def getResult(userOrganizationID: String, traderOrganizationID: String): Future[Result] = {
         if (userOrganizationID == traderOrganizationID) {
-          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = traderID, documentType = documentType)
           for {
             traderKYC <- traderKYC
           } yield Ok(views.html.component.master.organizationAcceptOrRejectTraderKYCDocument(traderKYC = traderKYC))
@@ -684,7 +683,7 @@ class SetACLController @Inject()(
     implicit request =>
       views.companion.master.OrganizationAcceptOrRejectTraderKYCDocument.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderKYC = masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             traderKYC <- traderKYC
           } yield BadRequest(views.html.component.master.organizationAcceptOrRejectTraderKYCDocument(formWithErrors, traderKYC))
@@ -716,7 +715,7 @@ class SetACLController @Inject()(
                 } yield {}
               }
 
-              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.get(id = organizationAcceptOrRejectTraderKYCDocumentData.traderID, documentType = organizationAcceptOrRejectTraderKYCDocumentData.documentType)
+              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = organizationAcceptOrRejectTraderKYCDocumentData.traderID, documentType = organizationAcceptOrRejectTraderKYCDocumentData.documentType)
 
               for {
                 _ <- verifyOrReject
@@ -793,20 +792,19 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
+      def updateFile(oldDocument: TraderKYC): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
         name = name,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterTraderKYCs.Service.updateOldDocument
       )
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(id, oldDocumentFileName)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {

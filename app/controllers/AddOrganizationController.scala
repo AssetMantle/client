@@ -396,13 +396,12 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(organizationID: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType)
+      def getOldDocument(organizationID: String): Future[OrganizationKYC] = masterOrganizationKYCs.Service.tryGet(id = organizationID, documentType = documentType)
 
-      def updateFile(organizationID: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
+      def updateFile(oldDocument: OrganizationKYC): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 
@@ -410,8 +409,8 @@ class AddOrganizationController @Inject()(
 
       (for {
         organizationID <- organizationID
-        oldDocumentFileName <- getOldDocumentFileName(organizationID)
-        _ <- updateFile(organizationID, oldDocumentFileName)
+        oldDocument <- getOldDocument(organizationID)
+        _ <- updateFile(oldDocument)
         organizationKYCs <- getOrganizationKYCs(organizationID)
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
       } yield result
@@ -605,7 +604,7 @@ class AddOrganizationController @Inject()(
 
       def getResult(userZoneID: String, organizationZoneID: String): Future[Result] = {
         if (userZoneID == organizationZoneID) {
-          val organizationKYC = masterOrganizationKYCs.Service.get(id = organizationID, documentType = documentType)
+          val organizationKYC = masterOrganizationKYCs.Service.tryGet(id = organizationID, documentType = documentType)
           for {
             organizationKYC <- organizationKYC
             result <- withUsernameToken.Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC))
@@ -627,7 +626,7 @@ class AddOrganizationController @Inject()(
     implicit request =>
       views.companion.master.UpdateOrganizationKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          val organizationKYC = masterOrganizationKYCs.Service.get(id = formWithErrors(constants.FormField.ORGANIZATION_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val organizationKYC = masterOrganizationKYCs.Service.tryGet(id = formWithErrors(constants.FormField.ORGANIZATION_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           for {
             organizationKYC <- organizationKYC
           } yield BadRequest(views.html.component.master.updateOrganizationKYCDocumentStatus(formWithErrors, organizationKYC))
@@ -656,7 +655,7 @@ class AddOrganizationController @Inject()(
             }
           }
 
-          def organizationKYC: Future[OrganizationKYC] = masterOrganizationKYCs.Service.get(updateOrganizationKYCDocumentStatusData.organizationID, updateOrganizationKYCDocumentStatusData.documentType)
+          def organizationKYC: Future[OrganizationKYC] = masterOrganizationKYCs.Service.tryGet(updateOrganizationKYCDocumentStatusData.organizationID, updateOrganizationKYCDocumentStatusData.documentType)
 
           def getResult(userZoneID: String, organizationZoneID: String): Future[Result] = {
             if (userZoneID == organizationZoneID) {
@@ -762,20 +761,19 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def oldDocumentFileName(organizationID: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType)
+      def getOldDocument(organizationID: String): Future[OrganizationKYC] = masterOrganizationKYCs.Service.tryGet(id = organizationID, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, organizationID: String): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
+      def updateFile(oldDocument: OrganizationKYC): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 
       (for {
         organizationID <- organizationID
-        oldDocumentFileName <- oldDocumentFileName(organizationID)
-        _ <- updateFile(oldDocumentFileName, organizationID)
+        oldDocument <- getOldDocument(organizationID)
+        _ <- updateFile(oldDocument)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {

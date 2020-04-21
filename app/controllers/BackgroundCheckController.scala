@@ -92,13 +92,12 @@ class BackgroundCheckController @Inject()(
   def updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val getOldDocumentFileName = masterTraderBackgroundChecks.Service.getFileName(id = traderID, documentType = documentType)
+      val getOldDocument = masterTraderBackgroundChecks.Service.tryGet(id = traderID, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[TraderBackgroundCheck](
+      def updateFile(oldDocument: TraderBackgroundCheck): Future[Boolean] = fileResourceManager.updateFile[TraderBackgroundCheck](
         name = name,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterTraderBackgroundChecks.Service.updateOldDocument
       )
 
@@ -107,8 +106,8 @@ class BackgroundCheckController @Inject()(
       val trader = masterTraders.Service.tryGet(traderID)
 
       (for {
-        oldDocumentFileName <- getOldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
+        oldDocument <- getOldDocument
+        _ <- updateFile(oldDocument)
         allDocuments <- allDocuments
         trader <- trader
         result <- withUsernameToken.PartialContent(views.html.component.master.zoneUploadOrUpdateTraderBackgroundCheck(allDocuments, trader))
@@ -126,6 +125,7 @@ class BackgroundCheckController @Inject()(
       val trader = masterTraders.Service.tryGet(traderID)
 
       def allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
+
       (for {
         zoneID <- zoneID
         trader <- trader
@@ -200,14 +200,12 @@ class BackgroundCheckController @Inject()(
 
   def updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val oldDocument = masterOrganizationBackgroundChecks.Service.tryGet(id = organizationID, documentType = documentType)
 
-      val getOldDocumentFileName = masterOrganizationBackgroundChecks.Service.getFileName(id = organizationID, documentType = documentType)
-
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[OrganizationBackgroundCheck](
+      def updateFile(oldDocument: OrganizationBackgroundCheck): Future[Boolean] = fileResourceManager.updateFile[OrganizationBackgroundCheck](
         name = name,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterOrganizationBackgroundChecks.Service.updateOldDocument
       )
 
@@ -216,8 +214,8 @@ class BackgroundCheckController @Inject()(
       val organization = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
-        oldDocumentFileName <- getOldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
+        oldDocument <- oldDocument
+        _ <- updateFile(oldDocument)
         allDocuments <- allDocuments
         organization <- organization
         result <- withUsernameToken.PartialContent(views.html.component.master.zoneUploadOrUpdateOrganizationBackgroundCheck(allDocuments, organization))

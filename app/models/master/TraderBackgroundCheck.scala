@@ -61,7 +61,15 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
     }
   }
 
-  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+  private def tryGetByIDAndDocumentType(id: String, documentType: String): Future[TraderBackgroundCheck] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def tryGetFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(traderBackgroundCheckTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -117,7 +125,9 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
     def updateOldDocument(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = update(traderBackgroundCheck)
 
-    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
+    def tryGet(id: String, documentType: String): Future[TraderBackgroundCheck] = tryGetByIDAndDocumentType(id = id, documentType = documentType)
+
+    def tryGetFileName(id: String, documentType: String): Future[String] = tryGetFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[TraderBackgroundCheck]] = getAllDocumentsById(id = id)
 

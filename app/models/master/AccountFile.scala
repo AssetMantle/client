@@ -64,7 +64,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[AccountFile] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def tryGetByIDAndDocumentType(id: String, documentType: String): Future[AccountFile] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -72,7 +72,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+  private def tryGetFileNameByIDAndDocumentType(id: String, documentType: String): Future[String] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -139,9 +139,9 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def updateOldDocument(accountFile: AccountFile): Future[Int] = update(accountFile)
 
-    def get(id: String, documentType: String): Future[AccountFile] = findByIdDocumentType(id = id, documentType = documentType)
+    def tryGet(id: String, documentType: String): Future[AccountFile] = tryGetByIDAndDocumentType(id = id, documentType = documentType)
 
-    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
+    def tryGetFileName(id: String, documentType: String): Future[String] = tryGetFileNameByIDAndDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[AccountFile]] = getAllDocumentsById(id = id)
 
