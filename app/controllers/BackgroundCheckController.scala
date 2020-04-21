@@ -1,13 +1,14 @@
 package controllers
 
 import java.nio.file.Files
+
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
-import models.master.{OrganizationBackgroundCheck, Trader}
+import models.master.{OrganizationBackgroundCheck, TraderBackgroundCheck}
 import models.{blockchain, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.{I18nSupport}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -64,10 +65,10 @@ class BackgroundCheckController @Inject()(
   def storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val storeFile = fileResourceManager.storeFile[master.TraderBackgroundCheck](
+      val storeFile = fileResourceManager.storeFile[TraderBackgroundCheck](
         name = name,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        document = master.TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
+        document = TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
         masterCreate = masterTraderBackgroundChecks.Service.create
       )
 
@@ -93,11 +94,11 @@ class BackgroundCheckController @Inject()(
 
       val getOldDocumentFileName = masterTraderBackgroundChecks.Service.getFileName(id = traderID, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderBackgroundCheck](
+      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[TraderBackgroundCheck](
         name = name,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
+        document = TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterTraderBackgroundChecks.Service.updateOldDocument
       )
 
@@ -176,7 +177,7 @@ class BackgroundCheckController @Inject()(
       val storeFile = fileResourceManager.storeFile[OrganizationBackgroundCheck](
         name = name,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
+        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
         masterCreate = masterOrganizationBackgroundChecks.Service.create
       )
 
@@ -202,11 +203,11 @@ class BackgroundCheckController @Inject()(
 
       val getOldDocumentFileName = masterOrganizationBackgroundChecks.Service.getFileName(id = organizationID, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationBackgroundCheck](
+      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[OrganizationBackgroundCheck](
         name = name,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
+        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterOrganizationBackgroundChecks.Service.updateOldDocument
       )
 

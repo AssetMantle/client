@@ -1,16 +1,13 @@
 package controllers
 
 import java.nio.file.Files
-import java.util.Date
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
-import models.common.Serializable
-import models.master.{AccountKYC, Asset, Negotiations, Trader}
-import models.masterTransaction.AssetFile
-import models.{blockchain, master, masterTransaction}
+import models.master.{AccountFile, AccountKYC, Negotiations}
+import models.{master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -79,10 +76,10 @@ class FileController @Inject()(
 
   def storeAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val storeFile = fileResourceManager.storeFile[master.AccountKYC](
+      val storeFile = fileResourceManager.storeFile[AccountKYC](
         name = name,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
-        document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+        document = AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterAccountKYCs.Service.create
       )
 
@@ -107,11 +104,11 @@ class FileController @Inject()(
     implicit request =>
       val oldDocumentFileName = masterAccountKYCs.Service.getFileName(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.AccountKYC](
+      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[AccountKYC](
         name = name,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+        document = AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterAccountKYCs.Service.updateOldDocument
       )
 
@@ -311,10 +308,10 @@ class FileController @Inject()(
 
   def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val storeFile = fileResourceManager.storeFile[master.AccountFile](
+      val storeFile = fileResourceManager.storeFile[AccountFile](
         name = name,
         path = fileResourceManager.getAccountFilePath(documentType),
-        document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
+        document = AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
         masterCreate = masterAccountFiles.Service.create
       )
       (for {
@@ -330,11 +327,11 @@ class FileController @Inject()(
     implicit request =>
       val oldDocumentFileName = masterAccountFiles.Service.getFileName(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.AccountFile](
+      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[AccountFile](
         name = name,
         path = fileResourceManager.getAccountFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
+        document = AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
         updateOldDocument = masterAccountFiles.Service.updateOldDocument
       )
 

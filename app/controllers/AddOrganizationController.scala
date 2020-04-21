@@ -21,23 +21,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddOrganizationController @Inject()(
                                            messagesControllerComponents: MessagesControllerComponents,
                                            withOrganizationLoginAction: WithOrganizationLoginAction,
-                                           withLoginAction: WithLoginAction,
                                            fileResourceManager: utilities.FileResourceManager,
                                            transaction: utilities.Transaction,
                                            masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
                                            utilitiesNotification: utilities.Notification,
-                                           blockchainAccounts: blockchain.Accounts,
                                            masterOrganizationKYCs: master.OrganizationKYCs,
-                                           masterTraders: master.Traders,
                                            transactionsAddOrganization: transactions.AddOrganization,
-                                           blockchainOrganizations: blockchain.Organizations,
                                            masterZones: master.Zones,
                                            blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations,
                                            masterOrganizations: master.Organizations,
                                            masterAccounts: master.Accounts,
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
-                                           withGenesisLoginAction: WithGenesisLoginAction,
                                            withUsernameToken: WithUsernameToken,
                                            masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -749,7 +744,7 @@ class AddOrganizationController @Inject()(
       def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
-        document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterOrganizationKYCs.Service.create
       )
 
@@ -769,11 +764,11 @@ class AddOrganizationController @Inject()(
 
       def oldDocumentFileName(organizationID: String): Future[String] = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, organizationID: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationKYC](
+      def updateFile(oldDocumentFileName: String, organizationID: String): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
+        document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 

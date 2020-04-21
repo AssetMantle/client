@@ -24,10 +24,8 @@ class AddZoneController @Inject()(
                                    withZoneLoginAction: WithZoneLoginAction,
                                    transaction: utilities.Transaction,
                                    utilitiesNotification: utilities.Notification,
-                                   blockchainAccounts: blockchain.Accounts,
                                    masterZoneKYCs: master.ZoneKYCs,
                                    transactionsAddZone: transactions.AddZone,
-                                   blockchainZones: models.blockchain.Zones,
                                    blockchainTransactionAddZones: blockchainTransaction.AddZones,
                                    masterAccounts: master.Accounts,
                                    masterZones: master.Zones,
@@ -177,10 +175,10 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
 
@@ -207,11 +205,11 @@ class AddZoneController @Inject()(
 
       def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[master.ZoneKYC](
+      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 
@@ -487,10 +485,10 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
 
@@ -514,11 +512,11 @@ class AddZoneController @Inject()(
 
       def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[master.ZoneKYC](
+      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 

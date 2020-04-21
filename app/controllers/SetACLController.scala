@@ -211,10 +211,10 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.TraderKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[TraderKYC](
         name = name,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
         masterCreate = masterTraderKYCs.Service.create
       )
 
@@ -241,11 +241,11 @@ class SetACLController @Inject()(
 
       def getOldDocumentFileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
 
-      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderKYC](
+      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
         name = name,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
         updateOldDocument = masterTraderKYCs.Service.updateOldDocument
       )
 
@@ -768,10 +768,10 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.TraderKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[TraderKYC](
         name = name,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
         masterCreate = masterTraderKYCs.Service.create
       )
 
@@ -795,11 +795,11 @@ class SetACLController @Inject()(
 
       def getOldDocumentFileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
 
-      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderKYC](
+      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
         name = name,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
         oldDocumentFileName = oldDocumentFileName,
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
         updateOldDocument = masterTraderKYCs.Service.updateOldDocument
       )
 
