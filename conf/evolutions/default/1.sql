@@ -472,10 +472,10 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountFile"
     "file"              BYTEA,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
-    "createdOnTimezone" VARCHAR,
+    "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
-    "updatedOnTimezone" VARCHAR,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -488,10 +488,10 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
-    "createdOnTimezone" VARCHAR,
+    "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
-    "updatedOnTimezone" VARCHAR,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
