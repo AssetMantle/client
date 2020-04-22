@@ -610,6 +610,20 @@ html, body {
   font-weight: normal;
   color: #272829;
   line-height: 2; }
+.comdex .check svg {
+  border-radius: 50%;
+  background: #49A948;
+  padding: 2px; }
+.comdex .close svg {
+  border-radius: 50%;
+  padding: 2px;
+  background: #FE4350; }
+.comdex .close svg > * {
+  stroke-width: 2 !important;
+  stroke: #ffffff !important; }
+.comdex .check > * > * {
+  stroke-width: 2 !important;
+  stroke: #ffffff !important; }
 
 .header {
   background: #053C75; }
@@ -1751,7 +1765,7 @@ header:before,
 
 .profileContainer .infoRow {
   font-size: 0.875rem;
-  line-height: 2; }
+  line-height: 2.2; }
 .profileContainer .infoRowLabel {
   color: #061728; }
 .profileContainer .infoRowValue {

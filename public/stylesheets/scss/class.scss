@@ -784,6 +784,24 @@ position: relative;
     color: #272829;
     line-height: 2;
   }
+  .check svg{
+    border-radius: 50%;
+    background: #49A948;
+    padding: 2px;
+  }
+  .close svg{
+    border-radius: 50%;
+    padding: 2px;
+    background: #FE4350;
+  }
+  .close svg >*{
+    stroke-width:2 !important;
+    stroke:#ffffff !important;
+  }
+  .check>*>*{
+    stroke-width:2 !important;
+    stroke:#ffffff !important;
+  }
 }
 
 .header{
@@ -2279,7 +2297,7 @@ header:before,
 .profileContainer{
   .infoRow{
     font-size: $paragraphFontSizeSmall;
-    line-height: 2;
+    line-height: 2.2;
   }
   .infoRowLabel{
     color:#061728;
