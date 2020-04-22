@@ -15,13 +15,13 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationBackgroundCheck] with Logged[OrganizationBackgroundCheck] {
+case class OrganizationBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationBackgroundCheck] with Logged[OrganizationBackgroundCheck] {
 
   def updateFileName(newFileName: String): OrganizationBackgroundCheck = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationBackgroundCheck = copy(file = newFile)
 
-  def createLog()(implicit node: Node): OrganizationBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+  def createLog()(implicit node: Node): OrganizationBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
   def updateLog()(implicit node: Node): OrganizationBackgroundCheck = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
@@ -84,7 +84,7 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   private[models] class OrganizationBackgroundCheckTable(tag: Tag) extends Table[OrganizationBackgroundCheck](tag, "OrganizationBackgroundCheck") {
 
-    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (OrganizationBackgroundCheck.tupled, OrganizationBackgroundCheck.unapply)
+    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (OrganizationBackgroundCheck.tupled, OrganizationBackgroundCheck.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -100,13 +100,13 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
     def createdOn = column[Timestamp]("createdOn")
 
-    def createdOnTimezone = column[String]("createdOnTimezone")
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
 
     def updatedBy = column[String]("updatedBy")
 
     def updatedOn = column[Timestamp]("updatedOn")
 
-    def updatedOnTimezone = column[String]("updatedOnTimezone")
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

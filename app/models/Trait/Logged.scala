@@ -8,7 +8,7 @@ trait Logged[T] {
 
   val createdBy: Option[String]
 
-  val createdOnTimezone: Option[String]
+  val createdOnTimeZone: Option[String]
 
   val updatedOn: Option[Timestamp]
 

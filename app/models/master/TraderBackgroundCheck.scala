@@ -14,13 +14,13 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderBackgroundCheck] with Logged[TraderBackgroundCheck] {
+case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderBackgroundCheck] with Logged[TraderBackgroundCheck] {
 
   def updateFileName(newFileName: String): TraderBackgroundCheck = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): TraderBackgroundCheck = copy(file = newFile)
 
-  def createLog()(implicit node: Node): TraderBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+  def createLog()(implicit node: Node): TraderBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
   def updateLog()(implicit node: Node): TraderBackgroundCheck = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
@@ -93,7 +93,7 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   private[models] class TraderBackgroundCheckTable(tag: Tag) extends Table[TraderBackgroundCheck](tag, "TraderBackgroundCheck") {
 
-    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TraderBackgroundCheck.tupled, TraderBackgroundCheck.unapply)
+    def * = (id, documentType, fileName, file.?, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TraderBackgroundCheck.tupled, TraderBackgroundCheck.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -109,13 +109,13 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
     def createdOn = column[Timestamp]("createdOn")
 
-    def createdOnTimezone = column[String]("createdOnTimezone")
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
 
     def updatedBy = column[String]("updatedBy")
 
     def updatedOn = column[Timestamp]("updatedOn")
 
-    def updatedOnTimezone = column[String]("updatedOnTimezone")
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

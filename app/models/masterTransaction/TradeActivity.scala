@@ -16,12 +16,12 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeActivity(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[TradeActivity] {
+case class TradeActivity(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[TradeActivity] {
   val title: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.TITLE_SUFFIX).mkString(".")
 
   val template: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.MESSAGE_SUFFIX).mkString(".")
 
-  def createLog()(implicit node: Node): TradeActivity = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+  def createLog()(implicit node: Node): TradeActivity = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
   def updateLog()(implicit node: Node): TradeActivity = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
@@ -44,11 +44,11 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
-  case class TradeActivitySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimezone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimezone = createdOnTimezone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class TradeActivitySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivity.tradeActivityTemplate).toString, read = tradeActivity.read, createdBy = tradeActivity.createdBy, createdOn = tradeActivity.createdOn, createdOnTimezone = tradeActivity.createdOnTimezone, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, updatedOnTimeZone = tradeActivity.updatedOnTimeZone)
+  def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivity.tradeActivityTemplate).toString, read = tradeActivity.read, createdBy = tradeActivity.createdBy, createdOn = tradeActivity.createdOn, createdOnTimeZone = tradeActivity.createdOnTimeZone, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, updatedOnTimeZone = tradeActivity.updatedOnTimeZone)
 
   private[models] val tradeActivityTable = TableQuery[TradeActivityTable]
 
@@ -74,7 +74,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class TradeActivityTable(tag: Tag) extends Table[TradeActivitySerializable](tag, "TradeActivity") {
 
-    def * = (id, negotiationID, tradeActivityTemplateJson, read, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TradeActivitySerializable.tupled, TradeActivitySerializable.unapply)
+    def * = (id, negotiationID, tradeActivityTemplateJson, read, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TradeActivitySerializable.tupled, TradeActivitySerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -88,13 +88,13 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def createdOn = column[Timestamp]("createdOn")
 
-    def createdOnTimezone = column[String]("createdOnTimezone")
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
 
     def updatedBy = column[String]("updatedBy")
 
     def updatedOn = column[Timestamp]("updatedOn")
 
-    def updatedOnTimezone = column[String]("updatedOnTimezone")
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

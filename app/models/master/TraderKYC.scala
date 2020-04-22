@@ -14,7 +14,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean] = None, organizationStatus: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderKYC] with Logged[TraderKYC] {
+case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean] = None, organizationStatus: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderKYC] with Logged[TraderKYC] {
 
   val status: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
 
@@ -22,7 +22,7 @@ case class TraderKYC(id: String, documentType: String, fileName: String, file: O
 
   def updateFile(newFile: Option[Array[Byte]]): TraderKYC = copy(file = newFile)
 
-  def createLog()(implicit node: Node): TraderKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+  def createLog()(implicit node: Node): TraderKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
   def updateLog()(implicit node: Node): TraderKYC = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
@@ -79,7 +79,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def zoneUpdateStatusByIdAndDocumentType(id: String, documentType: String, zoneStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.zoneStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((zoneStatus, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def zoneUpdateStatusByIdAndDocumentType(id: String, documentType: String, zoneStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.zoneStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((zoneStatus, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -89,7 +89,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def organizationUpdateStatusByIdAndDocumentType(id: String, documentType: String, organizationStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.organizationStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimezone)).update((organizationStatus, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def organizationUpdateStatusByIdAndDocumentType(id: String, documentType: String, organizationStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.organizationStatus.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((organizationStatus, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -121,7 +121,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class TraderKYCTable(tag: Tag) extends Table[TraderKYC](tag, "TraderKYC") {
 
-    def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (TraderKYC.tupled, TraderKYC.unapply)
+    def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TraderKYC.tupled, TraderKYC.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -139,13 +139,13 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def createdOn = column[Timestamp]("createdOn")
 
-    def createdOnTimezone = column[String]("createdOnTimezone")
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
 
     def updatedBy = column[String]("updatedBy")
 
     def updatedOn = column[Timestamp]("updatedOn")
 
-    def updatedOnTimezone = column[String]("updatedOnTimezone")
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

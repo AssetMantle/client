@@ -15,7 +15,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimezone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountFile] with Logged[AccountFile] {
+case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountFile] with Logged[AccountFile] {
 
   val status: Option[Boolean] = Option(true)
 
@@ -23,7 +23,7 @@ case class AccountFile(id: String, documentType: String, fileName: String, file:
 
   def updateFile(newFile: Option[Array[Byte]]): AccountFile = copy(file = newFile)
 
-  def createLog()(implicit node: Node): AccountFile = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimezone = Option(node.timeZone))
+  def createLog()(implicit node: Node): AccountFile = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
   def updateLog()(implicit node: Node): AccountFile = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
@@ -109,7 +109,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private[models] class AccountFileTable(tag: Tag) extends Table[AccountFile](tag, "AccountFile") {
 
-    def * = (id, documentType, fileName, file.?, createdBy.?, createdOn.?, createdOnTimezone.?, updatedBy.?, updatedOn.?, updatedOnTimezone.?) <> (AccountFile.tupled, AccountFile.unapply)
+    def * = (id, documentType, fileName, file.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountFile.tupled, AccountFile.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -123,13 +123,13 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def createdOn = column[Timestamp]("createdOn")
 
-    def createdOnTimezone = column[String]("createdOnTimezone")
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
 
     def updatedBy = column[String]("updatedBy")
 
     def updatedOn = column[Timestamp]("updatedOn")
 
-    def updatedOnTimezone = column[String]("updatedOnTimezone")
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

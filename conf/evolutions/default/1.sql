@@ -607,10 +607,10 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
-    "createdOnTimezone" VARCHAR,
+    "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
-    "updatedOnTimezone" VARCHAR,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -623,10 +623,10 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
-    "createdOnTimezone" VARCHAR,
+    "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
-    "updatedOnTimezone" VARCHAR,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -652,10 +652,10 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
-    "createdOnTimezone" VARCHAR,
+    "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
-    "updatedOnTimezone" VARCHAR,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -669,10 +669,10 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
     "organizationStatus" BOOLEAN,
     "createdBy"          VARCHAR,
     "createdOn"          TIMESTAMP,
-    "createdOnTimezone"  VARCHAR,
+    "createdOnTimeZone"  VARCHAR,
     "updatedBy"          VARCHAR,
     "updatedOn"          TIMESTAMP,
-    "updatedOnTimezone"  VARCHAR,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -706,10 +706,10 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
-    "createdOnTimezone" VARCHAR,
+    "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
-    "updatedOnTimezone" VARCHAR,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -723,10 +723,10 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
     "status"              BOOLEAN,
     "createdBy"           VARCHAR,
     "createdOn"           TIMESTAMP,
-    "createdOnTimezone"   VARCHAR,
+    "createdOnTimeZone"   VARCHAR,
     "updatedBy"           VARCHAR,
     "updatedOn"           TIMESTAMP,
-    "updatedOnTimezone"   VARCHAR,
+    "updatedOnTimeZone"   VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -799,10 +799,10 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
     "status"              BOOLEAN,
     "createdBy"           VARCHAR,
     "createdOn"           TIMESTAMP,
-    "createdOnTimezone"   VARCHAR,
+    "createdOnTimeZone"   VARCHAR,
     "updatedBy"           VARCHAR,
     "updatedOn"           TIMESTAMP,
-    "updatedOnTimezone"   VARCHAR,
+    "updatedOnTimeZone"   VARCHAR,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -814,10 +814,10 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
     "read"                     BOOLEAN NOT NULL,
     "createdBy"                VARCHAR,
     "createdOn"                TIMESTAMP,
-    "createdOnTimezone"        VARCHAR,
+    "createdOnTimeZone"        VARCHAR,
     "updatedBy"                VARCHAR,
     "updatedOn"                TIMESTAMP,
-    "updatedOnTimezone"        VARCHAR,
+    "updatedOnTimeZone"        VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -851,10 +851,10 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
     "read"                      BOOLEAN NOT NULL,
     "createdBy"                 VARCHAR,
     "createdOn"                 TIMESTAMP,
-    "createdOnTimezone"         VARCHAR,
+    "createdOnTimeZone"         VARCHAR,
     "updatedBy"                 VARCHAR,
     "updatedOn"                 TIMESTAMP,
-    "updatedOnTimezone"         VARCHAR,
+    "updatedOnTimeZone"         VARCHAR,
     PRIMARY KEY ("id")
 );
 
