@@ -2,17 +2,18 @@ package controllers
 
 
 import constants.Form
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Contacts, Organization, Organizations, Traders}
-import models.masterTransaction
+import models.{blockchainTransaction, masterTransaction}
 import models.masterTransaction.IssueFiatRequests
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import models.master
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -25,6 +26,11 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
                                        issueFiatRequests: IssueFiatRequests,
                                        organizations: Organizations,
                                        traders: Traders,
+                                       masterAccounts: master.Accounts,
+                                       withZoneLoginAction: WithZoneLoginAction,
+                                       transactionsIssueFiat: transactions.IssueFiat,
+                                       blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
+                                       transaction: utilities.Transaction,
                                        contacts: Contacts)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
 
@@ -39,6 +45,13 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_WESTERN_UNION
+
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
+  private val zonePassword = configuration.get[String]("zone.password")
+
+  private val zoneGas = configuration.get[Int]("zone.gas")
+
 
   def westernUnionRTCB: Action[NodeSeq] = Action.async(parse.xml) {
     request =>
@@ -99,5 +112,45 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           }
         })
   }
+
+//  def issueFiat(requestID: String, traderAccountID: String, zoneWalletAddress: String, fiatTransactionID: String, transactionAmount: String) = {
+//          val status = issueFiatRequests.Service.getStatus(requestID)
+//
+//          def getResult(status: Option[Boolean]) = {
+//            if (status.isEmpty) {
+//              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
+//
+//              def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
+//                entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
+//                blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
+//                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
+//                action = transactionsIssueFiat.Service.post,
+//                onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
+//                onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
+//                updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
+//              )
+//
+//              def accept(ticketID: String): Future[Int] = issueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
+//
+//              for {
+//                toAddress <- toAddress
+//                ticketID <- ticketID(toAddress)
+//                _ <- accept(ticketID)
+//
+//              } yield Unit
+//            } else {
+//              throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
+//            }
+//          }
+//
+//          (for {
+//            status <- status
+//            result <- getResult(status)
+//          } yield result
+//            ).recover {
+//          }
+//        }
+//
+//  }
 
 }

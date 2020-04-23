@@ -8,6 +8,8 @@ CREATE SCHEMA IF NOT EXISTS MASTER
     AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION
     AUTHORIZATION "commit";
+CREATE SCHEMA IF NOT EXISTS WESTERN_UNION
+    AUTHORIZATION "commit";
 
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
@@ -510,6 +512,18 @@ CREATE TABLE IF NOT EXISTS MASTER."Contact"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Fiat"
+(
+    "id"                VARCHAR NOT NULL,
+    "ownerID"           VARCHAR NOT NULL,
+    "transactionID"     VARCHAR NOT NULL UNIQUE,
+    "transactionAmount" INT     NOT NULL,
+    "amountProcessed"   INT,
+    "status"            BOOLEAN,
+    "rtcbStatus"        BOOLEAN NOT NULL,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Identification"
 (
     "accountID"          VARCHAR NOT NULL,
@@ -865,6 +879,42 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
+(
+    "id"                VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
+    "transactionAmount" INT     NOT NULL,
+    "gas"               INT,
+    "status"            BOOLEAN,
+    "rtcbStatus"        BOOLEAN NOT NULL,
+    "ticketID"          VARCHAR,
+    "comment"           VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
+(
+    "id"      VARCHAR NOT NULL,
+    "request" VARCHAR NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS WESTERN_UNION."SFTPFileTransaction"
+(
+    "payerID"              VARCHAR NOT NULL,
+    "invoiceNumber"        VARCHAR NOT NULL,
+    "customerFirstName"    VARCHAR NOT NULL,
+    "customerLastName"     VARCHAR NOT NULL,
+    "customerEmailAddress" VARCHAR NOT NULL,
+    "settlementDate"       VARCHAR NOT NULL,
+    "clientReceivedAmount" VARCHAR NOT NULL,
+    "transactionType"      VARCHAR NOT NULL,
+    "productType"          VARCHAR NOT NULL,
+    "transactionReference" VARCHAR NOT NULL,
+    PRIMARY KEY ("transactionReference")
+);
+
+
 ALTER TABLE BLOCKCHAIN."Asset_BC"
     ADD CONSTRAINT Asset_BC_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
@@ -1068,3 +1118,4 @@ DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS MASTER CASCADE;
 DROP SCHEMA IF EXISTS MASTER_TRANSACTION CASCADE;
+DROP SCHEMA IF EXISTS WESTERN_UNION CASCADE;
