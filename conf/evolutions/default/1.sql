@@ -460,7 +460,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
     "accountAddress" VARCHAR NOT NULL,
     "language"       VARCHAR NOT NULL,
     "userType"       VARCHAR NOT NULL,
-    "status"         VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -500,13 +499,11 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."Contact"
+CREATE TABLE IF NOT EXISTS MASTER."Email"
 (
     "id"                   VARCHAR NOT NULL,
-    "mobileNumber"         VARCHAR NOT NULL UNIQUE,
-    "mobileNumberVerified" BOOLEAN NOT NULL,
-    "emailAddress"         VARCHAR NOT NULL UNIQUE,
-    "emailAddressVerified" BOOLEAN NOT NULL,
+    "emailAddress"         VARCHAR NOT NULL,
+    "status" BOOLEAN       NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -522,6 +519,14 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     PRIMARY KEY ("accountID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Mobile"
+(
+    "id"                   VARCHAR NOT NULL,
+    "mobileNumber"         VARCHAR NOT NULL,
+    "status" BOOLEAN       NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
@@ -905,8 +910,10 @@ ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Asset"
     ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
-ALTER TABLE MASTER."Contact"
-    ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Email"
+    ADD CONSTRAINT Email_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Mobile"
+    ADD CONSTRAINT Mobile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Negotiation"
@@ -991,8 +998,8 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '0',
         true);
 
-INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
+INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType")
+VALUES ('main', '711213004', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS');
 
 # --- !Downs
 
@@ -1031,8 +1038,9 @@ DROP TABLE IF EXISTS MASTER."Account" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Asset" CASCADE;
-DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
+DROP TABLE IF EXISTS MASTER."Email" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
+DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
