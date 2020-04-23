@@ -89,6 +89,14 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private def getAssetsByDirtyBit(dirtyBit: Boolean): Future[Seq[Asset]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result)
 
+  private def tryGetLockedStatusByPegHash(pegHash: String): Future[Boolean] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.locked).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteByPegHash(pegHash: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -160,6 +168,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def deleteAssetPegWallet(ownerAddress: String): Future[Int] = deleteAssetPegWalletByAddress(ownerAddress)
 
     def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true)
+
+    def tryGetLockedStatus(pegHash: String): Future[Boolean] = tryGetLockedStatusByPegHash(pegHash)
 
     def markDirty(pegHash: String): Future[Int] = updateDirtyBitByPegHash(pegHash, dirtyBit = true)
   }

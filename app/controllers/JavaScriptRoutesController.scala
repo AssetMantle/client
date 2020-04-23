@@ -83,10 +83,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.OrderController.moderatedBuyerExecuteOrderList,
         routes.javascript.OrderController.blockchainBuyerExecuteOrderForm,
 
-        routes.javascript.ChangeBuyerBidController.changeBuyerBidForm,
         routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm,
 
-        routes.javascript.ChangeSellerBidController.changeSellerBidForm,
         routes.javascript.ChangeSellerBidController.blockchainChangeSellerBidForm,
 
         routes.javascript.ChatController.chatRoom,

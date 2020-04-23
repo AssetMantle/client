@@ -124,6 +124,10 @@ object Notification {
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val ZONE_RELEASED_ASSET =new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

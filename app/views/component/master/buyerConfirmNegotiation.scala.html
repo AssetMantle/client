@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.companion.master.ConfirmNegotiation
+@import views.html.base._
+@import models.master.Negotiation
+
+@(buyerConfirmNegotiationForm: Form[ConfirmNegotiation.Data] = ConfirmNegotiation.form, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.BUYER_CONFIRM_NEGOTIATION) {
+    @commonInputText(buyerConfirmNegotiationForm, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @Messages(constants.View.ASSET_DETAILS)
+    @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
+    @commonIntInfo(constants.View.PRICE, negotiation.price)
+    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(""))
+    @commonInputInt(buyerConfirmNegotiationForm, constants.FormField.GAS)
+    @commonInputPassword(buyerConfirmNegotiationForm, constants.FormField.PASSWORD)
+}

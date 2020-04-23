@@ -1,23 +1,11 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import views.companion.master.ModeratedBuyerExecuteOrder
-@import models.masterTransaction.NegotiationFile
 
-@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-@for(file <- files) {
-    @component.master.commonDocumentViewer(file) {
-        @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
-    } {
-        <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
-    } {
-        <span>@file.documentType</span>
-    }
-}
-
-@commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS)
+@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+    @commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ACCOUNT_ID)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ACCOUNT_ID)
     @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH)
     @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.PEG_HASH)
     @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS)

@@ -103,14 +103,16 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
+  val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.NegotiationController.buyerConfirmForm)
+  val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.NegotiationController.sellerConfirmForm)
 
   //OrderController
-  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecuteOrder(), routes.javascript.OrderController.buyerExecuteOrderForm)
-  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecuteOrder(), routes.javascript.OrderController.moderatedBuyerExecuteOrderForm)
-  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecuteOrder(), routes.javascript.OrderController.blockchainBuyerExecuteOrderForm)
-  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecuteOrder(), routes.javascript.OrderController.sellerExecuteOrderForm)
-  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecuteOrder(), routes.javascript.OrderController.moderatedSellerExecuteOrderForm)
-  val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecuteOrder(), routes.javascript.OrderController.blockchainSellerExecuteOrderForm)
+  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecute(), routes.javascript.OrderController.buyerExecuteForm)
+  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
+  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecute(), routes.javascript.OrderController.blockchainBuyerExecuteForm)
+  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecute(), routes.javascript.OrderController.sellerExecuteForm)
+  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecute(), routes.javascript.OrderController.moderatedSellerExecuteForm)
+  val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecute(), routes.javascript.OrderController.blockchainSellerExecuteForm)
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
