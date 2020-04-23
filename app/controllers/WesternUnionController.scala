@@ -6,6 +6,8 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.master.{Emails, Organization, Organizations, Traders}
+import models.masterTransaction
 import models.master.{Contacts, Organization, Organizations, Traders}
 import models.{blockchainTransaction, masterTransaction}
 import models.masterTransaction.IssueFiatRequests
@@ -26,12 +28,12 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
                                        issueFiatRequests: IssueFiatRequests,
                                        organizations: Organizations,
                                        traders: Traders,
+                                       emailAddresses: Emails,
                                        masterAccounts: master.Accounts,
                                        withZoneLoginAction: WithZoneLoginAction,
                                        transactionsIssueFiat: transactions.IssueFiat,
                                        blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
-                                       transaction: utilities.Transaction,
-                                       contacts: Contacts)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                       transaction: utilities.Transaction)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
 
   private val rtcbSecretKey = configuration.get[String]("westernUnion.rtcbSecretKey")
@@ -87,7 +89,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         issueFiatRequestData => {
           val create = issueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
           val traderDetails = traders.Service.tryGetByAccountID(loginState.username)
-          val emailAddress = contacts.Service.tryGetVerifiedEmailAddress(loginState.username)
+          val emailAddress = emailAddresses.Service.tryGetVerifiedEmailAddress(loginState.username)
 
           def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.tryGet(organizationID)
 

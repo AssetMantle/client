@@ -1,14 +1,11 @@
 package models.blockchain
 
-import actors.{Create, MainActor, ShutdownActor}
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
+import akka.actor.{ActorSystem}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
@@ -19,7 +16,21 @@ import scala.util.{Failure, Success}
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActor, actorsCreate: actors.Create, masterAccounts: master.Accounts, masterNegotiations: master.Negotiations, masterAssets: master.Assets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(
+                        actorsCreate: actors.Create,
+                        masterAccounts: master.Accounts,
+                        masterNegotiations: master.Negotiations,
+                        masterAssets: master.Assets,
+                        actorSystem: ActorSystem,
+                        protected val databaseConfigProvider: DatabaseConfigProvider,
+                        getAccount: queries.GetAccount,
+                        blockchainNegotiations: Negotiations,
+                        blockchainTraderFeedbackHistories: TraderFeedbackHistories,
+                        blockchainAssets: Assets,
+                        blockchainFiats: Fiats,
+                        getOrder: queries.GetOrder,
+                        utilitiesNotification: utilities.Notification
+                      )(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

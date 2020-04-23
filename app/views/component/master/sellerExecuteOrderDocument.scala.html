@@ -11,15 +11,6 @@
         </div>
         @negotiationFile match {
             case Some(file) => {
-                @component.master.commonDocumentViewer(file) {
-                    @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
-                } {
-                    <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)" target="_blank">@Messages(file.documentType)</a>
-                } {
-                    <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@file.documentType','@file.id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
-                    <script>hideElement('upload@file.documentType')</script>
-                }
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.OrderController.sellerExecuteOrderForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
             }
             case None => {}
         }

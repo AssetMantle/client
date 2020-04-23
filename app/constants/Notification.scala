@@ -44,9 +44,10 @@ object Notification {
   val VERIFY_PHONE = new Notification(notificationType = "VERIFY_PHONE", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val PHONE_VERIFIED = new Notification(notificationType = "PHONE_VERIFIED", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val VERIFY_EMAIL = new Notification(notificationType = "VERIFY_EMAIL", sendEmail = true, sendPushNotification = false, sendSMS = false)
-  val EMAIL_VERIFIED = new Notification(notificationType = "EMAIL_VERIFIED", sendEmail = false, sendPushNotification = false, sendSMS = true)
+  val EMAIL_VERIFIED = new Notification(notificationType = "EMAIL_VERIFIED", sendEmail = true, sendPushNotification = false, sendSMS = false)
   val FORGOT_PASSWORD_OTP = new Notification(notificationType = "FORGOT_PASSWORD_OTP", sendEmail = true, sendPushNotification = false, sendSMS = false)
-  val CONTACT_UPDATED = new Notification(notificationType = "CONTACT_UPDATED", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val EMAIL_ADDRESS_UPDATED = new Notification(notificationType = "EMAIL_ADDRESS_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
+  val MOBILE_NUMBER_UPDATED = new Notification(notificationType = "MOBILE_NUMBER_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
 
   //userReviewIdentification
   val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = true, sendPushNotification = true, sendSMS = false)

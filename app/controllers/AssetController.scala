@@ -85,25 +85,37 @@ class AssetController @Inject()(
                       result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
                     } yield result
                   } else {
-                    val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
 
-                    def getTicketID(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                      entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
-                      blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity.toString, moderated = false, takerAddress = "", mode = transactionMode),
-                      action = transactionsIssueAsset.Service.post,
-                      onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                      onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                      updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-                    )
+                    def issueAssetAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+                      val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+
+                      def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+                        entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
+                        blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity.toString, moderated = false, takerAddress = "", mode = transactionMode),
+                        action = transactionsIssueAsset.Service.post,
+                        onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+                        onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                        updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+                      )
+
+                      for {
+                        documentHash <- addUnmoderatedAsset
+                        ticketID <- sendTransaction(documentHash)
+                        tradableAssets <- getAllTradableAssets(traderID)
+                        counterPartyList <- getCounterPartyList(traderID)
+                        counterPartyTraders <- getCounterPartyTraders(counterPartyList)
+                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                      } yield result
+                    }
+                    else {
+                      Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+                    }
 
                     for {
-                      documentHash <- addUnmoderatedAsset
-                      ticketID <- getTicketID(documentHash)
-                      tradableAssets <- getAllTradableAssets(traderID)
-                      counterPartyList <- getCounterPartyList(traderID)
-                      counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                      validateUsernamePassword <- validateUsernamePassword
+                      result <- issueAssetAndGetResult(validateUsernamePassword)
                     } yield result
                   }
                 }
