@@ -3,11 +3,8 @@ package controllers
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain._
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderKYC, TraderRelation, Zone}
-import models.masterTransaction.{AssetFile, IssueAssetRequest}
 import models.master.{Organization => _, Zone => _, _}
-import models.masterTransaction.{AssetFile, IssueAssetRequest, Notification}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -962,7 +959,7 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.organizationDeclarations()))
   }
 
-// zone trades cards
+  // zone trades cards
   def zoneViewAcceptedNegotiationList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
@@ -987,7 +984,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
       def traderZoneIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetZoneIDs(traderIDs)
+
       def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
       def getResult(zoneID: String, traderZoneIDs: Seq[String], negotiation: Negotiation, asset: Asset): Result = if (traderZoneIDs contains zoneID) {
@@ -1009,13 +1008,13 @@ class ComponentViewController @Inject()(
 
   def zoneViewTradeRoomFinancialAndChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.zoneViewTradeRoomFinancialAndChecks(negotiationID)))
+      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancialAndChecks(negotiationID)))
   }
 
   def zoneViewTradeRoomFinancial(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       //TODO: show correct FINANCIALS after orderTable
-      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancial(0,0,0)))
+      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancial(0, 0, 0)))
   }
 
   def zoneViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -1026,12 +1025,14 @@ class ComponentViewController @Inject()(
   def zoneOrderActions(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
-      def traders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getResult(zoneID: String, traders: Seq[Trader],negotiation: Negotiation): Future[Result] = {
-        if(traders.map(_.zoneID) contains zoneID){
+      def traders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+      def getResult(zoneID: String, traders: Seq[Trader], negotiation: Negotiation): Future[Result] = {
+        if (traders.map(_.zoneID) contains zoneID) {
           def asset(assetID: String) = masterAssets.Service.tryGet(assetID)
+
           for {
             asset <- asset(negotiation.assetID)
           } yield Ok(views.html.component.master.zoneViewOrderActions(zoneID, traders, negotiation, asset))
@@ -1039,10 +1040,11 @@ class ComponentViewController @Inject()(
           Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
-      (for{
-       zoneID <- zoneID
-       negotiation <- negotiation
-       traders <- traders(Seq( negotiation.buyerTraderID, negotiation.sellerTraderID))
+
+      (for {
+        zoneID <- zoneID
+        negotiation <- negotiation
+        traders <- traders(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
         result <- getResult(zoneID, traders, negotiation)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))

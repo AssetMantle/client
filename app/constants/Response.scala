@@ -17,8 +17,14 @@ object Response {
   val KEY_ORDER_ID = "order_id"
   val KEY_EXECUTED = "executed"
   val NULL_POINTER_EXCEPTION = new Failure("NULL_POINTER_EXCEPTION")
+  val INVALID_FILE_PATH_EXCEPTION = new Failure("INVALID_FILE_PATH_EXCEPTION")
+  val FILE_SECURITY_EXCEPTION = new Failure("FILE_SECURITY_EXCEPTION")
   val GENERIC_EXCEPTION = new Failure("GENERIC_EXCEPTION")
   val I_O_EXCEPTION = new Failure("I_O_EXCEPTION")
+  val FILE_NOT_FOUND_EXCEPTION = new Failure("FILE_NOT_FOUND_EXCEPTION")
+  val FILE_ILLEGAL_ARGUMENT_EXCEPTION = new Failure("FILE_ILLEGAL_ARGUMENT_EXCEPTION")
+  val CLASS_CAST_EXCEPTION = new Failure("CLASS_CAST_EXCEPTION")
+  val FILE_UNSUPPORTED_OPERATION_EXCEPTION = new Failure("FILE_UNSUPPORTED_OPERATION_EXCEPTION")
 
   //Success- for telling if something is done and the further steps opened up because of it
   val SUCCESS = new Success("SUCCESS")

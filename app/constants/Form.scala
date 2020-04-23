@@ -52,21 +52,15 @@ object Form {
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
   //ChangeBuyerBidController
-  val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid(), routes.javascript.ChangeBuyerBidController.changeBuyerBidForm)
   val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid(), routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm)
 
   //ChangeSellerBidController
-  val CHANGE_SELLER_BID = new Form("CHANGE_SELLER_BID", routes.ChangeSellerBidController.changeSellerBid(), routes.javascript.ChangeSellerBidController.changeSellerBidForm)
   val BLOCKCHAIN_CHANGE_SELLER_BID = new Form("BLOCKCHAIN_CHANGE_SELLER_BID", routes.ChangeSellerBidController.blockchainChangeSellerBid(), routes.javascript.ChangeSellerBidController.blockchainChangeSellerBidForm)
 
   //ConfirmBuyerBidController
-  val CONFIRM_BUYER_BID = new Form("CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.confirmBuyerBid(), routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm)
-  val CONFIRM_BUYER_BID_DETAIL = new Form("CONFIRM_BUYER_BID_DETAIL", routes.ConfirmBuyerBidController.confirmBuyerBidDetail(), routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm)
   val BLOCKCHAIN_CONFIRM_BUYER_BID = new Form("BLOCKCHAIN_CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid(), routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm)
 
   //ConfirmSellerBidController
-  val CONFIRM_SELLER_BID = new Form("CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.confirmSellerBid(), routes.javascript.ConfirmSellerBidController.confirmSellerBidForm)
-  val CONFIRM_SELLER_BID_DETAIL = new Form("CONFIRM_SELLER_BID_DETAIL", routes.ConfirmSellerBidController.confirmSellerBidDetail(), routes.javascript.ConfirmSellerBidController.confirmSellerBidDetailForm)
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid(), routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm)
 
   //ChatController
@@ -79,14 +73,8 @@ object Form {
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber(), routes.javascript.ContactController.verifyMobileNumberForm)
 
   //IssueAssetController
-  val ISSUE_ASSET_REQUEST = new Form("ISSUE_ASSET_REQUEST", routes.IssueAssetController.issueAssetRequest(), routes.javascript.IssueAssetController.issueAssetRequestForm)
-  val ISSUE_ASSET_DETAIL = new Form("ISSUE_ASSET_DETAIL", routes.IssueAssetController.issueAssetDetail(), routes.javascript.IssueAssetController.issueAssetDetailForm)
-  val ISSUE_ASSET_OBL = new Form("ISSUE_ASSET_OBL", routes.IssueAssetController.issueAssetOBL(), routes.javascript.IssueAssetController.issueAssetOBLForm)
-  val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice(), routes.javascript.IssueAssetController.issueAssetInvoiceForm)
-  val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest(), routes.javascript.IssueAssetController.rejectIssueAssetRequestForm)
   val ZONE_ISSUE_ASSET = new Form("ZONE_ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
-  val UPDATE_ASSET_DOCUMENT_STATUS = new Form("UPDATE_ASSET_DOCUMENT_STATUS", routes.IssueAssetController.updateAssetDocumentStatus(), routes.javascript.IssueAssetController.updateAssetDocumentStatusForm)
 
   //IssueFiatController
   val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect(), routes.javascript.IssueFiatController.issueFiatRequestForm)
