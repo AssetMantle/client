@@ -83,7 +83,7 @@ class SetACLController @Inject()(
 
               def sendEmailAndGetResult(organization: Organization): Future[Result] = {
                 utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
-                withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+                withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_INVITATION_EMAIL_SENT)))
               }
 
               for {

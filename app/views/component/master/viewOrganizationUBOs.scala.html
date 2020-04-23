@@ -4,7 +4,7 @@
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.UBOS) {
+@commonCard(constants.View.UBOS_DETAILS) {
     @if(organization.ubos.data.nonEmpty) {
         <button type="button" class="cmuk-button cmuk-button-small cmuk-button-link" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addUBOForm())">
         <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>@Messages(constants.Form.ADD_UBO.legend)</button>
