@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AddOrUpdateMobileNumber
+
+@(addOrUpdateMobileNumber: Form[AddOrUpdateMobileNumber.Data] = AddOrUpdateMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER, addOrUpdateMobileNumber) {
+    <div class="mobileNumberUpdate cmuk-flex">
+        <div class="countryCode hiddenLabel">
+            @commonSelect(addOrUpdateMobileNumber, constants.FormField.COUNTRY_CODE)
+        </div>
+        <div class="mobileNumber">
+        @commonInputText(addOrUpdateMobileNumber, constants.FormField.MOBILE_NUMBER)
+        </div>
+    </div>
+}

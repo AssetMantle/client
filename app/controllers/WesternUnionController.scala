@@ -6,7 +6,7 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Contacts, Organization, Organizations, Traders}
+import models.master.{Emails, Organization, Organizations, Traders}
 import models.masterTransaction
 import models.masterTransaction.IssueFiatRequests
 import play.api.i18n.I18nSupport
@@ -25,7 +25,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
                                        issueFiatRequests: IssueFiatRequests,
                                        organizations: Organizations,
                                        traders: Traders,
-                                       contacts: Contacts)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                       emailAddresses: Emails)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
 
   private val rtcbSecretKey = configuration.get[String]("westernUnion.rtcbSecretKey")
@@ -74,7 +74,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         issueFiatRequestData => {
           val create = issueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
           val traderDetails = traders.Service.tryGetByAccountID(loginState.username)
-          val emailAddress = contacts.Service.tryGetVerifiedEmailAddress(loginState.username)
+          val emailAddress = emailAddresses.Service.tryGetVerifiedEmailAddress(loginState.username)
 
           def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.tryGet(organizationID)
 

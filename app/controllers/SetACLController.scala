@@ -6,7 +6,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Contact, Identification, Organization, Trader, TraderKYC}
+import models.master.{Identification, Organization, Trader, TraderKYC}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
@@ -20,7 +20,7 @@ class SetACLController @Inject()(
                                   withTraderLoginAction: WithTraderLoginAction,
                                   transaction: utilities.Transaction,
                                   masterTransactionTraderInvitations: masterTransaction.TraderInvitations,
-                                  masterContacts: master.Contacts,
+                                  masterEmails: master.Emails,
                                   fileResourceManager: utilities.FileResourceManager,
                                   blockchainAccounts: blockchain.Accounts,
                                   masterZones: master.Zones,
@@ -64,17 +64,16 @@ class SetACLController @Inject()(
         },
         inviteTraderData => {
 
-          val contact: Future[Option[Contact]] = masterContacts.Service.getContactByEmail(inviteTraderData.emailAddress)
+          val emailAddressAccount: Future[Option[String]] = masterEmails.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
 
-          def inviteeUserType(contact: Option[Contact]): Future[String] = if (contact.isDefined) {
-            masterAccounts.Service.getUserType(contact.get.id)
-          } else {
-            Future(constants.User.USER)
+          def inviteeUserType(emailAddressAccount: Option[String]): Future[String] = emailAddressAccount match {
+            case Some(emailAddressAccount) => masterAccounts.Service.getUserType(emailAddressAccount)
+            case None => Future(constants.User.USER)
           }
 
           def createSendInvitationAndGetResult(inviteeUserType: String): Future[Result] = {
             if (inviteeUserType != constants.User.USER) {
-              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE))))
+              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_TAKEN))))
             } else {
 
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
@@ -82,7 +81,7 @@ class SetACLController @Inject()(
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
               def sendEmailAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
                 withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
               }
 
@@ -97,8 +96,8 @@ class SetACLController @Inject()(
           }
 
           (for {
-            contact <- contact
-            inviteeUserType <- inviteeUserType(contact)
+            emailAddressAccount <- emailAddressAccount
+            inviteeUserType <- inviteeUserType(emailAddressAccount)
             result <- createSendInvitationAndGetResult(inviteeUserType)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -134,7 +133,7 @@ class SetACLController @Inject()(
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
@@ -327,7 +326,7 @@ class SetACLController @Inject()(
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = traderOrganization.id, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
