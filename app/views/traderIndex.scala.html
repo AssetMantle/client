@@ -2,6 +2,7 @@
 @import models.master.{Organization, Zone}
 @import views.html.base.common
 @import views.html.base.commonCard
+@import views.html.base.commonFormButton
 @(totalFiat: Int, zone: Zone, organization: Organization, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
@@ -52,10 +53,12 @@
                 @loginState.acl match {
                     case Some(acl) => {
                         @if(acl.issueFiat) {
-                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>
+@*                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>*@
+                            @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST)
                         }
                         @if(acl.redeemFiat) {
-                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.username'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>
+@*                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.username'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>*@
+                            @commonFormButton(constants.Form.REDEEM_FIAT,'parameters -> s"'${loginState.username}'")
                         }
                     }
                     case _ => {}

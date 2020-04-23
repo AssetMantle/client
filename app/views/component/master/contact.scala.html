@@ -6,7 +6,8 @@
 
 @commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
     @if(userContact.isDefined) {
-        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small buttonUpdate" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.View.UPDATE_CONTACT)</button>
+@*        <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small buttonUpdate" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.View.UPDATE_CONTACT)</button>*@
+        @commonModalButton(constants.View.UPDATE_CONTACT,routes.javascript.ContactController.updateContactForm)
     }
 } {
     @userContact match {
@@ -17,7 +18,8 @@
                     @if(contact.emailAddressVerified) {
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
-                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
+@*                        <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>*@
+                        @commonFormButton(constants.Form.VERIFY_EMAIL_ADDRESS)
                     }
 
                 </div>
@@ -29,6 +31,7 @@
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
                         <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
+                        @commonFormButton(constants.Form.VERIFY_MOBILE_NUMBER)
                     }
                 </div>
             }

@@ -10,5 +10,6 @@
     @userViewTrader(trader = trader, organization = organization, traderKYCs = traderKYCs)
     <br>
     @commonCheckbox(userReviewAddTraderRequestForm, constants.FormField.COMPLETION)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadOrUpdateTraderKYCView())">@Messages(constants.View.BACK)</button>
+@*    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadOrUpdateTraderKYCView())">@Messages(constants.View.BACK)</button>*@
+    @commonModalButton(constants.View.BACK,routes.javascript.SetACLController.userUploadOrUpdateTraderKYCView)
 }

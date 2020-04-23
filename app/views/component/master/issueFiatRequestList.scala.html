@@ -13,8 +13,10 @@
                 @commonTextInfo(constants.View.ACCOUNT_ID, issueFiatRequest.accountID)
                 @commonTextInfo(constants.Form.TRANSACTION_ID, issueFiatRequest.transactionID)
                 @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, issueFiatRequest.transactionAmount.toString)
-                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
-                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+@*                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>*@
+               @commonFormButton(constants.Form.ISSUE_FIAT,'parameters -> s"'${issueFiatRequest.id}','${issueFiatRequest.accountID}','${issueFiatRequest.transactionID}','${issueFiatRequest.transactionAmount}'")
+@*                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>*@
+                @commonFormButton(constants.Form.REJECT_ISSUE_FIAT_REQUEST,'parameters -> s"'${issueFiatRequest.id}'")
             </div>
         }
 

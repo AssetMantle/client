@@ -7,7 +7,8 @@
 
 <div class="centerText">
     <div id='@Seq("upload", constants.File.INVOICE).mkString("")'>
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
+@*        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>*@
+        @commonModalButton(constants.File.INVOICE,routes.javascript.FileController.uploadTraderAssetForm,'parameters -> s"'${constants.File.INVOICE}','${issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)}'")
     </div>
     @file match {
         case Some(fileView) => {
@@ -16,7 +17,8 @@
             } {
                 <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
             } {
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+@*                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>*@
+                @commonModalButton(constants.Form.UPDATE,routes.javascript.FileController.updateTraderAssetForm,'parameters -> s"'${fileView.documentType}','${fileView.id}'")
                 <script>hideElement('@Seq("upload", fileView.documentType).mkString("")')</script>
             }
         }

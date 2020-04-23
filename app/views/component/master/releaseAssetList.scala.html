@@ -9,7 +9,8 @@
    }{
        @commonTextInfo(constants.Form.OWNER_ADDRESS, releaseAsset.ownerAddress)
        @commonTextInfo(constants.Form.PEG_HASH, releaseAsset.pegHash)
-       <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
+@*       <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>*@
+       @commonFormButton(constants.Form.RELEASE_ASSET)
    }
    </div>
 }

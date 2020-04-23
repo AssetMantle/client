@@ -6,7 +6,8 @@
 
 @commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
     @if(organizationBankAccountDetail.isDefined) {
-        <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT.legend)</button>
+@*        <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT.legend)</button>*@
+        @commonFormButton(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT)
     }
 } {
     @organizationBankAccountDetail match {
@@ -22,7 +23,8 @@
         }
         case _ => {
             <div class="cmuk-position-center">
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT.legend)</button>
+@*                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm())">@Messages(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT.legend)</button>*@
+                @commonFormButton(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT)
             </div>
         }
     }

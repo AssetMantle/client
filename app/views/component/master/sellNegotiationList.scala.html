@@ -18,10 +18,12 @@
                         @loginState.acl match {
                             case Some(acl) => {
                                 @if(acl.changeSellerBid) {
-                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+@*                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>*@
+                                    @commonModalButton(constants.Form.NEGOTIATE,routes.javascript.ChangeSellerBidController.changeSellerBidForm,'parameters -> s"'${negotiation.buyerAddress}','${negotiation.assetPegHash}'")
                                 } <br>
                                 @if(acl.confirmSellerBid) {
-                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidDetailForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+@*                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidDetailForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>*@
+                                    @commonModalButton(constants.Form.ACCEPT_OFFER,routes.javascript.ConfirmSellerBidController.confirmSellerBidDetailForm,'parameters -> s"'${negotiation.buyerAddress}','${negotiation.assetPegHash}','${negotiation.bid}'")
                                 } <br>
                             }
                             case _ => {}
@@ -31,7 +33,8 @@
                         @loginState.acl match {
                             case Some(acl) => {
                                 @if(acl.sendAsset) {
-                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET.legend)</button>
+@*                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET.legend)</button>*@
+                                    @commonFormButton(constants.Form.SEND_ASSET)
                                 } <br>
                             }
                             case _ => {}

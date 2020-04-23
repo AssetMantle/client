@@ -18,8 +18,10 @@
                     @commonIntInfo(constants.Form.ASSET_PRICE, assetRequest.price)
                     @commonBooleanInfo(constants.Form.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
-                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@assetRequest.id'))">@Messages(constants.Form.APPROVE)</button>
-                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+@*                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@assetRequest.id'))">@Messages(constants.Form.APPROVE)</button>*@
+                    @commonModalButton(constants.Form.APPROVE,routes.javascript.IssueAssetController.issueAssetForm,'parameters -> s"'${assetRequest.id}'")
+@*                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>*@
+@*//                    @commonModalButtonButton(constants.Form.REJECT,routes.javascript.IssueAssetController.rejectAss,'parameters -> s"'${assetRequest.id}'")*@
                     <div id = "assetDocuments@assetRequest.id">
                         <script>componentResource('assetDocuments@assetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@assetRequest.id'))</script>
                     </div>
