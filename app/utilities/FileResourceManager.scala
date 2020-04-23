@@ -69,7 +69,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderNegotiationInsurancePath: String = configuration.get[String]("upload.negotiation.insurance")
 
-  private val uploadTraderNegotiationOtherPath: String = configuration.get[String]("upload.negotiation.other")
+  private val uploadTraderNegotiationBillOfExchangePath: String = configuration.get[String]("upload.negotiation.billOfExchange")
 
   private val uploadTraderNegotiationContractPath: String = configuration.get[String]("upload.negotiation.contract")
 
@@ -149,7 +149,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
       case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
       case constants.File.INSURANCE => uploadTraderNegotiationInsurancePath
-      case constants.File.OTHER => uploadTraderNegotiationOtherPath
+      case constants.File.BILL_OF_EXCHANGE => uploadTraderNegotiationBillOfExchangePath
       case constants.File.CONTRACT => uploadTraderNegotiationContractPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }

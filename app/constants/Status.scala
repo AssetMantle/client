@@ -61,4 +61,10 @@ object Status {
     val APPROVED = "APPROVED"
   }
 
+  object DocuSignEnvelopeStatus{
+    val CREATED="created"
+    val SENT="Send"
+    val SIGNING_COMPLETE="signing_complete"
+  }
+
 }

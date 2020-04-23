@@ -200,6 +200,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ContactController.updateContactForm,
         routes.javascript.ContactController.contact,
 
+        routes.javascript.DocusignController.embeddedSending,
+        routes.javascript.DocusignController.embeddedSigning,
+
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
         routes.javascript.FileController.storeAccountFile,

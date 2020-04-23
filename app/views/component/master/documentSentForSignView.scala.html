@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.Chat
+
+@(status:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+@status match{
+    case constants.Status.DocuSignEnvelopeStatus.SENT=>{
+        @Messages("document sent for signature")
+    }
+    case constants.Status.DocuSignEnvelopeStatus.SIGNING_COMPLETE=>{
+        @Messages("document signing complete")
+    }
+    case _=>{ @Messages("dhdghfgnf")}
+}
+

@@ -83,7 +83,11 @@
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
             </div>
             <div class="sellerTerm">
-                @negotiation.documentList.documents.map { document =>
+                @negotiation.documentList.assetDocuments.map { document =>
+                    @document
+                    <br>
+                }
+                @negotiation.documentList.negotiationDocuments.map { document =>
                     @document
                     <br>
                 }

@@ -97,6 +97,7 @@ object FileOperations {
       val bytes = new Array[Byte](file.length.asInstanceOf[Int])
       fileInputStreamReader.read(bytes)
       fileInputStreamReader.close()
+      println("byteArray---"+bytes.toList)
       bytes
     } catch {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)

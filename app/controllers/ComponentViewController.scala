@@ -30,6 +30,7 @@ class ComponentViewController @Inject()(
                                          masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                         masterTransactionDocusigns: masterTransaction.Docusigns,
                                          masterNegotiations: master.Negotiations,
                                          masterAccounts: master.Accounts,
                                          masterAccountFiles: master.AccountFiles,
@@ -1103,8 +1104,8 @@ class ComponentViewController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
-
-      def getResult(traderID: String, negotiation: Negotiation) = {
+      val envelopeStatus = masterTransactionDocusigns.Service.getEnvelopeStatus(id)
+      def getResult(traderID: String, negotiation: Negotiation,envelopeStatus:Option[String]) = {
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(id)
           val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
@@ -1112,7 +1113,10 @@ class ComponentViewController @Inject()(
           for {
             negotiationFiles <- negotiationFiles
             assetFiles <- assetFiles
-          } yield Ok(views.html.component.master.traderViewNegotiationFileList(id = id, negotiation = negotiation, assetFiles = assetFiles, negotiationFiles = negotiationFiles))
+          } yield {
+            println(envelopeStatus)
+            Ok(views.html.component.master.traderViewNegotiationFileList(id = id, traderID=traderID,negotiation = negotiation, assetFiles = assetFiles, negotiationFiles = negotiationFiles,envelopeStatus=envelopeStatus))
+          }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1121,7 +1125,8 @@ class ComponentViewController @Inject()(
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(traderID, negotiation)
+        envelopeStatus<-envelopeStatus
+        result <- getResult(traderID, negotiation,envelopeStatus)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))

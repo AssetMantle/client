@@ -6,6 +6,10 @@ GET         /javascriptRoutes                                                   
 
 GET         /firebase-messaging-sw.js                                                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
+GET         /docusign                                                                       controllers.DocusignController.embeddedSending(id:String, documentType: String)
+GET         /docusign/sign                                                                  controllers.DocusignController.embeddedSigning(id:String)
+GET         /docusignReturn                                                                 controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
+
 GET         /blockExplorer/lastBlockHeight                                                  controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                                     controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
 GET         /blockExplorer/stakingValidators                                                controllers.BlockExplorerController.stakingValidators

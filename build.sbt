@@ -53,3 +53,11 @@ libraryDependencies += "commons-codec" % "commons-codec" % "1.14"
 libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "1.1.2"
 
 libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.65"
+
+libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar"))
+
+libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.5.0-RC1"
+
+libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19"
+
+libraryDependencies += "org.glassfish.jersey.core" % "jersey-common" % "2.2"

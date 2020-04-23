@@ -129,7 +129,9 @@ class ViewController @Inject()(
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.tradeRoom(id))
-      } yield result).recover {
+      } yield {
+        result
+      }).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
