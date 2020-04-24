@@ -23,6 +23,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
                                 masterAssets: master.Assets,
                                 masterNegotiations: master.Negotiations,
                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                 withZoneLoginAction: WithZoneLoginAction,
                                 withTraderLoginAction: WithTraderLoginAction,
@@ -152,14 +153,22 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
 
   def moderatedSellerExecuteForm(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val negotiationID = masterNegotiations.Service.tryGetNegotiationIDByID(id)
-      val awbProofDocuments = masterTransactionNegotiationFiles.Service.getDocuments(id = id, Seq(constants.File.AWB_PROOF))
+      val negotiation = masterNegotiations.Service.tryGet(id)
+      val billOfLading = masterTransactionAssetFiles.Service.tryGet(id = id, documentType = constants.File.BILL_OF_LADING)
 
-      def negotiation(negotiationID: String): Future[Negotiation] = blockchainNegotiations.Service.get(negotiationID)
+      def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+
+      def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
+
+      def getResult(buyerAccountID: String, sellerAccountID: String, asset: Asset, fiatProof: String): Future[Result] = {
+        if (asset.status == constants.Status.Asset.ISSUED) {
+          withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(buyerAccountID = buyerAccountID, sellerAccountID = sellerAccountID, assetID = asset.id, gas = 0, password = "")), fiatProof = fiatProof))
+        } else throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
 
       (for {
-        negotiationID <- negotiationID
-        awbProofDocuments <- awbProofDocuments
+        negotiation <- negotiation
+        billOfLading <- billOfLading
         negotiation <- negotiation(negotiationID)
         result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form.fill(views.companion.master.ModeratedSellerExecuteOrder.Data(buyerAddress = negotiation.buyerAddress, sellerAddress = negotiation.sellerAddress, awbProofHash = utilities.FileOperations.getDocumentsHash(awbProofDocuments: _*), pegHash = negotiation.assetPegHash, gas = 0, password = "")), awbProofDocuments))
       } yield result
@@ -208,11 +217,11 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
       )
   }
 
-  def blockchainBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainBuyerExecuteForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.buyerExecuteOrder())
   }
 
-  def blockchainBuyerExecuteOrder: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainBuyerExecute: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.BuyerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.buyerExecuteOrder(formWithErrors)))
@@ -229,11 +238,11 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     )
   }
 
-  def blockchainSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSellerExecuteForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sellerExecuteOrder())
   }
 
-  def blockchainSellerExecuteOrder: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainSellerExecute: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SellerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors)))

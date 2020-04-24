@@ -513,9 +513,9 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
 
 CREATE TABLE IF NOT EXISTS MASTER."Email"
 (
-    "id"                   VARCHAR NOT NULL,
-    "emailAddress"         VARCHAR NOT NULL,
-    "status" BOOLEAN       NOT NULL,
+    "id"           VARCHAR NOT NULL,
+    "emailAddress" VARCHAR NOT NULL,
+    "status"       BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -535,9 +535,9 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
 
 CREATE TABLE IF NOT EXISTS MASTER."Mobile"
 (
-    "id"                   VARCHAR NOT NULL,
-    "mobileNumber"         VARCHAR NOT NULL,
-    "status" BOOLEAN       NOT NULL,
+    "id"           VARCHAR NOT NULL,
+    "mobileNumber" VARCHAR NOT NULL,
+    "status"       BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -569,6 +569,22 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
     UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Order"
+(
+    "id"                VARCHAR NOT NULL,
+    "buyerTraderID"     VARCHAR NOT NULL,
+    "sellerTraderID"    VARCHAR NOT NULL,
+    "assetID"           VARCHAR NOT NULL,
+    "iouID"             VARCHAR,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
@@ -958,6 +974,14 @@ ALTER TABLE MASTER."Negotiation"
     ADD CONSTRAINT Negotiation_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Negotiation"
     ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterTrader_buyerTraderID FOREIGN KEY ("buyerTraderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
 ALTER TABLE MASTER."Organization"
     ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Organization"
@@ -1074,6 +1098,7 @@ DROP TABLE IF EXISTS MASTER."Email" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
+DROP TABLE IF EXISTS MASTER."Order" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;

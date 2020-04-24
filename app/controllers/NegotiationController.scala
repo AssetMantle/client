@@ -102,7 +102,7 @@ class NegotiationController @Inject()(
             asset.status match {
               case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE => masterNegotiations.Service.createWithIssueAssetPending(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = asset.description, price = asset.price, quantity = asset.quantity, quantityUnit = asset.quantityUnit, assetOtherDetails = asset.otherDetails)
               case constants.Status.Asset.ISSUED | constants.Status.Asset.TRADE_COMPLETED => masterNegotiations.Service.createWithFormIncomplete(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = asset.description, price = asset.price, quantity = asset.quantity, quantityUnit = asset.quantityUnit, assetOtherDetails = asset.otherDetails)
-              case constants.Status.Asset.REJECTED_BY_ZONE | constants.Status.Asset.ISSUE_ASSET_FAILED | constants.Status.Asset.IN_ORDER | constants.Status.Asset.REDEEMED => throw new BaseException(constants.Response.ASSET_PEG_NOT_FOUND)
+              case constants.Status.Asset.REJECTED_BY_ZONE | constants.Status.Asset.ISSUE_ASSET_FAILED | constants.Status.Asset.IN_ORDER | constants.Status.Asset.REDEEMED => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
               case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
           }
@@ -831,8 +831,7 @@ class NegotiationController @Inject()(
         buyerConfirmData => {
           val buyerTraderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(buyerConfirmData.id)
-          //TODO
-          val contract = masterTransactionNegotiationFiles.Service.get(id = buyerConfirmData.id, documentType = constants.File.CONTRACT)
+          val contract = masterTransactionNegotiationFiles.Service.tryGet(id = buyerConfirmData.id, documentType = constants.File.CONTRACT)
 
           def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
@@ -840,16 +839,13 @@ class NegotiationController @Inject()(
 
           def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
 
-          def verifyBuyerAndNegotiation(buyerTraderID: String, negotiation: Negotiation, contract: NegotiationFile): Future[Boolean] = {
+          def sendTransaction(buyerTraderID: String, sellerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (buyerTraderID != negotiation.buyerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (!(negotiation.buyerAcceptedPrice && negotiation.buyerAcceptedQuantity && negotiation.buyerAcceptedAssetDescription && negotiation.buyerAcceptedAssetOtherDetails && negotiation.buyerAcceptedPaymentTerms && negotiation.buyerAcceptedDocumentList)) throw new BaseException(constants.Response.ALL_NEGOTIATION_TERMS_NOT_ACCEPTED)
             if (contract.status.isEmpty) throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
             if (contract.status.getOrElse(false)) throw new BaseException(constants.Response.CONTRACT_REJECTED)
-            Future(true)
-          }
 
-          def sendTransaction(sellerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
-            val contractHash = utilities.FileOperations.combinedHash(Seq(contract))
+            val contractHash = utilities.FileOperations.getDocumentsHash(contract)
 
             transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
               entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(negotiationDefaultTime), pegHash = pegHash, buyerContractHash = contractHash, gas = buyerConfirmData.gas, ticketID = "", mode = transactionMode),
@@ -869,8 +865,7 @@ class NegotiationController @Inject()(
             pegHash <- getPegHash(negotiation.assetID)
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             sellerAddress <- getAddress(sellerAccountID)
-            _ <- verifyBuyerAndNegotiation(buyerTraderID = buyerTraderID, negotiation = negotiation, contract = contract)
-            ticketID <- sendTransaction(sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
+            ticketID <- sendTransaction(buyerTraderID = buyerTraderID, sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)
             _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)
@@ -913,8 +908,7 @@ class NegotiationController @Inject()(
         sellerConfirmData => {
           val sellerTraderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(sellerConfirmData.id)
-          //TODO
-          val contract = masterTransactionNegotiationFiles.Service.get(id = sellerConfirmData.id, documentType = constants.File.CONTRACT)
+          val contract = masterTransactionNegotiationFiles.Service.tryGet(id = sellerConfirmData.id, documentType = constants.File.CONTRACT)
 
           def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
@@ -922,16 +916,12 @@ class NegotiationController @Inject()(
 
           def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
 
-          def verifySellerAndNegotiation(sellerTraderID: String, negotiation: Negotiation, contract: NegotiationFile): Future[Boolean] = {
+          def sendTransaction(sellerTraderID: String, buyerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (sellerTraderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (!(negotiation.buyerAcceptedPrice && negotiation.buyerAcceptedQuantity && negotiation.buyerAcceptedAssetDescription && negotiation.buyerAcceptedAssetOtherDetails && negotiation.buyerAcceptedPaymentTerms && negotiation.buyerAcceptedDocumentList)) throw new BaseException(constants.Response.ALL_NEGOTIATION_TERMS_NOT_ACCEPTED)
             if (contract.status.isEmpty) throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
             if (contract.status.getOrElse(false)) throw new BaseException(constants.Response.CONTRACT_REJECTED)
-            Future(true)
-          }
-
-          def sendTransaction(buyerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
-            val contractHash = utilities.FileOperations.combinedHash(Seq(contract))
+            val contractHash = utilities.FileOperations.getDocumentsHash(contract)
 
             transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
               entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(negotiationDefaultTime), pegHash = pegHash, sellerContractHash = contractHash, gas = sellerConfirmData.gas, ticketID = "", mode = transactionMode),
@@ -951,8 +941,7 @@ class NegotiationController @Inject()(
             pegHash <- getPegHash(negotiation.assetID)
             buyerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
-            _ <- verifySellerAndNegotiation(sellerTraderID = sellerTraderID, negotiation = negotiation, contract = contract)
-            ticketID <- sendTransaction(buyerAddress = buyerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
+            ticketID <- sendTransaction(sellerTraderID = sellerTraderID, buyerAddress = buyerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)

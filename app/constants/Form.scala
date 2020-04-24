@@ -100,9 +100,9 @@ object Form {
   //OrderController
   val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecute(), routes.javascript.OrderController.buyerExecuteForm)
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
-  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecute(), routes.javascript.OrderController.blockchainBuyerExecuteForm)
   val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecute(), routes.javascript.OrderController.sellerExecuteForm)
   val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecute(), routes.javascript.OrderController.moderatedSellerExecuteForm)
+  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecute(), routes.javascript.OrderController.blockchainBuyerExecuteForm)
   val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecute(), routes.javascript.OrderController.blockchainSellerExecuteForm)
 
   //RedeemAssetController

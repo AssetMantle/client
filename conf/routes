@@ -55,6 +55,20 @@ POST        /account/userReviewIdentification                                   
 GET         /asset/issue                                                                    controllers.AssetController.issueForm
 POST        /asset/issue                                                                    controllers.AssetController.issue
 
+GET         /contact                                                                        controllers.ContactController.contact
+
+GET         /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddressForm
+POST        /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddress
+
+GET         /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumberForm
+POST        /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumber
+
+GET         /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddressForm
+POST        /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddress
+
+GET         /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumberForm
+POST        /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumber
+
 GET         /negotiation/request                                                            controllers.NegotiationController.requestForm
 POST        /negotiation/request                                                            controllers.NegotiationController.request
 
@@ -88,21 +102,13 @@ POST        /negotiation/updateDocumentList                                     
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
+GET         /negotiation/buyerConfirm                                                       controllers.NegotiationController.buyerConfirmForm(id: String)
+POST        /negotiation/buyerConfirm                                                       controllers.NegotiationController.buyerConfirm
+
+GET         /negotiation/sellerConfirm                                                      controllers.NegotiationController.sellerConfirmForm(id: String)
+POST        /negotiation/sellerConfirm                                                      controllers.NegotiationController.sellerConfirm
+
 GET         /negotiation/tradeActivityMessages                                              controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
-
-GET         /contact                                                                        controllers.ContactController.contact
-
-GET         /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddressForm
-POST        /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddress
-
-GET         /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumberForm
-POST        /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumber
-
-GET         /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddressForm
-POST        /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddress
-
-GET         /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumberForm
-POST        /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumber
 
 GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequest
