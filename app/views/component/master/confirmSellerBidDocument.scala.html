@@ -7,7 +7,8 @@
 <div class="centerText">
     <h4>@Messages(constants.View.CONFIRM_SELLER_BID)</h4>
         <div id="upload@documentType">
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@negotiationID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@negotiationID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
+            @commonModalButton(constants.Form.UPLOAD,routes.javascript.FileController.uploadTraderNegotiationForm,'parameters -> s"'${documentType}','${negotiationID}'")
         </div>
     @negotiationFile match {
         case Some(file) => {
