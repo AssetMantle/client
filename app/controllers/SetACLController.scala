@@ -267,7 +267,7 @@ class SetACLController @Inject()(
 
       def getResult(trader: Trader): Future[Result] = {
         val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-        val zone = masterZones.Service.get(trader.zoneID)
+        val zone = masterZones.Service.tryGet(trader.zoneID)
         val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
         for {
           organization <- organization
@@ -294,7 +294,7 @@ class SetACLController @Inject()(
 
           def getResult(trader: Trader): Future[Result] = {
             val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-            val zone = masterZones.Service.get(trader.zoneID)
+            val zone = masterZones.Service.tryGet(trader.zoneID)
             val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
             for {
               organization <- organization
@@ -330,21 +330,17 @@ class SetACLController @Inject()(
                 Future(0)
               }
 
-              def getResult(traderOrganization: Organization, trader: Trader): Future[Result] = {
-                withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
-              }
-
               for {
                 _ <- markTraderFormCompleted
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
                 _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_USER_ADDED_OR_UPDATED_TRADER_REQUEST, trader.name)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_ADDED_OR_UPDATED_TRADER_REQUEST, traderOrganization.name, traderOrganization.id)
-                result <- getResult(traderOrganization, trader)
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
 
-              val zone = masterZones.Service.get(trader.zoneID)
+              val zone = masterZones.Service.tryGet(trader.zoneID)
               val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
 
               for {
