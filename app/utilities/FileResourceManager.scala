@@ -67,9 +67,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
 
-  private val uploadTraderNegotiationInsurancePath: String = configuration.get[String]("upload.negotiation.insurance")
-
-  private val uploadTraderNegotiationOtherPath: String = configuration.get[String]("upload.negotiation.other")
+  private val uploadTraderNegotiationBillOfExchangePath: String = configuration.get[String]("upload.negotiation.billOfExchange")
 
   private val uploadTraderNegotiationContractPath: String = configuration.get[String]("upload.negotiation.contract")
 
@@ -148,8 +146,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
       case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
-      case constants.File.INSURANCE => uploadTraderNegotiationInsurancePath
-      case constants.File.OTHER => uploadTraderNegotiationOtherPath
+      case constants.File.BILL_OF_EXCHANGE => uploadTraderNegotiationBillOfExchangePath
       case constants.File.CONTRACT => uploadTraderNegotiationContractPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
@@ -170,7 +167,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
+  def storeFile[T <: Document[T]](name: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -196,7 +193,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
+  def updateFile[T <: Document[T]](name: String, path: String, oldDocument: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -206,13 +203,13 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       }
     }
 
-    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64))
 
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64
       _ <- update(fileName, encodedBase64)
     } yield {
-      utilities.FileOperations.deleteFile(path, oldDocumentFileName)
+      utilities.FileOperations.deleteFile(path, oldDocument.fileName)
       utilities.FileOperations.renameFile(path, name, fileName)
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)

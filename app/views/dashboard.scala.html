@@ -22,8 +22,7 @@
         }
     </script>
 }
-
-@center = {
+@center={
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.ZONE => {
@@ -60,17 +59,17 @@
                 <div class="cmuk-width-expand@@m">
                     <div id="organizationTradeStatistics"></div>
                 </div>
-                <div class="tradeList cmuk-margin-bottom">
+                <div>
                     <div id="organizationViewAcceptedNegotiationList"></div>
                 </div>
-
-                <div class="salesQuoteList">
+                <div>
                     <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
                 </div>
+            </div>
             <script>
-                 componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
-                 componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
-                 componentResource('organizationTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationTradeStatistics());
+                componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
+                componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
+                componentResource('organizationTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationTradeStatistics());
             </script>
         }
         case constants.User.TRADER => {
@@ -79,21 +78,10 @@
                 <div class="cmuk-width-expand@@m">
                     <div id="traderTradeStatistics"></div>
                 </div>
-                <div class="tradeList cmuk-margin-bottom">
-                    <div id="traderViewAcceptedNegotiationList"></div>
-                </div>
-
-                <div class="salesQuoteList">
-                    <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
-                </div>
-
 
             </div>
             <script>
                     componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
-                    componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
-                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
-
             </script>
         }
         case constants.User.USER => {}

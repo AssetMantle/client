@@ -9,10 +9,10 @@
     case Some(file)=> {
         @utilities.FileOperations.fileExtensionFromName(file.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-                <img src="@routes.FileController.tradingFile(id, file.fileName, file.documentType)">
+                <img src="@routes.FileController.tradingFile(id, file.fileName, file.documentType)" width="600" height="800">
             }
             case _ => {
-                <iframe src="@routes.FileController.tradingFile(id, file.fileName, file.documentType)"></iframe>
+                <iframe src="@routes.FileController.tradingFile(id, file.fileName, file.documentType)" width="600" height="800"></iframe>
             }
         }
     }

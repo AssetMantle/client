@@ -96,6 +96,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def getZoneIDsByIDs(ids: Seq[String]): Future[Seq[String]] = db.run(traderTable.filter(_.id inSet ids).map(_.zoneID).result)
 
+  private def getOrganizationIDsByIDs(ids: Seq[String]): Future[Seq[String]] = db.run(traderTable.filter(_.id inSet ids).map(_.organizationID).result)
+
   private def getOrganizationIDByID(id: String): Future[String] = db.run(traderTable.filter(_.id === id).map(_.organizationID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -145,6 +147,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   private def getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
 
   private def getTradersByTraderIDs(traderIDs: Seq[String]): Future[Seq[Trader]] = db.run(traderTable.filter(_.id inSet traderIDs).result)
+
+  private def findTradersByZoneID(zoneID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).result)
 
   private def findTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = db.run(traderTable.filter(_.zoneID === zoneID).map(_.id).result)
 
@@ -222,6 +226,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def tryGetZoneIDs(ids: Seq[String]): Future[Seq[String]] = getZoneIDsByIDs(ids)
 
+    def tryGetOrganizationIDs(ids: Seq[String]): Future[Seq[String]] = getOrganizationIDsByIDs(ids)
+
     def tryGetOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
 
     def tryGetTraderName(id: String): Future[String] = getTraderNameByID(id)
@@ -261,6 +267,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def getOrNoneByAccountID(accountID: String): Future[Option[Trader]] = getTraderOrNoneByAccountID(accountID)
 
     def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = getTradersByTraderIDs(traderIDs)
+
+    def getTradersByZoneID(zoneID: String): Future[Seq[Trader]] = findTradersByZoneID(zoneID)
 
     def getTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = findTraderIDsByZoneID(zoneID)
 

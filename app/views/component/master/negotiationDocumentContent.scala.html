@@ -2,28 +2,12 @@
 @import views.html.base._
 @import models.masterTransaction.NegotiationFile
 @import models.common.Serializable
-@import models.Trait.DocumentContent
-@(documentType:String, documentContent: Option[DocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.Abstract.NegotiationDocumentContent
+@(documentType:String, documentContent: Option[NegotiationDocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @documentContent match {
     case Some(content)=> {
         @documentType match {
-            case constants.File.OBL => {
-                @Messages(constants.File.OBL) :
-                @defining(content.asInstanceOf[Serializable.OBL]){oblDetails=>
-                    @commonTextInfo(constants.Form.BILL_OF_LADING_NUMBER, oblDetails.billOfLadingID)
-                    @commonTextInfo(constants.Form.PORT_OF_LOADING, oblDetails.portOfLoading)
-                    @commonTextInfo(constants.Form.SHIPPER_NAME, oblDetails.shipperName)
-                    @commonTextInfo(constants.Form.SHIPPER_ADDRESS, oblDetails.shipperAddress)
-                    @commonTextInfo(constants.Form.NOTIFY_PARTY_NAME, oblDetails.notifyPartyName)
-                    @commonTextInfo(constants.Form.NOTIFY_PARTY_ADDRESS, oblDetails.notifyPartyAddress)
-                    @commonDateInfo(constants.Form.SHIPMENT_DATE, oblDetails.dateOfShipping)
-                    @commonTextInfo(constants.Form.DELIVERY_TERM, oblDetails.deliveryTerm)
-                    @commonIntInfo(constants.Form.ASSET_QUANTITY, oblDetails.weightOfConsignment)
-                    @commonIntInfo(constants.Form.ASSET_PRICE, oblDetails.declaredAssetValue)
-
-                }
-            }
             case constants.File.INVOICE => {
                 @Messages(constants.File.INVOICE) :
                 @defining(content.asInstanceOf[Serializable.Invoice]){invoiceDetails=>
