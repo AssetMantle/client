@@ -16,6 +16,7 @@
         }
         </ul>
     </div>
+    @commonFormButton(constants.Form.ISSUE_ASSET)
     @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'readonly -> true)
     <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_COUNTER_PARTY)</div>
     <div class="cmuk-panel cmuk-panel-scrollable">
@@ -25,7 +26,7 @@
         }
         </ul>
     </div>
+    @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
     @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
-    @commonFormButton(constants.Form.ISSUE_ASSET)
 }
 <script src="@routes.Assets.versioned("javascripts/negotiationRequest.js")" type="text/javascript"></script>
