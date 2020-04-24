@@ -9,10 +9,6 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import scala.concurrent.duration._
-import actors.{Create, ShutdownActor}
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
 import play.api.libs.json.{JsString, JsValue, Json, OWrites, Reads, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,7 +17,7 @@ import scala.util.{Failure, Success}
 case class Message(id: String, fromAccountID: String, chatID: String, text: String, replyToID: Option[String], createdAt: Timestamp)
 
 @Singleton
-class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_MESSAGE
   private val logger: Logger = Logger(this.getClass)
@@ -132,7 +128,7 @@ class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getChatIDs(chatID: String): Future[Seq[String]] = findAllChatIDsByChatWindowID(chatID)
 
-    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => actorsCreate.mainActor ! actors.Message.makeCometMessage(x, constants.Comet.CHAT , message))
+    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => actors.Service.cometActor ! actors.Message.makeCometMessage(x, constants.Comet.CHAT, message))
   }
 
 }

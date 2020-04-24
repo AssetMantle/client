@@ -28,7 +28,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 

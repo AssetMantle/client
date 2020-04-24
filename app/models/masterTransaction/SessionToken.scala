@@ -1,10 +1,8 @@
 package models.masterTransaction
 
-import actors.ShutdownActor
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -18,7 +16,7 @@ import scala.util.{Failure, Success}
 case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: Long)
 
 @Singleton
-class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_SESSION_TOKEN
 
@@ -26,7 +24,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private val sessionTokenTimeout: Long = configuration.get[Long]("play.http.session.token.timeout")
 
@@ -117,11 +115,11 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   object Service {
 
     def refresh(id: String): Future[String] = {
-        val sessionToken: String = utilities.IDGenerator.hexadecimal
-        val upsertToken=upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
-        for{
-          _<-upsertToken
-        }yield sessionToken
+      val sessionToken: String = utilities.IDGenerator.hexadecimal
+      val upsertToken = upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
+      for {
+        _ <- upsertToken
+      } yield sessionToken
     }
 
     def tryVerifyingSessionToken(id: String, sessionToken: String): Future[Boolean] = {
@@ -148,13 +146,15 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIDs
 
-    for {
+    (for {
       ids <- ids
     } yield {
       ids.foreach { id =>
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN, id)
+        actors.Service.Comet.shutdownUserActor(id)
       }
       Service.deleteSessionTokens(ids)
+    }).recover {
+      case baseException: BaseException => logger.info(baseException.failure.message)
     }
   }
 }
