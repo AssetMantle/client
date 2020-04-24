@@ -1,6 +1,5 @@
 package controllers
 
-import actors.ShutdownActor
 import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -22,7 +21,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AccountController @Inject()(
                                    utilitiesNotification: utilities.Notification,
-                                   shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
@@ -189,7 +187,7 @@ class AccountController @Inject()(
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           def shutdownActorsAndGetResult = {
-            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN, loginState.username)
+            actors.Service.Comet.shutdownUserActor(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 

@@ -506,6 +506,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     "quantityUnit" VARCHAR NOT NULL,
     "price"        INT     NOT NULL,
     "moderated"    BOOLEAN NOT NULL,
+    "takerID"      VARCHAR,
     "otherDetails" VARCHAR NOT NULL,
     "status"       VARCHAR NOT NULL,
     PRIMARY KEY ("id")
@@ -960,6 +961,8 @@ ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Asset"
     ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
+ALTER TABLE MASTER."Asset"
+    ADD CONSTRAINT Asset_Trader_TakerID FOREIGN KEY ("takerID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Email"
     ADD CONSTRAINT Email_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Mobile"

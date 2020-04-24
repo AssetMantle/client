@@ -1,6 +1,7 @@
 package models.blockchain
 
 import akka.actor.{ActorSystem}
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -17,7 +18,6 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 
 @Singleton
 class Orders @Inject()(
-                        actorsCreate: actors.Create,
                         masterAccounts: master.Accounts,
                         masterNegotiations: master.Negotiations,
                         masterAssets: master.Assets,
@@ -42,7 +42,7 @@ class Orders @Inject()(
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private[models] val orderTable = TableQuery[OrderTable]
 
@@ -241,8 +241,8 @@ class Orders @Inject()(
               _ <- insertOrUpdateOrder(orderResponse)
               (buyerAddressID, sellerAddressID) <- ids(negotiation)
             } yield {
-              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
-              actorsCreate.mainActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAddressID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
             }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

@@ -4,7 +4,7 @@ import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction, 
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Asset, Trader}
+import models.master.{Asset, Trader, Zone}
 import models.masterTransaction.AssetFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -24,11 +24,11 @@ class AssetController @Inject()(
                                  masterAssets: master.Assets,
                                  messagesControllerComponents: MessagesControllerComponents,
                                  withTraderLoginAction: WithTraderLoginAction,
-                                 withLoginAction: WithLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  transaction: utilities.Transaction,
                                  transactionsIssueAsset: transactions.IssueAsset,
                                  utilitiesNotification: utilities.Notification,
+                                 utilitiesTransaction: utilities.Transaction,
                                  withZoneLoginAction: WithZoneLoginAction,
                                  masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                  transactionsReleaseAsset: transactions.ReleaseAsset,
@@ -45,6 +45,61 @@ class AssetController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
+  private val zonePassword = configuration.get[String]("zone.password")
+
+  private val zoneGas = configuration.get[Int]("zone.gas")
+
+  private def issueModeratedAsset(assetID: String): Future[Unit] = {
+    val asset = masterAssets.Service.tryGet(assetID)
+
+    def getTrader(ownerID: String): Future[Trader] = masterTraders.Service.tryGet(ownerID)
+
+    def getZone(zoneID: String): Future[Zone] = masterZones.Service.tryGet(zoneID)
+
+    def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+
+    def getAddress(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
+
+    def getTakerAddress(takerID: Option[String]): Future[String] = {
+      takerID match {
+        case Some(takerID) =>
+          for {
+            takerAccountID <- getAccountID(takerID)
+            takerAddress <- getAddress(takerAccountID)
+          } yield takerAddress
+        case None => Future("")
+      }
+    }
+
+    def sendTransaction(traderAddress: String, zoneAddress: String, takerAddress: String, asset: Asset): Future[String] = utilitiesTransaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+      entity = blockchainTransaction.IssueAsset(from = zoneAddress, to = traderAddress, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, gas = zoneGas, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
+      blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = zoneGas.toString), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity.toString, moderated = true, takerAddress = takerAddress, mode = transactionMode),
+      action = transactionsIssueAsset.Service.post,
+      onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+      onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+      updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+    )
+
+    def markAssetStatusAwaitingBlockchainResponse: Future[Int] = masterAssets.Service.markStatusAwaitingBlockchainResponse(assetID)
+
+    (for {
+      asset <- asset
+      trader <- getTrader(asset.ownerID)
+      zone <- getZone(trader.zoneID)
+      traderAddress <- getAddress(trader.accountID)
+      zoneAddress <- getAddress(zone.accountID)
+      takerAddress <- getTakerAddress(asset.takerID)
+      ticketID <- sendTransaction(traderAddress = traderAddress, zoneAddress = zoneAddress, takerAddress = takerAddress, asset = asset)
+      _ <- markAssetStatusAwaitingBlockchainResponse
+      _ <- utilitiesNotification.send(zone.accountID, constants.Notification.ASSET_ISSUED, ticketID)
+      _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ASSET_ISSUED, ticketID)
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  }
 
   def issueForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueAsset())
@@ -74,7 +129,8 @@ class AssetController @Inject()(
                     val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
                     for {
-                      _ <- addModeratedAsset
+                      assetID <- addModeratedAsset
+                      _ <- issueModeratedAsset(assetID)
                       tradableAssets <- getAllTradableAssets(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
                       counterPartyTraders <- getCounterPartyTraders(counterPartyList)

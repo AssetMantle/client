@@ -1,6 +1,5 @@
 package models.blockchain
 
-import actors.{Create, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import exceptions.BaseException
@@ -21,13 +20,13 @@ import scala.util.{Failure, Success}
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -199,7 +198,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               _ <- insertOrUpdate(ownerAccount)
               accountID <- accountID
             } yield {
-               actorsCreate.mainActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
             }).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
@@ -208,7 +207,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
                   for {
                     _ <- deleteAssetPegWallet
                     id <- id
-                  } yield actorsCreate.mainActor ! actors.Message.makeCometMessage(username = id, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
+                  } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = id, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
                 }
             }
           }
