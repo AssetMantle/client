@@ -20,7 +20,7 @@ case class AddZone(from: String, to: String, zoneID: String, gas: Int, status: O
 }
 
 @Singleton
-class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, utilitiesZoneAutomation: utilities.ZoneAutomation, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -231,5 +231,4 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
     }(schedulerExecutionContext)
   }
 
-  utilitiesZoneAutomation.start()
 }

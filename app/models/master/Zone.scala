@@ -155,11 +155,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       } yield id
     }
 
-    def get(id: String): Future[Zone] = findById(id).map {
-      _.deserialize
-    }
+    def tryGet(id: String): Future[Zone] = findById(id).map(_.deserialize)
 
-    def getOrNone(id: String): Future[Option[Zone]] = findOrNoneByID(id).map(_.map(_.deserialize))
+    def get(id: String): Future[Option[Zone]] = findOrNoneByID(id).map(_.map(_.deserialize))
 
     def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 

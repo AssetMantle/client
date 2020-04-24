@@ -267,7 +267,7 @@ class SetACLController @Inject()(
 
       def getResult(trader: Trader): Future[Result] = {
         val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-        val zone = masterZones.Service.get(trader.zoneID)
+        val zone = masterZones.Service.tryGet(trader.zoneID)
         val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
         for {
           organization <- organization
@@ -294,7 +294,7 @@ class SetACLController @Inject()(
 
           def getResult(trader: Trader): Future[Result] = {
             val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-            val zone = masterZones.Service.get(trader.zoneID)
+            val zone = masterZones.Service.tryGet(trader.zoneID)
             val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
             for {
               organization <- organization
@@ -344,7 +344,7 @@ class SetACLController @Inject()(
               } yield result
             } else {
 
-              val zone = masterZones.Service.get(trader.zoneID)
+              val zone = masterZones.Service.tryGet(trader.zoneID)
               val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
 
               for {

@@ -607,7 +607,7 @@ class ComponentViewController @Inject()(
       val email: Future[Option[Email]] = masterEmails.Service.get(loginState.username)
       val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
-      def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
+      def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.get(organization.get.zoneID) else Future(None)
 
       def getOrganizationOrNoneByTrader(trader: Option[Trader]): Future[Option[Organization]] = if (trader.isDefined) masterOrganizations.Service.getOrNone(trader.get.organizationID) else Future(None)
 
@@ -665,7 +665,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organization: Future[Organization] = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
-      def getZone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
+      def getZone(zoneID: String): Future[Zone] = masterZones.Service.tryGet(zoneID)
 
       def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
