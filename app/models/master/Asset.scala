@@ -52,6 +52,14 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
+  private def tryGetOwnerIDByID(id: String): Future[String] = db.run(assetTable.filter(_.id === id).map(_.ownerID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def findIDByPegHash(pegHash: String): Future[String] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -159,6 +167,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
 
     def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
+
+    def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
 
     def tryGetPegHash(id: String): Future[String] = findPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 

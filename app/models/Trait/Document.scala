@@ -1,6 +1,6 @@
 package models.Trait
 
-trait Document[T]{
+trait Document[T] {
 
   val id: String
 

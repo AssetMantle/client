@@ -72,7 +72,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   object Service {
-    def sendOTP(id: String): Future[String] = {
+    def get(id: String): Future[String] = {
       val otp = (Random.nextInt(899999) + 100000).toString
       val upsertEmailOTP = upsert(EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString))
       for {
@@ -80,7 +80,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       } yield otp
     }
 
-    def verifyOTP(id: String, otp: String) = {
+    def verifyOTP(id: String, otp: String): Future[Boolean] = {
       val emailOTP = findById(id)
       for {
         emailOTP <- emailOTP
