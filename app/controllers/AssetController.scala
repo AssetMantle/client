@@ -81,25 +81,37 @@ class AssetController @Inject()(
                       result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
                     } yield result
                   } else {
-                    val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+                    val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
 
-                    def getTicketID(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                      entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
-                      blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity.toString, moderated = false, takerAddress = "", mode = transactionMode),
-                      action = transactionsIssueAsset.Service.post,
-                      onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                      onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                      updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-                    )
+                    def issueAssetAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+                      val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+
+                      def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+                        entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
+                        blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.price.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity.toString, moderated = false, takerAddress = "", mode = transactionMode),
+                        action = transactionsIssueAsset.Service.post,
+                        onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+                        onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                        updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+                      )
+
+                      for {
+                        documentHash <- addUnmoderatedAsset
+                        ticketID <- sendTransaction(documentHash)
+                        tradableAssets <- getAllTradableAssets(traderID)
+                        counterPartyList <- getCounterPartyList(traderID)
+                        counterPartyTraders <- getCounterPartyTraders(counterPartyList)
+                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                      } yield result
+                    }
+                    else {
+                      Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+                    }
 
                     for {
-                      documentHash <- addUnmoderatedAsset
-                      ticketID <- getTicketID(documentHash)
-                      tradableAssets <- getAllTradableAssets(traderID)
-                      counterPartyList <- getCounterPartyList(traderID)
-                      counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                      validateUsernamePassword <- validateUsernamePassword
+                      result <- issueAssetAndGetResult(validateUsernamePassword)
                     } yield result
                   }
                 }
@@ -135,20 +147,19 @@ class AssetController @Inject()(
         releaseData => {
           val zoneID = masterZones.Service.tryGetID(loginState.username)
           val asset = masterAssets.Service.tryGet(releaseData.assetID)
-          //TODO
-          val billOfLading = masterTransactionAssetFiles.Service.get(id = releaseData.assetID, documentType = constants.File.BILL_OF_LADING)
+          val billOfLading = masterTransactionAssetFiles.Service.tryGet(id = releaseData.assetID, documentType = constants.File.BILL_OF_LADING)
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
+          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
 
           def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
 
           def sendTransaction(seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean): Future[String] = {
             if (seller.zoneID != zoneID || asset.ownerID != seller.id) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
-            if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND)
-            if (billOfLading.status.isDefined && !billOfLading.status.get) throw new BaseException(constants.Response.BILL_OF_LADING_NOT_VERIFIED)
+            if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
+            if (billOfLading.status.isDefined && !billOfLading.status.get) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
             transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
               entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND)), gas = releaseData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,

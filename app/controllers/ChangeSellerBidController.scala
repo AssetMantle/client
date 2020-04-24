@@ -32,37 +32,6 @@ class ChangeSellerBidController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_CHANGE_SELLER_BID
 
-  def changeSellerBidForm(): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changeSellerBid())
-  }
-
-  def changeSellerBid: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.ChangeSellerBid.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.changeSellerBid(formWithErrors)))
-        },
-        changeSellerBidData => {
-          val transactionProcess = transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
-            entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, ticketID = "", mode = transactionMode),
-            blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
-            request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = loginState.address, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = transactionMode),
-            action = transactionsChangeSellerBid.Service.post,
-            onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
-            onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
-            updateTransactionHash = blockchainTransactionChangeSellerBids.Service.updateTransactionHash
-          )
-          (for {
-            _ <- transactionProcess
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
   def blockchainChangeSellerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.changeSellerBid())
   }

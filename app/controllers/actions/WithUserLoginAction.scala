@@ -23,7 +23,7 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
         val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.USER)
-        val address = masterAccounts.Service.getAddress(username)
+        val address = masterAccounts.Service.tryGetAddress(username)
         for {
           _ <- sessionTokenVerify
           _ <- tokenTimeVerify

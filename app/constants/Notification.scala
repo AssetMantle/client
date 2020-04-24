@@ -34,6 +34,7 @@ object Notification {
     val subject: String = Seq(EMAIL_PREFIX, notificationType, SUBJECT_SUFFIX).mkString(".")
     val message: String = Seq(EMAIL_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
+
   //Invitation Emails
   val ZONE_INVITATION = new Email(notificationType = "ZONE_INVITATION")
   val TRADER_INVITATION = new Email(notificationType = "TRADER_INVITATION")
@@ -44,9 +45,10 @@ object Notification {
   val VERIFY_PHONE = new Notification(notificationType = "VERIFY_PHONE", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val PHONE_VERIFIED = new Notification(notificationType = "PHONE_VERIFIED", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val VERIFY_EMAIL = new Notification(notificationType = "VERIFY_EMAIL", sendEmail = true, sendPushNotification = false, sendSMS = false)
-  val EMAIL_VERIFIED = new Notification(notificationType = "EMAIL_VERIFIED", sendEmail = false, sendPushNotification = false, sendSMS = true)
+  val EMAIL_VERIFIED = new Notification(notificationType = "EMAIL_VERIFIED", sendEmail = true, sendPushNotification = false, sendSMS = false)
   val FORGOT_PASSWORD_OTP = new Notification(notificationType = "FORGOT_PASSWORD_OTP", sendEmail = true, sendPushNotification = false, sendSMS = false)
-  val CONTACT_UPDATED = new Notification(notificationType = "CONTACT_UPDATED", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val EMAIL_ADDRESS_UPDATED = new Notification(notificationType = "EMAIL_ADDRESS_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
+  val MOBILE_NUMBER_UPDATED = new Notification(notificationType = "MOBILE_NUMBER_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
 
   //userReviewIdentification
   val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = true, sendPushNotification = true, sendSMS = false)
@@ -127,7 +129,8 @@ object Notification {
   val BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
-  val ZONE_RELEASED_ASSET =new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val ZONE_RELEASED_ASSET = new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val MODERATED_BUY_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_BUY_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

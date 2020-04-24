@@ -232,7 +232,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendAsset = Service.getTransaction(ticketID)
 
-      def address(sendAsset: SendAsset): Future[String] = masterAccounts.Service.getAddress(sendAsset.from)
+      def address(sendAsset: SendAsset): Future[String] = masterAccounts.Service.tryGetAddress(sendAsset.from)
 
       def markDirty(address: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(address)
 

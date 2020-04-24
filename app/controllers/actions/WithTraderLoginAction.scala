@@ -24,7 +24,7 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
         val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.TRADER)
-        val address = masterAccounts.Service.getAddress(username)
+        val address = masterAccounts.Service.tryGetAddress(username)
         for {
           _ <- sessionTokenVerify
           _ <- tokenTimeVerify

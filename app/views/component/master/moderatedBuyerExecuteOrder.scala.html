@@ -2,12 +2,12 @@
 @import views.html.base._
 @import views.companion.master.ModeratedBuyerExecuteOrder
 
-@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form, fiatProof: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
     @commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ACCOUNT_ID)
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ACCOUNT_ID)
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH)
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.PEG_HASH)
-    @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS)
-    @commonInputPassword(moderatedBuyerExecuteOrderForm, constants.FormField.PASSWORD)
-}
+        @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ACCOUNT_ID)
+        @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ACCOUNT_ID)
+        @commonTextInfo(constants.View.FIAT_PROOF, fiatProof)
+        @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.ASSET_ID, 'containerDivClass -> "hidden", 'readonly -> true)
+        @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS)
+        @commonInputPassword(moderatedBuyerExecuteOrderForm, constants.FormField.PASSWORD)
+    }

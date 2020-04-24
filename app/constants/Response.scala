@@ -17,8 +17,14 @@ object Response {
   val KEY_ORDER_ID = "order_id"
   val KEY_EXECUTED = "executed"
   val NULL_POINTER_EXCEPTION = new Failure("NULL_POINTER_EXCEPTION")
+  val INVALID_FILE_PATH_EXCEPTION = new Failure("INVALID_FILE_PATH_EXCEPTION")
+  val FILE_SECURITY_EXCEPTION = new Failure("FILE_SECURITY_EXCEPTION")
   val GENERIC_EXCEPTION = new Failure("GENERIC_EXCEPTION")
   val I_O_EXCEPTION = new Failure("I_O_EXCEPTION")
+  val FILE_NOT_FOUND_EXCEPTION = new Failure("FILE_NOT_FOUND_EXCEPTION")
+  val FILE_ILLEGAL_ARGUMENT_EXCEPTION = new Failure("FILE_ILLEGAL_ARGUMENT_EXCEPTION")
+  val CLASS_CAST_EXCEPTION = new Failure("CLASS_CAST_EXCEPTION")
+  val FILE_UNSUPPORTED_OPERATION_EXCEPTION = new Failure("FILE_UNSUPPORTED_OPERATION_EXCEPTION")
 
   //Success- for telling if something is done and the further steps opened up because of it
   val SUCCESS = new Success("SUCCESS")
@@ -32,7 +38,8 @@ object Response {
   val BUYER_FEEDBACK_SET = new Success("BUYER_FEEDBACK_SET")
   val BUYER_ORDER_EXECUTED = new Success("BUYER_ORDER_EXECUTED")
   val COINS_REQUESTED = new Success("COINS_REQUESTED")
-  val CONTACT_UPDATED = new Success("CONTACT_UPDATED")
+  val EMAIL_ADDRESS_UPDATED = new Success("EMAIL_ADDRESS_UPDATED")
+  val MOBILE_NUMBER_UPDATED = new Success("MOBILE_NUMBER_UPDATED")
   val EMAIL_ADDRESS_VERIFIED = new Success("EMAIL_ADDRESS_VERIFIED")
   val FAUCET_REQUEST_APPROVED = new Success("FAUCET_REQUEST_APPROVED")
   val FAUCET_REQUEST_REJECTED = new Success("FAUCET_REQUEST_REJECTED")
@@ -90,9 +97,10 @@ object Response {
   val ZONE_RELEASED_ASSET = new Success("ZONE_RELEASED_ASSET")
 
   //Warning- for telling that something important is not done and ask to do it
-  val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
-  val VERIFY_EMAIL_ADDRESS = new Warning("VERIFY_EMAIL_ADDRESS", routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm)
-  val UPDATE_CONTACT_DETAILS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.updateContactForm)
+  val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.ContactController.verifyMobileNumberForm)
+  val VERIFY_EMAIL_ADDRESS = new Warning("VERIFY_EMAIL_ADDRESS", routes.javascript.ContactController.verifyEmailAddressForm)
+  val UPDATE_MOBILE_NUMBER = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.addOrUpdateMobileNumberForm)
+  val UPDATE_EMAIL_ADDRESS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.addOrUpdateEmailAddressForm)
 
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")
@@ -105,8 +113,8 @@ object Response {
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
-  val EMAIL_ADDRESS_ALREADY_IN_USE = new Failure("EMAIL_ADDRESS_ALREADY_IN_USE")
-  val MOBILE_NUMBER_ALREADY_IN_USE = new Failure("MOBILE_NUMBER_ALREADY_IN_USE")
+  val EMAIL_ADDRESS_TAKEN = new Failure("EMAIL_ADDRESS_TAKEN")
+  val MOBILE_NUMBER_TAKEN = new Failure("MOBILE_NUMBER_TAKEN")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")
@@ -143,6 +151,7 @@ object Response {
   val INVITATION_EMAIL_ALREADY_SENT = new Failure("INVITATION_EMAIL_ALREADY_SENT")
   val BUYER_FROM_SAME_ORGANIZATION = new Failure("BUYER_FROM_SAME_ORGANIZATION")
   val NOT_PRESENT_AS_COUNTERPARTY = new Failure("NOT_PRESENT_AS_COUNTERPARTY")
+  val UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE = new Failure("UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE")
   val CHAT_ROOM_NOT_FOUND = new Failure("CHAT_ROOM_NOT_FOUND")
   val ALL_ORGANIZATION_BACKGROUND_CHECK_FILES_NOT_VERFIED = new Failure("ALL_ORGANIZATION_BACKGROUND_CHECK_FILES_NOT_VERFIED")
   val ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED = new Failure("ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED")
@@ -153,13 +162,15 @@ object Response {
   val DOCUMENT_LIST_LESS_THAN_REQUIRED = new Failure("DOCUMENT_LIST_LESS_THAN_REQUIRED")
   val NEGOTIATION_NOT_FOUND = new Failure("NEGOTIATION_NOT_FOUND")
   val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
+  val USERNAME_OR_PASSWORD_INCORRECT = new Failure("USERNAME_OR_PASSWORD_INCORRECT", routes.javascript.AccountController.loginForm)
+  val INCORRECT_PASSWORD = new Failure("INCORRECT_PASSWORD")
   val ALL_NEGOTIATION_TERMS_NOT_ACCEPTED = new Failure("ALL_NEGOTIATION_TERMS_NOT_ACCEPTED")
   val CONTRACT_NOT_VERIFIED = new Failure("CONTRACT_NOT_VERIFIED")
   val CONTRACT_REJECTED = new Failure("CONTRACT_REJECTED")
   val ASSET_NOT_FOUND = new Failure("ASSET_NOT_FOUND")
   val ASSET_ALREADY_UNLOCKED = new Failure("ASSET_ALREADY_UNLOCKED")
-  val BILL_OF_LADING_NOT_FOUND = new Failure("BILL_OF_LADING_NOT_FOUND")
-  val BILL_OF_LADING_NOT_VERIFIED = new Failure("BILL_OF_LADING_NOT_VERIFIED")
+  val BILL_OF_LADING_VERIFICATION_STATUS_PENDING = new Failure("BILL_OF_LADING_VERIFICATION_STATUS_PENDING")
+  val BILL_OF_LADING_REJECTED = new Failure("BILL_OF_LADING_REJECTED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -92,6 +92,18 @@ GET         /negotiation/tradeActivityMessages                                  
 
 GET         /contact                                                                        controllers.ContactController.contact
 
+GET         /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddressForm
+POST        /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddress
+
+GET         /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumberForm
+POST        /contact/addOrUpdateMobileNumber                                                controllers.ContactController.addOrUpdateMobileNumber
+
+GET         /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddressForm
+POST        /contact/verifyEmailAddress                                                     controllers.ContactController.verifyEmailAddress
+
+GET         /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumberForm
+POST        /contact/verifyMobileNumber                                                     controllers.ContactController.verifyMobileNumber
+
 GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequest
 
@@ -192,7 +204,6 @@ GET         /zone/inviteZone                                                    
 POST        /zone/inviteZone                                                                controllers.AddZoneController.inviteZone
 GET         /zone/acceptInvitation                                                          controllers.AddZoneController.acceptInvitation(token: String)
 
-GET         /master/component/releaseAssetList                                              controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/setBuyerFeedbackList                                          controllers.SetBuyerFeedbackController.buyerFeedbackList
 GET         /master/component/setSellerFeedbackList                                         controllers.SetSellerFeedbackController.sellerFeedbackList
 GET         /master/component/viewTradersInOrganizationForZone                              controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
@@ -200,11 +211,9 @@ GET         /master/component/viewTradersInOrganizationForGenesis               
 
 GET         /master/getGenesisAccessedFile                                                  controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                                         controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
-GET         /master/zoneAccessedAssetFile                                                   controllers.FileController.zoneAccessedAssetFile(id: String, fileName: String, documentType: String)
 GET         /master/organizationAccessedTraderKYCFile                                       controllers.FileController.organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String)
 GET         /master/getZoneAccessedTraderKYCFile                                            controllers.FileController.zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String)
 GET         /master/file                                                                    controllers.FileController.file(fileName: String, documentType: String)
-GET         /master/tradingFile                                                             controllers.FileController.tradingFile(id: String, fileName: String, documentType: String)
 
 GET         /accountUpload                                                                  controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                                             controllers.FileController.uploadAccountFile(documentType: String)
@@ -233,15 +242,6 @@ GET         /zoneUpload/updateFile                                              
 GET         /master/userAccessedOrganizationKYCFile                                         controllers.FileController.userAccessedOrganizationKYCFile(documentType: String)
 GET         /master/userAccessedTraderKYCFile                                               controllers.FileController.userAccessedTraderKYCFile(documentType: String)
 GET         /master/userAccessedZoneKYCFile                                                 controllers.FileController.userAccessedZoneKYCFile(documentType: String)
-
-GET         /master/updateContact                                                           controllers.ContactController.updateContactForm
-POST        /master/updateContact                                                           controllers.ContactController.updateContact
-
-GET         /master/verifyMobileNumber                                                      controllers.VerifyMobileNumberController.verifyMobileNumberForm
-POST        /master/verifyMobileNumber                                                      controllers.VerifyMobileNumberController.verifyMobileNumber
-
-GET         /master/verifyEmailAddress                                                      controllers.VerifyEmailAddressController.verifyEmailAddressForm
-POST        /master/verifyEmailAddress                                                      controllers.VerifyEmailAddressController.verifyEmailAddress
 
 GET         /master/inviteTrader                                                            controllers.SetACLController.inviteTraderForm
 POST        /master/inviteTrader                                                            controllers.SetACLController.inviteTrader
@@ -290,24 +290,6 @@ GET         /worldCheck/uploadOrUpdateOrganizationBackgroundCheck               
 
 GET         /worldCheck/zoneAccessedTraderBackgroundCheckFile                               controllers.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String)
 GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile                         controllers.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String)
-
-GET         /traderUpload/assetForm                                                         controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
-POST        /traderUpload/assetDocument                                                     controllers.FileController.uploadTraderAsset(documentType: String)
-GET         /traderUpload/storeAssetDocument                                                controllers.FileController.storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
-GET         /traderUpdate/assetForm                                                         controllers.FileController.updateTraderAssetForm(documentType: String, issueAssetRequestID :String)
-GET         /traderUpdate/assetDocument                                                     controllers.FileController.updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
-
-GET         /traderUpload/negotiationForm                                                   controllers.FileController.uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String)
-POST        /traderUpload/negotiationDocument                                               controllers.FileController.uploadTraderNegotiation(documentType: String)
-GET         /traderUpload/storeNegotiationDocument                                          controllers.FileController.storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
-GET         /traderUpdate/negotiationForm                                                   controllers.FileController.updateTraderNegotiationForm(documentType: String, negotiationRequestID :String)
-GET         /traderUpdate/negotiationDocument                                               controllers.FileController.updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
-
-GET         /zoneUpload/negotiationForm                                                     controllers.FileController.uploadZoneNegotiationForm(documentType: String, negotiationRequestID: String)
-POST        /zoneUpload/negotiationDocument                                                 controllers.FileController.uploadZoneNegotiation(documentType: String)
-GET         /zoneUpload/storeNegotiationDocument                                            controllers.FileController.storeZoneNegotiation(name: String, documentType: String, negotiationRequestID: String)
-GET         /zoneUpdate/negotiationForm                                                     controllers.FileController.updateZoneNegotiationForm(documentType: String, negotiationRequestID :String)
-GET         /zoneUpdate/negotiationDocument                                                 controllers.FileController.updateZoneNegotiation(name: String, documentType: String, negotiationRequestID: String)
 
 GET         /master/addOrganization                                                         controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                                         controllers.AddOrganizationController.addOrganization
@@ -362,42 +344,7 @@ GET         /master/viewVerifyZoneRequests                                      
 GET         /master/rejectVerifyZoneRequest                                                 controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
 POST        /master/rejectVerifyZoneRequest                                                 controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBidForm
-POST        /master/changeBuyerBid                                                          controllers.ChangeBuyerBidController.changeBuyerBid
-
-GET         /master/changeSellerBid                                                         controllers.ChangeSellerBidController.changeSellerBidForm
-POST        /master/changeSellerBid                                                         controllers.ChangeSellerBidController.changeSellerBid
-
-GET         /master/confirmBuyerBid                                                         controllers.ConfirmBuyerBidController.confirmBuyerBidForm(requestID: String)
-POST        /master/confirmBuyerBid                                                         controllers.ConfirmBuyerBidController.confirmBuyerBid
-
-GET         /master/confirmBuyerBidDetail                                                   controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm
-POST        /master/confirmBuyerBidDetail                                                   controllers.ConfirmBuyerBidController.confirmBuyerBidDetail
-
-GET         /master/confirmSellerBid                                                        controllers.ConfirmSellerBidController.confirmSellerBidForm(requestID: String)
-POST        /master/confirmSellerBid                                                        controllers.ConfirmSellerBidController.confirmSellerBid
-
-GET         /master/confirmSellerBidDetail                                                  controllers.ConfirmSellerBidController.confirmSellerBidDetailForm
-POST        /master/confirmSellerBidDetail                                                  controllers.ConfirmSellerBidController.confirmSellerBidDetail
-
-GET         /master/issueAssetRequest                                                       controllers.IssueAssetController.issueAssetRequestForm(id: String)
-POST        /master/issueAssetRequest                                                       controllers.IssueAssetController.issueAssetRequest
-
-GET         /master/issueAssetDetail                                                        controllers.IssueAssetController.issueAssetDetailForm(id: Option[String])
-POST        /master/issueAssetDetail                                                        controllers.IssueAssetController.issueAssetDetail
-
-GET         /master/issueAssetOBL                                                           controllers.IssueAssetController.issueAssetOBLForm(id: String)
-POST        /master/issueAssetOBL                                                           controllers.IssueAssetController.issueAssetOBL
-
-GET         /master/issueAssetInvoice                                                       controllers.IssueAssetController.issueAssetInvoiceForm(id: String)
-POST        /master/issueAssetInvoice                                                       controllers.IssueAssetController.issueAssetInvoice
-
 GET         /master/viewPendingIssueAssetRequests                                           controllers.IssueAssetController.viewPendingIssueAssetRequests
-GET         /master/rejectIssueAssetRequest                                                 controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
-POST        /master/rejectIssueAssetRequest                                                 controllers.IssueAssetController.rejectIssueAssetRequest
-GET         /master/viewTraderAssetDocuments                                                controllers.IssueAssetController.viewAssetDocuments(id: String)
-GET         /master/updateAssetDocumentStatus                                               controllers.IssueAssetController.updateAssetDocumentStatusForm(requestID: String, documentType: String)
-POST        /master/updateAssetDocumentStatus                                               controllers.IssueAssetController.updateAssetDocumentStatus
 
 GET         /master/issueAsset                                                              controllers.IssueAssetController.issueAssetForm(assetID: String)
 POST        /master/issueAsset                                                              controllers.IssueAssetController.issueAsset
@@ -419,9 +366,6 @@ POST        /master/redeemAsset                                                 
 
 GET         /master/redeemFiat                                                              controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                              controllers.RedeemFiatController.redeemFiat
-
-GET         /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAssetForm(assetID: String)
-POST        /master/releaseAsset                                                            controllers.ReleaseAssetController.releaseAsset
 
 GET         /master/sendAsset                                                               controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
 POST        /master/sendAsset                                                               controllers.SendAssetController.sendAsset
