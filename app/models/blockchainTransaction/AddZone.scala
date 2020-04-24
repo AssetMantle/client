@@ -230,5 +230,4 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
     }(schedulerExecutionContext)
   }
-
 }

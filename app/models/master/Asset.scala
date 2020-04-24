@@ -36,7 +36,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   import databaseConfig.profile.api._
 
-  private def add(assetSerializable: AssetSerializable): Future[String] = db.run((assetTable returning assetTable.map(_.documentHash) += assetSerializable).asTry).map {
+  private def add(assetSerializable: AssetSerializable): Future[String] = db.run((assetTable returning assetTable.map(_.id) += assetSerializable).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -157,15 +157,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def addModerated(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
       val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true)
-      for {
-        _ <- add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.REQUESTED_TO_ZONE)))
-      } yield id
+      add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.REQUESTED_TO_ZONE)))
     }
 
     def addUnmoderated(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
       val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false)
-      add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)))
+      for {
+        _ <- add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)))
+      } yield documentHash
     }
 
     def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
