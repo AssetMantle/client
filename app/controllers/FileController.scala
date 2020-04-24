@@ -772,7 +772,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       } yield {
         val path = documentType match {
           case constants.File.OBL | constants.File.COO | constants.File.COA => if (traderNegotiationExists) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.OTHER => if (traderNegotiationExists) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => if (traderNegotiationExists) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       }).recover {
@@ -794,7 +794,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       } yield {
         val path = documentType match {
           case constants.File.OBL | constants.File.COO | constants.File.COA => if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.OTHER => if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => if (organizationTraderIDs.contains(negotiation.buyerTraderID) || organizationTraderIDs.contains(negotiation.sellerTraderID)) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       }).recover {

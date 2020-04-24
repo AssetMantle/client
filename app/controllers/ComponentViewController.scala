@@ -1183,7 +1183,7 @@ class ComponentViewController @Inject()(
                   negotiation <- negotiation
                   assetFile <- assetFile(negotiation.assetID)
                 } yield Ok(views.html.component.master.traderViewNegotiationFile(id, assetFile))
-              case constants.File.INVOICE | constants.File.INSURANCE | constants.File.CONTRACT | constants.File.OTHER =>
+              case constants.File.INVOICE | constants.File.INSURANCE | constants.File.CONTRACT | constants.File.BILL_OF_EXCHANGE =>
                 val negotiationFile = masterTransactionNegotiationFiles.Service.get(id, documentType)
                 for {
                   negotiationFile <- negotiationFile
