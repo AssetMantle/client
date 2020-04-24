@@ -6,7 +6,6 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.master.{Asset, Negotiation, Organization, Trader}
-import models.masterTransaction.IssueAssetRequest
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

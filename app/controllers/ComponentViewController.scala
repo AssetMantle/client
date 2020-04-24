@@ -3,11 +3,8 @@ package controllers
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain._
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderKYC, TraderRelation, Zone}
-import models.masterTransaction.{AssetFile, IssueAssetRequest}
 import models.master.{Organization => _, Zone => _, _}
-import models.masterTransaction.{AssetFile, IssueAssetRequest, Notification}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -32,6 +29,8 @@ class ComponentViewController @Inject()(
                                          masterOrganizations: master.Organizations,
                                          masterZones: master.Zones,
                                          masterAccountKYCs: master.AccountKYCs,
+                                         masterMobiles: master.Mobiles,
+                                         masterEmails: master.Emails,
                                          masterIdentifications: master.Identifications,
                                          masterTraderRelations: master.TraderRelations,
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
@@ -601,9 +600,9 @@ class ComponentViewController @Inject()(
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val accountStatus: Future[String] = masterAccounts.Service.getStatus(loginState.username)
-
-      def identification(accountID: String): Future[Option[Identification]] = masterIdentifications.Service.get(accountID)
+      val mobile: Future[Option[Mobile]] = masterMobiles.Service.get(loginState.username)
+      val email: Future[Option[Email]] = masterEmails.Service.get(loginState.username)
+      val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
       def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
 
@@ -617,9 +616,9 @@ class ComponentViewController @Inject()(
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
-      def getUserResult(identification: Option[Identification], accountStatus: String): Future[Result] = {
+      def getUserResult(identification: Option[Identification], contactStatus: Seq[String]): Future[Result] = {
         val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
-        if (identificationStatus && accountStatus == constants.Status.Account.COMPLETE) {
+        if (identificationStatus && contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
           for {
             trader <- getTraderOrNoneByAccountID(loginState.username)
             traderOrganization <- getOrganizationOrNoneByTrader(trader)
@@ -627,16 +626,17 @@ class ComponentViewController @Inject()(
             organization <- getOrganizationOrNoneByAccountID(loginState.username)
             organizationZone <- getZoneOrNoneByOrganization(organization)
             organizationKYCs <- getOrganizationKYCsByOrganization(organization)
-          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, accountStatus = accountStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
+          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, contactStatus = contactStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
         } else {
-          Future(Ok(views.html.component.master.userViewPendingRequests(identification = if (identification.isDefined) Option(identification.get) else None, accountStatus = accountStatus)))
+          Future(Ok(views.html.component.master.userViewPendingRequests(identification = if (identification.isDefined) Option(identification.get) else None, contactStatus = contactStatus)))
         }
       }
 
       (for {
-        accountStatus <- accountStatus
-        identification <- identification(loginState.username)
-        result <- getUserResult(identification, accountStatus)
+        mobile <- mobile
+        email <- email
+        identification <- identification
+        result <- getUserResult(identification, utilities.Contact.getStatus(mobile,email))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -956,7 +956,7 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.organizationDeclarations()))
   }
 
-// zone trades cards
+  // zone trades cards
   def zoneViewAcceptedNegotiationList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
@@ -981,7 +981,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
       def traderZoneIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetZoneIDs(traderIDs)
+
       def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
       def getResult(zoneID: String, traderZoneIDs: Seq[String], negotiation: Negotiation, asset: Asset): Result = if (traderZoneIDs contains zoneID) {
@@ -1003,13 +1005,13 @@ class ComponentViewController @Inject()(
 
   def zoneViewTradeRoomFinancialAndChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.zoneViewTradeRoomFinancialAndChecks(negotiationID)))
+      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancialAndChecks(negotiationID)))
   }
 
   def zoneViewTradeRoomFinancial(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       //TODO: show correct FINANCIALS after orderTable
-      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancial(0,0,0)))
+      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancial(0, 0, 0)))
   }
 
   def zoneViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -1020,12 +1022,14 @@ class ComponentViewController @Inject()(
   def zoneOrderActions(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
-      def traders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getResult(zoneID: String, traders: Seq[Trader],negotiation: Negotiation): Future[Result] = {
-        if(traders.map(_.zoneID) contains zoneID){
+      def traders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+      def getResult(zoneID: String, traders: Seq[Trader], negotiation: Negotiation): Future[Result] = {
+        if (traders.map(_.zoneID) contains zoneID) {
           def asset(assetID: String) = masterAssets.Service.tryGet(assetID)
+
           for {
             asset <- asset(negotiation.assetID)
           } yield Ok(views.html.component.master.zoneViewOrderActions(zoneID, traders, negotiation, asset))
@@ -1033,10 +1037,11 @@ class ComponentViewController @Inject()(
           Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
-      (for{
-       zoneID <- zoneID
-       negotiation <- negotiation
-       traders <- traders(Seq( negotiation.buyerTraderID, negotiation.sellerTraderID))
+
+      (for {
+        zoneID <- zoneID
+        negotiation <- negotiation
+        traders <- traders(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
         result <- getResult(zoneID, traders, negotiation)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))

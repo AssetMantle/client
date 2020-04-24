@@ -4,17 +4,6 @@
 @import models.masterTransaction.NegotiationFile
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-    @for(file <- files) {
-        @component.master.commonDocumentViewer(file) {
-            @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
-        } {
-            <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
-        } {
-            <span>@file.documentType</span>
-        }
-    }
-
 @commonForm(constants.Form.SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
     @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
     @commonInputText(sellerExecuteOrderForm, constants.FormField.AWB_PROOF_HASH)
