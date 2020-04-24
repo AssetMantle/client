@@ -2,10 +2,8 @@
   font-family: Oxygen, sans-serif !important;
   box-sizing: border-box;
   --card-padding: 24px;
+  --card-height: 340px;
   --card-skeleton: linear-gradient(#FAFAFA var(--card-height), transparent 0);
-  --list-avatar-size: 56px;
-  --list-avatar-position: var(--card-padding) 100px;
-  --list-avatar-skeleton: radial-gradient(circle 25px at center, #ccc 99%, transparent 0);
   --avatar-size: 26px;
   --avatar-position: var(--card-padding) var(--card-padding);
   --avatar-skeleton: radial-gradient(circle 12px at center, #ccc 99%, transparent 0);
@@ -20,18 +18,14 @@
   --desc-line-height: 16px;
   --desc-line-skeleton: linear-gradient(#ccc var(--desc-line-height), transparent 0);
   --desc-line-1-width: 230px;
-  --desc-line-1-position: var(--card-padding) 100px;
+  --desc-line-1-position: var(--card-padding) 242px;
   --desc-line-2-width: 180px;
-  --desc-line-2-position: var(--card-padding) 125px;
-  --desc-line-3-width: 230px;
-  --desc-line-3-position: var(--card-padding) 175px;
-  --desc-line-4-width: 180px;
-  --desc-line-4-position: var(--card-padding) 200px;
+  --desc-line-2-position: var(--card-padding) 265px;
   --footer-height: 40px;
   --footer-position: 0 calc(var(--card-height) - var(--footer-height));
   --footer-skeleton: linear-gradient(#ccc var(--footer-height), transparent 0);
   --blur-width: 200px;
-  --blur-size: var(--blur-width) calc(var(--card-height)); }
+  --blur-size: var(--blur-width) calc(var(--card-height) - var(--footer-height)); }
 
 *,
 ::after,
@@ -1182,9 +1176,7 @@ html, body {
   color: #061728;
   font-size: 1rem; }
   .leftSideContainer .cmuk-card-header .icon {
-    margin-bottom: 2px;
-    width: 18px;
-    height: 18px; }
+    margin-bottom: 2px; }
 .leftSideContainer .cmuk-card-body {
   padding: 0px;
   overflow-y: auto; }
@@ -1816,8 +1808,8 @@ header:before,
   background-color: #FFFFFF;
   border: 1px solid rgba(5, 60, 117, 0.12); }
 .profileContainer .icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   margin-right: 5px;
   margin-bottom: 3px; }
 .profileContainer .plusIcon .icon {
@@ -1829,8 +1821,8 @@ header:before,
   margin-bottom: 5px; }
 .profileDetails .editIcon,
 .profileDetails .editIcon .icon, .profileDetails .icon {
-  height: 18px;
-  width: 18px;
+  height: 16px;
+  width: 16px;
   margin-right: 5px;
   margin-bottom: 3px; }
 
@@ -1841,14 +1833,15 @@ header:before,
     margin-right: 5px; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }
+.contactDetails .cmuk-card-default {
+  margin-bottom: 5px; }
 .contactDetails .cmuk-card-header {
-  padding: 13px 20px; }
+  padding: 15px 20px; }
 .contactDetails .cmuk-card-body {
   position: relative; }
   .contactDetails .cmuk-card-body .cmuk-card {
     border: 1px solid #EDEDED;
     border-radius: 5px;
-    margin-bottom: 5px;
     box-shadow: none; }
     .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
       padding: 10px 15px;
@@ -1991,7 +1984,8 @@ dl .info {
   box-sizing: border-box;
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
-  font-size: 14px; }
+  font-size: 14px;
+  font-family: Oxygen; }
   .cmuk-panel ul li {
     font-size: 0.875rem;
     color: #272829;
@@ -2000,43 +1994,24 @@ dl .info {
     padding: 10px;
     background: #e7eaf3; }
 
-.fskeleton {
+#skeleton {
   width: auto;
   height: var(--card-height); }
-  .fskeleton:empty::after {
+  #skeleton:empty::after {
     content: "";
     display: block;
     width: 100%;
     height: 100%;
     border-radius: 6px;
     box-shadow: 0 10px 45px rgba(0, 0, 0, 0.1);
-    background-image: linear-gradient(90deg, rgba(250, 250, 250, 0) 0, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%), var(--card-title-skeleton), var(--list-avatar-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--list-avatar-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--list-avatar-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--avatar-skeleton), var(--card-skeleton);
-    background-size: var(--blur-size), var(--card-title-width) var(--card-title-height), var(--list-avatar-size) var(--list-avatar-size), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--list-avatar-size) var(--list-avatar-size), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--list-avatar-size) var(--list-avatar-size), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--avatar-size) var(--avatar-size), 100% 100%;
-    background-position: -150% 0, var(--card-title-position), var(--list-avatar-position), 100px 100px, 100px 125px, 25px 175px, 100px 175px, 100px 200px, 25px 250px, 100px 250px, 100px 275px, var(--avatar-position), 0 0;
-    background-repeat: no-repeat;
-    animation: loading1 1.5s infinite; }
-
-.skeleton {
-  width: auto;
-  height: var(--card-height); }
-  .skeleton:empty::after {
-    content: "";
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    box-shadow: 0 10px 45px rgba(0, 0, 0, 0.1);
-    background-image: linear-gradient(90deg, rgba(250, 250, 250, 0) 0, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%), var(--card-title-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--avatar-skeleton), var(--card-skeleton);
-    background-size: var(--blur-size), var(--card-title-width) var(--card-title-height), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--desc-line-3-width) var(--desc-line-height), var(--desc-line-4-width) var(--desc-line-height), var(--avatar-size) var(--avatar-size), 100% 100%;
-    background-position: -150% 0, var(--card-title-position), var(--desc-line-1-position), var(--desc-line-2-position), var(--desc-line-3-position), var(--desc-line-4-position), var(--avatar-position), 0 0;
+    background-image: linear-gradient(90deg, rgba(250, 250, 250, 0) 0, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%), var(--card-title-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--avatar-skeleton), var(--card-skeleton);
+    background-size: var(--blur-size), var(--card-title-width) var(--card-title-height), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--avatar-size) var(--avatar-size), 100% 100%;
+    background-position: -150% 0, var(--card-title-position), var(--desc-line-1-position), var(--desc-line-2-position), var(--avatar-position), var(--footer-position), 0 0;
     background-repeat: no-repeat;
     animation: loading 1.5s infinite; }
 
 @keyframes loading {
   to {
-    background-position: 350% 0, var(--card-title-position), var(--desc-line-1-position), var(--desc-line-2-position), var(--desc-line-3-position), var(--desc-line-4-position), var(--avatar-position), 0 0; } }
-@keyframes loading1 {
-  to {
-    background-position: 350% 0, var(--card-title-position), var(--list-avatar-position), 100px 100px, 100px 125px, 25px 175px, 100px 175px, 100px 200px, 25px 250px, 100px 250px, 100px 275px, var(--avatar-position), 0 0; } }
+    background-position: 350% 0, var(--card-title-position), var(--desc-line-1-position), var(--desc-line-2-position), var(--avatar-position), var(--footer-position), 0 0; } }
 
 /*# sourceMappingURL=class.css.map */

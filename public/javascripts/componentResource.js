@@ -9,6 +9,7 @@ function componentResource(source, route){
                 div.html(data);
             },
             401: function (data) {
+                $('#' + source).addClass('skeleton');
                 replaceDocument(data.responseText);
             },
             500: function (data) {

@@ -7,10 +7,12 @@
 @commonCard(constants.View.RECENT_ACTIVITY,'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
 } {
     <div class="scroller">
-        <div id="tradeActivityMessages"></div>
+        <div id="tradeActivityMessages" class="recentActivityMessages"></div>
         <div class="cover-bar"></div>
     </div>
 }
+    <script>loadMoreReachEnd('@negotiationID');</script>
 <script>
     componentResource('tradeActivityMessages', jsRoutes.controllers.NegotiationController.tradeActivityMessages('@negotiationID', 1));
 </script>
+

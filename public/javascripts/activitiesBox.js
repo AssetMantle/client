@@ -5,15 +5,17 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
     } else {
         route = notificationRoute(negotiationID, $(".recentActivityBox").length + 1);
     }
+    console.log("route", route, $(".recentActivityBox").length);
+
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
+                console.log(data);
                 const loadMore = $(".recentActivityBox .notification:last");
-                loadMore.before(data);
-                loadMore.remove();
+                loadMore.after(data);
             }
         }
     });

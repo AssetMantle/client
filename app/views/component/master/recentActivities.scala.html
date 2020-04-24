@@ -7,9 +7,10 @@
 @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
 } {
     <div class="scroller">
-        <div id="recentActivityMessages"></div>
+        <div id="recentActivityMessages" class="recentActivityMessages"></div>
     </div>
 }
+    <script>loadMoreReachEnd()</script>
 <script>
     componentResource('recentActivityMessages', jsRoutes.controllers.NotificationController.recentActivityMessages(1));
 </script>

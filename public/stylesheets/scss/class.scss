@@ -4,6 +4,47 @@
 :root{
   font-family: Oxygen, sans-serif !important;
   box-sizing: border-box;
+  --card-padding: 24px;
+  --card-skeleton: linear-gradient(#FAFAFA var(--card-height), transparent 0);
+
+  --list-avatar-size:56px;
+  --list-avatar-position:var(--card-padding) 100px;
+  --list-avatar-skeleton: radial-gradient(circle 25px at center, #ccc 99%, transparent 0);
+
+  --avatar-size: 26px;
+  --avatar-position: var(--card-padding) var(--card-padding);
+  --avatar-skeleton: radial-gradient(circle 12px at center, #ccc 99%, transparent 0);
+
+  --card-title-height:16px;
+  --card-title-width:200px;
+  --card-title-position:70px var(--card-padding);
+  --card-title-skeleton:linear-gradient(#ccc var(--card-title-height), transparent 0);
+
+
+  --title-height: 32px;
+  --title-width: 200px;
+  --title-position: var(--card-padding) 180px;
+  --title-skeleton: linear-gradient(#ccc var(--title-height), transparent 0);
+
+  --desc-line-height: 16px;
+  --desc-line-skeleton: linear-gradient(#ccc var(--desc-line-height), transparent 0);
+
+  --desc-line-1-width:230px;
+  --desc-line-1-position: var(--card-padding) 100px;
+  --desc-line-2-width:180px;
+  --desc-line-2-position: var(--card-padding) 125px;
+
+  --desc-line-3-width:230px;
+  --desc-line-3-position: var(--card-padding) 175px;
+  --desc-line-4-width:180px;
+  --desc-line-4-position: var(--card-padding) 200px;
+
+  --footer-height: 40px;
+  --footer-position: 0 calc(var(--card-height) - var(--footer-height));
+  --footer-skeleton: linear-gradient(#ccc var(--footer-height), transparent 0);
+
+  --blur-width: 200px;
+  --blur-size: var(--blur-width) calc(var(--card-height));
 }
 
 *,
@@ -390,7 +431,7 @@ html, body{
 
 .profileDropdown li{
   padding: 5px 20px;
-}
+}--card-title-skeleton
 
 .tablePadding tr td,
 .tablePadding tr th{
@@ -676,7 +717,7 @@ position: relative;
   .cmuk-badge.pending{
     @extend %verifiedLabel;
     background-color: #faa05a;
-  }
+  } 
   .cmuk-button-primary{
     border: none;
   }
@@ -1488,6 +1529,8 @@ position: relative;
     font-size: $paragraphFontSizeMedium;
     .icon{
       margin-bottom: 2px;
+      width: 18px;
+      height: 18px;
     }
   }
   .cmuk-card-body{
@@ -1663,6 +1706,12 @@ position: relative;
     }
     .cmuk-card-body{
       overflow-y: auto;
+      padding: 0px;
+      .recentActivityMessages{
+        height: 300px;
+        padding: 0px 15px;
+        overflow:auto
+      }
     }
   }
   .cmuk-card-default{
@@ -1687,7 +1736,7 @@ position: relative;
         margin: 0px 5px;
       }
     }
-    .chatMessages{
+    .chatMessagesContainer{
       height: 250px;
       overflow: auto;
     }
@@ -2316,8 +2365,8 @@ header:before,
     }
   }
   .icon{
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     margin-right: 5px;
     margin-bottom: 3px;
   }
@@ -2338,8 +2387,8 @@ header:before,
   }
   .editIcon,
   .editIcon .icon, .icon{
-      height: 16px;
-      width: 16px;
+      height: 18px;
+      width: 18px;
       margin-right: 5px;
       margin-bottom: 3px;
     }
@@ -2359,17 +2408,15 @@ header:before,
   .cmuk-badge{
     margin-left: 10px;
   }
-  .cmuk-card-default{
-    margin-bottom: 5px;
-  }
   .cmuk-card-header{
-    padding: 15px 20px;
+    padding: 13px 20px;
   }
   .cmuk-card-body{
     position: relative;
     .cmuk-card {
       border: 1px solid #EDEDED;
       border-radius: 5px;
+      margin-bottom: 5px;
       box-shadow: none;
       .cmuk-card-body {
         padding: 10px 15px;
@@ -2557,7 +2604,6 @@ dl .info {
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
   font-size: 14px;
-  font-family: Oxygen;
   ul{
     li{
       font-size:$paragraphFontSizeSmall;
@@ -2567,6 +2613,172 @@ dl .info {
       padding: 10px;
       background: #e7eaf3;
     }
+  }
+}
+
+
+  // this unfortunately uses set px widths for the background-gradient, I never got around to changing it to work with all widths :(
+@mixin background-gradient {
+  background-image: linear-gradient(90deg, $base-color 0px, $shine-color 40px, $base-color 80px);
+  background-size: 600px;
+}
+
+
+.fskeleton{
+  width: auto;
+  height: var(--card-height);
+  &:empty::after {
+    content:"";
+    display:block;
+    width: 100%;
+    height: 100%;
+    border-radius:6px;
+    box-shadow: 0 10px 45px rgba(0,0,0, .1);
+    background-image:
+      linear-gradient(
+      90deg,
+      rgba(#FAFAFA, 0) 0,
+      rgba(#FAFAFA, .8) 50%,
+      rgba(#FAFAFA, 0) 100%
+      ),                          //animation blur
+      var(--card-title-skeleton),
+      var(--list-avatar-skeleton),
+      var(--desc-line-skeleton),     //title
+      var(--desc-line-skeleton),
+      var(--list-avatar-skeleton),
+      var(--desc-line-skeleton),     //title
+      var(--desc-line-skeleton),
+      var(--list-avatar-skeleton),
+      var(--desc-line-skeleton),     //title
+      var(--desc-line-skeleton),
+      var(--avatar-skeleton),     //avatar
+      var(--card-skeleton),    //card
+      ;
+
+    background-size:
+            var(--blur-size),
+            var(--card-title-width) var(--card-title-height),
+            var(--list-avatar-size) var(--list-avatar-size),
+            var(--desc-line-1-width) var(--desc-line-height),
+            var(--desc-line-2-width) var(--desc-line-height),
+            var(--list-avatar-size) var(--list-avatar-size),
+            var(--desc-line-1-width) var(--desc-line-height),
+            var(--desc-line-2-width) var(--desc-line-height),
+            var(--list-avatar-size) var(--list-avatar-size),
+            var(--desc-line-1-width) var(--desc-line-height),
+            var(--desc-line-2-width) var(--desc-line-height),
+            var(--avatar-size) var(--avatar-size),
+            100% 100%
+  ;
+
+    background-position:
+            -150% 0,                      //animation
+            var(--card-title-position),
+            var(--list-avatar-position),
+            100px 100px,
+            100px 125px,
+            25px 175px,
+            100px 175px,  //desc1
+            100px 200px,  //desc2
+            25px 250px,
+            100px 250px,  //desc1
+            100px 275px,
+            var(--avatar-position),       //avatar
+            0 0                           //card
+  ;
+
+    background-repeat: no-repeat;
+    animation: loading1 1.5s infinite;
+
+  }
+}
+  .skeleton {
+  width: auto;
+  height: var(--card-height);
+
+  &:empty::after {
+    content:"";
+    display:inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius:6px;
+    box-shadow: 0 10px 45px rgba(0,0,0, .1);
+
+    background-image:
+            linear-gradient(
+                            90deg,
+                            rgba(#FAFAFA, 0) 0,
+                            rgba(#FAFAFA, .8) 50%,
+                            rgba(#FAFAFA, 0) 100%
+            ),                          //animation blur
+            var(--card-title-skeleton),
+            var(--desc-line-skeleton),     //title
+            var(--desc-line-skeleton),
+            var(--desc-line-skeleton),     //title
+            var(--desc-line-skeleton),
+            var(--avatar-skeleton),     //avatar
+            var(--card-skeleton)        //card
+  ;
+
+    background-size:
+            var(--blur-size),
+            var(--card-title-width) var(--card-title-height),
+            var(--desc-line-1-width) var(--desc-line-height),
+            var(--desc-line-2-width) var(--desc-line-height),
+            var(--desc-line-3-width) var(--desc-line-height),
+            var(--desc-line-4-width) var(--desc-line-height),
+            var(--avatar-size) var(--avatar-size),
+            100% 100%
+  ;
+
+    background-position:
+            -150% 0,                      //animation
+            var(--card-title-position),
+            var(--desc-line-1-position),
+            var(--desc-line-2-position),
+            var(--desc-line-3-position),  //desc1
+            var(--desc-line-4-position),  //desc2
+            var(--avatar-position),       //avatar
+            0 0                           //card
+  ;
+
+    background-repeat: no-repeat;
+    animation: loading 1.5s infinite;
+
+  }
+}
+
+@keyframes loading {
+  to {
+    background-position:
+            350% 0,
+            var(--card-title-position),
+            var(--desc-line-1-position),
+            var(--desc-line-2-position),
+            var(--desc-line-3-position),
+            var(--desc-line-4-position),
+            var(--avatar-position),
+            0 0
+  ;
+  }
+}
+@keyframes loading1 {
+  to {
+    background-position:
+            350% 0,
+            var(--card-title-position),
+            var(--list-avatar-position),
+            100px 100px,
+            100px 125px,
+            25px 175px,
+            100px 175px,  //desc1
+            100px 200px,  //desc2
+            25px 250px,
+            100px 250px,  //desc1
+            100px 275px,
+            var(--avatar-position),
+            0 0
+  ;
   }
 }
 

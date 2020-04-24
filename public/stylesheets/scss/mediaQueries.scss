@@ -224,12 +224,15 @@
       margin-bottom: 15px;
       .cmuk-card-body{
         height: 210px;
+        .recentActivityMessages{
+          height: 210px;
+        }
       }
     }
     .chatRoom{
       .cmuk-card-body{
         height: 300px;
-        .chatMessages {
+        .chatMessagesContainer {
           height: 190px;
         }
       }
@@ -250,11 +253,20 @@
       height: 180px;
     }
   }
+  .timeline {
+    &:before{
+      left: 20px;
+    }
+    .timeline-item .timeline-icon {
+      left: 0px;
+    }
+  }
 }
 
 @media (max-width: 1599px){
   :root {
     font-size: 14px;
+    --card-height: 265px;
   }
   .bodyContainer{
     margin: 0px auto -135px;
@@ -306,6 +318,7 @@
 
 @media (min-width: 1600px) {
   :root {
+    --card-height: 356.74px;
     font-size: 16px;
   }
   .showpassword, .checkIcon{

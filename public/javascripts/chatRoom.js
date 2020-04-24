@@ -1,14 +1,20 @@
+
+window.onload=function () {
+    var objDiv = document.getElementById("chatMessages");
+    objDiv.scrollTop = objDiv.scrollHeight;
+}
+
 function loadMoreChats(chatID) {
-    const route = jsRoutes.controllers.TradeRoomController.loadMoreChats(chatID, ($(".chatMessages").length));
+    const route = jsRoutes.controllers.ChatController.loadMoreChats(chatID, ($(".chatMessages").length));
+    console.log("insde loadmore", $(".chatMessages").length);
     $.ajax({
         url: route.url,
-        type: route.type,
+        type: route.type,                                       
         async: true,
         statusCode: {
             200: function (data) {
                 const loadMore = $(".chatMessages .chatMessage:first");
-                loadMore.after(data);
-                loadMore.remove();
+                loadMore.before(data);
             }
         }
     });

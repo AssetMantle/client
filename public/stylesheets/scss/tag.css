@@ -1,0 +1,30 @@
+input, select {
+  width: 100%; }
+
+input:focus {
+  background-color: #ddd;
+  outline: none; }
+
+input:hover {
+  cursor: pointer; }
+
+button {
+  background-color: #EEF9FF;
+  color: #1B7FBD;
+  padding: 10px 15px;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  word-break: break-all; }
+
+dl {
+  text-align: left; }
+
+label {
+  font-size: var(--paragraphFontSizeMedium);
+  font-family: Oxygen;
+  font-weight: normal;
+  color: #272829;
+  line-height: 2; }
+
+/*# sourceMappingURL=tag.css.map */

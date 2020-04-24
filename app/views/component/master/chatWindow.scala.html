@@ -12,7 +12,7 @@
             }
     }
 
-    <div id="chatMessages" class="chatMessages chat" title="You have chat with">
+    <div id="chatMessages" class="chat chatMessagesContainer" title="You have chat with">
         <script>
             componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0))
     </script>
@@ -28,3 +28,8 @@
     @sendMessage(sendMessageForm)
     </div>
 </div>
+
+  <script>
+    loadMoreActivitiesonScroll('@chatID');
+  </script>
+
