@@ -4,23 +4,34 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(sentNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(sentNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sentNegotiationRequestList.map { sentNegotiationRequest =>
     @commonVerticalInfoBox() {
-        @defining(counterPartyTraders.find(_.id == sentNegotiationRequest.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, sentNegotiationRequest.buyerTraderID)
+        @counterPartyTraders.find(_.id == sentNegotiationRequest.buyerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
                 }
             }
+            case None => {}
+        }
+        @assets.find(_.id == sentNegotiationRequest.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+            }
+            case None => {}
         }
         @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sentNegotiationRequest.assetDescription)
         @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
         @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString, sentNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
     }
 }

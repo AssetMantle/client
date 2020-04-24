@@ -31,6 +31,12 @@
                     @commonDateInfo(constants.View.INVOICE_DATE, invoiceDetails.invoiceDate)
                 }
             }
+            case constants.File.CONTRACT =>{
+                @Messages(constants.File.CONTRACT) :
+                @defining(content.asInstanceOf[Serializable.Contract]){contractDetails=>
+                    @commonTextInfo(constants.View.CONTRACT_NUMBER, contractDetails.contractNumber)
+                }
+            }
             case _ => {}
         }
     }

@@ -3,25 +3,37 @@
 @import models.master.Negotiation
 @import models.master.Trader
 
-@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@import models.master.Asset
+@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div>
     <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)
         @rejectedReceivedNegotiationList.map { rejectedReceivedNegotiation =>
             @commonVerticalInfoBox() {
-                @defining(counterPartyTraders.find(_.id == rejectedReceivedNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
-                    @counterPartyTrader match {
-                        case Some(trader) => {
-                            @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                        }
-                        case None => {
-                            @commonVerticalTextInfo(constants.View.TRADER_ID, rejectedReceivedNegotiation.sellerTraderID)
+                @counterPartyTraders.find(_.id == rejectedReceivedNegotiation.sellerTraderID) match {
+                    case Some(trader) => {
+                        @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                        @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                            }
+                            case None => {}
                         }
                     }
+                    case None => {}
+                }
+                @assets.find(_.id == rejectedReceivedNegotiation.assetID) match {
+                    case Some(asset) => {
+                        @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+                    }
+                    case None => {}
                 }
                 @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, rejectedReceivedNegotiation.assetDescription)
                 @commonVerticalIntInfo(constants.View.PRICE, rejectedReceivedNegotiation.price)
                 @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedReceivedNegotiation.quantity.toString, rejectedReceivedNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.LOAD_PORT, rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 @commonVerticalTextInfo(constants.View.COMMENT, rejectedReceivedNegotiation.comment.getOrElse(""))
                 @commonVerticalTextInfo(constants.View.STATUS, rejectedReceivedNegotiation.status)
             }
@@ -31,19 +43,29 @@
     <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)
         @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
             @commonVerticalInfoBox() {
-                @defining(counterPartyTraders.find(_.id == rejectedSentNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
-                    @counterPartyTrader match {
-                        case Some(trader) => {
-                            @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                        }
-                        case None => {
-                            @commonVerticalTextInfo(constants.View.TRADER_ID, rejectedSentNegotiation.buyerTraderID)
+                @counterPartyTraders.find(_.id == rejectedSentNegotiation.buyerTraderID) match {
+                    case Some(trader) => {
+                        @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                        @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                            }
+                            case None => {}
                         }
                     }
+                    case None => {}
+                }
+                @assets.find(_.id == rejectedSentNegotiation.assetID) match {
+                    case Some(asset) => {
+                        @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+                    }
+                    case None => {}
                 }
                 @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, rejectedSentNegotiation.assetDescription)
                 @commonVerticalIntInfo(constants.View.PRICE, rejectedSentNegotiation.price)
                 @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.LOAD_PORT, rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 @commonVerticalTextInfo(constants.View.COMMENT, rejectedSentNegotiation.comment.getOrElse(""))
                 @commonVerticalTextInfo(constants.View.STATUS, rejectedSentNegotiation.status)
             }
@@ -53,19 +75,29 @@
     <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)
         @failedNegotiationList.map { failedNegotiation =>
             @commonVerticalInfoBox() {
-                @defining(counterPartyTraders.find(_.id == failedNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
-                    @counterPartyTrader match {
-                        case Some(trader) => {
-                            @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                        }
-                        case None => {
-                            @commonVerticalTextInfo(constants.View.TRADER_ID, failedNegotiation.buyerTraderID)
+                @counterPartyTraders.find(_.id == failedNegotiation.buyerTraderID) match {
+                    case Some(trader) => {
+                        @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                        @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                            }
+                            case None => {}
                         }
                     }
+                    case None => {}
+                }
+                @assets.find(_.id == failedNegotiation.assetID) match {
+                    case Some(asset) => {
+                        @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+                    }
+                    case None => {}
                 }
                 @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, failedNegotiation.assetDescription)
                 @commonVerticalIntInfo(constants.View.PRICE, failedNegotiation.price)
-                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(failedNegotiation.quantity.toString(), failedNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(failedNegotiation.quantity.toString, failedNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.LOAD_PORT, failedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, failedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 @commonVerticalTextInfo(constants.View.STATUS, failedNegotiation.status)
             }
         }

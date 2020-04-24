@@ -4,7 +4,8 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(incompleteNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(incompleteNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @incompleteNegotiationList.map { incompleteNegotiation =>
     @commonInfoBox() {
@@ -18,15 +19,27 @@
         }
         @counterPartyTraders.find(_.id == incompleteNegotiation.buyerTraderID) match {
             case Some(trader) => {
-                @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
+                }
             }
-            case None => {
-                @commonTextInfo(constants.View.BUYER_TRADER_ID, incompleteNegotiation.buyerTraderID)
+            case None => {}
+        }
+        @assets.find(_.id == incompleteNegotiation.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }
+            case None => {}
         }
         @commonTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString, incompleteNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
     }
 }

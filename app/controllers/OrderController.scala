@@ -43,7 +43,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
       val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
-      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
+      def negotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.FIAT_PROOF)
 
       (for {
         requestID <- requestID
@@ -141,7 +141,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
 
       def getResult(zoneID: String, tradersZoneIDs: Seq[String]): Future[Result] = {
         if (tradersZoneIDs contains zoneID){
-          val getNegotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(negotiationID, constants.File.FIAT_PROOF)
+          val getNegotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(negotiationID, constants.File.FIAT_PROOF)
           for{
             negotiationFiles <- getNegotiationFiles
             result <- withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderDocument(negotiationFiles, negotiationID, constants.File.FIAT_PROOF))
@@ -222,7 +222,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
       val requestID = masterNegotiations.Service.tryGetNegotiationIDByID(orderID)
 
-      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.AWB_PROOF)
+      def getNegotiationFiles(requestID: String): Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(requestID, constants.File.AWB_PROOF)
 
       (for {
         requestID <- requestID
@@ -320,7 +320,7 @@ class OrderController @Inject()(messagesControllerComponents: MessagesController
 
       def getResult(zoneID: String, tradersZoneIDs: Seq[String]): Future[Result] = {
         if (tradersZoneIDs contains zoneID){
-          val negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(negotiationID, constants.File.AWB_PROOF)
+          val negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.get(negotiationID, constants.File.AWB_PROOF)
           for{
             negotiationFiles <- negotiationFiles
             result <- withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderDocument(negotiationFiles, negotiationID, constants.File.AWB_PROOF))

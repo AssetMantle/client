@@ -908,27 +908,22 @@ class NegotiationController @Inject()(
     implicit request =>
       views.companion.master.InvoiceDetails.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.invoiceDetails(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+          Future(BadRequest(views.html.component.master.invoiceDetails(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
         },
         updateInvoiceDetailsData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val sellerTraderID = masterNegotiations.Service.tryGetSellerTraderID(updateInvoiceDetailsData.id)
-          val buyerTraderID = masterNegotiations.Service.tryGetBuyerTraderID(updateInvoiceDetailsData.id)
+          val negotiation = masterNegotiations.Service.tryGet(updateInvoiceDetailsData.id)
 
-          def updateAndGetResult(traderID: String, sellerTraderID: String, buyerTraderID: String) = {
-            if (traderID == sellerTraderID) {
+          def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
+            if (traderID == negotiation.sellerTraderID) {
               val updateInvoiceDetails = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateInvoiceDetailsData.id, constants.File.INVOICE, Serializable.Invoice(updateInvoiceDetailsData.invoiceNumber, utilities.Date.utilDateToSQLDate(updateInvoiceDetailsData.invoiceDate)))
               val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(updateInvoiceDetailsData.id)
-              val negotiation = masterNegotiations.Service.tryGet(updateInvoiceDetailsData.id)
-
-              def assetFiles(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
-
-              val buyerAccountID = masterTraders.Service.tryGetAccountId(buyerTraderID)
+              val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+              val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
               for {
                 _ <- updateInvoiceDetails
                 negotiationFiles <- negotiationFiles
-                negotiation <- negotiation
-                assetFiles <- assetFiles(negotiation.assetID)
+                assetFiles <- assetFiles
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_DETAILS_ADDED, updateInvoiceDetailsData.id)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_DETAILS_ADDED, updateInvoiceDetailsData.id)
@@ -941,9 +936,73 @@ class NegotiationController @Inject()(
 
           (for {
             traderID <- traderID
-            sellerTraderID <- sellerTraderID
-            buyerTraderID <- buyerTraderID
-            result <- updateAndGetResult(traderID, sellerTraderID, buyerTraderID)
+            negotiation <- negotiation
+            result <- updateAndGetResult(traderID, negotiation)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def contractDetailsForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(id, constants.File.CONTRACT)
+
+      def getResult(documentContent: Option[DocumentContent]) = {
+        documentContent match {
+          case Some(content) => {
+            val contract = content.asInstanceOf[Serializable.Contract]
+            withUsernameToken.Ok(views.html.component.master.contractDetails(views.companion.master.ContractDetails.form.fill(views.companion.master.ContractDetails.Data(id = id, contractNumber = contract.contractNumber)), id = id))
+          }
+          case None => withUsernameToken.Ok(views.html.component.master.invoiceDetails(id = id))
+        }
+      }
+
+      (for {
+        documentContent <- documentContent
+        result <- getResult(documentContent)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(id = id, failures = Seq(baseException.failure)))
+      }
+  }
+
+  def contractDetails: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.ContractDetails.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.contractDetails(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
+        },
+        updateContractDetailsData => {
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
+          val negotiation = masterNegotiations.Service.tryGet(updateContractDetailsData.id)
+
+          def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
+            if (traderID == negotiation.sellerTraderID) {
+              val updateContractDetails = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateContractDetailsData.id, constants.File.CONTRACT, Serializable.Contract(updateContractDetailsData.contractNumber))
+              val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(updateContractDetailsData.id)
+              val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+              val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
+              for {
+                _ <- updateContractDetails
+                negotiationFiles <- negotiationFiles
+                assetFiles <- assetFiles
+                buyerAccountID <- buyerAccountID
+                _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.CONTRACT_DETAILS_ADDED, updateContractDetailsData.id)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTRACT_DETAILS_ADDED, updateContractDetailsData.id)
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(updateContractDetailsData.id, negotiation, assetFiles, negotiationFiles))
+              } yield result
+            } else {
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+            }
+          }
+
+          (for {
+            traderID <- traderID
+            negotiation <- negotiation
+            result <- updateAndGetResult(traderID, negotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -1005,7 +1064,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             dcumentContent <- getDocumentContent(negotiation.assetID)
           } yield dcumentContent
-        case constants.File.INVOICE => masterTransactionNegotiationFiles.Service.getDocumentContent(id, documentType)
+        case constants.File.INVOICE | constants.File.CONTRACT => masterTransactionNegotiationFiles.Service.getDocumentContent(id, documentType)
       }
 
       (for {

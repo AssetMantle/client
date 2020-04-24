@@ -4,7 +4,8 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(sellNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(sellNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellNegotiationList.map { sellNegotiation =>
     @commonInfoBox() {
@@ -20,16 +21,28 @@
 
         @counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID) match {
             case Some(trader) => {
-                @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
+                }
             }
-            case None => {
-                @commonTextInfo(constants.View.BUYER_TRADER_ID, sellNegotiation.buyerTraderID)
+            case None => {}
+        }
+        @assets.find(_.id == sellNegotiation.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }
+            case None => {}
         }
 
         @commonTextInfo(constants.View.ASSET_DESCRIPTION, sellNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, sellNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, sellNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonTextInfo(constants.View.STATUS, sellNegotiation.status)
         <a class="cmuk-link" href="@routes.ViewController.tradeRoom(sellNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
     }

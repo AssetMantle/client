@@ -72,10 +72,13 @@ object Serializable {
 
   case class Invoice(invoiceNumber: String, invoiceDate: Date) extends DocumentContent
 
+  case class Contract(contractNumber: String) extends DocumentContent
+
   implicit val documentContentWrites = new Writes[DocumentContent] {
     override def writes(documentContent: DocumentContent): JsValue = documentContent match {
       case obl: OBL => Json.toJson(obl)(Json.writes[OBL])
       case invoice: Invoice => Json.toJson(invoice)(Json.writes[Invoice])
+      case contract: Contract => Json.toJson(contract)(Json.writes[Contract])
     }
   }
 

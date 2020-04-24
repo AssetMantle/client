@@ -4,23 +4,35 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(sellNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(sellNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sellNegotiationList.map { sellNegotiation =>
-    co@commonVerticalInfoBox() {
-        @defining(counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, sellNegotiation.buyerTraderID)
+    @commonVerticalInfoBox() {
+        @counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+
+                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
                 }
             }
+            case None => {}
+        }
+        @assets.find(_.id == sellNegotiation.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+            }
+            case None => {}
         }
         @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sellNegotiation.assetDescription)
         @commonVerticalIntInfo(constants.View.PRICE, sellNegotiation.price)
         @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, sellNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, sellNegotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">

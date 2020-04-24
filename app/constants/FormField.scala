@@ -56,6 +56,7 @@ object FormField {
   val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val INVOICE_NUMBER = new StringFormField("INVOICE_NUMBER", 2, 32)
+  val CONTRACT_NUMBER = new StringFormField("CONTRACT_NUMBER", 2, 100)
   val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 45, 45)
   val REGISTERED_ADDRESS_LINE_1 = new StringFormField("REGISTERED_ADDRESS_LINE_1", 4, 200)
   val REGISTERED_ADDRESS_LINE_2 = new StringFormField("REGISTERED_ADDRESS_LINE_2", 4, 200)
