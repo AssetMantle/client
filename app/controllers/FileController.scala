@@ -614,11 +614,16 @@ class FileController @Inject()(
         traderID <- traderID
         traderNegotiationExists <- checkTraderNegotiationExists(traderID)
       } yield {
-        val path = documentType match {
-          case constants.File.OBL | constants.File.COO | constants.File.COA => if (traderNegotiationExists) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => if (traderNegotiationExists) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        if (traderNegotiationExists) {
+          val path = documentType match {
+            case constants.File.OBL | constants.File.COO | constants.File.COA => fileResourceManager.getTraderAssetFilePath(documentType)
+            case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => fileResourceManager.getTraderNegotiationFilePath(documentType)
+            case _ => throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          }
+          Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -636,11 +641,16 @@ class FileController @Inject()(
         negotiation <- negotiation
         traderOrganizationIDs <- traderOrganizationIDs(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
       } yield {
-        val path = documentType match {
-          case constants.File.OBL | constants.File.COO | constants.File.COA => if (traderOrganizationIDs contains organizationID) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => if (traderOrganizationIDs contains organizationID) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        if (traderOrganizationIDs contains organizationID) {
+          val path = documentType match {
+            case constants.File.OBL | constants.File.COO | constants.File.COA => fileResourceManager.getTraderAssetFilePath(documentType)
+            case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => fileResourceManager.getTraderNegotiationFilePath(documentType)
+            case _ => throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          }
+          Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -658,11 +668,16 @@ class FileController @Inject()(
         negotiation <- negotiation
         traderZoneIDs <- traderZoneIDs(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
       } yield {
-        val path = documentType match {
-          case constants.File.OBL | constants.File.COO | constants.File.COA => if (traderZoneIDs contains zoneID) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-          case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => if (traderZoneIDs contains zoneID) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        if (traderZoneIDs contains zoneID) {
+          val path = documentType match {
+            case constants.File.OBL | constants.File.COO | constants.File.COA => fileResourceManager.getTraderAssetFilePath(documentType)
+            case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => fileResourceManager.getTraderNegotiationFilePath(documentType)
+            case _ => throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          }
+          Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

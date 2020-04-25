@@ -130,7 +130,7 @@ object Notification {
   val OBL_DETAILS_ADDED = new Notification(notificationType = "OBL_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val INVOICE_DETAILS_ADDED = new Notification(notificationType = "INVOICE_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val CONTRACT_DETAILS_ADDED = new Notification(notificationType = "CONTRACT_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

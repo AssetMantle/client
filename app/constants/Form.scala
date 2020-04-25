@@ -159,9 +159,6 @@ object Form {
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
   val ACCEPT_REJECT_TRADER_RELATION = new Form("ACCEPT_REJECT_TRADER_RELATION", routes.TraderController.acceptOrRejectTraderRelation(), routes.javascript.TraderController.acceptOrRejectTraderRelationForm)
 
-  val ACCOUNT_ID = "ACCOUNT_ID"
-  val ORGANIZATION_ID = "ORGANIZATION_ID"
-  val TRADER_ID = "TRADER_ID"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
   val BLOCKS = "BLOCKS"

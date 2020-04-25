@@ -42,8 +42,6 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
-  //private def serialize(negotiationFile: NegotiationFile): NegotiationFileSerialized = NegotiationFileSerialized(negotiationFile.id, negotiationFile.documentType, negotiationFile.fileName, negotiationFile.file, negotiationFile.documentContent.map(Json.toJson(_).toString), negotiationFile.status)
-
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
@@ -51,10 +49,10 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
   private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   case class NegotiationFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String] = None, status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: NegotiationFile =NegotiationFile(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content=>utilities.JSON.convertJsonStringToObject[NegotiationDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content => utilities.JSON.convertJsonStringToObject[NegotiationDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  private def serialize(negotiationFile: NegotiationFile): NegotiationFileSerialized = NegotiationFileSerialized(id = negotiationFile.id, documentType = negotiationFile.documentType, fileName = negotiationFile.fileName, file = negotiationFile.file, documentContentJson = negotiationFile.documentContent.map(content=>Json.toJson(content).toString), status = negotiationFile.status, createdBy = negotiationFile.createdBy, createdOn = negotiationFile.createdOn, createdOnTimeZone = negotiationFile.createdOnTimeZone, updatedBy = negotiationFile.updatedBy, updatedOn = negotiationFile.updatedOn, updatedOnTimeZone = negotiationFile.updatedOnTimeZone)
+  private def serialize(negotiationFile: NegotiationFile): NegotiationFileSerialized = NegotiationFileSerialized(id = negotiationFile.id, documentType = negotiationFile.documentType, fileName = negotiationFile.fileName, file = negotiationFile.file, documentContentJson = negotiationFile.documentContent.map(content => Json.toJson(content).toString), status = negotiationFile.status, createdBy = negotiationFile.createdBy, createdOn = negotiationFile.createdOn, createdOnTimeZone = negotiationFile.createdOnTimeZone, updatedBy = negotiationFile.updatedBy, updatedOn = negotiationFile.updatedOn, updatedOnTimeZone = negotiationFile.updatedOnTimeZone)
 
   private[models] val negotiationFileTable = TableQuery[NegotiationFileTable]
 
@@ -76,7 +74,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType===documentType).map(x => (x.documentContentJson.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((documentContentJson, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.documentContentJson.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((documentContentJson, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

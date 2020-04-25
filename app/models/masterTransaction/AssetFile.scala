@@ -109,14 +109,6 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def getDocumentContentByIDAndDocumentType(id: String, documentType: String): Future[Option[String]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContentJson.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def getStatusForAllDocumentsById(id: String): Future[Seq[Option[Boolean]]] = db.run(assetFileTable.filter(_.id === id).map(_.status.?).result)
 
   private def getAllDocumentsById(id: String): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).result)

@@ -83,6 +83,7 @@ object Serializable {
   }
 
   case class Invoice(invoiceNumber: String, invoiceDate: Date) extends NegotiationDocumentContent
+
   case class Contract(contractNumber: String) extends NegotiationDocumentContent
 
   implicit val negotiationDocumentContentWrites: Writes[NegotiationDocumentContent] = {
@@ -93,6 +94,6 @@ object Serializable {
 
   implicit val negotiationDocumentContentReads: Reads[NegotiationDocumentContent] = {
     Json.format[Invoice].map(x => x: NegotiationDocumentContent) or
-    Json.format[Contract].map(x => x: NegotiationDocumentContent)
+      Json.format[Contract].map(x => x: NegotiationDocumentContent)
   }
 }

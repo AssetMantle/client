@@ -189,7 +189,7 @@ object setACLControllerTest {
         .post(routes.SetACLController.updateTraderKYCDocumentZoneStatus().url)
         .formParamMap(Map(
           Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
-          "TRADER_ID" -> "${%s}".format(Test.TEST_TRADER_ID),
+          Form.TRADER_ID -> "${%s}".format(Test.TEST_TRADER_ID),
           Form.DOCUMENT_TYPE -> "${documentType}",
           Form.STATUS -> true
         ))
@@ -222,7 +222,7 @@ object setACLControllerTest {
         .post(routes.SetACLController.updateTraderKYCDocumentOrganizationStatus().url)
         .formParamMap(Map(
           Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
-          "TRADER_ID" -> "${%s}".format(Test.TEST_TRADER_ID),
+          Form.TRADER_ID -> "${%s}".format(Test.TEST_TRADER_ID),
           Form.DOCUMENT_TYPE -> "${documentType}",
           Form.STATUS -> true
         ))
@@ -263,7 +263,7 @@ object setACLControllerTest {
       .formParamMap(Map(
         Form.FROM -> "${%s}".format(Test.TEST_FROM),
         Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_ACL_ADDRESS),
-        "ORGANIZATION_ID" -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+        Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
         Form.ZONE_ID-> "${%s}".format(Test.TEST_ZONE_ID),
         Form.ISSUE_ASSET_ACL -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT_ACL -> setACLPrivileges.issueFiat, Form.SEND_ASSET_ACL -> setACLPrivileges.sendAsset, Form.SEND_FIAT_ACL -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET_ACL -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT_ACL -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER_ACL -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER_ACL -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID_ACL -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID_ACL -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID_ACL -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID_ACL -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION_ACL -> setACLPrivileges.negotiation, Form.RELEASE_ASSET_ACL -> setACLPrivileges.releaseAsset,
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
