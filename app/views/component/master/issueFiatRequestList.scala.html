@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
-@import models.masterTransaction.IssueFiatRequest
+@import models.WesternUnion.FiatRequest
 @import views.html.base._
-@(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(issueFiatRequests: Seq[FiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @if(issueFiatRequests.isEmpty){
     <span>@Messages(constants.View.NO_REQUESTS_FOUND)</span>
 } else {

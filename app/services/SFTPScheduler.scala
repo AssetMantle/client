@@ -2,13 +2,16 @@ package services
 
 import java.io.File
 import java.net.InetAddress
+
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import akka.stream.alpakka.ftp.scaladsl.Sftp
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
+
 import scala.concurrent.{Await, ExecutionContext, Future}
 import java.nio.file.{Files, Paths}
+
 import scala.io
 import akka.Done
 import akka.stream.scaladsl.Source
@@ -16,16 +19,17 @@ import akka.stream.{ActorMaterializer, IOResult}
 import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
 import akka.stream.scaladsl.FileIO
 import exceptions.BaseException
-import models.masterTransaction.{WUSFTPFileTransaction, WUSFTPFileTransactions}
+import models.WesternUnion.{SFTPFileTransaction, SFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
 import utilities.PGP
+
 import scala.io.BufferedSource
 
 
 @Singleton
-class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: WUSFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.SFTP_SCHEDULER
@@ -76,7 +80,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
             val csvFileContentProcessor = Future.sequence {
               csvFileContentBuffer.getLines.drop(1).map { line =>
                 val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
-                wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
+                sFTPFileTransactions.Service.create(SFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
               }
             }
             for {

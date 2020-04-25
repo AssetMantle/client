@@ -523,14 +523,13 @@ CREATE TABLE IF NOT EXISTS MASTER."Email"
 
 CREATE TABLE IF NOT EXISTS MASTER."Fiat"
 (
-    "id"                VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
     "ownerID"           VARCHAR NOT NULL,
     "transactionID"     VARCHAR NOT NULL UNIQUE,
     "transactionAmount" INT     NOT NULL,
-    "amountProcessed"   INT,
+    "amountRedeemed"    INT,
     "status"            BOOLEAN,
-    "rtcbStatus"        BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("pegHash", "ownerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Identification"
@@ -775,20 +774,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
-(
-    "id"                VARCHAR NOT NULL,
-    "accountID"         VARCHAR NOT NULL,
-    "transactionID"     VARCHAR NOT NULL,
-    "transactionAmount" INT     NOT NULL,
-    "gas"               INT,
-    "status"            BOOLEAN,
-    "rtcbStatus"        BOOLEAN NOT NULL,
-    "ticketID"          VARCHAR,
-    "comment"           VARCHAR,
-    PRIMARY KEY ("id")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Message"
 (
     "id"            VARCHAR   NOT NULL,
@@ -887,28 +872,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
     UNIQUE ("organizationID", "inviteeEmailAddress")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
-(
-    "id"      VARCHAR NOT NULL,
-    "request" VARCHAR NOT NULL,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction"
-(
-    "payerID"              VARCHAR NOT NULL,
-    "invoiceNumber"        VARCHAR NOT NULL,
-    "customerFirstName"    VARCHAR NOT NULL,
-    "customerLastName"     VARCHAR NOT NULL,
-    "customerEmailAddress" VARCHAR NOT NULL,
-    "settlementDate"       VARCHAR NOT NULL,
-    "clientReceivedAmount" VARCHAR NOT NULL,
-    "transactionType"      VARCHAR NOT NULL,
-    "productType"          VARCHAR NOT NULL,
-    "transactionReference" VARCHAR NOT NULL,
-    PRIMARY KEY ("transactionReference")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
 (
     "id"           VARCHAR NOT NULL,
@@ -921,20 +884,29 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
 (
     "id"                VARCHAR NOT NULL,
-    "accountID"         VARCHAR NOT NULL,
+    "traderID"         VARCHAR NOT NULL,
     "transactionAmount" INT     NOT NULL,
-    "gas"               INT,
-    "status"            BOOLEAN,
-    "rtcbStatus"        BOOLEAN NOT NULL,
-    "ticketID"          VARCHAR,
-    "comment"           VARCHAR,
+    "status"            VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
+
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
 (
-    "id"      VARCHAR NOT NULL,
-    "request" VARCHAR NOT NULL,
+    "id"        VARCHAR NOT NULL,
+    "reference" VARCHAR NO NOT NULL,
+    "externalReference" VARCHAR NOT NULL,
+    "invoiceNumber" VARCHAR NOT NULL,
+    "buyerBusinessId" VARCHAR NOT NULL,
+    "buyerFirstName" VARCHAR NOT NULL,
+    "buyerLastName" VARCHAR NOT NULL,
+    "createdDate" TIMESTAMP NOT NULL,
+    "lastUpdatedDate" TIMESTAMP NOT NULL,
+    "status" VARCHAR NOT NULL,
+    "dealType" VARCHAR NOT NULL,
+    "paymentTypeId" VARCHAR NOT NULL,
+    "paidOutAmount" INT NOT NULL,
+    "requestSignature" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -1070,6 +1042,11 @@ ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
 ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
     ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 
+ALTER TABLE WESTERN_UNION."FiatRequest"
+    ADD CONSTRAINT FiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE WESTERN_UNION."RTCB"
+    ADD CONSTRAINT RTCB_FiatRequest_externalReference FOREIGN KEY ("externalReference") REFERENCES WESTERN_UNION."FiatRequest" ("id");
+
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
@@ -1121,6 +1098,7 @@ DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Asset" CASCADE;
 DROP TABLE IF EXISTS MASTER."Email" CASCADE;
+DROP TABLE IF EXISTS MASTER."Fiat" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
@@ -1139,7 +1117,6 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Chat" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Message" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."MessageRead" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile" CASCADE;
@@ -1149,9 +1126,11 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TraderInvitation" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."WURTCBRequest" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."ZoneInvitation" CASCADE;
+
+DROP TABLE IF EXISTS WESTERN_UNION."FiatRequest" CASCADE;
+DROP TABLE IF EXISTS WESTERN_UNION."RTCB" CASCADE;
+DROP TABLE IF EXISTS WESTERN_UNION."SFTPFileTransaction" CASCADE;
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;

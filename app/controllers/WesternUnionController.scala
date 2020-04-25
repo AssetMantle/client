@@ -6,11 +6,10 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Emails, Organization, Organizations, Traders}
+import models.WesternUnion.{FiatRequests, RTCBs}
+import models.master.{Emails, Organization, Organizations, Traders, Zones}
 import models.masterTransaction
-import models.master.{Contacts, Organization, Organizations, Traders}
 import models.{blockchainTransaction, masterTransaction}
-import models.masterTransaction.IssueFiatRequests
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -22,14 +21,17 @@ import scala.xml.NodeSeq
 
 @Singleton
 class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                       masterTransactionWURTCBRequests: masterTransaction.WURTCBRequests,
+                                       masterTransactionWURTCBRequests: RTCBs,
                                        withTraderLoginAction: WithTraderLoginAction,
                                        withUsernameToken: WithUsernameToken,
-                                       issueFiatRequests: IssueFiatRequests,
+                                       issueFiatRequests: FiatRequests,
                                        organizations: Organizations,
                                        traders: Traders,
+                                       zones: Zones,
                                        emailAddresses: Emails,
+                                       identifications: master.Identifications,
                                        masterAccounts: master.Accounts,
+                                       masterFiats: master.Fiats,
                                        withZoneLoginAction: WithZoneLoginAction,
                                        transactionsIssueFiat: transactions.IssueFiat,
                                        blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
@@ -64,11 +66,34 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
 
       (if (requestBody.requestSignature == utilities.String.sha256Sum(hash)) {
-        val create = masterTransactionWURTCBRequests.Service.create(requestBody.id, Json.toJson(requestBody).toString())
-        val updateIssueFiatRequestRTCBStatus = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference)
+        val createRTCB = masterTransactionWURTCBRequests.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
+          requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
+          utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
+          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, requestBody.paidOutAmount.toInt, requestBody.requestSignature)
+
+        def totalRTCBAmountReceived: Future[Int] = masterTransactionWURTCBRequests.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
+
+        def updateIssueFiatRequestRTCBStatus(totalRTCBAmount: Int): Future[Int] = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference, totalRTCBAmount)
+
+        val traderDetails = traders.Service.tryGet(requestBody.buyerBusinessId)
+
+        def traderAddress(traderAccountID: String) = masterAccounts.Service.getAddress(traderAccountID)
+
+        def zoneAccountID(zoneID: String) = zones.Service.getAccountId(zoneID)
+
+        def zoneAddress(zoneAccountID: String) = masterAccounts.Service.getAddress(zoneAccountID)
+
+        def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat( traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount)
+
         for {
-          _ <- create
-          _ <- updateIssueFiatRequestRTCBStatus
+          _ <- createRTCB
+          totalRTCBAmountReceived <- totalRTCBAmountReceived
+          _ <- updateIssueFiatRequestRTCBStatus(totalRTCBAmountReceived)
+          traderDetails <- traderDetails
+          traderAddress <- traderAddress(traderDetails.accountID)
+          zoneAccountID <- zoneAccountID(traderDetails.zoneID)
+          zoneAddress <- zoneAddress(zoneAccountID)
+          _ <- zoneAutomation(traderAddress, zoneAddress)
         } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else {
         Future {
@@ -87,20 +112,24 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           Future(BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
         },
         issueFiatRequestData => {
-          val create = issueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
           val traderDetails = traders.Service.tryGetByAccountID(loginState.username)
+          val identification = identifications.Service.tryGet(loginState.username)
+
+          def create(traderID: String): Future[String] = issueFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
+
           val emailAddress = emailAddresses.Service.tryGetVerifiedEmailAddress(loginState.username)
 
           def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.tryGet(organizationID)
 
           (for {
-            _ <- create
-            emailAddress <- emailAddress
             traderDetails <- traderDetails
+            identification <- identification
+            transactionID <- create(traderDetails.id)
+            emailAddress <- emailAddress
             organizationDetails <- organizationDetails(traderDetails.organizationID)
           } yield {
-            val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(issueFiatRequestData.transactionID),
-              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(traderDetails.name), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(""),
+            val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(transactionID),
+              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(identification.firstName), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(identification.lastName),
               Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
               Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
@@ -115,44 +144,25 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         })
   }
 
-//  def issueFiat(requestID: String, traderAccountID: String, zoneWalletAddress: String, fiatTransactionID: String, transactionAmount: String) = {
-//          val status = issueFiatRequests.Service.getStatus(requestID)
-//
-//          def getResult(status: Option[Boolean]) = {
-//            if (status.isEmpty) {
-//              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
-//
-//              def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
-//                entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
-//                blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-//                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
-//                action = transactionsIssueFiat.Service.post,
-//                onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
-//                onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
-//                updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
-//              )
-//
-//              def accept(ticketID: String): Future[Int] = issueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
-//
-//              for {
-//                toAddress <- toAddress
-//                ticketID <- ticketID(toAddress)
-//                _ <- accept(ticketID)
-//
-//              } yield Unit
-//            } else {
-//              throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
-//            }
-//          }
-//
-//          (for {
-//            status <- status
-//            result <- getResult(status)
-//          } yield result
-//            ).recover {
-//          }
-//        }
-//
-//  }
+  def issueFiat(traderAddress: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: Int) = {
+
+    val ticketID = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
+      entity = blockchainTransaction.IssueFiat(from = zoneWalletAddress, to = traderAddress, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, gas = zoneGas, ticketID = "", mode = transactionMode),
+      blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
+      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = zoneGas.toString), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount.toString, mode = transactionMode),
+      action = transactionsIssueFiat.Service.post,
+      onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
+      onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
+      updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
+    )
+
+    //              def accept(ticketID: String): Future[Int] = issueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
+
+    (for {
+      _ <- ticketID
+      //      _<- accept
+    } yield Unit
+      )
+  }
 
 }

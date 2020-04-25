@@ -4,7 +4,7 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.masterTransaction.IssueFiatRequest
+import models.WesternUnion.{FiatRequest, FiatRequests}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                     transaction: utilities.Transaction,
                                     withZoneLoginAction: WithZoneLoginAction,
-                                    masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests,
+                                    masterTransactionIssueFiatRequests: FiatRequests,
                                     blockchainAclAccounts: blockchain.ACLAccounts,
                                     masterZones: master.Zones,
                                     withTraderLoginAction: WithTraderLoginAction,
@@ -33,69 +33,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueFiatRequest())
-  }
-
-  def issueFiatRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
-        },
-        issueFiatRequestData => {
-          val create = masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
-          (for {
-            _ <- create
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
-  def issueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zoneID = masterZones.Service.tryGetID(loginState.username)
-
-      def addressesUnderZone(zoneID: String): Future[Seq[String]] = blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
-
-      def iDsForAddresses(addresses: Seq[String]): Future[Seq[String]] = masterAccounts.Service.getIDsForAddresses(addresses)
-
-      def pendingIssueFiatRequests(iDs: Seq[String]): Future[Seq[IssueFiatRequest]] = masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(iDs)
-
-      (for {
-        zoneID <- zoneID
-        addressesUnderZone <- addressesUnderZone(zoneID)
-        iDsForAddresses <- iDsForAddresses(addressesUnderZone)
-        pendingIssueFiatRequests <- pendingIssueFiatRequests(iDsForAddresses)
-      } yield Ok(views.html.component.master.issueFiatRequestList(pendingIssueFiatRequests))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def rejectIssueFiatRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectIssueFiatRequest(requestID = requestID))
-  }
-
-  def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name))))
-        },
-        rejectIssueFiatRequestData => {
-          val reject = masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
-          (for {
-            _ <- reject
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
   }
 
   def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = Action { implicit request =>
@@ -125,12 +62,12 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
               )
 
-              def accept(ticketID: String): Future[Int] = masterTransactionIssueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
+//              def accept(ticketID: String): Future[Int] = masterTransactionIssueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
 
               for {
                 toAddress <- toAddress
                 ticketID <- ticketID(toAddress)
-                _ <- accept(ticketID)
+//                _ <- accept(ticketID)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
               } yield result
             } else {
@@ -140,7 +77,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
           (for {
             status <- status
-            result <- getResult(status)
+            result <- getResult(None)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
