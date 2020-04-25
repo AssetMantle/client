@@ -398,6 +398,9 @@ object Form {
   val BUYER_LAST_NAME = "buyerLastName"
   val CREATED_DATE = "createdDate"
   val LAST_UPDATED_DATE = "lastUpdatedDate"
+  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+
+  //Western Union - Please Do not change.
   val WU_RTCB_STATUS = "status"
   val DEAL_TYPE = "dealType"
   val PAYMENT_TYPE_ID = "paymentTypeId"
@@ -414,7 +417,6 @@ object Form {
   val BUYER_EMAIL = "buyer.email"
   val SERVICE_ID = "service.id"
   val SERVICE_AMOUNT = "service.amount"
-  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
 
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"
