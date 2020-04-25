@@ -26,7 +26,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
                                        withTraderLoginAction: WithTraderLoginAction,
                                        withUsernameToken: WithUsernameToken,
                                        sftpScheduler: SFTPScheduler,
-                                       issueFiatRequests: FiatRequests,
+                                       fiatRequests: FiatRequests,
                                        organizations: Organizations,
                                        traders: Traders,
                                        zones: Zones,
@@ -75,9 +75,9 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
 
         def totalRTCBAmountReceived: Future[Int] = masterTransactionWURTCBRequests.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
-        val fiatRequest = issueFiatRequests.Service.tryGetByID(requestBody.externalReference)
+        val fiatRequest = fiatRequests.Service.tryGetByID(requestBody.externalReference)
 
-        def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
+        def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = fiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
 
         def traderDetails(traderID: String) = traders.Service.tryGet(traderID)
 
@@ -123,7 +123,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           val traderDetails = traders.Service.tryGetByAccountID(loginState.username)
           val identification = identifications.Service.tryGet(loginState.username)
 
-          def create(traderID: String): Future[String] = issueFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
+          def create(traderID: String): Future[String] = fiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
           val emailAddress = emailAddresses.Service.tryGetVerifiedEmailAddress(loginState.username)
 
