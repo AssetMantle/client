@@ -17,14 +17,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ComponentViewController @Inject()(
-                                         actorsCreate: actors.Create,
                                          messagesControllerComponents: MessagesControllerComponents,
                                          masterTraders: master.Traders,
                                          masterOrganizationKYCs: master.OrganizationKYCs,
                                          masterTraderKYCs: master.TraderKYCs,
                                          masterAssets: master.Assets,
-                                         masterTransactionNotifications: masterTransaction.Notifications,
-                                         masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                          masterNegotiations: master.Negotiations,
                                          masterAccounts: master.Accounts,
                                          masterAccountFiles: master.AccountFiles,
@@ -219,7 +216,7 @@ class ComponentViewController @Inject()(
 
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok.chunked(actorsCreate.Service.cometSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
+      Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -607,9 +604,9 @@ class ComponentViewController @Inject()(
       val email: Future[Option[Email]] = masterEmails.Service.get(loginState.username)
       val identification: Future[Option[Identification]] = masterIdentifications.Service.get(loginState.username)
 
-      def getZoneOrNoneByOrganization(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.getOrNone(organization.get.zoneID) else Future(None)
+      def getOrganizationZone(organization: Option[Organization]): Future[Option[Zone]] = if (organization.isDefined) masterZones.Service.get(organization.get.zoneID) else Future(None)
 
-      def getOrganizationOrNoneByTrader(trader: Option[Trader]): Future[Option[Organization]] = if (trader.isDefined) masterOrganizations.Service.getOrNone(trader.get.organizationID) else Future(None)
+      def getTraderOrganization(trader: Option[Trader]): Future[Option[Organization]] = if (trader.isDefined) masterOrganizations.Service.getOrNone(trader.get.organizationID) else Future(None)
 
       def getTraderKYCsByTrader(trader: Option[Trader]): Future[Seq[TraderKYC]] = if (trader.isDefined) masterTraderKYCs.Service.getAllDocuments(trader.get.id) else Future(Seq[TraderKYC]())
 
@@ -624,10 +621,10 @@ class ComponentViewController @Inject()(
         if (identificationStatus && contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
           for {
             trader <- getTraderOrNoneByAccountID(loginState.username)
-            traderOrganization <- getOrganizationOrNoneByTrader(trader)
+            traderOrganization <- getTraderOrganization(trader)
             traderKYCs <- getTraderKYCsByTrader(trader)
             organization <- getOrganizationOrNoneByAccountID(loginState.username)
-            organizationZone <- getZoneOrNoneByOrganization(organization)
+            organizationZone <- getOrganizationZone(organization)
             organizationKYCs <- getOrganizationKYCsByOrganization(organization)
           } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, contactStatus = contactStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader, traderKYCs = traderKYCs))
         } else {
@@ -665,7 +662,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organization: Future[Organization] = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
-      def getZone(zoneID: String): Future[Zone] = masterZones.Service.get(zoneID)
+      def getZone(zoneID: String): Future[Zone] = masterZones.Service.tryGet(zoneID)
 
       def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 

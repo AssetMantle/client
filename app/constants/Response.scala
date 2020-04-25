@@ -162,6 +162,7 @@ object Response {
   val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
   val USERNAME_OR_PASSWORD_INCORRECT = new Failure("USERNAME_OR_PASSWORD_INCORRECT", routes.javascript.AccountController.loginForm)
   val INCORRECT_PASSWORD = new Failure("INCORRECT_PASSWORD")
+  val COMET_ACTOR_ERROR = new Failure("COMET_ACTOR_ERROR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

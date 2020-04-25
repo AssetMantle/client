@@ -73,26 +73,32 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
 
         def totalRTCBAmountReceived: Future[Int] = masterTransactionWURTCBRequests.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
-        def updateIssueFiatRequestRTCBStatus(totalRTCBAmount: Int): Future[Int] = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference, totalRTCBAmount)
+        val fiatRequest = issueFiatRequests.Service.tryGetByID(requestBody.externalReference)
 
-        val traderDetails = traders.Service.tryGet(requestBody.buyerBusinessId)
+        def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
+
+        def traderDetails(traderID: String) = traders.Service.tryGet(traderID)
 
         def traderAddress(traderAccountID: String) = masterAccounts.Service.getAddress(traderAccountID)
 
-        def zoneAccountID(zoneID: String) = zones.Service.getAccountId(zoneID)
+        def zoneAccountID(zoneID: String) = zones.Service.tryGetAccountID(zoneID)
 
         def zoneAddress(zoneAccountID: String) = masterAccounts.Service.getAddress(zoneAccountID)
 
-        def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat( traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount)
+        def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat( traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount.toInt)
+
+        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, requestBody.paidOutAmount.toInt, 0)
 
         for {
           _ <- createRTCB
+          fiatRequest <- fiatRequest
           totalRTCBAmountReceived <- totalRTCBAmountReceived
-          _ <- updateIssueFiatRequestRTCBStatus(totalRTCBAmountReceived)
-          traderDetails <- traderDetails
+          _ <- updateIssueFiatRequestRTCBStatus(fiatRequest.transactionAmount, totalRTCBAmountReceived)
+          traderDetails <- traderDetails(fiatRequest.traderID)
           traderAddress <- traderAddress(traderDetails.accountID)
           zoneAccountID <- zoneAccountID(traderDetails.zoneID)
           zoneAddress <- zoneAddress(zoneAccountID)
+          _ <- createFiat(traderDetails.id)
           _ <- zoneAutomation(traderAddress, zoneAddress)
         } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else {
@@ -135,6 +141,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
               Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
             val fullURL = utilities.String.queryURLGenerator(wuURL, queryString)
+            println(fullURL)
             Status(302)(fullURL)
           }
             ).recover {

@@ -78,7 +78,7 @@ object Form {
 
   //IssueFiatController
   val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect(), routes.javascript.IssueFiatController.issueFiatRequestForm)
-  val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest(), routes.javascript.IssueFiatController.rejectIssueFiatRequestForm)
+//  val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest(), routes.javascript.IssueFiatController.rejectIssueFiatRequestForm)
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat(), routes.javascript.IssueFiatController.issueFiatForm)
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat(), routes.javascript.IssueFiatController.blockchainIssueFiatForm)
 
@@ -413,8 +413,8 @@ object Form {
   val BUYER_CITY = "buyer.city"
   val BUYER_ZIP = "buyer.zip"
   val BUYER_EMAIL = "buyer.email"
-  val SERVICE_ID = "service1.id"
-  val SERVICE_AMOUNT = "service1.amount"
+  val SERVICE_ID = "service.id"
+  val SERVICE_AMOUNT = "service.amount"
   val SHIPPING_PERIOD = "SHIPPING_PERIOD"
 
   //Gatling Test

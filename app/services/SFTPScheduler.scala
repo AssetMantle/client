@@ -33,7 +33,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.SFTP_SCHEDULER
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
   implicit val system = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
@@ -54,6 +54,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
 
   def scheduler: Done = {
     try {
+      println("entered")
       val sftpSettings = SftpSettings
         .create(InetAddress.getByName(sftpSite))
         .withPort(sftpPort)

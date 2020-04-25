@@ -508,6 +508,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     "quantityUnit" VARCHAR NOT NULL,
     "price"        INT     NOT NULL,
     "moderated"    BOOLEAN NOT NULL,
+    "takerID"      VARCHAR,
     "otherDetails" VARCHAR NOT NULL,
     "status"       VARCHAR NOT NULL,
     PRIMARY KEY ("id")
@@ -523,13 +524,12 @@ CREATE TABLE IF NOT EXISTS MASTER."Email"
 
 CREATE TABLE IF NOT EXISTS MASTER."Fiat"
 (
-    "pegHash"           VARCHAR NOT NULL,
     "ownerID"           VARCHAR NOT NULL,
-    "transactionID"     VARCHAR NOT NULL UNIQUE,
+    "transactionID"     VARCHAR NOT NULL,
     "transactionAmount" INT     NOT NULL,
     "amountRedeemed"    INT,
     "status"            BOOLEAN,
-    PRIMARY KEY ("pegHash", "ownerID")
+    PRIMARY KEY ("transactionID", "ownerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Identification"
@@ -894,7 +894,7 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
 (
     "id"        VARCHAR NOT NULL,
-    "reference" VARCHAR NO NOT NULL,
+    "reference" VARCHAR NOT NULL,
     "externalReference" VARCHAR NOT NULL,
     "invoiceNumber" VARCHAR NOT NULL,
     "buyerBusinessId" VARCHAR NOT NULL,
@@ -966,6 +966,8 @@ ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Asset"
     ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
+ALTER TABLE MASTER."Asset"
+    ADD CONSTRAINT Asset_Trader_TakerID FOREIGN KEY ("takerID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Email"
     ADD CONSTRAINT Email_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Mobile"
@@ -1023,8 +1025,6 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
     ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
     ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
-    ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
     ADD CONSTRAINT NegotiationFile_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"

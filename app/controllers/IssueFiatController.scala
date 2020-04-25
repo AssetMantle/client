@@ -19,8 +19,10 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                                     masterTransactionIssueFiatRequests: FiatRequests,
                                     blockchainAclAccounts: blockchain.ACLAccounts,
                                     masterZones: master.Zones,
+                                    masterTraders: master.Traders,
                                     withTraderLoginAction: WithTraderLoginAction,
                                     masterAccounts: master.Accounts,
+                                    masterFiats: master.Fiats,
                                     transactionsIssueFiat: transactions.IssueFiat,
                                     blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
                                     withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -62,12 +64,14 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
               )
 
-//              def accept(ticketID: String): Future[Int] = masterTransactionIssueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
+              val traderID = masterTraders.Service.tryGetID(issueFiatData.accountID)
+              def create(traderID: String) = masterFiats.Service.create(traderID, issueFiatData.transactionID, issueFiatData.transactionAmount, 0)
 
               for {
                 toAddress <- toAddress
                 ticketID <- ticketID(toAddress)
-//                _ <- accept(ticketID)
+                traderID <- traderID
+                _ <- create(traderID)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
               } yield result
             } else {

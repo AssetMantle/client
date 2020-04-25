@@ -43,20 +43,12 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findTransactionAmountByID(id: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).map(_.transactionAmount).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => if (result > 0) {
       result
     } else {
-        logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = "+ transactionID))
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = " + id))
+      throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -99,29 +91,20 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.requestID, traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.Fiat.REQUEST_INITIATED))
+    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.ID30letters, traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.Fiat.REQUEST_INITIATED))
 
     def tryGetByID(id: String): Future[FiatRequest] = findByID(id)
 
-    def tryGetTransactionAmountByID(id: String): Future[Int] = findTransactionAmountByID(id)
-
     def getStatus(id: String): Future[String] = getStatusByID(id)
 
-    def markRTCBReceived(id: String, totalRTCBAmount: Int): Future[Int] = {
-      val amountRequested = tryGetTransactionAmountByID(id)
-      def rtcbStatus(amountRequested: Int): Future[Int] = {
-        if(amountRequested == totalRTCBAmount){
-          updateStatusByID(id, constants.Status.Fiat.FULLY_PAID)
-        }else if(amountRequested < totalRTCBAmount){
-          updateStatusByID(id, constants.Status.Fiat.OVER_PAID)
-        }else{
-          updateStatusByID(id, constants.Status.Fiat.PARTIALLY_PAID)
-        }
+    def markRTCBReceived(id: String, amountRequested: Int, totalRTCBAmount: Int): Future[Int] = {
+      if (amountRequested == totalRTCBAmount) {
+        updateStatusByID(id, constants.Status.Fiat.FULLY_PAID)
+      } else if (amountRequested < totalRTCBAmount) {
+        updateStatusByID(id, constants.Status.Fiat.OVER_PAID)
+      } else {
+        updateStatusByID(id, constants.Status.Fiat.PARTIALLY_PAID)
       }
-      for{
-        amountRequested <- amountRequested
-        rtcbStatus <- rtcbStatus(amountRequested)
-      } yield rtcbStatus
     }
   }
 

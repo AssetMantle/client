@@ -28,7 +28,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case constants.User.ZONE =>
           val id = blockchainZones.Service.getID(loginState.address)
 
-          def zone(id: String): Future[Zone] = masterZones.Service.get(id)
+          def zone(id: String): Future[Zone] = masterZones.Service.tryGet(id)
 
           for {
             id <- id
@@ -50,7 +50,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           val totalFiat = blockchainFiats.Service.getFiatPegWallet(loginState.address)
 
           def getZoneAndOrganization(aclAccount: ACLAccount): Future[(Zone, Organization)] = {
-            val zone = masterZones.Service.get(aclAccount.zoneID)
+            val zone = masterZones.Service.tryGet(aclAccount.zoneID)
             val organization = masterOrganizations.Service.tryGet(aclAccount.organizationID)
             for {
               zone <- zone
