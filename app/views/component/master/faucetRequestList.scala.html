@@ -12,9 +12,9 @@
       @commonTextInfo(constants.View.ACCOUNT_ID, faucetRequest.accountID)
       @commonIntInfo(constants.Form.AMOUNT, faucetRequest.amount)
 @*      <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button>*@
-      @commonModalButton(constants.Form.APPROVE,routes.javascript.SendCoinController.approveFaucetRequestsForm,'parameters -> s"'${faucetRequest.id},${faucetRequest.accountID}'")
+      @commonFormButton(constants.Form.APPROVE_FAUCET_REQUEST)
 @*      <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>*@
-      @commonModalButton(constants.Form.REJECT,routes.javascript.SendCoinController.rejectFaucetRequestForm,'parameters -> s"'${faucetRequest.id}'")
+      @commonFormButton(constants.Form.REJECT_FAUCET_REQUEST)
     }
     </div>
   }

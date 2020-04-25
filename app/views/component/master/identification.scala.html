@@ -11,7 +11,7 @@
         case Some(identification) => {
             @if(!identification.completionStatus) {
 @*                <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.Form.ADD_IDENTIFICATION.legend)</button>*@
-                @commonModalButton(constants.Form.ADD_IDENTIFICATION.legend,routes.javascript.AccountController.addIdentification)
+                @commonFormButton(constants.Form.ADD_IDENTIFICATION)
             }
         }
         case _ => {}

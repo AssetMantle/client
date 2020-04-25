@@ -22,7 +22,7 @@
 @*                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile('@traderVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>*@
                 @commonModalButton(constants.Form.APPROVE,routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile,'parameters -> s"'${traderVerificationRequest.id}'")
 @*                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.TraderController.zoneRejectRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>*@
-                @commonModalButton(constants.Form.REJECT,routes.javascript.TraderController.zoneRejectRequestForm,'parameters -> s"'${traderVerificationRequest.id}'")
+                @commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST)
             </div>
         }
         </div>

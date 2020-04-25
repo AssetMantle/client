@@ -10,7 +10,7 @@
     <h4>@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</h4>
         <div id="upload@documentType">
 @*            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@negotiationRequestID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
-            @commonModalButton(constants.Form.UPLOAD,routes.javascript.FileController.uploadTraderNegotiationForm,'parameters -> s"'${documentType}'")
+            @commonModalButton(constants.Form.UPLOAD,routes.javascript.FileController.uploadTraderNegotiationForm,'parameters -> s"'${documentType}','${negotiationRequestID}'")
 
 
         </div>

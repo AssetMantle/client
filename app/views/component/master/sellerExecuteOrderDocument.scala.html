@@ -8,7 +8,7 @@
     <div class="centerText">
         <div id="upload@documentType">
 @*            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@negotiationRequestID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
-            @commonModalButton(constants.Form.UPLOAD,routes.javascript.FileController.uploadTraderNegotiationForm,'parameters -> s"'${documentType},${negotiationRequestID}'")
+            @commonModalButton(constants.Form.UPLOAD + " " +documentType,routes.javascript.FileController.uploadTraderNegotiationForm,'parameters -> s"'${documentType},${negotiationRequestID}'")
         </div>
         @negotiationFile match {
             case Some(file) => {
@@ -18,11 +18,11 @@
                     <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)" target="_blank">@Messages(file.documentType)</a>
                 } {
 @*                    <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@file.documentType','@file.id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>*@
-                    @commonModalButton(constants.Form.UPDATE,routes.javascript.FileController.updateTraderNegotiationForm,'parameters -> s"'${file.documentType},${file.id}'")
+                    @commonModalButton(constants.Form.UPDATE + " " + file.documentType,routes.javascript.FileController.updateTraderNegotiationForm,'parameters -> s"'${file.documentType},${file.id}'")
                     <script>hideElement('upload@file.documentType')</script>
                 }
 @*                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.OrderController.sellerExecuteOrderForm('@file.id'))">@Messages(constants.Form.NEXT)</button>*@
-                @commonModalButton(constants.Form.NEXT,routes.javascript.OrderController.sellerExecuteOrderForm,'parameters -> s"'${file.id}'")
+                @commonFormButton(constants.Form.SELLER_EXECUTE_ORDER,'parameters -> s"'${file.id}'")
             }
             case None => {}
         }

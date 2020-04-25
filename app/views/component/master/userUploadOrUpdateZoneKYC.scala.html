@@ -10,7 +10,7 @@
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
 //@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
-            @commonModalButton(constants.Form.UPLOAD,routes.javascript.AddZoneController.userUploadZoneKYCForm,'parameters -> s"'${documentType}'")
+            @commonModalButton(constants.Form.UPLOAD + " " +documentType,routes.javascript.AddZoneController.userUploadZoneKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
     @for(zoneKYC <- zoneKYCs) {
@@ -20,7 +20,7 @@
             <a href="@routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)" target="_blank">@Messages(zoneKYC.documentType)</a>
         } {
 @*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUpdateZoneKYCForm('@zoneKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(zoneKYC.documentType)</button>*@
-            @commonModalButton(constants.Form.UPDATE,routes.javascript.AddZoneController.userUpdateZoneKYCForm,'parameters -> s"'${zoneKYC.documentType}'")
+            @commonModalButton(constants.Form.UPDATE + " " +zoneKYC.documentType,routes.javascript.AddZoneController.userUpdateZoneKYCForm,'parameters -> s"'${zoneKYC.documentType}'")
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }
