@@ -32,7 +32,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   val db = databaseConfig.db
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_COIN
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 

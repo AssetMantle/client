@@ -575,7 +575,7 @@ class NegotiationController @Inject()(
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateAssetTermsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield {
-            masterNegotiations.Service.sendMessageToNegotiationTermsActor(buyerAccountID, negotiation.id)
+            actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
             result
           }
             ).recover {
@@ -633,7 +633,7 @@ class NegotiationController @Inject()(
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updateAssetOtherDetailsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield {
-            masterNegotiations.Service.sendMessageToNegotiationTermsActor(buyerAccountID, negotiation.id)
+            actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
             result
           }
             ).recover {
@@ -692,7 +692,7 @@ class NegotiationController @Inject()(
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, negotiation.sellerTraderID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(id = updatePaymentTermsData.id, successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
           } yield {
-            masterNegotiations.Service.sendMessageToNegotiationTermsActor(buyerAccountID, negotiation.id)
+            actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
             result
           }
             ).recover {
@@ -755,7 +755,7 @@ class NegotiationController @Inject()(
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, negotiation.sellerTraderID)
             result <- getResult(negotiation)
           } yield {
-            masterNegotiations.Service.sendMessageToNegotiationTermsActor(buyerAccountID, negotiation.id)
+            actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
             result
           }
             ).recover {
@@ -820,7 +820,7 @@ class NegotiationController @Inject()(
             sellerAccountID <- sellerAccountID(negotiation)
             result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = acceptOrRejectNegotiationTermsData.termType, status = acceptOrRejectNegotiationTermsData.status))
           } yield {
-            masterNegotiations.Service.sendMessageToNegotiationTermsActor(sellerAccountID, negotiation.id)
+            actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
             result
           }
             ).recover {
@@ -974,7 +974,7 @@ class NegotiationController @Inject()(
             val contract = content.asInstanceOf[Serializable.Contract]
             withUsernameToken.Ok(views.html.component.master.contractDetails(views.companion.master.ContractDetails.form.fill(views.companion.master.ContractDetails.Data(id = id, contractNumber = contract.contractNumber)), id = id))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.invoiceDetails(id = id))
+          case None => withUsernameToken.Ok(views.html.component.master.contractDetails(id = id))
         }
       }
 
@@ -1042,7 +1042,7 @@ class NegotiationController @Inject()(
 
       def getOrganizationAccountID(organizationID: String): Future[String] = masterOrganizations.Service.tryGetAccountID(organizationID)
 
-      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.getAccountId(zoneID)
+      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
       def getTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivity]] = {
         if (!accountIDs.contains(loginState.username)) throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -1067,30 +1067,6 @@ class NegotiationController @Inject()(
       } yield Ok(views.html.component.master.tradeActivityMessages(tradeActivities = tradeActivityMessages))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def assetDocumentContent(assetID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val documentContent = masterTransactionAssetFiles.Service.getDocumentContent(assetID, documentType)
-
-      (for {
-        documentContent <- documentContent
-      } yield Ok(views.html.component.master.assetDocumentContent(documentType, documentContent))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def negotiationDocumentContent(id: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(id, documentType)
-
-      (for {
-        documentContent <- documentContent
-      } yield Ok(views.html.component.master.negotiationDocumentContent(documentType, documentContent))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 
@@ -1122,7 +1098,7 @@ class NegotiationController @Inject()(
                     _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, confirmAllNegotiationTermsData.id)
                     result <- withUsernameToken.Ok(views.html.tradeRoom(confirmAllNegotiationTermsData.id))
                   } yield {
-                    masterNegotiations.Service.sendMessageToNegotiationTermsActor(sellerAccountID, negotiation.id)
+                    actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
                     result
                   }
                 } else {

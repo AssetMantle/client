@@ -92,6 +92,7 @@ object Serializable {
   }
 
   implicit val negotiationDocumentContentReads: Reads[NegotiationDocumentContent] = {
-    Json.format[Invoice].map(x => x: NegotiationDocumentContent)
+    Json.format[Invoice].map(x => x: NegotiationDocumentContent) or
+    Json.format[Contract].map(x => x: NegotiationDocumentContent)
   }
 }

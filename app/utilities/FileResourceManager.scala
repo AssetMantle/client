@@ -134,7 +134,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.PACKING_LIST => uploadTraderAssetPackingListPath
       case constants.File.COO => uploadTraderAssetCOOPath
       case constants.File.COA => uploadTraderAssetCOAPath
-      case constants.File.OTHER => uploadTraderAssetOtherPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }

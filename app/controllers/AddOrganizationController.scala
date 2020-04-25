@@ -424,7 +424,7 @@ class AddOrganizationController @Inject()(
       val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
       def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
-        val zone = masterZones.Service.get(organization.zoneID)
+        val zone = masterZones.Service.tryGet(organization.zoneID)
         val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
         for {
           zone <- zone
@@ -449,7 +449,7 @@ class AddOrganizationController @Inject()(
           val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
           def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
-            val zone = masterZones.Service.get(organization.zoneID)
+            val zone = masterZones.Service.tryGet(organization.zoneID)
             val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
             for {
               zone <- zone
@@ -480,7 +480,7 @@ class AddOrganizationController @Inject()(
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
               def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
-                val zone = masterZones.Service.get(organization.zoneID)
+                val zone = masterZones.Service.tryGet(organization.zoneID)
                 val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
                 for {
                   zone <- zone

@@ -164,6 +164,7 @@ object Response {
   val INCORRECT_PASSWORD = new Failure("INCORRECT_PASSWORD")
   val ALL_NEGOTIATION_TERMS_NOT_CONFIRMED = new Failure("ALL_NEGOTIATION_TERMS_NOT_CONFIRMED")
   val ALL_NEGOTIATION_TERMS_CONFIRMED = new Failure("ALL_NEGOTIATION_TERMS_CONFIRMED")
+  val COMET_ACTOR_ERROR = new Failure("COMET_ACTOR_ERROR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -13,7 +13,7 @@
     <div>
         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationFile('@id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
         @assetFile.documentType match{
-            case constants.File.OBL=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.NegotiationController.negotiationDocumentContent('@id','@assetFile.documentType'))")></td>}
+            case constants.File.OBL=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiation.assetID','@assetFile.documentType'))")></td>}
             case _=>{}
         }
     </div>
@@ -24,7 +24,7 @@
     <div>
         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationFile('@id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
         @negotiationFile.documentType match{
-            case constants.File.INVOICE=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.NegotiationController.negotiationDocumentContent('@id','@negotiationFile.documentType'))")></td>}
+            case constants.File.INVOICE | constants.File.CONTRACT=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocumentContent('@id','@negotiationFile.documentType'))")></td>}
             case _=>{}
         }
     </div>

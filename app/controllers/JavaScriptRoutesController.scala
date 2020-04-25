@@ -194,6 +194,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewAcceptedNegotiationFiles,
         routes.javascript.ComponentViewController.tradeDocuments,
         routes.javascript.ComponentViewController.tradeActivities,
+        routes.javascript.ComponentViewController.traderViewNegotiationDocumentContent,
+        routes.javascript.ComponentViewController.traderViewAssetDocumentContent,
+        routes.javascript.ComponentViewController.organizationViewNegotiationDocumentContent,
+        routes.javascript.ComponentViewController.organizationViewAssetDocumentContent,
+        routes.javascript.ComponentViewController.zoneViewNegotiationDocumentContent,
+        routes.javascript.ComponentViewController.zoneViewAssetDocumentContent,
 
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
@@ -256,9 +262,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.updatePaymentTermsForm,
         routes.javascript.NegotiationController.updateDocumentListForm,
         routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm,
-        routes.javascript.NegotiationController.negotiationDocumentContent,
         routes.javascript.NegotiationController.oblDetailsForm,
         routes.javascript.NegotiationController.invoiceDetailsForm,
+        routes.javascript.NegotiationController.contractDetailsForm,
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,
 
         routes.javascript.NegotiationController.tradeActivityMessages,

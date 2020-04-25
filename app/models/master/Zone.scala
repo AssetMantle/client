@@ -46,7 +46,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findById(id: String): Future[ZoneSerialized] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(id: String): Future[ZoneSerialized] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -54,7 +54,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findOrNoneByID(id: String): Future[Option[ZoneSerialized]] = db.run(zoneTable.filter(_.id === id).result.headOption)
+  private def getByID(id: String): Future[Option[ZoneSerialized]] = db.run(zoneTable.filter(_.id === id).result.headOption)
 
   private def findByAccountID(accountID: String): Future[ZoneSerialized] = db.run(zoneTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
@@ -64,7 +64,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.headOption)
+  private def tryGetIDByAccountID(accountID: String): Future[Option[String]] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.headOption)
 
   private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -76,7 +76,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getAccountIdById(id: String): Future[String] = db.run(zoneTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
+  private def tryGetAccountIDByID(id: String): Future[String] = db.run(zoneTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -145,7 +145,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def create(accountID: String, name: String, currency: String, address: Address): Future[String] = add(serialize(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency, address = address)))
 
     def insertOrUpdate(accountID: String, name: String, currency: String, address: Address): Future[String] = {
-      val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
+      val id = tryGetIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
 
       def upsertZone(id: String) = upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
 
@@ -155,13 +155,11 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       } yield id
     }
 
-    def get(id: String): Future[Zone] = findById(id).map {
-      _.deserialize
-    }
+    def tryGet(id: String): Future[Zone] = tryGetByID(id).map(_.deserialize)
 
-    def getOrNone(id: String): Future[Option[Zone]] = findOrNoneByID(id).map(_.map(_.deserialize))
+    def get(id: String): Future[Option[Zone]] = getByID(id).map(_.map(_.deserialize))
 
-    def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+    def tryGetID(accountID: String): Future[String] = tryGetIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
     def getByAccountID(accountID: String): Future[Zone] = findByAccountID(accountID).map(_.deserialize)
 
@@ -171,7 +169,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def rejectZone(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(false))
 
-    def getAccountId(id: String): Future[String] = getAccountIdById(id)
+    def tryGetAccountID(id: String): Future[String] = tryGetAccountIDByID(id)
 
     def markZoneFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 

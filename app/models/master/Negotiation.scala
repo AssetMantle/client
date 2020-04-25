@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 case class Negotiation(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, chatID: Option[String] = None, status: String, comment: Option[String] = None)
 
 @Singleton
-class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorsCreate: actors.Create)(implicit executionContext: ExecutionContext) {
+class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -494,8 +494,6 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def updateQuantity(id: String, quantity: Int): Future[Int] = updateQuantityByID(id, quantity, false)
 
     def updatePrice(id: String, price: Int): Future[Int] = updatePriceByID(id, price, false)
-
-    def sendMessageToNegotiationTermsActor(accountID: String, id: String): Unit = actorsCreate.mainActor ! actors.Message.makeCometMessage(accountID, constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(id)))
 
     def getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.NEGOTIATION_STARTED, constants.Status.Negotiation.BUYER_CONFIRMED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE).map(_.map(_.deserialize))
 

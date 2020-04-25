@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models.common.Serializable._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
+import models.Abstract.NegotiationDocumentContent
 import models.Trait.{Document, Logged}
 import models.common.Node
 import models.Trait.Document
@@ -76,7 +76,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(negotiationFileTable.map(x => (x.id, x.documentType, x.documentContentJson.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((id, documentType, documentContentJson, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(negotiationFileTable.filter(_.id === id).filter(_.documentType===documentType).map(x => (x.documentContentJson.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((documentContentJson, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

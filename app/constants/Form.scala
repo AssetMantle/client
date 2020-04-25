@@ -96,6 +96,7 @@ object Form {
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
   val OBL_DETAILS = new Form("OBL_DETAILS", routes.NegotiationController.oblDetails(), routes.javascript.NegotiationController.oblDetailsForm)
   val INVOICE_DETAILS = new Form("INVOICE_DETAILS", routes.NegotiationController.invoiceDetails(), routes.javascript.NegotiationController.invoiceDetailsForm)
+  val CONTRACT_DETAILS = new Form("CONTRACT_DETAILS", routes.NegotiationController.contractDetails(), routes.javascript.NegotiationController.contractDetailsForm)
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
 
   //OrderController

@@ -391,7 +391,7 @@ class FileController @Inject()(
 
       def getResult: Future[Result] = {
         documentType match {
-          case constants.File.INVOICE | constants.File.CONTRACT | constants.File.OTHER =>
+          case constants.File.INVOICE | constants.File.CONTRACT | constants.File.BILL_OF_EXCHANGE =>
             val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
             val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 

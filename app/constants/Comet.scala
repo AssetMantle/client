@@ -4,6 +4,8 @@ object Comet {
 
   val PING = "PING"
 
+  val ERROR = "ERROR"
+
   //MessageTypes
   val ACCOUNT = "ACCOUNT"
   val ASSET = "ASSET"

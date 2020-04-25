@@ -207,7 +207,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
    // def updateDocumentContent(id: String, documentType: String, documentContent: DocumentContent): Future[Int] = updateDocumentContentByID(id, documentType, Json.toJson(documentContent).toString)
 
-    def getDocumentContent(id: String, documentType: String) = getDocumentContentByIDAndDocumentType(id = id, documentType = documentType).map(_.map(content => utilities.JSON.convertJsonStringToObject[AssetDocumentContent](content)))
+    def getDocumentContent(id: String, documentType: String) = tryGetByIDAndDocumentType(id = id, documentType = documentType).map(_.deserialize).map(_.documentContent)
   }
 
 }
