@@ -15,6 +15,7 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import models.master
+import services.SFTPScheduler
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -24,6 +25,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
                                        masterTransactionWURTCBRequests: RTCBs,
                                        withTraderLoginAction: WithTraderLoginAction,
                                        withUsernameToken: WithUsernameToken,
+                                       sftpScheduler: SFTPScheduler,
                                        issueFiatRequests: FiatRequests,
                                        organizations: Organizations,
                                        traders: Traders,
@@ -85,7 +87,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
 
         def zoneAddress(zoneAccountID: String) = masterAccounts.Service.getAddress(zoneAccountID)
 
-        def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat( traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount.toInt)
+        def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat(traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount.toInt)
 
         def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, requestBody.paidOutAmount.toInt, 0)
 
@@ -141,7 +143,6 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
               Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
             val fullURL = utilities.String.queryURLGenerator(wuURL, queryString)
-            println(fullURL)
             Status(302)(fullURL)
           }
             ).recover {
@@ -163,13 +164,10 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
       updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
     )
 
-    //              def accept(ticketID: String): Future[Int] = issueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
-
-    (for {
+    for {
       _ <- ticketID
-      //      _<- accept
     } yield Unit
-      )
+
   }
 
 }

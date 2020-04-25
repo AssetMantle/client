@@ -12,10 +12,9 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import java.nio.file.{Files, Paths}
 
-import scala.io
 import akka.Done
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, IOResult}
+import akka.stream.{IOResult, Materializer}
 import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
 import akka.stream.scaladsl.FileIO
 import exceptions.BaseException
@@ -35,7 +34,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
   private implicit val module: String = constants.Module.SFTP_SCHEDULER
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
   implicit val system = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val materializer: Materializer = Materializer(system)
 
   private val wuSFTPInitialDelay = configuration.get[Int]("westernUnion.scheduler.initialDelay").seconds
   private val wuSFTPIntervalTime = configuration.get[Int]("westernUnion.scheduler.intervalTime").seconds
@@ -52,9 +51,8 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
   private val comdexPGPPrivateKeyPassword = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPassword")
   private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
-  def scheduler: Done = {
+  def scheduler: Unit = {
     try {
-      println("entered")
       val sftpSettings = SftpSettings
         .create(InetAddress.getByName(sftpSite))
         .withPort(sftpPort)
@@ -77,7 +75,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
 
           def decryptAndReadCSV: Future[BufferedSource] = {
             PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
-            val csvFileContentBuffer = io.Source.fromFile(storagePathSFTPFiles + tempFileName)
+            val csvFileContentBuffer = scala.io.Source.fromFile(storagePathSFTPFiles + tempFileName)
             val csvFileContentProcessor = Future.sequence {
               csvFileContentBuffer.getLines.drop(1).map { line =>
                 val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
@@ -114,7 +112,10 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime) {
-    scheduler
-  }(schedulerExecutionContext)
+  val runnable = new Runnable {
+    override def run(): Unit =
+      scheduler
+  }
+
+  actorSystem.scheduler.scheduleAtFixedRate(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime)(runnable)(schedulerExecutionContext)
 }
