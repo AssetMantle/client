@@ -188,7 +188,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markRedeemedByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.REDEEMED)
 
-    def markIssueAssetRejected(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.ISSUE_ASSET_FAILED)
+    def markIssueAssetFailed(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.ISSUE_ASSET_FAILED)
 
     def markStatusAwaitingBlockchainResponse(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)
 

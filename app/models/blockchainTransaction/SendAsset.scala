@@ -30,8 +30,11 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -46,7 +49,6 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendAsset: SendAsset): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += sendAsset).asTry).map {

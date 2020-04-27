@@ -304,7 +304,7 @@ class IssueAssets @Inject()(
 
       def getAsset(traderID: String, documentHash: String): Future[Asset] = masterAssets.Service.getAllAssets(traderID).map(assets => assets.find(_.documentHash == documentHash).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
-      def markIssueAssetRejected(assetID: String): Future[Int] = masterAssets.Service.markIssueAssetRejected(assetID)
+      def markIssueAssetFailed(assetID: String): Future[Int] = masterAssets.Service.markIssueAssetFailed(assetID)
 
       def getNegotiations(assetID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
 
@@ -338,7 +338,7 @@ class IssueAssets @Inject()(
         asset <- getAsset(traderID = seller.id, documentHash = issueAsset.documentHash)
         negotiations <- getNegotiations(asset.id)
         _ <- updateNegotiationStatus(negotiations = negotiations, asset = asset)
-        _ <- markIssueAssetRejected(asset.id)
+        _ <- markIssueAssetFailed(asset.id)
         fromAccountID <- getAccountIDByAddress(issueAsset.from)
         traderOrganization <- getOrganization(seller.organizationID)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.ISSUE_ASSET_REQUEST_FAILED, message, asset.description, asset.assetType, asset.quantity.toString, asset.quantityUnit, asset.price.toString)
