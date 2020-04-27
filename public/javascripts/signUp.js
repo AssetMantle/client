@@ -11,7 +11,7 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
             const result = $(resultID);
             const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
-            let userNameNotAvailable = "User Name Not available";
+            let userNameNotAvailable = "";
             if (username.length > 0) {
                 $.ajax({
                     url: route.url,
@@ -20,19 +20,19 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
-                            $("#checkUsernameAvailableResult span").remove();
+                            $("#checkUsernameAvailableResult span").hide();
                             $(".checkIcon").fadeIn();
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
-                            $("#checkUsernameAvailableResult span").remove();
+                            $("#checkUsernameAvailableResult span").hide();
                             $(".checkIcon").fadeOut();
-                            result.append("<span class=\"userNameNotAvailable error\">" + userNameNotAvailable + "</span>");
+                            $(".userNameNotAvailable").show();
                         },
                     }
                 });
             } else {
-                $("#checkUsernameAvailableResult span").remove();
+                $("#checkUsernameAvailableResult span, .checkIcon").hide();
             }
         }, 1500);
     }
@@ -45,17 +45,17 @@ function checkPasswords() {
     let matchConfirmPasswordsResult = $('#matchConfirmPasswordsResult');
     let passwordNotMatch = "Passwords Do Not Match"
     if (confirmPassword !== password) {
-        $('#matchConfirmPasswordsResult span').remove();
-        matchConfirmPasswordsResult.append("<span class=\"passwordNotMatched error\">" + passwordNotMatch + "</span>");
+        $('#matchConfirmPasswordsResult span').hide();
+        $(".passwordNotMatched").show();
     } else {
-        $('#matchConfirmPasswordsResult span').remove();
+        $('#matchConfirmPasswordsResult span').hide();
     }
 }
 
 function showPassword() {
     $('#showPassword span').toggleClass('active');
-    let password = document.getElementById("signUpPassword");
-    let matchPassword = document.getElementById("signUpConfirmPassword");
+    let password = $('#signUpPassword')[0];
+    let matchPassword =$('#signUpConfirmPassword')[0];
     if (password.type && matchPassword.type === "password") {
         password.type = "text";
         matchPassword.type="text"

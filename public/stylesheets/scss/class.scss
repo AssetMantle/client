@@ -14,9 +14,8 @@
 
 html, body{
   height: 100%;
+  position: relative;
   background: #F0F0F0;
-  scroll-behavior: smooth;
-
 }
 
 
@@ -111,16 +110,11 @@ html, body{
 }
 
 .bodyContainer{
-  height:auto;
-  min-height: 100%;
+  min-height: 100vh;
+  display: block;
+  position: relative;
   background: #F0F0F0;
-  margin: 0 auto -138px;
-}
-
-.pageContainer,
-.dataContainer,
-.pageContent{
-  height: 100%;
+  padding-bottom: 115px;
 }
 
 .toolTip:hover .toolTipText {
@@ -332,8 +326,8 @@ html, body{
 }
 
 .footer {
-  display: none;
-  margin-top: 20px;
+  position: absolute;
+  bottom: 0;
   width: 100%;
   padding: 30px 0px;
   font-size: $paragraphFontSizeSmall;
@@ -478,6 +472,10 @@ html, body{
       width: 20px;
       height: 20px;
     }
+  }
+  .userNameNotAvailable,
+  .passwordNotMatched{
+    display: none;
   }
 }
 
@@ -1253,7 +1251,6 @@ position: relative;
 }
 
 .pageContainer{
-  padding-bottom: 136px;
   .pageContent{
     padding-top: 10px;
   }

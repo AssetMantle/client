@@ -9,8 +9,8 @@
 
 html, body {
   height: 100%;
-  background: #F0F0F0;
-  scroll-behavior: smooth; }
+  position: relative;
+  background: #F0F0F0; }
 
 .scroller {
   scrollbar-color: #E2E4E6 #FFFFFF;
@@ -82,15 +82,11 @@ html, body {
   min-height: 100vh; }
 
 .bodyContainer {
-  height: auto;
-  min-height: 100%;
+  min-height: 100vh;
+  display: block;
+  position: relative;
   background: #F0F0F0;
-  margin: 0 auto -138px; }
-
-.pageContainer,
-.dataContainer,
-.pageContent {
-  height: 100%; }
+  padding-bottom: 115px; }
 
 .toolTip:hover .toolTipText {
   visibility: visible;
@@ -261,8 +257,8 @@ html, body {
   width: 120px; }
 
 .footer {
-  display: none;
-  margin-top: 20px;
+  position: absolute;
+  bottom: 0;
   width: 100%;
   padding: 30px 0px;
   font-size: 0.875rem;
@@ -381,6 +377,9 @@ html, body {
     .usernameAvailibilty .checkIcon .icon {
       width: 20px;
       height: 20px; }
+  .usernameAvailibilty .userNameNotAvailable,
+  .usernameAvailibilty .passwordNotMatched {
+    display: none; }
 
 .showPassword {
   position: absolute;
@@ -971,178 +970,176 @@ html, body {
     border-radius: 50%;
     box-shadow: 0 0 0 5px #A1ED9F; }
 
-.pageContainer {
-  padding-bottom: 136px; }
-  .pageContainer .pageContent {
-    padding-top: 10px; }
-  .pageContainer .middle .cmuk-card-default {
-    background: #FAFAFA;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 3px; }
-  .pageContainer .middle .mainTabs .cmuk-card-body {
-    padding: 0px; }
-    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-switcher {
-      padding: 15px 30px; }
-    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav {
-      margin: 0px;
-      width: 100%;
-      margin: 0px;
-      border-bottom: 1px solid #e5e5e5; }
-    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li {
-      padding: 0px;
-      flex: 1;
-      text-align: center; }
-      .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li:first-child {
-        border-right: 1px solid #cccccc; }
-      .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li a {
-        padding: 15px 0px;
-        text-transform: capitalize;
-        font-size: 1rem; }
-    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav > .cmuk-active > a {
+.pageContainer .pageContent {
+  padding-top: 10px; }
+.pageContainer .middle .cmuk-card-default {
+  background: #FAFAFA;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 3px; }
+.pageContainer .middle .mainTabs .cmuk-card-body {
+  padding: 0px; }
+  .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-switcher {
+    padding: 15px 30px; }
+  .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav {
+    margin: 0px;
+    width: 100%;
+    margin: 0px;
+    border-bottom: 1px solid #e5e5e5; }
+  .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li {
+    padding: 0px;
+    flex: 1;
+    text-align: center; }
+    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li:first-child {
+      border-right: 1px solid #cccccc; }
+    .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav li a {
+      padding: 15px 0px;
+      text-transform: capitalize;
+      font-size: 1rem; }
+  .pageContainer .middle .mainTabs .cmuk-card-body .cmuk-subnav > .cmuk-active > a {
+    color: #061728;
+    background: none;
+    font-weight: bold;
+    border-bottom: 2px solid #0862BE; }
+.pageContainer .middle .mainTabs .docViewList a {
+  margin-right: -11px; }
+.pageContainer .middle .mainTabs .tradeTerms .traderCommodity {
+  display: flex;
+  align-items: center;
+  margin: 15px 0px; }
+  .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    background: #F2F2F2;
+    border: 1.51312px solid #E3E3E3;
+    position: relative;
+    text-align: center;
+    border-radius: 50%;
+    align-items: center;
+    margin-right: 15px;
+    justify-content: center; }
+    .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto; }
+  .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
+    color: #4B4B4B;
+    font-weight: bold;
+    font-size: 1rem; }
+.pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
+  justify-content: space-between;
+  border-bottom: 1px solid #E8E8E8;
+  padding: 25px 0px 15px 0px;
+  margin-bottom: 25px;
+  color: #848A91;
+  font-size: 0.875rem;
+  font-weight: bold; }
+.pageContainer .middle .mainTabs .tradeTerms .terms .term {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: #F8F9FC;
+  border: 1px solid #E2E4E6;
+  box-sizing: border-box;
+  border-radius: 3px;
+  margin: 10px 0px;
+  align-items: center; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
+    color: #859EB9;
+    font-family: "Oxygen", sans-serif;
+    font-size: 1rem;
+    margin-right: 10px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
+    margin-right: 10px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon .icon {
+      width: 16px;
+      height: 16px;
+      margin-bottom: 3px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
+    color: #0862BE;
+    font-size: 0.875rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-style: normal; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
+    color: #061728;
+    font-size: 1rem;
+    margin-right: 10px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
+    text-indent: 40px;
+    margin-top: 5px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
+      font-size: 1rem;
       color: #061728;
-      background: none;
-      font-weight: bold;
-      border-bottom: 2px solid #0862BE; }
-  .pageContainer .middle .mainTabs .docViewList a {
-    margin-right: -11px; }
-  .pageContainer .middle .mainTabs .tradeTerms .traderCommodity {
+      margin: 0px;
+      margin-bottom: 5px; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
     display: flex;
     align-items: center;
-    margin: 15px 0px; }
-    .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage {
-      width: 44px;
-      height: 44px;
-      display: inline-flex;
-      background: #F2F2F2;
-      border: 1.51312px solid #E3E3E3;
-      position: relative;
-      text-align: center;
-      border-radius: 50%;
-      align-items: center;
-      margin-right: 15px;
-      justify-content: center; }
-      .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .commodityImage img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto; }
-    .pageContainer .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
-      color: #4B4B4B;
-      font-weight: bold;
-      font-size: 1rem; }
-  .pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
-    justify-content: space-between;
-    border-bottom: 1px solid #E8E8E8;
-    padding: 25px 0px 15px 0px;
-    margin-bottom: 25px;
-    color: #848A91;
-    font-size: 0.875rem;
-    font-weight: bold; }
-  .pageContainer .middle .mainTabs .tradeTerms .terms .term {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 20px;
-    background: #F8F9FC;
-    border: 1px solid #E2E4E6;
-    box-sizing: border-box;
-    border-radius: 3px;
-    margin: 10px 0px;
-    align-items: center; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .serialNumber {
-      color: #859EB9;
-      font-family: "Oxygen", sans-serif;
-      font-size: 1rem;
-      margin-right: 10px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon {
-      margin-right: 10px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termIcon .icon {
-        width: 16px;
-        height: 16px;
-        margin-bottom: 3px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
-      color: #0862BE;
-      font-size: 0.875rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.01em;
-      font-style: normal; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termValue {
-      color: #061728;
-      font-size: 1rem;
-      margin-right: 10px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms {
-      text-indent: 40px;
-      margin-top: 5px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms p {
-        font-size: 1rem;
-        color: #061728;
-        margin: 0px;
-        margin-bottom: 5px; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
-      display: flex;
-      align-items: center;
-      font-family: Rubik;
-      color: #061728; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
-        width: auto;
-        display: none; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dl {
-        margin-bottom: 0px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox {
-        height: 22px;
-        width: 22px;
-        border: 1px solid #5EB55C; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:focus, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:focus {
-        border-color: #5EB55C; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:checked, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:indeterminate, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:checked {
-        background-color: #5EB55C; }
-    .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms {
-      text-indent: 30px;
-      margin-top: 10px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms .infoRowLabel {
-        color: #061728;
-        font-weight: normal;
-        width: auto;
-        margin: 2px 0px 3px 0px; }
-      .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms .infoRowValue {
-        color: #061728;
-        font-weight: bold; }
-  .pageContainer .middle .mainTabs .tradeTerms .terms hr {
-    margin: 15px 0px; }
-  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 20px;
-    background: #F8F9FC;
-    border: 1px solid #E2E4E6;
-    box-sizing: border-box;
-    border-radius: 3px;
-    margin: 10px 0px;
-    align-items: center; }
-    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
+    font-family: Rubik;
+    color: #061728; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
       width: auto;
-      color: #0862BE;
-      font-size: 0.875rem;
-      font-weight: bold;
-      text-transform: uppercase;
+      display: none; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dl {
+      margin-bottom: 0px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox {
+      height: 22px;
+      width: 22px;
+      border: 1px solid #5EB55C; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:focus, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:focus {
+      border-color: #5EB55C; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:checked, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:indeterminate, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:checked {
+      background-color: #5EB55C; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms {
+    text-indent: 30px;
+    margin-top: 10px; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms .infoRowLabel {
+      color: #061728;
+      font-weight: normal;
+      width: auto;
       margin: 2px 0px 3px 0px; }
-    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue {
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms .infoRowValue {
       color: #061728;
-      font-size: 0.875rem;
-      margin-left: 20px; }
-    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
-      font-family: Rubik;
-      color: #061728; }
-    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
-      color: #061728;
-      font-size: 0.875rem;
-      margin: 0px 0px 5px 0px; }
-  .pageContainer .middle .mainTabs .tradeTerms button {
-    padding: 0 15px;
-    line-height: 28px;
-    font-size: 14px; }
+      font-weight: bold; }
+.pageContainer .middle .mainTabs .tradeTerms .terms hr {
+  margin: 15px 0px; }
+.pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: #F8F9FC;
+  border: 1px solid #E2E4E6;
+  box-sizing: border-box;
+  border-radius: 3px;
+  margin: 10px 0px;
+  align-items: center; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
+    width: auto;
+    color: #0862BE;
+    font-size: 0.875rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 2px 0px 3px 0px; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue {
+    color: #061728;
+    font-size: 0.875rem;
+    margin-left: 20px; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
+    font-family: Rubik;
+    color: #061728; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
+    color: #061728;
+    font-size: 0.875rem;
+    margin: 0px 0px 5px 0px; }
+.pageContainer .middle .mainTabs .tradeTerms button {
+  padding: 0 15px;
+  line-height: 28px;
+  font-size: 14px; }
 
 .leftSideContainer .financial {
   margin-bottom: 20px; }

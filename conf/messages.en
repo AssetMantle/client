@@ -767,3 +767,5 @@ MOBILE_NUMBER_UNVERIFIED=Mobile Number Unverified
 EMAIL_ADDRESS_UNVERIFIED=Email Address Unverified
 AWAITING_BLOCKCHAIN_RESPONSE=Awaiting Blockchain Response
 MESSAGES_NOT_FOUND=Messages Not Found
+USER_NAME_NOT_AVAILABLE=User Name Not available
+PASSWORDS_NOT_MATCHED=Passwords Do Not Match
