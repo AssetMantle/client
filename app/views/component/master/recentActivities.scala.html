@@ -10,7 +10,8 @@
         <div id="recentActivityMessages" class="recentActivityMessages"></div>
     </div>
 }
-    <script>loadMoreReachEnd()</script>
+<script src="@routes.Assets.versioned("javascripts/loadMore.js")" type="text/javascript"></script>
 <script>
+        loadMoreActivitiesOnScroll();
     componentResource('recentActivityMessages', jsRoutes.controllers.NotificationController.recentActivityMessages(1));
 </script>

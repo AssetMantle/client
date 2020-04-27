@@ -203,6 +203,7 @@ class NegotiationController @Inject()(
         documentListData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(documentListData.id)
+
           def assetStatus(id: String): Future[String] = masterAssets.Service.tryGetStatus(id)
 
           def update(traderID: String, assetStatus: String, negotiation: Negotiation): Future[Int] = {
@@ -376,7 +377,10 @@ class NegotiationController @Inject()(
           }
         },
         acceptRequestData => {
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = acceptRequestData.password)
           val negotiation = masterNegotiations.Service.tryGet(acceptRequestData.id)
+
+          def sellerName(sellerTraderID: String): Future[String] = masterTraders.Service.tryGetTraderName(sellerTraderID)
 
           def assetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
@@ -406,16 +410,27 @@ class NegotiationController @Inject()(
 
           }
 
+          def acceptNegotiationAndGetResult(validateUsernamePassword: Boolean, negotiation: Negotiation, sellerName: String): Future[Result] = if (validateUsernamePassword) {
+            for {
+              pegHash <- assetPegHash(negotiation.assetID)
+              sellerAccountID <- sellerAccountID(negotiation.sellerTraderID)
+              sellerAddress <- sellerAddress(sellerAccountID)
+              ticketID <- sendTransaction(sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation)
+              _ <- createChatIDAndChatRoom(sellerAccountID = sellerAccountID, negotiationID = negotiation.id)
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING, sellerName, ticketID)
+              _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING, ticketID)
+              result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING)))
+            } yield result
+          }
+          else {
+            Future(BadRequest(views.html.component.master.acceptNegotiationRequest(views.companion.master.AcceptNegotiationRequest.form.fill(acceptRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiation = negotiation, sellerName = sellerName)))
+          }
+
           (for {
+            validateUsernamePassword <- validateUsernamePassword
             negotiation <- negotiation
-            pegHash <- assetPegHash(negotiation.assetID)
-            sellerAccountID <- sellerAccountID(negotiation.sellerTraderID)
-            sellerAddress <- sellerAddress(sellerAccountID)
-            ticketID <- sendTransaction(sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation)
-            _ <- createChatIDAndChatRoom(sellerAccountID = sellerAccountID, negotiationID = negotiation.id)
-            _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING, ticketID)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING, ticketID)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING)))
+            sellerName <- sellerName(negotiation.sellerTraderID)
+            result <- acceptNegotiationAndGetResult(validateUsernamePassword = validateUsernamePassword, negotiation = negotiation, sellerName = sellerName)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -794,7 +809,7 @@ class NegotiationController @Inject()(
 
       def getOrganizationAccountID(organizationID: String): Future[String] = masterOrganizations.Service.tryGetAccountID(organizationID)
 
-      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.getAccountId(zoneID)
+      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
       def getTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivity]] = {
         if (!accountIDs.contains(loginState.username)) throw new BaseException(constants.Response.UNAUTHORIZED)

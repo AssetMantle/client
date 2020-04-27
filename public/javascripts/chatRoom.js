@@ -6,7 +6,6 @@ window.onload=function () {
 
 function loadMoreChats(chatID) {
     const route = jsRoutes.controllers.ChatController.loadMoreChats(chatID, ($(".chatMessages").length));
-    console.log("insde loadmore", $(".chatMessages").length);
     $.ajax({
         url: route.url,
         type: route.type,                                       

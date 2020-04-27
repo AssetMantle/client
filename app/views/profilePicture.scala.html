@@ -3,7 +3,7 @@
 @(profilePicture: Array[Byte] = Array[Byte]())(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
     @if(profilePicture sameElements Array[Byte]()) {
-        <div class="cmuk-inline-clip cmuk-transition-toggle profilePictureContainer" tabindex="0">
+        <div class="cmuk-inline-clip cmuk-transition-toggle profilePictureContainer  cmuk-animation-fade" tabindex="0">
             <span cmuk-icon="icon: user; ratio: 10" class="profilePicture"></span>
             <div class="cmuk-transition-slide-bottom cmuk-overlay-primary cmuk-position-bottom cmuk-overlay-default cmuk-text-center">
                 <p class="cmuk-h4 cmuk-margin-remove">
@@ -13,7 +13,7 @@
         </div>
 
     } else {
-        <div class="cmuk-inline-clip cmuk-transition-toggle profilePictureContainer" tabindex="0">
+        <div class="cmuk-inline-clip cmuk-transition-toggle profilePictureContainer  cmuk-animation-fade" tabindex="0">
             <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
             <div class="cmuk-transition-slide-bottom cmuk-position-bottom cmuk-overlay-default cmuk-text-center">
                 <p class="cmuk-h4 cmuk-margin-remove">

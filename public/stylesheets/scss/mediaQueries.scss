@@ -247,6 +247,10 @@
     .cmuk-height-medium{
       height: 210px;
     }
+    .cmuk-card-header .cmuk-button
+    {
+      line-height: 26px;
+    }
   }
   .switcherCard{
     .cmuk-switcher{
@@ -266,7 +270,6 @@
 @media (max-width: 1599px){
   :root {
     font-size: 14px;
-    --card-height: 265px;
   }
   .bodyContainer{
     margin: 0px auto -135px;
@@ -318,7 +321,6 @@
 
 @media (min-width: 1600px) {
   :root {
-    --card-height: 356.74px;
     font-size: 16px;
   }
   .showpassword, .checkIcon{

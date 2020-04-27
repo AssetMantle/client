@@ -1,4 +1,4 @@
-function loadMoreReachEnd(negotiationID) {
+function loadMoreActivitiesOnScroll(negotiationID) {
     $('.recentActivityMessages').on('scroll', function () {
         if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
             if ($(this).scrollTop() +
@@ -14,10 +14,9 @@ function loadMoreReachEnd(negotiationID) {
         }
     });
 }
-function loadMoreActivitiesonScroll(chatID) {
+function loadMoreChatsOnScroll(chatID) {
     $('#chatMessages').on('scroll', function () {
         if (!$('#chatMessages .chatMessages > li').hasClass("noChats")) {
-            // var srollheight = $('#chatMessages > .chatMessages').innerHeight();
             var scrollTop = $(this).scrollTop();
             if (scrollTop <= 0) {
                 loadMoreChats(chatID);

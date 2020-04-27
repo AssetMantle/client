@@ -24,10 +24,8 @@ class AddZoneController @Inject()(
                                    withZoneLoginAction: WithZoneLoginAction,
                                    transaction: utilities.Transaction,
                                    utilitiesNotification: utilities.Notification,
-                                   blockchainAccounts: blockchain.Accounts,
                                    masterZoneKYCs: master.ZoneKYCs,
                                    transactionsAddZone: transactions.AddZone,
-                                   blockchainZones: models.blockchain.Zones,
                                    blockchainTransactionAddZones: blockchainTransaction.AddZones,
                                    masterAccounts: master.Accounts,
                                    masterZones: master.Zones,
@@ -61,7 +59,7 @@ class AddZoneController @Inject()(
           val token = masterTransactionZoneInvitations.Service.create(inviteZoneData.emailAddress)
 
           def sendEmailNotificationsAndGetResult(token: String): Future[Result] = {
-            utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteZoneData.emailAddress, email = constants.Notification.ZONE_INVITATION, comdexURL, token)
+            utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteZoneData.emailAddress, email = constants.Notification.ZONE_INVITATION, comdexURL, token)
             utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.ZONE_INVITATION_SENT)
             withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
           }
@@ -177,11 +175,10 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[ZoneKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
 
@@ -206,14 +203,12 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[master.ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 
@@ -221,8 +216,8 @@ class AddZoneController @Inject()(
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(oldDocumentFileName, id)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         zoneKYCs <- zoneKYCs(id)
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
       } yield result
@@ -318,7 +313,7 @@ class AddZoneController @Inject()(
 
           def processTransactionAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
-              val accountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
+              val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
 
               def zoneAccountAddress(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
 
@@ -381,7 +376,7 @@ class AddZoneController @Inject()(
 
   def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val zoneKYC = masterZoneKYCs.Service.get(id = zoneID, documentType = documentType)
+      val zoneKYC = masterZoneKYCs.Service.tryGet(id = zoneID, documentType = documentType)
       (for {
         zoneKYC <- zoneKYC
       } yield Ok(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC))
@@ -394,7 +389,7 @@ class AddZoneController @Inject()(
     implicit request =>
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          val zoneKYC = masterZoneKYCs.Service.get(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val zoneKYC = masterZoneKYCs.Service.tryGet(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             zoneKYC <- zoneKYC
           } yield BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors, zoneKYC))
@@ -405,7 +400,7 @@ class AddZoneController @Inject()(
         updateZoneKYCDocumentStatusData => {
           val verifyOrRejectAndSendNotification = if (updateZoneKYCDocumentStatusData.status) {
             val verify = masterZoneKYCs.Service.verify(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- verify
               zoneId <- zoneId
@@ -413,7 +408,7 @@ class AddZoneController @Inject()(
             } yield {}
           } else {
             val reject = masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- reject
               zoneId <- zoneId
@@ -421,7 +416,7 @@ class AddZoneController @Inject()(
             } yield {}
           }
 
-          def zoneKYC: Future[ZoneKYC] = masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
+          def zoneKYC: Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
 
           (for {
             _ <- verifyOrRejectAndSendNotification
@@ -447,14 +442,11 @@ class AddZoneController @Inject()(
         },
         rejectVerifyZoneRequestData => {
           val rejectZone = masterZones.Service.rejectZone(rejectVerifyZoneRequestData.zoneID)
-          val accountID = masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID)
-
-          def rejectAll(accountID: String): Future[Int] = masterZoneKYCs.Service.rejectAll(accountID)
+          val accountID = masterZones.Service.tryGetAccountID(rejectVerifyZoneRequestData.zoneID)
 
           (for {
             _ <- rejectZone
             accountID <- accountID
-            _ <- rejectAll(accountID)
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
           } yield result
             ).recover {
@@ -492,11 +484,10 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.ZoneKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[ZoneKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
 
@@ -518,21 +509,19 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String, id: String): Future[Boolean] = fileResourceManager.updateFile[master.ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterZoneKYCs.Service.updateOldDocument
       )
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(oldDocumentFileName, id)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {

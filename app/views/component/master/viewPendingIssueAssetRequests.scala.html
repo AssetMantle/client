@@ -20,9 +20,6 @@
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
                     <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@assetRequest.id'))">@Messages(constants.Form.APPROVE)</button>
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>
-                    <div id = "assetDocuments@assetRequest.id">
-                        <script>componentResource('assetDocuments@assetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@assetRequest.id'))</script>
-                    </div>
                 }
                 </div>
             }

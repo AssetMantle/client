@@ -1,15 +1,14 @@
 package controllers
 
 import java.nio.file.Files
+
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
-import models.common.Serializable
-import models.master.{OrganizationBackgroundCheck, Trader}
-import models.masterTransaction.AssetFile
+import models.master.{OrganizationBackgroundCheck, TraderBackgroundCheck}
 import models.{blockchain, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.{I18nSupport}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -18,7 +17,17 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BackgroundCheckController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterTraderBackgroundChecks: master.TraderBackgroundChecks, masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, fileResourceManager: utilities.FileResourceManager, withZoneLoginAction: WithZoneLoginAction, withUserLoginAction: WithUserLoginAction, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BackgroundCheckController @Inject()(
+                                           messagesControllerComponents: MessagesControllerComponents,
+                                           masterTraderBackgroundChecks: master.TraderBackgroundChecks,
+                                           masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks,
+                                           masterZones: master.Zones,
+                                           masterOrganizations: master.Organizations,
+                                           masterTraders: master.Traders,
+                                           fileResourceManager: utilities.FileResourceManager,
+                                           withZoneLoginAction: WithZoneLoginAction,
+                                           withUsernameToken: WithUsernameToken
+                                         )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -56,11 +65,10 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val storeFile = fileResourceManager.storeFile[master.TraderBackgroundCheck](
+      val storeFile = fileResourceManager.storeFile[TraderBackgroundCheck](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        document = master.TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None, status = Option(true)),
+        document = TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None),
         masterCreate = masterTraderBackgroundChecks.Service.create
       )
 
@@ -84,14 +92,12 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
   def updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val getOldDocumentFileName = masterTraderBackgroundChecks.Service.getFileName(id = traderID, documentType = documentType)
+      val getOldDocument = masterTraderBackgroundChecks.Service.tryGet(id = traderID, documentType = documentType)
 
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderBackgroundCheck](
+      def updateFile(oldDocument: TraderBackgroundCheck): Future[Boolean] = fileResourceManager.updateFile[TraderBackgroundCheck](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = master.TraderBackgroundCheck(id = traderID, documentType = documentType, fileName = name, file = None, status = Option(true)),
+        oldDocument = oldDocument,
         updateOldDocument = masterTraderBackgroundChecks.Service.updateOldDocument
       )
 
@@ -100,8 +106,8 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
       val trader = masterTraders.Service.tryGet(traderID)
 
       (for {
-        oldDocumentFileName <- getOldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
+        oldDocument <- getOldDocument
+        _ <- updateFile(oldDocument)
         allDocuments <- allDocuments
         trader <- trader
         result <- withUsernameToken.PartialContent(views.html.component.master.zoneUploadOrUpdateTraderBackgroundCheck(allDocuments, trader))
@@ -119,6 +125,7 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
       val trader = masterTraders.Service.tryGet(traderID)
 
       def allDocuments = masterTraderBackgroundChecks.Service.getAllDocuments(traderID)
+
       (for {
         zoneID <- zoneID
         trader <- trader
@@ -169,9 +176,8 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
       val storeFile = fileResourceManager.storeFile[OrganizationBackgroundCheck](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None, status = Option(true)),
+        document = OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None),
         masterCreate = masterOrganizationBackgroundChecks.Service.create
       )
 
@@ -194,15 +200,12 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
 
   def updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val oldDocument = masterOrganizationBackgroundChecks.Service.tryGet(id = organizationID, documentType = documentType)
 
-      val getOldDocumentFileName = masterOrganizationBackgroundChecks.Service.getFileName(id = organizationID, documentType = documentType)
-
-      def updateFile(oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.OrganizationBackgroundCheck](
+      def updateFile(oldDocument: OrganizationBackgroundCheck): Future[Boolean] = fileResourceManager.updateFile[OrganizationBackgroundCheck](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getBackgroundCheckFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = master.OrganizationBackgroundCheck(id = organizationID, documentType = documentType, fileName = name, file = None, status = Option(true)),
+        oldDocument = oldDocument,
         updateOldDocument = masterOrganizationBackgroundChecks.Service.updateOldDocument
       )
 
@@ -211,8 +214,8 @@ class BackgroundCheckController @Inject()(messagesControllerComponents: Messages
       val organization = masterOrganizations.Service.tryGet(organizationID)
 
       (for {
-        oldDocumentFileName <- getOldDocumentFileName
-        _ <- updateFile(oldDocumentFileName)
+        oldDocument <- oldDocument
+        _ <- updateFile(oldDocument)
         allDocuments <- allDocuments
         organization <- organization
         result <- withUsernameToken.PartialContent(views.html.component.master.zoneUploadOrUpdateOrganizationBackgroundCheck(allDocuments, organization))

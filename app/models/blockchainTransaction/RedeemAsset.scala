@@ -21,16 +21,24 @@ case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, stat
   def mutateTicketID(newTicketID: String): RedeemAsset = RedeemAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
-class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class RedeemAssets @Inject()(
+                              actorSystem: ActorSystem,
+                              transaction: utilities.Transaction,
+                              protected val databaseConfigProvider: DatabaseConfigProvider,
+                              blockchainAssets: blockchain.Assets,
+                              blockchainAccounts: blockchain.Accounts,
+                              utilitiesNotification: utilities.Notification,
+                              masterAccounts: master.Accounts,
+                              masterAssets: master.Assets
+                            )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 

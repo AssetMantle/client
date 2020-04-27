@@ -1,37 +1,6 @@
 :root {
   font-family: Oxygen, sans-serif !important;
-  box-sizing: border-box;
-  --card-padding: 24px;
-  --card-skeleton: linear-gradient(#FAFAFA var(--card-height), transparent 0);
-  --list-avatar-size: 56px;
-  --list-avatar-position: var(--card-padding) 100px;
-  --list-avatar-skeleton: radial-gradient(circle 25px at center, #ccc 99%, transparent 0);
-  --avatar-size: 26px;
-  --avatar-position: var(--card-padding) var(--card-padding);
-  --avatar-skeleton: radial-gradient(circle 12px at center, #ccc 99%, transparent 0);
-  --card-title-height: 16px;
-  --card-title-width: 200px;
-  --card-title-position: 70px var(--card-padding);
-  --card-title-skeleton: linear-gradient(#ccc var(--card-title-height), transparent 0);
-  --title-height: 32px;
-  --title-width: 200px;
-  --title-position: var(--card-padding) 180px;
-  --title-skeleton: linear-gradient(#ccc var(--title-height), transparent 0);
-  --desc-line-height: 16px;
-  --desc-line-skeleton: linear-gradient(#ccc var(--desc-line-height), transparent 0);
-  --desc-line-1-width: 230px;
-  --desc-line-1-position: var(--card-padding) 100px;
-  --desc-line-2-width: 180px;
-  --desc-line-2-position: var(--card-padding) 125px;
-  --desc-line-3-width: 230px;
-  --desc-line-3-position: var(--card-padding) 175px;
-  --desc-line-4-width: 180px;
-  --desc-line-4-position: var(--card-padding) 200px;
-  --footer-height: 40px;
-  --footer-position: 0 calc(var(--card-height) - var(--footer-height));
-  --footer-skeleton: linear-gradient(#ccc var(--footer-height), transparent 0);
-  --blur-width: 200px;
-  --blur-size: var(--blur-width) calc(var(--card-height)); }
+  box-sizing: border-box; }
 
 *,
 ::after,
@@ -292,6 +261,7 @@ html, body {
   width: 120px; }
 
 .footer {
+  display: none;
   margin-top: 20px;
   width: 100%;
   padding: 30px 0px;
@@ -1789,11 +1759,9 @@ header:before,
     transform: rotate(-45deg);
     display: block; }
 
-.salesQuoteList .cmuk-card-header {
-  padding: 15px 20px; }
-  .salesQuoteList .cmuk-card-header .cmuk-button {
-    padding: 0 15px;
-    line-height: 28px; }
+.salesQuoteList .cmuk-card-header .cmuk-button {
+  padding: 0 15px;
+  line-height: 28px; }
 .salesQuoteList .cmuk-card-body .commonList .cmuk-button {
   padding: 0 15px;
   line-height: 28px; }
@@ -1832,7 +1800,7 @@ header:before,
   height: 18px;
   width: 18px;
   margin-right: 5px;
-  margin-bottom: 3px; }
+  margin-bottom: 2px; }
 
 .contactDetails .infoRowBox {
   justify-content: space-between; }
@@ -1854,6 +1822,10 @@ header:before,
       padding: 10px 15px;
       border-radius: 5px;
       background-color: #FFFFFF; }
+.contactDetails .contactUpdateButton {
+  text-align: right; }
+  .contactDetails .contactUpdateButton button {
+    font-weight: normal; }
 
 .toolTip {
   position: relative;
@@ -1999,44 +1971,5 @@ dl .info {
     cursor: pointer;
     padding: 10px;
     background: #e7eaf3; }
-
-.fskeleton {
-  width: auto;
-  height: var(--card-height); }
-  .fskeleton:empty::after {
-    content: "";
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    box-shadow: 0 10px 45px rgba(0, 0, 0, 0.1);
-    background-image: linear-gradient(90deg, rgba(250, 250, 250, 0) 0, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%), var(--card-title-skeleton), var(--list-avatar-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--list-avatar-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--list-avatar-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--avatar-skeleton), var(--card-skeleton);
-    background-size: var(--blur-size), var(--card-title-width) var(--card-title-height), var(--list-avatar-size) var(--list-avatar-size), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--list-avatar-size) var(--list-avatar-size), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--list-avatar-size) var(--list-avatar-size), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--avatar-size) var(--avatar-size), 100% 100%;
-    background-position: -150% 0, var(--card-title-position), var(--list-avatar-position), 100px 100px, 100px 125px, 25px 175px, 100px 175px, 100px 200px, 25px 250px, 100px 250px, 100px 275px, var(--avatar-position), 0 0;
-    background-repeat: no-repeat;
-    animation: loading1 1.5s infinite; }
-
-.skeleton {
-  width: auto;
-  height: var(--card-height); }
-  .skeleton:empty::after {
-    content: "";
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    box-shadow: 0 10px 45px rgba(0, 0, 0, 0.1);
-    background-image: linear-gradient(90deg, rgba(250, 250, 250, 0) 0, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%), var(--card-title-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--desc-line-skeleton), var(--avatar-skeleton), var(--card-skeleton);
-    background-size: var(--blur-size), var(--card-title-width) var(--card-title-height), var(--desc-line-1-width) var(--desc-line-height), var(--desc-line-2-width) var(--desc-line-height), var(--desc-line-3-width) var(--desc-line-height), var(--desc-line-4-width) var(--desc-line-height), var(--avatar-size) var(--avatar-size), 100% 100%;
-    background-position: -150% 0, var(--card-title-position), var(--desc-line-1-position), var(--desc-line-2-position), var(--desc-line-3-position), var(--desc-line-4-position), var(--avatar-position), 0 0;
-    background-repeat: no-repeat;
-    animation: loading 1.5s infinite; }
-
-@keyframes loading {
-  to {
-    background-position: 350% 0, var(--card-title-position), var(--desc-line-1-position), var(--desc-line-2-position), var(--desc-line-3-position), var(--desc-line-4-position), var(--avatar-position), 0 0; } }
-@keyframes loading1 {
-  to {
-    background-position: 350% 0, var(--card-title-position), var(--list-avatar-position), 100px 100px, 100px 125px, 25px 175px, 100px 175px, 100px 200px, 25px 250px, 100px 250px, 100px 275px, var(--avatar-position), 0 0; } }
 
 /*# sourceMappingURL=class.css.map */

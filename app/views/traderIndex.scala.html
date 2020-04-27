@@ -7,24 +7,6 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
-     <ul cmuk-accordion class="flexContainer">
-         <li>
-             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.Form.ASSETS_OWNED)</a>
-                <div class="cmuk-accordion-buttons">
-                    @loginState.acl match {
-                        case Some(acl) => {
-                            @if(acl.issueAsset) {
-                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
-                            }
-                        }
-                        case _ => {}
-                    }
-                </div>
-                <div class="cmuk-accordion-content">
-                    <div id="assetList" class="flexContainer"></div>
-                </div>
-          </li>
-    </ul>
     <ul cmuk-accordion class="flexContainer">
         <li>
             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.Form.FIATS_OWNED)
