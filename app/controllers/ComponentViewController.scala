@@ -1365,12 +1365,12 @@ class ComponentViewController @Inject()(
                   } yield Ok(views.html.component.master.zoneViewNegotiationFile(negotiationID, negotiationFile))
               }
             case None =>
-              val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-              val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+              val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+              val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               for {
-                assetFiles <- assetFiles
-                negotiationFiles <- negotiationFiles
-              } yield Ok(views.html.component.master.zoneViewNegotiationFile(negotiationID, (assetFiles ++ negotiationFiles).headOption))
+                negotiationFileList <- negotiationFileList
+                assetFileList <- assetFileList
+              } yield Ok(views.html.component.master.zoneViewNegotiationFile(negotiationID, (assetFileList ++ negotiationFileList).headOption))
           }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -1392,18 +1392,15 @@ class ComponentViewController @Inject()(
     implicit request =>
       val traderID= masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-
-      def assetFiles(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
 
       def getResult(negotiation: Negotiation, traderID:String)={
         if(negotiation.sellerTraderID==traderID || negotiation.buyerTraderID==traderID){
-          val negotiationFiles = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-          val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+          val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+          val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
           for{
-            negotiationFiles<-negotiationFiles
-            assetFiles<-assetFiles
-          }yield Ok(views.html.component.master.tradeDocuments( negotiation, assetFiles, negotiationFiles))
+            negotiationFileList <- negotiationFileList
+            assetFileList <- assetFileList
+          }yield Ok(views.html.component.master.tradeDocuments( negotiation, assetFileList, negotiationFileList))
         }else{
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1525,7 +1522,7 @@ class ComponentViewController @Inject()(
 
       def getTraderList(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getTradersByZoneID(zoneID)
 
-      def acceptedNegotiations(traderIDs: Seq[String]) = masterNegotiations.Service.getAllAcceptedNegotiationListByTraderIDs(traderIDs)
+      def getAcceptedNegotiationList(traderIDs: Seq[String]) = masterNegotiations.Service.getAllAcceptedNegotiationListByTraderIDs(traderIDs)
 
       def getCounterPartyTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
@@ -1534,10 +1531,10 @@ class ComponentViewController @Inject()(
       (for {
         zoneID <- zoneID
         traderList <- getTraderList(zoneID)
-        acceptedNegotiations <- acceptedNegotiations(traderList.map(_.id))
+        acceptedNegotiationList <- getAcceptedNegotiationList(traderList.map(_.id))
         counterPartyTraderList <- getCounterPartyTraderList(traderList.map(_.id))
-        assetList <- getAssetListList(acceptedNegotiations.map(_.assetID))
-      } yield Ok(views.html.component.master.zoneViewAcceptedNegotiationList(acceptedNegotiations, counterPartyTraderList, assetList))).recover {
+        assetList <- getAssetListList(acceptedNegotiationList.map(_.assetID))
+      } yield Ok(views.html.component.master.zoneViewAcceptedNegotiationList(acceptedNegotiationList, counterPartyTraderList, assetList))).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
@@ -1633,10 +1630,9 @@ class ComponentViewController @Inject()(
 
       def getResult(zoneID: String, traderList: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (traderList.map(_.zoneID) contains zoneID) {
-          def asset(assetID: String) = masterAssets.Service.tryGet(assetID)
-
+          val asset = masterAssets.Service.tryGet(negotiation.assetID)
           for {
-            asset <- asset(negotiation.assetID)
+            asset <- asset
           } yield Ok(views.html.component.master.zoneViewOrderActions(zoneID, traderList, negotiation, asset))
         } else {
           Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -1668,7 +1664,6 @@ class ComponentViewController @Inject()(
   def traderViewAssetDocumentContent(assetID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val documentContent = masterTransactionAssetFiles.Service.getDocumentContent(assetID, documentType)
-
       (for {
         documentContent <- documentContent
       } yield Ok(views.html.component.master.viewAssetDocumentContent(documentType, documentContent))
