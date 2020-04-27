@@ -35,6 +35,13 @@ object Status {
     val REJECTED_BY_ZONE = "REJECTED_BY_ZONE"
   }
 
+  object Fiat {
+    val REQUEST_INITIATED = "REQUEST_INITIATED"
+    val PARTIALLY_PAID = "PARTIALLY_PAID"
+    val FULLY_PAID = "FULLY_PAID"
+    val OVER_PAID = "OVER_PAID"
+  }
+
   object Negotiation {
     val ISSUE_ASSET_PENDING = "ISSUE_ASSET_PENDING"
     val FORM_INCOMPLETE = "FORM_INCOMPLETE"

@@ -164,6 +164,7 @@ object Response {
   val INCORRECT_PASSWORD = new Failure("INCORRECT_PASSWORD")
   val ALL_NEGOTIATION_TERMS_NOT_CONFIRMED = new Failure("ALL_NEGOTIATION_TERMS_NOT_CONFIRMED")
   val ALL_NEGOTIATION_TERMS_CONFIRMED = new Failure("ALL_NEGOTIATION_TERMS_CONFIRMED")
+  val NEW_PASSWORD_SAME_AS_OLD_PASSWORD = new Failure("NEW_PASSWORD_SAME_AS_OLD_PASSWORD")
   val COMET_ACTOR_ERROR = new Failure("COMET_ACTOR_ERROR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

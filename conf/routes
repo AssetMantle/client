@@ -453,11 +453,6 @@ POST        /master/issueAsset                                                  
 GET         /component/comet                                                                controllers.ComponentViewController.comet
 
 GET         /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequestForm
-POST        /master/issueFiatRequest                                                        controllers.IssueFiatController.issueFiatRequest
-
-GET         /master/issueFiatRequestList                                                    controllers.IssueFiatController.issueFiatRequestList
-GET         /master/rejectIssueFiatRequest                                                  controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
-POST        /master/rejectIssueFiatRequest                                                  controllers.IssueFiatController.rejectIssueFiatRequest
 
 GET         /master/issueFiat                                                               controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                                               controllers.IssueFiatController.issueFiat

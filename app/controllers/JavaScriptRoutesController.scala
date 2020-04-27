@@ -244,12 +244,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
         routes.javascript.IssueAssetController.issueAssetForm,
 
-        routes.javascript.IssueFiatController.issueFiatRequestList,
         routes.javascript.IssueFiatController.issueFiatForm,
         routes.javascript.IssueFiatController.issueFiatRequestForm,
-        routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
-        routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
 
         routes.javascript.NegotiationController.requestForm,
         routes.javascript.NegotiationController.paymentTermsForm,
