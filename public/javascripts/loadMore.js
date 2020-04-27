@@ -19,8 +19,10 @@ function loadMoreChatsOnScroll(chatID) {
         if (!$('#chatMessages .chatMessages > li').hasClass("noChats")) {
             var scrollTop = $(this).scrollTop();
             if (scrollTop <= 0) {
-                loadMoreChats(chatID);
-                $('#chatMessages').scrollTop(100);
+                setTimeout(function () {
+                    loadMoreChats(chatID);
+                    $('#chatMessages').scrollTop(100);
+                }, 100);
             }
         }
     });

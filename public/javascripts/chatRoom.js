@@ -1,9 +1,3 @@
-
-window.onload=function () {
-    var objDiv = document.getElementById("chatMessages");
-    objDiv.scrollTop = objDiv.scrollHeight;
-}
-
 function loadMoreChats(chatID) {
     const route = jsRoutes.controllers.ChatController.loadMoreChats(chatID, ($(".chatMessages").length));
     $.ajax({
