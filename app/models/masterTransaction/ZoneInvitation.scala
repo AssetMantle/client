@@ -67,7 +67,7 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(emailAddress: String): Future[String] = add(ZoneInvitation(id = utilities.IDGenerator.requestID, emailAddress = emailAddress))
+    def create(emailAddress: String): Future[String] = add(ZoneInvitation(id = utilities.IDGenerator.requestID(), emailAddress = emailAddress))
 
     def tryGet(id: String): Future[ZoneInvitation] = findByID(id)
 

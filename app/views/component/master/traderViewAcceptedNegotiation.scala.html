@@ -1,172 +1,19 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.master.{Asset, Negotiation}
-@import views.html.component.master.buyerViewNegotiationTerm
+@import models.master.Negotiation
+@import models.masterTransaction.NegotiationFile
+@import scala.collection.immutable.ListMap
 
-@(traderID: String, negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderID: String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.traderViewAcceptedNegotiationTerms,
+        constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.traderViewNegotiationFile,
+    ),
+        'VIEW_TERMS_PARAMETERS -> s"'${negotiation.id}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiation.id}'")
+<br>
+@if(negotiation.buyerTraderID == traderID && negotiation.status == constants.Status.Negotiation.STARTED) {
+    @commonFormButton(constants.Form.CONFIRM_ALL_NEGOTIATION_TERMS, 'parameters -> s"'${negotiation.id}'")
+}
 
-<div class="tradeTerms">
-    <div class="traderCommodity">
-        <span class="commodityImage">@asset.assetType.mkString.substring(0, 1)</span><span class="tradeName">@asset.assetType</span>
-    </div>
-    <div class="terms">
-    @traderID match {
-        case negotiation.sellerTraderID => {
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
-                @commonFormButton(constants.Form.UPDATE_ASSET_TERMS, 'parameters -> s"'${negotiation.id}'")
-            </div>
-
-            <div class="sellerTerm">
-                @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetAndBuyerAccepted.assetDescription)
-            <div>
-            @negotiation.assetAndBuyerAccepted.buyerAcceptedAssetDescription
-            </div>
-            </div>
-            <div class="sellerTerm">
-                @commonIntInfo(constants.View.PRICE, negotiation.assetAndBuyerAccepted.price)
-            <div>
-            @negotiation.assetAndBuyerAccepted.buyerAcceptedPrice
-            </div>
-            </div>
-            <div class="sellerTerm">
-                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.assetAndBuyerAccepted.quantity.toString, negotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-            <div>
-            @negotiation.assetAndBuyerAccepted.buyerAcceptedQuantity
-            </div>
-            </div>
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
-                @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
-            </div>
-            <div class="sellerTerm">
-                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-            <br>
-                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
-            <br>
-                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.shippingPeriod)
-            <br>
-            <div>
-            @negotiation.assetOtherDetailsAndBuyerAccepted.buyerAccepted
-            </div>
-            </div>
-
-            <hr>
-
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
-                @commonFormButton(constants.Form.UPDATE_PAYMENT_TERMS, 'parameters -> s"'${negotiation.id}'")
-            </div>
-            <div class="sellerTerm">
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePayment))
-            <br>
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePercentage.getOrElse(0.0))
-            <br>
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.credit))
-            <br>
-                @commonIntInfo(constants.View.TENURE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tenure.getOrElse(0))
-            <br>
-                @negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate match {
-                    case Some(date) => {
-                        @commonDateInfo(constants.View.TENTATIVE_DATE, date)
-                    }
-                    case None => {
-                        @commonTextInfo(constants.View.TENTATIVE_DATE, "")
-                    }
-                }
-            <br>
-                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.reference.getOrElse(""))
-            <div>
-            @negotiation.paymentTermsAndBuyerAccepted.buyerAccepted
-            </div>
-            </div>
-
-            <hr>
-
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
-                @commonFormButton(constants.Form.UPDATE_DOCUMENT_LIST, 'parameters -> s"'${negotiation.id}'")
-            </div>
-            <div class="sellerTerm">
-                @negotiation.documentListAndBuyerAccepted.documentList.documents.map { document =>
-                    @document
-                    <br>
-                }
-            <div>
-            @negotiation.documentListAndBuyerAccepted.buyerAccepted
-            </div>
-            </div>
-        }
-        case negotiation.buyerTraderID => {
-
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.assetAndBuyerAccepted.buyerAcceptedAssetDescription, iconPath = "icon-description") {
-                @Messages(constants.View.ASSET_DESCRIPTION)
-            } {
-                @negotiation.assetAndBuyerAccepted.assetDescription
-            }
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.assetAndBuyerAccepted.buyerAcceptedPrice, iconPath = "icon-contract-price") {
-                @Messages(constants.View.PRICE)
-            } {
-                @negotiation.assetAndBuyerAccepted.price
-            }
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.assetAndBuyerAccepted.buyerAcceptedQuantity, iconPath = "icon-quantity") {
-                @Messages(constants.View.QUANTITY)
-            } {
-                @Seq(negotiation.assetAndBuyerAccepted.quantity.toString, negotiation.assetAndBuyerAccepted.quantityUnit).mkString(" ")
-            }
-
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.assetOtherDetailsAndBuyerAccepted.buyerAccepted, iconPath = "icon-shipment-period") {
-                @Messages(constants.View.ASSET_OTHER_DETAILS)
-                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
-                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.shippingPeriod)
-            } {
-            }
-            <hr>
-
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.paymentTermsAndBuyerAccepted.buyerAccepted, iconPath = "icon-advance-payment") {
-                @Messages(constants.View.PAYMENT_TERMS)
-                <br>
-                <p>@Messages(constants.View.ADVANCE_PERCENTAGE) - <span class="cmuk-text-bold">
-                @if(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePayment) {
-                    @negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePercentage %
-                } else {
-                    @Messages(constants.View.NO)
-                }
-                </span></p>
-                @if(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate.isEmpty) {
-                    <p>@Messages(constants.View.TENURE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tenure.getOrElse(0)
-                            Days</span></p>
-                    <p>@Messages(constants.View.REFERENCE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTermsAndBuyerAccepted.paymentTerms.reference.getOrElse("")</span></p>
-                } else {
-                    <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                    @negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate match {
-                        case Some(date) => {
-                            @date
-                        }
-                        case None => {}
-                    }
-                    </span></p>
-                }
-            } {
-            }
-
-            <hr>
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.documentListAndBuyerAccepted.buyerAccepted, iconPath = "icon-document") {
-                @Messages(constants.View.DOCUMENT_LIST)
-                <br>
-                @negotiation.documentListAndBuyerAccepted.documentList.documents.map { document =>
-                    @document
-                    <br>
-                }
-            } {
-
-            }
-
-        }
-        case _ => {}
-    }
-    </div>
 </div>

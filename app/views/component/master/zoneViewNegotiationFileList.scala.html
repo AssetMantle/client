@@ -1,0 +1,35 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.NegotiationFile
+
+@import models.masterTransaction.AssetFile
+
+@import models.master.Negotiation
+@(negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@Messages(constants.View.ASSET_DOCUMENTS):
+@assetFileList.filter(assetFile => negotiation.documentListAndBuyerAccepted.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
+    <div>
+        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationFile('@negotiation.id', '@assetFile.documentType')) >@Messages(assetFile.documentType)</a>
+        @assetFile.documentType match {
+            case constants.File.OBL => {
+                <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewAssetDocumentContent('@negotiation.assetID', '@assetFile.documentType'))" )></td>
+            }
+            case _ => {}
+        }
+    </div>
+}
+
+@Messages(constants.View.NEGOTIATION_DOCUMENTS):
+@negotiationFileList.filter(negotiationFile => negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments.contains(negotiationFile.documentType) || negotiationFile.documentType == constants.File.CONTRACT).map { negotiationFile =>
+    <div>
+        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationFile('@negotiation.id', '@negotiationFile.documentType')) >@Messages(negotiationFile.documentType)</a>
+        @negotiationFile.documentType match {
+            case constants.File.INVOICE | constants.File.CONTRACT => {
+                <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocumentContent('@negotiation.id', '@negotiationFile.documentType'))" )></td>
+            }
+            case _ => {}
+        }
+    </div>
+}
+<script src="@routes.Assets.versioned("javascripts/switchTab.js")" type="text/javascript"></script>

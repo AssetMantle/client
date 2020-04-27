@@ -70,7 +70,7 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(organizationID: String, inviteeEmailAddress: String): Future[String] = add(TraderInvitation(id = utilities.IDGenerator.requestID, organizationID = organizationID, inviteeEmailAddress = inviteeEmailAddress, status = constants.Status.TraderInvitation.NO_CONTACT))
+    def create(organizationID: String, inviteeEmailAddress: String): Future[String] = add(TraderInvitation(id = utilities.IDGenerator.requestID(), organizationID = organizationID, inviteeEmailAddress = inviteeEmailAddress, status = constants.Status.TraderInvitation.NO_CONTACT))
 
     def get(id: String): Future[TraderInvitation] = findByID(id)
 

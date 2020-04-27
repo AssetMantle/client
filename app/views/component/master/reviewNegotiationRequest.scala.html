@@ -30,8 +30,12 @@
     @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.reference.getOrElse(""))
 
     <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
-    @negotiation.documentListAndBuyerAccepted.documentList.documents.map { document =>
-        @document
+    @negotiation.documentListAndBuyerAccepted.documentList.assetDocuments.map { assetDocument =>
+        @assetDocument
+        <br>
+    }
+    @negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments.map { negotiationDocument =>
+        @negotiationDocument
         <br>
     }
 

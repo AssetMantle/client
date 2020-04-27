@@ -4,23 +4,35 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(buyNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(buyNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @buyNegotiationList.map { buyNegotiation =>
     @commonVerticalInfoBox() {
-        @defining(counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, buyNegotiation.sellerTraderID)
+        @counterPartyTraderList.find(_.id == buyNegotiation.sellerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
                 }
             }
+            case None => {}
+        }
+        @assetList.find(_.id == buyNegotiation.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+            }
+            case None => {}
         }
         @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetAndBuyerAccepted.assetDescription)
         @commonVerticalIntInfo(constants.View.PRICE, buyNegotiation.assetAndBuyerAccepted.price)
         @commonVerticalTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.assetAndBuyerAccepted.quantity.toString, buyNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, buyNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, buyNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, buyNegotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">
@@ -28,7 +40,7 @@
             </p>
             <p class="listItemChildValue">
                 <button class="cmuk-button cmuk-button-primary cmuk-button-small">
-                    <a class="cmuk-link secondaryFont" href="@routes.ViewController.tradeRoom(buyNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(buyNegotiation.id), 'class -> "secondaryFont")
                 </button>
             </p>
         </div>
