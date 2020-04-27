@@ -389,6 +389,9 @@ object Form {
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"
   val ONLY_BUYER = "ONLY_BUYER"
   val BOTH_PARTIES = "BOTH_PARTIES"
+  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+
+  //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"
   val REFERENCE = "reference"
   val EXTERNAL_REFERENCE = "externalReference"
@@ -398,9 +401,6 @@ object Form {
   val BUYER_LAST_NAME = "buyerLastName"
   val CREATED_DATE = "createdDate"
   val LAST_UPDATED_DATE = "lastUpdatedDate"
-  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
-
-  //Western Union - Please Do not change.
   val WU_RTCB_STATUS = "status"
   val DEAL_TYPE = "dealType"
   val PAYMENT_TYPE_ID = "paymentTypeId"
