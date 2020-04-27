@@ -88,14 +88,14 @@ POST        /negotiation/updateDocumentList                                     
 GET         /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                     controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
-GET         /negotiation/oblDetails                                                         controllers.NegotiationController.oblDetailsForm(id: String)
-POST        /negotiation/oblDetails                                                         controllers.NegotiationController.oblDetails
+GET         /negotiation/oblContent                                                         controllers.NegotiationController.oblContentForm(id: String)
+POST        /negotiation/oblContent                                                         controllers.NegotiationController.oblContent
 
-GET         /negotiation/invoiceDetails                                                     controllers.NegotiationController.invoiceDetailsForm(id: String)
-POST        /negotiation/invoiceDetails                                                     controllers.NegotiationController.invoiceDetails
+GET         /negotiation/invoiceContent                                                     controllers.NegotiationController.invoiceContentForm(id: String)
+POST        /negotiation/invoiceContent                                                     controllers.NegotiationController.invoiceContent
 
-GET         /negotiation/contractDetails                                                    controllers.NegotiationController.contractDetailsForm(id: String)
-POST        /negotiation/contractDetails                                                    controllers.NegotiationController.contractDetails
+GET         /negotiation/contractContent                                                    controllers.NegotiationController.contractContentForm(id: String)
+POST        /negotiation/contractContent                                                    controllers.NegotiationController.contractContent
 
 GET         /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTermsForm(id: String)
 POST        /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTerms

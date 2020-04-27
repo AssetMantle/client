@@ -53,8 +53,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderWorldCheck = configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
 
-  private val uploadTraderAssetContractPath: String = configuration.get[String]("upload.asset.contract")
-
   private val uploadTraderAssetOBLPath: String = configuration.get[String]("upload.asset.obl")
 
   private val uploadTraderAssetPackingListPath: String = configuration.get[String]("upload.asset.packingList")
@@ -129,7 +127,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   def getTraderAssetFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.CONTRACT => uploadTraderAssetContractPath
       case constants.File.OBL => uploadTraderAssetOBLPath
       case constants.File.PACKING_LIST => uploadTraderAssetPackingListPath
       case constants.File.COO => uploadTraderAssetCOOPath

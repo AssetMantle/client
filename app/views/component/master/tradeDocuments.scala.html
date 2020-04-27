@@ -23,7 +23,7 @@
         } {
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@assetFile.documentType', '@assetFile.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
             @assetFile.documentType match{
-                case constants.File.OBL=>{@commonFormButton(constants.Form.OBL_DETAILS, 'parameters -> s"'${id}'")}
+                case constants.File.OBL=>{@commonFormButton(constants.Form.OBL_CONTENT, 'parameters -> s"'${id}'")}
                 case _=>{}
             }
             <script>hideElement('UPLOAD_ASSET_@assetFile.documentType')</script>
@@ -51,8 +51,8 @@
         } {
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@negotiationFile.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(negotiationFile.documentType)</button>
             @negotiationFile.documentType match{
-                case constants.File.INVOICE=>{@commonFormButton(constants.Form.INVOICE_DETAILS, 'parameters -> s"'${id}'")}
-                case constants.File.CONTRACT=>{@commonFormButton(constants.Form.CONTRACT_DETAILS, 'parameters -> s"'${id}'")}
+                case constants.File.INVOICE=>{@commonFormButton(constants.Form.INVOICE_CONTENT, 'parameters -> s"'${id}'")}
+                case constants.File.CONTRACT=>{@commonFormButton(constants.Form.CONTRACT_CONTENT, 'parameters -> s"'${id}'")}
                 case _=>{}
             }
             <script>hideElement('UPLOAD_NEGOTIATION_@negotiationFile.documentType')</script>

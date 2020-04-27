@@ -1,0 +1,20 @@
+@import controllers.actions.LoginState
+@import views.companion.master.OBL
+@import views.html.base._
+
+@(oblContentForm: Form[OBL.Data] = OBL.form, id:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@commonForm(constants.Form.OBL_CONTENT, oblContentForm) {
+    @commonInputText(oblContentForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden")
+    @commonInputText(oblContentForm, constants.FormField.BILL_OF_LADING_NUMBER)
+    @commonInputText(oblContentForm, constants.FormField.PORT_OF_LOADING)
+    @commonInputText(oblContentForm, constants.FormField.SHIPPER_NAME)
+    @commonInputText(oblContentForm, constants.FormField.SHIPPER_ADDRESS)
+    @commonInputText(oblContentForm, constants.FormField.NOTIFY_PARTY_NAME)
+    @commonInputText(oblContentForm, constants.FormField.NOTIFY_PARTY_ADDRESS)
+    @commonInputDate(oblContentForm, constants.FormField.SHIPMENT_DATE)
+    @commonSelect(oblContentForm, constants.FormField.DELIVERY_TERM)
+    @commonInputInt(oblContentForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputInt(oblContentForm, constants.FormField.ASSET_PRICE)
+}
+

@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction
+@import views.companion.master.ContractContent
+
+@(contractContentForm: Form[ContractContent.Data] = ContractContent.form, id:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@commonForm(constants.Form.CONTRACT_CONTENT, contractContentForm) {
+    @commonInputText(contractContentForm, constants.FormField.ID, 'value -> id,'containerDivClass -> "hidden")
+    @commonInputText(contractContentForm, constants.FormField.CONTRACT_NUMBER)
+}
+

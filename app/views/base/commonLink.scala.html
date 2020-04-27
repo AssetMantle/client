@@ -1,0 +1,9 @@
+@import play.api.mvc.Call
+
+@(name: String, route: Call, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<a id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-link", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")' href="@route">
+@Messages(name)
+</a>
+
+@*Example Usage: @commonLink(constants.View.NAME, routes.ViewController.tradeRoom(id), 'class-> "font") *@

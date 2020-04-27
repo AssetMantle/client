@@ -5,14 +5,14 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(sentNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(sentNegotiationRequestList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sentNegotiationRequestList.map { sentNegotiationRequest =>
     @commonVerticalInfoBox() {
-        @counterPartyTraders.find(_.id == sentNegotiationRequest.buyerTraderID) match {
+        @counterPartyTraderList.find(_.id == sentNegotiationRequest.buyerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
                         @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                     }
@@ -21,7 +21,7 @@
             }
             case None => {}
         }
-        @assets.find(_.id == sentNegotiationRequest.assetID) match {
+        @assetList.find(_.id == sentNegotiationRequest.assetID) match {
             case Some(asset) => {
                 @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }

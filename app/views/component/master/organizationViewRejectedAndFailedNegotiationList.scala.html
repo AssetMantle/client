@@ -5,13 +5,13 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 
 <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)</div>
 @rejectedReceivedNegotiationList.map { rejectedReceivedNegotiation =>
     <li class="commonList">
-        @traders.find(_.id == rejectedReceivedNegotiation.buyerTraderID) match {
+        @traderList.find(_.id == rejectedReceivedNegotiation.buyerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
             }
@@ -20,10 +20,10 @@
             }
         }
 
-        @counterPartyTraders.find(_.id == rejectedReceivedNegotiation.sellerTraderID) match {
+        @counterPartyTraderList.find(_.id == rejectedReceivedNegotiation.sellerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
                         @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                     }
@@ -32,7 +32,7 @@
             }
             case None => {}
         }
-        @assets.find(_.id == rejectedReceivedNegotiation.assetID) match {
+        @assetList.find(_.id == rejectedReceivedNegotiation.assetID) match {
             case Some(asset) => {
                 @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }
@@ -49,7 +49,7 @@
 <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
 @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
     <li class="commonList">
-        @traders.find(_.id == rejectedSentNegotiation.sellerTraderID) match {
+        @traderList.find(_.id == rejectedSentNegotiation.sellerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
             }
@@ -58,10 +58,10 @@
             }
         }
 
-        @counterPartyTraders.find(_.id == rejectedSentNegotiation.buyerTraderID) match {
+        @counterPartyTraderList.find(_.id == rejectedSentNegotiation.buyerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
                         @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                     }
@@ -70,7 +70,7 @@
             }
             case None => {}
         }
-        @assets.find(_.id == rejectedSentNegotiation.assetID) match {
+        @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
             case Some(asset) => {
                 @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }
@@ -87,7 +87,7 @@
 <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
 @failedNegotiationList.map { failedNegotiation =>
     <li class="commonList">
-        @traders.find(_.id == failedNegotiation.sellerTraderID) match {
+        @traderList.find(_.id == failedNegotiation.sellerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
             }
@@ -96,10 +96,10 @@
             }
         }
 
-        @counterPartyTraders.find(_.id == failedNegotiation.buyerTraderID) match {
+        @counterPartyTraderList.find(_.id == failedNegotiation.buyerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
                         @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                     }
@@ -108,7 +108,7 @@
             }
             case None => {}
         }
-        @assets.find(_.id == failedNegotiation.assetID) match {
+        @assetList.find(_.id == failedNegotiation.assetID) match {
             case Some(asset) => {
                 @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }

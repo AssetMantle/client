@@ -5,15 +5,15 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(buyNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(buyNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @buyNegotiationList.map { buyNegotiation =>
     @commonVerticalInfoBox() {
-        @counterPartyTraders.find(_.id == buyNegotiation.sellerTraderID) match {
+        @counterPartyTraderList.find(_.id == buyNegotiation.sellerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.TRADER_NAME, trader.name)
 
-                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
                         @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                     }
@@ -22,7 +22,7 @@
             }
             case None => {}
         }
-        @assets.find(_.id == buyNegotiation.assetID) match {
+        @assetList.find(_.id == buyNegotiation.assetID) match {
             case Some(asset) => {
                 @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }
@@ -40,7 +40,7 @@
             </p>
             <p class="listItemChildValue">
                 <button class="cmuk-button cmuk-button-primary cmuk-button-small">
-                    <a class="cmuk-link secondaryFont" href="@routes.ViewController.tradeRoom(buyNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(buyNegotiation.id), 'class -> "secondaryFont")
                 </button>
             </p>
         </div>

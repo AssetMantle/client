@@ -5,11 +5,11 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(incompleteNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader], counterPartyOrganizations:Seq[Organization], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @incompleteNegotiationList.map { incompleteNegotiation =>
     @commonInfoBox() {
-        @traders.find(_.id == incompleteNegotiation.sellerTraderID) match {
+        @traderList.find(_.id == incompleteNegotiation.sellerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
             }
@@ -17,10 +17,10 @@
                 @commonTextInfo(constants.View.SELLER_TRADER_ID, incompleteNegotiation.buyerTraderID)
             }
         }
-        @counterPartyTraders.find(_.id == incompleteNegotiation.buyerTraderID) match {
+        @counterPartyTraderList.find(_.id == incompleteNegotiation.buyerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizations.find(_.id == trader.organizationID) match {
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
                         @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                     }
@@ -29,7 +29,7 @@
             }
             case None => {}
         }
-        @assets.find(_.id == incompleteNegotiation.assetID) match {
+        @assetList.find(_.id == incompleteNegotiation.assetID) match {
             case Some(asset) => {
                 @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
             }

@@ -94,9 +94,9 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
-  val OBL_DETAILS = new Form("OBL_DETAILS", routes.NegotiationController.oblDetails(), routes.javascript.NegotiationController.oblDetailsForm)
-  val INVOICE_DETAILS = new Form("INVOICE_DETAILS", routes.NegotiationController.invoiceDetails(), routes.javascript.NegotiationController.invoiceDetailsForm)
-  val CONTRACT_DETAILS = new Form("CONTRACT_DETAILS", routes.NegotiationController.contractDetails(), routes.javascript.NegotiationController.contractDetailsForm)
+  val OBL_CONTENT = new Form("OBL_CONTENT", routes.NegotiationController.oblContent(), routes.javascript.NegotiationController.oblContentForm)
+  val INVOICE_CONTENT = new Form("INVOICE_CONTENT", routes.NegotiationController.invoiceContent(), routes.javascript.NegotiationController.invoiceContentForm)
+  val CONTRACT_CONTENT = new Form("CONTRACT_CONTENT", routes.NegotiationController.contractContent(), routes.javascript.NegotiationController.contractContentForm)
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
 
   //OrderController
