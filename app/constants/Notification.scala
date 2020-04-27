@@ -34,6 +34,7 @@ object Notification {
     val subject: String = Seq(EMAIL_PREFIX, notificationType, SUBJECT_SUFFIX).mkString(".")
     val message: String = Seq(EMAIL_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
+
   //Invitation Emails
   val ZONE_INVITATION = new Email(notificationType = "ZONE_INVITATION")
   val TRADER_INVITATION = new Email(notificationType = "TRADER_INVITATION")
@@ -125,6 +126,11 @@ object Notification {
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val OBL_CONTENT_ADDED = new Notification(notificationType = "OBL_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val INVOICE_CONTENT_ADDED = new Notification(notificationType = "INVOICE_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val CONTRACT_CONTENT_ADDED = new Notification(notificationType = "CONTRACT_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

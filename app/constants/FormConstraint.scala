@@ -23,15 +23,6 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val negotiationDocumentListConstraint: Constraint[DocumentList.Data] = Constraint("constraints.negotiationDocumentList")({ documentListData: DocumentList.Data =>
-    val errors = {
-      if (documentListData.documentList.isEmpty) Seq(ValidationError(constants.Response.DOCUMENT_LIST_EMPTY.message))
-      else if (documentListData.documentList.flatten.length <= 2) Seq(ValidationError(constants.Response.DOCUMENT_LIST_LESS_THAN_REQUIRED.message))
-      else Nil
-    }
-    if (errors.isEmpty) Valid else Invalid(errors)
-  })
-
   val changePasswordConstraint: Constraint[ChangePassword.Data] = Constraint("constraints.changePassword")({ changePasswordData: ChangePassword.Data =>
     val errors = {
       if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))

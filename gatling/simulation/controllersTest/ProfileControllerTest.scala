@@ -18,21 +18,29 @@ object profileControllerTest {
 
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Detail_Form")
-        .get(routes.AccountController.identificationForm().url)
+        .get(routes.AccountController.addIdentificationForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .feed(NameFeeder.nameFeed)
     .feed(IdentificationFeeder.identificationFeed)
+    .feed(AddressDataFeeder.addressDataFeed)
     .pause(2)
     .exec(http("IdentificationDetail_Post")
-      .post(routes.AccountController.identification().url)
+      .post(routes.AccountController.addIdentification().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.FIRST_NAME -> "${%s}".format(Test.TEST_FIRST_NAME),
         Form.LAST_NAME -> "${%s}".format(Test.TEST_LAST_NAME),
         Form.DATE_OF_BIRTH -> "2019-11-11",
         Form.ID_NUMBER -> "${%s}".format(Test.TEST_ID_NUMBER),
-        Form.ID_TYPE -> "${%s}".format(Test.TEST_ID_TYPE)
+        Form.ID_TYPE -> "${%s}".format(Test.TEST_ID_TYPE),
+        Form.ADDRESS_ADDRESS_LINE_1 -> "${%s}".format(Test.TEST_ADDRESS_LINE_1),
+        Form.ADDRESS_ADDRESS_LINE_2 -> "${%s}".format(Test.TEST_ADDRESS_LINE_2),
+        Form.ADDRESS_LANDMARK -> "${%s}".format(Test.TEST_LANDMARK),
+        Form.ADDRESS_CITY -> "${%s}".format(Test.TEST_CITY),
+        Form.ADDRESS_COUNTRY ->"${%s}".format(Test.TEST_COUNTRY),
+        Form.ADDRESS_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
+        Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
     )
     .pause(2)
@@ -60,12 +68,12 @@ object profileControllerTest {
     )
     .pause(2)
     .exec(http("AddIdentificationForm")
-      .get(routes.AccountController.userReviewIdentificationDetailsForm().url)
+      .get(routes.AccountController.userReviewIdentificationForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .pause(2)
     .exec(http("IdentificationDetail_Post")
-      .post(routes.AccountController.userReviewIdentificationDetails().url)
+      .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.COMPLETION -> true
