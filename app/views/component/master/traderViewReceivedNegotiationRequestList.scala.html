@@ -18,8 +18,8 @@
                 }
             }
         }
-        @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString(), receivedNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.assetAndBuyerAccepted.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.assetAndBuyerAccepted.quantity.toString, receivedNegotiationRequest.assetAndBuyerAccepted.quantityUnit).mkString(" "))
         <div class="listItemChild">
             <p class="listItemChildTitle">
             @Messages(constants.View.ACCEPT)

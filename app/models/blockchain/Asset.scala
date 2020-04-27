@@ -65,7 +65,17 @@ class Assets @Inject()(
     }
   }
 
-  private def updateByID(asset: Asset): Future[Int] = db.run(assetTable.filter(_.pegHash === asset.pegHash).update(asset.updateLog()).asTry).map {
+  private def updateByPegHash(asset: Asset): Future[Int] = db.run(assetTable.filter(_.pegHash === asset.pegHash).update(asset.updateLog()).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateOwnerAddressByPegHash(pegHash: String, address: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.ownerAddress).update(address).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -179,7 +189,9 @@ class Assets @Inject()(
 
     def getAssetPegHashes(address: String): Future[Seq[String]] = getAssetPegHashesByAddress(address)
 
-    def update(asset: Asset): Future[Int] = updateByID(asset)
+    def update(asset: Asset): Future[Int] = updateByPegHash(asset)
+
+    def updateOwnerAddress(pegHash: String, address: String): Future[Int] = updateOwnerAddressByPegHash(pegHash = pegHash, address = address)
 
     def deleteAsset(pegHash: String): Future[Int] = deleteByPegHash(pegHash)
 

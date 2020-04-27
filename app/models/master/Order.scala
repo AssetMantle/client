@@ -65,6 +65,14 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
+  private def tryGetByID(id: String): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getByID(id: String): Future[Option[Order]] = db.run(orderTable.filter(_.id === id).result.headOption)
 
   private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
@@ -122,6 +130,8 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def markStatusAssetSentFiatPendingByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(id = orderID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING)
 
     def get(id: String): Future[Option[Order]] = getByID(id)
+
+    def tryGet(id: String): Future[Order] = tryGetByID(id)
 
   }
 

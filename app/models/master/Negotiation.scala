@@ -49,13 +49,13 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
-  private case class AssetOtherDetailsAndBuyerAcceptedSerialize(assetOtherDetails: String, buyerAccepted: Boolean = false)
+  case class AssetOtherDetailsAndBuyerAcceptedSerialize(assetOtherDetails: String, buyerAccepted: Boolean = false)
 
-  private case class PaymentTermsAndBuyerAcceptedSerialize(paymentTerms: String, buyerAccepted: Boolean = false)
+  case class PaymentTermsAndBuyerAcceptedSerialize(paymentTerms: String, buyerAccepted: Boolean = false)
 
-  private case class DocumentListAndBuyerAcceptedSerialize(documentList: String, buyerAccepted: Boolean = false)
+  case class DocumentListAndBuyerAcceptedSerialize(documentList: String, buyerAccepted: Boolean = false)
 
-  private case class NegotiationSerializable(id: String, negotiationID: Option[String], buyerTraderID: String, sellerTraderID: String, assetID: String, assetAndBuyerAccepted: AssetAndBuyerAccepted, assetOtherDetailsAndBuyerAcceptedSerialize: AssetOtherDetailsAndBuyerAcceptedSerialize, time: Option[Int], paymentTermsAndBuyerAcceptedSerialize: PaymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize: DocumentListAndBuyerAcceptedSerialize, chatID: Option[String], status: String, comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class NegotiationSerializable(id: String, negotiationID: Option[String], buyerTraderID: String, sellerTraderID: String, assetID: String, assetAndBuyerAccepted: AssetAndBuyerAccepted, assetOtherDetailsAndBuyerAcceptedSerialize: AssetOtherDetailsAndBuyerAcceptedSerialize, time: Option[Int], paymentTermsAndBuyerAcceptedSerialize: PaymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize: DocumentListAndBuyerAcceptedSerialize, chatID: Option[String], status: String, comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Negotiation = Negotiation(id = id, negotiationID = negotiationID, buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetAndBuyerAccepted = assetAndBuyerAccepted, assetOtherDetailsAndBuyerAccepted = AssetOtherDetailsAndBuyerAccepted(utilities.JSON.convertJsonStringToObject[AssetOtherDetails](assetOtherDetailsAndBuyerAcceptedSerialize.assetOtherDetails), assetOtherDetailsAndBuyerAcceptedSerialize.buyerAccepted), time = time, paymentTermsAndBuyerAccepted = PaymentTermsAndBuyerAccepted(utilities.JSON.convertJsonStringToObject[PaymentTerms](paymentTermsAndBuyerAcceptedSerialize.paymentTerms), paymentTermsAndBuyerAcceptedSerialize.buyerAccepted), documentListAndBuyerAccepted = DocumentListAndBuyerAccepted(utilities.JSON.convertJsonStringToObject[DocumentList](documentListAndBuyerAcceptedSerialize.documentList), documentListAndBuyerAcceptedSerialize.buyerAccepted), chatID = chatID, status = status, comment = comment, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -80,7 +80,15 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
 
-  private def find(id: String): Future[NegotiationSerializable] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(id: String): Future[NegotiationSerializable] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def tryGetByNegotiationID(negotiationID: String): Future[NegotiationSerializable] = db.run(negotiationTable.filter(_.negotiationID === negotiationID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -425,7 +433,9 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def update(negotiation: Negotiation): Future[Int] = updateByID(negotiation)
 
-    def tryGet(id: String): Future[Negotiation] = find(id).map(serializedNegotiation => serializedNegotiation.deserialize)
+    def tryGet(id: String): Future[Negotiation] = tryGetByID(id).map(serializedNegotiation => serializedNegotiation.deserialize)
+
+    def tryGetByBCNegotiationID(negotiationID: String): Future[Negotiation] = tryGetByNegotiationID(negotiationID).map(serializedNegotiation => serializedNegotiation.deserialize)
 
     def tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = findByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID).map(serializedNegotiation => serializedNegotiation.deserialize)
 

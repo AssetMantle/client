@@ -98,6 +98,16 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
+  private def updateOwnerIDByPegHash(pegHash: String, ownerID: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.ownerID).update(ownerID).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateStatusByPegHash(pegHash: String, status: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -167,6 +177,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         _ <- add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)))
       } yield documentHash
     }
+
+    def updateOwnerByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDByPegHash(pegHash = pegHash, ownerID = ownerID)
 
     def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
 

@@ -55,6 +55,9 @@ POST        /account/userReviewIdentification                                   
 GET         /asset/issue                                                                    controllers.AssetController.issueForm
 POST        /asset/issue                                                                    controllers.AssetController.issue
 
+GET         /asset/release                                                                  controllers.AssetController.releaseForm(assetID: String)
+POST        /asset/release                                                                  controllers.AssetController.release
+
 GET         /contact                                                                        controllers.ContactController.contact
 
 GET         /contact/addOrUpdateEmailAddress                                                controllers.ContactController.addOrUpdateEmailAddressForm
@@ -109,6 +112,18 @@ GET         /negotiation/sellerConfirm                                          
 POST        /negotiation/sellerConfirm                                                      controllers.NegotiationController.sellerConfirm
 
 GET         /negotiation/tradeActivityMessages                                              controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
+
+GET         /order/moderatedBuyerExecute                                                    controllers.OrderController.moderatedBuyerExecuteForm(orderID: String)
+POST        /order/moderatedBuyerExecute                                                    controllers.OrderController.moderatedBuyerExecute
+
+GET         /order/moderatedSellerExecute                                                   controllers.OrderController.moderatedSellerExecuteForm(orderID: String)
+POST        /order/moderatedSellerExecute                                                   controllers.OrderController.moderatedSellerExecute
+
+GET         /order/blockchainBuyerExecute                                                   controllers.OrderController.blockchainBuyerExecuteForm
+POST        /order/blockchainBuyerExecute                                                   controllers.OrderController.blockchainBuyerExecute
+
+GET         /order/blockchainSellerExecute                                                  controllers.OrderController.blockchainSellerExecuteForm
+POST        /order/blockchainSellerExecute                                                  controllers.OrderController.blockchainSellerExecute
 
 GET         /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organizationRejectRequest                                               controllers.TraderController.organizationRejectRequest
@@ -419,9 +434,6 @@ POST        /blockchain/addOrganization                                         
 GET         /blockchain/addZone                                                             controllers.AddZoneController.blockchainAddZoneForm
 POST        /blockchain/addZone                                                             controllers.AddZoneController.blockchainAddZone
 
-GET         /blockchain/buyerExecuteOrder                                                   controllers.OrderController.blockchainBuyerExecuteOrderForm
-POST        /blockchain/buyerExecuteOrder                                                   controllers.OrderController.blockchainBuyerExecuteOrder
-
 GET         /blockchain/changeBuyerBid                                                      controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm
 POST        /blockchain/changeBuyerBid                                                      controllers.ChangeBuyerBidController.blockchainChangeBuyerBid
 
@@ -448,9 +460,6 @@ POST        /blockchain/redeemFiat                                              
 
 GET         /blockchain/releaseAsset                                                        controllers.ReleaseAssetController.blockchainReleaseAssetForm
 POST        /blockchain/releaseAsset                                                        controllers.ReleaseAssetController.blockchainReleaseAsset
-
-GET         /blockchain/sellerExecuteOrder                                                  controllers.OrderController.blockchainSellerExecuteOrderForm
-POST        /blockchain/sellerExecuteOrder                                                  controllers.OrderController.blockchainSellerExecuteOrder
 
 GET         /blockchain/sendAsset                                                           controllers.SendAssetController.blockchainSendAssetForm
 POST        /blockchain/sendAsset                                                           controllers.SendAssetController.blockchainSendAsset

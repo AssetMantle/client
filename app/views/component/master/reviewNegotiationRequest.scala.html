@@ -21,16 +21,16 @@
     @commonTextInfo(constants.Form.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
     @commonTextInfo(constants.Form.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
     <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS)</div>
-    @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-    @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-    @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-    @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
+    @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePayment))
+    @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePercentage.getOrElse(0.0))
+    @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.credit))
+    @commonIntInfo(constants.View.TENURE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tenure.getOrElse(0))
     @*// TODO: commonOptionalDateInfo ??? *@
-    @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTerms.tentativeDate.toString())
-    @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
+    @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate.toString())
+    @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.reference.getOrElse(""))
 
     <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
-    @negotiation.documentList.documents.map { document =>
+    @negotiation.documentListAndBuyerAccepted.documentList.documents.map { document =>
         @document
         <br>
     }

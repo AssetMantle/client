@@ -18,21 +18,21 @@
             </div>
 
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
+                @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetAndBuyerAccepted.assetDescription)
             <div>
-            @negotiation.buyerAcceptedAssetDescription
+            @negotiation.assetAndBuyerAccepted.buyerAcceptedAssetDescription
             </div>
             </div>
             <div class="sellerTerm">
-                @commonIntInfo(constants.View.PRICE, negotiation.price)
+                @commonIntInfo(constants.View.PRICE, negotiation.assetAndBuyerAccepted.price)
             <div>
-            @negotiation.buyerAcceptedPrice
+            @negotiation.assetAndBuyerAccepted.buyerAcceptedPrice
             </div>
             </div>
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.assetAndBuyerAccepted.quantity.toString, negotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
             <div>
-            @negotiation.buyerAcceptedQuantity
+            @negotiation.assetAndBuyerAccepted.buyerAcceptedQuantity
             </div>
             </div>
             <div class="cmuk-flex cmuk-flex-between">
@@ -40,14 +40,14 @@
                 @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
             </div>
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
             <br>
-                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
+                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
             <br>
-                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.shippingPeriod)
             <br>
             <div>
-            @negotiation.buyerAcceptedAssetOtherDetails
+            @negotiation.assetOtherDetailsAndBuyerAccepted.buyerAccepted
             </div>
             </div>
 
@@ -58,15 +58,15 @@
                 @commonFormButton(constants.Form.UPDATE_PAYMENT_TERMS, 'parameters -> s"'${negotiation.id}'")
             </div>
             <div class="sellerTerm">
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                <br>
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
+                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePayment))
             <br>
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePercentage.getOrElse(0.0))
             <br>
-                @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
+                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.credit))
             <br>
-                @negotiation.paymentTerms.tentativeDate match {
+                @commonIntInfo(constants.View.TENURE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tenure.getOrElse(0))
+            <br>
+                @negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate match {
                     case Some(date) => {
                         @commonDateInfo(constants.View.TENTATIVE_DATE, date)
                     }
@@ -75,9 +75,9 @@
                     }
                 }
             <br>
-                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
+                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTermsAndBuyerAccepted.paymentTerms.reference.getOrElse(""))
             <div>
-            @negotiation.buyerAcceptedPaymentTerms
+            @negotiation.paymentTermsAndBuyerAccepted.buyerAccepted
             </div>
             </div>
 
@@ -88,61 +88,61 @@
                 @commonFormButton(constants.Form.UPDATE_DOCUMENT_LIST, 'parameters -> s"'${negotiation.id}'")
             </div>
             <div class="sellerTerm">
-                @negotiation.documentList.documents.map { document =>
+                @negotiation.documentListAndBuyerAccepted.documentList.documents.map { document =>
                     @document
                     <br>
                 }
             <div>
-            @negotiation.buyerAcceptedDocumentList
+            @negotiation.documentListAndBuyerAccepted.buyerAccepted
             </div>
             </div>
         }
         case negotiation.buyerTraderID => {
 
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "icon-description") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.assetAndBuyerAccepted.buyerAcceptedAssetDescription, iconPath = "icon-description") {
                 @Messages(constants.View.ASSET_DESCRIPTION)
             } {
-                @negotiation.assetDescription
+                @negotiation.assetAndBuyerAccepted.assetDescription
             }
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "icon-contract-price") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.assetAndBuyerAccepted.buyerAcceptedPrice, iconPath = "icon-contract-price") {
                 @Messages(constants.View.PRICE)
             } {
-                @negotiation.price
+                @negotiation.assetAndBuyerAccepted.price
             }
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "icon-quantity") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.assetAndBuyerAccepted.buyerAcceptedQuantity, iconPath = "icon-quantity") {
                 @Messages(constants.View.QUANTITY)
             } {
-                @Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" ")
+                @Seq(negotiation.assetAndBuyerAccepted.quantity.toString, negotiation.assetAndBuyerAccepted.quantityUnit).mkString(" ")
             }
 
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "icon-shipment-period") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.assetOtherDetailsAndBuyerAccepted.buyerAccepted, iconPath = "icon-shipment-period") {
                 @Messages(constants.View.ASSET_OTHER_DETAILS)
-                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
-                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.shippingPeriod)
             } {
             }
             <hr>
 
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "icon-advance-payment") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.paymentTermsAndBuyerAccepted.buyerAccepted, iconPath = "icon-advance-payment") {
                 @Messages(constants.View.PAYMENT_TERMS)
                 <br>
                 <p>@Messages(constants.View.ADVANCE_PERCENTAGE) - <span class="cmuk-text-bold">
-                @if(negotiation.paymentTerms.advancePayment) {
-                    @negotiation.paymentTerms.advancePercentage %
+                @if(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePayment) {
+                    @negotiation.paymentTermsAndBuyerAccepted.paymentTerms.advancePercentage %
                 } else {
                     @Messages(constants.View.NO)
                 }
                 </span></p>
-                @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
+                @if(negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate.isEmpty) {
                     <p>@Messages(constants.View.TENURE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
+                        - <span class="cmuk-text-bold">@negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tenure.getOrElse(0)
                             Days</span></p>
                     <p>@Messages(constants.View.REFERENCE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.reference.getOrElse("")</span></p>
+                        - <span class="cmuk-text-bold">@negotiation.paymentTermsAndBuyerAccepted.paymentTerms.reference.getOrElse("")</span></p>
                 } else {
                     <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                    @negotiation.paymentTerms.tentativeDate match {
+                    @negotiation.paymentTermsAndBuyerAccepted.paymentTerms.tentativeDate match {
                         case Some(date) => {
                             @date
                         }
@@ -154,10 +154,10 @@
             }
 
             <hr>
-            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.buyerAcceptedDocumentList, iconPath = "icon-document") {
+            @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.documentListAndBuyerAccepted.buyerAccepted, iconPath = "icon-document") {
                 @Messages(constants.View.DOCUMENT_LIST)
                 <br>
-                @negotiation.documentList.documents.map { document =>
+                @negotiation.documentListAndBuyerAccepted.documentList.documents.map { document =>
                     @document
                     <br>
                 }

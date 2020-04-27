@@ -31,6 +31,7 @@ object FormField {
   val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ID = new StringFormField("ID", 32, 32)
+  val ORDER_ID = new StringFormField("ORDER_ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
   val BUYER_ACCOUNT_ID = new StringFormField("BUYER_ACCOUNT_ID", 3, 50)
   val SELLER_ACCOUNT_ID = new StringFormField("SELLER_ACCOUNT_ID", 3, 50)

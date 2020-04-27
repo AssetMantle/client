@@ -131,11 +131,19 @@ object Notification {
 
   val ZONE_RELEASED_ASSET = new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val MODERATED_BUY_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_BUY_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val MODERATED_SELL_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_SELL_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val BUYER_BID_CONFIRMED = new Notification(notificationType = "BUYER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_BID_CONFIRMED = new Notification(notificationType = "SELLER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "BUYER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "SELLER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val SEND_ASSET_TO_ORDER_SUCCESSFUL = new Notification(notificationType = "SEND_ASSET_TO_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SEND_ASSET_TO_ORDER_FAILED = new Notification(notificationType = "SEND_ASSET_TO_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_EXECUTE_ORDER_SUCCESSFUL = new Notification(notificationType = "BUYER_EXECUTE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_EXECUTE_ORDER_FAILED = new Notification(notificationType = "BUYER_EXECUTE_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_EXECUTE_ORDER_SUCCESSFUL = new Notification(notificationType = "SELLER_EXECUTE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_EXECUTE_ORDER_FAILED = new Notification(notificationType = "SELLER_EXECUTE_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

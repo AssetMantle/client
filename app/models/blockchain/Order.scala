@@ -111,6 +111,8 @@ class Orders @Inject()(
 
   private def getOrderIDsWithoutAWBProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.awbProofHash.?.isEmpty).map(_.id).result)
 
+  private def checkOrderExistsByID(id: String): Future[Boolean] = db.run(orderTable.filter(_.id === id).exists.result)
+
   private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -148,9 +150,9 @@ class Orders @Inject()(
 
   object Service {
 
-    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): Future[String] = add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true))
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): Future[String] = add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false))
 
-    def update(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean): Future[Int] = updateByID(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit))
+    def update(order: Order): Future[Int] = updateByID(order)
 
     def getDirtyOrders: Future[Seq[Order]] = getOrdersByDirtyBit(dirtyBit = true)
 
@@ -163,6 +165,8 @@ class Orders @Inject()(
     def getAllOrderIdsWithoutAWBProofHash: Future[Seq[String]] = getOrderIDsWithoutAWBProofHash
 
     def markDirty(id: String): Future[Int] = updateDirtyBitById(id, dirtyBit = true)
+
+    def checkOrderExists(id: String): Future[Boolean] = checkOrderExistsByID(id)
   }
 
   object Utility {
@@ -209,7 +213,7 @@ class Orders @Inject()(
               } else Future()
             }
 
-            def update(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.update(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+            def update(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.update(Order(id = dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false))
 
             def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 

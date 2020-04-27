@@ -18,9 +18,9 @@
                 }
             }
         }
-        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetDescription)
-        @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString(), incompleteNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetAndBuyerAccepted.assetDescription)
+        @commonIntInfo(constants.View.PRICE, incompleteNegotiation.assetAndBuyerAccepted.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.assetAndBuyerAccepted.quantity.toString, incompleteNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
         @commonFormButton(constants.Form.NEGOTIATION_PAYMENT_TERMS, 'parameters -> s"'${incompleteNegotiation.id}'")
     }

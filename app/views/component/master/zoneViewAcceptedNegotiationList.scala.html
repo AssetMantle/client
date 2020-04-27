@@ -22,8 +22,8 @@
                 }
             }
         }
-        @commonVerticalIntInfo(constants.View.PRICE, negotiation.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString(), negotiation.quantityUnit).mkString(" "))
+        @commonVerticalIntInfo(constants.View.PRICE, negotiation.assetAndBuyerAccepted.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(negotiation.assetAndBuyerAccepted.quantity.toString(), negotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.STATUS, negotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">

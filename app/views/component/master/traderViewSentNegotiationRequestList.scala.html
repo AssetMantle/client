@@ -18,9 +18,9 @@
                 }
             }
         }
-        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sentNegotiationRequest.assetDescription)
-        @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString, sentNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sentNegotiationRequest.assetAndBuyerAccepted.assetDescription)
+        @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.assetAndBuyerAccepted.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.assetAndBuyerAccepted.quantity.toString, sentNegotiationRequest.assetAndBuyerAccepted.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
     }
 }

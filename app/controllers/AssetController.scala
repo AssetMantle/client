@@ -59,7 +59,7 @@ class AssetController @Inject()(
 
     def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-    def getAddress(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
+    def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
 
     def getTakerAddress(takerID: Option[String]): Future[String] = {
       takerID match {

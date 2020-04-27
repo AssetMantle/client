@@ -70,18 +70,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.updateZoneKYC,
 
         routes.javascript.AssetController.issueForm,
+        routes.javascript.AssetController.releaseForm,
 
         routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
         routes.javascript.BlockExplorerController.stakingValidators,
         routes.javascript.BlockExplorerController.transactionHash,
-
-        routes.javascript.OrderController.buyerExecuteOrderDocument,
-        routes.javascript.OrderController.buyerExecuteOrderForm,
-        routes.javascript.OrderController.moderatedBuyerExecuteOrderDocument,
-        routes.javascript.OrderController.moderatedBuyerExecuteOrderForm,
-        routes.javascript.OrderController.moderatedBuyerExecuteOrderList,
-        routes.javascript.OrderController.blockchainBuyerExecuteOrderForm,
 
         routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm,
 
@@ -222,22 +216,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
 
+        routes.javascript.OrderController.moderatedBuyerExecuteForm,
+        routes.javascript.OrderController.moderatedSellerExecuteForm,
+        routes.javascript.OrderController.blockchainBuyerExecute,
+        routes.javascript.OrderController.blockchainSellerExecute,
+
         routes.javascript.RedeemAssetController.redeemAssetForm,
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 
         routes.javascript.RedeemFiatController.redeemFiatForm,
         routes.javascript.RedeemFiatController.blockchainRedeemFiatForm,
 
-        routes.javascript.ReleaseAssetController.releaseAssetList,
-        routes.javascript.ReleaseAssetController.releaseAssetForm,
         routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
-
-        routes.javascript.OrderController.moderatedSellerExecuteOrderList,
-        routes.javascript.OrderController.sellerExecuteOrderDocument,
-        routes.javascript.OrderController.sellerExecuteOrderForm,
-        routes.javascript.OrderController.moderatedSellerExecuteOrderForm,
-        routes.javascript.OrderController.moderatedSellerExecuteOrderDocument,
-        routes.javascript.OrderController.blockchainSellerExecuteOrderForm,
 
         routes.javascript.SendAssetController.sendAssetForm,
         routes.javascript.SendAssetController.blockchainSendAssetForm,

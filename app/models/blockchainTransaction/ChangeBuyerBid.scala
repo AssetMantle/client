@@ -209,10 +209,10 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
       def negotiation(changeBuyerBid: ChangeBuyerBid): Future[Option[Negotiation]] = blockchainNegotiations.Service.getNegotiation(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
 
-      def negotiationResponse(negotiation: Option[Negotiation], changeSellerBid: ChangeSellerBid): Future[NegotiationResponse.Response] = negotiation match {
+      def negotiationResponse(negotiation: Option[Negotiation], changeBuyerBid: ChangeBuyerBid): Future[NegotiationResponse.Response] = negotiation match {
         case Some(negotiation) => getNegotiation.Service.get(negotiation.id)
         case None =>
-          val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = changeSellerBid.from, sellerAddress = changeSellerBid.to, pegHash = changeSellerBid.pegHash)
+          val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
 
           def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
 
@@ -222,7 +222,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
           } yield negotiationResponse
       }
 
-      def insertOrUpdate(negotiation: Option[Negotiation], negotiationResponse: NegotiationResponse.Response) = {
+      def createOrUpdate(negotiation: Option[Negotiation], negotiationResponse: NegotiationResponse.Response) = {
         if (negotiation.isDefined) {
           blockchainNegotiations.Service.update(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
         } else blockchainNegotiations.Service.create(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
@@ -278,7 +278,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
         changeBuyerBid <- changeBuyerBid
         negotiation <- negotiation(changeBuyerBid)
         negotiationResponse <- negotiationResponse(negotiation, changeBuyerBid)
-        _ <- insertOrUpdate(negotiationResponse)
+        _ <- createOrUpdate(negotiation, negotiationResponse)
         _ <- markDirty(changeBuyerBid)
         buyerAccountID <- getID(changeBuyerBid.from)
         sellerAccountID <- getID(changeBuyerBid.to)

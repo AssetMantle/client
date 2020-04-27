@@ -41,6 +41,7 @@ object Form {
 
   //AssetController
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
+  val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
 
   //AddZoneController
   val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)
@@ -94,13 +95,13 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
-  val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.NegotiationController.buyerConfirmForm)
-  val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.NegotiationController.sellerConfirmForm)
+  val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.javascript.NegotiationController.buyerConfirmForm)
+  val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.javascript.NegotiationController.sellerConfirmForm)
 
   //OrderController
-  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecute(), routes.javascript.OrderController.buyerExecuteForm)
+//  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecute(), routes.javascript.OrderController.buyerExecuteForm)
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
-  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecute(), routes.javascript.OrderController.sellerExecuteForm)
+//  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecute(), routes.javascript.OrderController.sellerExecuteForm)
   val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecute(), routes.javascript.OrderController.moderatedSellerExecuteForm)
   val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecute(), routes.javascript.OrderController.blockchainBuyerExecuteForm)
   val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecute(), routes.javascript.OrderController.blockchainSellerExecuteForm)
@@ -114,7 +115,6 @@ object Form {
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat(), routes.javascript.RedeemFiatController.blockchainRedeemFiatForm)
 
   //ReleaseAssetController
-  val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset(), routes.javascript.ReleaseAssetController.releaseAssetForm)
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
 
   //SendAssetController
