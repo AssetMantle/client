@@ -3,7 +3,7 @@
 @import views.html.base.common
 @import views.html.base._
 @import scala.collection.immutable.ListMap
-@(id: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(negotiationID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
@@ -14,22 +14,22 @@
             case constants.User.TRADER => {
                 <div id="traderViewNegotiationDocuments"></div>
                 <script type="text/javascript">
-                    componentResource('financial', jsRoutes.controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks('@id'));
-                    componentResource('traderViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationFiles('@id'));
+                    componentResource('financial', jsRoutes.controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('traderViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationFiles('@negotiationID'));
                 </script>
             }
             case constants.User.ORGANIZATION => {
                 <div id="organizationViewNegotiationDocuments"></div>
                 <script type="text/javascript">
-                    componentResource('financial', jsRoutes.controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks('@id'));
-                    componentResource('organizationViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles('@id'));
+                    componentResource('financial', jsRoutes.controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('organizationViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles('@negotiationID'));
                 </script>
             }
             case constants.User.ZONE => {
                 <div id="zoneViewNegotiationDocuments"></div>
                 <script type="text/javascript">
-                      componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@id'));
-                    componentResource('zoneViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationFiles('@id'));
+                      componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('zoneViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationFiles('@negotiationID'));
                 </script>
 
             }
@@ -47,21 +47,21 @@
                     <div id="traderViewAcceptedNegotiation">
                 </div>
                     <script type="text/javascript">
-                    componentResource('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@id'));
+                    componentResource('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@negotiationID'));
                 </script>
                 }
                 case constants.User.ORGANIZATION => {
                     <div id="organizationViewAcceptedNegotiation">
                 </div>
                     <script type="text/javascript">
-                    componentResource('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation('@id'));
+                    componentResource('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation('@negotiationID'));
                 </script>
                 }
                 case constants.User.ZONE => {
                     <div id="zoneViewAcceptedNegotiation">
                 </div>
                     <script type="text/javascript">
-                    componentResource('zoneViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiation('@id'));
+                    componentResource('zoneViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiation('@negotiationID'));
                 </script>
                 }
                 case _ => {}
@@ -89,13 +89,13 @@
         <div id="orderActions"></div>
     </div>
     <script>
-    componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@id'));
+    componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@negotiationID'));
     @loginState.userType match {
     case constants.User.TRADER => {
-    componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
+    componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@negotiationID'));
     }
     case constants.User.ZONE => {
-    componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@id'));
+    componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@negotiationID'));
     }
     case _ => {}
     }

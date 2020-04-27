@@ -9,7 +9,7 @@ object OBL {
 
   val form = Form(
     mapping(
-      constants.FormField.ID.name -> constants.FormField.ID.field,
+      constants.FormField.NEGOTIATION_ID.name -> constants.FormField.NEGOTIATION_ID.field,
       constants.FormField.BILL_OF_LADING_NUMBER.name -> constants.FormField.BILL_OF_LADING_NUMBER.field,
       constants.FormField.PORT_OF_LOADING.name -> constants.FormField.PORT_OF_LOADING.field,
       constants.FormField.SHIPPER_NAME.name -> constants.FormField.SHIPPER_NAME.field,
@@ -23,6 +23,6 @@ object OBL {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, billOfLadingNumber: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetQuantity: Int, assetPrice: Int)
+  case class Data(negotiationID: String, billOfLadingNumber: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetQuantity: Int, assetPrice: Int)
 
 }

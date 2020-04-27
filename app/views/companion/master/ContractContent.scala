@@ -9,12 +9,12 @@ object ContractContent {
 
   val form = Form(
     mapping(
-      constants.FormField.ID.name -> constants.FormField.ID.field,
+      constants.FormField.NEGOTIATION_ID.name -> constants.FormField.NEGOTIATION_ID.field,
       constants.FormField.CONTRACT_NUMBER.name -> constants.FormField.CONTRACT_NUMBER.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, contractNumber: String)
+  case class Data(negotiationID: String, contractNumber: String)
 
 }
 

@@ -3,10 +3,10 @@
 @import models.masterTransaction
 @import views.companion.master.InvoiceContent
 
-@(invoiceContentForm: Form[InvoiceContent.Data] = InvoiceContent.form, id:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(invoiceContentForm: Form[InvoiceContent.Data] = InvoiceContent.form, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.INVOICE_CONTENT, invoiceContentForm) {
-    @commonInputText(invoiceContentForm, constants.FormField.ID, 'value -> id,'containerDivClass -> "hidden")
+    @commonInputText(invoiceContentForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
     @commonInputText(invoiceContentForm, constants.FormField.INVOICE_NUMBER)
     @commonInputDate(invoiceContentForm, constants.FormField.INVOICE_DATE)
 }

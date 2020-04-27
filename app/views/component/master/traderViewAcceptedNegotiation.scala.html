@@ -4,16 +4,16 @@
 @import models.masterTransaction.NegotiationFile
 @import scala.collection.immutable.ListMap
 
-@(id:String, traderID: String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(traderID: String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @commonHorizontalSwitcher(ListMap(
         constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.traderViewAcceptedNegotiationTerms,
         constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.traderViewNegotiationFile,
     ),
-        'VIEW_TERMS_PARAMETERS -> s"'${id}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${id}'")
+        'VIEW_TERMS_PARAMETERS -> s"'${negotiation.id}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiation.id}'")
     <br>
     @if(negotiation.buyerTraderID == traderID && negotiation.status == constants.Status.Negotiation.NEGOTIATION_STARTED){
-        @commonFormButton(constants.Form.CONFIRM_ALL_NEGOTIATION_TERMS, 'parameters -> s"'${id}'")
+        @commonFormButton(constants.Form.CONFIRM_ALL_NEGOTIATION_TERMS, 'parameters -> s"'${negotiation.id}'")
     }
 
 </div>

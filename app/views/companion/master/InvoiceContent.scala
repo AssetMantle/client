@@ -9,13 +9,13 @@ object InvoiceContent {
 
   val form = Form(
     mapping(
-      constants.FormField.ID.name -> constants.FormField.ID.field,
+      constants.FormField.NEGOTIATION_ID.name -> constants.FormField.NEGOTIATION_ID.field,
       constants.FormField.INVOICE_NUMBER.name -> constants.FormField.INVOICE_NUMBER.field,
       constants.FormField.INVOICE_DATE.name -> constants.FormField.INVOICE_DATE.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, invoiceNumber: String, invoiceDate: Date)
+  case class Data(negotiationID: String, invoiceNumber: String, invoiceDate: Date)
 
 }
 

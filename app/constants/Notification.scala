@@ -127,9 +127,9 @@ object Notification {
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
-  val OBL_DETAILS_ADDED = new Notification(notificationType = "OBL_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val INVOICE_DETAILS_ADDED = new Notification(notificationType = "INVOICE_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val CONTRACT_DETAILS_ADDED = new Notification(notificationType = "CONTRACT_DETAILS_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val OBL_CONTENT_ADDED = new Notification(notificationType = "OBL_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val INVOICE_CONTENT_ADDED = new Notification(notificationType = "INVOICE_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val CONTRACT_CONTENT_ADDED = new Notification(notificationType = "CONTRACT_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)

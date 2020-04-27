@@ -5,12 +5,12 @@
 @import models.masterTransaction.AssetFile
 
 @import models.master.Negotiation
-@(id:String,negotiation:Negotiation, assetFiles:Seq[AssetFile],negotiationFiles: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiation:Negotiation, assetFileList:Seq[AssetFile],negotiationFileList: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @Messages(constants.View.ASSET_DOCUMENTS):
-@assetFiles.filter(assetFile=> negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map{assetFile=>
+@assetFileList.filter(assetFile=> negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map{assetFile=>
     <div>
-        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationFile('@id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
+        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationFile('@negotiation.id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
         @assetFile.documentType match{
             case constants.File.OBL=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewAssetDocumentContent('@negotiation.assetID','@assetFile.documentType'))")></td>}
             case _=>{}
@@ -19,11 +19,11 @@
 }
 
 @Messages(constants.View.NEGOTIATION_DOCUMENTS):
-@negotiationFiles.filter(negotiationFile=> negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.CONTRACT).map{negotiationFile=>
+@negotiationFileList.filter(negotiationFile=> negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.CONTRACT).map{negotiationFile=>
     <div>
-        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationFile('@id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
+        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationFile('@negotiation.id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
         @negotiationFile.documentType match{
-            case constants.File.INVOICE | constants.File.CONTRACT=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocumentContent('@id','@negotiationFile.documentType'))")></td>}
+            case constants.File.INVOICE | constants.File.CONTRACT=> {<td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocumentContent('@negotiation.id','@negotiationFile.documentType'))")></td>}
             case _=>{}
         }
     </div>
