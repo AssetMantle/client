@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.westernUnion.FiatRequests
 import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
