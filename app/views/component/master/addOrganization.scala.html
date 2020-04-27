@@ -5,6 +5,7 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
+    @Messages(constants.View.SELECT_ZONE)
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @zones.map { zone =>
@@ -29,9 +30,8 @@
         @commonInputText(addOrganizationForm, constants.FormField.PHONE)
     }
 
-    @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
-
     @Messages(constants.FormField.POSTAL_ADDRESS.name):
+    @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
     @defining(Option(constants.FormField.POSTAL_ADDRESS)) { implicit nestedFormField =>
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_1)
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)

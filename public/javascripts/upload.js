@@ -61,7 +61,7 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
             }
         });
     });
-    
+
     $("#uploadButton").click(function () {
         rFile.upload();
     });

@@ -6,7 +6,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Contact, Identification, Organization, Trader, TraderKYC}
+import models.master.{Identification, Organization, Trader, TraderKYC}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
@@ -20,9 +20,8 @@ class SetACLController @Inject()(
                                   withTraderLoginAction: WithTraderLoginAction,
                                   transaction: utilities.Transaction,
                                   masterTransactionTraderInvitations: masterTransaction.TraderInvitations,
-                                  masterContacts: master.Contacts,
+                                  masterEmails: master.Emails,
                                   fileResourceManager: utilities.FileResourceManager,
-                                  blockchainAccounts: blockchain.Accounts,
                                   masterZones: master.Zones,
                                   masterOrganizations: master.Organizations,
                                   masterIdentifications: master.Identifications,
@@ -64,17 +63,16 @@ class SetACLController @Inject()(
         },
         inviteTraderData => {
 
-          val contact: Future[Option[Contact]] = masterContacts.Service.getContactByEmail(inviteTraderData.emailAddress)
+          val emailAddressAccount: Future[Option[String]] = masterEmails.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
 
-          def inviteeUserType(contact: Option[Contact]): Future[String] = if (contact.isDefined) {
-            masterAccounts.Service.getUserType(contact.get.id)
-          } else {
-            Future(constants.User.USER)
+          def inviteeUserType(emailAddressAccount: Option[String]): Future[String] = emailAddressAccount match {
+            case Some(emailAddressAccount) => masterAccounts.Service.getUserType(emailAddressAccount)
+            case None => Future(constants.User.USER)
           }
 
           def createSendInvitationAndGetResult(inviteeUserType: String): Future[Result] = {
             if (inviteeUserType != constants.User.USER) {
-              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_ALREADY_IN_USE))))
+              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_TAKEN))))
             } else {
 
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
@@ -82,7 +80,7 @@ class SetACLController @Inject()(
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
               def sendEmailAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, toEmailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
                 withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_INVITATION_EMAIL_SENT)))
               }
 
@@ -97,8 +95,8 @@ class SetACLController @Inject()(
           }
 
           (for {
-            contact <- contact
-            inviteeUserType <- inviteeUserType(contact)
+            emailAddressAccount <- emailAddressAccount
+            inviteeUserType <- inviteeUserType(emailAddressAccount)
             result <- createSendInvitationAndGetResult(inviteeUserType)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -134,7 +132,7 @@ class SetACLController @Inject()(
 
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
@@ -212,11 +210,10 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.TraderKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[TraderKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
         masterCreate = masterTraderKYCs.Service.create
       )
 
@@ -241,14 +238,12 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderKYC](
+      def updateFile(oldDocument: TraderKYC): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterTraderKYCs.Service.updateOldDocument
       )
 
@@ -256,8 +251,8 @@ class SetACLController @Inject()(
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(id, oldDocumentFileName)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         allDocuments <- allDocuments(id)
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(allDocuments))
       } yield result
@@ -272,7 +267,7 @@ class SetACLController @Inject()(
 
       def getResult(trader: Trader): Future[Result] = {
         val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-        val zone = masterZones.Service.get(trader.zoneID)
+        val zone = masterZones.Service.tryGet(trader.zoneID)
         val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
         for {
           organization <- organization
@@ -299,7 +294,7 @@ class SetACLController @Inject()(
 
           def getResult(trader: Trader): Future[Result] = {
             val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-            val zone = masterZones.Service.get(trader.zoneID)
+            val zone = masterZones.Service.tryGet(trader.zoneID)
             val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
             for {
               organization <- organization
@@ -327,16 +322,12 @@ class SetACLController @Inject()(
             if (userReviewAddTraderRequestData.completion && allKYCFileTypesExists) {
               val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
 
-              val emailAddress: Future[Option[String]] = masterContacts.Service.getVerifiedEmailAddress(loginState.username)
+              val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
                 masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = traderOrganization.id, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
               } else {
                 Future(0)
-              }
-
-              def getResult(traderOrganization: Organization, trader: Trader): Future[Result] = {
-                withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               }
 
               for {
@@ -345,11 +336,11 @@ class SetACLController @Inject()(
                 _ <- updateInvitationStatus(emailAddress)
                 _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_USER_ADDED_OR_UPDATED_TRADER_REQUEST, trader.name)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_ADDED_OR_UPDATED_TRADER_REQUEST, traderOrganization.name, traderOrganization.id)
-                result <- getResult(traderOrganization, trader)
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
 
-              val zone = masterZones.Service.get(trader.zoneID)
+              val zone = masterZones.Service.tryGet(trader.zoneID)
               val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
 
               for {
@@ -491,7 +482,7 @@ class SetACLController @Inject()(
 
       def getResult(userZoneID: String, traderZoneID: String): Future[Result] = {
         if (userZoneID == traderZoneID) {
-          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = traderID, documentType = documentType)
           for {
             traderKYC <- traderKYC
           } yield Ok(views.html.component.master.zoneAcceptOrRejectTraderKYCDocument(traderKYC = traderKYC))
@@ -512,7 +503,7 @@ class SetACLController @Inject()(
     implicit request =>
       views.companion.master.ZoneAcceptOrRejectTraderKYCDocument.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderKYC = masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             traderKYC <- traderKYC
           } yield BadRequest(views.html.component.master.zoneAcceptOrRejectTraderKYCDocument(formWithErrors, traderKYC))
@@ -544,7 +535,7 @@ class SetACLController @Inject()(
                 } yield {}
               }
 
-              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.get(id = zoneAcceptOrRejectTraderKYCDocumentData.traderID, documentType = zoneAcceptOrRejectTraderKYCDocumentData.documentType)
+              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = zoneAcceptOrRejectTraderKYCDocumentData.traderID, documentType = zoneAcceptOrRejectTraderKYCDocumentData.documentType)
 
               for {
                 _ <- verifyOrReject
@@ -666,7 +657,7 @@ class SetACLController @Inject()(
 
       def getResult(userOrganizationID: String, traderOrganizationID: String): Future[Result] = {
         if (userOrganizationID == traderOrganizationID) {
-          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = traderID, documentType = documentType)
           for {
             traderKYC <- traderKYC
           } yield Ok(views.html.component.master.organizationAcceptOrRejectTraderKYCDocument(traderKYC = traderKYC))
@@ -687,7 +678,7 @@ class SetACLController @Inject()(
     implicit request =>
       views.companion.master.OrganizationAcceptOrRejectTraderKYCDocument.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderKYC = masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val traderKYC = masterTraderKYCs.Service.tryGet(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             traderKYC <- traderKYC
           } yield BadRequest(views.html.component.master.organizationAcceptOrRejectTraderKYCDocument(formWithErrors, traderKYC))
@@ -719,7 +710,7 @@ class SetACLController @Inject()(
                 } yield {}
               }
 
-              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.get(id = organizationAcceptOrRejectTraderKYCDocumentData.traderID, documentType = organizationAcceptOrRejectTraderKYCDocumentData.documentType)
+              def traderKYC: Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = organizationAcceptOrRejectTraderKYCDocumentData.traderID, documentType = organizationAcceptOrRejectTraderKYCDocumentData.documentType)
 
               for {
                 _ <- verifyOrReject
@@ -771,11 +762,10 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[master.TraderKYC](
+      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[TraderKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        document = TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
         masterCreate = masterTraderKYCs.Service.create
       )
 
@@ -797,21 +787,19 @@ class SetACLController @Inject()(
     implicit request =>
       val id = masterTraders.Service.tryGetID(loginState.username)
 
-      def getOldDocumentFileName(id: String): Future[String] = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
+      def getOldDocument(id: String): Future[TraderKYC] = masterTraderKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(id: String, oldDocumentFileName: String): Future[Boolean] = fileResourceManager.updateFile[master.TraderKYC](
+      def updateFile(oldDocument: TraderKYC): Future[Boolean] = fileResourceManager.updateFile[TraderKYC](
         name = name,
-        documentType = documentType,
         path = fileResourceManager.getTraderKYCFilePath(documentType),
-        oldDocumentFileName = oldDocumentFileName,
-        document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+        oldDocument = oldDocument,
         updateOldDocument = masterTraderKYCs.Service.updateOldDocument
       )
 
       (for {
         id <- id
-        oldDocumentFileName <- getOldDocumentFileName(id)
-        _ <- updateFile(id, oldDocumentFileName)
+        oldDocument <- getOldDocument(id)
+        _ <- updateFile(oldDocument)
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {

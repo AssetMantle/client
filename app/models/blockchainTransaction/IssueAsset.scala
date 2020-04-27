@@ -6,7 +6,6 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.master.{Asset, Negotiation, Organization, Trader}
-import models.masterTransaction.IssueAssetRequest
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -33,7 +32,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
