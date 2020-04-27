@@ -132,6 +132,11 @@ object Notification {
   val ZONE_RELEASED_ASSET = new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val MODERATED_BUY_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_BUY_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
+  val BUYER_BID_CONFIRMED = new Notification(notificationType = "BUYER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_BID_CONFIRMED = new Notification(notificationType = "SELLER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "BUYER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "SELLER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)
 

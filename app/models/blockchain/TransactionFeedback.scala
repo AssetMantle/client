@@ -118,8 +118,44 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   private[models] class TransactionFeedbackTable(tag: Tag) extends Table[TransactionFeedback](tag, "TransactionFeedBack_BC") {
 
-    def * = (address, (sendAssetsPositiveTx, sendAssetsNegativeTx), (sendFiatsPositiveTx, sendFiatsNegativeTx), (ibcIssueAssetsPositiveTx, ibcIssueAssetsNegativeTx), (ibcIssueFiatsPositiveTx, ibcIssueFiatsNegativeTx), (buyerExecuteOrderPositiveTx, buyerExecuteOrderNegativeTx), (sellerExecuteOrderPositiveTx, sellerExecuteOrderNegativeTx), (changeBuyerBidPositiveTx, changeBuyerBidNegativeTx), (changeSellerBidPositiveTx, changeSellerBidNegativeTx), (confirmBuyerBidPositiveTx, confirmBuyerBidNegativeTx), (confirmSellerBidPositiveTx, confirmSellerBidNegativeTx), (negotiationPositiveTx, negotiationNegativeTx), dirtyBit).shaped <> ( {
-      case (address, sendAssetCounts, sendFiatCounts, ibcIssueAssetCounts, ibcIssueFiatCounts, buyerExecuteOrderCounts, sellerExecuteOrderCounts, changeBuyerBidCounts, changeSellerBidCounts, confirmBuyerBidCounts, confirmSellerBidCounts, negotiationCounts, dirtyBit) => TransactionFeedback(address, SendAssetCounts.tupled.apply(sendAssetCounts), SendFiatCounts.tupled.apply(sendFiatCounts), IBCIssueAssetCounts.tupled.apply(ibcIssueAssetCounts), IBCIssueFiatCounts.tupled.apply(ibcIssueFiatCounts), BuyerExecuteOrderCounts.tupled.apply(buyerExecuteOrderCounts), SellerExecuteOrderCounts.tupled.apply(sellerExecuteOrderCounts), ChangeBuyerBidCounts.tupled.apply(changeBuyerBidCounts), ChangeSellerBidCounts.tupled.apply(changeSellerBidCounts), ConfirmBuyerBidCounts.tupled.apply(confirmBuyerBidCounts), ConfirmSellerBidCounts.tupled.apply(confirmSellerBidCounts), NegotiationCounts.tupled.apply(negotiationCounts), dirtyBit)
+    def * = (address,
+      (sendAssetsPositiveTx, sendAssetsNegativeTx),
+      (sendFiatsPositiveTx, sendFiatsNegativeTx),
+      (ibcIssueAssetsPositiveTx, ibcIssueAssetsNegativeTx),
+      (ibcIssueFiatsPositiveTx, ibcIssueFiatsNegativeTx),
+      (buyerExecuteOrderPositiveTx, buyerExecuteOrderNegativeTx),
+      (sellerExecuteOrderPositiveTx, sellerExecuteOrderNegativeTx),
+      (changeBuyerBidPositiveTx, changeBuyerBidNegativeTx),
+      (changeSellerBidPositiveTx, changeSellerBidNegativeTx),
+      (confirmBuyerBidPositiveTx, confirmBuyerBidNegativeTx),
+      (confirmSellerBidPositiveTx, confirmSellerBidNegativeTx),
+      (negotiationPositiveTx, negotiationNegativeTx),
+      dirtyBit).shaped <> ( {
+      case (address,
+      sendAssetCounts,
+      sendFiatCounts,
+      ibcIssueAssetCounts,
+      ibcIssueFiatCounts,
+      buyerExecuteOrderCounts,
+      sellerExecuteOrderCounts,
+      changeBuyerBidCounts,
+      changeSellerBidCounts,
+      confirmBuyerBidCounts,
+      confirmSellerBidCounts,
+      negotiationCounts, dirtyBit) =>
+        TransactionFeedback(address,
+          SendAssetCounts.tupled.apply(sendAssetCounts),
+          SendFiatCounts.tupled.apply(sendFiatCounts),
+          IBCIssueAssetCounts.tupled.apply(ibcIssueAssetCounts),
+          IBCIssueFiatCounts.tupled.apply(ibcIssueFiatCounts),
+          BuyerExecuteOrderCounts.tupled.apply(buyerExecuteOrderCounts),
+          SellerExecuteOrderCounts.tupled.apply(sellerExecuteOrderCounts),
+          ChangeBuyerBidCounts.tupled.apply(changeBuyerBidCounts),
+          ChangeSellerBidCounts.tupled.apply(changeSellerBidCounts),
+          ConfirmBuyerBidCounts.tupled.apply(confirmBuyerBidCounts),
+          ConfirmSellerBidCounts.tupled.apply(confirmSellerBidCounts),
+          NegotiationCounts.tupled.apply(negotiationCounts),
+          dirtyBit)
     }, { transactionFeedback: TransactionFeedback =>
       def f1(sendAssetCounts: SendAssetCounts) = SendAssetCounts.unapply(sendAssetCounts).get
 

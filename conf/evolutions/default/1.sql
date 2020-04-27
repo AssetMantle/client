@@ -80,17 +80,23 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
 (
-    "pegHash"       VARCHAR NOT NULL,
-    "documentHash"  VARCHAR NOT NULL,
-    "assetType"     VARCHAR NOT NULL,
-    "assetQuantity" VARCHAR NOT NULL,
-    "assetPrice"    VARCHAR NOT NULL,
-    "quantityUnit"  VARCHAR NOT NULL,
-    "ownerAddress"  VARCHAR NOT NULL,
-    "locked"        BOOLEAN NOT NULL,
-    "moderated"     BOOLEAN NOT NULL,
-    "takerAddress"  VARCHAR,
-    "dirtyBit"      BOOLEAN,
+    "pegHash"           VARCHAR NOT NULL,
+    "documentHash"      VARCHAR NOT NULL,
+    "assetType"         VARCHAR NOT NULL,
+    "assetQuantity"     VARCHAR NOT NULL,
+    "assetPrice"        VARCHAR NOT NULL,
+    "quantityUnit"      VARCHAR NOT NULL,
+    "ownerAddress"      VARCHAR NOT NULL,
+    "locked"            BOOLEAN NOT NULL,
+    "moderated"         BOOLEAN NOT NULL,
+    "takerAddress"      VARCHAR,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("pegHash")
 );
 
@@ -109,15 +115,27 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
     "buyerContractHash"  VARCHAR,
     "sellerContractHash" VARCHAR,
     "dirtyBit"           BOOLEAN NOT NULL,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
 (
-    "id"            VARCHAR NOT NULL,
-    "fiatProofHash" VARCHAR,
-    "awbProofHash"  VARCHAR,
-    "dirtyBit"      BOOLEAN NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "fiatProofHash"     VARCHAR,
+    "awbProofHash"      VARCHAR,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -566,6 +584,12 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
     "chatID"                         VARCHAR UNIQUE,
     "status"                         VARCHAR NOT NULL,
     "comment"                        VARCHAR,
+    "createdBy"                      VARCHAR,
+    "createdOn"                      TIMESTAMP,
+    "createdOnTimeZone"              VARCHAR,
+    "updatedBy"                      VARCHAR,
+    "updatedOn"                      TIMESTAMP,
+    "updatedOnTimeZone"              VARCHAR,
     PRIMARY KEY ("id"),
     UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
 );
@@ -573,6 +597,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
 CREATE TABLE IF NOT EXISTS MASTER."Order"
 (
     "id"                VARCHAR NOT NULL,
+    "orderID"           VARCHAR NOT NULL UNIQUE,
     "buyerTraderID"     VARCHAR NOT NULL,
     "sellerTraderID"    VARCHAR NOT NULL,
     "assetID"           VARCHAR NOT NULL,
@@ -979,6 +1004,8 @@ ALTER TABLE MASTER."Negotiation"
     ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
 ALTER TABLE MASTER."Order"
     ADD CONSTRAINT Order_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_BCOrder_orderID FOREIGN KEY ("orderID") REFERENCES BLOCKCHAIN."Order_BC" ("id");
 ALTER TABLE MASTER."Order"
     ADD CONSTRAINT Order_MasterTrader_buyerTraderID FOREIGN KEY ("buyerTraderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Order"

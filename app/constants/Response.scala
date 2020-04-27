@@ -172,6 +172,7 @@ object Response {
   val ASSET_ALREADY_UNLOCKED = new Failure("ASSET_ALREADY_UNLOCKED")
   val BILL_OF_LADING_VERIFICATION_STATUS_PENDING = new Failure("BILL_OF_LADING_VERIFICATION_STATUS_PENDING")
   val BILL_OF_LADING_REJECTED = new Failure("BILL_OF_LADING_REJECTED")
+  val FIAT_PEG_WALLET_NOT_FOUND = new Failure("FIAT_PEG_WALLET_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
