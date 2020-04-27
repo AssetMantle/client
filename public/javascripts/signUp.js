@@ -32,7 +32,6 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                     }
                 });
             } else {
-                console.log(resultID);
                 $("#checkUsernameAvailableResult span").remove();
             }
         }, 1500);

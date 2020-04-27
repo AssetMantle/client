@@ -12,8 +12,7 @@
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
-                componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials())
-                componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials())
+                componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
             case constants.User.ORGANIZATION => {}
             case constants.User.ZONE => {}
@@ -94,9 +93,9 @@
         </div>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome())
-            componentResource('contact', jsRoutes.controllers.ContactController.contact())
-            componentResource('identification', jsRoutes.controllers.ComponentViewController.identification())
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+            componentResource('contact', jsRoutes.controllers.ContactController.contact());
+            componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
     </script>
 }
 
@@ -107,6 +106,6 @@
     </div>
     </div>
     <script>
-            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities())
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
     </script>
 }
