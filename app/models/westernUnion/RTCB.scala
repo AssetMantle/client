@@ -1,4 +1,4 @@
-package models.WesternUnion
+package models.westernUnion
 
 import java.sql.Timestamp
 import java.util.Date

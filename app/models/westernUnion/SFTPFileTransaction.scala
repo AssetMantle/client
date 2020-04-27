@@ -1,4 +1,4 @@
-package models.WesternUnion
+package models.westernUnion
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}

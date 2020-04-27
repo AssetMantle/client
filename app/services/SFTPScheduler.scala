@@ -18,7 +18,7 @@ import akka.stream.{IOResult, Materializer}
 import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
 import akka.stream.scaladsl.FileIO
 import exceptions.BaseException
-import models.WesternUnion.{SFTPFileTransaction, SFTPFileTransactions}
+import models.westernUnion.{SFTPFileTransaction, SFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient

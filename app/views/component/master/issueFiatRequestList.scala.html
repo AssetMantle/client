@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import models.WesternUnion.FiatRequest
+@import models.westernUnion.FiatRequest
 @import views.html.base._
 @(issueFiatRequests: Seq[FiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @if(issueFiatRequests.isEmpty){

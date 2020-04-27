@@ -6,38 +6,33 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.WesternUnion.{FiatRequests, RTCBs}
-import models.master.{Emails, Organization, Organizations, Traders, Zones}
-import models.masterTransaction
-import models.{blockchainTransaction, masterTransaction}
+import models.{blockchainTransaction, westernUnion}
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import models.master
 import services.SFTPScheduler
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
 class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                       masterTransactionWURTCBRequests: RTCBs,
-                                       withTraderLoginAction: WithTraderLoginAction,
-                                       withUsernameToken: WithUsernameToken,
+                                       blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
                                        sftpScheduler: SFTPScheduler,
-                                       fiatRequests: FiatRequests,
-                                       organizations: Organizations,
-                                       traders: Traders,
-                                       zones: Zones,
-                                       emailAddresses: Emails,
-                                       identifications: master.Identifications,
+                                       masterOrganizations: master.Organizations,
+                                       masterTraders: master.Traders,
+                                       masterZones: master.Zones,
+                                       masterEmails: master.Emails,
+                                       masterIdentifications: master.Identifications,
                                        masterAccounts: master.Accounts,
                                        masterFiats: master.Fiats,
-                                       withZoneLoginAction: WithZoneLoginAction,
+                                       westernUnionFiatRequests: westernUnion.FiatRequests,
+                                       westernUnionRTCBs: westernUnion.RTCBs,
                                        transactionsIssueFiat: transactions.IssueFiat,
-                                       blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
-                                       transaction: utilities.Transaction)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                       transaction: utilities.Transaction,
+                                       withTraderLoginAction: WithTraderLoginAction,
+                                       withZoneLoginAction: WithZoneLoginAction,
+                                       withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
 
   private val rtcbSecretKey = configuration.get[String]("westernUnion.rtcbSecretKey")
@@ -68,22 +63,22 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
 
       (if (requestBody.requestSignature == utilities.String.sha256Sum(hash)) {
-        val createRTCB = masterTransactionWURTCBRequests.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
+        val createRTCB = westernUnionRTCBs.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
           requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
           utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
           requestBody.status, requestBody.dealType, requestBody.paymentTypeId, requestBody.paidOutAmount.toInt, requestBody.requestSignature)
 
-        def totalRTCBAmountReceived: Future[Int] = masterTransactionWURTCBRequests.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
+        def totalRTCBAmountReceived: Future[Int] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
-        val fiatRequest = fiatRequests.Service.tryGetByID(requestBody.externalReference)
+        val fiatRequest = westernUnionFiatRequests.Service.tryGetByID(requestBody.externalReference)
 
-        def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = fiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
+        def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = westernUnionFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
 
-        def traderDetails(traderID: String) = traders.Service.tryGet(traderID)
+        def traderDetails(traderID: String) = masterTraders.Service.tryGet(traderID)
 
         def traderAddress(traderAccountID: String) = masterAccounts.Service.getAddress(traderAccountID)
 
-        def zoneAccountID(zoneID: String) = zones.Service.tryGetAccountID(zoneID)
+        def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
 
         def zoneAddress(zoneAccountID: String) = masterAccounts.Service.getAddress(zoneAccountID)
 
@@ -120,14 +115,14 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           Future(BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
         },
         issueFiatRequestData => {
-          val traderDetails = traders.Service.tryGetByAccountID(loginState.username)
-          val identification = identifications.Service.tryGet(loginState.username)
+          val traderDetails = masterTraders.Service.tryGetByAccountID(loginState.username)
+          val identification = masterIdentifications.Service.tryGet(loginState.username)
 
-          def create(traderID: String): Future[String] = fiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
+          def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
-          val emailAddress = emailAddresses.Service.tryGetVerifiedEmailAddress(loginState.username)
+          val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
 
-          def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.tryGet(organizationID)
+          def organizationDetails(organizationID: String): Future[master.Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           (for {
             traderDetails <- traderDetails

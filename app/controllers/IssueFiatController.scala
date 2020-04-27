@@ -1,11 +1,11 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.WithZoneLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.WesternUnion.{FiatRequest, FiatRequests}
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.westernUnion.FiatRequests
+import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -14,17 +14,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                    transaction: utilities.Transaction,
-                                    withZoneLoginAction: WithZoneLoginAction,
-                                    masterTransactionIssueFiatRequests: FiatRequests,
-                                    blockchainAclAccounts: blockchain.ACLAccounts,
-                                    masterZones: master.Zones,
+                                    blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
                                     masterTraders: master.Traders,
-                                    withTraderLoginAction: WithTraderLoginAction,
                                     masterAccounts: master.Accounts,
                                     masterFiats: master.Fiats,
+                                    masterTransactionIssueFiatRequests: FiatRequests,
                                     transactionsIssueFiat: transactions.IssueFiat,
-                                    blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
+                                    transaction: utilities.Transaction,
+                                    withZoneLoginAction: WithZoneLoginAction,
                                     withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
