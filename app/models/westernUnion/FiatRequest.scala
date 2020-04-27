@@ -91,7 +91,7 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.ID30letters, traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.Fiat.REQUEST_INITIATED))
+    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.Fiat.REQUEST_INITIATED))
 
     def tryGetByID(id: String): Future[FiatRequest] = findByID(id)
 
