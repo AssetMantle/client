@@ -41,6 +41,7 @@ object Form {
 
   //AssetController
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
+  val BILL_OF_LADING_CONTENT = new Form("BILL_OF_LADING_CONTENT", routes.AssetController.billOfLadingContent(), routes.javascript.AssetController.billOfLadingContentForm)
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
 
   //AddZoneController
@@ -94,7 +95,6 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
-  val OBL_CONTENT = new Form("OBL_CONTENT", routes.NegotiationController.oblContent(), routes.javascript.NegotiationController.oblContentForm)
   val INVOICE_CONTENT = new Form("INVOICE_CONTENT", routes.NegotiationController.invoiceContent(), routes.javascript.NegotiationController.invoiceContentForm)
   val CONTRACT_CONTENT = new Form("CONTRACT_CONTENT", routes.NegotiationController.contractContent(), routes.javascript.NegotiationController.contractContentForm)
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
@@ -239,7 +239,6 @@ object Form {
   val UPDATE = "UPDATE"
   val DOCUMENTS = "DOCUMENTS"
   val CONTRACT = "CONTRACT"
-  val COPY_OF_OBL = "COPY_OF_OBL"
   val INVOICE = "INVOICE"
   val PACKING_LIST = "PACKING_LIST"
   val COO = "COO"
@@ -273,8 +272,6 @@ object Form {
 
   val UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = "UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL"
   val UPDATE_ORGANIZATION_IDENTIFICATION = "UPDATE_ORGANIZATION_IDENTIFICATION"
-  val UPLOAD_OBL_DOCUMENT = "UPLOAD_OBL_DOCUMENT"
-  val UPDATE_OBL_DOCUMENT = "UPDATE_OBL_DOCUMENT"
   val UPLOAD_INVOICE_DOCUMENT = "UPLOAD_INVOICE_DOCUMENT"
   val UPDATE_INVOICE_DOCUMENT = "UPDATE_INVOICE_DOCUMENT"
   val UPLOAD_CONTRACT_DOCUMENT = "UPLOAD_CONTRACT_DOCUMENT"

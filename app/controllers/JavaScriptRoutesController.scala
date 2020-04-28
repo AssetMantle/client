@@ -70,6 +70,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.updateZoneKYC,
 
         routes.javascript.AssetController.issueForm,
+        routes.javascript.AssetController.billOfLadingContentForm,
         routes.javascript.AssetController.releaseForm,
 
         routes.javascript.BlockExplorerController.lastBlockHeight,
@@ -252,7 +253,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.updatePaymentTermsForm,
         routes.javascript.NegotiationController.updateDocumentListForm,
         routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm,
-        routes.javascript.NegotiationController.oblContentForm,
         routes.javascript.NegotiationController.invoiceContentForm,
         routes.javascript.NegotiationController.contractContentForm,
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,

@@ -145,7 +145,7 @@ object Notification {
   val SELLER_EXECUTE_ORDER_SUCCESSFUL = new Notification(notificationType = "SELLER_EXECUTE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_EXECUTE_ORDER_FAILED = new Notification(notificationType = "SELLER_EXECUTE_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
-  val OBL_CONTENT_ADDED = new Notification(notificationType = "OBL_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BILL_OF_LADING_CONTENT_ADDED = new Notification(notificationType = "BILL_OF_LADING_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val INVOICE_CONTENT_ADDED = new Notification(notificationType = "INVOICE_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val CONTRACT_CONTENT_ADDED = new Notification(notificationType = "CONTRACT_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)

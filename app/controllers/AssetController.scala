@@ -4,7 +4,9 @@ import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction, 
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Asset, Trader, Zone}
+import models.Abstract.AssetDocumentContent
+import models.common.Serializable._
+import models.master.{Asset, Negotiation, Trader, Zone}
 import models.masterTransaction.AssetFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -34,6 +36,8 @@ class AssetController @Inject()(
                                  transactionsReleaseAsset: transactions.ReleaseAsset,
                                  blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
                                  masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                 masterNegotiations: master.Negotiations,
                                )
                                (implicit
                                 executionContext: ExecutionContext,
@@ -184,6 +188,75 @@ class AssetController @Inject()(
               throw new BaseException(constants.Response.UNAUTHORIZED)
             }
           }).recover {
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def billOfLadingContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
+      def getDocumentContent(assetID: String) = masterTransactionAssetFiles.Service.getDocumentContent(assetID, constants.File.Asset.BILL_OF_LADING)
+
+      def getResult(documentContent: Option[AssetDocumentContent]) = {
+        documentContent match {
+          case Some(content) => {
+            val billOfLading = content.asInstanceOf[BillOfLading]
+            withUsernameToken.Ok(views.html.component.master.billOfLadingContent(views.companion.master.BILL_OF_LADING.form.fill(views.companion.master.BILL_OF_LADING.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+          }
+          case None => withUsernameToken.Ok(views.html.component.master.billOfLadingContent(negotiationID = negotiationID))
+        }
+      }
+
+      (for {
+        negotiation <- negotiation
+        documentContent <- getDocumentContent(negotiation.assetID)
+        result <- getResult(documentContent)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+      }
+  }
+
+  def billOfLadingContent: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.BILL_OF_LADING.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.billOfLadingContent(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+        },
+        billOfLadingContentData => {
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
+          val negotiation = masterNegotiations.Service.tryGet(billOfLadingContentData.negotiationID)
+
+          def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
+            if (traderID == negotiation.sellerTraderID) {
+              val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.portOfLoading, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetQuantity, billOfLadingContentData.assetPrice))
+              val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(billOfLadingContentData.negotiationID)
+              val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+              val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
+
+              for {
+                _ <- updateBillOfLadingContent
+                negotiationFileList <- negotiationFileList
+                assetFileList <- assetFileList
+                buyerAccountID <- buyerAccountID
+                _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
+              } yield result
+            } else {
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+            }
+          }
+
+          (for {
+            traderID <- traderID
+            negotiation <- negotiation
+            result <- updateAndGetResult(traderID, negotiation)
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
         }

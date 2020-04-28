@@ -5,7 +5,7 @@ import java.util.Date
 import play.api.data.Form
 import play.api.data.Forms._
 
-object OBL {
+object BILL_OF_LADING {
 
   val form = Form(
     mapping(

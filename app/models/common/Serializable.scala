@@ -65,15 +65,15 @@ object Serializable {
 
   implicit val tradeActivityTemplateWrites: OWrites[TradeActivityTemplate] = Json.writes[TradeActivityTemplate]
 
-  case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends AssetDocumentContent
+  case class BillOfLading(id: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends AssetDocumentContent
 
   implicit val assetDocumentContentWrites: Writes[AssetDocumentContent] = {
-    case obl: OBL => Json.toJson(obl)(Json.writes[OBL])
+    case billOfLading: BillOfLading => Json.toJson(billOfLading)(Json.writes[BillOfLading])
     case _ => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
   }
 
   implicit val assetDocumentContentReads: Reads[AssetDocumentContent] = {
-    Json.format[OBL].map(x => x: AssetDocumentContent)
+    Json.format[BillOfLading].map(x => x: AssetDocumentContent)
   }
 
   case class Invoice(invoiceNumber: String, invoiceDate: Date) extends NegotiationDocumentContent

@@ -1,6 +1,5 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.IssueAssetOBL
 @import models.masterTransaction.NegotiationFile
 @import models.masterTransaction.AssetFile
 @import models.master.Negotiation
@@ -10,8 +9,8 @@
 <div>
     @Messages(constants.View.ASSET_DOCUMENTS):
     @negotiation.documentListAndBuyerAccepted.documentList.assetDocuments.map { assetDocuemntType =>
-        <div id='@Seq("UPLOAD_ASSET_", assetDocuemntType).mkString("")'>
-        @commonModalButton(Seq("UPLOAD_", assetDocuemntType).mkString(""), routes.javascript.FileController.uploadAssetForm, 'parameters -> s"'${assetDocuemntType}','${negotiation.id}'")
+        <div id='@Seq("UPLOAD", "ASSET", assetDocuemntType).mkString("_")'>
+        @commonModalButton(Seq("UPLOAD", assetDocuemntType).mkString("_"), routes.javascript.FileController.uploadAssetForm, 'parameters -> s"'${assetDocuemntType}','${negotiation.id}'")
         </div>
     }
     @assetFiles.filter(assetFile => negotiation.documentListAndBuyerAccepted.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
@@ -23,7 +22,7 @@
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateNegotiationForm('@assetFile.documentType', '@assetFile.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
             @assetFile.documentType match {
                 case constants.File.Asset.BILL_OF_LADING => {
-                    @commonFormButton(constants.Form.OBL_CONTENT, 'parameters -> s"'${negotiation.id}'")
+                    @commonFormButton(constants.Form.BILL_OF_LADING_CONTENT, 'parameters -> s"'${negotiation.id}'")
                 }
                 case _ => {}
             }
