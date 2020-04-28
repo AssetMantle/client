@@ -48,26 +48,34 @@ class Docusign @Inject()(masterContacts: master.Contacts,
 
   //val baseUrl = configuration.get[String]("comdex.url")
 
-  val accessToken="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjY4MTg1ZmYxLTRlNTEtNGNlOS1hZjFjLTY4OTgxMjIwMzMxNyJ9.eyJUb2tlblR5cGUiOjUsIklzc3VlSW5zdGFudCI6MTU4NzgxMjUyNiwiZXhwIjoxNTg3ODQxMzI2LCJVc2VySWQiOiJjMjViNmE3OC1kZDc2LTQwOGEtODllZi0wZjhjMTVmYmZhZjYiLCJzaXRlaWQiOjEsInNjcCI6WyJzaWduYXR1cmUiLCJjbGljay5tYW5hZ2UiLCJvcmdhbml6YXRpb25fcmVhZCIsInJvb21fZm9ybXMiLCJncm91cF9yZWFkIiwicGVybWlzc2lvbl9yZWFkIiwidXNlcl9yZWFkIiwidXNlcl93cml0ZSIsImFjY291bnRfcmVhZCIsImRvbWFpbl9yZWFkIiwiaWRlbnRpdHlfcHJvdmlkZXJfcmVhZCIsImR0ci5yb29tcy5yZWFkIiwiZHRyLnJvb21zLndyaXRlIiwiZHRyLmRvY3VtZW50cy5yZWFkIiwiZHRyLmRvY3VtZW50cy53cml0ZSIsImR0ci5wcm9maWxlLnJlYWQiLCJkdHIucHJvZmlsZS53cml0ZSIsImR0ci5jb21wYW55LnJlYWQiLCJkdHIuY29tcGFueS53cml0ZSJdLCJhdWQiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJhenAiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJpc3MiOiJodHRwczovL2FjY291bnQtZC5kb2N1c2lnbi5jb20vIiwic3ViIjoiYzI1YjZhNzgtZGQ3Ni00MDhhLTg5ZWYtMGY4YzE1ZmJmYWY2IiwiYW1yIjpbImludGVyYWN0aXZlIl0sImF1dGhfdGltZSI6MTU4NzgxMjUyMiwicHdpZCI6ImIwZDk2OTU0LTczNmItNDk4Mi04NjNiLTk4YWY5OTNmZTIyMCJ9.gcnuYM_q2-KuqOB0OIvblDoduMHTfcZT-PKqZMsmGMkULNJMcfLv5WNZGb8fpo--VQi0yuM9ENoCRjZVYiW1VrQkzE8Ce7OUnNLhb_j_e-Y4wE-_kgM9iVI7v_0dwGYLllUlcgdXDhwt38A8E-hE192xVI3HoJP_U3kIu4w4XBGDMugwAbiB8l8tE-NjR94_5vfmQjnck-ysChHtyPGACTiWlWMzzA69VYz0SzKgzPjVcStkUMkUhlfMSRtQmU8BvsnKLnVHOzRTkAnIpz19EkZ_OGysdJCWfV2La5qOHZ3y_EMNcLQdOcaugqYilKMZvGZ2S1yOKZFCb6z6i12oIA"
+  /*val accessToken="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjY4MTg1ZmYxLTRlNTEtNGNlOS1hZjFjLTY4OTgxMjIwMzMxNyJ9.eyJUb2tlblR5cGUiOjUsIklzc3VlSW5zdGFudCI6MTU4ODA5NDAwNCwiZXhwIjoxNTg4MTIyODA0LCJVc2VySWQiOiJjMjViNmE3OC1kZDc2LTQwOGEtODllZi0wZjhjMTVmYmZhZjYiLCJzaXRlaWQiOjEsInNjcCI6WyJzaWduYXR1cmUiLCJjbGljay5tYW5hZ2UiLCJvcmdhbml6YXRpb25fcmVhZCIsInJvb21fZm9ybXMiLCJncm91cF9yZWFkIiwicGVybWlzc2lvbl9yZWFkIiwidXNlcl9yZWFkIiwidXNlcl93cml0ZSIsImFjY291bnRfcmVhZCIsImRvbWFpbl9yZWFkIiwiaWRlbnRpdHlfcHJvdmlkZXJfcmVhZCIsImR0ci5yb29tcy5yZWFkIiwiZHRyLnJvb21zLndyaXRlIiwiZHRyLmRvY3VtZW50cy5yZWFkIiwiZHRyLmRvY3VtZW50cy53cml0ZSIsImR0ci5wcm9maWxlLnJlYWQiLCJkdHIucHJvZmlsZS53cml0ZSIsImR0ci5jb21wYW55LnJlYWQiLCJkdHIuY29tcGFueS53cml0ZSJdLCJhdWQiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJhenAiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJpc3MiOiJodHRwczovL2FjY291bnQtZC5kb2N1c2lnbi5jb20vIiwic3ViIjoiYzI1YjZhNzgtZGQ3Ni00MDhhLTg5ZWYtMGY4YzE1ZmJmYWY2IiwiYW1yIjpbImludGVyYWN0aXZlIl0sImF1dGhfdGltZSI6MTU4ODA5NDAwMSwicHdpZCI6ImIwZDk2OTU0LTczNmItNDk4Mi04NjNiLTk4YWY5OTNmZTIyMCJ9.luO7VV39h_eWmc2f1IY7Suzr2kRkRC6Yj2jXHysksj3aJsCDwyGVOy37i4YvOaorg6-7ZX8udpkHRECh-xCEiPbJzbZx0D7t67cajJESxCmUkJRrTe_c4fqNeWyZadnOR_9CtnpiPqDjyMY0DG-N4iSEUZVZaoxw94EnpG0pEwFJRqlZMZ1NhpXBw_PrRQmNP-b_FMMTojogzzl4pVtLE2tBgr3Qwvko8m3mOdxc-ZZanadFXMSk02IuP8vakZrlQkWRCIWD6xo7F-LiVS1DWvYvTPdKjpMiR7l6nzPziaWGl7t9JeL_MxTyNzN2GTBohz9WbIAcwYa3_CD-IhF0Iw"
   val accountID="10371036"
-  val signerName="John Mclane"
-  val signerEmail="chardinkichandani123@gmail.com"
   val baseUrl="http://192.168.0.105:9000"
-  val clientUserID="9052042A09CA3974"
   val authenticationMethod="None"
-  val basePath="https://demo.docusign.net/restapi"
-  val tokenExpiration= (60.toLong).*(480:Long)
+  val basePath="https://demo.docusign.net/restapi"*/
+  private val accessToken = configuration.get[String]("docusign.accessToken")
+  private val accountID = configuration.get[String]("docusign.accountID")
+  private val baseUrl = configuration.get[String]("comdex.url")
+  private val authenticationMethod = configuration.get[String]("docusign.authenticationMethod")
+  private val basePath = configuration.get[String]("docusign.basePath")
+  private val apiClient = new ApiClient(basePath)
+  apiClient.setAccessToken(accessToken, tokenExpiration)
+  val envelopesApi = new EnvelopesApi(apiClient)
+  val tokenExpiration= (6000.toLong).*(480:Long)
 
-  private def createDocusignEnvelope(id:String,emailAddress:String, documentType:String, fileName: String, trader: Trader)={
+  private def createDocusignEnvelope(emailAddress:String, documentType:String, fileName: String, trader: Trader)={
     try {
-      val fileByteArray = utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(fileResourceManager.getTraderNegotiationFilePath(documentType), fileName))
+      val path = documentType match {
+        case constants.File.OBL | constants.File.COO | constants.File.COA =>fileResourceManager.getTraderAssetFilePath(documentType)
+        case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE =>  fileResourceManager.getTraderNegotiationFilePath(documentType)
+      }
+
+      val fileByteArray = utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, fileName))
       val base64File = new String(Base64Docusign.encode(fileByteArray))
 
       val document = new Document()
       document.setDocumentBase64(base64File)
       document.setName(constants.File.CONTRACT)
-      println("fileName-----------"+fileName)
-      println("fileExtension-----------"+utilities.FileOperations.fileExtensionFromName(fileName))
       document.setFileExtension(utilities.FileOperations.fileExtensionFromName(fileName))
       document.setDocumentId("1")
 
@@ -78,7 +86,7 @@ class Docusign @Inject()(masterContacts: master.Contacts,
       signer.recipientId("1")
 
       val envelopeDefinition = new EnvelopeDefinition()
-      envelopeDefinition.setEmailSubject("Please sign this document")
+      envelopeDefinition.setEmailSubject(messagesApi(constants.View.PLEASE_SIGN_THIS_DOCUMENT))
       envelopeDefinition.setDocuments(Arrays.asList(document))
       val recipients = new Recipients()
       recipients.setSigners(Arrays.asList(signer))
@@ -86,10 +94,10 @@ class Docusign @Inject()(masterContacts: master.Contacts,
       envelopeDefinition.setRecipients(recipients)
       envelopeDefinition.setStatus(constants.Status.DocuSignEnvelopeStatus.CREATED)
 
-      val apiClient = new ApiClient(basePath)
-      apiClient.setAccessToken(accessToken, tokenExpiration)
+     /* val apiClient = new ApiClient(basePath)
+      apiClient.setAccessToken(accessToken, tokenExpiration)*/
 
-      val envelopesApi = new EnvelopesApi(apiClient)
+      /*val envelopesApi = new EnvelopesApi(apiClient)*/
       val results = envelopesApi.createEnvelope(accountID, envelopeDefinition)
       val envelopeId = results.getEnvelopeId
 
@@ -99,13 +107,15 @@ class Docusign @Inject()(masterContacts: master.Contacts,
       (envelopesApi.createSenderView(accountID, envelopeId, viewRequest).getUrl,envelopeId)
 
     }catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.SMS_SEND_FAILED)
     }
   }
 
 
-  def createEnvelope(id:String,emailAddress:String, documentType:String, fileName: String, trader: Trader)=createDocusignEnvelope(id,emailAddress,documentType,fileName,trader)
+  def createEnvelope(emailAddress:String, documentType:String, fileName: String, trader: Trader)=createDocusignEnvelope(emailAddress,documentType,fileName,trader)
 
   private def createRecipientView22(envelopeID:String,emailAddress:String, trader: Trader)={
     val apiClient = new ApiClient(basePath)
@@ -129,11 +139,11 @@ class Docusign @Inject()(masterContacts: master.Contacts,
 
   def fetchAndStoreSignedDocument(envelopeID:String,fileName:String)={
 
-    val apiClient = new ApiClient(basePath)
-    apiClient.setAccessToken(accessToken, tokenExpiration)
-    val envelopesApi = new EnvelopesApi(apiClient)
+    /*val apiClient = new ApiClient(basePath)
+    apiClient.setAccessToken(accessToken, tokenExpiration)*/
+   /* val envelopesApi = new EnvelopesApi(apiClient)*/
     val result =envelopesApi.getDocument(accountID,envelopeID,"1")
-    println("docuSIgnByteArry"+result.toList)
+    println("docuSIgnByteArray"+result.toList)
     val newName=List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(result)).toString, utilities.FileOperations.fileExtensionFromName(fileName)).mkString(".")
     val byteArray= utilities.FileOperations.fileExtensionFromName(fileName) match{
       case constants.File.PDF=>Some(result)

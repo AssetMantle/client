@@ -74,7 +74,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         buyerTrader<-buyerTrader(buyerTraderID)
         emailAddress<-emailAddress(buyerTrader.accountID)
         fileName<-fileName
-        (senderURL,envelopeID)<-Future(docusign.createEnvelope(id,emailAddress,documentType ,fileName,buyerTrader))
+        (senderURL,envelopeID)<-Future(docusign.createEnvelope(emailAddress,documentType ,fileName,buyerTrader))
         _<- create(id,envelopeID)
       }yield Ok(views.html.component.master.docusignView(senderURL))
       ).recover {
