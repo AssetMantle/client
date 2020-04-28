@@ -177,17 +177,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewAcceptedNegotiation,
         routes.javascript.ComponentViewController.zoneViewAcceptedNegotiationTerms,
         routes.javascript.ComponentViewController.organizationDeclarations,
+        routes.javascript.ComponentViewController.traderViewNegotiationDocumentList,
+        routes.javascript.ComponentViewController.traderViewNegotiationDocument,
+        routes.javascript.ComponentViewController.traderViewAcceptedNegotiationDocumentList,
+        routes.javascript.ComponentViewController.organizationViewNegotiationDocumentList,
+        routes.javascript.ComponentViewController.organizationViewNegotiationDocument,
+        routes.javascript.ComponentViewController.organizationViewAcceptedNegotiationDocumentList,
+        routes.javascript.ComponentViewController.zoneViewNegotiationDocumentList,
+        routes.javascript.ComponentViewController.zoneViewNegotiationDocument,
+        routes.javascript.ComponentViewController.zoneViewAcceptedNegotiationDocumentList,
         //TODO
-        routes.javascript.ComponentViewController.traderViewNegotiationFileList,
-        routes.javascript.ComponentViewController.traderViewNegotiationFile,
-        routes.javascript.ComponentViewController.traderViewAcceptedNegotiationFiles,
-        routes.javascript.ComponentViewController.organizationViewNegotiationFileList,
-        routes.javascript.ComponentViewController.organizationViewNegotiationFile,
-        routes.javascript.ComponentViewController.organizationViewAcceptedNegotiationFiles,
-        routes.javascript.ComponentViewController.zoneViewNegotiationFileList,
-        routes.javascript.ComponentViewController.zoneViewNegotiationFile,
-        //TODO
-        routes.javascript.ComponentViewController.zoneViewAcceptedNegotiationFiles,
         routes.javascript.ComponentViewController.tradeDocuments,
         routes.javascript.ComponentViewController.tradeActivities,
         routes.javascript.ComponentViewController.traderViewNegotiationDocumentContent,
@@ -196,7 +195,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewAssetDocumentContent,
         routes.javascript.ComponentViewController.zoneViewNegotiationDocumentContent,
         routes.javascript.ComponentViewController.zoneViewAssetDocumentContent,
-
+        //TODO
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,

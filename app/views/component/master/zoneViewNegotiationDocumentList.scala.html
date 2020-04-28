@@ -10,10 +10,10 @@
 @Messages(constants.View.ASSET_DOCUMENTS):
 @assetFileList.filter(assetFile => negotiation.documentListAndBuyerAccepted.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
     <div>
-        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationFile('@negotiation.id', '@assetFile.documentType')) >@Messages(assetFile.documentType)</a>
+        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocument('@negotiation.id', '@assetFile.documentType')) >@Messages(assetFile.documentType)</a>
         @assetFile.documentType match {
             case constants.File.Asset.BILL_OF_LADING => {
-                <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiation.assetID', '@assetFile.documentType'))" )></td>
+                <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewAssetDocumentContent('@negotiation.assetID', '@assetFile.documentType'))" )></td>
             }
             case _ => {}
         }
@@ -23,10 +23,10 @@
 @Messages(constants.View.NEGOTIATION_DOCUMENTS):
 @negotiationFileList.filter(negotiationFile => negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments.contains(negotiationFile.documentType) || negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile =>
     <div>
-        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationFile('@negotiation.id', '@negotiationFile.documentType')) >@Messages(negotiationFile.documentType)</a>
+        <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocument('@negotiation.id', '@negotiationFile.documentType')) >@Messages(negotiationFile.documentType)</a>
         @negotiationFile.documentType match {
             case constants.File.Negotiation.INVOICE | constants.File.Negotiation.CONTRACT => {
-                <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocumentContent('@negotiation.id', '@negotiationFile.documentType'))" )></td>
+                <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocumentContent('@negotiation.id', '@negotiationFile.documentType'))" )></td>
             }
             case _ => {}
         }

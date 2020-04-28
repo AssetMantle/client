@@ -207,20 +207,20 @@ GET         /component/organizationViewAssetDocumentContent                     
 GET         /component/zoneViewNegotiationDocumentContent                                         controllers.ComponentViewController.zoneViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/zoneViewAssetDocumentContent                                               controllers.ComponentViewController.zoneViewAssetDocumentContent(id: String, documentType: String)
 
-
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials
-GET         /component/traderViewNegotiationFileList                                              controllers.ComponentViewController.traderViewNegotiationFileList(id:String)
-GET         /component/traderViewNegotiationFile                                                  controllers.ComponentViewController.traderViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/traderViewAcceptedNegotiationFiles                                         controllers.ComponentViewController.traderViewAcceptedNegotiationFiles(id:String)
 
-GET         /component/organizationViewNegotiationFileList                                        controllers.ComponentViewController.organizationViewNegotiationFileList(id:String)
-GET         /component/organizationViewNegotiationFile                                            controllers.ComponentViewController.organizationViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/organizationViewAcceptedNegotiationFiles                                   controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles(id:String)
+GET         /component/traderViewNegotiationDocumentList                                          controllers.ComponentViewController.traderViewNegotiationDocumentList(id:String)
+GET         /component/traderViewNegotiationDocument                                              controllers.ComponentViewController.traderViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/traderViewAcceptedNegotiationDocumentList                                  controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(id:String)
 
-GET         /component/zoneViewNegotiationFileList                                                controllers.ComponentViewController.zoneViewNegotiationFileList(id:String)
-GET         /component/zoneViewNegotiationFile                                                    controllers.ComponentViewController.zoneViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/zoneViewAcceptedNegotiationFiles                                           controllers.ComponentViewController.zoneViewAcceptedNegotiationFiles(id:String)
+GET         /component/organizationViewNegotiationDocumentList                                    controllers.ComponentViewController.organizationViewNegotiationDocumentList(id:String)
+GET         /component/organizationViewNegotiationDocument                                        controllers.ComponentViewController.organizationViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/organizationViewAcceptedNegotiationDocumentList                            controllers.ComponentViewController.organizationViewAcceptedNegotiationDocumentList(id:String)
+
+GET         /component/zoneViewNegotiationDocumentList                                            controllers.ComponentViewController.zoneViewNegotiationDocumentList(id:String)
+GET         /component/zoneViewNegotiationDocument                                                controllers.ComponentViewController.zoneViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/zoneViewAcceptedNegotiationDocumentList                                    controllers.ComponentViewController.zoneViewAcceptedNegotiationDocumentList(id:String)
 
 GET         /component/traderViewAcceptedNegotiationTerms                                         controllers.ComponentViewController.traderViewAcceptedNegotiationTerms(id: String)
 GET         /component/traderViewAcceptedNegotiation                                              controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
