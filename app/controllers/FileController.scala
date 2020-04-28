@@ -344,12 +344,12 @@ class FileController @Inject()(
         val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
         val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-        def getAssetFilesList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+        def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
 
         for {
           negotiationFileList <- negotiationFileList
           negotiation <- negotiation
-          assetFileList <- getAssetFilesList(negotiation.assetID)
+          assetFileList <- getAssetFileList(negotiation.assetID)
           result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
         } yield result
       }
@@ -378,12 +378,12 @@ class FileController @Inject()(
         val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
         val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-        def getAssetFilesList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+        def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
 
         for {
           negotiationFileList <- negotiationFileList
           negotiation <- negotiation
-          assetFileList <- getAssetFilesList(negotiation.assetID)
+          assetFileList <- getAssetFileList(negotiation.assetID)
           result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
         } yield result
       }
