@@ -67,6 +67,16 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sellerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
@@ -158,6 +168,8 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[SellerExecuteOrder] = findByTicketID(ticketID)
@@ -213,7 +225,16 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
         _ <- sendFromAccountNotifications(sellerExecuteOrder)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -231,7 +252,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
         _ <- markDirty(sellerExecuteOrder)
         fromAccountID <- getAccountID(sellerExecuteOrder.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SELLER_EXECUTE_ORDER_FAILED, message)
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

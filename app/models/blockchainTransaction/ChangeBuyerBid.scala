@@ -209,7 +209,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
       def negotiation(changeBuyerBid: ChangeBuyerBid): Future[Option[Negotiation]] = blockchainNegotiations.Service.getNegotiation(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
 
-      def negotiationResponse(negotiation: Option[Negotiation], changeBuyerBid: ChangeBuyerBid): Future[NegotiationResponse.Response] = negotiation match {
+      def getNegotiationResponse(negotiation: Option[Negotiation], changeBuyerBid: ChangeBuyerBid): Future[NegotiationResponse.Response] = negotiation match {
         case Some(negotiation) => getNegotiation.Service.get(negotiation.id)
         case None =>
           val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
@@ -277,7 +277,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
         _ <- markTransactionSuccessful
         changeBuyerBid <- changeBuyerBid
         negotiation <- negotiation(changeBuyerBid)
-        negotiationResponse <- negotiationResponse(negotiation, changeBuyerBid)
+        negotiationResponse <- getNegotiationResponse(negotiation, changeBuyerBid)
         _ <- createOrUpdate(negotiation, negotiationResponse)
         _ <- markDirty(changeBuyerBid)
         buyerAccountID <- getID(changeBuyerBid.from)

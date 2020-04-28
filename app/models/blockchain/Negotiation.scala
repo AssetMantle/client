@@ -264,7 +264,7 @@ class Negotiations @Inject()(
 
             def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
-            def updateMasterStatus(negotiation: masterNegotiation, negotiationResponse: Response): Future[Int] = {
+            def updateMasterNegotiationStatus(negotiation: masterNegotiation, negotiationResponse: Response): Future[Int] = {
               if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt)))
               else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
               else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
@@ -295,7 +295,7 @@ class Negotiations @Inject()(
               seller <- getTrader(sellerAccountID)
               assetID <- getAssetID(negotiationResponse.value.pegHash)
               negotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
-              _ <- updateMasterStatus(negotiation = negotiation, negotiationResponse = negotiationResponse)
+              _ <- updateMasterNegotiationStatus(negotiation = negotiation, negotiationResponse = negotiationResponse)
               _ <- createMasterOrder(negotiation = negotiation, negotiationResponse = negotiationResponse)
             } yield {
               actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())

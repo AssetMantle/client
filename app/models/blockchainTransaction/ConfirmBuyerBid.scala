@@ -111,6 +111,16 @@ class ConfirmBuyerBids @Inject()(
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(confirmBuyerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
@@ -180,6 +190,8 @@ class ConfirmBuyerBids @Inject()(
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[ConfirmBuyerBid] = findByTicketID(ticketID)
@@ -227,6 +239,15 @@ class ConfirmBuyerBids @Inject()(
         _ <- masterTransactionTradeActivities.Service.create(masterNegotiationID, constants.TradeActivity.BUYER_BID_CONFIRMED, ticketID, blockResponse.txhash)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
           throw baseException
       }
     }

@@ -240,14 +240,7 @@ class SendFiats @Inject()(
         } yield ()
       }
 
-      def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -259,7 +252,8 @@ class SendFiats @Inject()(
         orderExists <- checkOrderExists(negotiationID)
         _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation)
         _ <- markDirty(sendFiat)
-        (toAccountID, fromAccountID) <- getIDs(sendFiat)
+        fromAccountID <- getAccountID(sendFiat.from)
+        toAccountID <- getAccountID(sendFiat.to)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield ()).recover {
@@ -283,21 +277,13 @@ class SendFiats @Inject()(
 
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
-      def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionFailed
         sendFiat <- sendFiat
         _ <- markDirty(sendFiat.from)
-        (toAccountID, fromAccountID) <- getIDs(sendFiat)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        fromAccountID <- getAccountID(sendFiat.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

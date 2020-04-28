@@ -98,6 +98,16 @@ class RedeemAssets @Inject()(
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(redeemAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
@@ -161,6 +171,8 @@ class RedeemAssets @Inject()(
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[RedeemAsset] = findByTicketID(ticketID)
@@ -189,20 +201,29 @@ class RedeemAssets @Inject()(
         } yield {}
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionSuccessful
         redeemAsset <- redeemAsset
         _ <- markRedeemed(redeemAsset.pegHash)
         _ <- markDirty(redeemAsset)
-        fromAccountID <- getID(redeemAsset.from)
-        toAccountID <- getID(redeemAsset.to)
+        fromAccountID <- getAccountID(redeemAsset.from)
+        toAccountID <- getAccountID(redeemAsset.to)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -219,7 +240,7 @@ class RedeemAssets @Inject()(
         toAccountID <- getID(redeemAsset.to)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

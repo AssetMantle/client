@@ -71,8 +71,6 @@ class ComponentViewController @Inject()(
 
       def negotiations(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
 
-      //TODO If we make a master.Order Table and store order status such ASSET_SEND, FIAT_SEND, ORDER_COMPLETE, etc. then fetch incomplete orders and take difference w.r.t negotiations
-
       (for {
         fiatPegWallet <- fiatPegWallet
         traderID <- traderID
@@ -1445,9 +1443,9 @@ class ComponentViewController @Inject()(
 
       def getTraders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
 
-      def getTradeCompletedBuyNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = Future(Seq[Negotiation]()) //masterNegotiations.Service.getAllTradeCompletedBuyNegotiationListByTraderIDs(traderIDs)
+      def getTradeCompletedBuyNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedBuyNegotiationListByTraderIDs(traderIDs)
 
-      def getTradeCompletedSellNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] = Future(Seq[Negotiation]()) // masterNegotiations.Service.getAllTradeCompletedSellNegotiationListByTraderIDs(traderIDs)
+      def getTradeCompletedSellNegotiationList(traderIDs: Seq[String]): Future[Seq[Negotiation]] =  masterNegotiations.Service.getAllTradeCompletedSellNegotiationListByTraderIDs(traderIDs)
 
       (for {
         organizationID <- organizationID
@@ -1469,9 +1467,9 @@ class ComponentViewController @Inject()(
 
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-      def getTradeCompletedBuyNegotiationList(traderID: String): Future[Seq[Negotiation]] = Future(Seq[Negotiation]()) //masterNegotiations.Service.getAllTradeCompletedBuyNegotiationListByTraderID(traderID)
+      def getTradeCompletedBuyNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedBuyNegotiationListByTraderID(traderID)
 
-      def getTradeCompletedSellNegotiationList(traderID: String): Future[Seq[Negotiation]] = Future(Seq[Negotiation]()) //masterNegotiations.Service.getAllTradeCompletedSellNegotiationListByTraderID(traderID)
+      def getTradeCompletedSellNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllTradeCompletedSellNegotiationListByTraderID(traderID)
 
       (for {
         traderID <- traderID
