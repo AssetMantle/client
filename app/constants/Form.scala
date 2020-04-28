@@ -78,7 +78,6 @@ object Form {
 
   //IssueFiatController
   val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect(), routes.javascript.IssueFiatController.issueFiatRequestForm)
-  val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest(), routes.javascript.IssueFiatController.rejectIssueFiatRequestForm)
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat(), routes.javascript.IssueFiatController.issueFiatForm)
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat(), routes.javascript.IssueFiatController.blockchainIssueFiatForm)
 
@@ -94,6 +93,10 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
+  val OBL_CONTENT = new Form("OBL_CONTENT", routes.NegotiationController.oblContent(), routes.javascript.NegotiationController.oblContentForm)
+  val INVOICE_CONTENT = new Form("INVOICE_CONTENT", routes.NegotiationController.invoiceContent(), routes.javascript.NegotiationController.invoiceContentForm)
+  val CONTRACT_CONTENT = new Form("CONTRACT_CONTENT", routes.NegotiationController.contractContent(), routes.javascript.NegotiationController.contractContentForm)
+  val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
 
   //OrderController
   val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecuteOrder(), routes.javascript.OrderController.buyerExecuteOrderForm)
@@ -317,6 +320,7 @@ object Form {
   val ORGANIZATION_NAME = "ORGANIZATION_NAME"
   val ORGANIZATION_USERNAME = "ORGANIZATION_USERNAME"
   val ZONE_ID = "ZONE_ID"
+  val NAME = "NAME"
   val BUYER_ADDRESS = "BUYER_ADDRESS"
   val BUYER_ID = "BUYER_ID"
   val SELLER_ADDRESS = "SELLER_ADDRESS"
@@ -390,6 +394,9 @@ object Form {
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"
   val ONLY_BUYER = "ONLY_BUYER"
   val BOTH_PARTIES = "BOTH_PARTIES"
+  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+
+  //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"
   val REFERENCE = "reference"
   val EXTERNAL_REFERENCE = "externalReference"
@@ -413,9 +420,8 @@ object Form {
   val BUYER_CITY = "buyer.city"
   val BUYER_ZIP = "buyer.zip"
   val BUYER_EMAIL = "buyer.email"
-  val SERVICE_ID = "service1.id"
-  val SERVICE_AMOUNT = "service1.amount"
-  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+  val SERVICE_ID = "service.id"
+  val SERVICE_AMOUNT = "service.amount"
 
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"
