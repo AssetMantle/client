@@ -170,8 +170,6 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def get(id: String, documentType: String): Future[Option[NegotiationFile]] = getByIDAndDocumentType(id = id, documentType = documentType).map(_.map(_.deserialize))
 
-    def getConfirmBidDocuments(id: String): Future[Seq[NegotiationFile]] = getByIDAndDocumentTypes(id = id, documentTypes = Seq(constants.File.BUYER_CONTRACT, constants.File.SELLER_CONTRACT)).map(_.map(_.deserialize))
-
     def updateDocumentContent(id: String, documentType: String, documentContent: NegotiationDocumentContent): Future[Int] = updateDocumentContentByIDAndDocumentType(id = id, documentType = documentType, documentContentJson = Option(Json.toJson(documentContent).toString))
 
     def accept(id: String, documentType: String): Future[Int] = updateStatusByIDAndDocumentType(id = id, documentType = documentType, status = Option(true))

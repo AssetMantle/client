@@ -2,7 +2,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.common.Serializable.{AssetOtherDetails, ShipmentDetails, ShippingDetails}
+import models.common.Serializable.{AssetOtherDetails, ShippingDetails}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider

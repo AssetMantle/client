@@ -29,12 +29,6 @@ object Serializable {
 
   implicit val ubosWrites: OWrites[UBOs] = Json.writes[UBOs]
 
-  case class ShipmentDetails(commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date)
-
-  implicit val shipmentDetailsReads: Reads[ShipmentDetails] = Json.reads[ShipmentDetails]
-
-  implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
-
   case class ShippingDetails(shippingPeriod: Int, portOfLoading: String, portOfDischarge: String)
 
   implicit val shippingDetailsReads: Reads[ShippingDetails] = Json.reads[ShippingDetails]

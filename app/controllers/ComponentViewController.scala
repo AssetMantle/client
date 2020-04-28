@@ -822,7 +822,7 @@ class ComponentViewController @Inject()(
 
   def identification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       val identification = masterIdentifications.Service.get(loginState.username)
       for {
         accountKYC <- accountKYC
@@ -1251,6 +1251,7 @@ class ComponentViewController @Inject()(
       }
   }
 
+  //TODO Change Name
   def traderViewNegotiationFile(negotiationID: String, documentType: Option[String] = None): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
@@ -1260,12 +1261,12 @@ class ComponentViewController @Inject()(
         documentType match {
           case Some(documentType) =>
             documentType match {
-              case constants.File.OBL | constants.File.COO | constants.File.COA =>
+              case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA =>
                 val assetFile = masterTransactionAssetFiles.Service.get(negotiation.assetID, documentType)
                 for {
                   assetFile <- assetFile
                 } yield Ok(views.html.component.master.traderViewNegotiationFile(negotiationID, assetFile))
-              case constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE | constants.File.CONTRACT =>
+              case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
                 val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
                 for {
                   negotiationFile <- negotiationFile
@@ -1306,12 +1307,12 @@ class ComponentViewController @Inject()(
           documentTypeOrNone match {
             case Some(documentType) =>
               documentType match {
-                case constants.File.OBL | constants.File.COO | constants.File.COA =>
+                case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA =>
                   val assetFile = masterTransactionAssetFiles.Service.get(negotiation.assetID, documentType)
                   for {
                     assetFile <- assetFile
                   } yield Ok(views.html.component.master.organizationViewNegotiationFile(negotiationID, assetFile))
-                case constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE | constants.File.CONTRACT =>
+                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
                   val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
                   for {
                     negotiationFile <- negotiationFile
@@ -1353,12 +1354,12 @@ class ComponentViewController @Inject()(
           documentType match {
             case Some(documentType) =>
               documentType match {
-                case constants.File.OBL | constants.File.COO | constants.File.COA =>
+                case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA =>
                   val assetFile = masterTransactionAssetFiles.Service.get(negotiation.assetID, documentType)
                   for {
                     assetFile <- assetFile
                   } yield Ok(views.html.component.master.zoneViewNegotiationFile(negotiationID, assetFile))
-                case constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE | constants.File.CONTRACT =>
+                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
                   val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
                   for {
                     negotiationFile <- negotiationFile

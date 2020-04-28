@@ -8,8 +8,8 @@
 @documentContent match {
     case Some(content)=> {
         @documentType match {
-            case constants.File.OBL => {
-                @Messages(constants.File.OBL) :
+            case constants.File.Asset.BILL_OF_LADING => {
+                @Messages(constants.File.Asset.BILL_OF_LADING) :
                 @defining(content.asInstanceOf[Serializable.OBL]){oblDetails=>
                     @commonTextInfo(constants.Form.BILL_OF_LADING_NUMBER, oblDetails.billOfLadingID)
                     @commonTextInfo(constants.Form.PORT_OF_LOADING, oblDetails.portOfLoading)

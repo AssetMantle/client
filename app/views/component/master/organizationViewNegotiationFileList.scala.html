@@ -12,7 +12,7 @@
     <div>
         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.organizationViewNegotiationFile('@negotiation.id', '@assetFile.documentType')) >@Messages(assetFile.documentType)</a>
         @assetFile.documentType match {
-            case constants.File.OBL => {
+            case constants.File.Asset.BILL_OF_LADING => {
                 <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewAssetDocumentContent('@negotiation.assetID', '@assetFile.documentType'))" )></td>
             }
             case _ => {}
@@ -21,11 +21,11 @@
 }
 
 @Messages(constants.View.NEGOTIATION_DOCUMENTS):
-@negotiationFileList.filter(negotiationFile => negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments.contains(negotiationFile.documentType) || negotiationFile.documentType == constants.File.CONTRACT).map { negotiationFile =>
+@negotiationFileList.filter(negotiationFile => negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments.contains(negotiationFile.documentType) || negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile =>
     <div>
         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.organizationViewNegotiationFile('@negotiation.id', '@negotiationFile.documentType')) >@Messages(negotiationFile.documentType)</a>
         @negotiationFile.documentType match {
-            case constants.File.INVOICE | constants.File.CONTRACT => {
+            case constants.File.Negotiation.INVOICE | constants.File.Negotiation.CONTRACT => {
                 <td class="seenIcon"><img src="@routes.Assets.versioned("./images/icons/seenIcon.svg")" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewNegotiationDocumentContent('@negotiation.id', '@negotiationFile.documentType'))" )></td>
             }
             case _ => {}

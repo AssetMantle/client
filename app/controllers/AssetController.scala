@@ -203,7 +203,7 @@ class AssetController @Inject()(
         releaseData => {
           val zoneID = masterZones.Service.tryGetID(loginState.username)
           val asset = masterAssets.Service.tryGet(releaseData.assetID)
-          val billOfLading = masterTransactionAssetFiles.Service.tryGet(id = releaseData.assetID, documentType = constants.File.BILL_OF_LADING)
+          val billOfLading = masterTransactionAssetFiles.Service.tryGet(id = releaseData.assetID, documentType = constants.File.Asset.BILL_OF_LADING)
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 

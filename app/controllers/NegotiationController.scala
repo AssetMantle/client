@@ -220,7 +220,7 @@ class NegotiationController @Inject()(
             negotiation.status match {
               case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
                 assetStatus match {
-                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(assetDocuments = documentListData.documentList.flatten.filter(documentType => constants.File.TRADER_ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = documentListData.documentList.flatten.filterNot(documentType => constants.File.TRADER_ASSET_DOCUMENTS.contains(documentType))))
+                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(assetDocuments = documentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = documentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))))
                   case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
                 }
               case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -733,7 +733,7 @@ class NegotiationController @Inject()(
           val negotiation = masterNegotiations.Service.tryGet(updateDocumentListData.id)
 
           def updateDocumentList(traderID: String, negotiation: Negotiation): Future[Int] = if (traderID == negotiation.sellerTraderID) {
-            if (updateDocumentListData.documentList.flatten != negotiation.documentListAndBuyerAccepted.documentList.assetDocuments ++ negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments) masterNegotiations.Service.updateDocumentList(id = updateDocumentListData.id, documentList = DocumentList(assetDocuments = updateDocumentListData.documentList.flatten.filter(documentType => constants.File.TRADER_ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = updateDocumentListData.documentList.flatten.filterNot(documentType => constants.File.TRADER_ASSET_DOCUMENTS.contains(documentType)))) else Future(0)
+            if (updateDocumentListData.documentList.flatten != negotiation.documentListAndBuyerAccepted.documentList.assetDocuments ++ negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments) masterNegotiations.Service.updateDocumentList(id = updateDocumentListData.id, documentList = DocumentList(assetDocuments = updateDocumentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = updateDocumentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)))) else Future(0)
           } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
@@ -833,7 +833,7 @@ class NegotiationController @Inject()(
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getDocumentContent(assetID: String) = masterTransactionAssetFiles.Service.getDocumentContent(assetID, constants.File.OBL)
+      def getDocumentContent(assetID: String) = masterTransactionAssetFiles.Service.getDocumentContent(assetID, constants.File.Asset.BILL_OF_LADING)
 
       def getResult(documentContent: Option[AssetDocumentContent]) = {
         documentContent match {
@@ -867,7 +867,7 @@ class NegotiationController @Inject()(
 
           def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
             if (traderID == negotiation.sellerTraderID) {
-              val updateOBLContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.OBL, Serializable.OBL(updateOBLContentData.billOfLadingNumber, updateOBLContentData.portOfLoading, updateOBLContentData.shipperName, updateOBLContentData.shipperAddress, updateOBLContentData.notifyPartyName, updateOBLContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(updateOBLContentData.shipmentDate), updateOBLContentData.deliveryTerm, updateOBLContentData.assetQuantity, updateOBLContentData.assetPrice))
+              val updateOBLContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, Serializable.OBL(updateOBLContentData.billOfLadingNumber, updateOBLContentData.portOfLoading, updateOBLContentData.shipperName, updateOBLContentData.shipperAddress, updateOBLContentData.notifyPartyName, updateOBLContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(updateOBLContentData.shipmentDate), updateOBLContentData.deliveryTerm, updateOBLContentData.assetQuantity, updateOBLContentData.assetPrice))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateOBLContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
@@ -900,7 +900,7 @@ class NegotiationController @Inject()(
 
   def invoiceContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.INVOICE)
+      val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
 
       def getResult(documentContent: Option[NegotiationDocumentContent]) = {
         documentContent match {
@@ -933,7 +933,7 @@ class NegotiationController @Inject()(
 
           def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
             if (traderID == negotiation.sellerTraderID) {
-              val updateInvoiceContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateInvoiceContentData.negotiationID, constants.File.INVOICE, Serializable.Invoice(updateInvoiceContentData.invoiceNumber, utilities.Date.utilDateToSQLDate(updateInvoiceContentData.invoiceDate)))
+              val updateInvoiceContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateInvoiceContentData.negotiationID, constants.File.Negotiation.INVOICE, Serializable.Invoice(updateInvoiceContentData.invoiceNumber, utilities.Date.utilDateToSQLDate(updateInvoiceContentData.invoiceDate)))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateInvoiceContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
@@ -965,7 +965,7 @@ class NegotiationController @Inject()(
 
   def contractContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.CONTRACT)
+      val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.CONTRACT)
 
       def getResult(documentContent: Option[NegotiationDocumentContent]) = {
         documentContent match {
@@ -998,7 +998,7 @@ class NegotiationController @Inject()(
 
           def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
             if (traderID == negotiation.sellerTraderID) {
-              val updateContractContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateContractContentData.negotiationID, constants.File.CONTRACT, Serializable.Contract(updateContractContentData.contractNumber))
+              val updateContractContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateContractContentData.negotiationID, constants.File.Negotiation.CONTRACT, Serializable.Contract(updateContractContentData.contractNumber))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateContractContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
@@ -1058,7 +1058,7 @@ class NegotiationController @Inject()(
         buyerConfirmData => {
           val buyerTraderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(buyerConfirmData.id)
-          val contract = masterTransactionNegotiationFiles.Service.tryGet(id = buyerConfirmData.id, documentType = constants.File.CONTRACT)
+          val contract = masterTransactionNegotiationFiles.Service.tryGet(id = buyerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
 
           def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
@@ -1135,7 +1135,7 @@ class NegotiationController @Inject()(
         sellerConfirmData => {
           val sellerTraderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(sellerConfirmData.id)
-          val contract = masterTransactionNegotiationFiles.Service.tryGet(id = sellerConfirmData.id, documentType = constants.File.CONTRACT)
+          val contract = masterTransactionNegotiationFiles.Service.tryGet(id = sellerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
 
           def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
