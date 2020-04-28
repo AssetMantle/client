@@ -1387,7 +1387,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def tradeDocuments(negotiationID: String) = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradeDocuments(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
@@ -1569,6 +1569,7 @@ class ComponentViewController @Inject()(
       }
   }
 
+  //TODO: Whoever did this correct it
   def zoneViewTradeRoomFinancialAndChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.zoneViewTradeRoomFinancialAndChecks(negotiationID)))
@@ -1580,12 +1581,13 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.zoneViewTradeRoomFinancial(0, 0, 0)))
   }
 
+  //TODO: Whoever did this correct it
   def zoneViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.zoneViewTradeRoomChecks()))
   }
 
-
+  //TODO: Whoever did this correct it
   def organizationViewTradeRoomFinancialAndChecks(negotiationID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.organizationViewTradeRoomFinancialAndChecks(negotiationID)))
@@ -1597,12 +1599,13 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.organizationViewTradeRoomFinancial(0, 0, 0)))
   }
 
+  //TODO: Whoever did this correct it
   def organizationViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.organizationViewTradeRoomChecks()))
   }
 
-
+  //TODO: Whoever did this correct it
   def traderViewTradeRoomFinancialAndChecks(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.traderViewTradeRoomFinancialAndChecks(negotiationID)))
@@ -1614,11 +1617,11 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.traderViewTradeRoomFinancial(0, 0, 0)))
   }
 
+  //TODO: Whoever did this correct it
   def traderViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.traderViewTradeRoomChecks()))
   }
-
 
   def zoneOrderActions(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
