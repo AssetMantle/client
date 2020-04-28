@@ -61,8 +61,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderAssetCOAPath: String = configuration.get[String]("upload.asset.coa")
 
-  private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
-
   private val uploadTraderNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
 
   private val uploadTraderNegotiationBillOfExchangePath: String = configuration.get[String]("upload.negotiation.billOfExchange")
