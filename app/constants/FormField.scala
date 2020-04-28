@@ -175,7 +175,7 @@ object FormField {
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
   val ADVANCE_PAYMENT = new BooleanFormField("ADVANCE_PAYMENT")
   val CREDIT = new BooleanFormField("CREDIT")
-  val OBL = new BooleanFormField("OBL")
+  val BILL_OF_LADING = new BooleanFormField("BILL_OF_LADING")
   val INVOICE = new BooleanFormField("INVOICE")
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
