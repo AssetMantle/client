@@ -5,7 +5,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderKYC, TraderRelation, Zone}
 import models.master.{Organization => _, Zone => _, _}
-import models.{blockchain, master, masterTransaction}
+import models.{blockchain, master, masterTransaction, westernUnion}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
@@ -35,6 +35,8 @@ class ComponentViewController @Inject()(
                                          masterZones: master.Zones,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                         westernUnionFiatRequests: westernUnion.FiatRequests,
+                                         westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withTraderLoginAction: WithTraderLoginAction,
@@ -1224,27 +1226,28 @@ class ComponentViewController @Inject()(
   def zoneViewNegotiationFileList(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      val zoneID= masterZones.Service.tryGetID(loginState.username)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
       def getTradersZoneIDList(traderIDs: Seq[String]) = masterTraders.Service.tryGetZoneIDs(traderIDs)
 
-      def getResult(traderZoneIDs: Seq[String], negotiation: Negotiation,zoneID:String)= {
-        if (traderZoneIDs contains zoneID){
-        val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-        for {
-          negotiationFileList <- negotiationFileList
-          assetFileList <- assetFileList
-        } yield Ok(views.html.component.master.zoneViewNegotiationFileList(negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList))
-      }else{
+      def getResult(traderZoneIDs: Seq[String], negotiation: Negotiation, zoneID: String) = {
+        if (traderZoneIDs contains zoneID) {
+          val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+          val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+          for {
+            negotiationFileList <- negotiationFileList
+            assetFileList <- assetFileList
+          } yield Ok(views.html.component.master.zoneViewNegotiationFileList(negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList))
+        } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
       }
 
       (for {
         negotiation <- negotiation
-        zoneID<-zoneID
-        traderZoneIDs<- getTradersZoneIDList(Seq(negotiation.sellerTraderID,negotiation.buyerTraderID))
-        result <- getResult(traderZoneIDs,negotiation,zoneID)
+        zoneID <- zoneID
+        traderZoneIDs <- getTradersZoneIDList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        result <- getResult(traderZoneIDs, negotiation, zoneID)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -1390,26 +1393,26 @@ class ComponentViewController @Inject()(
 
   def tradeDocuments(negotiationID: String) = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID= masterTraders.Service.tryGetID(loginState.username)
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getResult(negotiation: Negotiation, traderID:String)={
-        if(negotiation.sellerTraderID==traderID || negotiation.buyerTraderID==traderID){
+      def getResult(negotiation: Negotiation, traderID: String) = {
+        if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-          for{
+          for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-          }yield Ok(views.html.component.master.tradeDocuments( negotiation, assetFileList, negotiationFileList))
-        }else{
+          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
+        } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
       }
 
       (for {
-        traderID<-traderID
+        traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(negotiation,traderID)
+        result <- getResult(negotiation, traderID)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
@@ -1718,6 +1721,62 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
+  }
+
+  def traderViewFiatTransactions: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def issueFiatRequests(traderID: String) = westernUnionFiatRequests.Service.getAll(traderID)
+
+      def rtcbList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+
+      for {
+        traderID <- traderID
+        issueFiatRequests <- issueFiatRequests(traderID)
+        rtcbList <- rtcbList(issueFiatRequests.map(_.id))
+      } yield Ok(views.html.component.master.traderViewFiatTransactions(issueFiatRequests, rtcbList))
+  }
+
+  def organizationViewFiatTransactions: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traders(organizationID: String) = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
+
+      def issueFiatRequests(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
+
+      def rtcbList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+
+      for {
+        organizationID <- organizationID
+        traders <- traders(organizationID)
+        issueFiatRequests <- issueFiatRequests(traders.map(_.id))
+        rtcbList <- rtcbList(issueFiatRequests.map(_.id))
+      } yield Ok(views.html.component.master.organizationViewFiatTransactions(traders, issueFiatRequests, rtcbList))
+
+  }
+
+  def zoneViewFiatTransactions: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def organizations(zoneID: String) = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
+
+      def traders(zoneID: String) = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
+
+      def issueFiatRequests(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
+
+      def rtcbList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+
+      for {
+        zoneID <- zoneID
+        organizations <- organizations(zoneID)
+        traders <- traders(zoneID)
+        issueFiatRequests <- issueFiatRequests(traders.map(_.id))
+        rtcbList <- rtcbList(issueFiatRequests.map(_.id))
+      } yield Ok(views.html.component.master.zoneViewFiatTransactions(traders, organizations, issueFiatRequests, rtcbList))
   }
 
 }
