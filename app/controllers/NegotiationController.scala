@@ -105,7 +105,7 @@ class NegotiationController @Inject()(
             if (traderID != asset.ownerID || !checkRelationExists) throw new BaseException(constants.Response.UNAUTHORIZED)
             asset.status match {
               case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE => masterNegotiations.Service.createWithIssueAssetPending(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = asset.description, price = asset.price, quantity = asset.quantity, quantityUnit = asset.quantityUnit, assetOtherDetails = asset.otherDetails)
-              case constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.createWithFormIncomplete(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = asset.description, price = asset.price, quantity = asset.quantity, quantityUnit = asset.quantityUnit, assetOtherDetails = asset.otherDetails)
+              case constants.Status.Asset.ISSUED => masterNegotiations.Service.createWithFormIncomplete(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = asset.description, price = asset.price, quantity = asset.quantity, quantityUnit = asset.quantityUnit, assetOtherDetails = asset.otherDetails)
               case constants.Status.Asset.REJECTED_BY_ZONE | constants.Status.Asset.ISSUE_ASSET_FAILED | constants.Status.Asset.IN_ORDER | constants.Status.Asset.REDEEMED => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
               case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
@@ -841,7 +841,7 @@ class NegotiationController @Inject()(
             val obl = content.asInstanceOf[Serializable.OBL]
             withUsernameToken.Ok(views.html.component.master.oblContent(views.companion.master.OBL.form.fill(views.companion.master.OBL.Data(negotiationID = negotiationID, billOfLadingNumber = obl.billOfLadingID, portOfLoading = obl.portOfLoading, shipperName = obl.shipperName, shipperAddress = obl.shipperAddress, notifyPartyName = obl.notifyPartyName, notifyPartyAddress = obl.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(obl.dateOfShipping), deliveryTerm = obl.deliveryTerm, assetQuantity = obl.weightOfConsignment, assetPrice = obl.declaredAssetValue)), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.oblContent( negotiationID= negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.oblContent(negotiationID = negotiationID))
         }
       }
 
@@ -1009,7 +1009,7 @@ class NegotiationController @Inject()(
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments( negotiation, assetFileList, negotiationFileList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -1069,8 +1069,10 @@ class NegotiationController @Inject()(
           def sendTransaction(buyerTraderID: String, sellerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (buyerTraderID != negotiation.buyerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (!(negotiation.assetAndBuyerAccepted.buyerAcceptedPrice && negotiation.assetAndBuyerAccepted.buyerAcceptedQuantity && negotiation.assetAndBuyerAccepted.buyerAcceptedAssetDescription && negotiation.assetOtherDetailsAndBuyerAccepted.buyerAccepted && negotiation.paymentTermsAndBuyerAccepted.buyerAccepted && negotiation.documentListAndBuyerAccepted.buyerAccepted)) throw new BaseException(constants.Response.ALL_NEGOTIATION_TERMS_NOT_ACCEPTED)
-            if (contract.status.isEmpty) throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
-            if (contract.status.getOrElse(false)) throw new BaseException(constants.Response.CONTRACT_REJECTED)
+            contract.status match {
+              case Some(status) => if (!status) throw new BaseException(constants.Response.CONTRACT_REJECTED)
+              case None => throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
+            }
 
             val contractHash = utilities.FileOperations.getDocumentsHash(contract)
 
@@ -1146,8 +1148,11 @@ class NegotiationController @Inject()(
           def sendTransaction(sellerTraderID: String, buyerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (sellerTraderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (!(negotiation.assetAndBuyerAccepted.buyerAcceptedPrice && negotiation.assetAndBuyerAccepted.buyerAcceptedQuantity && negotiation.assetAndBuyerAccepted.buyerAcceptedAssetDescription && negotiation.assetOtherDetailsAndBuyerAccepted.buyerAccepted && negotiation.paymentTermsAndBuyerAccepted.buyerAccepted && negotiation.documentListAndBuyerAccepted.buyerAccepted)) throw new BaseException(constants.Response.ALL_NEGOTIATION_TERMS_NOT_ACCEPTED)
-            if (contract.status.isEmpty) throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
-            if (contract.status.getOrElse(false)) throw new BaseException(constants.Response.CONTRACT_REJECTED)
+            contract.status match {
+              case Some(status) => if (!status) throw new BaseException(constants.Response.CONTRACT_REJECTED)
+              case None => throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
+            }
+
             val contractHash = utilities.FileOperations.getDocumentsHash(contract)
 
             transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
@@ -1166,7 +1171,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             contract <- contract
             pegHash <- getPegHash(negotiation.assetID)
-            buyerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
+            buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
             ticketID <- sendTransaction(sellerTraderID = sellerTraderID, buyerAddress = buyerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN, ticketID)

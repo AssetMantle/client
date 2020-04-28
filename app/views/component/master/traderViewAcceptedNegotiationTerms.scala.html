@@ -204,6 +204,14 @@
                 }
                 </div>
             </div>
+            @traderID match {
+                case negotiation.buyerTraderID => {
+                    @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
+                }
+                case negotiation.sellerTraderID => {
+                    @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
+                }
+            }
         }
         </div>
     </div>
