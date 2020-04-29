@@ -267,6 +267,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.OrderController.moderatedBuyerExecuteForm,
         routes.javascript.OrderController.moderatedSellerExecuteForm,
+        routes.javascript.OrderController.buyerExecuteForm,
+        routes.javascript.OrderController.sellerExecuteForm,
         routes.javascript.OrderController.blockchainBuyerExecute,
         routes.javascript.OrderController.blockchainSellerExecute,
 

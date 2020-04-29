@@ -191,7 +191,7 @@ class Assets @Inject()(
 
     def update(asset: Asset): Future[Int] = updateByPegHash(asset)
 
-    def updateOwnerAddress(pegHash: String, address: String): Future[Int] = updateOwnerAddressByPegHash(pegHash = pegHash, address = address)
+    def markAssetSentToOrder(pegHash: String, address: String): Future[Int] = updateOwnerAddressByPegHash(pegHash = pegHash, address = address)
 
     def deleteAsset(pegHash: String): Future[Int] = deleteByPegHash(pegHash)
 

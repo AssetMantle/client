@@ -131,6 +131,12 @@ POST        /order/moderatedBuyerExecute                                        
 GET         /order/moderatedSellerExecute                                                         controllers.OrderController.moderatedSellerExecuteForm(orderID: String)
 POST        /order/moderatedSellerExecute                                                         controllers.OrderController.moderatedSellerExecute
 
+GET         /order/buyerExecute                                                                   controllers.OrderController.buyerExecuteForm(orderID: String)
+POST        /order/buyerExecute                                                                   controllers.OrderController.buyerExecute
+
+GET         /order/sellerExecute                                                                  controllers.OrderController.sellerExecuteForm(orderID: String)
+POST        /order/sellerExecute                                                                  controllers.OrderController.sellerExecute
+
 GET         /order/blockchainBuyerExecute                                                         controllers.OrderController.blockchainBuyerExecuteForm
 POST        /order/blockchainBuyerExecute                                                         controllers.OrderController.blockchainBuyerExecute
 

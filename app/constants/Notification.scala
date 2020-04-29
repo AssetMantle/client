@@ -130,8 +130,11 @@ object Notification {
   val SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val ZONE_RELEASED_ASSET = new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
   val MODERATED_BUY_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_BUY_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val MODERATED_SELL_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_SELL_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_ORDER_EXECUTED = new Notification(notificationType = "BUYER_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_ORDER_EXECUTED = new Notification(notificationType = "SELLER_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val BUYER_BID_CONFIRMED = new Notification(notificationType = "BUYER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_BID_CONFIRMED = new Notification(notificationType = "SELLER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)

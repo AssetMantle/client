@@ -36,6 +36,7 @@ object FormField {
   val BUYER_ACCOUNT_ID = new StringFormField("BUYER_ACCOUNT_ID", 3, 50)
   val SELLER_ACCOUNT_ID = new StringFormField("SELLER_ACCOUNT_ID", 3, 50)
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 0, 1000)
+  val FIAT_PROOF = new StringFormField("FIAT_PROOF", 0, 1000)
   val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 0, 1000)
   val PEG_HASH = new StringFormField("PEG_HASH", 2, 50, RegularExpression.PEG_HASH)
   val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)

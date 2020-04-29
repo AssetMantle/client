@@ -212,9 +212,9 @@ class SendAssets @Inject()(
 
       def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
 
-      def updateBCAsset(pegHash: String, negotiationID: String): Future[Int] = blockchainAssets.Service.updateOwnerAddress(pegHash = pegHash, address = negotiationID)
+      def markBCAssetSentToOrder(pegHash: String, negotiationID: String): Future[Int] = blockchainAssets.Service.markAssetSentToOrder(pegHash = pegHash, address = negotiationID)
 
-      def updateMasterAsset(pegHash: String, ownerID: String): Future[Int] = masterAssets.Service.updateOwnerByPegHash(pegHash = pegHash, ownerID = ownerID)
+      def markMasterAssetSendToOrder(pegHash: String, ownerID: String): Future[Int] = masterAssets.Service.markAssetSendToOrderByPegHash(pegHash = pegHash, ownerID = ownerID)
 
       def checkOrderExists(negotiationID: String): Future[Boolean] = blockchainOrders.Service.checkOrderExists(negotiationID)
 
@@ -245,8 +245,8 @@ class SendAssets @Inject()(
         sendAsset <- sendAsset
         negotiationID <- getNegotiationID(sendAsset)
         masterNegotiation <- getMasterNegotiation(negotiationID)
-        _ <- updateBCAsset(pegHash = sendAsset.pegHash, negotiationID = negotiationID)
-        _ <- updateMasterAsset(pegHash = sendAsset.pegHash, ownerID = masterNegotiation.id)
+        _ <- markBCAssetSentToOrder(pegHash = sendAsset.pegHash, negotiationID = negotiationID)
+        _ <- markMasterAssetSendToOrder(pegHash = sendAsset.pegHash, ownerID = masterNegotiation.id)
         orderExists <- checkOrderExists(negotiationID)
         _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation)
         _ <- markDirty(sendAsset)
