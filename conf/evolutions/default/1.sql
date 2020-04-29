@@ -613,7 +613,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Order"
     "buyerTraderID"     VARCHAR NOT NULL,
     "sellerTraderID"    VARCHAR NOT NULL,
     "assetID"           VARCHAR NOT NULL,
-    "iouID"             VARCHAR,
     "status"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
