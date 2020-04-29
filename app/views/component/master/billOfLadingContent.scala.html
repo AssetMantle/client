@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import views.companion.master.BILL_OF_LADING
+@import views.companion.master.BillOfLading
 @import views.html.base._
 
-@(billOfLadingContentForm: Form[BILL_OF_LADING.Data] = BILL_OF_LADING.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(billOfLadingContentForm: Form[BillOfLading.Data] = BillOfLading.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.BILL_OF_LADING_CONTENT, billOfLadingContentForm) {
     @commonInputText(billOfLadingContentForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden")

@@ -204,7 +204,7 @@ class AssetController @Inject()(
         documentContent match {
           case Some(content) => {
             val billOfLading = content.asInstanceOf[BillOfLading]
-            withUsernameToken.Ok(views.html.component.master.billOfLadingContent(views.companion.master.BILL_OF_LADING.form.fill(views.companion.master.BILL_OF_LADING.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.billOfLadingContent(views.companion.master.BillOfLading.form.fill(views.companion.master.BillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
           }
           case None => withUsernameToken.Ok(views.html.component.master.billOfLadingContent(negotiationID = negotiationID))
         }
@@ -222,7 +222,7 @@ class AssetController @Inject()(
 
   def billOfLadingContent: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.BILL_OF_LADING.form.bindFromRequest().fold(
+      views.companion.master.BillOfLading.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.billOfLadingContent(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
         },
