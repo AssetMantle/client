@@ -94,6 +94,7 @@ object View {
 
   //TradeRoom
   val ADD_BALANCE = "ADD_BALANCE"
+  val REDEEM_BALANCE = "REDEEM_BALANCE"
   val AMEND = "AMEND"
   val VIEW_DOCUMENTS = "VIEW_DOCUMENTS"
   val FINANCIALS = "FINANCIALS"

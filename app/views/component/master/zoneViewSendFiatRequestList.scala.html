@@ -7,8 +7,8 @@
 @commonCard(constants.View.PENDING_SEND_FIAT_REQUESTS) {
 }{
     @commonHorizontalSwitcher(ListMap(
-        constants.View.PENDING -> routes.javascript.ComponentViewController.zoneViewSendFiatRequestList,
-        constants.View.COMPLETED -> routes.javascript.ComponentViewController.zoneViewSendFiatRequestList,
-        constants.View.FAILED -> routes.javascript.ComponentViewController.zoneViewSendFiatRequestList,
+        constants.View.PENDING -> routes.javascript.ComponentViewController.zoneViewPendingSendFiatRequestList,
+        constants.View.COMPLETED -> routes.javascript.ComponentViewController.zoneViewPendingSendFiatRequestList,
+        constants.View.FAILED -> routes.javascript.ComponentViewController.zoneViewPendingSendFiatRequestList,
     ))
 }
