@@ -25,14 +25,14 @@ case class IssueFiat(from: String, to: String, transactionID: String, transactio
 
 
 @Singleton
-class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, getAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterFiats: master.Fiats, masterTraders: master.Traders, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, getAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
@@ -196,6 +196,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         } yield (toAccountID, fromAccountID)
       }
 
+      def traderID(accountID: String): Future[String] = masterTraders.Service.tryGetID(accountID)
+      def markSuccess(traderID: String, transactionID: String): Future[Int] = masterFiats.Service.markSuccess(traderID, transactionID)
       (for {
         _ <- markTransactionSuccessful
         issueFiat <- issueFiat
@@ -203,6 +205,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         _ <- insertOrUpdate(account, issueFiat)
         _ <- markDirty(issueFiat)
         (toAccountID, fromAccountID) <- getIDs(issueFiat)
+        traderID <- traderID(toAccountID)
+        _ <- markSuccess(traderID, issueFiat.transactionID)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
@@ -225,11 +229,15 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
+      def traderID(accountID: String): Future[String] = masterTraders.Service.tryGetID(accountID)
+      def markFailure(traderID: String, transactionID: String): Future[Int] = masterFiats.Service.markFailure(traderID, transactionID)
 
       (for {
         _ <- markTransactionFailed
         issueFiat <- issueFiat
         (toAccountID, fromAccountID) <- getIDs(issueFiat)
+        traderID <- traderID(toAccountID)
+        _ <- markFailure(traderID, issueFiat.transactionID)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {

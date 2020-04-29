@@ -37,7 +37,7 @@ object FormField {
   val PEG_HASH = new StringFormField("PEG_HASH", 2, 50, RegularExpression.PEG_HASH)
   val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val QUANTITY_UNIT = new StringFormField("QUANTITY_UNIT", 2, 10, RegularExpression.ALL_LETTERS)
-  val TRANSACTION_ID = new StringFormField("TRANSACTION_ID", 2, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val TRANSACTION_ID = new StringFormField("TRANSACTION_ID", 2, 40, RegularExpression.ALL_NUMBERS_ALL_CAPITAL_LETTERS)
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val COMMENT = new StringFormField("COMMENT", 0, 200)
   val COUPON = new StringFormField("COUPON", 0, 50)
@@ -56,6 +56,7 @@ object FormField {
   val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val INVOICE_NUMBER = new StringFormField("INVOICE_NUMBER", 2, 32)
+  val CONTRACT_NUMBER = new StringFormField("CONTRACT_NUMBER", 2, 100)
   val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 45, 45)
   val REGISTERED_ADDRESS_LINE_1 = new StringFormField("REGISTERED_ADDRESS_LINE_1", 4, 200)
   val REGISTERED_ADDRESS_LINE_2 = new StringFormField("REGISTERED_ADDRESS_LINE_2", 4, 200)
@@ -110,6 +111,7 @@ object FormField {
   val COUNTER_PARTY = new StringFormField("COUNTER_PARTY", 2, 100)
   val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
+  val NEGOTIATION_ID = new StringFormField("NEGOTIATION_ID", 1, 100)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -181,6 +183,7 @@ object FormField {
   val BUYER_ADVANCE_PAYMENT = new BooleanFormField("BUYER_ADVANCE_PAYMENT")
   val BUYER_CREDIT = new BooleanFormField("BUYER_CREDIT")
   val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
+  val CONFIRM = new BooleanFormField("CONFIRM")
   val DOCUMENT_LIST_COMPLETED = new BooleanFormField("DOCUMENT_LIST_COMPLETED")
 
   //NestedFormField

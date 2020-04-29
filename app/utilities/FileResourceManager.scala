@@ -53,11 +53,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderWorldCheck = configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
 
-  private val uploadTraderAssetContractPath: String = configuration.get[String]("upload.asset.contract")
-
   private val uploadTraderAssetOBLPath: String = configuration.get[String]("upload.asset.obl")
-
-  private val uploadTraderAssetInvoicePath: String = configuration.get[String]("upload.asset.invoice")
 
   private val uploadTraderAssetPackingListPath: String = configuration.get[String]("upload.asset.packingList")
 
@@ -65,7 +61,11 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderAssetCOAPath: String = configuration.get[String]("upload.asset.coa")
 
-  private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
+  private val uploadTraderNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
+
+  private val uploadTraderNegotiationBillOfExchangePath: String = configuration.get[String]("upload.negotiation.billOfExchange")
+
+  private val uploadTraderNegotiationContractPath: String = configuration.get[String]("upload.negotiation.contract")
 
   private val uploadTraderNegotiationBuyerContractPath: String = configuration.get[String]("upload.negotiation.buyerContract")
 
@@ -125,13 +125,10 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   def getTraderAssetFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.CONTRACT => uploadTraderAssetContractPath
       case constants.File.OBL => uploadTraderAssetOBLPath
-      case constants.File.INVOICE => uploadTraderAssetInvoicePath
       case constants.File.PACKING_LIST => uploadTraderAssetPackingListPath
       case constants.File.COO => uploadTraderAssetCOOPath
       case constants.File.COA => uploadTraderAssetCOAPath
-      case constants.File.OTHER => uploadTraderAssetOtherPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
@@ -142,6 +139,9 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.SELLER_CONTRACT => uploadTraderNegotiationSellerContractOtherPath
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
+      case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
+      case constants.File.BILL_OF_EXCHANGE => uploadTraderNegotiationBillOfExchangePath
+      case constants.File.CONTRACT => uploadTraderNegotiationContractPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
@@ -161,7 +161,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
+  def storeFile[T <: Document[T]](name: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -187,7 +187,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
+  def updateFile[T <: Document[T]](name: String, path: String, oldDocument: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -197,13 +197,13 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       }
     }
 
-    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64))
 
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64
       _ <- update(fileName, encodedBase64)
     } yield {
-      utilities.FileOperations.deleteFile(path, oldDocumentFileName)
+      utilities.FileOperations.deleteFile(path, oldDocument.fileName)
       utilities.FileOperations.renameFile(path, name, fileName)
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)

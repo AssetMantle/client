@@ -34,6 +34,7 @@ object Notification {
     val subject: String = Seq(EMAIL_PREFIX, notificationType, SUBJECT_SUFFIX).mkString(".")
     val message: String = Seq(EMAIL_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
+
   //Invitation Emails
   val ZONE_INVITATION = new Email(notificationType = "ZONE_INVITATION")
   val TRADER_INVITATION = new Email(notificationType = "TRADER_INVITATION")
@@ -44,12 +45,13 @@ object Notification {
   val VERIFY_PHONE = new Notification(notificationType = "VERIFY_PHONE", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val PHONE_VERIFIED = new Notification(notificationType = "PHONE_VERIFIED", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val VERIFY_EMAIL = new Notification(notificationType = "VERIFY_EMAIL", sendEmail = true, sendPushNotification = false, sendSMS = false)
-  val EMAIL_VERIFIED = new Notification(notificationType = "EMAIL_VERIFIED", sendEmail = false, sendPushNotification = false, sendSMS = true)
+  val EMAIL_VERIFIED = new Notification(notificationType = "EMAIL_VERIFIED", sendEmail = true, sendPushNotification = false, sendSMS = false)
   val FORGOT_PASSWORD_OTP = new Notification(notificationType = "FORGOT_PASSWORD_OTP", sendEmail = true, sendPushNotification = false, sendSMS = false)
-  val CONTACT_UPDATED = new Notification(notificationType = "CONTACT_UPDATED", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val EMAIL_ADDRESS_UPDATED = new Notification(notificationType = "EMAIL_ADDRESS_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
+  val MOBILE_NUMBER_UPDATED = new Notification(notificationType = "MOBILE_NUMBER_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
 
   //userReviewIdentification
-  val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = true, sendPushNotification = true, sendSMS = false)
+  val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   //inviteTrader
   val ORGANIZATION_TRADER_INVITATION = new Notification(notificationType = "ORGANIZATION_TRADER_INVITATION", sendEmail = false, sendPushNotification = true, sendSMS = false)
@@ -124,6 +126,11 @@ object Notification {
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val OBL_CONTENT_ADDED = new Notification(notificationType = "OBL_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val INVOICE_CONTENT_ADDED = new Notification(notificationType = "INVOICE_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val CONTRACT_CONTENT_ADDED = new Notification(notificationType = "CONTRACT_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)
