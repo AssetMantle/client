@@ -124,8 +124,6 @@ class SetACLController @Inject()(
               val name = masterIdentifications.Service.tryGetName(loginState.username)
               val organization = masterOrganizations.Service.tryGet(addTraderData.organizationID)
 
-              def getZone(zoneID: String) = masterZones.Service.tryGet(zoneID)
-
               def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
 
               val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
