@@ -241,13 +241,15 @@ class IssueAssets @Inject()(
         def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
         Future.traverse(negotiations)(negotiation => {
-          val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
-          for {
-            _ <- markStatusRequestSent
-            buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
-            _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-            _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-          } yield ()
+          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING) {
+            val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
+            for {
+              _ <- markStatusRequestSent
+              buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+            } yield ()
+          } else Future()
         })
       }
 
