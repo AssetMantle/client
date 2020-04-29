@@ -718,23 +718,6 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
     PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
-(
-    "id"                 VARCHAR NOT NULL,
-    "documentType"       VARCHAR NOT NULL,
-    "fileName"           VARCHAR NOT NULL UNIQUE,
-    "file"               BYTEA,
-    "zoneStatus"         BOOLEAN,
-    "organizationStatus" BOOLEAN,
-    "createdBy"          VARCHAR,
-    "createdOn"          TIMESTAMP,
-    "createdOnTimeZone"  VARCHAR,
-    "updatedBy"          VARCHAR,
-    "updatedOn"          TIMESTAMP,
-    "updatedOnTimeZone"  VARCHAR,
-    PRIMARY KEY ("id", "documentType")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
 (
     "id"     VARCHAR NOT NULL,
@@ -1051,8 +1034,6 @@ ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
 ALTER TABLE MASTER."TraderBackgroundCheck"
     ADD CONSTRAINT TraderBackgroundCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."TraderKYC"
-    ADD CONSTRAINT TraderKYC_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
     ADD CONSTRAINT TraderRelation_Trader_fromID FOREIGN KEY ("fromID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
@@ -1159,7 +1140,6 @@ DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;

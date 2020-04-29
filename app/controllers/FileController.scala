@@ -29,7 +29,6 @@ class FileController @Inject()(
                                 masterZoneKYCs: master.ZoneKYCs,
                                 masterOrganizationKYCs: master.OrganizationKYCs,
                                 masterNegotiations: master.Negotiations,
-                                masterTraderKYCs: master.TraderKYCs,
                                 masterZones: master.Zones,
                                 masterOrganizations: master.Organizations,
                                 masterTraders: master.Traders,
@@ -164,42 +163,6 @@ class FileController @Inject()(
       } yield {
         if (organizationZoneID == userZoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val traderZoneID = masterTraders.Service.tryGetZoneID(traderID)
-      val userZoneID = masterZones.Service.tryGetID(loginState.username)
-      (for {
-        traderZoneID <- traderZoneID
-        userZoneID <- userZoneID
-      } yield {
-        if (traderZoneID == userZoneID) {
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      }).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val traderOrganizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
-      val userOrganizationID = masterOrganizations.Service.tryGetID(loginState.username)
-      (for {
-        traderOrganizationID <- traderOrganizationID
-        userOrganizationID <- userOrganizationID
-      } yield {
-        if (traderOrganizationID == userOrganizationID) {
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -430,21 +393,6 @@ class FileController @Inject()(
       }
   }
 
-  //TODO Shall we check if exists?
-  def userAccessedTraderKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val id = masterTraders.Service.tryGetID(loginState.username)
-
-      def fileName(id: String): Future[String] = masterTraderKYCs.Service.tryGetFileName(id = id, documentType = documentType)
-
-      (for {
-        id <- id
-        fileName <- fileName(id)
-      } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
 
   def zoneAccessedNegotiationFile(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -557,15 +505,6 @@ class FileController @Inject()(
             organizationID <- organizationID
             checkFileNameExistsOrganizationKYCs <- checkFileNameExistsOrganizationKYCs(organizationID)
           } yield if (checkFileNameExistsOrganizationKYCs) fileResourceManager.getOrganizationKYCFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-        case constants.User.TRADER =>
-          val traderID = masterTraders.Service.tryGetID(loginState.username)
-
-          def checkFileNameExistsTraderKYCs(traderID: String): Future[Boolean] = masterTraderKYCs.Service.checkFileNameExists(id = traderID, fileName = fileName)
-
-          for {
-            traderID <- traderID
-            checkFileNameExistsTraderKYCs <- checkFileNameExistsTraderKYCs(traderID)
-          } yield if (checkFileNameExistsTraderKYCs) fileResourceManager.getTraderKYCFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         case constants.User.USER =>
           val checkFileNameExistsAccountKYCs = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
           for {

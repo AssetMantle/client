@@ -16,29 +16,11 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ViewController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
-                                masterAccountKYC: master.AccountKYCs,
-                                masterAccountFile: master.AccountFiles,
-                                masterZoneKYC: master.ZoneKYCs,
-                                masterOrganizationKYC: master.OrganizationKYCs,
-                                masterTraderKYC: master.TraderKYCs,
                                 withLoginAction: WithLoginAction,
                                 withTraderLoginAction: WithTraderLoginAction,
                                 withZoneLoginAction: WithZoneLoginAction,
                                 withOrganizationLoginAction: WithOrganizationLoginAction,
                                 withGenesisLoginAction: WithGenesisLoginAction,
-                                masterAccounts: master.Accounts,
-                                blockchainAclAccounts: ACLAccounts,
-                                blockchainZones: blockchain.Zones,
-                                blockchainOrganizations: blockchain.Organizations,
-                                blockchainAssets: blockchain.Assets,
-                                blockchainFiats: blockchain.Fiats,
-                                blockchainNegotiations: blockchain.Negotiations,
-                                masterOrganizations: master.Organizations,
-                                masterZones: master.Zones,
-                                blockchainAclHashes: blockchain.ACLHashes,
-                                blockchainOrders: blockchain.Orders,
-                                getAccount: GetAccount,
-                                blockchainAccounts: blockchain.Accounts,
                                 withUsernameToken: WithUsernameToken
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
