@@ -36,11 +36,11 @@
             }
             case None => {}
         }
-        @commonTextInfo(constants.View.ASSET_DESCRIPTION, sentNegotiationRequest.assetAndBuyerAccepted.assetDescription)
-        @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.assetAndBuyerAccepted.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.assetAndBuyerAccepted.quantity.toString, sentNegotiationRequest.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, sentNegotiationRequest.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sentNegotiationRequest.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, sentNegotiationRequest.assetDescription)
+        @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString, sentNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
     </li>
 }

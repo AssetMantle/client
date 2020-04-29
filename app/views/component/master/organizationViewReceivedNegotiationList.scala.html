@@ -37,10 +37,10 @@
             }
             case None => {}
         }
-        @commonTextInfo(constants.View.ASSET_DESCRIPTION, receivedNegotiation.assetAndBuyerAccepted.assetDescription)
-        @commonIntInfo(constants.View.PRICE, receivedNegotiation.assetAndBuyerAccepted.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(receivedNegotiation.assetAndBuyerAccepted.quantity.toString, receivedNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, receivedNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, receivedNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, receivedNegotiation.assetDescription)
+        @commonIntInfo(constants.View.PRICE, receivedNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(receivedNegotiation.quantity.toString, receivedNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, receivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, receivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
     }
     }

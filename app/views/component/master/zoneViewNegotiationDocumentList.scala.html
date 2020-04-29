@@ -8,7 +8,7 @@
 @(negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @Messages(constants.View.ASSET_DOCUMENTS):
-@assetFileList.filter(assetFile => negotiation.documentListAndBuyerAccepted.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
+@assetFileList.filter(assetFile => negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
     <div>
         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocument('@negotiation.id', '@assetFile.documentType')) >@Messages(assetFile.documentType)</a>
         @assetFile.documentType match {
@@ -21,7 +21,7 @@
 }
 
 @Messages(constants.View.NEGOTIATION_DOCUMENTS):
-@negotiationFileList.filter(negotiationFile => negotiation.documentListAndBuyerAccepted.documentList.negotiationDocuments.contains(negotiationFile.documentType) || negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile =>
+@negotiationFileList.filter(negotiationFile => negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType) || negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile =>
     <div>
         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.zoneViewNegotiationDocument('@negotiation.id', '@negotiationFile.documentType')) >@Messages(negotiationFile.documentType)</a>
         @negotiationFile.documentType match {

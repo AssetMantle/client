@@ -29,11 +29,11 @@
                     }
                     case None => {}
                 }
-                @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, rejectedReceivedNegotiation.assetAndBuyerAccepted.assetDescription)
-                @commonVerticalIntInfo(constants.View.PRICE, rejectedReceivedNegotiation.assetAndBuyerAccepted.price)
-                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedReceivedNegotiation.assetAndBuyerAccepted.quantity.toString, rejectedReceivedNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-                @commonVerticalTextInfo(constants.View.LOAD_PORT, rejectedReceivedNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, rejectedReceivedNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+                @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, rejectedReceivedNegotiation.assetDescription)
+                @commonVerticalIntInfo(constants.View.PRICE, rejectedReceivedNegotiation.price)
+                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedReceivedNegotiation.quantity.toString, rejectedReceivedNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.LOAD_PORT, rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 @commonVerticalTextInfo(constants.View.COMMENT, rejectedReceivedNegotiation.comment.getOrElse(""))
                 @commonVerticalTextInfo(constants.View.STATUS, rejectedReceivedNegotiation.status)
             }
@@ -61,11 +61,11 @@
                     }
                     case None => {}
                 }
-                @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, rejectedSentNegotiation.assetAndBuyerAccepted.assetDescription)
-                @commonVerticalIntInfo(constants.View.PRICE, rejectedSentNegotiation.assetAndBuyerAccepted.price)
-                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedSentNegotiation.assetAndBuyerAccepted.quantity.toString, rejectedSentNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-                @commonVerticalTextInfo(constants.View.LOAD_PORT, rejectedSentNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, rejectedSentNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+                @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, rejectedSentNegotiation.assetDescription)
+                @commonVerticalIntInfo(constants.View.PRICE, rejectedSentNegotiation.price)
+                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.LOAD_PORT, rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 @commonVerticalTextInfo(constants.View.COMMENT, rejectedSentNegotiation.comment.getOrElse(""))
                 @commonVerticalTextInfo(constants.View.STATUS, rejectedSentNegotiation.status)
             }
@@ -93,11 +93,11 @@
                     }
                     case None => {}
                 }
-                @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, failedNegotiation.assetAndBuyerAccepted.assetDescription)
-                @commonVerticalIntInfo(constants.View.PRICE, failedNegotiation.assetAndBuyerAccepted.price)
-                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(failedNegotiation.assetAndBuyerAccepted.quantity.toString, failedNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-                @commonVerticalTextInfo(constants.View.LOAD_PORT, failedNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, failedNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+                @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, failedNegotiation.assetDescription)
+                @commonVerticalIntInfo(constants.View.PRICE, failedNegotiation.price)
+                @commonVerticalTextInfo(constants.View.QUANTITY, Seq(failedNegotiation.quantity.toString, failedNegotiation.quantityUnit).mkString(" "))
+                @commonVerticalTextInfo(constants.View.LOAD_PORT, failedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, failedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 @commonVerticalTextInfo(constants.View.STATUS, failedNegotiation.status)
             }
         }
