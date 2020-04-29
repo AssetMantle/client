@@ -288,8 +288,6 @@ GET         /zone/acceptInvitation                                              
 
 GET         /master/component/setBuyerFeedbackList                                                controllers.SetBuyerFeedbackController.buyerFeedbackList
 GET         /master/component/setSellerFeedbackList                                               controllers.SetSellerFeedbackController.sellerFeedbackList
-GET         /master/component/viewTradersInOrganizationForZone                                    controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
-GET         /master/component/viewTradersInOrganizationForGenesis                                 controllers.SetACLController.viewTradersInOrganizationForGenesis(organizationID: String)
 
 GET         /master/getGenesisAccessedFile                                                        controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                                               controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
@@ -341,12 +339,9 @@ GET         /master/inviteTrader                                                
 POST        /master/inviteTrader                                                                  controllers.SetACLController.inviteTrader
 GET         /master/addTrader                                                                     controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                                                     controllers.SetACLController.addTrader
-GET         /master/userReviewAddTraderRequest                                                    controllers.SetACLController.userReviewAddTraderRequestForm
-POST        /master/userReviewAddTraderRequest                                                    controllers.SetACLController.userReviewAddTraderRequest
 
 GET         /master/zoneVerifyTrader                                                              controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
 POST        /master/zoneVerifyTrader                                                              controllers.SetACLController.zoneVerifyTrader
-GET         /master/zoneViewVerifyTraderRequests                                                  controllers.SetACLController.zoneViewPendingVerifyTraderRequests
 
 GET         /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTrader

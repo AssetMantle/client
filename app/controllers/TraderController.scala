@@ -126,7 +126,7 @@ class TraderController @Inject()(
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
-          def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.verificationStatus.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
+          def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.status.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
             masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
           } else {
             if (fromTrader.organizationID == toTrader.organizationID) {

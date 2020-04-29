@@ -291,12 +291,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.SetACLController.inviteTraderForm,
         routes.javascript.SetACLController.addTraderForm,
-        routes.javascript.SetACLController.userReviewAddTraderRequestForm,
-        routes.javascript.SetACLController.viewTradersInOrganizationForZone,
-        routes.javascript.SetACLController.viewTradersInOrganizationForGenesis,
         routes.javascript.SetACLController.zoneVerifyTraderForm,
         routes.javascript.SetACLController.organizationVerifyTraderForm,
-        routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
         routes.javascript.SetACLController.blockchainSetACLForm,
 
         routes.javascript.SetBuyerFeedbackController.setBuyerFeedbackForm,

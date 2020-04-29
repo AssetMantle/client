@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, comment: Option[String] = None)
+case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, status: Option[Boolean] = None, comment: Option[String] = None)
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -114,17 +114,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = db.run(traderTable.filter(_.accountID === accountID).result.headOption)
+  private def getByAccountID(accountID: String): Future[Option[Trader]] = db.run(traderTable.filter(_.accountID === accountID).result.headOption)
 
-  private def getVerificationStatusById(id: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.id === id).map(_.verificationStatus.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findVerificationStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.accountID === accountID).map(_.verificationStatus.?).result.head.asTry).map {
+  private def tryGetStatusById(id: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -142,9 +134,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
+  private def getTradersByStatusAndZoneID(zoneID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.status.? === status).result)
 
-  private def getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
+  private def getTradersByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).result)
 
   private def getTradersByTraderIDs(traderIDs: Seq[String]): Future[Seq[Trader]] = db.run(traderTable.filter(_.id inSet traderIDs).result)
 
@@ -156,17 +148,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def checkOrganizationIDTraderIDExists(traderID: String, organizationID: String): Future[Boolean] = db.run(traderTable.filter(_.id === traderID).filter(_.organizationID === organizationID).exists.result)
 
-  private def updateVerificationStatusAndCommentByID(id: String, verificationStatus: Option[Boolean], comment: Option[String]): Future[Int] = db.run(traderTable.filter(_.id === id).map(x => (x.verificationStatus.?, x.comment.?)).update((verificationStatus, comment)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateCompletionStatusOnID(id: String, completionStatus: Boolean) = db.run(traderTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
+  private def updateStatusAndCommentByID(id: String, status: Option[Boolean], comment: Option[String]): Future[Int] = db.run(traderTable.filter(_.id === id).map(x => (x.status.?, x.comment.?)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -178,7 +160,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private[models] class TraderTable(tag: Tag) extends Table[Trader](tag, "Trader") {
 
-    def * = (id, zoneID, organizationID, accountID, name, completionStatus, verificationStatus.?, comment.?) <> (Trader.tupled, Trader.unapply)
+    def * = (id, zoneID, organizationID, accountID, name, status.?, comment.?) <> (Trader.tupled, Trader.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -190,9 +172,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def name = column[String]("name")
 
-    def completionStatus = column[Boolean]("completionStatus")
-
-    def verificationStatus = column[Boolean]("verificationStatus")
+    def status = column[Boolean]("status")
 
     def comment = column[String]("comment")
 
@@ -206,7 +186,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
       val id = getIDByAccountID(accountID)
 
-      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name, completionStatus = true))
+      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
 
       for {
         id <- id
@@ -236,35 +216,29 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getOrganizationIDByAccountID(accountID: String): Future[String] = findOrganizationIDByAccountId(accountID)
 
-    def markAccepted(id: String): Future[Int] = updateVerificationStatusAndCommentByID(id = id, verificationStatus = Option(true), comment = None)
+    def markAccepted(id: String): Future[Int] = updateStatusAndCommentByID(id = id, status = Option(true), comment = None)
 
-    def markRejected(id: String, comment: Option[String]): Future[Int] = updateVerificationStatusAndCommentByID(id = id, verificationStatus = Option(false), comment = comment)
+    def markRejected(id: String, comment: Option[String]): Future[Int] = updateStatusAndCommentByID(id = id, status = Option(false), comment = comment)
 
     def tryGetAccountId(id: String): Future[String] = getAccountIdById(id)
 
-    def getZoneVerifyTraderRequestList(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null)
+    def tryGetStatus(id: String): Future[Boolean] = tryGetStatusById(id).map(_.getOrElse(false))
 
-    def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusById(id).map(_.getOrElse(false))
+    def getOrganizationAcceptedTraderList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = Option(true))
 
-    def getVerificationStatusByAccountID(accountID: String): Future[Boolean] = findVerificationStatusByAccountID(accountID).map(_.getOrElse(false))
+    def getOrganizationPendingTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = null)
 
-    def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
+    def getOrganizationRejectedTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = Option(false))
 
-    def getOrganizationAcceptedTraderList(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = Option(true))
+    def getZoneAcceptedTraderList(zoneID: String): Future[Seq[Trader]] = getTradersByStatusAndZoneID(zoneID = zoneID, status = Option(true))
 
-    def getOrganizationPendingTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null)
+    def getZonePendingTraderRequestList(zoneID: String): Future[Seq[Trader]] = getTradersByStatusAndZoneID(zoneID = zoneID, status = null)
 
-    def getOrganizationRejectedTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = Option(false))
-
-    def getZoneAcceptedTraderList(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(true))
-
-    def getZonePendingTraderRequestList(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null)
-
-    def getZoneRejectedTraderRequestList(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(false))
+    def getZoneRejectedTraderRequestList(zoneID: String): Future[Seq[Trader]] = getTradersByStatusAndZoneID(zoneID = zoneID, status = Option(false))
 
     def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
 
-    def getOrNoneByAccountID(accountID: String): Future[Option[Trader]] = getTraderOrNoneByAccountID(accountID)
+    def getOrNoneByAccountID(accountID: String): Future[Option[Trader]] = getByAccountID(accountID)
 
     def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = getTradersByTraderIDs(traderIDs)
 

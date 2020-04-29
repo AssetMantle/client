@@ -131,7 +131,7 @@ class SetACLController @Inject()(
               val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
               def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
-                masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.IDENTIFICATION_COMPLETE_DOCUMENT_UPLOAD_PENDING)
+                masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = addTraderData.organizationID, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
               } else {
                 Future(0)
               }
@@ -139,11 +139,10 @@ class SetACLController @Inject()(
               for {
                 name <- name
                 organization <- organization
-                id <- addTrader(name = name, zoneID = organization.zoneID)
-                zone <- getZone(organization.zoneID)
+                _ <- addTrader(name = name, zoneID = organization.zoneID)
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
-                result <- withUsernameToken.PartialContent(views.html.component.master.userReviewAddTraderRequest(trader = Trader(id = id, zoneID = organization.zoneID, organizationID = organization.id, accountID = loginState.username, name = name), organization = organization, zone = zone))
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
               Future(Unauthorized(views.html.profile(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION))))
@@ -153,99 +152,6 @@ class SetACLController @Inject()(
           (for {
             status <- status
             result <- insertOrUpdateAndGetResult(status)
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
-  def userReviewAddTraderRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
-
-      def getResult(trader: Trader): Future[Result] = {
-        val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-        val zone = masterZones.Service.tryGet(trader.zoneID)
-        for {
-          organization <- organization
-          zone <- zone
-          result <- withUsernameToken.Ok(views.html.component.master.userReviewAddTraderRequest(trader = trader, organization = organization, zone = zone))
-        } yield result
-      }
-
-      (for {
-        trader <- trader
-        result <- getResult(trader)
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def userReviewAddTraderRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.ReviewAddTraderRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
-
-          def getResult(trader: Trader): Future[Result] = {
-            val organization = masterOrganizations.Service.tryGet(trader.organizationID)
-            val zone = masterZones.Service.tryGet(trader.zoneID)
-            for {
-              organization <- organization
-              zone <- zone
-            } yield BadRequest(views.html.component.master.userReviewAddTraderRequest(formWithErrors, trader = trader, organization = organization, zone = zone))
-          }
-
-          (for {
-            trader <- trader
-            result <- getResult(trader)
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
-          }
-        },
-        userReviewAddTraderRequestData => {
-          val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
-
-          def organization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
-
-          def getResult(trader: Trader, traderOrganization: Organization): Future[Result] = {
-            if (userReviewAddTraderRequestData.completion) {
-              val markTraderFormCompleted = masterTraders.Service.markTraderFormCompleted(trader.id)
-
-              val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
-
-              def updateInvitationStatus(emailAddress: Option[String]): Future[Int] = if (emailAddress.isDefined) {
-                masterTransactionTraderInvitations.Service.updateStatusByEmailAddress(organizationID = traderOrganization.id, emailAddress = emailAddress.get, status = constants.Status.TraderInvitation.TRADER_ADDED_FOR_VERIFICATION)
-              } else {
-                Future(0)
-              }
-
-              for {
-                _ <- markTraderFormCompleted
-                emailAddress <- emailAddress
-                _ <- updateInvitationStatus(emailAddress)
-                _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_USER_ADDED_OR_UPDATED_TRADER_REQUEST, trader.name)
-                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_ADDED_OR_UPDATED_TRADER_REQUEST, traderOrganization.name, traderOrganization.id)
-                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
-              } yield result
-            } else {
-
-              val zone = masterZones.Service.tryGet(trader.zoneID)
-
-              for {
-                zone <- zone
-              } yield BadRequest(views.html.component.master.userReviewAddTraderRequest(trader = trader, organization = traderOrganization, zone = zone))
-            }
-          }
-
-          (for {
-            trader <- trader
-            traderOrganization <- organization(trader.organizationID)
-            result <- getResult(trader, traderOrganization)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -338,18 +244,6 @@ class SetACLController @Inject()(
       )
   }
 
-  def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zoneID = masterZones.Service.tryGetID(loginState.username)
-
-      def getVerifyTraderRequestsForZone(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneVerifyTraderRequestList(zoneID)
-
-      for {
-        zoneID <- zoneID
-        verifyTraderRequestsForZone <- getVerifyTraderRequestsForZone(zoneID)
-      } yield Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(verifyTraderRequestsForZone))
-  }
-
   def organizationVerifyTraderForm(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.tryGet(traderID)
@@ -430,41 +324,6 @@ class SetACLController @Inject()(
           }
         }
       )
-  }
-
-
-  def viewTradersInOrganizationForZone(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
-      val userZoneID = masterZones.Service.tryGetID(loginState.username)
-
-      def getResult(organizationZoneID: String, userZoneID: String): Future[Result] = {
-        if (organizationZoneID == userZoneID) {
-          val verifiedTradersForOrganization = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
-          for {
-            verifiedTradersForOrganization <- verifiedTradersForOrganization
-          } yield Ok(views.html.component.master.viewTradersInOrganization(verifiedTradersForOrganization))
-        } else {
-          Future(Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
-          )
-        }
-      }
-
-      (for {
-        organizationZoneID <- organizationZoneID
-        userZoneID <- userZoneID
-        result <- getResult(organizationZoneID, userZoneID)
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def viewTradersInOrganizationForGenesis(organizationID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val verifiedTradersForOrganization = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
-      for {
-        verifiedTradersForOrganization <- verifiedTradersForOrganization
-      } yield Ok(views.html.component.master.viewTradersInOrganization(verifiedTradersForOrganization))
   }
 
   def blockchainSetACLForm: Action[AnyContent] = Action { implicit request =>

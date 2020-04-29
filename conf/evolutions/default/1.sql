@@ -691,14 +691,13 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Trader"
 (
-    "id"                 VARCHAR NOT NULL,
-    "zoneID"             VARCHAR NOT NULL,
-    "organizationID"     VARCHAR NOT NULL,
-    "accountID"          VARCHAR NOT NULL UNIQUE,
-    "name"               VARCHAR NOT NULL,
-    "completionStatus"   BOOLEAN NOT NULL,
-    "verificationStatus" BOOLEAN,
-    "comment"            VARCHAR,
+    "id"             VARCHAR NOT NULL,
+    "zoneID"         VARCHAR NOT NULL,
+    "organizationID" VARCHAR NOT NULL,
+    "accountID"      VARCHAR NOT NULL UNIQUE,
+    "name"           VARCHAR NOT NULL,
+    "status"         BOOLEAN,
+    "comment"        VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -908,7 +907,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
 (
     "id"                VARCHAR NOT NULL,
-    "traderID"         VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
     "transactionAmount" INT     NOT NULL,
     "status"            VARCHAR NOT NULL,
     PRIMARY KEY ("id")
@@ -917,20 +916,20 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
 
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
 (
-    "id"        VARCHAR NOT NULL,
-    "reference" VARCHAR NOT NULL,
-    "externalReference" VARCHAR NOT NULL,
-    "invoiceNumber" VARCHAR NOT NULL,
-    "buyerBusinessId" VARCHAR NOT NULL,
-    "buyerFirstName" VARCHAR NOT NULL,
-    "buyerLastName" VARCHAR NOT NULL,
-    "createdDate" TIMESTAMP NOT NULL,
-    "lastUpdatedDate" TIMESTAMP NOT NULL,
-    "status" VARCHAR NOT NULL,
-    "dealType" VARCHAR NOT NULL,
-    "paymentTypeId" VARCHAR NOT NULL,
-    "paidOutAmount" INT NOT NULL,
-    "requestSignature" VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "reference"         VARCHAR   NOT NULL,
+    "externalReference" VARCHAR   NOT NULL,
+    "invoiceNumber"     VARCHAR   NOT NULL,
+    "buyerBusinessId"   VARCHAR   NOT NULL,
+    "buyerFirstName"    VARCHAR   NOT NULL,
+    "buyerLastName"     VARCHAR   NOT NULL,
+    "createdDate"       TIMESTAMP NOT NULL,
+    "lastUpdatedDate"   TIMESTAMP NOT NULL,
+    "status"            VARCHAR   NOT NULL,
+    "dealType"          VARCHAR   NOT NULL,
+    "paymentTypeId"     VARCHAR   NOT NULL,
+    "paidOutAmount"     INT       NOT NULL,
+    "requestSignature"  VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
