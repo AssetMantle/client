@@ -72,6 +72,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AssetController.issueForm,
         routes.javascript.AssetController.billOfLadingContentForm,
         routes.javascript.AssetController.releaseForm,
+        routes.javascript.AssetController.sendForm,
 
         routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
@@ -280,7 +281,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
 
-        routes.javascript.SendAssetController.sendAssetForm,
         routes.javascript.SendAssetController.blockchainSendAssetForm,
 
         routes.javascript.SendCoinController.faucetRequestForm,

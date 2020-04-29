@@ -58,6 +58,9 @@ POST        /asset/issue                                                        
 GET         /asset/billOfLadingContent                                                            controllers.AssetController.billOfLadingContentForm(negotiationID: String)
 POST        /asset/billOfLadingContent                                                            controllers.AssetController.billOfLadingContent
 
+GET         /asset/send                                                                           controllers.AssetController.sendForm(orderID: String)
+POST        /asset/send                                                                           controllers.AssetController.send
+
 GET         /asset/release                                                                        controllers.AssetController.releaseForm(assetID: String)
 POST        /asset/release                                                                        controllers.AssetController.release
 
@@ -464,9 +467,6 @@ POST        /master/redeemAsset                                                 
 
 GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiat
-
-GET         /master/sendAsset                                                                     controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
-POST        /master/sendAsset                                                                     controllers.SendAssetController.sendAsset
 
 GET         /master/sendCoin                                                                      controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                                                      controllers.SendCoinController.sendCoin

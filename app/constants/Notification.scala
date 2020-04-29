@@ -141,6 +141,7 @@ object Notification {
   val BUYER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "BUYER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "SELLER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
+  val BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SEND_ASSET_TO_ORDER_SUCCESSFUL = new Notification(notificationType = "SEND_ASSET_TO_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SEND_ASSET_TO_ORDER_FAILED = new Notification(notificationType = "SEND_ASSET_TO_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_EXECUTE_ORDER_SUCCESSFUL = new Notification(notificationType = "BUYER_EXECUTE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)

@@ -43,6 +43,7 @@ object Form {
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
   val BILL_OF_LADING_CONTENT = new Form("BILL_OF_LADING_CONTENT", routes.AssetController.billOfLadingContent(), routes.javascript.AssetController.billOfLadingContentForm)
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
+  val SEND_ASSET = new Form("SEND_ASSET", routes.AssetController.send(), routes.javascript.AssetController.sendForm)
 
   //AddZoneController
   val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)
@@ -121,7 +122,6 @@ object Form {
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
 
   //SendAssetController
-  val SEND_ASSET = new Form("SEND_ASSET", routes.SendAssetController.sendAsset(), routes.javascript.SendAssetController.sendAssetForm)
   val BLOCKCHAIN_SEND_ASSET = new Form("BLOCKCHAIN_SEND_ASSET", routes.SendAssetController.blockchainSendAsset(), routes.javascript.SendAssetController.blockchainSendAssetForm)
 
   //SendCoinController

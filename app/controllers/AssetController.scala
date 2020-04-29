@@ -19,12 +19,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class AssetController @Inject()(
                                  blockchainAssets: blockchain.Assets,
                                  blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
+                                 blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
+                                 blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
                                  masterAccounts: master.Accounts,
                                  masterTraders: master.Traders,
                                  masterTradeRelations: master.TraderRelations,
                                  masterZones: master.Zones,
                                  masterAssets: master.Assets,
+                                 masterNegotiations: master.Negotiations,
                                  messagesControllerComponents: MessagesControllerComponents,
+                                 masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  transaction: utilities.Transaction,
@@ -32,12 +38,8 @@ class AssetController @Inject()(
                                  utilitiesNotification: utilities.Notification,
                                  utilitiesTransaction: utilities.Transaction,
                                  withZoneLoginAction: WithZoneLoginAction,
-                                 masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                  transactionsReleaseAsset: transactions.ReleaseAsset,
-                                 blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
-                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
-                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                                 masterNegotiations: master.Negotiations,
+                                 transactionsSendAsset: transactions.SendAsset,
                                )
                                (implicit
                                 executionContext: ExecutionContext,
@@ -318,4 +320,60 @@ class AssetController @Inject()(
       )
   }
 
+  def sendForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.sendAsset(orderID = orderID))
+  }
+
+  def send: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.SendAsset.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.ORDER_ID.name))))
+        },
+        sendAssetData => {
+          val negotiation = masterNegotiations.Service.tryGet(sendAssetData.orderID)
+
+          def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
+
+          def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+
+          def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
+
+          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean): Future[String] = {
+            if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
+            asset.pegHash match {
+              case Some(pegHash) =>
+                transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
+                  entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
+                  request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sellerAddress, gas = sendAssetData.gas.toString), to = buyerAddress, password = sendAssetData.password, pegHash = pegHash, mode = transactionMode),
+                  action = transactionsSendAsset.Service.post,
+                  onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionSendAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
+                )
+              case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+            }
+
+          }
+
+          (for {
+            negotiation <- negotiation
+            asset <- getAsset(negotiation.assetID)
+            assetLocked <- getLockedStatus(asset.pegHash)
+            buyer <- getTrader(negotiation.buyerTraderID)
+            buyerAddress <- getAddress(buyer.accountID)
+            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
+            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.orderID, successes = Seq(constants.Response.ASSET_SENT)))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sendAssetData.orderID, failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
 }
