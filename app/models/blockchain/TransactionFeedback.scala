@@ -241,7 +241,9 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
       (for {
         dirtyAddresses <- dirtyAddresses
         _ <- refreshDirtyAddresses(dirtyAddresses)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

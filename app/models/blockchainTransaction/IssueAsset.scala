@@ -236,23 +236,19 @@ class IssueAssets @Inject()(
 
       def getNegotiations(assetID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
 
-      def updateNegotiationStatus(sellerAccountID: String, negotiations: Seq[Negotiation], masterAsset: masterAsset): Future[Int] = {
+      def updateNegotiationStatus(sellerAccountID: String, negotiations: Seq[Negotiation], masterAsset: masterAsset) = {
 
         def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-        negotiations.map { negotiation =>
-          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING) {
-            val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
-
-            for {
-              _ <- markStatusRequestSent
-              buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
-              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-            } yield Unit
-          }
-        }
-        Future(0)
+        Future.traverse(negotiations)(negotiation => Future {
+          val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
+          for {
+            _ <- markStatusRequestSent
+            buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
+            _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+            _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+          } yield ()
+        })
       }
 
       def markAccountDirty(address: String): Future[Int] = blockchainAccounts.Service.markDirty(address)

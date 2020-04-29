@@ -308,8 +308,7 @@ class Negotiations @Inject()(
       (for {
         dirtyNegotiations <- dirtyNegotiations
         _ <- refreshDirtyAndSendCometMessage(dirtyNegotiations)
-      } yield ()
-        ).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

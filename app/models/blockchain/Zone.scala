@@ -156,7 +156,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       (for {
         dirtyZones <- dirtyZones
         _ <- refreshDirtyZones(dirtyZones)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

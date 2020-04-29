@@ -202,7 +202,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       (for {
         dirtyFiats <- dirtyFiats
         _ <- insertOrUpdateAndSendCometMessage(dirtyFiats)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

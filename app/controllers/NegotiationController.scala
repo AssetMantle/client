@@ -157,15 +157,16 @@ class NegotiationController @Inject()(
           def getAssetStatus(id: String): Future[String] = masterAssets.Service.tryGetStatus(id)
 
           def updatePaymentTerms(traderID: String, assetStatus: String, negotiation: Negotiation): Future[Int] = {
-            if (traderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
-            negotiation.status match {
-              case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
-                assetStatus match {
-                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updatePaymentTerms(id = paymentTermsData.id, paymentTerms = PaymentTerms(advancePayment = paymentTermsData.advancePayment, advancePercentage = paymentTermsData.advancePercentage, credit = paymentTermsData.credit, tenure = paymentTermsData.tenure, tentativeDate = if (paymentTermsData.tentativeDate.isDefined) Option(utilities.Date.utilDateToSQLDate(paymentTermsData.tentativeDate.get)) else None, reference = paymentTermsData.refrence))
-                  case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
-                }
-              case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
-            }
+            if (traderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED) {
+              negotiation.status match {
+                case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
+                  assetStatus match {
+                    case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updatePaymentTerms(id = paymentTermsData.id, paymentTerms = PaymentTerms(advancePayment = paymentTermsData.advancePayment, advancePercentage = paymentTermsData.advancePercentage, credit = paymentTermsData.credit, tenure = paymentTermsData.tenure, tentativeDate = if (paymentTermsData.tentativeDate.isDefined) Option(utilities.Date.utilDateToSQLDate(paymentTermsData.tentativeDate.get)) else None, reference = paymentTermsData.refrence))
+                    case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)(module)
+                  }
+                case _ => throw new BaseException(constants.Response.UNAUTHORIZED)(module)
+              }
+            } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
           (for {
@@ -214,15 +215,16 @@ class NegotiationController @Inject()(
           def getAssetStatus(id: String): Future[String] = masterAssets.Service.tryGetStatus(id)
 
           def updateDocumentList(traderID: String, assetStatus: String, negotiation: Negotiation): Future[Int] = {
-            if (traderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
-            negotiation.status match {
-              case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
-                assetStatus match {
-                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(assetDocuments = documentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = documentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))))
-                  case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
-                }
-              case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
-            }
+            if (traderID != negotiation.sellerTraderID) {
+              negotiation.status match {
+                case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
+                  assetStatus match {
+                    case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(assetDocuments = documentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = documentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))))
+                    case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+                  }
+                case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
+              }
+            } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
           def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
@@ -305,18 +307,20 @@ class NegotiationController @Inject()(
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(reviewRequestData.id)
 
-          def getAssetStatus(id: String): Future[String] = masterAssets.Service.tryGetStatus(id)
+          def getAssetStatus(assetID: String): Future[String] = masterAssets.Service.tryGetStatus(assetID)
 
           def update(traderID: String, assetStatus: String, negotiation: Negotiation): Future[Int] = {
-            negotiation.status match {
-              case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
-                assetStatus match {
-                  case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE => masterNegotiations.Service.markStatusIssueAssetPending(reviewRequestData.id)
-                  case constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.markStatusRequestSent(reviewRequestData.id)
-                  case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
-                }
-              case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
-            }
+            if (traderID == negotiation.sellerTraderID) {
+              negotiation.status match {
+                case constants.Status.Negotiation.FORM_INCOMPLETE =>
+                  assetStatus match {
+                    case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE => masterNegotiations.Service.markStatusIssueAssetPending(reviewRequestData.id)
+                    case constants.Status.Asset.ISSUED => masterNegotiations.Service.markStatusRequestSent(reviewRequestData.id)
+                    case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+                  }
+                case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
+              }
+            } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
           (for {
