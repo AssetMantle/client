@@ -32,7 +32,6 @@ object Status {
     val TRADED = "TRADED"
 
     val ISSUE_ASSET_FAILED = "ISSUE_ASSET_FAILED"
-    val REJECTED_BY_ZONE = "REJECTED_BY_ZONE"
   }
 
   object Fiat {
