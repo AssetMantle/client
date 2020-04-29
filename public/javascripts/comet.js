@@ -29,6 +29,12 @@ function cometMessageHandler(message){
             if ($('#sellNegotiationList').length) {
                 comet('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
             }
+            if ($('#traderViewAcceptedNegotiation').length) {
+                comet('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation(parsedMessage.messageContent.id));
+            }
+            if ($('#organizationViewAcceptedNegotiation').length) {
+                comet('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation(parsedMessage.messageContent.id));
+            }
             break;
         case 'CHAT' :
             if( $('#chatMessages').length ){

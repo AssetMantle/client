@@ -1,0 +1,104 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.{Asset, Negotiation}
+
+@(negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<div id='@Seq(negotiation.id, "TermsView").mkString("")'>
+    <div class="tradeTerms">
+        <div class="traderCommodity">
+            <span class="commodityImage">@asset.assetType.mkString.substring(0, 1)</span><span class="tradeName">@asset.assetType</span>
+        </div>
+        <div class="terms">
+
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
+            </div>
+
+            <div class="sellerTerm">
+                @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
+                <div>
+                @negotiation.buyerAcceptedAssetDescription
+                </div>
+            </div>
+            <div class="sellerTerm">
+                @commonIntInfo(constants.View.PRICE, negotiation.price)
+                <div>
+                @negotiation.buyerAcceptedPrice
+                </div>
+            </div>
+            <div class="sellerTerm">
+                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                <div>
+                @negotiation.buyerAcceptedQuantity
+                </div>
+            </div>
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
+            </div>
+            <div class="sellerTerm">
+                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                <br>
+                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
+                <br>
+                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+                <br>
+                <div>
+                @negotiation.buyerAcceptedAssetOtherDetails
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
+            </div>
+            <div class="sellerTerm">
+                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
+                <br>
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
+                <br>
+                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
+                <br>
+                @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
+                <br>
+                @negotiation.paymentTerms.tentativeDate match {
+                    case Some(date) => {
+                        @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                    }
+                    case None => {
+                        @commonTextInfo(constants.View.TENTATIVE_DATE, "")
+                    }
+                }
+                <br>
+                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
+                <div>
+                @negotiation.buyerAcceptedPaymentTerms
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
+            </div>
+            <div class="sellerTerm">
+                @negotiation.documentList.assetDocuments.map { document =>
+                    @document
+                    <br>
+                }
+                @negotiation.documentList.negotiationDocuments.map { document =>
+                    @document
+                    <br>
+                }
+                <div>
+                @negotiation.buyerAcceptedDocumentList
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    @*Add here comet source for component id = '@Seq(negotiation.id, "TermsView").mkString("")'*@
+</script>

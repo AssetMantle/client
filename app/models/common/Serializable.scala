@@ -53,7 +53,7 @@ object Serializable {
 
   implicit val paymentTermsWrites: OWrites[PaymentTerms] = Json.writes[PaymentTerms]
 
-  case class DocumentList(documents: Seq[String])
+  case class DocumentList(assetDocuments: Seq[String], negotiationDocuments: Seq[String])
 
   implicit val documentListReads: Reads[DocumentList] = Json.reads[DocumentList]
 
@@ -84,12 +84,16 @@ object Serializable {
 
   case class Invoice(invoiceNumber: String, invoiceDate: Date) extends NegotiationDocumentContent
 
+  case class Contract(contractNumber: String) extends NegotiationDocumentContent
+
   implicit val negotiationDocumentContentWrites: Writes[NegotiationDocumentContent] = {
     case invoice: Invoice => Json.toJson(invoice)(Json.writes[Invoice])
+    case contract: Contract => Json.toJson(contract)(Json.writes[Contract])
     case _ => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
   }
 
   implicit val negotiationDocumentContentReads: Reads[NegotiationDocumentContent] = {
-    Json.format[Invoice].map(x => x: NegotiationDocumentContent)
+    Json.format[Invoice].map(x => x: NegotiationDocumentContent) or
+      Json.format[Contract].map(x => x: NegotiationDocumentContent)
   }
 }

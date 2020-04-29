@@ -39,7 +39,20 @@
                     componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
             </script>
         }
-        case constants.User.ORGANIZATION => {}
+        case constants.User.ORGANIZATION => {
+            <div class="tradeList cmuk-margin-bottom">
+                <div id="organizationViewAcceptedNegotiationList"></div>
+            </div>
+
+            <div class="salesQuoteList">
+                <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+            </div>
+
+            <script>
+                    componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
+                    componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
+            </script>
+        }
         case constants.User.ZONE => {
             <div class="tradeList cmuk-margin-bottom">
             @commonCard(constants.View.TRADE_ROOMS) {

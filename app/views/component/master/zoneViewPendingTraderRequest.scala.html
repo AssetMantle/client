@@ -2,8 +2,8 @@
 @import models.master.Trader
 @import views.html.base._
 @import models.master.TraderKYC
-
 @import models.master.Organization
+
 @(trader: Trader, traderKYCs: Seq[TraderKYC], organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
