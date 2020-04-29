@@ -157,14 +157,14 @@ class NegotiationController @Inject()(
           def getAssetStatus(id: String): Future[String] = masterAssets.Service.tryGetStatus(id)
 
           def updatePaymentTerms(traderID: String, assetStatus: String, negotiation: Negotiation): Future[Int] = {
-            if (traderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED) {
+            if (traderID != negotiation.sellerTraderID) {
               negotiation.status match {
                 case constants.Status.Negotiation.ISSUE_ASSET_FAILED | constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
                   assetStatus match {
                     case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED | constants.Status.Asset.TRADED => masterNegotiations.Service.updatePaymentTerms(id = paymentTermsData.id, paymentTerms = PaymentTerms(advancePayment = paymentTermsData.advancePayment, advancePercentage = paymentTermsData.advancePercentage, credit = paymentTermsData.credit, tenure = paymentTermsData.tenure, tentativeDate = if (paymentTermsData.tentativeDate.isDefined) Option(utilities.Date.utilDateToSQLDate(paymentTermsData.tentativeDate.get)) else None, reference = paymentTermsData.refrence))
-                    case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)(module)
+                    case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
                   }
-                case _ => throw new BaseException(constants.Response.UNAUTHORIZED)(module)
+                case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
               }
             } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
