@@ -240,7 +240,7 @@ class IssueAssets @Inject()(
 
         def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-        Future.traverse(negotiations)(negotiation => Future {
+        Future.traverse(negotiations)(negotiation => {
           val markStatusRequestSent = masterNegotiations.Service.markStatusRequestSent(negotiation.id)
           for {
             _ <- markStatusRequestSent
@@ -301,24 +301,18 @@ class IssueAssets @Inject()(
 
       def getNegotiations(assetID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
 
-      def updateNegotiationStatus(negotiations: Seq[Negotiation], masterAsset: masterAsset): Future[Int] = {
+      def updateNegotiationStatus(negotiations: Seq[Negotiation], masterAsset: masterAsset) = {
 
         def getIDByTraderID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-        negotiations.map { negotiation =>
-          if (negotiation.status == constants.Status.Negotiation.ISSUE_ASSET_PENDING) {
-            val markStatusIssueAssetRequestFailed = masterNegotiations.Service.markStatusIssueAssetRequestFailed(negotiation.id)
-
-            for {
-              _ <- markStatusIssueAssetRequestFailed
-              sellerAccountID <- getIDByTraderID(negotiation.sellerTraderID)
-              buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
-              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT_FAILED, masterAsset.description, masterAsset.assetType)
-              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT_FAILED, masterAsset.description, masterAsset.assetType)
-            } yield Unit
-          }
-        }
-        Future(0)
+        Future.traverse(negotiations)(negotiation => {
+          val markStatusIssueAssetRequestFailed = masterNegotiations.Service.markStatusIssueAssetRequestFailed(negotiation.id)
+          for {
+            _ <- markStatusIssueAssetRequestFailed
+            sellerAccountID <- getIDByTraderID(negotiation.sellerTraderID)
+            _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT_FAILED, masterAsset.description, masterAsset.assetType)
+          } yield ()
+        })
       }
 
       def getOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
@@ -341,6 +335,7 @@ class IssueAssets @Inject()(
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
+
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
