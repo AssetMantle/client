@@ -58,6 +58,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
     request =>
 
       val requestBody = views.companion.master.WesternUnionRTCB.fromXml(request.body)
+      println(requestBody, requestBody.buyerLastName)
       val hash = rtcbSecretKey + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
         requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount

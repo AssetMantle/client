@@ -113,6 +113,7 @@ object Form {
   //RedeemFiatController
   val REDEEM_FIAT = new Form("REDEEM_FIAT", routes.RedeemFiatController.redeemFiat(), routes.javascript.RedeemFiatController.redeemFiatForm)
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat(), routes.javascript.RedeemFiatController.blockchainRedeemFiatForm)
+  val ZONE_REDEEM_FIAT = new Form("ZONE_REDEEM_FIAT",  routes.RedeemFiatController.zoneRedeemFiat(), routes.javascript.RedeemFiatController.zoneRedeemFiatForm)
 
   //ReleaseAssetController
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset(), routes.javascript.ReleaseAssetController.releaseAssetForm)
@@ -132,6 +133,7 @@ object Form {
   //SendFiatController
   val SEND_FIAT = new Form("SEND_FIAT", routes.SendFiatController.sendFiat(), routes.javascript.SendFiatController.sendFiatForm)
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat(), routes.javascript.SendFiatController.blockchainSendFiatForm)
+  val ZONE_SEND_FIAT = new Form("ZONE_SEND_FIAT",  routes.SendFiatController.zoneSendFiat(), routes.javascript.SendFiatController.zoneSendFiatForm)
 
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader(), routes.javascript.SetACLController.inviteTraderForm)

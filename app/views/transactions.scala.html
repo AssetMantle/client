@@ -24,7 +24,19 @@
 
 @center = {
     <div class="cmuk-container cmuk-margin-bottom">
+        <div id="sendFiatRequests"></div>
     </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {}
+            case constants.User.ORGANIZATION => {}
+            case constants.User.ZONE => {
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequestList());
+            }
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
 }
 
 @right = {

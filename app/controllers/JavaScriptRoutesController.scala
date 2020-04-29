@@ -142,6 +142,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewTradeRoomFinancial,
         routes.javascript.ComponentViewController.organizationViewTradeRoomChecks,
         routes.javascript.ComponentViewController.zoneOrderActions,
+        routes.javascript.ComponentViewController.zoneViewSendFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewPendingSendFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewPendingRedeemFiatRequestList,
 
         routes.javascript.ComponentViewController.organizationSubscription,
         routes.javascript.ComponentViewController.traderSubscription,
@@ -274,6 +278,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 
         routes.javascript.RedeemFiatController.redeemFiatForm,
+        routes.javascript.RedeemFiatController.zoneRedeemFiatForm,
         routes.javascript.RedeemFiatController.blockchainRedeemFiatForm,
 
         routes.javascript.ReleaseAssetController.releaseAssetList,
@@ -298,6 +303,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendCoinController.blockchainSendCoinForm,
 
         routes.javascript.SendFiatController.sendFiatForm,
+        routes.javascript.SendFiatController.zoneSendFiatForm,
         routes.javascript.SendFiatController.blockchainSendFiatForm,
 
         routes.javascript.SetACLController.inviteTraderForm,

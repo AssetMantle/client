@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.{blockchain, master}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -26,7 +26,19 @@ case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas:
 
 
 @Singleton
-class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendFiats @Inject()(actorSystem: ActorSystem,
+                          transaction: utilities.Transaction,
+                          protected val databaseConfigProvider: DatabaseConfigProvider,
+                          blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
+                          getOrder: GetOrder,
+                          transactionSendFiat: transactions.SendFiat,
+                          blockchainFiats: blockchain.Fiats,
+                          blockchainOrders: blockchain.Orders,
+                          blockchainNegotiations: blockchain.Negotiations,
+                          blockchainAccounts: blockchain.Accounts,
+                          masterAccounts: master.Accounts,
+                          masterTransactionSendFiatRequests : masterTransaction.SendFiatRequests,
+                          utilitiesNotification: utilities.Notification)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
@@ -210,6 +222,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } yield (toAccountID, fromAccountID)
       }
 
+      val markBlockchainSuccess = masterTransactionSendFiatRequests.Service.markBlockchainSuccess(ticketID)
+
       (for {
         _ <- markTransactionSuccessful
         sendFiat <- sendFiat
@@ -219,6 +233,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         _ <- insertOrUpdateFiats(orderResponse, negotiationID)
         _ <- markDirty(sendFiat)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
+        _ <- markBlockchainSuccess
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
@@ -231,6 +246,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendFiat = Service.getTransaction(ticketID)
+      val markBlockchainFailure = masterTransactionSendFiatRequests.Service.markBlockchainFailure(ticketID)
 
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
@@ -248,6 +264,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         sendFiat <- sendFiat
         _ <- markDirty(sendFiat.from)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
+        _ <- markBlockchainFailure
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
