@@ -293,15 +293,19 @@ class AssetController @Inject()(
             if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
             if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
             if (billOfLading.status.isDefined && !billOfLading.status.get) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
-            transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
-              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND)), gas = releaseData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND)), mode = transactionMode),
-              action = transactionsReleaseAsset.Service.post,
-              onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
-            )
+            asset.pegHash match {
+              case Some(pegHash) =>
+                transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
+                  entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = pegHash, gas = releaseData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
+                  request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = pegHash, mode = transactionMode),
+                  action = transactionsReleaseAsset.Service.post,
+                  onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
+                )
+              case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+            }
           }
 
           (for {
@@ -347,7 +351,7 @@ class AssetController @Inject()(
             if (asset.ownerID != sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
             asset.pegHash match {
-              case Some(pegHash) =>
+              case Some(pegHash) => if (asset.status == constants.Status.Asset.ISSUED) {
                 transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
                   entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
@@ -357,6 +361,7 @@ class AssetController @Inject()(
                   onFailure = blockchainTransactionSendAssets.Utility.onFailure,
                   updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
                 )
+              } else throw new BaseException(constants.Response.UNAUTHORIZED)
               case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
 
