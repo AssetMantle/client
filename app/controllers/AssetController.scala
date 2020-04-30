@@ -198,7 +198,7 @@ class AssetController @Inject()(
       )
   }
 
-  def billOfLadingContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addBillOfLadingContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -208,9 +208,9 @@ class AssetController @Inject()(
         documentContent match {
           case Some(content) => {
             val billOfLading = content.asInstanceOf[BillOfLading]
-            withUsernameToken.Ok(views.html.component.master.billOfLadingContent(views.companion.master.BillOfLading.form.fill(views.companion.master.BillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addBillOfLadingContent(views.companion.master.AddBillOfLadingContent.form.fill(views.companion.master.AddBillOfLadingContent.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.billOfLadingContent(negotiationID = negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.addBillOfLadingContent(negotiationID = negotiationID))
         }
       }
 
@@ -224,11 +224,11 @@ class AssetController @Inject()(
       }
   }
 
-  def billOfLadingContent: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addBillOfLadingContent(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.BillOfLading.form.bindFromRequest().fold(
+      views.companion.master.AddBillOfLadingContent.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.billOfLadingContent(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+          Future(BadRequest(views.html.component.master.addBillOfLadingContent(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
         },
         billOfLadingContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
@@ -292,7 +292,7 @@ class AssetController @Inject()(
             if (seller.zoneID != zoneID || asset.ownerID != seller.id) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
             if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
-            if (billOfLading.status.isDefined && !billOfLading.status.get) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
+            if (billOfLading.status.contains(false)) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
             asset.pegHash match {
               case Some(pegHash) =>
                 transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](

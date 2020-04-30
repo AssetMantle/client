@@ -1,0 +1,19 @@
+@import views.companion.master.AddBillOfLadingContent
+@import views.html.base._
+
+@(addBillOfLadingContentForm: Form[AddBillOfLadingContent.Data] = AddBillOfLadingContent.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.ADD_BILL_OF_LADING_CONTENT, addBillOfLadingContentForm) {
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden")
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.BILL_OF_LADING_NUMBER)
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.PORT_OF_LOADING)
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.SHIPPER_NAME)
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.SHIPPER_ADDRESS)
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.NOTIFY_PARTY_NAME)
+    @commonInputText(addBillOfLadingContentForm, constants.FormField.NOTIFY_PARTY_ADDRESS)
+    @commonInputDate(addBillOfLadingContentForm, constants.FormField.SHIPMENT_DATE)
+    @commonSelect(addBillOfLadingContentForm, constants.FormField.DELIVERY_TERM)
+    @commonInputInt(addBillOfLadingContentForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputInt(addBillOfLadingContentForm, constants.FormField.ASSET_PRICE)
+}
+

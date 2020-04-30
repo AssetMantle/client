@@ -55,8 +55,8 @@ POST        /account/userReviewIdentification                                   
 GET         /asset/issue                                                                          controllers.AssetController.issueForm
 POST        /asset/issue                                                                          controllers.AssetController.issue
 
-GET         /asset/billOfLadingContent                                                            controllers.AssetController.billOfLadingContentForm(negotiationID: String)
-POST        /asset/billOfLadingContent                                                            controllers.AssetController.billOfLadingContent
+GET         /asset/addBillOfLadingContent                                                         controllers.AssetController.addBillOfLadingContentForm(negotiationID: String)
+POST        /asset/addBillOfLadingContent                                                         controllers.AssetController.addBillOfLadingContent
 
 GET         /asset/send                                                                           controllers.AssetController.sendForm(orderID: String)
 POST        /asset/send                                                                           controllers.AssetController.send
@@ -114,11 +114,11 @@ POST        /negotiation/updateDocumentList                                     
 GET         /negotiation/acceptOrRejectNegotiationTerms                                           controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                           controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
-GET         /negotiation/invoiceContent                                                           controllers.NegotiationController.invoiceContentForm(id: String)
-POST        /negotiation/invoiceContent                                                           controllers.NegotiationController.invoiceContent
+GET         /negotiation/addInvoiceContent                                                        controllers.NegotiationController.addInvoiceContentForm(id: String)
+POST        /negotiation/addInvoiceContent                                                        controllers.NegotiationController.addInvoiceContent
 
-GET         /negotiation/contractContent                                                          controllers.NegotiationController.contractContentForm(id: String)
-POST        /negotiation/contractContent                                                          controllers.NegotiationController.contractContent
+GET         /negotiation/addContractContent                                                       controllers.NegotiationController.addContractContentForm(id: String)
+POST        /negotiation/addContractContent                                                       controllers.NegotiationController.addContractContent
 
 GET         /negotiation/confirmAllNegotiationTerms                                               controllers.NegotiationController.confirmAllNegotiationTermsForm(id: String)
 POST        /negotiation/confirmAllNegotiationTerms                                               controllers.NegotiationController.confirmAllNegotiationTerms

@@ -1,0 +1,9 @@
+@import views.html.base._
+@import views.companion.master.AddContractContent
+
+@(addContractContentForm: Form[AddContractContent.Data] = AddContractContent.form, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.ADD_CONTRACT_CONTENT, addContractContentForm) {
+    @commonInputText(addContractContentForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
+    @commonInputText(addContractContentForm, constants.FormField.CONTRACT_NUMBER)
+}

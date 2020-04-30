@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AddInvoiceContent
+
+@(addInvoiceContentForm: Form[AddInvoiceContent.Data] = AddInvoiceContent.form, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.ADD_INVOICE_CONTENT, addInvoiceContentForm) {
+    @commonInputText(addInvoiceContentForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
+    @commonInputText(addInvoiceContentForm, constants.FormField.INVOICE_NUMBER)
+    @commonInputDate(addInvoiceContentForm, constants.FormField.INVOICE_DATE)
+}
+
