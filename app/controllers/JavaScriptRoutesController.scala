@@ -73,6 +73,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AssetController.billOfLadingContentForm,
         routes.javascript.AssetController.releaseForm,
         routes.javascript.AssetController.sendForm,
+        routes.javascript.AssetController.redeemForm,
 
         routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
@@ -273,7 +274,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.OrderController.blockchainBuyerExecute,
         routes.javascript.OrderController.blockchainSellerExecute,
 
-        routes.javascript.RedeemAssetController.redeemAssetForm,
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 
         routes.javascript.RedeemFiatController.redeemFiatForm,

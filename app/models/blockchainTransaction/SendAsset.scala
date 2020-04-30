@@ -286,7 +286,7 @@ class SendAssets @Inject()(
         address <- address(sendAsset)
         _ <- markDirty(address)
         fromAccountID <- getAccountID(sendAsset.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SEND_ASSET_TO_ORDER_FAILED, message)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -36,16 +36,23 @@ class RedeemAssets @Inject()(
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
   private[models] val redeemAssetTable = TableQuery[RedeemAssetTable]
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(redeemAsset: RedeemAsset): Future[String] = db.run((redeemAssetTable returning redeemAssetTable.map(_.ticketID) += redeemAsset).asTry).map {
@@ -193,12 +200,12 @@ class RedeemAssets @Inject()(
       def markRedeemed(pegHash: String): Future[Int] = masterAssets.Service.markRedeemedByPegHash(pegHash)
 
       def markDirty(redeemAsset: RedeemAsset): Future[Unit] = {
-        val markDirtyPegHash = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(redeemAsset.from)
+        val markAssetDirty = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
+        val markFromAccountDirty = blockchainAccounts.Service.markDirty(redeemAsset.from)
         for {
-          _ <- markDirtyPegHash
-          _ <- markDirtyFrom
-        } yield {}
+          _ <- markAssetDirty
+          _ <- markAssetDirty
+        } yield ()
       }
 
       def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
@@ -210,9 +217,9 @@ class RedeemAssets @Inject()(
         _ <- markDirty(redeemAsset)
         fromAccountID <- getAccountID(redeemAsset.from)
         toAccountID <- getAccountID(redeemAsset.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {
@@ -237,9 +244,7 @@ class RedeemAssets @Inject()(
         _ <- markTransactionFailed
         redeemAsset <- redeemAsset
         fromAccountID <- getID(redeemAsset.from)
-        toAccountID <- getID(redeemAsset.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_FAILED, message)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -64,6 +64,9 @@ POST        /asset/send                                                         
 GET         /asset/release                                                                        controllers.AssetController.releaseForm(assetID: String)
 POST        /asset/release                                                                        controllers.AssetController.release
 
+GET         /asset/redeem                                                                         controllers.AssetController.redeemForm(assetID: String)
+POST        /asset/redeem                                                                         controllers.AssetController.redeem
+
 GET         /contact                                                                              controllers.ContactController.contact
 
 GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
@@ -461,9 +464,6 @@ GET         /master/issueFiatRequest                                            
 
 GET         /master/issueFiat                                                                     controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                                                     controllers.IssueFiatController.issueFiat
-
-GET         /master/redeemAsset                                                                   controllers.RedeemAssetController.redeemAssetForm(username: String, pegHash: String)
-POST        /master/redeemAsset                                                                   controllers.RedeemAssetController.redeemAsset
 
 GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiat
