@@ -30,7 +30,7 @@ object MemberCheckMemberScanResponse {
 
   implicit val scanEntityReads: Reads[ScanEntity] = Json.reads[ScanEntity]
 
-  case class Response(scanID: Int, resultUrl: String, matchedNumber: Int, matchedEntities: Seq[ScanEntity]) extends BaseResponse
+  case class Response(scanID: Int, resultUrl: String, matchedNumber: Int, matchedEntities: Option[Seq[ScanEntity]]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

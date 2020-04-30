@@ -17,7 +17,7 @@ object Serializable {
 
   implicit val addressReads: Reads[Address] = Json.reads[Address]
 
-  case class UBO(personName: String, sharePercentage: Double, relationship: String, title: String)
+  case class UBO(personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String)
 
   implicit val uboReads: Reads[UBO] = Json.reads[UBO]
 

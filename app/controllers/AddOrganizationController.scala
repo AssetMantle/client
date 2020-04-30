@@ -116,7 +116,7 @@ class AddOrganizationController @Inject()(
       (for {
         id <- id
         ubos <- getUBOs(id)
-        result <- withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
+        result <- withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(personFirstName = ubo.personFirstName, personLastName = ubo.personLastName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
       } yield result
         ).recoverWith {
         case _: BaseException => withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs())
@@ -134,7 +134,7 @@ class AddOrganizationController @Inject()(
 
           def updateUBOs(id: String): Future[Int] = {
             if (updateUBOsData.ubos.flatten.map(uboData => uboData.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.flatten.map(uboData => UBO(personName = uboData.personName, sharePercentage = uboData.sharePercentage, relationship = uboData.relationship, title = uboData.title)))
+            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.flatten.map(uboData => UBO(personFirstName = uboData.personFirstName, personLastName = uboData.personLastName, sharePercentage = uboData.sharePercentage, relationship = uboData.relationship, title = uboData.title)))
           }
 
           def getUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
@@ -143,7 +143,7 @@ class AddOrganizationController @Inject()(
             id <- id
             _ <- updateUBOs(id)
             ubos <- getUBOs(id)
-            result <- withUsernameToken.PartialContent(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
+            result <- withUsernameToken.PartialContent(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(personFirstName = ubo.personFirstName, personLastName = ubo.personLastName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -168,7 +168,7 @@ class AddOrganizationController @Inject()(
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data :+ UBO(personName = userAddUBOData.personName, sharePercentage = userAddUBOData.sharePercentage, relationship = userAddUBOData.relationship, title = userAddUBOData.title)
+            val newUBOs = oldUBOs.data :+ UBO(personFirstName = userAddUBOData.personFirstName, personLastName = userAddUBOData.personLastName, sharePercentage = userAddUBOData.sharePercentage, relationship = userAddUBOData.relationship, title = userAddUBOData.title)
             if (newUBOs.map(_.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
@@ -202,7 +202,7 @@ class AddOrganizationController @Inject()(
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data :+ UBO(personName = addUBOData.personName, sharePercentage = addUBOData.sharePercentage, relationship = addUBOData.relationship, title = addUBOData.title)
+            val newUBOs = oldUBOs.data :+ UBO(personFirstName = addUBOData.personFirstName, personLastName = addUBOData.personLastName, sharePercentage = addUBOData.sharePercentage, relationship = addUBOData.relationship, title = addUBOData.title)
             if (newUBOs.map(_.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
@@ -220,8 +220,8 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userDeleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personName = personName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
+  def userDeleteUBOForm(personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personFirstName = personFirstName, personLastName = personLastName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
   }
 
   def userDeleteUBO(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -236,7 +236,7 @@ class AddOrganizationController @Inject()(
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title))
+            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personFirstName == userDeleteUBOData.personFirstName && ubo.personLastName == userDeleteUBOData.personLastName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title))
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 
@@ -253,8 +253,8 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def deleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personName = personName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
+  def deleteUBOForm(personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personFirstName = personFirstName, personLastName = personLastName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
   }
 
   def deleteUBO(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -269,7 +269,7 @@ class AddOrganizationController @Inject()(
           def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
 
           def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title))
+            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personFirstName == deleteUBOData.personFirstName && ubo.personLastName == deleteUBOData.personLastName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title))
             masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
           }
 

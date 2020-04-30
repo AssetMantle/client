@@ -8,7 +8,7 @@ import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-
+import responses.MemberCheckMemberScanResponse.Response
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -27,6 +27,7 @@ class MemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configuration
   private val apiHeaderValue = configuration.get[String]("memberCheck.apiHeaderValue")
 
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
+
   private val apiKeyHeader = Tuple2(apiKeyHeaderName, apiHeaderValue)
 
   private val baseURL = configuration.get[String]("memberCheck.url")
@@ -35,16 +36,16 @@ class MemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configuration
 
   private val url = baseURL + endpoint
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request))
+  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request)))
 
   // Either of originalScriptName or firstName + lastName are necessary. To specify a mononym (single name), enter a dash (-) in firstName parameter and the mononym in lastName.
   //dob field requires DD/MM/YYYY
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
-  case class Request(matchType: String = "Exact", closeMatchRateThreshold: Option[Int], whitelist: String = "Apply", residence: String = "ApplyPEP", pepJurisdiction: String = "Apply", memberNumber: Option[String], firstName: String, middleName: Option[String], lastName: String, originalScriptName: Option[String], gender: Option[String], dob: String, address: Option[String], updateMonitoringList: Boolean = false) extends BaseRequest
+  case class Request(matchType: String = "Exact", closeMatchRateThreshold: Option[Int], whitelist: String = "Apply", residence: String = "ApplyPEP", pepJurisdiction: String = "Apply", memberNumber: Option[String], firstName: String, middleName: Option[String], lastName: String, originalScriptName: Option[String], gender: Option[String], dob: Option[String], address: Option[String], updateMonitoringList: Boolean = false) extends BaseRequest
 
   object Service {
 
-    def post(request: Request): Future[WSResponse] = action(request).recover {
+    def post(request: Request): Future[Response] = action(request).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

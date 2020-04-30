@@ -8,13 +8,15 @@ import exceptions.BaseException
 import javax.inject._
 import models.master.{OrganizationBackgroundCheck, TraderBackgroundCheck}
 import models.{blockchain, master, masterTransaction}
-import play.api.i18n.{I18nSupport}
+import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import queries.GetMemberCheckMemberScanResult
 import views.companion.master.FileUpload
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class BackgroundCheckController @Inject()(
@@ -24,6 +26,7 @@ class BackgroundCheckController @Inject()(
                                            masterZones: master.Zones,
                                            masterOrganizations: master.Organizations,
                                            masterTraders: master.Traders,
+                                           getMemberCheckMemberScanResult: GetMemberCheckMemberScanResult,
                                            fileResourceManager: utilities.FileResourceManager,
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken
@@ -32,6 +35,16 @@ class BackgroundCheckController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_BACKGROUND_CHECK
+
+  def memberCheck(id: String): Action[AnyContent] = Action.async { implicit request =>
+    val a = getMemberCheckMemberScanResult.Service.get(id)
+    println(a)
+    for {
+      a <- a
+    } yield {
+      Ok(views.html.component.master.memberCheckMemberScanResult(a))
+    }
+  }
 
   def uploadTraderBackgroundCheckFileForm(documentType: String, traderID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFile), utilities.String.getJsRouteFunction(routes.javascript.BackgroundCheckController.storeTraderBackgroundCheckFile), documentType, traderID))

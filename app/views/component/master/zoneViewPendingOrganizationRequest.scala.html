@@ -2,8 +2,8 @@
 @import models.master.Organization
 @import views.html.base._
 @import models.master.OrganizationKYC
-
 @import views.html.component.master.streetAddress
+
 @(organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
@@ -27,7 +27,8 @@
 </div>
 <div>@Messages(constants.View.ORGANIZATION_UBO_DETAIL): <br>
 @for(ubo <- organization.ubos.data) {
-    @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
+    @commonTextInfo(constants.View.PERSON_FIRST_NAME, ubo.personFirstName)
+    @commonTextInfo(constants.View.PERSON_LAST_NAME, ubo.personLastName)
     @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
     @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
     @commonTextInfo(constants.View.TITLE, ubo.title)

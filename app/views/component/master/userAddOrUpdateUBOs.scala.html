@@ -9,7 +9,8 @@
         @repeatWithIndex(userAddOrUpdateUBOsForm(constants.FormField.UBOS.name), min = userAddOrUpdateUBOsForm(constants.FormField.UBOS.name).indexes.length + 1) { (uboSequentialFormField, i) =>
             @defining(Option(uboSequentialFormField)) { implicit uboSequentialField =>
                 <div id='@Seq(constants.FormField.UBOS.name, i).mkString("_")'>
-                    @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.PERSON_NAME)
+                    @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.PERSON_FIRST_NAME)
+                    @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.PERSON_LAST_NAME)
                     @commonInputDouble(userAddOrUpdateUBOsForm, constants.FormField.SHARE_PERCENTAGE)
                     @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.RELATIONSHIP)
                     @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.TITLE)
