@@ -41,35 +41,19 @@
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "icon-advance-payment") {
                 @Messages(constants.View.PAYMENT_TERMS)
             } {
-                @Messages(constants.View.ADVANCE_PAYMENT)
-                @if(negotiation.paymentTerms.advancePayment) {
-                    @Messages(constants.View.YES)
-                    @negotiation.paymentTerms.advancePercentage %
-                } else {
-                    @Messages(constants.View.NO)
-                }
-                @Messages(constants.View.CREDIT_TERMS)
-                @if(negotiation.paymentTerms.credit) {
-                    @Messages(constants.View.YES)
-                } else {
-                    @Messages(constants.View.NO)
-                }
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                 <div class="creditTerms">
-                @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
-                    <p>@Messages(constants.View.TENURE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
-                            Days</span></p>
-                    <p>@Messages(constants.View.REFERENCE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.reference.getOrElse("")</span></p>
-                } else {
-                    <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                    @negotiation.paymentTerms.tentativeDate match {
-                        case Some(date) => {
-                            @date
+                @negotiation.paymentTerms.credit match {
+                    case Some(credit) => {
+                        @Messages(constants.View.CREDIT_TERMS):
+                        <br>
+                        @credit.tentativeDate match {
+                            case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
+                            case None => {@commonIntInfo(constants.View.TENURE, credit.tenure.getOrElse(0))}
                         }
-                        case None => {}
-                    }
-                    </span></p>
+                            @commonTextInfo(constants.View.REFERENCE, credit.reference)
+                        }
+                    case None => {}
                 }
                 </div>
             }
@@ -153,24 +137,20 @@
                 }
             </div>
             <div class="sellerTerm">
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-                @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
-                    <p>@Messages(constants.View.TENURE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
-                            Days</span></p>
-                    <p>@Messages(constants.View.REFERENCE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.reference.getOrElse("")</span></p>
-                } else {
-                    <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                    @negotiation.paymentTerms.tentativeDate match {
-                        case Some(date) => {
-                            @date
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                @negotiation.paymentTerms.credit match {
+                    case Some(credit) => {
+                        <br>
+                        @Messages(constants.View.CREDIT_TERMS):
+                        <br>
+                        @credit.tentativeDate match {
+                            case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
+                            case None => {@commonIntInfo(constants.View.TENURE, credit.tenure.getOrElse(0))}
                         }
-                        case None => {}
+                        <br>
+                        @commonTextInfo(constants.View.REFERENCE, credit.reference)
                     }
-                    </span></p>
+                    case None => {}
                 }
                 <div>
                 @if(negotiation.buyerAcceptedPaymentTerms) {

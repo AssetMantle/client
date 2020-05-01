@@ -70,24 +70,20 @@
                 <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
             </div>
             <div class="sellerTerm">
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-                @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
-                    <p>@Messages(constants.View.TENURE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
-                            Days</span></p>
-                    <p>@Messages(constants.View.REFERENCE)
-                        - <span class="cmuk-text-bold">@negotiation.paymentTerms.reference.getOrElse("")</span></p>
-                } else {
-                    <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                    @negotiation.paymentTerms.tentativeDate match {
-                        case Some(date) => {
-                            @date
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                @negotiation.paymentTerms.credit match {
+                    case Some(credit) => {
+                        <br>
+                        @Messages(constants.View.CREDIT_TERMS):
+                        <br>
+                        @credit.tentativeDate match {
+                            case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
+                            case None => {@commonIntInfo(constants.View.TENURE, credit.tenure.getOrElse(0))}
                         }
-                        case None => {}
+                        <br>
+                        @commonTextInfo(constants.View.REFERENCE, credit.reference)
                     }
-                    </span></p>
+                    case None => {}
                 }
                 <div>
                 @if(negotiation.buyerAcceptedPaymentTerms) {

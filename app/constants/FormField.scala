@@ -123,7 +123,7 @@ object FormField {
   val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_BY", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
-  val REFRENCE = new SelectFormField("REFRENCE", constants.SelectFieldOptions.REFRENCE_DATES)
+  val REFERENCE = new SelectFormField("REFERENCE", constants.SelectFieldOptions.REFERENCE_DATES)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
@@ -171,8 +171,6 @@ object FormField {
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_MNEMONIC_NOTED = new BooleanFormField("CONFIRM_MNEMONIC_NOTED")
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
-  val ADVANCE_PAYMENT = new BooleanFormField("ADVANCE_PAYMENT")
-  val CREDIT = new BooleanFormField("CREDIT")
   val BILL_OF_LADING = new BooleanFormField("BILL_OF_LADING")
   val INVOICE = new BooleanFormField("INVOICE")
   val COO = new BooleanFormField("COO")
@@ -193,6 +191,7 @@ object FormField {
   val ADDRESS = new NestedFormField("ADDRESS")
   val UBOS = new NestedFormField("UBOS")
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
+  val CREDIT = new NestedFormField("CREDIT")
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
