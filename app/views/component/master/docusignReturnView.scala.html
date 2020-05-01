@@ -2,7 +2,7 @@
 @import views.html.base._
 @import models.masterTransaction.Chat
 
-@(event:String="", errorMessage:String="")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(event:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 @event match{
     case constants.View.DOCUSIGN_EVENT_SEND=>{
