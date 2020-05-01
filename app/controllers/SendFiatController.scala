@@ -76,7 +76,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             assetPegHash <- assetPegHash(negotiation.assetID)
             ticketID <- transactionProcess(sellerAddress, assetPegHash)
             _ <- createFiatRequest(negotiation.buyerTraderID, ticketID, negotiation.id)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(sendFiatData.negotiationID, successes = Seq(constants.Response.FIAT_SENT)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

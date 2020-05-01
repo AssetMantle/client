@@ -188,8 +188,8 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
       }
 
       def getIDs(redeemFiat: RedeemFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
+        val toAccountID = masterAccounts.Service.tryGetId(redeemFiat.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(redeemFiat.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID
@@ -215,8 +215,8 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
       val redeemFiat = Service.getTransaction(ticketID)
 
       def getIDs(redeemFiat: RedeemFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
+        val toAccountID = masterAccounts.Service.tryGetId(redeemFiat.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(redeemFiat.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID

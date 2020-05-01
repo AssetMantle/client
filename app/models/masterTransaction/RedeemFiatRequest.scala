@@ -42,9 +42,9 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getByTraderIDs(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID inSet traderIDs).result)
+  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
 
-  private def getByTraderID(traderID: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID === traderID).result)
+  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
   private def update(redeemFiat: RedeemFiatRequest): Future[Int] = db.run(redeemFiatTable.update(redeemFiat).asTry).map {
     case Success(result) => result
@@ -103,9 +103,17 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
   object Service {
     def create(traderID: String, ticketID: String, amount: Int): Future[String] = add(RedeemFiatRequest(id = utilities.IDGenerator.requestID(), traderID, ticketID, amount, status = constants.Status.RedeemFiat.AWAITING_BLOCKCHAIN_RESPONSE))
 
-    def getRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDs(traderIDs)
+    def getPendingRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS)
 
-    def getRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderID(traderID)
+    def getCompleteRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.REDEEMED)
+
+    def getFailedRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.BLOCKCHAIN_FAILURE)
+
+    def getPendingRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS)
+
+    def getCompleteRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.REDEEMED)
+
+    def getFailedRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.BLOCKCHAIN_FAILURE)
 
     def markBlockchainSuccess(ticketID: String): Future[Int] = updateStatusByTicketIDAndStatus(ticketID, constants.Status.RedeemFiat.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS)
 

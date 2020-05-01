@@ -181,7 +181,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               } yield {}
             }
 
-            def accountID: Future[String] = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
+            def accountID: Future[String] = masterAccounts.Service.tryGetId(dirtyAsset.ownerAddress)
 
             (for {
               ownerAccount <- ownerAccount
@@ -193,7 +193,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
                   val deleteAssetPegWallet = Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
-                  val id = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
+                  val id = masterAccounts.Service.tryGetId(dirtyAsset.ownerAddress)
                   for {
                     _ <- deleteAssetPegWallet
                     id <- id

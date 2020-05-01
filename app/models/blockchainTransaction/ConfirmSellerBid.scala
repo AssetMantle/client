@@ -212,7 +212,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield Unit
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -245,7 +245,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield {}
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       (for {
         _ <- markTransactionFailed

@@ -1724,49 +1724,325 @@ class ComponentViewController @Inject()(
   }
 
   //Transaction View Cards
-  def zoneViewSendFiatRequestList = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewSendFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.zoneViewSendFiatRequestList()))
+      Future(Ok(views.html.component.master.zoneViewSendFiatRequests()))
   }
 
-  def zoneViewPendingSendFiatRequestList = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewPendingSendFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
-      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getSendFiatRequests(traderIDs)
+      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderIDs)
 
       (for {
         zoneID <- zoneID
         traderIDs <- traderIDs(zoneID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
       } yield Ok(views.html.component.master.zoneViewPendingSendFiatRequestList(sendFiatRequestList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
-  def zoneViewRedeemFiatRequestList = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      Future(Ok(views.html.component.master.zoneViewRedeemFiatRequestList()))
-  }
-
-  def zoneViewPendingRedeemFiatRequestList = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewCompleteSendFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
       def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
-      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getRedeemFiatRequests(traderIDs)
+      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderIDs)
+
+      (for {
+        zoneID <- zoneID
+        traderIDs <- traderIDs(zoneID)
+        sendFiatRequestList <- sendFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def zoneViewFailedSendFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
+
+      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderIDs)
+
+      (for {
+        zoneID <- zoneID
+        traderIDs <- traderIDs(zoneID)
+        sendFiatRequestList <- sendFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def zoneViewRedeemFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.zoneViewRedeemFiatRequests()))
+  }
+
+  def zoneViewPendingRedeemFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
+
+      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getPendingRedeemFiatRequests(traderIDs)
 
       (for {
         zoneID <- zoneID
         traderIDs <- traderIDs(zoneID)
         redeemFiatRequestList <- redeemFiatRequestList(traderIDs)
       } yield Ok(views.html.component.master.zoneViewPendingRedeemFiatRequestList(redeemFiatRequestList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
+
+  def zoneViewCompleteRedeemFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
+
+      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getCompleteRedeemFiatRequests(traderIDs)
+
+      (for {
+        zoneID <- zoneID
+        traderIDs <- traderIDs(zoneID)
+        redeemFiatRequestList <- redeemFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+
+  def zoneViewFailedRedeemFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
+
+      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getFailedRedeemFiatRequests(traderIDs)
+
+      (for {
+        zoneID <- zoneID
+        traderIDs <- traderIDs(zoneID)
+        redeemFiatRequestList <- redeemFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  //Transactions organization
+  def organizationViewSendFiatRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationViewSendFiatRequests()))
+  }
+
+  def organizationViewPendingSendFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        sendFiatRequestList <- sendFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewCompleteSendFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        sendFiatRequestList <- sendFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewFailedSendFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        sendFiatRequestList <- sendFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewRedeemFiatRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.organizationViewRedeemFiatRequests()))
+  }
+
+  def organizationViewPendingRedeemFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getPendingRedeemFiatRequests(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        redeemFiatRequestList <- redeemFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewCompleteRedeemFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getCompleteRedeemFiatRequests(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        redeemFiatRequestList <- redeemFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewFailedRedeemFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
+
+      def redeemFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getFailedRedeemFiatRequests(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        redeemFiatRequestList <- redeemFiatRequestList(traderIDs)
+      } yield Ok(views.html.component.master.viewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewSendFiatRequests: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.traderViewSendFiatRequests()))
+  }
+
+  def traderViewPendingSendFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderID)
+
+      (for {
+        traderID <- traderID
+        sendFiatRequestList <- sendFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewCompleteSendFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderID)
+
+      (for {
+        traderID <- traderID
+        sendFiatRequestList <- sendFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewFailedSendFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderID)
+
+      (for {
+        traderID <- traderID
+        sendFiatRequestList <- sendFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewRedeemFiatRequests: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.traderViewRedeemFiatRequests()))
+  }
+
+  def traderViewPendingRedeemFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def redeemFiatRequestList(traderID: String): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getPendingRedeemFiatRequests(traderID)
+
+      (for {
+        traderID <- traderID
+        redeemFiatRequestList <- redeemFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewCompleteRedeemFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def redeemFiatRequestList(traderID: String): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getCompleteRedeemFiatRequests(traderID)
+
+      (for {
+        traderID <- traderID
+        redeemFiatRequestList <- redeemFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewFailedRedeemFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def redeemFiatRequestList(traderID: String): Future[Seq[masterTransaction.RedeemFiatRequest]] = masterTransactionRedeemFiatRequests.Service.getFailedRedeemFiatRequests(traderID)
+
+      (for {
+        traderID <- traderID
+        redeemFiatRequestList <- redeemFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
 
 }

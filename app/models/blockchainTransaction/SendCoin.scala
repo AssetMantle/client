@@ -198,7 +198,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } else Future(0)
       }
 
-      def fromAccountID(fromAddress: String): Future[String] = masterAccounts.Service.getId(fromAddress)
+      def fromAccountID(fromAddress: String): Future[String] = masterAccounts.Service.tryGetId(fromAddress)
 
       (for {
         _ <- markTransactionSuccessful
@@ -220,8 +220,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val sendCoin = Service.getTransaction(ticketID)
 
       def getIDs(sendCoin: SendCoin): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendCoin.to)
-        val fromAccountID = masterAccounts.Service.getId(sendCoin.from)
+        val toAccountID = masterAccounts.Service.tryGetId(sendCoin.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(sendCoin.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID

@@ -29,11 +29,17 @@
     </div>
     <script>
         @loginState.userType match {
-            case constants.User.TRADER => {}
-            case constants.User.ORGANIZATION => {}
+            case constants.User.TRADER => {
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewSendFiatRequests());
+                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewRedeemFiatRequests());
+            }
+            case constants.User.ORGANIZATION => {
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewSendFiatRequests());
+                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewRedeemFiatRequests());
+            }
             case constants.User.ZONE => {
-                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequestList());
-                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequestList());
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequests());
+                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequests());
             }
             case constants.User.GENESIS => {}
             case _ => {}

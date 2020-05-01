@@ -180,8 +180,8 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       }
 
       def getIDs(releaseAsset: ReleaseAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
+        val toAccountID = masterAccounts.Service.tryGetId(releaseAsset.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(releaseAsset.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID
@@ -206,8 +206,8 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       val releaseAsset = Service.getTransaction(ticketID)
 
       def getIDs(releaseAsset: ReleaseAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
+        val toAccountID = masterAccounts.Service.tryGetId(releaseAsset.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(releaseAsset.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID

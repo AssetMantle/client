@@ -181,7 +181,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val confirmBuyerBid = Service.getTransaction(ticketID)
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       def negotiationID(confirmBuyerBid: ConfirmBuyerBid): Future[Option[String]] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
 
@@ -245,7 +245,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         } yield {}
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       (for {
         _ <- markTransactionFailed

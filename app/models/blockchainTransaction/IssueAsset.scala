@@ -189,7 +189,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
       def markTransactionSuccessful: Future[Int] = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
 
-      def getIDByAddress(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getIDByAddress(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
@@ -258,7 +258,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def getIDByAddress(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getIDByAddress(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 

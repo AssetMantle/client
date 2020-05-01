@@ -60,6 +60,16 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def updateTransactionAmount(ownerID: String, transactionAmount: Int): Future[Int] = db.run(fiatTable.filter(_.ownerID === ownerID).map(_.transactionAmount).update(transactionAmount).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTransactionAmountsByTransactionID(transactionID: String): Future[Option[Int]] = db.run(fiatTable.filter(_.transactionID === transactionID).map(_.transactionAmount).sum.result)
 
   private def getFiatPegWalletByOwnerID(ownerID: String): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerID === ownerID).result)
@@ -83,7 +93,11 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create( ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int): Future[String] = add(Fiat(ownerID, transactionID, transactionAmount, amountRedeemed, status = None))
+    def create(ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int): Future[String] = add(Fiat(ownerID, transactionID, transactionAmount, amountRedeemed, status = None))
+
+    def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int): Future[Int] = upsert(Fiat(ownerID, transactionID, transactionAmount, amountRedeemed, status = Some(true)))
+
+    def updateAllTransactionAmounts(ownerID: String): Future[Int] = updateTransactionAmount(ownerID, 0)
 
     def getRTCBAmountsByTransactionID(transactionID: String): Future[Option[Int]] = getTransactionAmountsByTransactionID(transactionID)
 
@@ -94,8 +108,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def markSuccess(ownerID: String, transactionID: String): Future[Int] = updateStatus(ownerID, transactionID, status = true)
 
     def markFailure(ownerID: String, transactionID: String): Future[Int] = updateStatus(ownerID, transactionID, status = false)
-
-    def insertOrUpdate( ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int, status: Option[Boolean]): Future[Int] = upsert(Fiat(ownerID, transactionID = transactionID, transactionAmount = transactionAmount, amountRedeemed = amountRedeemed, status = status))
 
   }
 }

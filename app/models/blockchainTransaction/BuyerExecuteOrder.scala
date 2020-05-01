@@ -184,7 +184,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         val markDirtyFromAddress = {
           if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
             val markDirtyFromAddress = blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-            val id = masterAccounts.Service.getId(buyerExecuteOrder.from)
+            val id = masterAccounts.Service.tryGetId(buyerExecuteOrder.from)
             for {
               _ <- markDirtyFromAddress
               id <- id
@@ -202,8 +202,8 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
       }
 
       def getIDs(buyerExecuteOrder: BuyerExecuteOrder): Future[(String, String)] = {
-        val buyerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
-        val sellerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
+        val buyerAddressID = masterAccounts.Service.tryGetId(buyerExecuteOrder.buyerAddress)
+        val sellerAddressID = masterAccounts.Service.tryGetId(buyerExecuteOrder.sellerAddress)
         for {
           buyerAddressID <- buyerAddressID
           sellerAddressID <- sellerAddressID
@@ -234,7 +234,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         val markDirtyFromAddress = {
           if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
             val markDirtyFromAddress = blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-            val id = masterAccounts.Service.getId(buyerExecuteOrder.from)
+            val id = masterAccounts.Service.tryGetId(buyerExecuteOrder.from)
             for {
               _ <- markDirtyFromAddress
               id <- id
@@ -252,8 +252,8 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
       }
 
       def getIDs(buyerExecuteOrder: BuyerExecuteOrder): Future[(String, String)] = {
-        val buyerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
-        val sellerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
+        val buyerAddressID = masterAccounts.Service.tryGetId(buyerExecuteOrder.buyerAddress)
+        val sellerAddressID = masterAccounts.Service.tryGetId(buyerExecuteOrder.sellerAddress)
         for {
           buyerAddressID <- buyerAddressID
           sellerAddressID <- sellerAddressID

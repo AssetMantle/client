@@ -52,6 +52,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findIDByAddress(accountAddress: String): Future[Option[String]] = db.run(accountTable.filter(_.accountAddress === accountAddress).map(_.id).result.headOption)
 
   private def tryGetLanguageById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.language).result.head.asTry).map {
     case Success(result) => result
@@ -173,7 +174,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def tryGetLanguage(id: String): Future[String] = tryGetLanguageById(id)
 
-    def getId(accountAddress: String): Future[String] = getIdByAddress(accountAddress)
+    def tryGetId(accountAddress: String): Future[String] = getIdByAddress(accountAddress)
+
+    def getId(accountAddress: String): Future[Option[String]] = findIDByAddress(accountAddress)
 
     def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 

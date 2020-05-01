@@ -225,8 +225,8 @@ class Orders @Inject()(
             def insertOrUpdateOrder(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
 
             def ids(negotiation: Negotiation): Future[(String, String)] = {
-              val buyerAddressID = masterAccounts.Service.getId(negotiation.buyerAddress)
-              val sellerAddressID = masterAccounts.Service.getId(negotiation.sellerAddress)
+              val buyerAddressID = masterAccounts.Service.tryGetId(negotiation.buyerAddress)
+              val sellerAddressID = masterAccounts.Service.tryGetId(negotiation.sellerAddress)
               for {
                 buyerAddressID <- buyerAddressID
                 sellerAddressID <- sellerAddressID

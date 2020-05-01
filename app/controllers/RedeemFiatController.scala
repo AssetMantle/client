@@ -68,7 +68,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             zoneAddress <- zoneAddress(zoneAccountID)
             ticketID <- transactionProcess(zoneAddress)
             _ <- createRedeemFiatRequests(trader.id, ticketID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
+            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))

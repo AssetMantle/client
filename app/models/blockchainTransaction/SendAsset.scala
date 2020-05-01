@@ -202,8 +202,8 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       }
 
       def getIDs(sendAsset: SendAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
+        val toAccountID = masterAccounts.Service.tryGetId(sendAsset.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(sendAsset.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID
@@ -237,8 +237,8 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       def markDirty(address: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(address)
 
       def getIDs(sendAsset: SendAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
+        val toAccountID = masterAccounts.Service.tryGetId(sendAsset.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(sendAsset.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID

@@ -214,8 +214,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem,
       }
 
       def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
+        val toAccountID = masterAccounts.Service.tryGetId(sendFiat.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(sendFiat.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID
@@ -251,8 +251,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem,
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
       def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
+        val toAccountID = masterAccounts.Service.tryGetId(sendFiat.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(sendFiat.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID

@@ -207,8 +207,8 @@ class Negotiations @Inject()(masterAccounts: master.Accounts, actorSystem: Actor
             def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
 
             def getIDs(dirtyNegotiation: Negotiation): Future[(String, String)] = {
-              val sellerAddressID = masterAccounts.Service.getId(dirtyNegotiation.sellerAddress)
-              val buyerAddressID = masterAccounts.Service.getId(dirtyNegotiation.buyerAddress)
+              val sellerAddressID = masterAccounts.Service.tryGetId(dirtyNegotiation.sellerAddress)
+              val buyerAddressID = masterAccounts.Service.tryGetId(dirtyNegotiation.buyerAddress)
               for {
                 sellerAddressID <- sellerAddressID
                 buyerAddressID <- buyerAddressID

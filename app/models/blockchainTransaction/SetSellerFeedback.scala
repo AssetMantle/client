@@ -183,8 +183,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
       }
 
       def getIDs(setSellerFeedback: SetSellerFeedback): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
-        val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
+        val toAccountID = masterAccounts.Service.tryGetId(setSellerFeedback.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(setSellerFeedback.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID
@@ -209,8 +209,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
       val setSellerFeedback = Service.getTransaction(ticketID)
 
       def getIDs(setSellerFeedback: SetSellerFeedback): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
-        val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
+        val toAccountID = masterAccounts.Service.tryGetId(setSellerFeedback.to)
+        val fromAccountID = masterAccounts.Service.tryGetId(setSellerFeedback.from)
         for {
           toAccountID <- toAccountID
           fromAccountID <- fromAccountID

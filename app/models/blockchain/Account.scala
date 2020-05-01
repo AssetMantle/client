@@ -141,7 +141,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         Future.sequence {
           dirtyAddresses.map { dirtyAddress =>
             val responseAccount = getAccount.Service.get(dirtyAddress)
-            val accountID = masterAccounts.Service.getId(dirtyAddress)
+            val accountID = masterAccounts.Service.tryGetId(dirtyAddress)
 
             def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
 

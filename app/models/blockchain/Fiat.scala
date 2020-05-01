@@ -22,7 +22,10 @@ import scala.util.{Failure, Success}
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider,
+                      actorSystem: ActorSystem, getAccount: GetAccount,
+                      masterAccounts: master.Accounts, masterTraders: master.Traders,
+                      masterFiats: master.Fiats)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -158,17 +161,49 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               } yield fiatPegWallet
             }
 
-            val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+            val accountID = masterAccounts.Service.tryGetId(dirtyFiat.ownerAddress)
+
+            def insertOrUpdateMasterFiat(accountOwnerAddress: Response): Future[Unit] = {
+              val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+
+              def upsertMasterFiat(accountID: Option[String]): Future[Unit] = {
+                accountID match {
+                  case Some(traderAccountID) => {
+                    val traderID = masterTraders.Service.tryGetID(traderAccountID)
+                    def upsert(traderID: String) =
+                    accountOwnerAddress.value.fiatPegWallet match {
+                      case Some(wallet) => Future.sequence(wallet.map { fiatPeg =>
+                        if (wallet.map(_.pegHash) contains dirtyFiat.pegHash) {
+                          masterFiats.Service.insertOrUpdate(traderID, fiatPeg.transactionID, fiatPeg.transactionAmount.toInt, fiatPeg.redeemedAmount.toInt)
+                        } else {masterFiats.Service.insertOrUpdate(traderID, dirtyFiat.transactionID, 0, dirtyFiat.redeemedAmount.toInt)}
+                      })
+                      case None => masterFiats.Service.updateAllTransactionAmounts(traderID)
+                    }
+                    for {
+                      traderID <- traderID
+                      _ <- upsert(traderID)
+                    } yield println(accountOwnerAddress.value.fiatPegWallet)
+                  }
+                  case None => Future(Unit)
+                }
+              }
+              for{
+                accountID <- accountID
+                _ <- upsertMasterFiat(accountID)
+              } yield Unit
+            }
+
             (for {
               accountOwnerAddress <- accountOwnerAddress
               fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
+              _ <- insertOrUpdateMasterFiat(accountOwnerAddress)
               accountID <- accountID
             } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.FIAT, messageContent = actors.Message.Fiat(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
               ).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
                   val deleteFiatPegWallet = Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
-                  val id = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+                  val id = masterAccounts.Service.tryGetId(dirtyFiat.ownerAddress)
                   for {
                     _ <- deleteFiatPegWallet
                     id <- id
