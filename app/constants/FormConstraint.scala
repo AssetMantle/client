@@ -1,7 +1,7 @@
 package constants
 
 import play.api.data.validation._
-import views.companion.master.{IssueAsset, SignUp, DocumentList, ChangePassword}
+import views.companion.master.{IssueAsset, SignUp, PaymentTerms, ChangePassword}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -31,4 +31,14 @@ object FormConstraint {
     }
     if (errors.isEmpty) Valid else Invalid(errors)
   })
+
+  val paymentTermsConstraint: Constraint[PaymentTerms.Data] = Constraint("constraints.paymentTerms")({ paymentTermsData: PaymentTerms.Data =>
+    val errors = {
+      if ((paymentTermsData.advancePercentage < 100.0 && paymentTermsData.credit.isEmpty) || (paymentTermsData.advancePercentage == 100.0 && paymentTermsData.credit.isDefined)) Seq(ValidationError(constants.Response.INVALID_PAYMENT_TERMS.message))
+      else if (paymentTermsData.credit.isDefined && (paymentTermsData.credit.get.tenure.isDefined && paymentTermsData.credit.get.tentativeDate.isDefined)) Seq(ValidationError(constants.Response.TENURE_AND_TENTATIVE_DATE_BOTH_FOUND.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
 }

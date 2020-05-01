@@ -41,7 +41,13 @@ object Serializable {
 
   implicit val assetOtherDetailsWrites: OWrites[AssetOtherDetails] = Json.writes[AssetOtherDetails]
 
-  case class PaymentTerms(advancePayment: Boolean = false, advancePercentage: Option[Double] = None, credit: Boolean = false, tenure: Option[Int] = None, tentativeDate: Option[Date] = None, reference: Option[String] = None)
+  case class Credit(tenure: Option[Int] = None, tentativeDate: Option[Date] = None, reference: String)
+
+  implicit val creditReads: Reads[Credit] = Json.reads[Credit]
+
+  implicit val creditWrites: OWrites[Credit] = Json.writes[Credit]
+
+  case class PaymentTerms(advancePercentage: Double = 0.0, credit: Option[Credit] = None)
 
   implicit val paymentTermsReads: Reads[PaymentTerms] = Json.reads[PaymentTerms]
 
