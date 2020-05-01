@@ -17,7 +17,7 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Negotiation(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, chatID: Option[String] = None, status: String, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Negotiation] {
+case class Negotiation(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, physicalDocumentsHandledVia: Option[String] = None, chatID: Option[String] = None, status: String, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Negotiation] {
 
   def createLog()(implicit node: Node): Negotiation = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
@@ -50,7 +50,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   case class DocumentListAndBuyerAcceptedSerialize(documentList: String, buyerAccepted: Boolean)
 
-  case class NegotiationSerializable(id: String, negotiationID: Option[String], buyerTraderID: String, sellerTraderID: String, assetID: String, assetAndBuyerAcceptedSerialize: AssetAndBuyerAcceptedSerialize, assetOtherDetailsAndBuyerAcceptedSerialize: AssetOtherDetailsAndBuyerAcceptedSerialize, time: Option[Int], paymentTermsAndBuyerAcceptedSerialize: PaymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize: DocumentListAndBuyerAcceptedSerialize, chatID: Option[String], status: String, comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class NegotiationSerializable(id: String, negotiationID: Option[String], buyerTraderID: String, sellerTraderID: String, assetID: String, assetAndBuyerAcceptedSerialize: AssetAndBuyerAcceptedSerialize, assetOtherDetailsAndBuyerAcceptedSerialize: AssetOtherDetailsAndBuyerAcceptedSerialize, time: Option[Int], paymentTermsAndBuyerAcceptedSerialize: PaymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize: DocumentListAndBuyerAcceptedSerialize, physicalDocumentsHandledVia: Option[String], chatID: Option[String], status: String, comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Negotiation = Negotiation(id = id, negotiationID = negotiationID,
       buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID,
       assetDescription = assetAndBuyerAcceptedSerialize.assetDescription, price = assetAndBuyerAcceptedSerialize.price, quantity = assetAndBuyerAcceptedSerialize.quantity, quantityUnit = assetAndBuyerAcceptedSerialize.quantityUnit,
@@ -62,7 +62,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
       buyerAcceptedPaymentTerms = paymentTermsAndBuyerAcceptedSerialize.buyerAccepted,
       documentList = utilities.JSON.convertJsonStringToObject[DocumentList](documentListAndBuyerAcceptedSerialize.documentList),
       buyerAcceptedDocumentList = documentListAndBuyerAcceptedSerialize.buyerAccepted,
-      chatID = chatID, status = status, comment = comment,
+      physicalDocumentsHandledVia = physicalDocumentsHandledVia, chatID = chatID, status = status, comment = comment,
       createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone,
       updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -75,7 +75,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     time = negotiation.time,
     paymentTermsAndBuyerAcceptedSerialize = PaymentTermsAndBuyerAcceptedSerialize(paymentTerms = Json.toJson(negotiation.paymentTerms).toString(), buyerAccepted = negotiation.buyerAcceptedPaymentTerms),
     documentListAndBuyerAcceptedSerialize = DocumentListAndBuyerAcceptedSerialize(documentList = Json.toJson(negotiation.documentList).toString(), buyerAccepted = negotiation.buyerAcceptedDocumentList),
-    chatID = negotiation.chatID, status = negotiation.status, comment = negotiation.comment,
+    physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia, chatID = negotiation.chatID, status = negotiation.status, comment = negotiation.comment,
     createdBy = negotiation.createdBy, createdOn = negotiation.createdOn, createdOnTimeZone = negotiation.createdOnTimeZone,
     updatedBy = negotiation.updatedBy, updatedOn = negotiation.updatedOn, updatedOnTimeZone = negotiation.updatedOnTimeZone)
 
@@ -214,7 +214,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateDocumentListAndBuyerAcceptedDocumentListByID(id: String, documentList: String, buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.documentList, x.buyerAcceptedDocumentList)).update((documentList, buyerAcceptedDocumentList)).asTry).map {
+  private def updateDocumentListPhysicalDocumentsHandledViaAndBuyerAcceptedDocumentListByID(id: String, documentList: String, physicalDocumentsHandledVia: String, buyerAcceptedDocumentList: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.documentList, x.physicalDocumentsHandledVia, x.buyerAcceptedDocumentList)).update((documentList, physicalDocumentsHandledVia, buyerAcceptedDocumentList)).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -427,15 +427,18 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
       time.?,
       (paymentTerms, buyerAcceptedPaymentTerms),
       (documentList, buyerAcceptedDocumentList),
-      chatID.?, status, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?).shaped <> ( {
-      case (id, negotiationID, buyerTraderID, sellerTraderID, assetID, assetAndBuyerAccepted, assetOtherDetailsAndBuyerAcceptedSerialize, time, paymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize, chatID, status, comment, createdBy, createdOn, createdOnTimeZone, updatedBy, updatedOn, updatedOnTimeZone) =>
+      physicalDocumentsHandledVia.?, chatID.?, status, comment.?,
+      createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?).shaped <> ( {
+      case (id, negotiationID, buyerTraderID, sellerTraderID, assetID, assetAndBuyerAccepted, assetOtherDetailsAndBuyerAcceptedSerialize, time, paymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize, physicalDocumentsHandledVia, chatID, status, comment, createdBy, createdOn, createdOnTimeZone, updatedBy, updatedOn, updatedOnTimeZone) =>
         NegotiationSerializable(id = id, negotiationID = negotiationID, buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID,
           assetAndBuyerAcceptedSerialize = AssetAndBuyerAcceptedSerialize.tupled.apply(assetAndBuyerAccepted),
           assetOtherDetailsAndBuyerAcceptedSerialize = AssetOtherDetailsAndBuyerAcceptedSerialize.tupled.apply(assetOtherDetailsAndBuyerAcceptedSerialize),
           time = time,
           paymentTermsAndBuyerAcceptedSerialize = PaymentTermsAndBuyerAcceptedSerialize.tupled.apply(paymentTermsAndBuyerAcceptedSerialize),
           documentListAndBuyerAcceptedSerialize = DocumentListAndBuyerAcceptedSerialize.tupled.apply(documentListAndBuyerAcceptedSerialize),
-          chatID = chatID, status = status, comment = comment, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+          physicalDocumentsHandledVia = physicalDocumentsHandledVia, chatID = chatID, status = status, comment = comment,
+          createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone,
+          updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
     }, { negotiationSerializable: NegotiationSerializable =>
       def f1(assetAndBuyerAcceptedSerialize: AssetAndBuyerAcceptedSerialize) = AssetAndBuyerAcceptedSerialize.unapply(assetAndBuyerAcceptedSerialize).get
 
@@ -451,7 +454,9 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
         negotiationSerializable.time,
         f3(negotiationSerializable.paymentTermsAndBuyerAcceptedSerialize),
         f4(negotiationSerializable.documentListAndBuyerAcceptedSerialize),
-        negotiationSerializable.chatID, negotiationSerializable.status, negotiationSerializable.comment, negotiationSerializable.createdBy, negotiationSerializable.createdOn, negotiationSerializable.createdOnTimeZone, negotiationSerializable.updatedBy, negotiationSerializable.updatedOn, negotiationSerializable.updatedOnTimeZone))
+        negotiationSerializable.physicalDocumentsHandledVia, negotiationSerializable.chatID, negotiationSerializable.status, negotiationSerializable.comment,
+        negotiationSerializable.createdBy, negotiationSerializable.createdOn, negotiationSerializable.createdOnTimeZone,
+        negotiationSerializable.updatedBy, negotiationSerializable.updatedOn, negotiationSerializable.updatedOnTimeZone))
     })
 
     def id = column[String]("id", O.PrimaryKey)
@@ -491,6 +496,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def documentList = column[String]("documentList")
 
     def buyerAcceptedDocumentList = column[Boolean]("buyerAcceptedDocumentList")
+
+    def physicalDocumentsHandledVia = column[String]("physicalDocumentsHandledVia")
 
     def chatID = column[String]("chatID")
 
@@ -534,7 +541,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetDocumentList(id: String): Future[DocumentList] = findDocumentListByID(id).map(documentList => utilities.JSON.convertJsonStringToObject[DocumentList](documentList))
 
-    def updateDocumentList(id: String, documentList: DocumentList): Future[Int] = updateDocumentListAndBuyerAcceptedDocumentListByID(id = id, documentList = Json.toJson(documentList).toString(), buyerAcceptedDocumentList = false)
+    def updateDocumentList(id: String, documentList: DocumentList, physicalDocumentsHandledVia: String): Future[Int] = updateDocumentListPhysicalDocumentsHandledViaAndBuyerAcceptedDocumentListByID(id = id, documentList = Json.toJson(documentList).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, buyerAcceptedDocumentList = false)
 
     def updateAssetTerms(id: String, description: String, price: Int, quantity: Int, quantityUnit: String): Future[Int] = updateAssetTermsAndBuyerAcceptedTermsByID(id = id, description = description, price = price, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedAssetDescription = false, buyerAcceptedPrice = false, buyerAcceptedQuantity = false)
 

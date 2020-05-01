@@ -290,10 +290,10 @@ class AssetController @Inject()(
 
           def sendTransaction(seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean): Future[String] = {
             if (seller.zoneID != zoneID || asset.ownerID != seller.id) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
-            if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
-            if (billOfLading.status.contains(false)) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
-            asset.pegHash match {
+            else if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
+            else if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
+            else if (billOfLading.status.contains(false)) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
+            else asset.pegHash match {
               case Some(pegHash) =>
                 transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
                   entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = pegHash, gas = releaseData.gas, ticketID = "", mode = transactionMode),
@@ -349,8 +349,8 @@ class AssetController @Inject()(
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String): Future[String] = {
             if (asset.ownerID != sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
-            asset.pegHash match {
+            else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
+            else asset.pegHash match {
               case Some(pegHash) => if (asset.status == constants.Status.Asset.ISSUED) {
                 transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
                   entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
@@ -407,8 +407,8 @@ class AssetController @Inject()(
 
           def sendTransaction(ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[String] = {
             if (asset.ownerID != trader.id) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
-            asset.pegHash match {
+            else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
+            else asset.pegHash match {
               case Some(pegHash) =>
                 transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
                   entity = blockchainTransaction.RedeemAsset(from = ownerAddress, to = zoneAddress, pegHash = pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),

@@ -212,7 +212,7 @@ class SendFiats @Inject()(
       def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
 
       def updateBCFiat(negotiationID: String, orderResponse: OrderResponse.Response): Future[Seq[String]] = orderResponse.value.fiatPegWallet match {
-        case Some(fiatPegWallet) => blockchainFiats.Service.insertMultiple(fiatPegWallet.map(fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = negotiationID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)))
+        case Some(fiatPegWallet) => blockchainFiats.Service.insertList(fiatPegWallet.map(fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = negotiationID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)))
         case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
       }
 
