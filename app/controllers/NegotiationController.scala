@@ -9,7 +9,7 @@ import models.Abstract.NegotiationDocumentContent
 import models.common.Serializable
 import models.common.Serializable.{AssetOtherDetails, DocumentList, PaymentTerms, ShippingDetails}
 import models.master.{Asset, Negotiation, Trader}
-import models.masterTransaction.TradeActivity
+import models.masterTransaction.{TradeActivity, NegotiationFile}
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
