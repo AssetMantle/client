@@ -99,14 +99,8 @@
                                 }
                                 case default => {
                                     @loginState.userType match {
-                                        case constants.User.TRADER => {
-                                            <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.View.MARKET)</a></li>
-                                        }
                                         case constants.User.ZONE => {
                                             <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
-                                        }
-                                        case constants.User.ORGANIZATION => {
-                                            <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.View.REQUEST)</a></li>
                                         }
                                         case constants.User.GENESIS => {
                                             <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
