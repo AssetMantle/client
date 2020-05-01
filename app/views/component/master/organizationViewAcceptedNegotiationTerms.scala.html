@@ -76,10 +76,11 @@
                         @Messages(constants.View.CREDIT_TERMS):
                         @credit.tentativeDate match {
                             case Some(date) => {
-                                @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                                <p>@Messages(constants.View.TENTATIVE_DATE): <span class="cmuk-text-bold">@date</span></p>
                             }
                             case None => {
-                                @commonIntInfo(constants.View.TENURE, credit.tenure.getOrElse(0))
+                                <p>@Messages(constants.View.TENURE)
+                                    : <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
                             }
                         }
                         @commonTextInfo(constants.View.REFERENCE, credit.reference)
