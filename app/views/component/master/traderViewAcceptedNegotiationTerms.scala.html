@@ -45,12 +45,12 @@
                         case Some(credit) => {
                             @credit.tentativeDate match {
                                 case Some(date) => {
-                                    <p>@Messages(constants.View.TENTATIVE_DATE)
-                                        : <span class="cmuk-text-bold">@date</span></p>
+                                    @Messages(constants.View.TENTATIVE_DATE)
+                                        : <span>@date</span>
                                 }
                                 case None => {
-                                    <p>@Messages(constants.View.TENURE)
-                                        : <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
+                                    @Messages(constants.View.TENURE)
+                                        : <span>@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span>
                                 }
                             }
                             @commonTextInfo(constants.View.REFERENCE, credit.reference)
@@ -148,11 +148,11 @@
                         <br>
                         @credit.tentativeDate match {
                             case Some(date) => {
-                                <p>@Messages(constants.View.TENTATIVE_DATE): <span class="cmuk-text-bold">@date</span></p>
+                                <p>@Messages(constants.View.TENTATIVE_DATE): <span>@date</span></p>
                             }
                             case None => {
                                 <p>@Messages(constants.View.TENURE)
-                                    : <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
+                                    : <span>@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
                             }
                         }
                         <br>
