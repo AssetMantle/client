@@ -198,7 +198,7 @@ class AssetController @Inject()(
       )
   }
 
-  def addBillOfLadingContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addBillOfLadingForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -208,9 +208,9 @@ class AssetController @Inject()(
         documentContent match {
           case Some(content) => {
             val billOfLading = content.asInstanceOf[BillOfLading]
-            withUsernameToken.Ok(views.html.component.master.addBillOfLadingContent(views.companion.master.AddBillOfLadingContent.form.fill(views.companion.master.AddBillOfLadingContent.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.addBillOfLadingContent(negotiationID = negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
         }
       }
 
@@ -224,11 +224,11 @@ class AssetController @Inject()(
       }
   }
 
-  def addBillOfLadingContent(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addBillOfLading(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.AddBillOfLadingContent.form.bindFromRequest().fold(
+      views.companion.master.AddBillOfLading.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addBillOfLadingContent(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+          Future(BadRequest(views.html.component.master.addBillOfLading(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
         },
         billOfLadingContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)

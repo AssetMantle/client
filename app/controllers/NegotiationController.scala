@@ -831,7 +831,7 @@ class NegotiationController @Inject()(
       )
   }
 
-  def addInvoiceContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addInvoiceForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
 
@@ -839,9 +839,9 @@ class NegotiationController @Inject()(
         documentContent match {
           case Some(content) => {
             val invoice = content.asInstanceOf[Serializable.Invoice]
-            withUsernameToken.Ok(views.html.component.master.addInvoiceContent(views.companion.master.AddInvoiceContent.form.fill(views.companion.master.AddInvoiceContent.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.addInvoiceContent(negotiationID = negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.addInvoice(negotiationID = negotiationID))
         }
       }
 
@@ -854,11 +854,11 @@ class NegotiationController @Inject()(
       }
   }
 
-  def addInvoiceContent(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addInvoice(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.AddInvoiceContent.form.bindFromRequest().fold(
+      views.companion.master.AddInvoice.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addInvoiceContent(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
+          Future(BadRequest(views.html.component.master.addInvoice(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
         },
         updateInvoiceContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
@@ -896,7 +896,7 @@ class NegotiationController @Inject()(
       )
   }
 
-  def addContractContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addContractForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.CONTRACT)
 
@@ -904,9 +904,9 @@ class NegotiationController @Inject()(
         documentContent match {
           case Some(content) => {
             val contract = content.asInstanceOf[Serializable.Contract]
-            withUsernameToken.Ok(views.html.component.master.addContractContent(views.companion.master.AddContractContent.form.fill(views.companion.master.AddContractContent.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.addContractContent(negotiationID = negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.addContract(negotiationID = negotiationID))
         }
       }
 
@@ -919,11 +919,11 @@ class NegotiationController @Inject()(
       }
   }
 
-  def addContractContent(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addContract(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.AddContractContent.form.bindFromRequest().fold(
+      views.companion.master.AddContract.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addContractContent(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
+          Future(BadRequest(views.html.component.master.addContract(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
         },
         updateContractContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)

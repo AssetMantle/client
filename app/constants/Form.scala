@@ -41,7 +41,7 @@ object Form {
 
   //AssetController
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
-  val ADD_BILL_OF_LADING_CONTENT = new Form("ADD_BILL_OF_LADING_CONTENT", routes.AssetController.addBillOfLadingContent(), routes.javascript.AssetController.addBillOfLadingContentForm)
+  val ADD_BILL_OF_LADING = new Form("ADD_BILL_OF_LADING", routes.AssetController.addBillOfLading(), routes.javascript.AssetController.addBillOfLadingForm)
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
   val SEND_ASSET = new Form("SEND_ASSET", routes.AssetController.send(), routes.javascript.AssetController.sendForm)
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.AssetController.redeem(), routes.javascript.AssetController.redeemForm)
@@ -97,8 +97,8 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
-  val ADD_INVOICE_CONTENT = new Form("ADD_INVOICE_CONTENT", routes.NegotiationController.addInvoiceContent(), routes.javascript.NegotiationController.addInvoiceContentForm)
-  val ADD_CONTRACT_CONTENT = new Form("ADD_CONTRACT_CONTENT", routes.NegotiationController.addContractContent(), routes.javascript.NegotiationController.addContractContentForm)
+  val ADD_INVOICE = new Form("ADD_INVOICE", routes.NegotiationController.addInvoice(), routes.javascript.NegotiationController.addInvoiceForm)
+  val ADD_CONTRACT = new Form("ADD_CONTRACT", routes.NegotiationController.addContract(), routes.javascript.NegotiationController.addContractForm)
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
   val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.javascript.NegotiationController.buyerConfirmForm)
   val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.javascript.NegotiationController.sellerConfirmForm)

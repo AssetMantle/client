@@ -22,7 +22,7 @@
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateNegotiationForm('@assetFile.documentType', '@assetFile.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
             @assetFile.documentType match {
                 case constants.File.Asset.BILL_OF_LADING => {
-                    @commonFormButton(constants.Form.ADD_BILL_OF_LADING_CONTENT, 'parameters -> s"'${negotiation.id}'")
+                    @commonFormButton(constants.Form.ADD_BILL_OF_LADING, 'parameters -> s"'${negotiation.id}'")
                 }
                 case _ => {}
             }
@@ -52,10 +52,10 @@
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateNegotiationForm('@negotiationFile.documentType', '@negotiation.id'))">@Messages(constants.Form.UPDATE) @Messages(negotiationFile.documentType)</button>
             @negotiationFile.documentType match {
                 case constants.File.Negotiation.INVOICE => {
-                    @commonFormButton(constants.Form.ADD_INVOICE_CONTENT, 'parameters -> s"'${negotiation.id}'")
+                    @commonFormButton(constants.Form.ADD_INVOICE, 'parameters -> s"'${negotiation.id}'")
                 }
                 case constants.File.Negotiation.CONTRACT => {
-                    @commonFormButton(constants.Form.ADD_CONTRACT_CONTENT, 'parameters -> s"'${negotiation.id}'")
+                    @commonFormButton(constants.Form.ADD_CONTRACT, 'parameters -> s"'${negotiation.id}'")
                 }
                 case _ => {}
             }
