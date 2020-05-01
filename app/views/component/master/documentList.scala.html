@@ -7,28 +7,29 @@
 <script src="@routes.Assets.versioned("javascripts/documentList.js")" type="text/javascript"></script>
 @commonForm(constants.Form.NEGOTIATION_DOCUMENT_LIST, documentsListForm) {
     @commonInputText(documentsListForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonCheckbox(documentsListForm, constants.FormField.BILL_OF_LADING, 'onclick -> """onDocumentSelect(this)""")
-    @commonCheckbox(documentsListForm, constants.FormField.COO, 'onclick -> """onDocumentSelect(this)""")
-    @commonCheckbox(documentsListForm, constants.FormField.COA, 'onclick -> """onDocumentSelect(this)""")
-    @commonCheckbox(documentsListForm, constants.FormField.BILL_OF_EXCHANGE, 'onclick -> """onDocumentSelect(this)""")
-    @commonCheckbox(documentsListForm, constants.FormField.INVOICE, 'onclick -> """onDocumentSelect(this)""")
+    @commonCheckbox(documentsListForm, constants.FormField.BILL_OF_LADING, 'onclick -> "onDocumentSelect(this)")
+    @commonCheckbox(documentsListForm, constants.FormField.COO, 'onclick -> "onDocumentSelect(this)")
+    @commonCheckbox(documentsListForm, constants.FormField.COA, 'onclick -> "onDocumentSelect(this)")
+    @commonCheckbox(documentsListForm, constants.FormField.BILL_OF_EXCHANGE, 'onclick -> "onDocumentSelect(this)")
+    @commonCheckbox(documentsListForm, constants.FormField.INVOICE, 'onclick -> "onDocumentSelect(this)")
     @repeatWithIndex(documentsListForm(constants.FormField.DOCUMENT_LIST.name), min = documentsListForm(constants.FormField.DOCUMENT_LIST.name).indexes.length + 1) { (documentField, i) =>
         @defining(Option(documentField)) { implicit sequentialFormField =>
-            @if(if(documentField.value.isDefined) constants.File.NEGOTIATION_DOCUMENTS.contains(documentField.value.get) || constants.File.ASSET_DOCUMENTS.contains(documentField.value.get) else false){
-                    <div id='@Seq(constants.FormField.DOCUMENT_LIST.name, i).mkString("_")' class="hidden">
-                        @commonInputText(documentsListForm, constants.FormField.DOCUMENT_TYPE)
-                    </div>
-                    <script>intializeCheckBox('@documentField.value.get')</script>
-                }else{
-                    <div id='@Seq(constants.FormField.DOCUMENT_LIST.name, i).mkString("_")' class="updateDocumentField">
-                        @commonInputText(documentsListForm, constants.FormField.DOCUMENT_TYPE)
-                        @commonJavascriptButton(constants.Form.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
-                    </div>
-                }
+            @if(if(documentField.value.isDefined) constants.File.NEGOTIATION_DOCUMENTS.contains(documentField.value.get) || constants.File.ASSET_DOCUMENTS.contains(documentField.value.get) else false) {
+                <div id='@Seq(constants.FormField.DOCUMENT_LIST.name, i).mkString("_")' class="hidden">
+                @commonInputText(documentsListForm, constants.FormField.DOCUMENT_TYPE)
+                </div>
+                <script>initializeCheckBox('@documentField.value.get')</script>
+            } else {
+                <div id='@Seq(constants.FormField.DOCUMENT_LIST.name, i).mkString("_")' class="updateDocumentField">
+                    @commonInputText(documentsListForm, constants.FormField.DOCUMENT_TYPE)
+                    @commonJavascriptButton(constants.Form.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
+                </div>
+            }
         }
     }
-    @commonJavascriptButton(constants.View.ADD, JavaScript("""onDocumentListIncomplete(this)"""))
+    @commonJavascriptButton(constants.View.ADD, JavaScript("onDocumentListIncomplete(this)"))
     @commonCheckbox(documentsListForm, constants.FormField.DOCUMENT_LIST_COMPLETED, 'containerDivClass -> "hidden", 'id -> "negotiationDocumentListCompleted")
+    @commonSelect(documentsListForm, constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA)
     @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_PAYMENT_TERMS.get, 'parameters -> s"'${id}'")
 }
 

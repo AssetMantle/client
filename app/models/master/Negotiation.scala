@@ -250,7 +250,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateQuantityByID(id: String, quantity: Int, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.quantity, x.buyerAcceptedQuantity)).update((quantity, buyerAcceptedQuantity)).asTry).map {
+  private def updateQuantityByID(id: String, quantity: Int, quantityUnit: String, buyerAcceptedQuantity: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(x => (x.quantity, x.quantityUnit, x.buyerAcceptedQuantity)).update((quantity, quantityUnit, buyerAcceptedQuantity)).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -611,11 +611,11 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetSellerTraderID(id: String): Future[String] = tryGetSellerTraderIDByID(id)
 
-    def updateAssetDescription(id: String, assetDescription: String): Future[Int] = updateAssetDescriptionByID(id, assetDescription, false)
+    def updateAssetDescription(id: String, assetDescription: String): Future[Int] = updateAssetDescriptionByID(id = id, assetDescription = assetDescription, buyerAcceptedAssetDescription = false)
 
-    def updateQuantity(id: String, quantity: Int): Future[Int] = updateQuantityByID(id, quantity, false)
+    def updateQuantity(id: String, quantity: Int, quantityUnit: String): Future[Int] = updateQuantityByID(id = id, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedQuantity = false)
 
-    def updatePrice(id: String, price: Int): Future[Int] = updatePriceByID(id, price, false)
+    def updatePrice(id: String, price: Int): Future[Int] = updatePriceByID(id = id, price = price, buyerAcceptedPrice = false)
 
     def getAllAcceptedBuyNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsByBuyerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.STARTED, constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED).map(_.map(_.deserialize))
 

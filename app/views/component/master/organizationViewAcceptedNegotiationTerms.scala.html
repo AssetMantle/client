@@ -89,32 +89,26 @@
                 <div>
                     <div class="cmuk-flex">
                         <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-advance-payment")"/></svg></span>
-                        @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                    </div>
-                    <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-advance-payment")"/></svg></span>
-                        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                    </div>
-                    <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-credit-terms")"/></svg></span>
-                        @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
+                        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                     </div>
                     <div class="subTerms">
-                        @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
-                            <p>@Messages(constants.View.TENURE)
-                                - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
-                                    Days</span></p>
-                            <p>@Messages(constants.View.REFERENCE)
-                                - <span class="cmuk-text-bold">@negotiation.paymentTerms.reference.getOrElse("")</span></p>
-                        } else {
-                            <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                            @negotiation.paymentTerms.tentativeDate match {
-                                case Some(date) => {
-                                    @date
+                     @negotiation.paymentTerms.credit match {
+                            case Some(credit) => {
+                                @Messages(constants.View.CREDIT_TERMS):
+                                @credit.tentativeDate match {
+                                    case Some(date) => {
+                                        <p>@Messages(constants.View.TENTATIVE_DATE)
+                                            - <span class="cmuk-text-bold">@date</span></p>
+                                    }
+                                    case None => {
+                                        <p>@Messages(constants.View.TENURE)
+                                            - <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
+                                    }
                                 }
-                                case None => {}
+                                <p>@Messages(constants.View.REFERENCE)
+                                    - <span class="cmuk-text-bold">@credit.reference</span></p>
                             }
-                            </span></p>
+                            case None => {}
                         }
                     </div>
                 </div>
@@ -134,12 +128,15 @@
             </div>
             <div class="sellerTerm">
                 <div>
+                    @Messages(constants.View.ASSET_DOCUMENTS):
                     @negotiation.documentList.assetDocuments.map{assetDocument=>
                         <div>
                             <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
                             @Messages(assetDocument)
                         </div>
                     }
+                <br>
+                @Messages(constants.View.NEGOTIATION_DOCUMENTS):
                     @negotiation.documentList.negotiationDocuments.map{negotiationDocument=>
                         <div>
                             <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>

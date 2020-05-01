@@ -19,11 +19,7 @@
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedAssetDescription){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
+                @negotiation.buyerAcceptedAssetDescription
                 </div>
             </div>
             <div class="sellerTerm">
@@ -32,11 +28,7 @@
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedPrice){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
+                @negotiation.buyerAcceptedPrice
                 </div>
             </div>
             <div class="sellerTerm">
@@ -45,11 +37,7 @@
                     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedQuantity){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
+                @negotiation.buyerAcceptedQuantity
                 </div>
             </div>
 
@@ -72,11 +60,7 @@
                     </div>
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedAssetOtherDetails){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
+                @negotiation.buyerAcceptedAssetOtherDetails
                 </div>
             </div>
 
@@ -87,43 +71,26 @@
             </div>
             <div class="sellerTerm">
                 <div>
-                    <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-advance-payment")"/></svg></span>
-                        @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                    </div>
-                    <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-advance-payment")"/></svg></span>
-                        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                    </div>
-                    <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-credit-terms")"/></svg></span>
-                        @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-                    </div>
-                    <div class="subTerms">
-                    @if(negotiation.paymentTerms.tentativeDate.isEmpty) {
-                        <p>@Messages(constants.View.TENURE)
-                            - <span class="cmuk-text-bold">@negotiation.paymentTerms.tenure.getOrElse(0)
-                                Days</span></p>
-                        <p>@Messages(constants.View.REFERENCE)
-                            - <span class="cmuk-text-bold">@negotiation.paymentTerms.reference.getOrElse("")</span></p>
-                    } else {
-                        <p>@Messages(constants.View.TENTATIVE_DATE) - <span class="cmuk-text-bold">
-                        @negotiation.paymentTerms.tentativeDate match {
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                @negotiation.paymentTerms.credit match {
+                    case Some(credit) => {
+                        @credit.tentativeDate match {
                             case Some(date) => {
-                                @date
+                                <p>@Messages(constants.View.TENTATIVE_DATE)
+                                    - <span class="cmuk-text-bold">@date</span></p>
                             }
-                            case None => {}
+                            case None => {
+                                <p>@Messages(constants.View.TENURE)
+                                    - <span class="cmuk-text-bold"> <span>@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
+                            }
                         }
-                        </span></p>
+                        @commonTextInfo(constants.View.REFERENCE, credit.reference)
                     }
-                    </div>
+                    case None => {}
+                }
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedPaymentTerms){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
+                @negotiation.buyerAcceptedPaymentTerms
                 </div>
             </div>
 
@@ -134,25 +101,24 @@
             </div>
             <div class="sellerTerm">
                 <div>
-                    @negotiation.documentList.assetDocuments.map{assetDocument=>
-                        <div>
-                            <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
-                            @Messages(assetDocument)
-                        </div>
-                    }
-                    @negotiation.documentList.negotiationDocuments.map{negotiationDocument=>
-                        <div>
-                            <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
-                            @Messages(negotiationDocument)
-                        </div>
-                    }
+                @Messages(constants.View.ASSET_DOCUMENTS):
+                @negotiation.documentList.assetDocuments.map { document =>
+                    <div>
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
+                        @Messages(document)
+                    </div>
+                }
+                <br>
+                @Messages(constants.View.NEGOTIATION_DOCUMENTS):
+                @negotiation.documentList.negotiationDocuments.map { document =>
+                    <div>
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
+                        @Messages(document)
+                    </div>
+                }
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedDocumentList){
-                    @Messages(constants.View.ACCEPTED)
-                } else{
-                    @Messages(constants.View.PENDING)
-                }
+                @negotiation.buyerAcceptedDocumentList
                 </div>
             </div>
         </div>

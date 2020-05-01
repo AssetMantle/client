@@ -9,15 +9,17 @@ object PaymentTerms {
   val form = Form(
     mapping(
       constants.FormField.ID.name -> constants.FormField.ID.field,
-      constants.FormField.ADVANCE_PAYMENT.name -> constants.FormField.ADVANCE_PAYMENT.field,
-      constants.FormField.ADVANCE_PERCENTAGE.name -> optional(constants.FormField.ADVANCE_PERCENTAGE.field),
-      constants.FormField.CREDIT.name -> constants.FormField.CREDIT.field,
-      constants.FormField.TENURE.name -> optional(constants.FormField.TENURE.field),
-      constants.FormField.TENTATIVE_DATE.name -> optional(constants.FormField.TENTATIVE_DATE.field),
-      constants.FormField.REFRENCE.name -> optional(constants.FormField.REFRENCE.field),
-    )(Data.apply)(Data.unapply)
+      constants.FormField.ADVANCE_PERCENTAGE.name -> constants.FormField.ADVANCE_PERCENTAGE.field,
+      constants.FormField.CREDIT.name -> optional(mapping(
+        constants.FormField.TENURE.name -> optional(constants.FormField.TENURE.field),
+        constants.FormField.TENTATIVE_DATE.name -> optional(constants.FormField.TENTATIVE_DATE.field),
+        constants.FormField.REFERENCE.name -> constants.FormField.REFERENCE.field,
+      )(CreditData.apply)(CreditData.unapply)),
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.paymentTermsConstraint)
   )
 
-  case class Data(id: String, advancePayment: Boolean, advancePercentage: Option[Double], credit: Boolean, tenure: Option[Int], tentativeDate: Option[Date], refrence: Option[String])
+  case class CreditData(tenure: Option[Int] = None, tentativeDate: Option[Date] = None, reference: String)
+
+  case class Data(id: String, advancePercentage: Double, credit: Option[CreditData])
 
 }
