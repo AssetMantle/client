@@ -10,10 +10,10 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Docusign(id: String, envelopeID: String, status:String)
+case class DocusignEnvelope(id: String, envelopeID: String, documentType:String, status:String)
 
 @Singleton
-class Docusigns @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_EMAIL_OTP
 
@@ -25,17 +25,9 @@ class Docusigns @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   import databaseConfig.profile.api._
 
-  private[models] val docusignTable = TableQuery[DocusignTable]
+  private[models] val docusignTable = TableQuery[DocusignEnvelopeTable]
 
-  private def add(docusign: Docusign): Future[String] = db.run((docusignTable returning docusignTable.map(_.id) += docusign).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(docusign: Docusign): Future[Int] = db.run(docusignTable.insertOrUpdate(docusign).asTry).map {
+  private def add(docusign: DocusignEnvelope): Future[String] = db.run((docusignTable returning docusignTable.map(_.id) += docusign).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -51,13 +43,17 @@ class Docusigns @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def findByEnvelopeID(envelopeID: String): Future[Docusign] = db.run(docusignTable.filter(_.envelopeID === envelopeID).result.head.asTry).map {
+  private def findByEnvelopeID(envelopeID: String): Future[DocusignEnvelope] = db.run(docusignTable.filter(_.envelopeID === envelopeID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
+  private def getByID(id: String) = db.run(docusignTable.filter(_.id === id).result.headOption)
+
+  private def getAllByID(id: String) = db.run(docusignTable.filter(_.id === id).result)
 
   private def findEnvelopeIDByID(id: String)= db.run(docusignTable.filter(_.id === id).map(_.envelopeID).result.head.asTry).map {
     case Success(result) => result
@@ -79,13 +75,15 @@ class Docusigns @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private[models] class DocusignTable(tag: Tag) extends Table[Docusign](tag, "Docusign") {
+  private[models] class DocusignEnvelopeTable(tag: Tag) extends Table[DocusignEnvelope](tag, "DocusignEnvelope") {
 
-    def * = (id, envelopeID,status) <> (Docusign.tupled, Docusign.unapply)
+    def * = (id, envelopeID, documentType, status) <> (DocusignEnvelope.tupled, DocusignEnvelope.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def envelopeID = column[String]("envelopeID")
+
+    def documentType = column[String]("documentType")
 
     def status = column[String]("status")
 
@@ -93,13 +91,17 @@ class Docusigns @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   object Service {
 
-    def create(id: String,envelopeID: String): Future[String] = add(Docusign(id, envelopeID, constants.Status.DocuSignEnvelopeStatus.CREATED))
+    def create(id: String,envelopeID: String, documentType:String): Future[String] = add(DocusignEnvelope(id, envelopeID, documentType, constants.Status.DocuSignEnvelopeStatus.CREATED))
+
+    def get(id:String)= getByID(id)
+
+    def getAll(id:String)= getAllByID(id)
 
     def tryGetByEnvelopeID(envelopeID: String)= findByEnvelopeID(envelopeID)
 
     def markSent(envelopeID:String)= updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.SENT)
 
-    def markSigningComplete(envelopeID:String)= updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.SIGNING_COMPLETE)
+    def markComplete(envelopeID:String)= updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.COMPLETED)
 
     def tryGetEnvelopeID(id:String)= findEnvelopeIDByID(id)
 

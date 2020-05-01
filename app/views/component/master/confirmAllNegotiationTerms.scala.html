@@ -3,8 +3,8 @@
 @import views.companion.master.ConfirmAllNegotiationTerms
 @import views.html.base._
 
-@(confirmAllNegotiationTermsForm: Form[ConfirmAllNegotiationTerms.Data] = ConfirmAllNegotiationTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@(confirmAllNegotiationTermsForm: Form[ConfirmAllNegotiationTerms.Data] = ConfirmAllNegotiationTerms.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_ALL_NEGOTIATION_TERMS, confirmAllNegotiationTermsForm) {
-    @commonInputText(confirmAllNegotiationTermsForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(confirmAllNegotiationTermsForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(confirmAllNegotiationTermsForm, constants.FormField.CONFIRM)
 }

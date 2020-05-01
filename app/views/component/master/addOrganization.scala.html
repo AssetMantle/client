@@ -29,9 +29,8 @@
         @commonInputText(addOrganizationForm, constants.FormField.PHONE)
     }
 
-    @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
-
     @Messages(constants.FormField.POSTAL_ADDRESS.name):
+    @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
     @defining(Option(constants.FormField.POSTAL_ADDRESS)) { implicit nestedFormField =>
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_1)
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)

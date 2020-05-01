@@ -3,11 +3,11 @@
 @import models.master.Negotiation
 @import scala.collection.immutable.ListMap
 
-@(id:String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiationID:String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @commonHorizontalSwitcher(ListMap(
         constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.organizationViewAcceptedNegotiationTerms,
         constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.organizationViewNegotiationFile,
     ),
-        'VIEW_TERMS_PARAMETERS -> s"'${id}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${id}'")
+        'VIEW_TERMS_PARAMETERS -> s"'${negotiationID}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiationID}'")
 </div>

@@ -61,14 +61,14 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
       ticketID <- ticketID
       _ <- create(ticketID)
       _ <- modeBasedAction(ticketID)
-    } yield {}
-      ).recover {
+    } yield ticketID
+      ).recoverWith {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         for {
           ticketID <- ticketID
-        } yield onFailure(ticketID, baseException.failure.message)
+          _<-onFailure(ticketID, baseException.failure.message)
+        } yield ticketID
     }
-    ticketID
   }
 
   def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) {

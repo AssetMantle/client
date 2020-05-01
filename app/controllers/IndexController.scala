@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.Arrays
+
 import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -11,6 +13,11 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import com.docusign.esign.api.AuthenticationApi
+import com.docusign.esign.api.EnvelopesApi
+import com.docusign.esign.client.ApiClient
+import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, ReturnUrlRequest, Signer, Document => DocusignDocument}
+//import com.docusign.esign.model.Auth
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +35,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case constants.User.ZONE =>
           val id = blockchainZones.Service.getID(loginState.address)
 
-          def zone(id: String): Future[Zone] = masterZones.Service.get(id)
+          def zone(id: String): Future[Zone] = masterZones.Service.tryGet(id)
 
           for {
             id <- id
@@ -50,7 +57,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           val totalFiat = blockchainFiats.Service.getFiatPegWallet(loginState.address)
 
           def getZoneAndOrganization(aclAccount: ACLAccount): Future[(Zone, Organization)] = {
-            val zone = masterZones.Service.get(aclAccount.zoneID)
+            val zone = masterZones.Service.tryGet(aclAccount.zoneID)
             val organization = masterOrganizations.Service.tryGet(aclAccount.organizationID)
             for {
               zone <- zone
@@ -78,4 +85,48 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+
+ /* def indexTest()= Action{
+
+    val baseUri="https://demo.docusign.net/restapi"
+    val clientID= "1c09afe5-88ee-4e4b-a4d3-b3c038c31953"
+    val clientSecret="c849bf50-1b3a-4a91-ba0d-fdfe8ca344a1"
+    val redirectUrl="http://localhost:9000/docusignReturn"
+    val apiClient = new ApiClient(baseUri)
+    val uri= apiClient.getAuthorizationUri(clientID,Arrays.asList("signature") ,redirectUrl,"code")
+   // apiClient.getA
+    /*val something=apiClient.generateAccessToken(clientID,clientSecret,redirectUrl)
+    val x= something.getAccessToken
+    val y= something.
+    println(x)
+    println(y)
+    println(something)*/
+    println(uri)
+    println(uri.getUserInfo)
+      Redirect(uri.toString.replace("https:/","https://"))
+    //Redirect(uri.toString).withHeaders("Access-Control-Allow-Methods" -> "OPTIONS, GET, POST, PUT, DELETE, HEAD")
+   // Future(Ok(views.html.component.master.docusignView(uri.toString)))
+
+  }
+
+  def returnDocuSign(code:String)=Action{
+    println("code----------------------"+code)
+
+    val baseUri="https://demo.docusign.net/restapi"
+    val clientID= "1c09afe5-88ee-4e4b-a4d3-b3c038c31953"
+    val clientSecret="c849bf50-1b3a-4a91-ba0d-fdfe8ca344a1"
+    val redirectUrl="http://localhost:9000/docusignReturn"
+    val apiClient = new ApiClient(baseUri)
+    //apiClient.generateAccessToken()
+    val x= apiClient.generateAccessToken(clientID,clientSecret,code)
+    println(x)
+    println("accessToken-------"+x.getAccessToken)
+    println("expireTime-------"+x.getExpiresIn)
+    val uri= apiClient.getAuthorizationUri(clientID,Arrays.asList("signature") ,redirectUrl,"code")
+   // val y= apiClient.registerAccessTokenListener()
+    //val z= apiClient.addAuthorization()
+    //val w= new Authen
+    Ok(code)
+  }*/
 }

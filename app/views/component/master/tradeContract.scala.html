@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.NegotiationFile
+@import models.masterTransaction.AssetFile
+@import models.master.Negotiation
+
+@(negotiation: Negotiation, contract: Option[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+    @contract match{
+        case Some(document)=>{
+            @component.master.commonDocumentViewer(document) {
+                @routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)">@Messages(document.documentType)</a>
+            } {
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@document.documentType', '@negotiation.id'))">@Messages(constants.Form.UPDATE) @Messages(document.documentType)</button>
+                @commonFormButton(constants.Form.CONTRACT_CONTENT, 'parameters -> s"'${negotiation.id}'")
+            }
+
+            <td><li><a href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.Form.SUBMIT)</a></li></td>
+        }
+        case None=>{
+            <div id='@Seq("UPLOAD_", constants.File.CONTRACT).mkString("")'>
+            @commonModalButton(Seq("UPLOAD_", constants.File.CONTRACT).mkString(""), routes.javascript.FileController.uploadTraderNegotiationForm,  'parameters -> s"'${constants.File.CONTRACT}','${negotiation.id}'")
+            </div>
+        }
+    }

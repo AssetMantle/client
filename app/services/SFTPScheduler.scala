@@ -2,36 +2,39 @@ package services
 
 import java.io.File
 import java.net.InetAddress
+
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import akka.stream.alpakka.ftp.scaladsl.Sftp
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
+
 import scala.concurrent.{Await, ExecutionContext, Future}
 import java.nio.file.{Files, Paths}
-import scala.io
+
 import akka.Done
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, IOResult}
+import akka.stream.{IOResult, Materializer}
 import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
 import akka.stream.scaladsl.FileIO
 import exceptions.BaseException
-import models.masterTransaction.{WUSFTPFileTransaction, WUSFTPFileTransactions}
+import models.westernUnion.{SFTPFileTransaction, SFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
 import utilities.PGP
+
 import scala.io.BufferedSource
 
 
 @Singleton
-class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: WUSFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.SFTP_SCHEDULER
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
   implicit val system = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val materializer: Materializer = Materializer(system)
 
   private val wuSFTPInitialDelay = configuration.get[Int]("westernUnion.scheduler.initialDelay").seconds
   private val wuSFTPIntervalTime = configuration.get[Int]("westernUnion.scheduler.intervalTime").seconds
@@ -48,7 +51,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
   private val comdexPGPPrivateKeyPassword = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPassword")
   private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
-  def scheduler: Done = {
+  def scheduler: Unit = {
     try {
       val sftpSettings = SftpSettings
         .create(InetAddress.getByName(sftpSite))
@@ -72,11 +75,11 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
 
           def decryptAndReadCSV: Future[BufferedSource] = {
             PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
-            val csvFileContentBuffer = io.Source.fromFile(storagePathSFTPFiles + tempFileName)
+            val csvFileContentBuffer = scala.io.Source.fromFile(storagePathSFTPFiles + tempFileName)
             val csvFileContentProcessor = Future.sequence {
               csvFileContentBuffer.getLines.drop(1).map { line =>
                 val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
-                wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
+                sFTPFileTransactions.Service.create(SFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
               }
             }
             for {
@@ -109,7 +112,10 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime) {
-    scheduler
-  }(schedulerExecutionContext)
+  val runnable = new Runnable {
+    override def run(): Unit =
+      scheduler
+  }
+
+  actorSystem.scheduler.scheduleAtFixedRate(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime)(runnable)(schedulerExecutionContext)
 }

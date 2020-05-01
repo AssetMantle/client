@@ -4,11 +4,12 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(receivedNegotiationList: Seq[Negotiation], traders: Seq[Trader], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(receivedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @receivedNegotiationList.map { receivedNegotiation =>
     @commonInfoBox() {
-        @defining(traders.find(_.id == receivedNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
+        @defining(traderList.find(_.id == receivedNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
             @organizationTrader match {
                 case Some(trader) => {
                     @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
@@ -18,18 +19,28 @@
                 }
             }
         }
-        @defining(counterPartyTraders.find(_.id == receivedNegotiation.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonTextInfo(constants.View.SELLER_TRADER_ID, receivedNegotiation.sellerTraderID)
+        @counterPartyTraderList.find(_.id == receivedNegotiation.sellerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
                 }
             }
+            case None => {}
+        }
+        @assetList.find(_.id == receivedNegotiation.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+            }
+            case None => {}
         }
         @commonTextInfo(constants.View.ASSET_DESCRIPTION, receivedNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, receivedNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(receivedNegotiation.quantity.toString, receivedNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, receivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, receivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
     }
 }

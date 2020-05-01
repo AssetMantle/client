@@ -9,12 +9,12 @@
     case Some(file)=> {
         @utilities.FileOperations.fileExtensionFromName(file.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-                <img src="@routes.FileController.organizationAccessedTradingFile(id, file.fileName, file.documentType)">
+                <img src="@routes.FileController.organizationAccessedTradingFile(id, file.fileName, file.documentType)" width="600" height="800">
             }
             case _ => {
-                <iframe src="@routes.FileController.organizationAccessedTradingFile(id, file.fileName, file.documentType)"></iframe>
+                <iframe src="@routes.FileController.organizationAccessedTradingFile(id, file.fileName, file.documentType)" width="600" height="800"></iframe>
             }
         }
     }
-    case None=> { @Messages(constants.View.NEGOTIATION_FILES_NOT_UPLOADED)}
+    case None=> { @Messages(constants.View.NEGOTIATION_FILE_NOT_FOUND)}
         }

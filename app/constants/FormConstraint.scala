@@ -1,8 +1,7 @@
 package constants
 
 import play.api.data.validation._
-import views.companion.master.{AddTrader, TraderRelationRequest, SignUp}
-import views.companion.master.{IssueAsset, SignUp, DocumentList}
+import views.companion.master.{IssueAsset, SignUp, DocumentList, ChangePassword}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -24,10 +23,10 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val negotiationDocumentListConstraint: Constraint[DocumentList.Data] = Constraint("constraints.negotiationDocumentList")({ documentListData: DocumentList.Data =>
+  val changePasswordConstraint: Constraint[ChangePassword.Data] = Constraint("constraints.changePassword")({ changePasswordData: ChangePassword.Data =>
     val errors = {
-      if (documentListData.documentList.isEmpty) Seq(ValidationError(constants.Response.DOCUMENT_LIST_EMPTY.message))
-      else if (documentListData.documentList.flatten.length <= 2) Seq(ValidationError(constants.Response.DOCUMENT_LIST_LESS_THAN_REQUIRED.message))
+      if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))
+      else if (changePasswordData.newPassword != changePasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
