@@ -183,13 +183,15 @@
   .leftSideContainer{
     .financial{
       margin-bottom: 15px;
+      .cmuk-card{
+        height: 265px;
+      }
     }
     .financial {
-      .cmuk-card-body{
-        height:210px;
-      }
+      .cmuk-switcher{
         ul li {
           padding: 10px 0;
+      }
       }
     }
     .addBalanceButton{
@@ -206,8 +208,11 @@
       .cmuk-card-header, .cmuk-card-body, .documentlist{
         padding:0px;
       }
-      .cmuk-card-body{
-        height: 300px;
+      .documentlist{
+        height: 150px;
+      }
+      .cmuk-card{
+        height: 265px;
       }
     }
     .zoneTradeFinancial{
@@ -231,9 +236,9 @@
     }
     .chatRoom{
       .cmuk-card-body{
-        height: 300px;
+        height: 264px;
         .chatMessagesContainer {
-          height: 190px;
+          height: 160px;
         }
       }
     }
@@ -254,7 +259,7 @@
   }
   .switcherCard{
     .cmuk-switcher{
-      height: 180px;
+      height: 179px;
     }
   }
   .timeline {
@@ -265,11 +270,22 @@
       left: 0px;
     }
   }
+  .SalesQuoteCard{
+    .firstPart{
+      flex: 32%;
+    }
+    .secondPart{
+      flex: 45%;
+    }
+    .thirdPart{
+      flex: 23%;
+    }
+  }
 }
 
 @media (max-width: 1599px){
   :root {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .profileContainer{

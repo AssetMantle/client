@@ -1,96 +1,13 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.master.{Asset, Negotiation}
+@import models.master.Negotiation
+@import scala.collection.immutable.ListMap
 
-@(negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
-
-<div id='@Seq(negotiation.id, "TermsView").mkString("")'>
-    <div class="tradeTerms">
-        <div class="traderCommodity">
-            <span class="commodityImage" ><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType</span>
-        </div>
-        <div class="terms">
-
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
-            </div>
-
-            <div class="sellerTerm">
-                @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-                <div class="sellerTermStatus">
-                    @negotiation.buyerAcceptedAssetDescription
-                </div>
-            </div>
-            <div class="sellerTerm">
-                @commonIntInfo(constants.View.PRICE, negotiation.price)
-                <div class="sellerTermStatus">
-                    @negotiation.buyerAcceptedPrice
-                </div>
-            </div>
-            <div class="sellerTerm">
-                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
-                <div class="sellerTermStatus">
-                    @negotiation.buyerAcceptedQuantity
-                </div>
-            </div>
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
-            </div>
-            <div class="sellerTerm">
-                <div>
-                    @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
-                    @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-                    @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
-                </div>
-                <div class="sellerTermStatus">
-                    @negotiation.buyerAcceptedAssetOtherDetails
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
-            </div>
-            <div class="sellerTerm">
-                <div>
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-                @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
-                @negotiation.paymentTerms.tentativeDate match {
-                    case Some(date) => {
-                        @commonDateInfo(constants.View.TENTATIVE_DATE, date)
-                    }
-                    case None => {
-                        @commonTextInfo(constants.View.TENTATIVE_DATE, "")
-                    }
-                }
-                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
-                </div>
-                <div class="sellerTermStatus">
-                    @negotiation.buyerAcceptedPaymentTerms
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="cmuk-flex cmuk-flex-between">
-                <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
-            </div>
-            <div class="sellerTerm">
-                <div>
-                @negotiation.documentList.documents.map { document =>
-                    <p class="documentTitle">@Messages(document)</p>
-                }
-                </div>
-                <div class="sellerTermStatus">
-                @negotiation.buyerAcceptedDocumentList
-                </div>
-            </div>
-        </div>
-    </div>
+@(negotiationID:String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.zoneViewAcceptedNegotiationTerms,
+        constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.zoneViewNegotiationFile,
+    ),
+        'VIEW_TERMS_PARAMETERS -> s"'${negotiationID}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiationID}'")
 </div>
-<script>
-    @*Add here comet source for component id = '@Seq(negotiation.id, "TermsView").mkString("")'*@
-</script>

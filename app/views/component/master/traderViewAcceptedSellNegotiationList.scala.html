@@ -4,33 +4,53 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(sellNegotiationList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-@sellNegotiationList.map { sellNegotiation =>
-    @commonVerticalInfoBox() {
-        @defining(counterPartyTraders.find(_.id == sellNegotiation.buyerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
+@import models.master.Organization
+@(sellNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="SalesQuoteCard">
+    @sellNegotiationList.map { sellNegotiation =>
+        @commonVerticalInfoBox(){
+            <div class="firstPart salesChild">
+                <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
+                </div>
+                <div class="content">
+                @assetList.find(_.id == sellNegotiation.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetIcon">
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                        </div>
+                        <div class="assetIntialData">
+                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetQuantity">@Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@sellNegotiation.price</p>
+                        </div>
+                    }
+                    case None => {}
                 }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, sellNegotiation.buyerTraderID)
+                </div>
+            </div>
+            <div class="secondPart salesChild">
+                @counterPartyTraderList.find(_.id == sellNegotiation.buyerTraderID) match {
+                    case Some(trader) => {
+                        @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span></p>
+                            }
+                            case None => {}
+                        }
+                        <p><span cmuk-tooltip="@Messages(constants.View.TRADER)">@trader.name</span></p>
+                    }
+                    case None => {}
                 }
-            }
+                <p><span>@sellNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
+                    <span class="lines">---</span>
+                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="lines">---</span>
+                    <span>@sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+            </div>
+            <div class="thirdPart salesChild">
+                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sellNegotiation.id), 'class->"cmuk-button-link")
+            </div>
         }
-        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, sellNegotiation.assetDescription)
-        @commonVerticalIntInfo(constants.View.PRICE, sellNegotiation.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.STATUS, sellNegotiation.status)
-        <div class="listItemChild">
-            <p class="listItemChildTitle">
-            @Messages(constants.View.ACTION)
-            </p>
-            <p class="listItemChildValue">
-                <button class="cmuk-button cmuk-button-primary cmuk-button-small">
-                    <a class="cmuk-link secondaryFont" href="@routes.ViewController.tradeRoom(sellNegotiation.id)">@Messages(constants.View.GO_TO_TRADE_ROOM)</a>
-                </button>
-            </p>
-        </div>
     }
-}
+</div>

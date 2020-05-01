@@ -1,0 +1,66 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import models.master.Asset
+@import models.master.Trader
+
+@import models.master.Organization
+@(receivedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div class="SalesQuoteCard">
+    @receivedNegotiationList.map { receivedNegotiation =>
+        @commonVerticalInfoBox(){
+            <div class="firstPart salesChild">
+                <div class="content">
+                @assetList.find(_.id == receivedNegotiation.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetIcon">
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                        </div>
+                        <div class="assetIntialData">
+                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetQuantity">@Seq(receivedNegotiation.quantity.toString, receivedNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@receivedNegotiation.price</p>
+                        </div>
+                    }
+                    case None => {}
+                }
+                </div>
+            </div>
+            <div class="secondPart salesChild">
+                @counterPartyTraderList.find(_.id == receivedNegotiation.sellerTraderID) match {
+                    case Some(trader) => {
+                        @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
+                            }
+                            case None => {}
+                        }
+                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)"> @trader.name</span>
+                            <span class="lines">---</span>
+                    }
+                    case None => {}
+                }
+                @defining(traderList.find(_.id == receivedNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
+                    @organizationTrader match {
+                        case Some(trader) => {
+                            <span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)">@trader.name</span></p>
+                                }
+                        case None => {
+                            <span>@receivedNegotiation.buyerTraderID</span></p>
+                        }
+                    }
+                }
+                <p><span>@receivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
+                    <span class="lines">---</span>
+                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="lines">---</span>
+                    <span>@receivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+            </div>
+            <div class="thirdPart salesChild">
+
+            </div>
+
+        }
+    }
+</div>

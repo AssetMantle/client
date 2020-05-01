@@ -53,11 +53,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadTraderWorldCheck = configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
 
-  private val uploadTraderAssetContractPath: String = configuration.get[String]("upload.asset.contract")
-
   private val uploadTraderAssetOBLPath: String = configuration.get[String]("upload.asset.obl")
-
-  private val uploadTraderAssetInvoicePath: String = configuration.get[String]("upload.asset.invoice")
 
   private val uploadTraderAssetPackingListPath: String = configuration.get[String]("upload.asset.packingList")
 
@@ -66,6 +62,12 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
   private val uploadTraderAssetCOAPath: String = configuration.get[String]("upload.asset.coa")
 
   private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
+
+  private val uploadTraderNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
+
+  private val uploadTraderNegotiationBillOfExchangePath: String = configuration.get[String]("upload.negotiation.billOfExchange")
+
+  private val uploadTraderNegotiationContractPath: String = configuration.get[String]("upload.negotiation.contract")
 
   private val uploadTraderNegotiationBuyerContractPath: String = configuration.get[String]("upload.negotiation.buyerContract")
 
@@ -125,13 +127,10 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   def getTraderAssetFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.CONTRACT => uploadTraderAssetContractPath
       case constants.File.OBL => uploadTraderAssetOBLPath
-      case constants.File.INVOICE => uploadTraderAssetInvoicePath
       case constants.File.PACKING_LIST => uploadTraderAssetPackingListPath
       case constants.File.COO => uploadTraderAssetCOOPath
       case constants.File.COA => uploadTraderAssetCOAPath
-      case constants.File.OTHER => uploadTraderAssetOtherPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }
@@ -142,6 +141,9 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.SELLER_CONTRACT => uploadTraderNegotiationSellerContractOtherPath
       case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
       case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
+      case constants.File.INVOICE => uploadTraderNegotiationInvoicePath
+      case constants.File.BILL_OF_EXCHANGE => uploadTraderNegotiationBillOfExchangePath
+      case constants.File.CONTRACT => uploadTraderNegotiationContractPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }

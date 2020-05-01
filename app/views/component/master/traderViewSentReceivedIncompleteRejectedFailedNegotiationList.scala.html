@@ -3,7 +3,7 @@
 @import scala.collection.immutable.ListMap
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="traderSalesQuotes">
 @commonCard(constants.View.SALES_QUOTE_LIST) {
   @commonFormButton(constants.Form.NEGOTIATION_REQUEST)
 } {
@@ -14,3 +14,4 @@
     constants.View.REJECTED_OR_FAILED_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.traderViewRejectedAndFailedNegotiationList,
   ))
 }
+</div>

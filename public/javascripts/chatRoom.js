@@ -44,6 +44,7 @@ function submitChat(source, target = '#chatMessages') {
                     $("#replyBox").fadeOut();
                     const loadMore = $(".chatMessages .chatMessage:last");
                     loadMore.after(data);
+                    $('.noChats').remove();
                 },
             }
         }).fail(function (XMLHttpRequest) {

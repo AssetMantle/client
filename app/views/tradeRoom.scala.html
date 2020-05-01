@@ -3,79 +3,95 @@
 @import views.html.base.common
 @import views.html.base._
 @import scala.collection.immutable.ListMap
-@(id: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(negotiationID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
     <div class="leftSideContainer">
-    <div id="financial"></div>
-    </div>
-    <script>
+        <div id="financial" class="financial"></div>
         @loginState.userType match {
+            case constants.User.TRADER => {
+                <div id="traderViewNegotiationDocuments"></div>
+                <script type="text/javascript">
+                    componentResource('financial', jsRoutes.controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('traderViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationFiles('@negotiationID'));
+                </script>
+            }
+            case constants.User.ORGANIZATION => {
+                <div id="organizationViewNegotiationDocuments"></div>
+                <script type="text/javascript">
+                    componentResource('financial', jsRoutes.controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('organizationViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles('@negotiationID'));
+                </script>
+            }
             case constants.User.ZONE => {
-            componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@id'));
+                <div id="zoneViewNegotiationDocuments"></div>
+                <script type="text/javascript">
+                      componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('zoneViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationFiles('@negotiationID'));
+                </script>
+
             }
             case _ => {}
         }
-    </script>
+    </div>
 }
 
 @center = {
     <div class="mainTabs">
-    <div class="cmuk-card cmuk-card-default">
-        <div class="cmuk-card-body">
+        <div class="cmuk-card cmuk-card-default">
+            <div class="cmuk-card-body">
             @loginState.userType match {
                 case constants.User.TRADER => {
-                    @commonHorizontalSwitcher(ListMap(
-                        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.traderViewAcceptedNegotiation,
-                        constants.View.VIEW_DOCUMENTS -> commonCard(constants.View.VIEW_DOCUMENTS)(Html(""))(Html("")),
-                    ),
-                        'VIEW_TERMS_PARAMETERS -> s"'${id}'")
+                    <div id="traderViewAcceptedNegotiation">
+                </div>
+                    <script type="text/javascript">
+                    componentResource('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation('@negotiationID'));
+                </script>
+                }
+                case constants.User.ORGANIZATION => {
+                    <div id="organizationViewAcceptedNegotiation">
+                </div>
+                    <script type="text/javascript">
+                    componentResource('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation('@negotiationID'));
+                </script>
                 }
                 case constants.User.ZONE => {
-                    @commonHorizontalSwitcher(ListMap(
-                        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.zoneViewAcceptedNegotiation,
-                        constants.View.VIEW_DOCUMENTS -> commonCard(constants.View.VIEW_DOCUMENTS)(Html(""))(Html("")),
-                    ),
-                        'VIEW_TERMS_PARAMETERS -> s"'${id}'")
+                    <div id="zoneViewAcceptedNegotiation">
+                </div>
+                    <script type="text/javascript">
+                    componentResource('zoneViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiation('@negotiationID'));
+                </script>
                 }
                 case _ => {}
             }
+            </div>
         </div>
-    </div>
     </div>
 }
 
 @right = {
-    <div class="right cmuk-flex">
-        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>@Messages(constants.View.AMEND)</button>
-        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>
-            @Messages(constants.View.REFRESH)</button>
-        <div class="cmuk-flex live">
-            <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
-            <div class="liveIcon"></div>
+
+    <div>
+        <div class="rightSideContainer">
+            <div class="recentActivityContainer">
+                <div id="tradeActivities"></div>
+            </div>
+            <div id="chatRoom" class="chatRoom"></div>
+            <div id="orderActions"></div>
         </div>
     </div>
-    <div>
-    <div class="rightSideContainer">
-    <div class="recentActivityContainer">
-        <div id="tradeActivities"></div>
-    </div>
-    <div id="chatRoom" class="chatRoom"></div>
-        <div id="orderActions"></div>
-    </div>
-    </div>
     <script>
-            componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@id'));
-            @loginState.userType match {
-                case constants.User.TRADER => {
-                    componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@id'));
-                }
-                case constants.User.ZONE => {
-                    componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@id'));
-                }
-                case _ => {}
-            }
+    componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@negotiationID'));
+    @loginState.userType match {
+    case constants.User.TRADER => {
+    componentResource('chatRoom', jsRoutes.controllers.ChatController.chatRoom('@negotiationID'));
+    }
+    case constants.User.ZONE => {
+    componentResource('orderActions', jsRoutes.controllers.ComponentViewController.zoneOrderActions('@negotiationID'));
+    }
+    case _ => {}
+    }
     </script>
 }

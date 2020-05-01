@@ -7,7 +7,7 @@
 
 @left = {
     <div class="leftSideContainer">
-        <div id="financials"></div>
+        <div id="financials" class="financial"></div>
     </div>
     <script>
         @loginState.userType match {
@@ -39,7 +39,20 @@
                     componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
             </script>
         }
-        case constants.User.ORGANIZATION => {}
+        case constants.User.ORGANIZATION => {
+            <div class="tradeList switcherCard">
+                <div id="organizationViewAcceptedNegotiationList"></div>
+            </div>
+
+            <div class="salesQuoteList switcherCard">
+                <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+            </div>
+
+            <script>
+                    componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
+                    componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
+            </script>
+        }
         case constants.User.ZONE => {
             <div class="tradeList cmuk-margin-bottom">
             @commonCard(constants.View.TRADE_ROOMS) {

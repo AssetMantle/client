@@ -4,37 +4,55 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@receivedNegotiationRequestList.map { receivedNegotiationRequest =>
-    @commonVerticalInfoBox() {
-        @defining(counterPartyTraders.find(_.id == receivedNegotiationRequest.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
+ <div class="SalesQuoteCard">
+    @receivedNegotiationRequestList.map { receivedNegotiationRequest =>
+        @commonVerticalInfoBox(){
+            <div class="firstPart salesChild">
+                <div class="salesQuoteCategory buy">
+                    <span>@Messages(constants.View.BUY)</span>
+                </div>
+                <div class="content">
+                @assetList.find(_.id == receivedNegotiationRequest.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetIcon">
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                        </div>
+                        <div class="assetIntialData">
+                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetQuantity">@Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@receivedNegotiationRequest.price</p>
+                        </div>
+                    }
+                    case None => {}
                 }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, receivedNegotiationRequest.sellerTraderID)
+                </div>
+            </div>
+            <div class="secondPart salesChild">
+                @counterPartyTraderList.find(_.id == receivedNegotiationRequest.sellerTraderID) match {
+                    case Some(trader) => {
+                        @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span></p>
+                            }
+                            case None => {}
+                        }
+                        <span cmuk-tooltip="@Messages(constants.View.TRADER)">@trader.name</span>
+                    }
+                    case None => {}
                 }
-            }
-        }
-        @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString(), receivedNegotiationRequest.quantityUnit).mkString(" "))
-        <div class="listItemChild">
-            <p class="listItemChildTitle">
-            @Messages(constants.View.ACCEPT)
-            </p>
-            <p class="listItemChildValue">
+                <p><span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span>
+                    <span class="lines">---</span>
+                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="lines">---</span>
+                    <span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+            </div>
+            <div class="thirdPart salesChild">
             @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-            </p>
-        </div>
-        <div class="listItemChild">
-            <p class="listItemChildTitle">
-            @Messages(constants.View.REJECT)
-            </p>
-            <p class="listItemChildValue">
-            @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-            </p>
-        </div>
+                @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+            </div>
+        }
     }
-}
+</div>

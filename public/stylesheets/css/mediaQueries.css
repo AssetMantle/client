@@ -129,9 +129,9 @@
 
   .leftSideContainer .financial {
     margin-bottom: 15px; }
-  .leftSideContainer .financial .cmuk-card-body {
-    height: 210px; }
-  .leftSideContainer .financial ul li {
+    .leftSideContainer .financial .cmuk-card {
+      height: 265px; }
+  .leftSideContainer .financial .cmuk-switcher ul li {
     padding: 10px 0; }
   .leftSideContainer .addBalanceButton {
     text-transform: capitalize;
@@ -144,8 +144,10 @@
     border: 0; }
   .leftSideContainer .docView .cmuk-card-header, .leftSideContainer .docView .cmuk-card-body, .leftSideContainer .docView .documentlist {
     padding: 0px; }
-  .leftSideContainer .docView .cmuk-card-body {
-    height: 300px; }
+  .leftSideContainer .docView .documentlist {
+    height: 150px; }
+  .leftSideContainer .docView .cmuk-card {
+    height: 265px; }
   .leftSideContainer .zoneTradeFinancial .cmuk-card-body {
     height: auto; }
     .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
@@ -158,9 +160,9 @@
       .rightSideContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
         height: 210px; }
   .rightSideContainer .chatRoom .cmuk-card-body {
-    height: 300px; }
+    height: 264px; }
     .rightSideContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 190px; }
+      height: 160px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
@@ -171,15 +173,22 @@
     line-height: 26px; }
 
   .switcherCard .cmuk-switcher {
-    height: 180px; }
+    height: 179px; }
 
   .timeline:before {
     left: 20px; }
   .timeline .timeline-item .timeline-icon {
-    left: 0px; } }
+    left: 0px; }
+
+  .SalesQuoteCard .firstPart {
+    flex: 32%; }
+  .SalesQuoteCard .secondPart {
+    flex: 45%; }
+  .SalesQuoteCard .thirdPart {
+    flex: 23%; } }
 @media (max-width: 1599px) {
   :root {
-    font-size: 14px; }
+    font-size: 13px; }
 
   .profileContainer .identificationDetails .documentItem {
     padding: 10px; }
