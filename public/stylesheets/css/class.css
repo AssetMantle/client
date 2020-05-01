@@ -2054,38 +2054,6 @@ figure.zoom {
     width: 100%;
     height: 100%; }
 
-.newSales {
-  display: flex;
-  flex: 1; }
-  .newSales .childr {
-    display: flex;
-    flex: 1; }
-    .newSales .childr .rotateChild {
-      width: 30px;
-      background: blue;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center; }
-      .newSales .childr .rotateChild span {
-        position: absolute;
-        transform: rotate(-90deg); }
-  .newSales .centerChild {
-    justify-content: center;
-    background: #f4f4f4;
-    align-items: center;
-    border-left: 1px solid #ccc;
-    padding: 20px;
-    flex: 40%;
-    border-right: 1px solid #ccc; }
-  .newSales .firstChild {
-    flex: 40%; }
-  .newSales .lastChild {
-    padding: 20px;
-    justify-content: center;
-    flex: 20%;
-    align-items: center; }
-
 .SalesQuoteCard .commonList {
   flex: 1;
   padding: 0px;

@@ -2704,51 +2704,6 @@ figure.zoom {
   cursor: zoom-in;
 }
 
-.newSales {
-    display: flex;
-    flex: 1;
-  .childr {
-    display: flex;
-    flex: 1;
-
-    .rotateChild {
-      width: 30px;
-      background: blue;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      span {
-        position: absolute;
-        transform: rotate(-90deg);
-      }
-    }
-  }
-
-  .centerChild {
-    justify-content: center;
-    background: #f4f4f4;
-    align-items: center;
-    border-left: 1px solid #ccc;
-    padding: 20px;
-    flex: 40%;
-    border-right: 1px solid #ccc;
-  }
-
-  .firstChild {
-    flex: 40%;
-  }
-
-  .lastChild {
-    padding: 20px;
-    justify-content: center;
-    flex: 20%;
-    align-items: center;
-  }
-}
-
-
 .SalesQuoteCard{
   .commonList{
     flex:1;
