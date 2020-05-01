@@ -2,10 +2,9 @@
 @import views.html.base._
 @import views.companion.master.ReleaseAsset
 
-@(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form, blockchainAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.RELEASE_ASSET, releaseAssetForm) {
-    @commonInputText(releaseAssetForm, constants.FormField.BLOCKCHAIN_ADDRESS, 'value -> blockchainAddress)
-    @commonInputText(releaseAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputText(releaseAssetForm, constants.FormField.ASSET_ID, 'value -> assetID, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputInt(releaseAssetForm, constants.FormField.GAS)
     @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD)
 }

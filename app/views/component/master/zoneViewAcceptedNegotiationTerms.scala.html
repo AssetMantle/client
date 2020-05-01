@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 <div>
                 @negotiation.buyerAcceptedQuantity
                 </div>
@@ -99,6 +99,3 @@
         </div>
     </div>
 </div>
-<script>
-    @*Add here comet source for component id = '@Seq(negotiation.id, "TermsView").mkString("")'*@
-</script>

@@ -143,7 +143,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       (for {
         dirtyOrganizations <- dirtyOrganizations
         _ <- refreshDirtyOrganizations(dirtyOrganizations)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

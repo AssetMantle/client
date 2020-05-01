@@ -53,11 +53,11 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         sendFiatData => {
 
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
-          def sellerAccountID(sellerTraderID: String) = masterTraders.Service.tryGetAccountId(sellerTraderID)
-          def sellerAddress(sellerAccountID: String) = masterAccounts.Service.getAddress(sellerAccountID)
-          def assetPegHash(assetID: String) = masterAssets.Service.tryGetPegHash(assetID)
+          def sellerAccountID(sellerTraderID: String): Future[String] = masterTraders.Service.tryGetAccountId(sellerTraderID)
+          def sellerAddress(sellerAccountID: String): Future[String] = masterAccounts.Service.tryGetAddress(sellerAccountID)
+          def assetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
-          def transactionProcess(sellerAddress:String, pegHash: String) = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+          def transactionProcess(sellerAddress:String, pegHash: String): Future[String] = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
             entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.amount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
             request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = pegHash, mode = transactionMode),

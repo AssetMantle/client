@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.{blockchain, master}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -24,15 +24,28 @@ case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHa
   def mutateTicketID(newTicketID: String): ConfirmSellerBid = ConfirmSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
-class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ConfirmSellerBids @Inject()(
+                                   actorSystem: ActorSystem,
+                                   transaction: utilities.Transaction,
+                                   protected val databaseConfigProvider: DatabaseConfigProvider,
+                                   blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
+                                   blockchainNegotiations: blockchain.Negotiations,
+                                   utilitiesNotification: utilities.Notification,
+                                   masterAccounts: master.Accounts,
+                                   blockchainAccounts: blockchain.Accounts,
+                                   masterNegotiations: master.Negotiations,
+                                   masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                 )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_SELLER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -40,9 +53,11 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
   private[models] val confirmSellerBidTable = TableQuery[ConfirmSellerBidTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(confirmSellerBid: ConfirmSellerBid): Future[String] = db.run((confirmSellerBidTable returning confirmSellerBidTable.map(_.ticketID) += confirmSellerBid).asTry).map {
@@ -86,6 +101,16 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
   }
 
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -164,6 +189,8 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[ConfirmSellerBid] = findByTicketID(ticketID)
@@ -181,54 +208,46 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val confirmSellerBid = Service.getTransaction(ticketID)
 
-      def negotiationID(confirmSellerBid: ConfirmSellerBid): Future[Option[String]] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
+      def negotiationID(confirmSellerBid: ConfirmSellerBid): Future[String] = blockchainNegotiations.Service.tryGetID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
 
-      def negotiationResponse(negotiationID: Option[String], confirmSellerBid: ConfirmSellerBid): Future[NegotiationResponse.Response] = {
-        negotiationID match {
-          case Some(id) => getNegotiation.Service.get(id)
-          case None => {
-            val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
-
-            def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
-
-            for {
-              negotiationIDResponse <- negotiationIDResponse
-              negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
-            } yield negotiation
-          }
-        }
-      }
-
-      def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
-
-      def markDirty(confirmSellerBid: ConfirmSellerBid): Future[Unit] = {
-        val markDirtyFromAddressBlockchainAccounts = blockchainAccounts.Service.markDirty(confirmSellerBid.from)
-        val markDirtyFromAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
-        val markDirtyToAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)
+      def markDirty(negotiationID: String, confirmSellerBid: ConfirmSellerBid): Future[Unit] = {
+        val markNegotiationDirty = blockchainNegotiations.Service.markDirty(negotiationID)
+        val markSellerAccountDirty = blockchainAccounts.Service.markDirty(confirmSellerBid.from)
+        val markSellerTransactionFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
         for {
-          _ <- markDirtyFromAddressBlockchainAccounts
-          _ <- markDirtyFromAddressInBlockchainTransactionFeedbacks
-          _ <- markDirtyToAddressInBlockchainTransactionFeedbacks
-        } yield Unit
+          _ <- markNegotiationDirty
+          _ <- markSellerAccountDirty
+          _ <- markSellerTransactionFeedbackDirty
+        } yield ()
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+
+      def masterNegotiationID(bcNegotiationID: String): Future[String] = masterNegotiations.Service.tryGetIDByNegotiationID(bcNegotiationID)
 
       (for {
         _ <- markTransactionSuccessful
         confirmSellerBid <- confirmSellerBid
         negotiationID <- negotiationID(confirmSellerBid)
-        negotiationResponse <- negotiationResponse(negotiationID, confirmSellerBid)
-        _ <- insertOrUpdate(negotiationResponse)
-        _ <- markDirty(confirmSellerBid)
-        fromAccountID <- getID(confirmSellerBid.from)
-        toAccountID <- getID(confirmSellerBid.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+        _ <- markDirty(negotiationID = negotiationID, confirmSellerBid = confirmSellerBid)
+        fromAccountID <- getAccountID(confirmSellerBid.from)
+        toAccountID <- getAccountID(confirmSellerBid.to)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SELLER_BID_CONFIRMED, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SELLER_BID_CONFIRMED, blockResponse.txhash)
+        masterNegotiationID <- masterNegotiationID(negotiationID)
+        _ <- masterTransactionTradeActivities.Service.create(masterNegotiationID, constants.TradeActivity.SELLER_BID_CONFIRMED, ticketID, blockResponse.txhash)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -236,14 +255,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val confirmSellerBid = Service.getTransaction(ticketID)
 
-      def markDirty(confirmSellerBid: ConfirmSellerBid): Future[Unit] = {
-        val markDirtyFromAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
-        val markDirtyToAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)
-        for {
-          _ <- markDirtyFromAddressInBlockchainTransactionFeedbacks
-          _ <- markDirtyToAddressInBlockchainTransactionFeedbacks
-        } yield {}
-      }
+      def markDirty(confirmSellerBid: ConfirmSellerBid): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
 
       def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
@@ -252,10 +264,8 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         confirmSellerBid <- confirmSellerBid
         _ <- markDirty(confirmSellerBid)
         fromAccountID <- getID(confirmSellerBid.from)
-        toAccountID <- getID(confirmSellerBid.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      } yield {}).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SELLER_BID_CONFIRMATION_FAILED, message)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

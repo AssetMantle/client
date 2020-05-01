@@ -14,38 +14,62 @@ CREATE SCHEMA IF NOT EXISTS WESTERN_UNION
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
 (
-    "id"       VARCHAR NOT NULL,
-    "address"  VARCHAR NOT NULL,
-    "dirtyBit" BOOLEAN NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC"
 (
-    "id"       VARCHAR NOT NULL,
-    "address"  VARCHAR NOT NULL,
-    "dirtyBit" BOOLEAN NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
-    "address"       VARCHAR NOT NULL,
-    "coins"         VARCHAR NOT NULL,
-    "publicKey"     VARCHAR NOT NULL,
-    "accountNumber" VARCHAR NOT NULL,
-    "sequence"      VARCHAR NOT NULL,
-    "dirtyBit"      BOOLEAN NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "coins"             VARCHAR NOT NULL,
+    "publicKey"         VARCHAR NOT NULL,
+    "accountNumber"     VARCHAR NOT NULL,
+    "sequence"          VARCHAR NOT NULL,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("address")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
 (
-    "address"        VARCHAR NOT NULL,
-    "zoneID"         VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
-    "aclHash"        VARCHAR NOT NULL,
-    "dirtyBit"       BOOLEAN NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "aclHash"           VARCHAR NOT NULL,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("address")
 );
 
@@ -66,6 +90,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLHash_BC"
     "negotiation"        BOOLEAN NOT NULL,
     "releaseAssets"      BOOLEAN NOT NULL,
     "hash"               VARCHAR NOT NULL,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("hash")
 );
 
@@ -77,22 +107,34 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
     "transactionAmount" VARCHAR NOT NULL,
     "redeemedAmount"    VARCHAR NOT NULL,
     "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("pegHash", "ownerAddress")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
 (
-    "pegHash"       VARCHAR NOT NULL,
-    "documentHash"  VARCHAR NOT NULL,
-    "assetType"     VARCHAR NOT NULL,
-    "assetQuantity" VARCHAR NOT NULL,
-    "assetPrice"    VARCHAR NOT NULL,
-    "quantityUnit"  VARCHAR NOT NULL,
-    "ownerAddress"  VARCHAR NOT NULL,
-    "locked"        BOOLEAN NOT NULL,
-    "moderated"     BOOLEAN NOT NULL,
-    "takerAddress"  VARCHAR,
-    "dirtyBit"      BOOLEAN,
+    "pegHash"           VARCHAR NOT NULL,
+    "documentHash"      VARCHAR NOT NULL,
+    "assetType"         VARCHAR NOT NULL,
+    "assetQuantity"     VARCHAR NOT NULL,
+    "assetPrice"        VARCHAR NOT NULL,
+    "quantityUnit"      VARCHAR NOT NULL,
+    "ownerAddress"      VARCHAR NOT NULL,
+    "locked"            BOOLEAN NOT NULL,
+    "moderated"         BOOLEAN NOT NULL,
+    "takerAddress"      VARCHAR,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("pegHash")
 );
 
@@ -111,15 +153,27 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
     "buyerContractHash"  VARCHAR,
     "sellerContractHash" VARCHAR,
     "dirtyBit"           BOOLEAN NOT NULL,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
 (
-    "id"            VARCHAR NOT NULL,
-    "fiatProofHash" VARCHAR,
-    "awbProofHash"  VARCHAR,
-    "dirtyBit"      BOOLEAN NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "fiatProofHash"     VARCHAR,
+    "awbProofHash"      VARCHAR,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -149,93 +203,135 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TransactionFeedBack_BC"
     "negotiationPositiveTx"        VARCHAR NOT NULL,
     "negotiationNegativeTx"        VARCHAR NOT NULL,
     "dirtyBit"                     BOOLEAN NOT NULL,
+    "createdBy"                    VARCHAR,
+    "createdOn"                    TIMESTAMP,
+    "createdOnTimeZone"            VARCHAR,
+    "updatedBy"                    VARCHAR,
+    "updatedOn"                    TIMESTAMP,
+    "updatedOnTimeZone"            VARCHAR,
     PRIMARY KEY ("address")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC"
 (
-    "address"       VARCHAR NOT NULL,
-    "buyerAddress"  VARCHAR NOT NULL,
-    "sellerAddress" VARCHAR NOT NULL,
-    "pegHash"       VARCHAR NOT NULL,
-    "rating"        VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "buyerAddress"      VARCHAR NOT NULL,
+    "sellerAddress"     VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "rating"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("address", "buyerAddress", "sellerAddress", "pegHash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
 (
-    "from"           VARCHAR NOT NULL,
-    "to"             VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
-    "zoneID"         VARCHAR NOT NULL,
-    "gas"            INT     NOT NULL,
-    "status"         BOOLEAN,
-    "txHash"         VARCHAR,
-    "ticketID"       VARCHAR NOT NULL,
-    "mode"           VARCHAR NOT NULL,
-    "code"           VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "zoneID"   VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
 (
-    "from"          VARCHAR NOT NULL,
-    "buyerAddress"  VARCHAR NOT NULL,
-    "sellerAddress" VARCHAR NOT NULL,
-    "fiatProofHash" VARCHAR NOT NULL,
-    "pegHash"       VARCHAR NOT NULL,
-    "gas"           INT     NOT NULL,
-    "status"        BOOLEAN,
-    "txHash"        VARCHAR,
-    "ticketID"      VARCHAR NOT NULL,
-    "mode"          VARCHAR NOT NULL,
-    "code"          VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "buyerAddress"      VARCHAR NOT NULL,
+    "sellerAddress"     VARCHAR NOT NULL,
+    "fiatProofHash"     VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "bid"      INT     NOT NULL,
-    "time"     INT     NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "bid"               INT     NOT NULL,
+    "time"              INT     NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "bid"      INT     NOT NULL,
-    "time"     INT     NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "bid"               INT     NOT NULL,
+    "time"              INT     NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
@@ -253,6 +349,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
     "ticketID"          VARCHAR NOT NULL,
     "mode"              VARCHAR NOT NULL,
     "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
@@ -270,26 +372,38 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
     "ticketID"           VARCHAR NOT NULL,
     "mode"               VARCHAR NOT NULL,
     "code"               VARCHAR,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
 (
-    "from"          VARCHAR NOT NULL,
-    "to"            VARCHAR NOT NULL,
-    "documentHash"  VARCHAR NOT NULL,
-    "assetType"     VARCHAR NOT NULL,
-    "assetPrice"    INT     NOT NULL,
-    "quantityUnit"  VARCHAR NOT NULL,
-    "assetQuantity" INT     NOT NULL,
-    "moderated"     BOOLEAN NOT NULL,
-    "gas"           INT     NOT NULL,
-    "takerAddress"  VARCHAR,
-    "status"        BOOLEAN,
-    "txHash"        VARCHAR,
-    "ticketID"      VARCHAR NOT NULL,
-    "mode"          VARCHAR NOT NULL,
-    "code"          VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "documentHash"      VARCHAR NOT NULL,
+    "assetType"         VARCHAR NOT NULL,
+    "assetPrice"        INT     NOT NULL,
+    "quantityUnit"      VARCHAR NOT NULL,
+    "assetQuantity"     INT     NOT NULL,
+    "moderated"         BOOLEAN NOT NULL,
+    "gas"               INT     NOT NULL,
+    "takerAddress"      VARCHAR,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
@@ -305,163 +419,235 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"
     "ticketID"          VARCHAR NOT NULL,
     "mode"              VARCHAR NOT NULL,
     "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemAsset"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemFiat"
 (
-    "from"         VARCHAR NOT NULL,
-    "to"           VARCHAR NOT NULL,
-    "redeemAmount" INT     NOT NULL,
-    "gas"          INT     NOT NULL,
-    "status"       BOOLEAN,
-    "txHash"       VARCHAR,
-    "ticketID"     VARCHAR NOT NULL,
-    "mode"         VARCHAR NOT NULL,
-    "code"         VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "redeemAmount"      INT     NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ReleaseAsset"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
 (
-    "from"          VARCHAR NOT NULL,
-    "buyerAddress"  VARCHAR NOT NULL,
-    "sellerAddress" VARCHAR NOT NULL,
-    "awbProofHash"  VARCHAR NOT NULL,
-    "pegHash"       VARCHAR NOT NULL,
-    "gas"           INT     NOT NULL,
-    "status"        BOOLEAN,
-    "txHash"        VARCHAR,
-    "ticketID"      VARCHAR NOT NULL,
-    "mode"          VARCHAR NOT NULL,
-    "code"          VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "buyerAddress"      VARCHAR NOT NULL,
+    "sellerAddress"     VARCHAR NOT NULL,
+    "awbProofHash"      VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendAsset"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "amount"   INT     NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "amount"            INT     NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendFiat"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "amount"   INT     NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "amount"            INT     NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetACL"
 (
-    "from"           VARCHAR NOT NULL,
-    "aclAddress"     VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
-    "zoneID"         VARCHAR NOT NULL,
-    "aclHash"        VARCHAR NOT NULL,
-    "gas"            INT     NOT NULL,
-    "status"         BOOLEAN,
-    "txHash"         VARCHAR,
-    "ticketID"       VARCHAR NOT NULL,
-    "mode"           VARCHAR NOT NULL,
-    "code"           VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "aclAddress"        VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
+    "aclHash"           VARCHAR NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetBuyerFeedback"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "rating"   INT     NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "rating"            INT     NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 (
-    "from"     VARCHAR NOT NULL,
-    "to"       VARCHAR NOT NULL,
-    "pegHash"  VARCHAR NOT NULL,
-    "rating"   INT     NOT NULL,
-    "gas"      INT     NOT NULL,
-    "status"   BOOLEAN,
-    "txHash"   VARCHAR,
-    "ticketID" VARCHAR NOT NULL,
-    "mode"     VARCHAR NOT NULL,
-    "code"     VARCHAR,
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "pegHash"           VARCHAR NOT NULL,
+    "rating"            INT     NOT NULL,
+    "gas"               INT     NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
-    "id"             VARCHAR NOT NULL,
-    "secretHash"     VARCHAR NOT NULL,
-    "accountAddress" VARCHAR NOT NULL,
-    "language"       VARCHAR NOT NULL,
-    "userType"       VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "secretHash"        VARCHAR NOT NULL,
+    "accountAddress"    VARCHAR NOT NULL,
+    "language"          VARCHAR NOT NULL,
+    "userType"          VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -498,27 +684,39 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
-    "id"           VARCHAR NOT NULL,
-    "ownerID"      VARCHAR NOT NULL,
-    "pegHash"      VARCHAR UNIQUE,
-    "assetType"    VARCHAR NOT NULL,
-    "description"  VARCHAR NOT NULL,
-    "documentHash" VARCHAR NOT NULL UNIQUE,
-    "quantity"     INT     NOT NULL,
-    "quantityUnit" VARCHAR NOT NULL,
-    "price"        INT     NOT NULL,
-    "moderated"    BOOLEAN NOT NULL,
-    "takerID"      VARCHAR,
-    "otherDetails" VARCHAR NOT NULL,
-    "status"       VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "ownerID"           VARCHAR NOT NULL,
+    "pegHash"           VARCHAR UNIQUE,
+    "assetType"         VARCHAR NOT NULL,
+    "description"       VARCHAR NOT NULL,
+    "documentHash"      VARCHAR NOT NULL UNIQUE,
+    "quantity"          INT     NOT NULL,
+    "quantityUnit"      VARCHAR NOT NULL,
+    "price"             INT     NOT NULL,
+    "moderated"         BOOLEAN NOT NULL,
+    "takerID"           VARCHAR,
+    "otherDetails"      VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Email"
 (
-    "id"                   VARCHAR NOT NULL,
-    "emailAddress"         VARCHAR NOT NULL,
-    "status" BOOLEAN       NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "emailAddress"      VARCHAR NOT NULL,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -529,6 +727,12 @@ CREATE TABLE IF NOT EXISTS MASTER."Fiat"
     "transactionAmount" INT     NOT NULL,
     "amountRedeemed"    INT,
     "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("transactionID", "ownerID")
 );
 
@@ -543,14 +747,26 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     "address"            VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("accountID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Mobile"
 (
-    "id"                   VARCHAR NOT NULL,
-    "mobileNumber"         VARCHAR NOT NULL,
-    "status" BOOLEAN       NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "mobileNumber"      VARCHAR NOT NULL,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -565,23 +781,46 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
     "price"                          INT     NOT NULL,
     "quantity"                       INT     NOT NULL,
     "quantityUnit"                   VARCHAR NOT NULL,
-    "assetOtherDetails"              VARCHAR NOT NULL,
     "buyerAcceptedAssetDescription"  BOOLEAN NOT NULL,
     "buyerAcceptedPrice"             BOOLEAN NOT NULL,
     "buyerAcceptedQuantity"          BOOLEAN NOT NULL,
+    "assetOtherDetails"              VARCHAR NOT NULL,
     "buyerAcceptedAssetOtherDetails" BOOLEAN NOT NULL,
     "time"                           INT,
     "paymentTerms"                   VARCHAR NOT NULL,
     "buyerAcceptedPaymentTerms"      BOOLEAN NOT NULL,
     "documentList"                   VARCHAR NOT NULL,
     "buyerAcceptedDocumentList"      BOOLEAN NOT NULL,
+    "physicalDocumentsHandledVia"    VARCHAR,
     "chatID"                         VARCHAR UNIQUE,
     "status"                         VARCHAR NOT NULL,
     "comment"                        VARCHAR,
+    "createdBy"                      VARCHAR,
+    "createdOn"                      TIMESTAMP,
+    "createdOnTimeZone"              VARCHAR,
+    "updatedBy"                      VARCHAR,
+    "updatedOn"                      TIMESTAMP,
+    "updatedOnTimeZone"              VARCHAR,
     PRIMARY KEY ("id"),
     UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Order"
+(
+    "id"                VARCHAR NOT NULL,
+    "orderID"           VARCHAR NOT NULL UNIQUE,
+    "buyerTraderID"     VARCHAR NOT NULL,
+    "sellerTraderID"    VARCHAR NOT NULL,
+    "assetID"           VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
@@ -598,21 +837,33 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     "comment"            VARCHAR,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 (
-    "id"            VARCHAR NOT NULL,
-    "accountHolder" VARCHAR NOT NULL,
-    "nickName"      VARCHAR NOT NULL,
-    "accountNumber" VARCHAR NOT NULL,
-    "bankName"      VARCHAR NOT NULL,
-    "swiftAddress"  VARCHAR NOT NULL,
-    "address"       VARCHAR NOT NULL,
-    "country"       VARCHAR NOT NULL,
-    "zipCode"       VARCHAR NOT NULL,
-    "status"        VARCHAR,
+    "id"                VARCHAR NOT NULL,
+    "accountHolder"     VARCHAR NOT NULL,
+    "nickName"          VARCHAR NOT NULL,
+    "accountNumber"     VARCHAR NOT NULL,
+    "bankName"          VARCHAR NOT NULL,
+    "swiftAddress"      VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "country"           VARCHAR NOT NULL,
+    "zipCode"           VARCHAR NOT NULL,
+    "status"            VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -650,14 +901,19 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Trader"
 (
-    "id"                 VARCHAR NOT NULL,
-    "zoneID"             VARCHAR NOT NULL,
-    "organizationID"     VARCHAR NOT NULL,
-    "accountID"          VARCHAR NOT NULL UNIQUE,
-    "name"               VARCHAR NOT NULL,
-    "completionStatus"   BOOLEAN NOT NULL,
-    "verificationStatus" BOOLEAN,
-    "comment"            VARCHAR,
+    "id"                VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL UNIQUE,
+    "name"              VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "comment"           VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -677,29 +933,18 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
     PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
-(
-    "id"                 VARCHAR NOT NULL,
-    "documentType"       VARCHAR NOT NULL,
-    "fileName"           VARCHAR NOT NULL UNIQUE,
-    "file"               BYTEA,
-    "zoneStatus"         BOOLEAN,
-    "organizationStatus" BOOLEAN,
-    "createdBy"          VARCHAR,
-    "createdOn"          TIMESTAMP,
-    "createdOnTimeZone"  VARCHAR,
-    "updatedBy"          VARCHAR,
-    "updatedOn"          TIMESTAMP,
-    "updatedOnTimeZone"  VARCHAR,
-    PRIMARY KEY ("id", "documentType")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
 (
-    "id"     VARCHAR NOT NULL,
-    "fromID" VARCHAR NOT NULL,
-    "toID"   VARCHAR NOT NULL,
-    "status" BOOLEAN,
+    "id"                VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "toID"              VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -712,6 +957,12 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
     "address"            VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "createdBy"          VARCHAR,
+    "createdOn"          TIMESTAMP,
+    "createdOnTimeZone"  VARCHAR,
+    "updatedBy"          VARCHAR,
+    "updatedOn"          TIMESTAMP,
+    "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -750,46 +1001,75 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
 (
-    "id"        VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id", "accountID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
 (
-    "id"         VARCHAR NOT NULL,
-    "secretHash" VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "secretHash"        VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 (
-    "id"        VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL,
-    "amount"    INT     NOT NULL,
-    "gas"       INT,
-    "status"    BOOLEAN,
-    "ticketID"  VARCHAR,
-    "comment"   VARCHAR,
+    "id"                VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
+    "amount"            INT     NOT NULL,
+    "gas"               INT,
+    "status"            BOOLEAN,
+    "ticketID"          VARCHAR,
+    "comment"           VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Message"
 (
-    "id"            VARCHAR   NOT NULL,
-    "fromAccountID" VARCHAR   NOT NULL,
-    "chatID"        VARCHAR   NOT NULL,
-    "text"          VARCHAR   NOT NULL,
-    "replyToID"     VARCHAR,
-    "createdAt"     TIMESTAMP NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "fromAccountID"     VARCHAR NOT NULL,
+    "chatID"            VARCHAR NOT NULL,
+    "text"              VARCHAR NOT NULL,
+    "replyToID"         VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MessageRead"
 (
-    "messageID" VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL,
-    "readAt"    TIMESTAMP,
+    "messageID"         VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
+    "readAt"            TIMESTAMP,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("messageID", "accountID")
 );
 
@@ -827,8 +1107,14 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
 (
-    "id"    VARCHAR NOT NULL,
-    "token" VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "token"             VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -855,16 +1141,28 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 (
-    "id"               VARCHAR NOT NULL,
-    "sessionTokenHash" VARCHAR NOT NULL,
-    "sessionTokenTime" BIGINT  NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "sessionTokenHash"  VARCHAR NOT NULL,
+    "sessionTokenTime"  BIGINT  NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 (
-    "id"         VARCHAR NOT NULL,
-    "secretHash" VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "secretHash"        VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -889,45 +1187,69 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TraderInvitation"
     "organizationID"      VARCHAR NOT NULL,
     "inviteeEmailAddress" VARCHAR NOT NULL,
     "status"              VARCHAR NOT NULL,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
     PRIMARY KEY ("id"),
     UNIQUE ("organizationID", "inviteeEmailAddress")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ZoneInvitation"
 (
-    "id"           VARCHAR NOT NULL,
-    "emailAddress" VARCHAR NOT NULL UNIQUE,
-    "accountID"    VARCHAR UNIQUE,
-    "status"       BOOLEAN,
+    "id"                VARCHAR NOT NULL,
+    "emailAddress"      VARCHAR NOT NULL UNIQUE,
+    "accountID"         VARCHAR UNIQUE,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
 (
     "id"                VARCHAR NOT NULL,
-    "traderID"         VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
     "transactionAmount" INT     NOT NULL,
     "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
 (
-    "id"        VARCHAR NOT NULL,
-    "reference" VARCHAR NOT NULL,
-    "externalReference" VARCHAR NOT NULL,
-    "invoiceNumber" VARCHAR NOT NULL,
-    "buyerBusinessId" VARCHAR NOT NULL,
-    "buyerFirstName" VARCHAR NOT NULL,
-    "buyerLastName" VARCHAR NOT NULL,
-    "createdDate" TIMESTAMP NOT NULL,
-    "lastUpdatedDate" TIMESTAMP NOT NULL,
-    "status" VARCHAR NOT NULL,
-    "dealType" VARCHAR NOT NULL,
-    "paymentTypeId" VARCHAR NOT NULL,
-    "paidOutAmount" INT NOT NULL,
-    "requestSignature" VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "reference"         VARCHAR   NOT NULL,
+    "externalReference" VARCHAR   NOT NULL,
+    "invoiceNumber"     VARCHAR   NOT NULL,
+    "buyerBusinessId"   VARCHAR   NOT NULL,
+    "buyerFirstName"    VARCHAR   NOT NULL,
+    "buyerLastName"     VARCHAR   NOT NULL,
+    "createdDate"       TIMESTAMP NOT NULL,
+    "lastUpdatedDate"   TIMESTAMP NOT NULL,
+    "status"            VARCHAR   NOT NULL,
+    "dealType"          VARCHAR   NOT NULL,
+    "paymentTypeId"     VARCHAR   NOT NULL,
+    "paidOutAmount"     INT       NOT NULL,
+    "requestSignature"  VARCHAR   NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -943,6 +1265,12 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."SFTPFileTransaction"
     "transactionType"      VARCHAR NOT NULL,
     "productType"          VARCHAR NOT NULL,
     "transactionReference" VARCHAR NOT NULL,
+    "createdBy"            VARCHAR,
+    "createdOn"            TIMESTAMP,
+    "createdOnTimeZone"    VARCHAR,
+    "updatedBy"            VARCHAR,
+    "updatedOn"            TIMESTAMP,
+    "updatedOnTimeZone"    VARCHAR,
     PRIMARY KEY ("transactionReference")
 );
 
@@ -1003,6 +1331,16 @@ ALTER TABLE MASTER."Negotiation"
     ADD CONSTRAINT Negotiation_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Negotiation"
     ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_BCOrder_orderID FOREIGN KEY ("orderID") REFERENCES BLOCKCHAIN."Order_BC" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterTrader_buyerTraderID FOREIGN KEY ("buyerTraderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER."Order"
+    ADD CONSTRAINT Order_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
 ALTER TABLE MASTER."Organization"
     ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Organization"
@@ -1021,8 +1359,6 @@ ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
 ALTER TABLE MASTER."TraderBackgroundCheck"
     ADD CONSTRAINT TraderBackgroundCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."TraderKYC"
-    ADD CONSTRAINT TraderKYC_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
     ADD CONSTRAINT TraderRelation_Trader_fromID FOREIGN KEY ("fromID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
@@ -1133,12 +1469,12 @@ DROP TABLE IF EXISTS MASTER."Fiat" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
+DROP TABLE IF EXISTS MASTER."Order" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;

@@ -48,7 +48,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
           def zoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
-          def zoneAddress(zoneAccountID: String): Future[String] = masterAccounts.Service.getAddress(zoneAccountID)
+          def zoneAddress(zoneAccountID: String): Future[String] = masterAccounts.Service.tryGetAddress(zoneAccountID)
 
           def transactionProcess(toAddress: String): Future[String] = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
             entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),

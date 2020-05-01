@@ -1,11 +1,9 @@
 package views.companion.master
 
-import java.util.Date
-
 import play.api.data.Form
 import play.api.data.Forms._
 
-object ContractContent {
+object AddContract {
 
   val form = Form(
     mapping(

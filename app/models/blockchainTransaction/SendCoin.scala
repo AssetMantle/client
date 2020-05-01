@@ -78,6 +78,16 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def findByTicketID(ticketID: String): Future[SendCoin] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -151,21 +161,19 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def create(sendCoin: SendCoin): Future[String] = add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
 
-    def createAsync(sendCoin: SendCoin) = add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
+    def createAsync(sendCoin: SendCoin): Future[String] = add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
-    def markTransactionFailedAsync(ticketID: String, code: String) = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
-
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionSuccessfulAsync(ticketID: String, txHash: String) = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[SendCoin] = findByTicketID(ticketID)
 
-    def getTransactionAsync(ticketID: String) = findByTicketID(ticketID)
+    def getTransactionAsync(ticketID: String): Future[SendCoin] = findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -198,7 +206,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } else Future(0)
       }
 
-      def fromAccountID(fromAddress: String): Future[String] = masterAccounts.Service.tryGetId(fromAddress)
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -206,12 +214,21 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         _ <- markDirty(sendCoin)
         toAccount <- toAccount(sendCoin.to)
         _ <- unknownUserTypeUpdate(toAccount)
-        fromAccountID <- fromAccountID(sendCoin.from)
+        fromAccountID <- getAccountID(sendCoin.from)
         _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -219,20 +236,12 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getIDs(sendCoin: SendCoin): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.tryGetId(sendCoin.to)
-        val fromAccountID = masterAccounts.Service.tryGetId(sendCoin.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
       (for {
         _ <- markTransactionFailed
         sendCoin <- sendCoin
-        (toAccountID, fromAccountID) <- getIDs(sendCoin)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        fromAccountID <- getAccountID(sendCoin.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

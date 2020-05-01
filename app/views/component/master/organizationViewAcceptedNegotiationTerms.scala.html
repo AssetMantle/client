@@ -19,9 +19,9 @@
             <div class="sellerTerm">
                 @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                 <div>
-                @if(negotiation.buyerAcceptedAssetDescription){
+                @if(negotiation.buyerAcceptedAssetDescription) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -29,19 +29,19 @@
             <div class="sellerTerm">
                 @commonIntInfo(constants.View.PRICE, negotiation.price)
                 <div>
-                @if(negotiation.buyerAcceptedPrice){
+                @if(negotiation.buyerAcceptedPrice) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
             </div>
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 <div>
-                @if(negotiation.buyerAcceptedQuantity){
+                @if(negotiation.buyerAcceptedQuantity) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -51,18 +51,18 @@
             </div>
             <div class="sellerTerm">
                 @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
-            <br>
+                <br>
                 @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-            <br>
+                <br>
                 @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
-            <br>
-            <div>
-            @if(negotiation.buyerAcceptedAssetOtherDetails){
-                @Messages(constants.View.ACCEPTED)
-            } else{
-                @Messages(constants.View.PENDING)
-            }
-            </div>
+                <br>
+                <div>
+                @if(negotiation.buyerAcceptedAssetOtherDetails) {
+                    @Messages(constants.View.ACCEPTED)
+                } else {
+                    @Messages(constants.View.PENDING)
+                }
+                </div>
             </div>
             <hr>
 
@@ -90,9 +90,9 @@
                     </span></p>
                 }
                 <div>
-                @if(negotiation.buyerAcceptedPaymentTerms){
+                @if(negotiation.buyerAcceptedPaymentTerms) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -104,22 +104,22 @@
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
             </div>
             <div class="sellerTerm">
-                @negotiation.documentList.assetDocuments.map{assetDocument=>
+                @negotiation.documentList.assetDocuments.map { assetDocument =>
                     @Messages(assetDocument)
                 }
-                @negotiation.documentList.negotiationDocuments.map{negotiationDocument=>
+                @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
                     @Messages(negotiationDocument)
                 }
-            <div>
-            @if(negotiation.buyerAcceptedDocumentList){
-                @Messages(constants.View.ACCEPTED)
-            } else{
-                @Messages(constants.View.PENDING)
-            }
-            </div>
+                <div>
+                @if(negotiation.buyerAcceptedDocumentList) {
+                    @Messages(constants.View.ACCEPTED)
+                } else {
+                    @Messages(constants.View.PENDING)
+                }
+                </div>
 
             </div>
 
-            </div>
         </div>
     </div>
+</div>

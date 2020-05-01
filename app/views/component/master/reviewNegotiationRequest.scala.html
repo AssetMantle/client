@@ -26,7 +26,7 @@
     @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
     @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
     @*// TODO: commonOptionalDateInfo ??? *@
-    @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTerms.tentativeDate.toString())
+    @commonTextInfo(constants.View.TENTATIVE_DATE, negotiation.paymentTerms.tentativeDate.toString)
     @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
 
     <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
