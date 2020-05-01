@@ -265,10 +265,10 @@ class Negotiations @Inject()(
             def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
             def updateMasterNegotiationStatus(negotiation: masterNegotiation, negotiationResponse: Response): Future[Int] = {
-              if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt)))
-              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
-              else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
-              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = negotiationResponse.value.bid.toInt), time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
+              if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt)))
+              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
+              else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
+              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
               else Future(0)
             }
 
@@ -308,8 +308,7 @@ class Negotiations @Inject()(
       (for {
         dirtyNegotiations <- dirtyNegotiations
         _ <- refreshDirtyAndSendCometMessage(dirtyNegotiations)
-      } yield ()
-        ).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

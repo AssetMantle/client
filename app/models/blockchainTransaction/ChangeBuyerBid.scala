@@ -247,9 +247,9 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
       //TODO If in future BC provides quantity and assetDescription in Negotiation, modify this to update them as well.
       def updateMasterNegotiation(negotiation: masterNegotiation, negotiationID: String, price: Int, time: Int): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
-        masterNegotiations.Service.update(negotiation.copy(negotiationID = Option(negotiationID), assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = price), time = Option(time), status = constants.Status.Negotiation.STARTED))
+        masterNegotiations.Service.update(negotiation.copy(negotiationID = Option(negotiationID), price = price, time = Option(time), status = constants.Status.Negotiation.STARTED))
       } else {
-        masterNegotiations.Service.update(negotiation.copy(assetAndBuyerAccepted = negotiation.assetAndBuyerAccepted.copy(price = price), time = Option(time)))
+        masterNegotiations.Service.update(negotiation.copy(price = price, time = Option(time)))
       }
 
       def sendNotifications(buyer: Trader, seller: Trader, negotiation: masterNegotiation): Future[Unit] = {
@@ -257,18 +257,18 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
         if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
           for {
-            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetAndBuyerAccepted.assetDescription)
-            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetAndBuyerAccepted.assetDescription)
+            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)
+            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)
             buyerOrganization <- getOrganization(buyer.organizationID)
             sellerOrganization <- getOrganization(seller.organizationID)
-            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetAndBuyerAccepted.assetDescription, seller.name, buyer.name, sellerOrganization.name)
-            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetAndBuyerAccepted.assetDescription, seller.name, buyer.name, buyerOrganization.name)
+            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, sellerOrganization.name)
+            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, buyerOrganization.name)
           } yield ()
         } else {
           for {
-            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetAndBuyerAccepted.assetDescription)
-            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetAndBuyerAccepted.assetDescription)
-            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_STARTED, negotiation.buyerTraderID, negotiation.sellerTraderID, negotiation.assetAndBuyerAccepted.assetDescription)
+            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
+            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_STARTED, negotiation.buyerTraderID, negotiation.sellerTraderID, negotiation.assetDescription)
           } yield ()
         }
       }

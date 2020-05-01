@@ -30,10 +30,10 @@
             }
             case None => {}
         }
-        @commonVerticalIntInfo(constants.View.PRICE, negotiation.assetAndBuyerAccepted.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(negotiation.assetAndBuyerAccepted.quantity.toString, negotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonVerticalIntInfo(constants.View.PRICE, negotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, negotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">

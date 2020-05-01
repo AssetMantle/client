@@ -38,11 +38,11 @@
             case None => {}
         }
 
-        @commonTextInfo(constants.View.ASSET_DESCRIPTION, sellNegotiation.assetAndBuyerAccepted.assetDescription)
-        @commonIntInfo(constants.View.PRICE, sellNegotiation.assetAndBuyerAccepted.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.assetAndBuyerAccepted.quantity.toString, sellNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, sellNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sellNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonTextInfo(constants.View.ASSET_DESCRIPTION, sellNegotiation.assetDescription)
+        @commonIntInfo(constants.View.PRICE, sellNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, sellNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonTextInfo(constants.View.STATUS, sellNegotiation.status)
         @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sellNegotiation.id))
     }

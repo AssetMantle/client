@@ -52,7 +52,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def insertMany(fiats: Seq[Fiat]): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
+  private def insertMultiple(fiats: Seq[Fiat]): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -143,7 +143,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[String] = add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit))
 
-    def insertMultiple(fiats: Seq[Fiat]): Future[Seq[String]] = insertMany(fiats)
+    def insertList(fiats: Seq[Fiat]): Future[Seq[String]] = insertMultiple(fiats)
 
     def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address)
 
@@ -202,7 +202,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       (for {
         dirtyFiats <- dirtyFiats
         _ <- insertOrUpdateAndSendCometMessage(dirtyFiats)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

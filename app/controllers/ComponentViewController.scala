@@ -74,7 +74,7 @@ class ComponentViewController @Inject()(
         fiatPegWallet <- fiatPegWallet
         traderID <- traderID
         negotiations <- negotiations(traderID)
-      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = negotiations.filter(_.buyerTraderID == traderID).map(_.assetAndBuyerAccepted.price).sum, receivable = negotiations.filter(_.sellerTraderID == traderID).map(_.assetAndBuyerAccepted.price).sum))
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = negotiations.filter(_.buyerTraderID == traderID).map(_.price).sum, receivable = negotiations.filter(_.sellerTraderID == traderID).map(_.price).sum))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

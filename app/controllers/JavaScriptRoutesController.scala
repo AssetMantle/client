@@ -70,8 +70,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.updateZoneKYC,
 
         routes.javascript.AssetController.issueForm,
-        routes.javascript.AssetController.billOfLadingContentForm,
+        routes.javascript.AssetController.addBillOfLadingForm,
         routes.javascript.AssetController.releaseForm,
+        routes.javascript.AssetController.sendForm,
+        routes.javascript.AssetController.redeemForm,
 
         routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
@@ -251,8 +253,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.updatePaymentTermsForm,
         routes.javascript.NegotiationController.updateDocumentListForm,
         routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm,
-        routes.javascript.NegotiationController.invoiceContentForm,
-        routes.javascript.NegotiationController.contractContentForm,
+        routes.javascript.NegotiationController.addInvoiceForm,
+        routes.javascript.NegotiationController.addContractForm,
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,
         routes.javascript.NegotiationController.buyerConfirmForm,
         routes.javascript.NegotiationController.sellerConfirmForm,
@@ -265,10 +267,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.OrderController.moderatedBuyerExecuteForm,
         routes.javascript.OrderController.moderatedSellerExecuteForm,
+        routes.javascript.OrderController.buyerExecuteForm,
+        routes.javascript.OrderController.sellerExecuteForm,
         routes.javascript.OrderController.blockchainBuyerExecute,
         routes.javascript.OrderController.blockchainSellerExecute,
 
-        routes.javascript.RedeemAssetController.redeemAssetForm,
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 
         routes.javascript.RedeemFiatController.redeemFiatForm,
@@ -276,7 +279,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
 
-        routes.javascript.SendAssetController.sendAssetForm,
         routes.javascript.SendAssetController.blockchainSendAssetForm,
 
         routes.javascript.SendCoinController.faucetRequestForm,

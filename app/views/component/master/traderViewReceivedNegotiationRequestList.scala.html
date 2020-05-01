@@ -28,10 +28,10 @@
             }
             case None => {}
         }
-        @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.assetAndBuyerAccepted.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.assetAndBuyerAccepted.quantity.toString, receivedNegotiationRequest.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, receivedNegotiationRequest.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, receivedNegotiationRequest.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge)
         <div class="listItemChild">
             <p class="listItemChildTitle">
             @Messages(constants.View.ACCEPT)

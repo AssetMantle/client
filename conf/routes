@@ -55,11 +55,17 @@ POST        /account/userReviewIdentification                                   
 GET         /asset/issue                                                                          controllers.AssetController.issueForm
 POST        /asset/issue                                                                          controllers.AssetController.issue
 
-GET         /asset/billOfLadingContent                                                            controllers.AssetController.billOfLadingContentForm(negotiationID: String)
-POST        /asset/billOfLadingContent                                                            controllers.AssetController.billOfLadingContent
+GET         /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLadingForm(negotiationID: String)
+POST        /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLading
+
+GET         /asset/send                                                                           controllers.AssetController.sendForm(orderID: String)
+POST        /asset/send                                                                           controllers.AssetController.send
 
 GET         /asset/release                                                                        controllers.AssetController.releaseForm(assetID: String)
 POST        /asset/release                                                                        controllers.AssetController.release
+
+GET         /asset/redeem                                                                         controllers.AssetController.redeemForm(assetID: String)
+POST        /asset/redeem                                                                         controllers.AssetController.redeem
 
 GET         /contact                                                                              controllers.ContactController.contact
 
@@ -108,11 +114,11 @@ POST        /negotiation/updateDocumentList                                     
 GET         /negotiation/acceptOrRejectNegotiationTerms                                           controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                           controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
-GET         /negotiation/invoiceContent                                                           controllers.NegotiationController.invoiceContentForm(id: String)
-POST        /negotiation/invoiceContent                                                           controllers.NegotiationController.invoiceContent
+GET         /negotiation/addInvoice                                                               controllers.NegotiationController.addInvoiceForm(id: String)
+POST        /negotiation/addInvoice                                                               controllers.NegotiationController.addInvoice
 
-GET         /negotiation/contractContent                                                          controllers.NegotiationController.contractContentForm(id: String)
-POST        /negotiation/contractContent                                                          controllers.NegotiationController.contractContent
+GET         /negotiation/addContract                                                              controllers.NegotiationController.addContractForm(id: String)
+POST        /negotiation/addContract                                                              controllers.NegotiationController.addContract
 
 GET         /negotiation/confirmAllNegotiationTerms                                               controllers.NegotiationController.confirmAllNegotiationTermsForm(id: String)
 POST        /negotiation/confirmAllNegotiationTerms                                               controllers.NegotiationController.confirmAllNegotiationTerms
@@ -130,6 +136,12 @@ POST        /order/moderatedBuyerExecute                                        
 
 GET         /order/moderatedSellerExecute                                                         controllers.OrderController.moderatedSellerExecuteForm(orderID: String)
 POST        /order/moderatedSellerExecute                                                         controllers.OrderController.moderatedSellerExecute
+
+GET         /order/buyerExecute                                                                   controllers.OrderController.buyerExecuteForm(orderID: String)
+POST        /order/buyerExecute                                                                   controllers.OrderController.buyerExecute
+
+GET         /order/sellerExecute                                                                  controllers.OrderController.sellerExecuteForm(orderID: String)
+POST        /order/sellerExecute                                                                  controllers.OrderController.sellerExecute
 
 GET         /order/blockchainBuyerExecute                                                         controllers.OrderController.blockchainBuyerExecuteForm
 POST        /order/blockchainBuyerExecute                                                         controllers.OrderController.blockchainBuyerExecute
@@ -428,14 +440,8 @@ GET         /master/issueFiatRequest                                            
 GET         /master/issueFiat                                                                     controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                                                     controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemAsset                                                                   controllers.RedeemAssetController.redeemAssetForm(username: String, pegHash: String)
-POST        /master/redeemAsset                                                                   controllers.RedeemAssetController.redeemAsset
-
 GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiat
-
-GET         /master/sendAsset                                                                     controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
-POST        /master/sendAsset                                                                     controllers.SendAssetController.sendAsset
 
 GET         /master/sendCoin                                                                      controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                                                      controllers.SendCoinController.sendCoin

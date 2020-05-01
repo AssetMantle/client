@@ -98,7 +98,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateOwnerIDByPegHash(pegHash: String, ownerID: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.ownerID).update(ownerID).asTry).map {
+  private def updateOwnerIDAndStatusByPegHash(pegHash: String, ownerID: String, status: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(x => (x.ownerID, x.status)).update((ownerID, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -178,7 +178,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       } yield documentHash
     }
 
-    def updateOwnerByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDByPegHash(pegHash = pegHash, ownerID = ownerID)
+    def markAssetSendToOrderByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDAndStatusByPegHash(pegHash = pegHash, ownerID = ownerID, status = constants.Status.Asset.IN_ORDER)
 
     def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
 

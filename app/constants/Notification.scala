@@ -122,18 +122,26 @@ object Notification {
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "BUYER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN = new Notification(notificationType = "SELLER_SENT_CONFIRM_NEGOTIATION_TRANSACTION_TO_BLOCKCHAIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val ZONE_RELEASED_ASSET = new Notification(notificationType = "ZONE_RELEASED_ASSET", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
   val MODERATED_BUY_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_BUY_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val MODERATED_SELL_ORDER_EXECUTED = new Notification(notificationType = "MODERATED_SELL_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BUYER_ORDER_EXECUTED = new Notification(notificationType = "BUYER_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_ORDER_EXECUTED = new Notification(notificationType = "SELLER_ORDER_EXECUTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val BUYER_BID_CONFIRMED = new Notification(notificationType = "BUYER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_BID_CONFIRMED = new Notification(notificationType = "SELLER_BID_CONFIRMED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "BUYER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SELLER_BID_CONFIRMATION_FAILED = new Notification(notificationType = "SELLER_BID_CONFIRMATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
+  val BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_FAILED = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val REDEEM_ASSET_SUCCESSFUL = new Notification(notificationType = "REDEEM_ASSET_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_FAILED = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SEND_ASSET_TO_ORDER_SUCCESSFUL = new Notification(notificationType = "SEND_ASSET_TO_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val SEND_ASSET_TO_ORDER_FAILED = new Notification(notificationType = "SEND_ASSET_TO_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_EXECUTE_ORDER_SUCCESSFUL = new Notification(notificationType = "BUYER_EXECUTE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false)

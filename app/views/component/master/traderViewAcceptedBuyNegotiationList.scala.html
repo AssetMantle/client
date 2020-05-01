@@ -28,11 +28,11 @@
             }
             case None => {}
         }
-        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetAndBuyerAccepted.assetDescription)
-        @commonVerticalIntInfo(constants.View.PRICE, buyNegotiation.assetAndBuyerAccepted.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.assetAndBuyerAccepted.quantity.toString, buyNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, buyNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, buyNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetDescription)
+        @commonVerticalIntInfo(constants.View.PRICE, buyNegotiation.price)
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.quantity.toString, buyNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, buyNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, buyNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, buyNegotiation.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">

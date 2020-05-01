@@ -19,25 +19,29 @@ import scala.concurrent.{ExecutionContext, Future}
 class AssetController @Inject()(
                                  blockchainAssets: blockchain.Assets,
                                  blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
+                                 blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
+                                 blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
+                                 blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets,
                                  masterAccounts: master.Accounts,
                                  masterTraders: master.Traders,
                                  masterTradeRelations: master.TraderRelations,
                                  masterZones: master.Zones,
                                  masterAssets: master.Assets,
+                                 masterNegotiations: master.Negotiations,
                                  messagesControllerComponents: MessagesControllerComponents,
+                                 masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  transaction: utilities.Transaction,
                                  transactionsIssueAsset: transactions.IssueAsset,
+                                 transactionsRedeemAsset: transactions.RedeemAsset,
+                                 transactionsReleaseAsset: transactions.ReleaseAsset,
+                                 transactionsSendAsset: transactions.SendAsset,
                                  utilitiesNotification: utilities.Notification,
                                  utilitiesTransaction: utilities.Transaction,
                                  withZoneLoginAction: WithZoneLoginAction,
-                                 masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                 transactionsReleaseAsset: transactions.ReleaseAsset,
-                                 blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
-                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
-                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                                 masterNegotiations: master.Negotiations,
                                )
                                (implicit
                                 executionContext: ExecutionContext,
@@ -194,7 +198,7 @@ class AssetController @Inject()(
       )
   }
 
-  def billOfLadingContentForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addBillOfLadingForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -204,9 +208,9 @@ class AssetController @Inject()(
         documentContent match {
           case Some(content) => {
             val billOfLading = content.asInstanceOf[BillOfLading]
-            withUsernameToken.Ok(views.html.component.master.billOfLadingContent(views.companion.master.BILL_OF_LADING.form.fill(views.companion.master.BILL_OF_LADING.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.billOfLadingContent(negotiationID = negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
         }
       }
 
@@ -220,11 +224,11 @@ class AssetController @Inject()(
       }
   }
 
-  def billOfLadingContent: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def addBillOfLading(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.BILL_OF_LADING.form.bindFromRequest().fold(
+      views.companion.master.AddBillOfLading.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.billOfLadingContent(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+          Future(BadRequest(views.html.component.master.addBillOfLading(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
         },
         billOfLadingContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
@@ -286,18 +290,22 @@ class AssetController @Inject()(
 
           def sendTransaction(seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean): Future[String] = {
             if (seller.zoneID != zoneID || asset.ownerID != seller.id) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
-            if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
-            if (billOfLading.status.isDefined && !billOfLading.status.get) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
-            transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
-              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND)), gas = releaseData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND)), mode = transactionMode),
-              action = transactionsReleaseAsset.Service.post,
-              onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
-            )
+            else if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
+            else if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
+            else if (billOfLading.status.contains(false)) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
+            else asset.pegHash match {
+              case Some(pegHash) =>
+                transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
+                  entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = pegHash, gas = releaseData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
+                  request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = pegHash, mode = transactionMode),
+                  action = transactionsReleaseAsset.Service.post,
+                  onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
+                )
+              case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+            }
           }
 
           (for {
@@ -312,6 +320,122 @@ class AssetController @Inject()(
             _ <- utilitiesNotification.send(seller.accountID, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
             result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ZONE_RELEASED_ASSET)))
           } yield result).recover {
+            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def sendForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.sendAsset(orderID = orderID))
+  }
+
+  def send: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.SendAsset.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.ORDER_ID.name))))
+        },
+        sendAssetData => {
+          val negotiation = masterNegotiations.Service.tryGet(sendAssetData.orderID)
+
+          def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
+
+          def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+
+          def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
+
+          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String): Future[String] = {
+            if (asset.ownerID != sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
+            else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
+            else asset.pegHash match {
+              case Some(pegHash) => if (asset.status == constants.Status.Asset.ISSUED) {
+                transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
+                  entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
+                  request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sellerAddress, gas = sendAssetData.gas.toString), to = buyerAddress, password = sendAssetData.password, pegHash = pegHash, mode = transactionMode),
+                  action = transactionsSendAsset.Service.post,
+                  onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionSendAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
+                )
+              } else throw new BaseException(constants.Response.UNAUTHORIZED)
+              case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+            }
+
+          }
+
+          (for {
+            negotiation <- negotiation
+            asset <- getAsset(negotiation.assetID)
+            assetLocked <- getLockedStatus(asset.pegHash)
+            buyer <- getTrader(negotiation.buyerTraderID)
+            buyerAddress <- getAddress(buyer.accountID)
+            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked, sellerTraderID = negotiation.sellerTraderID)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
+            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.orderID, successes = Seq(constants.Response.ASSET_SENT)))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sendAssetData.orderID, failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def redeemForm(assetID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.redeemAsset(assetID = assetID))
+  }
+
+  def redeem: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.RedeemAsset.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ASSET_ID.name))))
+        },
+        redeemAssetData => {
+          val asset = masterAssets.Service.tryGet(redeemAssetData.assetID)
+          val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+
+          def getLockedStatus(asset: Asset): Future[Boolean] = if (asset.pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(asset.pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+
+          def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
+
+          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+
+          def sendTransaction(ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[String] = {
+            if (asset.ownerID != trader.id) throw new BaseException(constants.Response.UNAUTHORIZED)
+            else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
+            else asset.pegHash match {
+              case Some(pegHash) =>
+                transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
+                  entity = blockchainTransaction.RedeemAsset(from = ownerAddress, to = zoneAddress, pegHash = pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
+                  request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = ownerAddress, gas = redeemAssetData.gas.toString), to = zoneAddress, password = redeemAssetData.password, pegHash = pegHash, mode = transactionMode),
+                  action = transactionsRedeemAsset.Service.post,
+                  onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
+                )
+              case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+            }
+
+          }
+
+          (for {
+            asset <- asset
+            trader <- trader
+            assetLocked <- getLockedStatus(asset)
+            zoneAccountID <- getZoneAccountID(trader.zoneID)
+            zoneAddress <- getAddress(zoneAccountID)
+            ticketID <- sendTransaction(ownerAddress = loginState.address, zoneAddress = zoneAddress, asset = asset, assetLocked = assetLocked, trader = trader)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT, ticketID)
+            _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT, ticketID)
+            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ASSET_REDEEMED)))
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
         }

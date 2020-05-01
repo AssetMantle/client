@@ -28,11 +28,11 @@
             }
             case None => {}
         }
-        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetAndBuyerAccepted.assetDescription)
-        @commonIntInfo(constants.View.PRICE, incompleteNegotiation.assetAndBuyerAccepted.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.assetAndBuyerAccepted.quantity.toString, incompleteNegotiation.assetAndBuyerAccepted.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, incompleteNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, incompleteNegotiation.assetOtherDetailsAndBuyerAccepted.assetOtherDetails.shippingDetails.portOfDischarge)
+        @commonVerticalTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetDescription)
+        @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
+        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString, incompleteNegotiation.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
         @commonFormButton(constants.Form.NEGOTIATION_PAYMENT_TERMS, 'parameters -> s"'${incompleteNegotiation.id}'")
     }
