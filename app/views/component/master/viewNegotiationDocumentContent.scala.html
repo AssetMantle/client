@@ -8,15 +8,15 @@
 @documentContent match {
     case Some(content)=> {
         @documentType match {
-            case constants.File.INVOICE => {
-                @Messages(constants.File.INVOICE) :
+            case constants.File.Negotiation.INVOICE => {
+                @Messages(constants.File.Negotiation.INVOICE) :
                 @defining(content.asInstanceOf[Serializable.Invoice]){invoiceDetails=>
                     @commonTextInfo(constants.View.INVOICE_NUMBER, invoiceDetails.invoiceNumber)
                     @commonDateInfo(constants.View.INVOICE_DATE, invoiceDetails.invoiceDate)
                 }
             }
-            case constants.File.CONTRACT =>{
-                @Messages(constants.File.CONTRACT) :
+            case constants.File.Negotiation.CONTRACT =>{
+                @Messages(constants.File.Negotiation.CONTRACT) :
                 @defining(content.asInstanceOf[Serializable.Contract]){contractDetails=>
                     @commonTextInfo(constants.View.CONTRACT_NUMBER, contractDetails.contractNumber)
                 }

@@ -73,7 +73,7 @@ class IssueAssetController @Inject()(
         issueAssetData => {
           val traderAccountID = masterTraders.Service.tryGetAccountId(issueAssetData.tarderID)
 
-          def toAddress(toAccountID: String): Future[String] = masterAccounts.Service.getAddress(toAccountID)
+          def toAddress(toAccountID: String): Future[String] = masterAccounts.Service.tryGetAddress(toAccountID)
 
           val verifyRequestedStatus = masterAssets.Service.verifyAssetPendingRequestStatus(issueAssetData.id)
 

@@ -31,8 +31,12 @@ object FormField {
   val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ID = new StringFormField("ID", 32, 32)
+  val ORDER_ID = new StringFormField("ORDER_ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
+  val BUYER_ACCOUNT_ID = new StringFormField("BUYER_ACCOUNT_ID", 3, 50)
+  val SELLER_ACCOUNT_ID = new StringFormField("SELLER_ACCOUNT_ID", 3, 50)
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 0, 1000)
+  val FIAT_PROOF = new StringFormField("FIAT_PROOF", 0, 1000)
   val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 0, 1000)
   val PEG_HASH = new StringFormField("PEG_HASH", 2, 50, RegularExpression.PEG_HASH)
   val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
@@ -116,13 +120,10 @@ object FormField {
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
   val DELIVERY_TERM = new SelectFormField("DELIVERY_TERM", constants.SelectFieldOptions.DELIVERY_TERMS)
-  val QUALITY = new SelectFormField("QUALITY", constants.SelectFieldOptions.QUALITIES)
-  val TRADE_TYPE = new SelectFormField("TRADE_TYPE", constants.SelectFieldOptions.TRADE_TYPES)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
-  val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldOptions.PAYMENT_TERMS)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_BY", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
-  val REFRENCE = new SelectFormField("REFRENCE", constants.SelectFieldOptions.REFRENCE_DATES)
+  val REFERENCE = new SelectFormField("REFERENCE", constants.SelectFieldOptions.REFERENCE_DATES)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
@@ -170,9 +171,7 @@ object FormField {
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_MNEMONIC_NOTED = new BooleanFormField("CONFIRM_MNEMONIC_NOTED")
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
-  val ADVANCE_PAYMENT = new BooleanFormField("ADVANCE_PAYMENT")
-  val CREDIT = new BooleanFormField("CREDIT")
-  val OBL = new BooleanFormField("OBL")
+  val BILL_OF_LADING = new BooleanFormField("BILL_OF_LADING")
   val INVOICE = new BooleanFormField("INVOICE")
   val COO = new BooleanFormField("COO")
   val COA = new BooleanFormField("COA")
@@ -192,6 +191,7 @@ object FormField {
   val ADDRESS = new NestedFormField("ADDRESS")
   val UBOS = new NestedFormField("UBOS")
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
+  val CREDIT = new NestedFormField("CREDIT")
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

@@ -36,16 +36,23 @@ class RedeemAssets @Inject()(
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
   private[models] val redeemAssetTable = TableQuery[RedeemAssetTable]
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(redeemAsset: RedeemAsset): Future[String] = db.run((redeemAssetTable returning redeemAssetTable.map(_.ticketID) += redeemAsset).asTry).map {
@@ -89,6 +96,16 @@ class RedeemAssets @Inject()(
   }
 
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -161,6 +178,8 @@ class RedeemAssets @Inject()(
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[RedeemAsset] = findByTicketID(ticketID)
@@ -181,28 +200,37 @@ class RedeemAssets @Inject()(
       def markRedeemed(pegHash: String): Future[Int] = masterAssets.Service.markRedeemedByPegHash(pegHash)
 
       def markDirty(redeemAsset: RedeemAsset): Future[Unit] = {
-        val markDirtyPegHash = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(redeemAsset.from)
+        val markAssetDirty = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
+        val markFromAccountDirty = blockchainAccounts.Service.markDirty(redeemAsset.from)
         for {
-          _ <- markDirtyPegHash
-          _ <- markDirtyFrom
-        } yield {}
+          _ <- markAssetDirty
+          _ <- markAssetDirty
+        } yield ()
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionSuccessful
         redeemAsset <- redeemAsset
         _ <- markRedeemed(redeemAsset.pegHash)
         _ <- markDirty(redeemAsset)
-        fromAccountID <- getID(redeemAsset.from)
-        toAccountID <- getID(redeemAsset.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+        fromAccountID <- getAccountID(redeemAsset.from)
+        toAccountID <- getAccountID(redeemAsset.to)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -216,10 +244,8 @@ class RedeemAssets @Inject()(
         _ <- markTransactionFailed
         redeemAsset <- redeemAsset
         fromAccountID <- getID(redeemAsset.from)
-        toAccountID <- getID(redeemAsset.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      } yield {}).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_FAILED, message)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
