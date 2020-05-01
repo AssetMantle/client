@@ -26,14 +26,7 @@ class ViewController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def market: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      Future(
-        Ok(views.html.market())
-      ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
+  private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
   def genesisRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -48,15 +41,6 @@ class ViewController @Inject()(
     implicit request =>
       Future {
         Ok(views.html.zoneRequest())
-      }.recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def organizationRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      Future {
-        Ok(views.html.organizationRequest())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
