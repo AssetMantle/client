@@ -339,10 +339,8 @@ class SetACLController @Inject()(
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
-
               val zone = masterZones.Service.tryGet(trader.zoneID)
               val traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)
-
               for {
                 zone <- zone
                 traderKYCs <- traderKYCs
