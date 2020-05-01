@@ -2345,19 +2345,12 @@ header:before,
   }
 }
 .accountName.buy{
-  //background-color:#B004DB ;
   background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
 }
 .accountName.sell{
-  //background-color: #5EB55C;
   background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
 }
-//.accountName.buy{
-//  border-color: #B004DB transparent transparent #B004DB;
-//}
-//.accountName.sell{
-//  border-color: #5EB55C transparent transparent #5EB55C;
-//}
+
 .salesQuoteList{
   .cmuk-card-header{
     .cmuk-button{
@@ -2826,17 +2819,13 @@ figure.zoom {
       }
     }
     .salesQuoteCategory.buy{
-      //background-color:#B004DB ;
       background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
     }
     .salesQuoteCategory.sell{
-      //background-color: #5EB55C;
       background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
     }
   }
   .secondPart{
-    //background:#F9F9F9;
-    //border: 0.928571px solid rgba(5, 60, 117, 0.12);
     border-radius: 2px;
     padding:20px 10px 20px 0px;
     flex: 45%;
