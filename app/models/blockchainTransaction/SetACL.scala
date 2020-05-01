@@ -29,7 +29,6 @@ class SetACLs @Inject()(
                          transaction: utilities.Transaction,
                          protected val databaseConfigProvider: DatabaseConfigProvider,
                          blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
-                         transactionSetACL: transactions.SetACL,
                          blockchainAccounts: blockchain.Accounts,
                          blockchainAclHashes: blockchain.ACLHashes,
                          blockchainAclAccounts: blockchain.ACLAccounts,
@@ -37,7 +36,6 @@ class SetACLs @Inject()(
                          masterAccounts: master.Accounts,
                          masterTraders: master.Traders,
                          masterOrganizations: master.Organizations,
-                         masterTraderKYCs: master.TraderKYCs
                        )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_ACL

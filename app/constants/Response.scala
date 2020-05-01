@@ -178,6 +178,7 @@ object Response {
   val BILL_OF_LADING_NOT_FOUND = new Failure("BILL_OF_LADING_NOT_FOUND")
   val BILL_OF_LADING_REJECTED = new Failure("BILL_OF_LADING_REJECTED")
   val FIAT_PEG_WALLET_NOT_FOUND = new Failure("FIAT_PEG_WALLET_NOT_FOUND")
+  val ORGANIZATION_NOT_VERIFIED = new Failure("ORGANIZATION_NOT_VERIFIED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

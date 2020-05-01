@@ -138,12 +138,9 @@ object Form {
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader(), routes.javascript.SetACLController.inviteTraderForm)
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader(), routes.javascript.SetACLController.addTraderForm)
-  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest(), routes.javascript.SetACLController.userReviewAddTraderRequestForm)
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL(), routes.javascript.SetACLController.blockchainSetACLForm)
-  val ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.organizationAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm)
-  val ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.zoneAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm)
 
   //SetBuyerFeedbackController
   val SET_BUYER_FEEDBACK = new Form("SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.setBuyerFeedback(), routes.javascript.SetBuyerFeedbackController.setBuyerFeedbackForm)
