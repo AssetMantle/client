@@ -115,20 +115,20 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           Future(BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
         },
         issueFiatRequestData => {
+          val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
           val traderDetails = masterTraders.Service.tryGetByAccountID(loginState.username)
           val identification = masterIdentifications.Service.tryGet(loginState.username)
 
           def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
-          val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
 
           def organizationDetails(organizationID: String): Future[master.Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           (for {
+            emailAddress <- emailAddress
             traderDetails <- traderDetails
             identification <- identification
             transactionID <- create(traderDetails.id)
-            emailAddress <- emailAddress
             organizationDetails <- organizationDetails(traderDetails.organizationID)
           } yield {
             val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(transactionID),

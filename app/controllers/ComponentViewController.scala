@@ -1570,7 +1570,15 @@ class ComponentViewController @Inject()(
   def traderViewTradeRoomFinancial(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       //TODO: show correct FINANCIALS after orderTable
-      Future(Ok(views.html.component.master.traderViewTradeRoomFinancial(0, 0, 0)))
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+      (for{
+        traderID <- traderID
+        negotiation <- negotiation
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(0, 0, 0, traderID, negotiation))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+      }
   }
 
   //TODO: Whoever did this correct it

@@ -1393,7 +1393,7 @@ ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
 ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
     ADD CONSTRAINT RedeemFiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
-    ADD CONSTRAINT SendFiatRequest_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("negotiationID");
+    ADD CONSTRAINT SendFiatRequest_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
     ADD CONSTRAINT SendFiatRequest_SendFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."SendFiat" ("ticketID");
 ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"

@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@(amountDue: Int, amountPaid: Int, amountPending: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import models.master.Negotiation
+@(amountDue: Int, amountPaid: Int, amountPending: Int, traderID: String, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="financial">
     <ul class="">
         <li class="cmuk-flex">
@@ -31,5 +32,13 @@
             </div>
 
         </li>
+        <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
+            @Messages(constants.View.ADD_BALANCE)</button>
+        <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
+            @Messages(constants.View.REDEEM_BALANCE)</button>
+        @if(traderID == negotiation.buyerTraderID){
+        <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.id'))">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
+            @Messages(constants.View.SEND_FIAT)</button>
+        }
     </ul>
 </div>
