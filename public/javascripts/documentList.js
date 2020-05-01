@@ -18,6 +18,6 @@ function onDocumentSelect(source) {
     }
 }
 
-function intializeCheckBox(value) {
+function initializeCheckBox(value) {
     $('#' + value).prop('checked', true);
 }

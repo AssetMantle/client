@@ -315,7 +315,7 @@ class AddZoneController @Inject()(
             if (allKYCFilesVerified) {
               val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
 
-              def zoneAccountAddress(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
+              def zoneAccountAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
 
               def transactionProcess(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
                 entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),

@@ -2,7 +2,7 @@
 @import views.companion.master.AddZone
 @import views.html.base._
 
-@(addZoneForm: Form[AddZone.Data] = AddZone.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(addZoneForm: Form[AddZone.Data] = AddZone.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ZONE, addZoneForm) {
     @commonInputText(addZoneForm, constants.FormField.NAME)
     @commonInputText(addZoneForm, constants.FormField.CURRENCY)

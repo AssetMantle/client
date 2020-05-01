@@ -67,13 +67,8 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
 
   private def createDocusignEnvelope(emailAddress: String, file: Document[_], trader: Trader)(implicit language: Lang) = {
     try {
-      val path = file.documentType match {
-        case constants.File.OBL | constants.File.COO | constants.File.COA => fileResourceManager.getTraderAssetFilePath(file.documentType)
-        case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => fileResourceManager.getTraderNegotiationFilePath(file.documentType)
-      }
-
       val document = new DocusignDocument()
-      document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, file.fileName)))))
+      document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(file.documentType), file.fileName)))))
       document.setName(file.fileName.split("""\.""")(0))
       document.setFileExtension(utilities.FileOperations.fileExtensionFromName(file.fileName))
       document.setDocumentId(constants.View.DOCUMENT_INDEX)
@@ -109,7 +104,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
 
   private def createSenderViewURL2(envelopeID: String) = {
     val viewRequest = new ReturnUrlRequest
-    viewRequest.setReturnUrl(comdexURL + routes.DocusignController.docusignReturn(None,None).url)
+    viewRequest.setReturnUrl(comdexURL + routes.DocusignController.docusignReturn("", "").url.split("""\?""")(0))
     envelopesApi.createSenderView(accountID, envelopeID, viewRequest).getUrl
   }
 
@@ -123,7 +118,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
   private def createRecipientView22(envelopeID: String, emailAddress: String, trader: Trader) = {
     try {
       val viewRequest = new RecipientViewRequest()
-      viewRequest.setReturnUrl(comdexURL +routes.DocusignController.docusignReturn(Option(envelopeID),None).url)
+      viewRequest.setReturnUrl(comdexURL + routes.DocusignController.docusignReturn(envelopeID,"").url.split("""&""")(0))
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
       viewRequest.setUserName(trader.name)
@@ -140,12 +135,12 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
 
   def createRecipientView(envelopeID: String, emailAddress: String, trader: Trader) = createRecipientView22(envelopeID, emailAddress, trader)
 
-  def updateSignedDOcuemnt(envelopeID: String, fileName: String) = fetchAndStoreSignedDocument(envelopeID, fileName)
+  def updateSignedDOcuemnt(envelopeID: String, documentType: String) = fetchAndStoreSignedDocument(envelopeID, documentType)
 
-  def fetchAndStoreSignedDocument(envelopeID: String, fileName: String) = {
+  def fetchAndStoreSignedDocument(envelopeID: String, documentType: String) = {
     val result = envelopesApi.getDocument(accountID, envelopeID, constants.View.DOCUMENT_INDEX)
     val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(result)).toString, constants.File.PDF).mkString(".")
-    val file = utilities.FileOperations.newFile(fileResourceManager.getTraderNegotiationFilePath(constants.File.CONTRACT), newFileName)
+    val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
     val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
     bufferedOutputStream.write(result)
     bufferedOutputStream.close()
@@ -186,7 +181,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
 
   private def fetchAuthorizationUri = {
     try {
-      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.View.SIGNATURE_SCOPE), comdexURL +routes.DocusignController.authorizationReturn(None).url, constants.View.CODE).toString
+      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.View.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationReturn("").url.split("""\?""")(0), constants.View.CODE).toString
     } catch {
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.ENVELOPE_CREATION_FAILED)

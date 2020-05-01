@@ -5,20 +5,18 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(buyNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(buyNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @buyNegotiationList.map { buyNegotiation =>
     @commonInfoBox() {
-
         @traderList.find(_.id == buyNegotiation.buyerTraderID) match {
-                case Some(trader) => {
-                    @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonTextInfo(constants.View.BUYER_TRADER_ID, buyNegotiation.buyerTraderID)
-                }
+            case Some(trader) => {
+                @commonTextInfo(constants.View.BUYER_TRADER_NAME, trader.name)
+            }
+            case None => {
+                @commonTextInfo(constants.View.BUYER_TRADER_ID, buyNegotiation.buyerTraderID)
+            }
         }
-
         @counterPartyTraderList.find(_.id == buyNegotiation.sellerTraderID) match {
             case Some(trader) => {
                 @commonTextInfo(constants.View.SELLER_TRADER_ID, trader.name)
@@ -37,13 +35,12 @@
             }
             case None => {}
         }
-
         @commonTextInfo(constants.View.ASSET_DESCRIPTION, buyNegotiation.assetDescription)
         @commonIntInfo(constants.View.PRICE, buyNegotiation.price)
         @commonTextInfo(constants.View.QUANTITY, Seq(buyNegotiation.quantity.toString, buyNegotiation.quantityUnit).mkString(" "))
         @commonVerticalTextInfo(constants.View.LOAD_PORT, buyNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
         @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, buyNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonTextInfo(constants.View.STATUS, buyNegotiation.status)
-        @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(buyNegotiation.id))
+        @commonLink(constants.View.GO_TO_TRADE_ROOM, routes.ViewController.tradeRoom(buyNegotiation.id))
     }
-}
+    }

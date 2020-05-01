@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 
 <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)</div>
@@ -46,7 +46,7 @@
         @commonVerticalTextInfo(constants.View.COMMENT, rejectedReceivedNegotiation.comment.getOrElse(""))
     </li>
 }
-<div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
+    <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
 @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
     <li class="commonList">
         @traderList.find(_.id == rejectedSentNegotiation.sellerTraderID) match {
@@ -84,7 +84,7 @@
         @commonVerticalTextInfo(constants.View.COMMENT, rejectedSentNegotiation.comment.getOrElse(""))
     </li>
 }
-<div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
+    <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
 @failedNegotiationList.map { failedNegotiation =>
     <li class="commonList">
         @traderList.find(_.id == failedNegotiation.sellerTraderID) match {
@@ -120,5 +120,5 @@
         @commonVerticalTextInfo(constants.View.LOAD_PORT, failedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
         @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, failedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonVerticalTextInfo(constants.View.STATUS, failedNegotiation.status)
-    </li>
+</li>
 }

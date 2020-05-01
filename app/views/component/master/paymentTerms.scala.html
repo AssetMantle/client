@@ -2,19 +2,17 @@
 @import views.html.base._
 @import views.companion.master.PaymentTerms
 
-@(paymentTermsForm: Form[PaymentTerms.Data] = PaymentTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="paymentTermsForm">
-    @commonForm(constants.Form.NEGOTIATION_PAYMENT_TERMS, paymentTermsForm) {
-        @commonInputText(paymentTermsForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
-        @commonCheckbox(paymentTermsForm, constants.FormField.ADVANCE_PAYMENT, 'oninput -> """advancePaymentInput(this, '#ADVANCE_PERCENTAGE', '#CREDIT')""")
-        @commonInputDouble(paymentTermsForm, constants.FormField.ADVANCE_PERCENTAGE, 'oninput -> """advancePercentageInput(this, "#CREDIT","#TENTATIVE_DATE","#TENURE", "#REFRENCE")""")
-        @commonCheckbox(paymentTermsForm, constants.FormField.CREDIT, 'oninput -> """creditInput(this, "#ADVANCE_PAYMENT", "#ADVANCE_PERCENTAGE","#TENTATIVE_DATE","#TENURE", "#REFRENCE")""")
-        @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'oninput -> """tentativeDateInput(this, "#TENURE", "#REFRENCE")""")
-        @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'oninput -> """tenureInput(this, "#TENTATIVE_DATE")""")
-        @commonSelect(paymentTermsForm, constants.FormField.REFRENCE, 'oninput -> """refrenceInput(this, "#TENTATIVE_DATE")""")
+@(paymentTermsForm: Form[PaymentTerms.Data] = PaymentTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.NEGOTIATION_PAYMENT_TERMS, paymentTermsForm) {
+    @commonInputText(paymentTermsForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @Messages(constants.View.ADVANCE_PAYMENT)
+    @commonInputDouble(paymentTermsForm, constants.FormField.ADVANCE_PERCENTAGE, 'id -> "advancePercentage", 'oninput -> "advancePercentageInput()")
+    @Messages(constants.View.CREDIT_TERMS)
+    @defining(Option(constants.FormField.CREDIT)) { implicit nestedFormField =>
+        @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'required -> false, 'id -> "tentativeDate", 'oninput -> "tentativeDateInput()")
+        @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'required -> false, 'id -> "tenure", 'oninput -> "tenureInput()")
+        @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'required -> false, 'id -> "reference")
     }
-</div>
+
+}
 <script src="@routes.Assets.versioned("javascripts/paymentTerms.js")" type="text/javascript"></script>
-<script>
-        formInitializtion("#ADVANCE_PAYMENT", "#ADVANCE_PERCENTAGE", "#CREDIT", "#TENTATIVE_DATE", "#TENURE", "#REFRENCE")
-</script>

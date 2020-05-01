@@ -1,13 +1,11 @@
-@import controllers.actions.LoginState
 @import views.html.base._
 @import views.companion.master.SellerExecuteOrder
-@import models.masterTransaction.NegotiationFile
 
-@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.AWB_PROOF_HASH)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.PEG_HASH)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputInt(sellerExecuteOrderForm, constants.FormField.GAS)
     @commonInputPassword(sellerExecuteOrderForm, constants.FormField.PASSWORD)
 }
+
+
