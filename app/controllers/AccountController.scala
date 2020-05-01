@@ -333,12 +333,12 @@ class AccountController @Inject()(
         addIdentificationData => {
           val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType, Address(addressLine1 = addIdentificationData.address.addressLine1, addressLine2 = addIdentificationData.address.addressLine2, landmark = addIdentificationData.address.landmark, city = addIdentificationData.address.city, country = addIdentificationData.address.country, zipCode = addIdentificationData.address.zipCode, phone = addIdentificationData.address.phone))
 
-          def accountKYC(): Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+          def getAccountKYC: Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
 
           (for {
             _ <- add
-            accountKYC <- accountKYC()
-            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
+            accountKYC <- getAccountKYC
+            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -349,17 +349,17 @@ class AccountController @Inject()(
 
   def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       for {
         accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
+        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
       } yield result
   }
 
   def userReviewIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       (for {
         identification <- identification
         accountKYC <- accountKYC
@@ -374,7 +374,7 @@ class AccountController @Inject()(
       views.companion.master.UserReviewIdentification.form.bindFromRequest().fold(
         formWithErrors => {
           val identification = masterIdentifications.Service.get(loginState.username)
-          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
           (for {
             identification <- identification
             accountKYC <- accountKYC
@@ -384,7 +384,7 @@ class AccountController @Inject()(
           }
         },
         userReviewAddZoneRequestData => {
-          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.IDENTIFICATION)
+          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.AccountKYC.IDENTIFICATION)
 
           def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
             if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
@@ -403,7 +403,7 @@ class AccountController @Inject()(
               } yield result
             } else {
               val identification = masterIdentifications.Service.get(loginState.username)
-              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
               for {
                 identification <- identification
                 accountKYC <- accountKYC

@@ -49,7 +49,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
           def getResult(status: Option[Boolean]): Future[Result] = {
             if (status.isEmpty) {
-              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
+              val toAddress = masterAccounts.Service.tryGetAddress(issueFiatData.accountID)
 
               def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
                 entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),

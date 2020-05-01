@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @incompleteNegotiationList.map { incompleteNegotiation =>
     @commonInfoBox() {
@@ -42,4 +42,4 @@
         @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
     }
-}
+    }

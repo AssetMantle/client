@@ -410,7 +410,7 @@ class SetACLController @Inject()(
           def processTransactionAndGetResult(trader: Trader, organizationVerificationStatus: Boolean, checkAllKYCFilesVerified: Boolean, checkAllBackgroundFilesVerified: Boolean): Future[Result] = {
             if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
             if (organizationVerificationStatus && checkAllKYCFilesVerified) {
-              val aclAddress = masterAccounts.Service.getAddress(verifyTraderData.accountID)
+              val aclAddress = masterAccounts.Service.tryGetAddress(verifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               val createACL = blockchainAclHashes.Service.create(acl)
 
@@ -607,7 +607,7 @@ class SetACLController @Inject()(
           def getResult(checkAllKYCFilesVerified: Boolean, checkAllBackgroundFilesVerified: Boolean, trader: Trader): Future[Result] = {
             if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
             if (checkAllKYCFilesVerified) {
-              val aclAddress = masterAccounts.Service.getAddress(verifyTraderData.accountID)
+              val aclAddress = masterAccounts.Service.tryGetAddress(verifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
 
               def createACL: Future[String] = blockchainAclHashes.Service.create(acl)

@@ -2,7 +2,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.common.Serializable.{AssetOtherDetails, ShipmentDetails, ShippingDetails}
+import models.common.Serializable.{AssetOtherDetails, ShippingDetails}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -98,6 +98,16 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
+  private def updateOwnerIDAndStatusByPegHash(pegHash: String, ownerID: String, status: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(x => (x.ownerID, x.status)).update((ownerID, status)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateStatusByPegHash(pegHash: String, status: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -168,6 +178,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       } yield documentHash
     }
 
+    def markAssetSendToOrderByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDAndStatusByPegHash(pegHash = pegHash, ownerID = ownerID, status = constants.Status.Asset.IN_ORDER)
+
     def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
 
     def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
@@ -178,7 +190,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAllAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderID(ownerID).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
-    def getAllTradableAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderIDAndStatuses(ownerID = ownerID, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED, constants.Status.Asset.TRADE_COMPLETED).map(serializedAssets => serializedAssets.map(_.deserialize()))
+    def getAllTradableAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderIDAndStatuses(ownerID = ownerID, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
     def getAllAssetsByID(ids: Seq[String]): Future[Seq[Asset]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
@@ -188,11 +200,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markRedeemedByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.REDEEMED)
 
-    def markIssueAssetRejected(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.ISSUE_ASSET_FAILED)
+    def markIssueAssetFailed(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.ISSUE_ASSET_FAILED)
 
     def markStatusAwaitingBlockchainResponse(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)
 
-    def markTradeCompletedByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.TRADE_COMPLETED)
+    def markTradeCompletedByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.TRADED)
+
+    def markStatusInOrderByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.IN_ORDER)
+
+    def resetStatusByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.ISSUED)
 
     def getPendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(ownerIDs = traderIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE).map(serializedAssets => serializedAssets.map(_.deserialize()))
 

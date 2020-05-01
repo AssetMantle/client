@@ -61,7 +61,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getAddressById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.accountAddress).result.head.asTry).map {
+  private def tryGetAddressById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.accountAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -177,7 +177,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 
-    def getAddress(id: String): Future[String] = getAddressById(id)
+    def tryGetAddress(id: String): Future[String] = tryGetAddressById(id)
 
     def markUserTypeTrader(id: String): Future[Int] = updateUserTypeById(id, constants.User.TRADER)
 
