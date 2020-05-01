@@ -59,11 +59,10 @@
                     case Some(credit) => {
                         @credit.tentativeDate match {
                             case Some(date) => {
-                                <p>@Messages(constants.View.TENTATIVE_DATE): <span>@date</span></p>
+                                @commonDateInfo(constants.View.TENTATIVE_DATE, date)
                             }
                             case None => {
-                                <p>@Messages(constants.View.TENURE)
-                                    : <span>@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
+                                @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
                             }
                         }
                         @commonTextInfo(constants.View.REFERENCE, credit.reference)
