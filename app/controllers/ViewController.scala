@@ -95,9 +95,7 @@ class ViewController @Inject()(
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.tradeRoom(id))
-      } yield {
-        result.withHeaders("Access-Control-Allow-Origin" ->"https://account.docusign.com/")
-      }).recover {
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }

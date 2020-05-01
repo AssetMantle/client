@@ -30,7 +30,7 @@ class AssetController @Inject()(
                                  masterNegotiations: master.Negotiations,
                                  messagesControllerComponents: MessagesControllerComponents,
                                  masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                 masterTransactionDocusignEnvelopes:masterTransaction.DocusignEnvelopes,
+                                 masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
                                  masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                  withTraderLoginAction: WithTraderLoginAction,
@@ -251,7 +251,7 @@ class AssetController @Inject()(
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList,docusignEnvelopeList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))

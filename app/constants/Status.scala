@@ -47,7 +47,7 @@ object Status {
     val REQUEST_SENT = "REQUEST_SENT"
     val STARTED = "STARTED"
     val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS"
-    val CONTRACT_SIGNED= "CONTRACT_SIGNED"
+    val CONTRACT_SIGNED = "CONTRACT_SIGNED"
     val BUYER_CONFIRMED_SELLER_PENDING = "BUYER_CONFIRMED_SELLER_PENDING"
     val SELLER_CONFIRMED_BUYER_PENDING = "SELLER_CONFIRMED_BUYER_PENDING"
     val BOTH_PARTIES_CONFIRMED = "BOTH_PARTIES_CONFIRMED"
@@ -67,10 +67,10 @@ object Status {
     val TIMED_OUT = "TIMED_OUT"
   }
 
-  object DocuSignEnvelopeStatus{
-    val CREATED="created"
-    val SENT="sent"
-    val COMPLETED="completed"
+  object DocuSignEnvelopeStatus {
+    val CREATED = "created"
+    val SENT = "sent"
+    val COMPLETED = "completed"
   }
 
 }

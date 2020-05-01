@@ -1,48 +1,30 @@
 package utilities
 
 import java.util.Arrays
-
-import com.docusign.esign.api.AuthenticationApi
 import com.docusign.esign.api.EnvelopesApi
 import com.docusign.esign.client.ApiClient
-import com.docusign.esign.client.auth.OAuth
 import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, ReturnUrlRequest, Signer, Document => DocusignDocument}
-import com.docusign.esign.model.OauthAccess
 import com.sun.jersey.core.util.{Base64 => Base64Docusign}
-import com.twilio.Twilio
-import com.twilio.`type`.PhoneNumber
-import com.twilio.exception.{ApiConnectionException, ApiException}
-import com.twilio.rest.api.v2010.account.Message
+import com.twilio.exception.ApiException
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.Trader
-import models.{master, masterTransaction}
+import models.master
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.libs.json.{Json, OWrites}
-import play.api.libs.mailer._
-import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import java.io.{BufferedOutputStream, File, FileInputStream, FileOutputStream, FilterInputStream}
+import java.io.{BufferedOutputStream, FileOutputStream}
 
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
-import com.sun.jersey.api.client.{Client, ClientHandlerException}
+import com.sun.jersey.api.client.ClientHandlerException
 import controllers.routes
 import models.Trait.Document
-import models.masterTransaction.NegotiationFile
 import org.apache.commons.codec.binary.Base64
-import org.apache.oltu.oauth2.client.OAuthClient
-import org.apache.oltu.oauth2.client.request.OAuthClientRequest.TokenRequestBuilder
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notifications,
-                         masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                         mailerClient: MailerClient,
-                         actorSystem: ActorSystem,
-                         masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
-                         wsClient: WSClient,
+class Docusign @Inject()(actorSystem: ActorSystem,
                          fileResourceManager: utilities.FileResourceManager,
                          masterAccounts: master.Accounts,
                          messagesApi: MessagesApi
@@ -115,10 +97,10 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
     } yield createDocusignEnvelope(emailAddress, file, trader)(Lang(language))
   }
 
-  private def createRecipientView22(envelopeID: String, emailAddress: String, trader: Trader) = {
+  private def createRecipientViewAndGetUrl(envelopeID: String, emailAddress: String, trader: Trader) = {
     try {
       val viewRequest = new RecipientViewRequest()
-      viewRequest.setReturnUrl(comdexURL + routes.DocusignController.docusignReturn(envelopeID,"").url.split("""&""")(0))
+      viewRequest.setReturnUrl(comdexURL + routes.DocusignController.docusignReturn(envelopeID, "").url.split("""&""")(0))
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
       viewRequest.setUserName(trader.name)
@@ -133,9 +115,9 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
     }
   }
 
-  def createRecipientView(envelopeID: String, emailAddress: String, trader: Trader) = createRecipientView22(envelopeID, emailAddress, trader)
+  def createRecipientView(envelopeID: String, emailAddress: String, trader: Trader) = createRecipientViewAndGetUrl(envelopeID, emailAddress, trader)
 
-  def updateSignedDOcuemnt(envelopeID: String, documentType: String) = fetchAndStoreSignedDocument(envelopeID, documentType)
+  def updateSignedDocuemnt(envelopeID: String, documentType: String) = fetchAndStoreSignedDocument(envelopeID, documentType)
 
   def fetchAndStoreSignedDocument(envelopeID: String, documentType: String) = {
     val result = envelopesApi.getDocument(accountID, envelopeID, constants.View.DOCUMENT_INDEX)
@@ -172,10 +154,8 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
     try {
       fetchAuthorizationUri
     } catch {
-      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
-        throw new BaseException(constants.Response.ENVELOPE_CREATION_FAILED)
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
-        throw new BaseException(constants.Response.INVALID_INPUT)
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
     }
   }
 

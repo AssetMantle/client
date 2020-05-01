@@ -8,10 +8,6 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
                 $(modal).fadeIn(200);
                 $(modalContent).html(data);
             },
-            302: function (data) {
-                $('#commonModal').fadeOut();
-                window.open(data.responseText);
-            },
             500: function (data) {
                 replaceDocument(data.responseText);
             },

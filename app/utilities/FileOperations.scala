@@ -153,7 +153,6 @@ object FileOperations {
       val bytes = new Array[Byte](file.length.asInstanceOf[Int])
       fileInputStreamReader.read(bytes)
       fileInputStreamReader.close()
-      println("byteArray---"+bytes.toList)
       bytes
     } catch {
       case baseException: BaseException => throw baseException

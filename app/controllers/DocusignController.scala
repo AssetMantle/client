@@ -6,21 +6,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{Json, OWrites}
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import com.docusign.esign.api._
-import play.api.libs.Files
-import java.io.File
-import java.util.List
-
-import javax.ws.rs.core.UriBuilderException
-import com.sun.jersey.core.util.Base64
-import com.docusign.esign.model.Document
-import com.docusign.esign.model._
-import java.util.Arrays
-
-import com.docusign.esign.client.ApiClient
 import models.master.Negotiation
 import models.masterTransaction.{DocusignEnvelope, NegotiationFile}
 
@@ -28,19 +15,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DocusignController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                   utilitiesNotification: utilities.Notification,
-                                   fileResourceManager: utilities.FileResourceManager,
                                    utilitiesDocusign: utilities.Docusign,
                                    masterEmails: master.Emails,
                                    masterNegotiations: master.Negotiations,
-                                   withLoginAction: WithLoginAction,
                                    withTraderLoginAction: WithTraderLoginAction,
                                    withGenesisLoginAction: WithGenesisLoginAction,
-                                   masterAccounts: master.Accounts,
                                    masterTraders: master.Traders,
                                    masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                                   masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
-                                   withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                   masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -53,7 +35,6 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       val docusign = masterTransactionDocusignEnvelopes.Service.get(negotiationID)
 
       def getSenderViewURL(docusignEnvelope: Option[DocusignEnvelope], traderID: String, negotiation: Negotiation) = {
-
         if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
           docusignEnvelope match {
             case Some(docusignEnvelope) => {
@@ -64,23 +45,19 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
               }
             }
             case None => {
-              val buyerTraderID = masterNegotiations.Service.tryGetBuyerTraderID(negotiationID)
-
-              def buyerTrader(traderID: String) = masterTraders.Service.tryGet(traderID)
-
-              def emailAddress(accountID: String) = masterEmails.Service.tryGetVerifiedEmailAddress(accountID)
-
               val file = masterTransactionNegotiationFiles.Service.tryGet(negotiationID, documentType)
+              val buyerTrader = masterTraders.Service.tryGet(negotiation.buyerTraderID)
 
-              def create(id: String, envelopeID: String) = masterTransactionDocusignEnvelopes.Service.create(id, envelopeID, documentType)
+              def getBuyerEmailAddress(accountID: String) = masterEmails.Service.tryGetVerifiedEmailAddress(accountID)
+
+              def createDocusignEnvelope(negotiationID: String, envelopeID: String) = masterTransactionDocusignEnvelopes.Service.create(negotiationID, envelopeID, documentType)
 
               for {
-                buyerTraderID <- buyerTraderID
-                buyerTrader <- buyerTrader(buyerTraderID)
-                emailAddress <- emailAddress(buyerTrader.accountID)
                 file <- file
-                envelopeID <- utilitiesDocusign.createEnvelope(emailAddress, file, buyerTrader)
-                _ <- create(negotiationID, envelopeID)
+                buyerTrader <- buyerTrader
+                buyerEmailAddress <- getBuyerEmailAddress(buyerTrader.accountID)
+                envelopeID <- utilitiesDocusign.createEnvelope(buyerEmailAddress, file, buyerTrader)
+                _ <- createDocusignEnvelope(negotiationID, envelopeID)
               } yield utilitiesDocusign.createSenderViewURL(envelopeID)
             }
           }
@@ -105,25 +82,23 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       val docusignEnvelope = masterTransactionDocusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
 
-      def negotiation(negotiationID: String) = masterNegotiations.Service.tryGet(negotiationID)
+      def getNegotiation(negotiationID: String) = masterNegotiations.Service.tryGet(negotiationID)
 
-      def traders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+      def getTraders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
       def updateStatus(docusignEnvelope: DocusignEnvelope) = event match {
         case constants.View.DOCUSIGN_EVENT_SEND => {
           masterTransactionDocusignEnvelopes.Service.markSent(envelopeId)
         }
         case constants.View.DOCUSIGN_EVENT_SEND_SIGNING_COMPLETE => {
-
           val oldFile = masterTransactionNegotiationFiles.Service.tryGet(docusignEnvelope.id, docusignEnvelope.documentType)
-
-          val signedDocument = Future(utilitiesDocusign.updateSignedDOcuemnt(envelopeId, docusignEnvelope.documentType))
+          val signedDocument = Future(utilitiesDocusign.updateSignedDocuemnt(envelopeId, docusignEnvelope.documentType))
 
           def updateFile(negotiationFile: NegotiationFile, newFileNme: String) = masterTransactionNegotiationFiles.Service.updateOldDocument(negotiationFile.updateFileName(newFileNme))
 
           def markSigningComplete = masterTransactionDocusignEnvelopes.Service.markComplete(envelopeId)
 
-          def markContractSigned(id: String) = masterNegotiations.Service.markContractSigned(id)
+          def markContractSigned(negotiationID: String) = masterNegotiations.Service.markContractSigned(negotiationID)
 
           for {
             oldFile <- oldFile
@@ -138,8 +113,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
       for {
         docusignEnvelope <- docusignEnvelope
-        negotiation <- negotiation(docusignEnvelope.id)
-        traders <- traders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        negotiation <- getNegotiation(docusignEnvelope.id)
+        traders <- getTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
         _ <- updateStatus(docusignEnvelope)
       } yield {
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
