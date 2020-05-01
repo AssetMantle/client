@@ -15,7 +15,7 @@
         <div class="inputFieldBody">
             @commonInputPassword(loginForm, constants.FormField.PASSWORD)
         </div>
-        <button type="button" class="cmuk-button cmuk-button-link forgotPassword" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD.legend)</button>
+        @commonFormButton(constants.Form.EMAIL_OTP_FORGOT_PASSWORD, 'class -> "cmuk-button-link forgotPassword")
     </div>
     <div class="pushNotification hiddenLabel">
     @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'containerDivClass -> "hidden", 'readonly -> true)
