@@ -57,16 +57,15 @@
                 @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                 @negotiation.paymentTerms.credit match {
                     case Some(credit) => {
-                        <br>
-                        @Messages(constants.View.CREDIT_TERMS):
-                        <br>
                         @credit.tentativeDate match {
-                            case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
-                            case None => {@commonIntInfo(constants.View.TENURE, credit.tenure.getOrElse(0))}
+                            case Some(date) => {
+                                @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                            }
+                            case None => {
+                                @commonIntInfo(constants.View.TENURE, credit.tenure.getOrElse(0))
+                            }
                         }
-                        <br>
                         @commonTextInfo(constants.View.REFERENCE, credit.reference)
-                        <br>
                     }
                     case None => {}
                 }
@@ -81,10 +80,13 @@
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
             </div>
             <div class="sellerTerm">
+                @Messages(constants.View.ASSET_DOCUMENTS):
                 @negotiation.documentList.assetDocuments.map { document =>
                     @document
                     <br>
                 }
+                <br>
+                @Messages(constants.View.NEGOTIATION_DOCUMENTS):
                 @negotiation.documentList.negotiationDocuments.map { document =>
                     @document
                     <br>

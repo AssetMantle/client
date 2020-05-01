@@ -4,6 +4,7 @@
 
 @(paymentTermsForm: Form[PaymentTerms.Data] = PaymentTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.NEGOTIATION_PAYMENT_TERMS, paymentTermsForm) {
+    @commonInputText(paymentTermsForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
     @Messages(constants.View.ADVANCE_PAYMENT)
     @commonInputDouble(paymentTermsForm, constants.FormField.ADVANCE_PERCENTAGE, 'id -> "advancePercentage", 'oninput -> "advancePercentageInput()")
     @Messages(constants.View.CREDIT_TERMS)
