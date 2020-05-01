@@ -1998,19 +1998,19 @@ dl .info {
       padding: 0 15px;
       line-height: 28px; }
 
-.switcherCard2 .cmuk-subnav {
+.switcherCardSecond .cmuk-subnav {
   margin: 0px;
   border-bottom: 1px solid #e5e5e5; }
-  .switcherCard2 .cmuk-subnav li {
+  .switcherCardSecond .cmuk-subnav li {
     text-align: center;
     padding: 0; }
-    .switcherCard2 .cmuk-subnav li:first-child {
+    .switcherCardSecond .cmuk-subnav li:first-child {
       border-right: 1px solid #cccccc; }
-    .switcherCard2 .cmuk-subnav li a {
+    .switcherCardSecond .cmuk-subnav li a {
       padding: 15px 0px; }
-.switcherCard2 .cmuk-subnav > * {
+.switcherCardSecond .cmuk-subnav > * {
   flex: 1; }
-.switcherCard2 .cmuk-subnav-pill > .cmuk-active > a {
+.switcherCardSecond .cmuk-subnav-pill > .cmuk-active > a {
   color: #636363;
   font-weight: bold;
   font-size: 0.875rem;
