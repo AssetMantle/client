@@ -42,7 +42,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-quantity")"/></svg></span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @if(negotiation.buyerAcceptedQuantity){
@@ -158,6 +158,3 @@
         </div>
     </div>
 </div>
-<script>
-    @*Add here comet source for component id = '@Seq(negotiation.id, "TermsView").mkString("")'*@
-</script>

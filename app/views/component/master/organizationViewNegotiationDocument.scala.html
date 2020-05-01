@@ -1,12 +1,10 @@
 @import controllers.actions.LoginState
-@import views.html.base._
-@import models.masterTransaction.NegotiationFile
 @import models.Trait.Document
 
-@(id:String,negotiationFile: Option[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+@(id: String, negotiationFile: Option[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@negotiationFile match{
-    case Some(file)=> {
+@negotiationFile match {
+    case Some(file) => {
         @utilities.FileOperations.fileExtensionFromName(file.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE |constants.File.JPEG_LOWER_CASE => {
                 <figure class="zoom" style='background-image: url(@routes.FileController.organizationAccessedTradingFile(id, file.fileName, file.documentType))' onmousemove='zoom(event)'>
@@ -18,7 +16,9 @@
             }
         }
     }
-    case None=> { @Messages(constants.View.NEGOTIATION_FILE_NOT_FOUND)}
-        }
+    case None => {
+        @Messages(constants.View.NEGOTIATION_FILE_NOT_FOUND)
+    }
+    }
 
         <script src="@routes.Assets.versioned("javascripts/zoomImage.js")" type="text/javascript"></script>

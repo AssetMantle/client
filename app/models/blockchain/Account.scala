@@ -157,10 +157,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       (for {
         dirtyAddresses <- dirtyAddresses
         _ <- refreshDirtyAndSendCometMessage(dirtyAddresses)
-      } yield {}
-        ).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }(schedulerExecutionContext)
+      }
     }
   }
 

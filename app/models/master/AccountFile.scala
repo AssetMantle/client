@@ -84,7 +84,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => documentType match {
-        case constants.File.PROFILE_PICTURE => Array[Byte]()
+        case constants.File.Account.PROFILE_PICTURE => Array[Byte]()
         case _ => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       }
@@ -149,7 +149,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
 
-    def getProfilePicture(id: String): Future[Array[Byte]] = getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE)
+    def getProfilePicture(id: String): Future[Array[Byte]] = getFileByIdDocumentType(id = id, documentType = constants.File.Account.PROFILE_PICTURE)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
   }

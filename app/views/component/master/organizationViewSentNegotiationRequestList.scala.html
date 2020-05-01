@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(sentNegotiationRequestList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(sentNegotiationRequestList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
     <div class="SalesQuoteCard">
     @sentNegotiationRequestList.map { sentNegotiationRequest =>

@@ -12,21 +12,21 @@
         </div>
 
         <div class="terms">
-        @if(traderID == negotiation.buyerTraderID && negotiation.status == constants.Status.Negotiation.NEGOTIATION_STARTED){
+        @if(traderID == negotiation.buyerTraderID && negotiation.status == constants.Status.Negotiation.STARTED) {
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "icon-description") {
                 @Messages(constants.View.ASSET_DESCRIPTION)
-            }{
+            } {
                 @negotiation.assetDescription
             }
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "icon-contract-price") {
                 @Messages(constants.View.PRICE)
-            }{
+            } {
                 @negotiation.price
             }
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "icon-quantity") {
                 @Messages(constants.View.QUANTITY)
-            }{
-                @Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" ")
+            } {
+                @Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")
             }
 
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "icon-shipment-period") {
@@ -77,26 +77,24 @@
                 }
                 </div>
             }{
-
             }
             <hr>
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.buyerAcceptedDocumentList, iconPath = "icon-document") {
                 @Messages(constants.View.DOCUMENT_LIST)
                 <div class="creditTerms">
-                @negotiation.documentList.assetDocuments.map{assetDocument=>
+                @negotiation.documentList.assetDocuments.map { assetDocument =>
                     @Messages(assetDocument)
                 }
-                @negotiation.documentList.negotiationDocuments.map{negotiationDocument=>
+                @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
                     @Messages(negotiationDocument)
                 }
                 </div>
             }{
-
             }
-        } else{
+        } else {
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
-                @if(negotiation.status ==constants.Status.Negotiation.NEGOTIATION_STARTED && negotiation.sellerTraderID ==traderID) {
+                @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                     @commonFormButton(constants.Form.UPDATE_ASSET_TERMS, 'parameters -> s"'${negotiation.id}'")
                 }
             </div>
@@ -107,9 +105,9 @@
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedAssetDescription){
+                @if(negotiation.buyerAcceptedAssetDescription) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -120,9 +118,9 @@
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedPrice){
+                @if(negotiation.buyerAcceptedPrice) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -130,19 +128,19 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-quantity")"/></svg></span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedQuantity){
+                @if(negotiation.buyerAcceptedQuantity) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
             </div>
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
-                @if(negotiation.status ==constants.Status.Negotiation.NEGOTIATION_STARTED && negotiation.sellerTraderID ==traderID){
+                @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                     @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
                 }
             </div>
@@ -162,11 +160,11 @@
                     </div>
                 </div>
                 <div>
-                    @if(negotiation.buyerAcceptedAssetOtherDetails){
-                        @Messages(constants.View.ACCEPTED)
-                    } else{
-                        @Messages(constants.View.PENDING)
-                    }
+                @if(negotiation.buyerAcceptedAssetOtherDetails) {
+                    @Messages(constants.View.ACCEPTED)
+                } else {
+                    @Messages(constants.View.PENDING)
+                }
                 </div>
             </div>
 
@@ -174,7 +172,7 @@
 
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
-                @if(negotiation.status ==constants.Status.Negotiation.NEGOTIATION_STARTED && negotiation.sellerTraderID ==traderID){
+                @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                     @commonFormButton(constants.Form.UPDATE_PAYMENT_TERMS, 'parameters -> s"'${negotiation.id}'")
                 }
             </div>
@@ -212,9 +210,9 @@
                     </div>
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedPaymentTerms){
+                @if(negotiation.buyerAcceptedPaymentTerms) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -224,19 +222,19 @@
 
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
-                @if(negotiation.status ==constants.Status.Negotiation.NEGOTIATION_STARTED && negotiation.sellerTraderID ==traderID) {
+                @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                     @commonFormButton(constants.Form.UPDATE_DOCUMENT_LIST, 'parameters -> s"'${negotiation.id}'")
                 }
             </div>
             <div class="sellerTerm">
                 <div>
-                   @negotiation.documentList.assetDocuments.map{assetDocument=>
+                   @negotiation.documentList.assetDocuments.map { assetDocument =>
                             <div>
                              <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
                             @Messages(assetDocument)
                             </div>
                          }
-                @negotiation.documentList.negotiationDocuments.map{negotiationDocument=>
+                @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
                     <div>
                         <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
                     @Messages(negotiationDocument)
@@ -244,20 +242,24 @@
                 }
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedDocumentList){
+                @if(negotiation.buyerAcceptedDocumentList) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
-
             </div>
-
+            @traderID match {
+                case negotiation.buyerTraderID => {
+                    @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
+                }
+                case negotiation.sellerTraderID => {
+                    @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
+                    @commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")
+                    @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
+                }
+            }
         }
-
         </div>
     </div>
 </div>
-<script>
-    @*Add here comet source for component id = '@Seq(negotiation.id, "TermsView").mkString("")'*@
-</script>

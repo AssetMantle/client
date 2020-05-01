@@ -21,9 +21,9 @@
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedAssetDescription){
+                @if(negotiation.buyerAcceptedAssetDescription) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -34,9 +34,9 @@
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedPrice){
+                @if(negotiation.buyerAcceptedPrice) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -44,12 +44,12 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-quantity")"/></svg></span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
-                @if(negotiation.buyerAcceptedQuantity){
+                @if(negotiation.buyerAcceptedQuantity) {
                     @Messages(constants.View.ACCEPTED)
-                } else{
+                } else {
                     @Messages(constants.View.PENDING)
                 }
                 </div>
@@ -119,9 +119,9 @@
                     </div>
                 </div>
                 <div>
-                    @if(negotiation.buyerAcceptedPaymentTerms){
+                    @if(negotiation.buyerAcceptedPaymentTerms) {
                         @Messages(constants.View.ACCEPTED)
-                    } else{
+                    } else {
                         @Messages(constants.View.PENDING)
                     }
                 </div>

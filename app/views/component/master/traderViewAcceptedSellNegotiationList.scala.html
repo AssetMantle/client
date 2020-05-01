@@ -15,7 +15,7 @@
                 </div>
                 <div class="content">
                 @assetList.find(_.id == sellNegotiation.assetID) match {
-                    case Some(asset) => {
+            case Some(asset) => {
                         <div class="assetIcon">
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
@@ -47,7 +47,7 @@
                     <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
                     <span class="lines">---</span>
                     <span>@sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
-            </div>
+        </div>
             <div class="thirdPart salesChild">
                 @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sellNegotiation.id), 'class->"cmuk-button-link")
             </div>

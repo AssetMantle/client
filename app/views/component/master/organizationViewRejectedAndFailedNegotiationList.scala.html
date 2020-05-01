@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)</div>
 <div class="SalesQuoteCard">
@@ -64,7 +64,7 @@
     }
 </div>
 
-<div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
+    <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
     <div class="SalesQuoteCard">
     @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
         @commonVerticalInfoBox() {
@@ -121,7 +121,7 @@
         }
     </div>
 
-<div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
+    <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
     <div class="SalesQuoteCard">
     @failedNegotiationList.map { failedNegotiation =>
         @commonVerticalInfoBox() {

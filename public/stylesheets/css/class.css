@@ -490,8 +490,8 @@ html, body {
   position: relative; }
   .updateDocumentField button {
     position: absolute;
-    top: 9px;
-    left: 25%;
+    top: 6px;
+    left: 30%;
     font-weight: bold; }
 
 .comdex .cmuk-sticky-fixed {

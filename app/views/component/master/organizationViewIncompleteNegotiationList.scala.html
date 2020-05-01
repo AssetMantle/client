@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
  <div class="SalesQuoteCard">
     @incompleteNegotiationList.map { incompleteNegotiation =>
         @commonVerticalInfoBox(){

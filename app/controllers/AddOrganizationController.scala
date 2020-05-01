@@ -558,7 +558,7 @@ class AddOrganizationController @Inject()(
             if (checkAllKYCFilesVerified) {
               val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)
 
-              def organizationAccountAddress(accountId: String): Future[String] = masterAccounts.Service.getAddress(accountId)
+              def getOrganizationAccountAddress(accountId: String): Future[String] = masterAccounts.Service.tryGetAddress(accountId)
 
               def getTicketID(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
                 entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
@@ -572,7 +572,7 @@ class AddOrganizationController @Inject()(
 
               for {
                 organizationAccountID <- organizationAccountID
-                organizationAccountAddress <- organizationAccountAddress(organizationAccountID)
+                organizationAccountAddress <- getOrganizationAccountAddress(organizationAccountID)
                 ticketID <- getTicketID(organizationAccountAddress)
                 _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
