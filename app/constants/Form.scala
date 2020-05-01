@@ -97,6 +97,7 @@ object Form {
   val INVOICE_CONTENT = new Form("INVOICE_CONTENT", routes.NegotiationController.invoiceContent(), routes.javascript.NegotiationController.invoiceContentForm)
   val CONTRACT_CONTENT = new Form("CONTRACT_CONTENT", routes.NegotiationController.contractContent(), routes.javascript.NegotiationController.contractContentForm)
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
+  val MARK_CONTRACT_SIGNED= new Form("MARK_CONTRACT_SIGNED", routes.NegotiationController.markContractSigned(), routes.javascript.NegotiationController.markContractSignedForm)
 
   //OrderController
   val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecuteOrder(), routes.javascript.OrderController.buyerExecuteOrderForm)

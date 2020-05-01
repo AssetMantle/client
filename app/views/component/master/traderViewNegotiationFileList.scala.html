@@ -19,10 +19,10 @@
                     @docusignEnvelopeList.find(_.documentType == constants.File.CONTRACT) match {
                         case Some(docusignEnvelope) => {
                             @if(docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.CREATED && negotiation.sellerTraderID == traderID) {
-                                @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.embeddedSending, 'parameters -> s"'${negotiation.id}','${constants.File.CONTRACT}'")
+                                @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.send, 'parameters -> s"'${negotiation.id}','${constants.File.CONTRACT}'")
                             }
                             @if(docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.SENT && negotiation.buyerTraderID == traderID) {
-                                @commonModalButton(constants.View.E_SIGN, routes.javascript.DocusignController.embeddedSigning, 'parameters -> s"'${negotiation.id}'")
+                                @commonModalButton(constants.View.E_SIGN, routes.javascript.DocusignController.sign, 'parameters -> s"'${negotiation.id}'")
                             }
                             @if(docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.COMPLETED) {
                                 <span>@constants.View.SIGNED</span>
@@ -30,7 +30,8 @@
                         }
                         case None => {
                             @if(negotiation.sellerTraderID == traderID) {
-                                @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.embeddedSending, 'parameters -> s"'${negotiation.id}','${constants.File.CONTRACT}'")
+                                @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.send, 'parameters -> s"'${negotiation.id}','${constants.File.CONTRACT}'")
+                                @commonFormButton(constants.Form.MARK_CONTRACT_SIGNED,'parameters -> s"'${negotiation.id}'")
                             }
 
                         }
@@ -41,7 +42,7 @@
 
             }
         }
-        case constants.Status.Negotiation.BUYER_SIGNED_CONTRACT | constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE | constants.Status.Negotiation.TRADE_COMPLETED => {
+        case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_PRICE_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_PRICE_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTY_CONFIRMED_PRICE | constants.Status.Negotiation.TRADE_COMPLETED => {
 
             @Messages(constants.View.ASSET_DOCUMENTS):
             @assetFileList.filter(assetFile => negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>

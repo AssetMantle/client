@@ -6,12 +6,12 @@ GET         /javascriptRoutes                                                   
 
 GET         /firebase-messaging-sw.js                                                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
-GET         /docusign                                                                       controllers.DocusignController.embeddedSending(id:String, documentType: String)
-GET         /docusign/sign                                                                  controllers.DocusignController.embeddedSigning(id:String)
-GET         /docusign/Return                                                                 controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
+GET         /docusign/send                                                                  controllers.DocusignController.send(id:String, documentType: String)
+GET         /docusign/sign                                                                  controllers.DocusignController.sign(id:String)
+GET         /docusign/return                                                                controllers.DocusignController.docusignReturn(envelopeId:Option[String], event:Option[String])
 
-GET         /docusign/authorization                                                        controllers.DocusignController.docusignAuthorization
-GET         /docusign/returnAuthorizationCode                                              controllers.DocusignController.returnDocuSign(code:String)
+GET         /docusign/authorization                                                         controllers.DocusignController.authorization
+GET         /docusign/authorizationReturn                                                   controllers.DocusignController.authorizationReturn(code:Option[String])
 
 GET         /blockExplorer/lastBlockHeight                                                  controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                                     controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
@@ -106,6 +106,9 @@ POST        /negotiation/contractContent                                        
 
 GET         /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTermsForm(id: String)
 POST        /negotiation/confirmAllNegotiationTerms                                         controllers.NegotiationController.confirmAllNegotiationTerms
+
+GET         /negotiation/markContractSigned                                                 controllers.NegotiationController.markContractSignedForm(negotiationID: String)
+POST        /negotiation/markContractSigned                                                  controllers.NegotiationController.markContractSigned
 
 GET         /negotiation/tradeActivityMessages                                              controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 

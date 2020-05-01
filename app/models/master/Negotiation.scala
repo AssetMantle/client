@@ -440,7 +440,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markBuyerAcceptedAllNegotiationTerms(id: String) = updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS)
 
-    def markBuyerSignedContract(id: String) = updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_SIGNED_CONTRACT)
+    def markContractSigned(id: String) = updateStatusByID(id = id, status = constants.Status.Negotiation.CONTRACT_SIGNED)
 
     def getAllByAssetID(assetID: String): Future[Seq[Negotiation]] = findAllByAssetID(assetID).map(serializedNegotiations => serializedNegotiations.map(_.deserialize))
 

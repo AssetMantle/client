@@ -169,6 +169,7 @@ object Response {
   val NEW_PASSWORD_SAME_AS_OLD_PASSWORD = new Failure("NEW_PASSWORD_SAME_AS_OLD_PASSWORD")
   val COMET_ACTOR_ERROR = new Failure("COMET_ACTOR_ERROR")
   val ENVELOPE_CREATION_FAILED= new Failure("ENVELOPE_CREATION_FAILED")
+  val AUTHORISATION_CODE_NOT_FOUND = new Failure("AUTHORISATION_CODE_NOT_FOUND")
 
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

@@ -30,8 +30,12 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+
+
       (loginState.userType match {
-        case constants.User.GENESIS => withUsernameToken.Ok(views.html.genesisIndex())
+        case constants.User.GENESIS => {
+          withUsernameToken.Ok(views.html.genesisIndex())
+        }
         case constants.User.ZONE =>
           val id = blockchainZones.Service.getID(loginState.address)
 

@@ -2,14 +2,14 @@
 @import views.html.base._
 @import models.masterTransaction.Chat
 
-@(status:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(event:String="", errorMessage:String="")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-@status match{
+@event match{
     case constants.View.DOCUSIGN_EVENT_SEND=>{
-        @Messages("document sent for signature")
+        @Messages(constants.View.DOCUMENT_SENT_FOR_SIGNING)
     }
     case constants.View.DOCUSIGN_EVENT_SEND_SIGNING_COMPLETE=>{
-        @Messages("document signing complete")
+        @Messages(constants.View.DOCUMENT_SIGNED)
     }
-    case _=>{ @Messages("dhdghfgnf")}
+    case _=>{ @Messages(constants.View.UNEXPECTED_EVENT)}
 }

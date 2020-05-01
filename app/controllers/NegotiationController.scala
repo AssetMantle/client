@@ -1124,4 +1124,43 @@ class NegotiationController @Inject()(
         }
       )
   }
+
+  def markContractSignedForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+    val traderID= masterTraders.Service.tryGetID(loginState.username)
+    val sellerTraderID = masterNegotiations.Service.tryGetSellerTraderID(negotiationID)
+    for{
+      traderID<-traderID
+      sellerTraderID<-sellerTraderID
+    }yield {
+      if(traderID== sellerTraderID){
+      Ok(views.html.component.master.markContractSigned(negotiationID=negotiationID))
+    }else{
+        throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
+    }
+  }
+
+  def markContractSigned: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.MarkContractSigned.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.markContractSigned(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
+        },
+        markContractSignedData => {
+          val traderID= masterTraders.Service.tryGetID(loginState.username)
+          val sellerTraderID = masterNegotiations.Service.tryGetSellerTraderID(markContractSignedData.negotiationID)
+          def markContractSigned(traderID:String, sellerTraderID:String)=if(sellerTraderID==traderID)masterNegotiations.Service.markContractSigned(markContractSignedData.negotiationID)else Future(0)
+          for{
+            traderID<-traderID
+            sellerTraderID<-sellerTraderID
+            markContractSigned<-markContractSigned(traderID,sellerTraderID)
+            result<-withUsernameToken.Ok(views.html.tradeRoom(negotiationID = markContractSignedData.negotiationID))
+          }yield result
+        }
+
+      )
+
+
+  }
 }

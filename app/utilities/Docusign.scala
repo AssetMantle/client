@@ -72,18 +72,17 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
         case constants.File.CONTRACT | constants.File.INVOICE | constants.File.BILL_OF_EXCHANGE => fileResourceManager.getTraderNegotiationFilePath(file.documentType)
       }
 
-      println(file.fileName.split("""\.""")(0))
       val document = new DocusignDocument()
       document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, file.fileName)))))
       document.setName(file.fileName.split("""\.""")(0))
       document.setFileExtension(utilities.FileOperations.fileExtensionFromName(file.fileName))
-      document.setDocumentId("1")
+      document.setDocumentId(constants.View.DOCUMENT_INDEX)
 
       val signer = new Signer()
       signer.setEmail(emailAddress)
       signer.setName(trader.name)
       signer.clientUserId(trader.id)
-      signer.recipientId("1")
+      signer.recipientId(constants.View.RECIPIENT_INDEX)
 
       val envelopeDefinition = new EnvelopeDefinition()
       envelopeDefinition.setEmailSubject(messagesApi(constants.View.PLEASE_SIGN_THIS_DOCUMENT))
@@ -95,10 +94,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
       envelopeDefinition.setRecipients(recipients)
       envelopeDefinition.setStatus(constants.Status.DocuSignEnvelopeStatus.CREATED)
 
-      val results = envelopesApi.createEnvelope(accountID, envelopeDefinition)
-      val envelopeId = results.getEnvelopeId
-
-      envelopeId
+      envelopesApi.createEnvelope(accountID, envelopeDefinition).getEnvelopeId
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
@@ -113,10 +109,9 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
 
   private def createSenderViewURL2(envelopeID: String) = {
     val viewRequest = new ReturnUrlRequest
-    viewRequest.setReturnUrl(comdexURL + "/docusign/Return")
+    viewRequest.setReturnUrl(comdexURL + routes.DocusignController.docusignReturn(None,None).url)
     envelopesApi.createSenderView(accountID, envelopeID, viewRequest).getUrl
   }
-
 
   def createEnvelope(emailAddress: String, file: Document[_], trader: Trader) = {
     val language = masterAccounts.Service.tryGetLanguage(trader.accountID)
@@ -128,7 +123,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
   private def createRecipientView22(envelopeID: String, emailAddress: String, trader: Trader) = {
     try {
       val viewRequest = new RecipientViewRequest()
-      viewRequest.setReturnUrl(comdexURL + s"/docusign/Return?envelopeId=${envelopeID}")
+      viewRequest.setReturnUrl(comdexURL +routes.DocusignController.docusignReturn(Option(envelopeID),None).url)
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
       viewRequest.setUserName(trader.name)
@@ -148,7 +143,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
   def updateSignedDOcuemnt(envelopeID: String, fileName: String) = fetchAndStoreSignedDocument(envelopeID, fileName)
 
   def fetchAndStoreSignedDocument(envelopeID: String, fileName: String) = {
-    val result = envelopesApi.getDocument(accountID, envelopeID, "1")
+    val result = envelopesApi.getDocument(accountID, envelopeID, constants.View.DOCUMENT_INDEX)
     val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(result)).toString, constants.File.PDF).mkString(".")
     val file = utilities.FileOperations.newFile(fileResourceManager.getTraderNegotiationFilePath(constants.File.CONTRACT), newFileName)
     val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
@@ -160,7 +155,7 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
   def updateAccessToken(code: String) = {
     try {
       generateAndUpdateAccessToken(code)
-    }catch {
+    } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
@@ -178,9 +173,27 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
     }
   }
 
-  def getAuthorizationUri = fetchAuthorizationUri
+  def getAuthorizationUri = {
+    try {
+      fetchAuthorizationUri
+    } catch {
+      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
+        throw new BaseException(constants.Response.ENVELOPE_CREATION_FAILED)
+      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
+        throw new BaseException(constants.Response.INVALID_INPUT)
+    }
+  }
 
-  private def fetchAuthorizationUri = apiClient.getAuthorizationUri(integrationKey, Arrays.asList("signature"), comdexURL + "/docusign/returnAuthorizationCode", "code").toString
+  private def fetchAuthorizationUri = {
+    try {
+      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.View.SIGNATURE_SCOPE), comdexURL +routes.DocusignController.authorizationReturn(None).url, constants.View.CODE).toString
+    } catch {
+      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
+        throw new BaseException(constants.Response.ENVELOPE_CREATION_FAILED)
+      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
+        throw new BaseException(constants.Response.INVALID_INPUT)
+    }
+  }
 
   object Utility {
     def regenerateAccessToken() = {
@@ -191,5 +204,4 @@ class Docusign @Inject()(masterTransactionNotifications: masterTransaction.Notif
   actorSystem.scheduler.schedule(initialDelay = 60.seconds, interval = 2000.seconds) {
     Utility.regenerateAccessToken()
   }
-
 }

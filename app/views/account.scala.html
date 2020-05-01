@@ -86,7 +86,7 @@
         }
         case constants.User.GENESIS => {
             @commonFormButton(constants.Form.INVITE_ZONE)
-            <a href="@routes.DocusignController.docusignAuthorization">@Messages(constants.View.AUTHORIZE_DOCUSIGN)</a>
+            <a href="@routes.DocusignController.authorization()">@Messages(constants.View.AUTHORIZE_DOCUSIGN)</a>
         }
         case constants.User.USER => {
         }
