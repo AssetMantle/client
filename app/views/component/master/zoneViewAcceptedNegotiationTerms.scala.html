@@ -54,24 +54,21 @@
                 <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
             </div>
             <div class="sellerTerm">
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                <br>
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                <br>
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-                <br>
-                @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
-                <br>
-                @negotiation.paymentTerms.tentativeDate match {
-                    case Some(date) => {
-                        @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                @negotiation.paymentTerms.credit match {
+                    case Some(credit) => {
+                        @credit.tentativeDate match {
+                            case Some(date) => {
+                                @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                            }
+                            case None => {
+                                @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
+                            }
+                        }
+                        @commonTextInfo(constants.View.REFERENCE, credit.reference)
                     }
-                    case None => {
-                        @commonTextInfo(constants.View.TENTATIVE_DATE, "")
-                    }
+                    case None => {}
                 }
-                <br>
-                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
                 <div>
                 @negotiation.buyerAcceptedPaymentTerms
                 </div>
@@ -83,10 +80,13 @@
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
             </div>
             <div class="sellerTerm">
+                @Messages(constants.View.ASSET_DOCUMENTS):
                 @negotiation.documentList.assetDocuments.map { document =>
                     @document
                     <br>
                 }
+                <br>
+                @Messages(constants.View.NEGOTIATION_DOCUMENTS):
                 @negotiation.documentList.negotiationDocuments.map { document =>
                     @document
                     <br>

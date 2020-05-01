@@ -15,37 +15,39 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val logger: Logger = Logger(this.getClass)
 
-  private val uploadAccountKYCIdentificationPath = configuration.get[String]("upload.account.identificationPath")
+  private val rootFilePath = configuration.get[String]("upload.rootFilePath")
 
-  private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
+  private val uploadAccountKYCIdentificationPath = rootFilePath + configuration.get[String]("upload.account.identificationPath")
 
-  private val uploadZoneKYCBankAccountDetailPath = configuration.get[String]("upload.zone.bankAccountDetailPath")
+  private val uploadAccountProfilePicturePath = rootFilePath + configuration.get[String]("upload.account.profilePicturePath")
 
-  private val uploadZoneKYCIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
+  private val uploadZoneKYCBankAccountDetailPath = rootFilePath + configuration.get[String]("upload.zone.bankAccountDetailPath")
 
-  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.acraPath")
+  private val uploadZoneKYCIdentificationPath = rootFilePath + configuration.get[String]("upload.zone.identificationPath")
 
-  private val uploadOrganizationKYCIncorporationDocumentPath = configuration.get[String]("upload.organization.incorporationDocument")
+  private val uploadOrganizationKYCACRAPath = rootFilePath + configuration.get[String]("upload.organization.acraPath")
 
-  private val uploadOrganizationWorldCheck = configuration.get[String]("upload.backgroundCheck.organizationWorldCheck")
+  private val uploadOrganizationKYCIncorporationDocumentPath = rootFilePath + configuration.get[String]("upload.organization.incorporationDocument")
 
-  private val uploadTraderWorldCheck = configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
+  private val uploadOrganizationWorldCheck = rootFilePath + configuration.get[String]("upload.backgroundCheck.organizationWorldCheck")
 
-  private val uploadAssetBillOfLadingPath: String = configuration.get[String]("upload.asset.billOfLading")
+  private val uploadTraderWorldCheck = rootFilePath + configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
 
-  private val uploadAssetCOOPath: String = configuration.get[String]("upload.asset.coo")
+  private val uploadAssetBillOfLadingPath: String = rootFilePath + configuration.get[String]("upload.asset.billOfLading")
 
-  private val uploadAssetCOAPath: String = configuration.get[String]("upload.asset.coa")
+  private val uploadAssetCOOPath: String = rootFilePath + configuration.get[String]("upload.asset.coo")
 
-  private val uploadNegotiationInvoicePath: String = configuration.get[String]("upload.negotiation.invoice")
+  private val uploadAssetCOAPath: String = rootFilePath + configuration.get[String]("upload.asset.coa")
 
-  private val uploadNegotiationBillOfExchangePath: String = configuration.get[String]("upload.negotiation.billOfExchange")
+  private val uploadNegotiationInvoicePath: String = rootFilePath + configuration.get[String]("upload.negotiation.invoice")
 
-  private val uploadNegotiationContractPath: String = configuration.get[String]("upload.negotiation.contract")
+  private val uploadNegotiationBillOfExchangePath: String = rootFilePath + configuration.get[String]("upload.negotiation.billOfExchange")
 
-  private val uploadNegotiationInsurancePath: String = configuration.get[String]("upload.negotiation.insurance")
+  private val uploadNegotiationContractPath: String = rootFilePath + configuration.get[String]("upload.negotiation.contract")
 
-  private val uploadNegotiationOthersPath: String = configuration.get[String]("upload.negotiation.others")
+  private val uploadNegotiationInsurancePath: String = rootFilePath + configuration.get[String]("upload.negotiation.insurance")
+
+  private val uploadNegotiationOthersPath: String = rootFilePath + configuration.get[String]("upload.negotiation.others")
 
 
   def getAccountKYCFilePath(documentType: String): String = {
