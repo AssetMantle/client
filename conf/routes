@@ -13,8 +13,6 @@ GET         /blockExplorer/transactionHash                                      
 
 GET         /genesisRequest                                                                       controllers.ViewController.genesisRequest
 GET         /zoneRequest                                                                          controllers.ViewController.zoneRequest
-GET         /organizationRequest                                                                  controllers.ViewController.organizationRequest
-GET         /market                                                                               controllers.ViewController.market
 
 GET         /profile                                                                              controllers.ViewController.profile
 GET         /account                                                                              controllers.ViewController.account
