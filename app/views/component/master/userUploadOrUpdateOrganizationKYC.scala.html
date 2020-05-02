@@ -9,7 +9,6 @@
     <h4>@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
             @commonModalButton(constants.Form.UPLOAD + " " + documentType,routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
@@ -19,15 +18,12 @@
         } {
             <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)" target="_blank">@Messages(organizationKYC.documentType)</a>
         } {
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKYCForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>*@
             @commonModalButton(constants.Form.UPDATE + " " + organizationKYC.documentType,routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
 </div>
-@*<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.View.BACK)</button>*@
 @commonFormButton(constants.Form.ADD_ORGANIZATION)
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
-@*    <button type="button" class="cmuk-button cmuk-button-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userReviewAddOrganizationRequestForm())">@Messages(constants.Form.NEXT)</button>*@
     @commonFormButton(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST)
 }

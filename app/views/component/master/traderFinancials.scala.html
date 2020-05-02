@@ -14,8 +14,9 @@
                 </div>
             </div>
             <div>
-                <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
-                    @Messages(constants.View.ADD_BALANCE)</button>
+@*                <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>*@
+@*                    @Messages(constants.View.ADD_BALANCE)</button>*@
+                @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST)
             </div>
         </li>
         <li class="cmuk-flex">

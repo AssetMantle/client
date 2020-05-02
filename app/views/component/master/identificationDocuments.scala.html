@@ -16,7 +16,6 @@
     }
     case None => {
         <div>
-@*            <button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.AccountController.userViewUploadOrUpdateIdentification())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>*@
             @commonModalButton(constants.Form.UPLOAD_IDENTIFICATION,routes.javascript.AccountController.userViewUploadOrUpdateIdentification)
         </div>
     }

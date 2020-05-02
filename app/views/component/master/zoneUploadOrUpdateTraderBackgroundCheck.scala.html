@@ -9,7 +9,6 @@
     <h4>@Messages(constants.Form.TRADER_BACKGROUND_CHECK)</h4>
     @for(documentType <- constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm('@documentType', '@trader.id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
             @commonModalButton(constants.Form.UPLOAD + " " + documentType ,routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,'parameters -> s"'${documentType}','${trader.id}'")
         </div>
     }
@@ -19,7 +18,6 @@
         } {
             <a href="@routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName, traderBackgroundCheck.documentType)" target="_blank">@Messages(traderBackgroundCheck.documentType)</a>
         } {
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm('@traderBackgroundCheck.documentType','@trader.id'))">@Messages(constants.Form.UPDATE) @Messages(traderBackgroundCheck.documentType)</button>*@
             @commonModalButton(constants.Form.UPDATE + " "+ traderBackgroundCheck.documentType,routes.javascript.BackgroundCheckController.updateTraderBackgroundCheckFileForm,'parameters -> s"'${traderBackgroundCheck.documentType}','${trader.id}'")
             <script>hideElement('upload@traderBackgroundCheck.documentType')</script>
         }

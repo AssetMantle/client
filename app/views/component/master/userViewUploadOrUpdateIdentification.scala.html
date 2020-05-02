@@ -10,7 +10,6 @@
 </div>
 <div class="centerText">
     <div id="@Seq("upload", documentType).mkString("")">
-@*        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
         @commonModalButton(constants.Form.UPLOAD + " " +documentType,routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
     </div>
     @accountKYC match {
@@ -20,14 +19,12 @@
             } {
                 <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
-@*                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@file.documentType'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>*@
+
                 @commonModalButton(constants.Form.UPDATE + " " +file.documentType,routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
                 <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
             }
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.View.BACK)</button>*@
             @commonFormButton(constants.Form. ADD_IDENTIFICATION)
-@*    check and confirm          *@
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userReviewIdentificationForm())">@Messages(constants.Form.NEXT)</button>*@
+
             @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION)
         }
         case None => {}

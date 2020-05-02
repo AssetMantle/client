@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 
+@import views.html.base.commonModalButton
 @(profilePicture: Array[Byte] = Array[Byte]())(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 
@@ -8,7 +9,8 @@
             <span cmuk-icon="icon: user; ratio: 10" class="profilePicture"></span>
             <div class="cmuk-transition-slide-bottom cmuk-overlay-primary cmuk-position-bottom cmuk-overlay-default cmuk-text-center">
                 <p class="cmuk-h4 cmuk-margin-remove">
-                    <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.Account.PROFILE_PICTURE'))"><span cmuk-icon="cloud-upload"></span>@Messages(constants.Form.UPLOAD)</button>
+@*                    <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.Account.PROFILE_PICTURE'))"><span cmuk-icon="cloud-upload"></span>@Messages(constants.Form.UPLOAD)</button>*@
+                    @commonModalButton(constants.Form.UPLOAD,routes.javascript.FileController.uploadAccountFileForm,'parameters -> s"'${constants.File.Account.PROFILE_PICTURE}'")
                 </p>
             </div>
         </div>
@@ -18,7 +20,8 @@
             <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
             <div class="cmuk-transition-slide-bottom cmuk-position-bottom cmuk-overlay-default cmuk-text-center">
                 <p class="cmuk-h4 cmuk-margin-remove">
-                    <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.Account.PROFILE_PICTURE'))"><span cmuk-icon="cloud-upload"></span>@Messages(constants.Form.UPDATE)</button>
+@*                    <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.Account.PROFILE_PICTURE'))"><span cmuk-icon="cloud-upload"></span>@Messages(constants.Form.UPDATE)</button>*@
+                    @commonModalButton(constants.Form.UPDATE,routes.javascript.FileController.uploadAccountFileForm,'parameters -> s"'${constants.File.Account.PROFILE_PICTURE}'")
                 </p>
             </div>
         </div>

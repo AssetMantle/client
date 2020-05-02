@@ -9,7 +9,6 @@
     <h4>@Messages(constants.Form.ZONE_KYC_FILES)</h4>
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-//@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
             @commonModalButton(constants.Form.UPLOAD + " " +documentType,routes.javascript.AddZoneController.userUploadZoneKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
@@ -19,16 +18,13 @@
         } {
             <a href="@routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)" target="_blank">@Messages(zoneKYC.documentType)</a>
         } {
-@*            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUpdateZoneKYCForm('@zoneKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(zoneKYC.documentType)</button>*@
             @commonModalButton(constants.Form.UPDATE + " " +zoneKYC.documentType,routes.javascript.AddZoneController.userUpdateZoneKYCForm,'parameters -> s"'${zoneKYC.documentType}'")
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }
 </div>
-@*<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.View.BACK)</button>*@
 @commonFormButton(constants.Form.ADD_ZONE)
 
 @if(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(zoneKYCs.map(_.documentType)).isEmpty) {
-@*    <button type="button" class="cmuk-button cmuk-button-primary" id="getZoneKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddZoneController.userReviewAddZoneRequestForm())">@Messages(constants.Form.NEXT)</button>*@
     @commonFormButton(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION)
 }
