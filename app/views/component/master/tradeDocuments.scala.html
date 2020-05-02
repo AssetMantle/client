@@ -8,7 +8,7 @@
 @(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],docusignEnvelopeList:Seq[DocusignEnvelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @negotiation.status match {
-    case constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS =>{
+    case constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS => {
         <div id='@Seq("UPLOAD", "NEGOTIATION", constants.File.Negotiation.CONTRACT).mkString("_")'>
         @commonModalButton(Seq("UPLOAD", constants.File.Negotiation.CONTRACT).mkString("_"), routes.javascript.FileController.uploadNegotiationForm,  'parameters -> s"'${constants.File.Negotiation.CONTRACT}','${negotiation.id}'")
         </div>
@@ -28,13 +28,13 @@
                              @commonFormButton(constants.Form.ADD_CONTRACT, 'parameters -> s"'${negotiation.id}'")
                             }
                         }
-                }
+                    }
                 <script>hideElement('@Seq("UPLOAD", "NEGOTIATION", constants.File.Negotiation.CONTRACT).mkString("_")')</script>
                 <td><li><a href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.Form.SUBMIT)</a></li></td>
             }
             case None=> {}
-        }
-     }
+                }
+          }
     case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED=>{
         <div>
         @Messages(constants.View.ASSET_DOCUMENTS):
@@ -49,7 +49,7 @@
             } {
                 <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)">@Messages(assetFile.documentType)</a>
             } {
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateNegotiationForm('@assetFile.documentType', '@assetFile.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAssetForm('@assetFile.documentType', '@negotiation.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
                 @assetFile.documentType match {
                     case constants.File.Asset.BILL_OF_LADING => {
                         @commonFormButton(constants.Form.ADD_BILL_OF_LADING, 'parameters -> s"'${negotiation.id}'")
