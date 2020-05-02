@@ -119,7 +119,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       } yield {
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
-        Ok(views.html.component.master.documentSentForSignView(event))
+        Ok(views.html.component.master.docusignReturnView(event))
       }
   }
 
