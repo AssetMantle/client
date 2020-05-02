@@ -4,22 +4,34 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Organization
+@(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @receivedNegotiationRequestList.map { receivedNegotiationRequest =>
     @commonVerticalInfoBox() {
-        @defining(counterPartyTraders.find(_.id == receivedNegotiationRequest.sellerTraderID)) { counterPartyTrader: Option[Trader] =>
-            @counterPartyTrader match {
-                case Some(trader) => {
-                    @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                }
-                case None => {
-                    @commonVerticalTextInfo(constants.View.TRADER_ID, receivedNegotiationRequest.sellerTraderID)
+        @counterPartyTraderList.find(_.id == receivedNegotiationRequest.sellerTraderID) match {
+            case Some(trader) => {
+                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+
+                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                    case Some(organization) => {
+                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                    }
+                    case None => {}
                 }
             }
+            case None => {}
+        }
+        @assetList.find(_.id == receivedNegotiationRequest.assetID) match {
+            case Some(asset) => {
+                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
+            }
+            case None => {}
         }
         @commonVerticalIntInfo(constants.View.PRICE, receivedNegotiationRequest.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString(), receivedNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" "))
+        @commonVerticalTextInfo(constants.View.LOAD_PORT, receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading)
+        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge)
         <div class="listItemChild">
             <p class="listItemChildTitle">
             @Messages(constants.View.ACCEPT)
@@ -37,4 +49,4 @@
             </p>
         </div>
     }
-}
+    }

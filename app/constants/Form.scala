@@ -41,6 +41,10 @@ object Form {
 
   //AssetController
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.AssetController.issue(), routes.javascript.AssetController.issueForm)
+  val ADD_BILL_OF_LADING = new Form("ADD_BILL_OF_LADING", routes.AssetController.addBillOfLading(), routes.javascript.AssetController.addBillOfLadingForm)
+  val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
+  val SEND_ASSET = new Form("SEND_ASSET", routes.AssetController.send(), routes.javascript.AssetController.sendForm)
+  val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.AssetController.redeem(), routes.javascript.AssetController.redeemForm)
 
   //AddZoneController
   val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)
@@ -52,42 +56,32 @@ object Form {
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
   //ChangeBuyerBidController
-  val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid(), routes.javascript.ChangeBuyerBidController.changeBuyerBidForm)
   val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid(), routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm)
 
   //ChangeSellerBidController
-  val CHANGE_SELLER_BID = new Form("CHANGE_SELLER_BID", routes.ChangeSellerBidController.changeSellerBid(), routes.javascript.ChangeSellerBidController.changeSellerBidForm)
   val BLOCKCHAIN_CHANGE_SELLER_BID = new Form("BLOCKCHAIN_CHANGE_SELLER_BID", routes.ChangeSellerBidController.blockchainChangeSellerBid(), routes.javascript.ChangeSellerBidController.blockchainChangeSellerBidForm)
 
   //ConfirmBuyerBidController
-  val CONFIRM_BUYER_BID = new Form("CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.confirmBuyerBid(), routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm)
-  val CONFIRM_BUYER_BID_DETAIL = new Form("CONFIRM_BUYER_BID_DETAIL", routes.ConfirmBuyerBidController.confirmBuyerBidDetail(), routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm)
   val BLOCKCHAIN_CONFIRM_BUYER_BID = new Form("BLOCKCHAIN_CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid(), routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm)
 
   //ConfirmSellerBidController
-  val CONFIRM_SELLER_BID = new Form("CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.confirmSellerBid(), routes.javascript.ConfirmSellerBidController.confirmSellerBidForm)
-  val CONFIRM_SELLER_BID_DETAIL = new Form("CONFIRM_SELLER_BID_DETAIL", routes.ConfirmSellerBidController.confirmSellerBidDetail(), routes.javascript.ConfirmSellerBidController.confirmSellerBidDetailForm)
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid(), routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm)
 
   //ChatController
   val SEND_MESSAGE = new Form("SEND_MESSAGE", routes.ChatController.sendMessage(), routes.javascript.ChatController.sendMessageForm)
 
   //ContactController
-  val UPDATE_CONTACT = new Form("UPDATE_CONTACT", routes.ContactController.updateContact(), routes.javascript.ContactController.updateContactForm)
+  val ADD_OR_UPDATE_EMAIL_ADDRESS = new Form("ADD_OR_UPDATE_EMAIL_ADDRESS", routes.ContactController.addOrUpdateEmailAddress(), routes.javascript.ContactController.addOrUpdateEmailAddressForm)
+  val ADD_OR_UPDATE_MOBILE_NUMBER = new Form("ADD_OR_UPDATE_MOBILE_NUMBER", routes.ContactController.addOrUpdateMobileNumber(), routes.javascript.ContactController.addOrUpdateMobileNumberForm)
+  val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.ContactController.verifyEmailAddress(), routes.javascript.ContactController.verifyEmailAddressForm)
+  val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber(), routes.javascript.ContactController.verifyMobileNumberForm)
 
   //IssueAssetController
-  val ISSUE_ASSET_REQUEST = new Form("ISSUE_ASSET_REQUEST", routes.IssueAssetController.issueAssetRequest(), routes.javascript.IssueAssetController.issueAssetRequestForm)
-  val ISSUE_ASSET_DETAIL = new Form("ISSUE_ASSET_DETAIL", routes.IssueAssetController.issueAssetDetail(), routes.javascript.IssueAssetController.issueAssetDetailForm)
-  val ISSUE_ASSET_OBL = new Form("ISSUE_ASSET_OBL", routes.IssueAssetController.issueAssetOBL(), routes.javascript.IssueAssetController.issueAssetOBLForm)
-  val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice(), routes.javascript.IssueAssetController.issueAssetInvoiceForm)
-  val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest(), routes.javascript.IssueAssetController.rejectIssueAssetRequestForm)
   val ZONE_ISSUE_ASSET = new Form("ZONE_ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
-  val UPDATE_ASSET_DOCUMENT_STATUS = new Form("UPDATE_ASSET_DOCUMENT_STATUS", routes.IssueAssetController.updateAssetDocumentStatus(), routes.javascript.IssueAssetController.updateAssetDocumentStatusForm)
 
   //IssueFiatController
   val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.WesternUnionController.westernUnionPortalRedirect(), routes.javascript.IssueFiatController.issueFiatRequestForm)
-  val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest(), routes.javascript.IssueFiatController.rejectIssueFiatRequestForm)
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat(), routes.javascript.IssueFiatController.issueFiatForm)
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat(), routes.javascript.IssueFiatController.blockchainIssueFiatForm)
 
@@ -103,17 +97,21 @@ object Form {
   val UPDATE_PAYMENT_TERMS = new Form("UPDATE_PAYMENT_TERMS", routes.NegotiationController.updatePaymentTerms(), routes.javascript.NegotiationController.updatePaymentTermsForm)
   val UPDATE_DOCUMENT_LIST = new Form("UPDATE_DOCUMENT_LIST", routes.NegotiationController.updateDocumentList(), routes.javascript.NegotiationController.updateDocumentListForm)
   val ACCEPT_OR_REJECT_NEGOTIATION_TERMS = new Form("ACCEPT_OR_REJECT_NEGOTIATION_TERMS", routes.NegotiationController.acceptOrRejectNegotiationTerms(), routes.javascript.NegotiationController.acceptOrRejectNegotiationTermsForm)
+  val ADD_INVOICE = new Form("ADD_INVOICE", routes.NegotiationController.addInvoice(), routes.javascript.NegotiationController.addInvoiceForm)
+  val ADD_CONTRACT = new Form("ADD_CONTRACT", routes.NegotiationController.addContract(), routes.javascript.NegotiationController.addContractForm)
+  val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
+  val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.javascript.NegotiationController.buyerConfirmForm)
+  val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.javascript.NegotiationController.sellerConfirmForm)
 
   //OrderController
-  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecuteOrder(), routes.javascript.OrderController.buyerExecuteOrderForm)
-  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecuteOrder(), routes.javascript.OrderController.moderatedBuyerExecuteOrderForm)
-  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecuteOrder(), routes.javascript.OrderController.blockchainBuyerExecuteOrderForm)
-  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecuteOrder(), routes.javascript.OrderController.sellerExecuteOrderForm)
-  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecuteOrder(), routes.javascript.OrderController.moderatedSellerExecuteOrderForm)
-  val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecuteOrder(), routes.javascript.OrderController.blockchainSellerExecuteOrderForm)
+  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
+  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.OrderController.moderatedSellerExecute(), routes.javascript.OrderController.moderatedSellerExecuteForm)
+  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.OrderController.buyerExecute(), routes.javascript.OrderController.buyerExecuteForm)
+  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.OrderController.sellerExecute(), routes.javascript.OrderController.sellerExecuteForm)
+  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.OrderController.blockchainBuyerExecute(), routes.javascript.OrderController.blockchainBuyerExecuteForm)
+  val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.OrderController.blockchainSellerExecute(), routes.javascript.OrderController.blockchainSellerExecuteForm)
 
   //RedeemAssetController
-  val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset(), routes.javascript.RedeemAssetController.redeemAssetForm)
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset(), routes.javascript.RedeemAssetController.blockchainRedeemAssetForm)
 
   //RedeemFiatController
@@ -121,11 +119,9 @@ object Form {
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat(), routes.javascript.RedeemFiatController.blockchainRedeemFiatForm)
 
   //ReleaseAssetController
-  val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset(), routes.javascript.ReleaseAssetController.releaseAssetForm)
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
 
   //SendAssetController
-  val SEND_ASSET = new Form("SEND_ASSET", routes.SendAssetController.sendAsset(), routes.javascript.SendAssetController.sendAssetForm)
   val BLOCKCHAIN_SEND_ASSET = new Form("BLOCKCHAIN_SEND_ASSET", routes.SendAssetController.blockchainSendAsset(), routes.javascript.SendAssetController.blockchainSendAssetForm)
 
   //SendCoinController
@@ -142,12 +138,9 @@ object Form {
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader(), routes.javascript.SetACLController.inviteTraderForm)
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader(), routes.javascript.SetACLController.addTraderForm)
-  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest(), routes.javascript.SetACLController.userReviewAddTraderRequestForm)
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL(), routes.javascript.SetACLController.blockchainSetACLForm)
-  val ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ORGANIZATION_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.organizationAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm)
-  val ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT = new Form("ZONE_ACCEPT_OR_REJECT_TRADER_KYC_DOCUMENT", routes.SetACLController.zoneAcceptOrRejectTraderKYCDocument(), routes.javascript.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm)
 
   //SetBuyerFeedbackController
   val SET_BUYER_FEEDBACK = new Form("SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.setBuyerFeedback(), routes.javascript.SetBuyerFeedbackController.setBuyerFeedbackForm)
@@ -163,12 +156,6 @@ object Form {
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
   val ACCEPT_REJECT_TRADER_RELATION = new Form("ACCEPT_REJECT_TRADER_RELATION", routes.TraderController.acceptOrRejectTraderRelation(), routes.javascript.TraderController.acceptOrRejectTraderRelationForm)
-
-  //VerifyEmailAddressController
-  val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress(), routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm)
-
-  //VerifyMobileNumberController
-  val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber(), routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
 
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
@@ -251,7 +238,6 @@ object Form {
   val UPDATE = "UPDATE"
   val DOCUMENTS = "DOCUMENTS"
   val CONTRACT = "CONTRACT"
-  val COPY_OF_OBL = "COPY_OF_OBL"
   val INVOICE = "INVOICE"
   val PACKING_LIST = "PACKING_LIST"
   val COO = "COO"
@@ -285,8 +271,6 @@ object Form {
 
   val UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL = "UPDATE_ORGANIZATION_BANK_ACCOUNT_DETAIL"
   val UPDATE_ORGANIZATION_IDENTIFICATION = "UPDATE_ORGANIZATION_IDENTIFICATION"
-  val UPLOAD_OBL_DOCUMENT = "UPLOAD_OBL_DOCUMENT"
-  val UPDATE_OBL_DOCUMENT = "UPDATE_OBL_DOCUMENT"
   val UPLOAD_INVOICE_DOCUMENT = "UPLOAD_INVOICE_DOCUMENT"
   val UPDATE_INVOICE_DOCUMENT = "UPDATE_INVOICE_DOCUMENT"
   val UPLOAD_CONTRACT_DOCUMENT = "UPLOAD_CONTRACT_DOCUMENT"
@@ -332,6 +316,7 @@ object Form {
   val ORGANIZATION_NAME = "ORGANIZATION_NAME"
   val ORGANIZATION_USERNAME = "ORGANIZATION_USERNAME"
   val ZONE_ID = "ZONE_ID"
+  val NAME = "NAME"
   val BUYER_ADDRESS = "BUYER_ADDRESS"
   val BUYER_ID = "BUYER_ID"
   val SELLER_ADDRESS = "SELLER_ADDRESS"
@@ -405,6 +390,9 @@ object Form {
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"
   val ONLY_BUYER = "ONLY_BUYER"
   val BOTH_PARTIES = "BOTH_PARTIES"
+  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+
+  //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"
   val REFERENCE = "reference"
   val EXTERNAL_REFERENCE = "externalReference"
@@ -428,9 +416,8 @@ object Form {
   val BUYER_CITY = "buyer.city"
   val BUYER_ZIP = "buyer.zip"
   val BUYER_EMAIL = "buyer.email"
-  val SERVICE_ID = "service1.id"
-  val SERVICE_AMOUNT = "service1.amount"
-  val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+  val SERVICE_ID = "service.id"
+  val SERVICE_AMOUNT = "service.amount"
 
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"

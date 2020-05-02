@@ -27,7 +27,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
@@ -79,6 +79,16 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   }
 
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(addOrganizationTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(addOrganizationTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -153,6 +163,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[AddOrganization] = findByTicketID(ticketID)
@@ -198,7 +210,16 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         result <- createOrganizationAndSendNotification(addOrganization)
       } yield result).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -212,10 +233,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         _ <- markTransactionFailed
         addOrganization <- addOrganization
         fromAccountID <- getID(addOrganization.from)
-        toAccountID <- getID(addOrganization.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ADD_ORGANIZATION_FAILED, toAccountID, message)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ADD_ORGANIZATION_FAILED, message)
-      } yield {}).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ADD_ORGANIZATION_FAILED, message)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

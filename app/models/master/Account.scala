@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: String, status: String)
+case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: String)
 
 @Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -53,15 +53,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
 
-  private def getLanguageById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.language
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getAddressById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.accountAddress).result.head.asTry).map {
+  private def tryGetLanguageById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.language).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -69,14 +61,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getStatusByIDAndSecretHash(id: String, secretHash: String): Future[String] = db.run(accountTable.filter(_.id === id).filter(_.secretHash === secretHash).map(_.status).result.head.asTry).map {
+  private def tryGetAddressById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.accountAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-
+  
   private def getUserTypeById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -90,14 +82,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def getIDsByAddresses(addresses: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).map(_.id).result)
 
   private def getAddressByIds(ids: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).map(_.accountAddress).result)
-
-  private def updateStatusById(id: String, status: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.status).update(status).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
 
   private def getUserTypeByAddress(address: String): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
     case Success(result) => result
@@ -157,19 +141,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getStatusByID(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.status).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress, language, userType, status) <> (Account.tupled, Account.unapply)
+    def * = (id, secretHash, accountAddress, language, userType) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -181,15 +155,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def userType = column[String]("userType")
 
-    def status = column[String]("status")
-
   }
 
   object Service {
 
-    def validateLoginAndGetStatus(username: String, password: String): Future[String] = getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString)
-
-    def validateLogin(username: String, password: String): Future[Boolean] = validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString)
+    def validateUsernamePassword(username: String, password: String): Future[Boolean] = validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString)
 
     def updatePassword(username: String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
 
@@ -197,21 +167,17 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       !_
     }
 
-    def addLogin(username: String, password: String, accountAddress: String, language: String): Future[String] = {
-      add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)).map { _ => accountAddress }
-    }
+    def addLogin(username: String, password: String, accountAddress: String, language: String): Future[String] = add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN)).map { _ => accountAddress }
 
     def tryGet(username: String): Future[Account] = findById(username)
 
-    def getLanguage(id: String): String = Await.result(getLanguageById(id), Duration.Inf)
-
-    def getLanguageAsync(id: String): Future[String] = getLanguageById(id)
+    def tryGetLanguage(id: String): Future[String] = tryGetLanguageById(id)
 
     def getId(accountAddress: String): Future[String] = getIdByAddress(accountAddress)
 
     def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 
-    def getAddress(id: String): Future[String] = getAddressById(id)
+    def tryGetAddress(id: String): Future[String] = tryGetAddressById(id)
 
     def markUserTypeTrader(id: String): Future[Int] = updateUserTypeById(id, constants.User.TRADER)
 
@@ -235,15 +201,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddresses(ids: Seq[String]): Future[Seq[String]] = getAddressByIds(ids)
 
-    def updateStatusUnverifiedContact(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED)
-
-    def updateStatusUnverifiedMobile(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED)
-
-    def updateStatusUnverifiedEmail(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.EMAIL_ADDRESS_UNVERIFIED)
-
-    def updateStatusComplete(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.COMPLETE)
-
-    def getStatus(id: String): Future[String] = getStatusByID(id)
   }
 
 }

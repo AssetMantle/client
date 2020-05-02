@@ -1,19 +1,18 @@
 @import controllers.actions.LoginState
 @import play.twirl.api.Html
 @import views.html.component.master._
-@import models.master.{Organization, OrganizationKYC, Trader, TraderKYC, Zone}
+@import models.master.{Organization, OrganizationKYC, Trader, Zone}
 @import views.html.base._
 @import models.master.Identification
 
 @import scala.collection.immutable.ListMap
-@(identification: Option[Identification], accountStatus: String, organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None, traderKYCs: Seq[TraderKYC] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(identification: Option[Identification], contactStatus: Seq[String], organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ORGANIZATION_DETAILS) {
     @identification match {
         case Some(identification) => {
-            @if(accountStatus == constants.Status.Account.COMPLETE && (identification.verificationStatus.getOrElse(false) && (organization.isDefined || trader.isDefined))) {
-@*                <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>*@
-                @commonFormButton(constants.Form.ADD_TRADER)
+            @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED)) && (identification.verificationStatus.getOrElse(false) && (organization.isDefined || trader.isDefined))) {
+                <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
             }
         }
         case _ => {}
@@ -21,7 +20,7 @@
 } {
     @identification match {
         case Some(identification) => {
-            @if(accountStatus == constants.Status.Account.COMPLETE) {
+            @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
                 @identification.verificationStatus match {
                     case Some(status) => {
                         @if(status) {
@@ -29,9 +28,9 @@
                                 organization match {
                                     case Some(organization) => {
                                         trader match {
-                                            case Some(trader) =>{
+                                            case Some(trader) => {
                                                 ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganization(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs),
-                                                    constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get, traderKYCs))
+                                                    constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get))
                                             }
                                             case _ => {
                                                 ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganization(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs))
@@ -40,8 +39,8 @@
                                     }
                                     case _ => {
                                         trader match {
-                                            case Some(trader) =>{
-                                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get, traderKYCs))
+                                            case Some(trader) => {
+                                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get))
                                             }
                                             case _ => {
                                                 ListMap()
@@ -53,8 +52,7 @@
                             }
                             @if(organization.isEmpty && trader.isEmpty) {
                                 <div class="cmuk-position-center">
-@*                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>*@
-                                    @commonFormButton(constants.Form.ADD_TRADER)
+                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>
                                 </div>
                             }
                         } else {
@@ -71,15 +69,19 @@
                 }
             } else {
                 <div class="cmuk-position-center">
-                @Messages(accountStatus)
+                @contactStatus.map { status =>
+                    @Messages(status)
+                    <br>
+                }
                 </div>
             }
         }
         case _ => {
             <div class="cmuk-position-center">
-                @if(accountStatus != constants.Status.Account.COMPLETE) {
-                    @Messages(accountStatus) <br>
-                    }
+                @contactStatus.map { status =>
+                    @Messages(status)
+                    <br>
+                }
                 @Messages(constants.Form.UPLOAD_IDENTIFICATION)
             </div>
         }

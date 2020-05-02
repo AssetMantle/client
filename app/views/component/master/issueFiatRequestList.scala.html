@@ -1,22 +1,20 @@
 @import controllers.actions.LoginState
-@import models.masterTransaction.IssueFiatRequest
+@import models.westernUnion.FiatRequest
 @import views.html.base._
-@(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(issueFiatRequests: Seq[FiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @if(issueFiatRequests.isEmpty){
     <span>@Messages(constants.View.NO_REQUESTS_FOUND)</span>
 } else {
     @for(issueFiatRequest <- issueFiatRequests) {
         <div>
-        @commonCard(issueFiatRequest.accountID){
+        @commonCard(issueFiatRequest.traderID){
         }{
             <div>
-                @commonTextInfo(constants.View.ACCOUNT_ID, issueFiatRequest.accountID)
-                @commonTextInfo(constants.Form.TRANSACTION_ID, issueFiatRequest.transactionID)
+                @commonTextInfo(constants.View.TRADER_ID, issueFiatRequest.traderID)
+                @commonTextInfo(constants.Form.TRANSACTION_ID, issueFiatRequest.id)
                 @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, issueFiatRequest.transactionAmount.toString)
-@*                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>*@
-               @commonFormButton(constants.Form.ISSUE_FIAT,'parameters -> s"'${issueFiatRequest.id}','${issueFiatRequest.accountID}','${issueFiatRequest.transactionID}','${issueFiatRequest.transactionAmount}'")
-@*                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>*@
-                @commonFormButton(constants.Form.REJECT_ISSUE_FIAT_REQUEST,'parameters -> s"'${issueFiatRequest.id}'")
+                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.traderID', '@issueFiatRequest.id', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
             </div>
         }
 

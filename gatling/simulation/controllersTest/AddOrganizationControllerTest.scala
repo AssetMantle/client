@@ -104,8 +104,14 @@ object addOrganizationControllerTest {
       .check(substring("${%s}".format(Test.TEST_ORGANIZATION_ID)).exists)
     )
     .pause(2)
+
     .foreach(organizationKYCs,"documentType"){
       exec(http("Organization_KYC_Update_Status"+"${documentType}")
+        .get(session=>routes.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(session(Test.TEST_ORGANIZATION_ID).as[String],session("documentType").as[String]).url)
+        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      )
+        .pause(2)
+        .exec(http("Organization_KYC_Update_Status"+"${documentType}")
         .post(routes.AddOrganizationController.updateOrganizationKYCDocumentStatus().url)
         .formParamMap(Map(
           Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
@@ -119,16 +125,15 @@ object addOrganizationControllerTest {
     .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(http("Verify_Organization_Form_GET")
-      .get(session=>routes.AddOrganizationController.verifyOrganizationForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_ZONE_ID).as[String]).url)
+      .get(session=>routes.AddOrganizationController.acceptRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(css("legend:contains(%s)".format("Verify Organization")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Verify_Organization_POST")
-      .post(routes.AddOrganizationController.verifyOrganization().url)
+      .post(routes.AddOrganizationController.acceptRequest().url)
       .formParamMap(Map(
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
         Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-        Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.PASSWORD -> "${%s}".format(Test.TEST_ZONE_PASSWORD),
       ))

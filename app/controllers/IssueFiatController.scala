@@ -1,11 +1,11 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.WithZoneLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.masterTransaction.IssueFiatRequest
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.westernUnion.FiatRequests
+import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -13,7 +13,16 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withZoneLoginAction: WithZoneLoginAction, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, transactionsIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                    blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
+                                    masterTraders: master.Traders,
+                                    masterAccounts: master.Accounts,
+                                    masterFiats: master.Fiats,
+                                    masterTransactionIssueFiatRequests: FiatRequests,
+                                    transactionsIssueFiat: transactions.IssueFiat,
+                                    transaction: utilities.Transaction,
+                                    withZoneLoginAction: WithZoneLoginAction,
+                                    withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -23,69 +32,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueFiatRequest())
-  }
-
-  def issueFiatRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.issueFiatRequest(formWithErrors)))
-        },
-        issueFiatRequestData => {
-          val create = masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
-          (for {
-            _ <- create
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
-  def issueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val zoneID = masterZones.Service.tryGetID(loginState.username)
-
-      def addressesUnderZone(zoneID: String): Future[Seq[String]] = blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
-
-      def iDsForAddresses(addresses: Seq[String]): Future[Seq[String]] = masterAccounts.Service.getIDsForAddresses(addresses)
-
-      def pendingIssueFiatRequests(iDs: Seq[String]): Future[Seq[IssueFiatRequest]] = masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(iDs)
-
-      (for {
-        zoneID <- zoneID
-        addressesUnderZone <- addressesUnderZone(zoneID)
-        iDsForAddresses <- iDsForAddresses(addressesUnderZone)
-        pendingIssueFiatRequests <- pendingIssueFiatRequests(iDsForAddresses)
-      } yield Ok(views.html.component.master.issueFiatRequestList(pendingIssueFiatRequests))
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def rejectIssueFiatRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectIssueFiatRequest(requestID = requestID))
-  }
-
-  def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name))))
-        },
-        rejectIssueFiatRequestData => {
-          val reject = masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
-          (for {
-            _ <- reject
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
   }
 
   def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = Action { implicit request =>
@@ -103,7 +49,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
           def getResult(status: Option[Boolean]): Future[Result] = {
             if (status.isEmpty) {
-              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
+              val toAddress = masterAccounts.Service.tryGetAddress(issueFiatData.accountID)
 
               def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
                 entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
@@ -115,12 +61,14 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
               )
 
-              def accept(ticketID: String): Future[Int] = masterTransactionIssueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
+              val traderID = masterTraders.Service.tryGetID(issueFiatData.accountID)
+              def create(traderID: String) = masterFiats.Service.create(traderID, issueFiatData.transactionID, issueFiatData.transactionAmount, 0)
 
               for {
                 toAddress <- toAddress
                 ticketID <- ticketID(toAddress)
-                _ <- accept(ticketID)
+                traderID <- traderID
+                _ <- create(traderID)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
               } yield result
             } else {
@@ -130,7 +78,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
           (for {
             status <- status
-            result <- getResult(status)
+            result <- getResult(None)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

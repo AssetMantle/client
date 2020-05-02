@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.master.{Negotiation, Negotiations, Organization, Trader}
+import models.master.{Organization, Trader, Negotiation => masterNegotiation}
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,6 +15,9 @@ import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 import java.net.ConnectException
+
+import models.blockchain.Negotiation
+
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -24,14 +27,29 @@ case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash
 }
 
 @Singleton
-class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, transactionChangeBuyerBid: transactions.ChangeBuyerBid, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterNegotiations: Negotiations, masterAssets: master.Assets, masterTraders: master.Traders, masterOrganizations: master.Organizations, blockchainAccounts: blockchain.Accounts, masterTransactionTradeActivities: masterTransaction.TradeActivities)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
+                                transaction: utilities.Transaction,
+                                protected val databaseConfigProvider: DatabaseConfigProvider,
+                                blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
+                                getNegotiation: GetNegotiation,
+                                getNegotiationID: GetNegotiationID,
+                                blockchainNegotiations: blockchain.Negotiations,
+                                utilitiesNotification: utilities.Notification,
+                                masterAccounts: master.Accounts,
+                                masterNegotiations: master.Negotiations,
+                                masterAssets: master.Assets,
+                                masterTraders: master.Traders,
+                                masterOrganizations: master.Organizations,
+                                blockchainAccounts: blockchain.Accounts,
+                                masterTransactionTradeActivities: masterTransaction.TradeActivities
+                               )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
@@ -115,6 +133,16 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(changeBuyerBidTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteByTicketID(ticketID: String) = db.run(changeBuyerBidTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -160,6 +188,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[ChangeBuyerBid] = findByTicketID(ticketID)
@@ -174,29 +204,38 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val changeBuyerBid = Service.getTransaction(ticketID)
 
-      def negotiationID(changeBuyerBid: ChangeBuyerBid): Future[Option[String]] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
+      def negotiation(changeBuyerBid: ChangeBuyerBid): Future[Option[Negotiation]] = blockchainNegotiations.Service.getNegotiation(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
 
-      def negotiationResponse(negotiationID: Option[String], changeBuyerBid: ChangeBuyerBid): Future[NegotiationResponse.Response] = {
-        negotiationID match {
-          case Some(id) => getNegotiation.Service.get(id)
-          case None => {
-            val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
+      def getNegotiationResponse(negotiation: Option[Negotiation], changeBuyerBid: ChangeBuyerBid): Future[NegotiationResponse.Response] = negotiation match {
+        case Some(negotiation) => getNegotiation.Service.get(negotiation.id)
+        case None =>
+          val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
 
-            def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
+          def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
 
-            for {
-              negotiationIDResponse <- negotiationIDResponse
-              negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
-            } yield negotiation
-          }
-        }
+          for {
+            negotiationIDResponse <- negotiationIDResponse
+            negotiationResponse <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
+          } yield negotiationResponse
       }
 
-      def markTransactionSuccessful: Future[Int] = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      def createOrUpdate(negotiation: Option[Negotiation], negotiationResponse: NegotiationResponse.Response) = {
+        if (negotiation.isDefined) {
+          blockchainNegotiations.Service.update(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
+        } else blockchainNegotiations.Service.create(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
+      }
 
-      def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
+      def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Unit] = {
+        val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(changeBuyerBid.from)
+        val markBuyerFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
+        for {
+          _ <- markBuyerAccountDirty
+          _ <- markBuyerFeedbackDirty
+        } yield ()
+      }
 
       def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
@@ -204,31 +243,16 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
       def getAssetID(pegHash: String): Future[String] = masterAssets.Service.tryGetIDByPegHash(pegHash)
 
-      def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
-
-      def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Unit] = {
-        val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(changeBuyerBid.from)
-        val markBuyerFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
-        val markSellerFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        for {
-          _ <- markBuyerAccountDirty
-          _ <- markBuyerFeedbackDirty
-          _ <- markSellerFeedbackDirty
-        } yield Unit
-      }
-
-      def markNegotiationAcceptedAndUpdateNegotiationID(negotiation: Negotiation, negotiationID: String): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
-        masterNegotiations.Service.markAcceptedAndUpdateNegotiationID(id = negotiation.id, negotiationID = negotiationID)
-      } else {
-        Future(0)
-      }
+      def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
       //TODO If in future BC provides quantity and assetDescription in Negotiation, modify this to update them as well.
-      def updateAssetTerms(negotiation: Negotiation, price: Int): Future[Int] = masterNegotiations.Service.updateAssetTerms(id = negotiation.id, description = negotiation.assetDescription, price = price, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit)
+      def updateMasterNegotiation(negotiation: masterNegotiation, negotiationID: String, price: Int, time: Int): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
+        masterNegotiations.Service.update(negotiation.copy(negotiationID = Option(negotiationID), price = price, time = Option(time), status = constants.Status.Negotiation.STARTED))
+      } else {
+        masterNegotiations.Service.update(negotiation.copy(price = price, time = Option(time)))
+      }
 
-      def updateTime(negotiation: Negotiation, time: Int): Future[Int] = masterNegotiations.Service.updateTime(id = negotiation.id, time = time)
-
-      def sendNotifications(buyer: Trader, seller: Trader, negotiation: Negotiation): Future[Unit] = {
+      def sendNotifications(buyer: Trader, seller: Trader, negotiation: masterNegotiation): Future[Unit] = {
         def getOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
         if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
@@ -239,40 +263,43 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
             sellerOrganization <- getOrganization(seller.organizationID)
             _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, sellerOrganization.name)
             _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, buyerOrganization.name)
-          } yield Unit
+          } yield ()
         } else {
           for {
             _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
             _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_STARTED, negotiation.buyerTraderID, negotiation.sellerTraderID, negotiation.assetDescription)
-          } yield Unit
+          } yield ()
         }
       }
 
       (for {
-        changeBuyerBid <- changeBuyerBid
-        //TODO: TECHNICAL_DEBT Getting response account first not markTransactionSuccessful because if we mark Tx successful first and then negotiationResponse,
-        // if negotiationResponse throws an exception, then the BC_TX will be updated to tx successful but BC and Master Schema won't get updated
-        // as ticket updater will not fetch it again. Correct way would have been to use dirtyBit.
-        negotiationID <- negotiationID(changeBuyerBid)
-        negotiationResponse <- negotiationResponse(negotiationID, changeBuyerBid)
         _ <- markTransactionSuccessful
-        _ <- insertOrUpdate(negotiationResponse)
+        changeBuyerBid <- changeBuyerBid
+        negotiation <- negotiation(changeBuyerBid)
+        negotiationResponse <- getNegotiationResponse(negotiation, changeBuyerBid)
+        _ <- createOrUpdate(negotiation, negotiationResponse)
+        _ <- markDirty(changeBuyerBid)
         buyerAccountID <- getID(changeBuyerBid.from)
         sellerAccountID <- getID(changeBuyerBid.to)
         buyer <- getTrader(buyerAccountID)
         seller <- getTrader(sellerAccountID)
         assetID <- getAssetID(negotiationResponse.value.pegHash)
-        negotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
-        _ <- markDirty(changeBuyerBid)
-        _ <- markNegotiationAcceptedAndUpdateNegotiationID(negotiation = negotiation, negotiationID = negotiationResponse.value.negotiationID)
-        _ <- updateAssetTerms(negotiation, negotiationResponse.value.bid.toInt)
-        _ <- updateTime(negotiation, negotiationResponse.value.time.toInt)
-        _ <- sendNotifications(buyer = buyer, seller = seller, negotiation = negotiation)
+        masterNegotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
+        _ <- updateMasterNegotiation(negotiation = masterNegotiation, negotiationID = negotiationResponse.value.negotiationID, price = negotiationResponse.value.bid.toInt, time = negotiationResponse.value.time.toInt)
+        _ <- sendNotifications(buyer = buyer, seller = seller, negotiation = masterNegotiation)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -280,22 +307,15 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val changeBuyerBid = Service.getTransaction(ticketID)
 
-      def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Unit] = {
-        val markBuyerFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
-        val markSellerFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        for {
-          _ <- markBuyerFeedbackDirty
-          _ <- markSellerFeedbackDirty
-        } yield Unit
-      }
+      def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
 
       (for {
         _ <- markTransactionFailed
         changeBuyerBid <- changeBuyerBid
         _ <- markDirty(changeBuyerBid)
-        fromAccountID <- getID(changeBuyerBid.from)
+        fromAccountID <- getAccountID(changeBuyerBid.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.NEGOTIATION_UPDATE_FAILED, message)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

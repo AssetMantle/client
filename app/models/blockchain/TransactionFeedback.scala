@@ -46,7 +46,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -241,7 +241,9 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
       (for {
         dirtyAddresses <- dirtyAddresses
         _ <- refreshDirtyAddresses(dirtyAddresses)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

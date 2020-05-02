@@ -1,6 +1,5 @@
 package controllers
 
-import actors.ShutdownActor
 import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -22,21 +21,11 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AccountController @Inject()(
                                    utilitiesNotification: utilities.Notification,
-                                   shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
                                    withUsernameToken: WithUsernameToken,
-                                   queryGetAccount: queries.GetAccount,
-                                   blockchainFiats: blockchain.Fiats,
-                                   blockchainZones: blockchain.Zones,
-                                   blockchainOrders: blockchain.Orders,
-                                   blockchainAssets: blockchain.Assets,
                                    blockchainAccounts: blockchain.Accounts,
                                    blockchainAclHashes: blockchain.ACLHashes,
                                    blockchainAclAccounts: blockchain.ACLAccounts,
-                                   blockchainNegotiations: blockchain.Negotiations,
-                                   blockchainOrganizations: blockchain.Organizations,
-                                   masterOrganizations: master.Organizations,
-                                   masterZones: master.Zones,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
@@ -45,12 +34,9 @@ class AccountController @Inject()(
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
-                                   sftpScheduler: SFTPScheduler,
                                    messagesControllerComponents: MessagesControllerComponents,
-                                   withTraderLoginAction: WithTraderLoginAction,
-                                   masterTraderRelations: master.TraderRelations,
-                                   masterContacts: master.Contacts,
-                                   masterTraders: master.Traders,
+                                   masterEmails: master.Emails,
+                                   masterMobiles: master.Mobiles,
                                    masterIdentifications: master.Identifications,
                                    masterAccountKYCs: master.AccountKYCs
                                  )
@@ -113,7 +99,7 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
-        val status = masterAccounts.Service.validateLoginAndGetStatus(username = loginData.username, password = loginData.password)
+        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
 
         def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
 
@@ -145,21 +131,38 @@ class AccountController @Inject()(
           } yield Unit
         }
 
-        def getResult(status: String)(implicit loginState: LoginState): Future[Result] = {
-          val contactWarnings = utilities.Contact.getWarnings(status)
+        def getContactWarnings: Future[Seq[constants.Response.Warning]] = {
+          val email = masterEmails.Service.get(loginData.username)
+          val mobile = masterMobiles.Service.get(loginData.username)
+          for {
+            email <- email
+            mobile <- mobile
+          } yield utilities.Contact.getWarnings(mobile, email)
+        }
+
+        def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = {
           loginState.userType match {
-            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = contactWarnings))
-            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = warnings))
+            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = warnings))
           }
         }
 
+        def checkLoginAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+          for {
+            account <- getAccount
+            userType <- firstLoginUserTypeUpdate(account.userType)
+            loginState <- getLoginState(address = account.accountAddress, userType = userType)
+            _ <- sendNotification(loginState)
+            contactWarnings <- getContactWarnings
+            result <- getResult(contactWarnings)(loginState)
+          } yield result
+        } else {
+          Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
+        }
+
         (for {
-          status <- status
-          account <- getAccount
-          userType <- firstLoginUserTypeUpdate(account.userType)
-          loginState <- getLoginState(address = account.accountAddress, userType = userType)
-          _ <- sendNotification(loginState)
-          result <- getResult(status = status)(loginState)
+          validateUsernamePassword <- validateUsernamePassword
+          result <- checkLoginAndGetResult(validateUsernamePassword)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -184,7 +187,7 @@ class AccountController @Inject()(
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           def shutdownActorsAndGetResult = {
-            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN, loginState.username)
+            actors.Service.Comet.shutdownUserActor(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
@@ -212,25 +215,25 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.changePassword(formWithErrors)))
         },
         changePasswordData => {
-          val validLogin = masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(loginState.username, changePasswordData.oldPassword)
 
-          def updateAndGetResult(validLogin: Boolean): Future[Result] = if (validLogin) {
+          def updateAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
             val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
 
-            def updatePassword: Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
+            def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
 
             for {
               _ <- postRequest
-              _ <- updatePassword
+              _ <- updatePassword()
               result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
           } else {
-            Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))
+            Future(BadRequest(views.html.component.master.changePassword(views.companion.master.ChangePassword.form.fill(value = views.companion.master.ChangePassword.Data(changePasswordData.oldPassword, changePasswordData.newPassword, changePasswordData.confirmNewPassword)).withError(constants.FormField.OLD_PASSWORD.name, constants.Response.INVALID_PASSWORD.message))))
           }
 
           (for {
-            validLogin <- validLogin
-            result <- updateAndGetResult(validLogin)
+            validateUsernamePassword <- validateUsernamePassword
+            result <- updateAndGetResult(validateUsernamePassword)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -248,7 +251,7 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.emailOTPForgotPassword(formWithErrors)))
       },
       emailOTPForgotPasswordData => {
-        val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
+        val otp = masterTransactionEmailOTP.Service.get(emailOTPForgotPasswordData.username)
         (for {
           otp <- otp
           _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
@@ -330,12 +333,12 @@ class AccountController @Inject()(
         addIdentificationData => {
           val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType, Address(addressLine1 = addIdentificationData.address.addressLine1, addressLine2 = addIdentificationData.address.addressLine2, landmark = addIdentificationData.address.landmark, city = addIdentificationData.address.city, country = addIdentificationData.address.country, zipCode = addIdentificationData.address.zipCode, phone = addIdentificationData.address.phone))
 
-          def accountKYC(): Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+          def getAccountKYC: Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
 
           (for {
             _ <- add
-            accountKYC <- accountKYC()
-            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
+            accountKYC <- getAccountKYC
+            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -346,17 +349,17 @@ class AccountController @Inject()(
 
   def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       for {
         accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.IDENTIFICATION))
+        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
       } yield result
   }
 
   def userReviewIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       (for {
         identification <- identification
         accountKYC <- accountKYC
@@ -371,7 +374,7 @@ class AccountController @Inject()(
       views.companion.master.UserReviewIdentification.form.bindFromRequest().fold(
         formWithErrors => {
           val identification = masterIdentifications.Service.get(loginState.username)
-          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
           (for {
             identification <- identification
             accountKYC <- accountKYC
@@ -381,7 +384,7 @@ class AccountController @Inject()(
           }
         },
         userReviewAddZoneRequestData => {
-          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.IDENTIFICATION)
+          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.AccountKYC.IDENTIFICATION)
 
           def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
             if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
@@ -400,7 +403,7 @@ class AccountController @Inject()(
               } yield result
             } else {
               val identification = masterIdentifications.Service.get(loginState.username)
-              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
+              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
               for {
                 identification <- identification
                 accountKYC <- accountKYC

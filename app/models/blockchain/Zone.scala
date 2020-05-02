@@ -22,7 +22,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -156,7 +156,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       (for {
         dirtyZones <- dirtyZones
         _ <- refreshDirtyZones(dirtyZones)
-      } yield {}) (schedulerExecutionContext)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
   }
 

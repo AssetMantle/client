@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.NegotiationFile
+@import models.common.Serializable
+@import models.Abstract.AssetDocumentContent
+@(documentType:String, documentContent: Option[AssetDocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@documentContent match {
+    case Some(content)=> {
+        @documentType match {
+            case constants.File.Asset.BILL_OF_LADING => {
+                @Messages(constants.File.Asset.BILL_OF_LADING) :
+                @defining(content.asInstanceOf[Serializable.BillOfLading]){billOfLading=>
+                    @commonTextInfo(constants.Form.BILL_OF_LADING_NUMBER, billOfLading.id)
+                    @commonTextInfo(constants.Form.PORT_OF_LOADING, billOfLading.portOfLoading)
+                    @commonTextInfo(constants.Form.SHIPPER_NAME, billOfLading.shipperName)
+                    @commonTextInfo(constants.Form.SHIPPER_ADDRESS, billOfLading.shipperAddress)
+                    @commonTextInfo(constants.Form.NOTIFY_PARTY_NAME, billOfLading.notifyPartyName)
+                    @commonTextInfo(constants.Form.NOTIFY_PARTY_ADDRESS, billOfLading.notifyPartyAddress)
+                    @commonDateInfo(constants.Form.SHIPMENT_DATE, billOfLading.dateOfShipping)
+                    @commonTextInfo(constants.Form.DELIVERY_TERM, billOfLading.deliveryTerm)
+                    @commonIntInfo(constants.Form.ASSET_QUANTITY, billOfLading.weightOfConsignment)
+                    @commonIntInfo(constants.Form.ASSET_PRICE, billOfLading.declaredAssetValue)
+
+                }
+            }
+            case _ => {}
+        }
+    }
+    case None=>{@Messages(constants.View.CONTENT_NOT_FOUND)}
+}

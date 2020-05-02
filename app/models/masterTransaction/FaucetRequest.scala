@@ -108,7 +108,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int): Future[String] = add(FaucetRequest(id = utilities.IDGenerator.requestID, accountID = accountID, amount = amount))
+    def create(accountID: String, amount: Int): Future[String] = add(FaucetRequest(id = utilities.IDGenerator.requestID(), accountID = accountID, amount = amount))
 
     def accept(requestID: String, gas: Int, ticketID: String): Future[Int] = updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas = Option(gas), status = Option(true))
 
