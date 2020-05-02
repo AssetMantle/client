@@ -16,6 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class DocusignController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                    utilitiesDocusign: utilities.Docusign,
+                                   utilitiesNotification: utilities.Notification,
                                    masterEmails: master.Emails,
                                    masterNegotiations: master.Negotiations,
                                    withTraderLoginAction: WithTraderLoginAction,
@@ -86,7 +87,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
       def getTraders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
-      def updateStatus(docusignEnvelope: DocusignEnvelope) = event match {
+      def updateStatus(docusignEnvelope: DocusignEnvelope, traderAccountIDs:Seq[String]) = event match {
         case constants.View.DOCUSIGN_EVENT_SEND => {
           masterTransactionDocusignEnvelopes.Service.markSent(envelopeId)
         }
@@ -109,6 +110,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
             _ <- markSigningComplete
             _ <- markContractSigned(docusignEnvelope.id)
             _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)
+            _ <- utilitiesNotification.send(traderAccountIDs(0), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
+            _ <- utilitiesNotification.send(traderAccountIDs(1), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
           } yield 0
         }
         case _ => Future(0)
@@ -118,7 +121,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         docusignEnvelope <- docusignEnvelope
         negotiation <- getNegotiation(docusignEnvelope.id)
         traders <- getTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
-        _ <- updateStatus(docusignEnvelope)
+        _ <- updateStatus(docusignEnvelope, traders.map(_.accountID))
       } yield {
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))

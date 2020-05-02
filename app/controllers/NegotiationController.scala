@@ -1048,7 +1048,6 @@ class NegotiationController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
