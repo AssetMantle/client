@@ -20,7 +20,7 @@
                                 @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.send, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")
                             }
                             @if(docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.SENT && negotiation.buyerTraderID == traderID) {
-                                @commonModalButton(constants.View.E_SIGN, routes.javascript.DocusignController.sign, 'parameters -> s"'${negotiation.id}'")
+                                @commonModalButton(constants.View.E_SIGN, routes.javascript.DocusignController.sign, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")
                             }
                             @if(docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.COMPLETED) {
                                 <span>@constants.View.SIGNED</span>

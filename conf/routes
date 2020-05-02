@@ -7,7 +7,7 @@ GET         /javascriptRoutes                                                   
 GET         /firebase-messaging-sw.js                                                             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
 GET         /docusign/send                                                                        controllers.DocusignController.send(id:String, documentType: String)
-GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String)
+GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
 GET         /docusign/return                                                                      controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
 
 GET         /docusign/authorization                                                               controllers.DocusignController.authorization

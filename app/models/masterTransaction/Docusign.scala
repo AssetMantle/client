@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class DocusignEnvelope(id: String, envelopeID: String, documentType:String, status:String)
+case class DocusignEnvelope(id: String, envelopeID: String, documentType: String, status: String)
 
 @Singleton
 class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -35,7 +35,7 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateStatusByEnvelopeID(envelopeID: String, status:String): Future[Int] = db.run(docusignTable.filter(_.envelopeID === envelopeID).map(_.status).update(status).asTry).map {
+  private def updateStatusByEnvelopeID(envelopeID: String, status: String): Future[Int] = db.run(docusignTable.filter(_.envelopeID === envelopeID).map(_.status).update(status).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -55,11 +55,7 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getByID(id: String) = db.run(docusignTable.filter(_.id === id).result.headOption)
-
-  private def getAllByID(id: String) = db.run(docusignTable.filter(_.id === id).result)
-
-  private def findEnvelopeIDByID(id: String)= db.run(docusignTable.filter(_.id === id).map(_.envelopeID).result.head.asTry).map {
+  private def tryGetByID(id: String, documentType: String): Future[DocusignEnvelope] = db.run(docusignTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -67,7 +63,19 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getEnvelopeStatusByID(id: String): Future[Option[String]]= db.run(docusignTable.filter(_.id === id).map(_.status).result.headOption)
+  private def getByID(id: String, documentType: String) = db.run(docusignTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption)
+
+  private def getAllByID(id: String) = db.run(docusignTable.filter(_.id === id).result)
+
+  private def findEnvelopeIDByID(id: String) = db.run(docusignTable.filter(_.id === id).map(_.envelopeID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getEnvelopeStatusByID(id: String): Future[Option[String]] = db.run(docusignTable.filter(_.id === id).map(_.status).result.headOption)
 
   private def deleteById(id: String): Future[Int] = db.run(docusignTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -95,21 +103,23 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(id: String,envelopeID: String, documentType:String): Future[String] = add(DocusignEnvelope(id, envelopeID, documentType, constants.Status.DocuSignEnvelopeStatus.CREATED))
+    def create(id: String, envelopeID: String, documentType: String): Future[String] = add(DocusignEnvelope(id, envelopeID, documentType, constants.Status.DocuSignEnvelopeStatus.CREATED))
 
-    def get(id:String): Future[Option[DocusignEnvelope]]= getByID(id)
+    def get(id: String, documentType: String): Future[Option[DocusignEnvelope]] = getByID(id, documentType)
 
-    def getAll(id:String): Future[Seq[DocusignEnvelope]]= getAllByID(id)
+    def tryGet(id: String, documentType: String) = tryGetByID(id, documentType)
 
-    def tryGetByEnvelopeID(envelopeID: String): Future[DocusignEnvelope]= findByEnvelopeID(envelopeID)
+    def getAll(id: String): Future[Seq[DocusignEnvelope]] = getAllByID(id)
 
-    def markSent(envelopeID:String): Future[Int]= updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.SENT)
+    def tryGetByEnvelopeID(envelopeID: String): Future[DocusignEnvelope] = findByEnvelopeID(envelopeID)
 
-    def markComplete(envelopeID:String): Future[Int]= updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.COMPLETED)
+    def markSent(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.SENT)
 
-    def tryGetEnvelopeID(id:String): Future[String]= findEnvelopeIDByID(id)
+    def markComplete(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.COMPLETED)
 
-    def getEnvelopeStatus(id:String): Future[Option[String]]= getEnvelopeStatusByID(id)
+    def tryGetEnvelopeID(id: String): Future[String] = findEnvelopeIDByID(id)
+
+    def getEnvelopeStatus(id: String): Future[Option[String]] = getEnvelopeStatusByID(id)
   }
 
 }

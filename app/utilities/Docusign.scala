@@ -120,13 +120,20 @@ class Docusign @Inject()(actorSystem: ActorSystem,
   def updateSignedDocuemnt(envelopeID: String, documentType: String) = fetchAndStoreSignedDocument(envelopeID, documentType)
 
   def fetchAndStoreSignedDocument(envelopeID: String, documentType: String) = {
-    val result = envelopesApi.getDocument(accountID, envelopeID, constants.View.DOCUMENT_INDEX)
-    val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(result)).toString, constants.File.PDF).mkString(".")
-    val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
-    val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
-    bufferedOutputStream.write(result)
-    bufferedOutputStream.close()
-    newFileName
+    try {
+      val result = envelopesApi.getDocument(accountID, envelopeID, constants.View.DOCUMENT_INDEX)
+      val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(result)).toString, constants.File.PDF).mkString(".")
+      val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
+      val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
+      bufferedOutputStream.write(result)
+      bufferedOutputStream.close()
+      newFileName
+    } catch {
+      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
+        throw new BaseException(constants.Response.ENVELOPE_CREATION_FAILED)
+      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
+        throw new BaseException(constants.Response.INVALID_INPUT)
+    }
   }
 
   def updateAccessToken(code: String) = {
