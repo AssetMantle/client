@@ -1684,12 +1684,12 @@ class ComponentViewController @Inject()(
 
       def getIssueFiatRequestList(traderID: String) = westernUnionFiatRequests.Service.getAll(traderID)
 
-      def rtcbList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
       for {
         traderID <- traderID
         issueFiatRequestList <- getIssueFiatRequestList(traderID)
-        rtcbList <- rtcbList(issueFiatRequestList.map(_.id))
+        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.traderViewIssueFiatRequests(issueFiatRequestList, rtcbList))
   }
 
@@ -1701,13 +1701,13 @@ class ComponentViewController @Inject()(
 
       def getIssueFiatRequestList(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
 
-      def rtcbList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
       for {
         organizationID <- organizationID
         traderList <- getTraderList(organizationID)
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
-        rtcbList <- rtcbList(issueFiatRequestList.map(_.id))
+        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.organizationViewIssueFiatRequests(traderList, issueFiatRequestList, rtcbList))
 
   }
@@ -1723,14 +1723,14 @@ class ComponentViewController @Inject()(
 
       def getIssueFiatRequestList(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
 
-      def rtcbList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
       for {
         zoneID <- zoneID
         organizationList <- getOrganizationList(zoneID)
         traderList <- getTraderList(zoneID)
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
-        rtcbList <- rtcbList(issueFiatRequestList.map(_.id))
+        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.zoneViewIssueFiatRequests(traderList, organizationList, issueFiatRequestList, rtcbList))
   }
 
