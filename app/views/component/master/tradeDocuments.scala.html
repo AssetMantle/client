@@ -19,7 +19,7 @@
         } {
             <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)">@Messages(assetFile.documentType)</a>
         } {
-            @commonJavascriptButton(Seq(constants.Form.UPDATE, assetFile.documentType).mkString("_"),JavaScript(s"getForm(jsRoutes.controllers.OrderController.moderatedSellerExecuteOrderDocument('${assetFile.documentType}','${assetFile.id}'))"))
+            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages(assetFile.documentType)).mkString(" "), routes.javascript.FileController.updateAssetForm, 'parameters -> s"'${assetFile.documentType}','${assetFile.id}'")
             @assetFile.documentType match {
                 case constants.File.Asset.BILL_OF_LADING => {
                     @commonFormButton(constants.Form.ADD_BILL_OF_LADING, 'parameters -> s"'${negotiation.id}'")
@@ -49,7 +49,7 @@
         } {
             <a href="@routes.FileController.tradingFile(negotiation.id, negotiationFile.fileName, negotiationFile.documentType)">@Messages(negotiationFile.documentType)</a>
         } {
-            @commonJavascriptButton(Seq(constants.Form.UPDATE, negotiationFile.documentType).mkString("_"),JavaScript(s"getForm(jsRoutes.controllers.FileController.updateNegotiationForm('${negotiationFile.documentType}','${negotiation.id}'))"))
+            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages(negotiationFile.documentType)).mkString(" "), routes.javascript.FileController.updateNegotiationForm, 'parameters -> s"'${negotiationFile.documentType}','${negotiationFile.id}'")
             @negotiationFile.documentType match {
                 case constants.File.Negotiation.INVOICE => {
                     @commonFormButton(constants.Form.ADD_INVOICE, 'parameters -> s"'${negotiation.id}'")

@@ -14,7 +14,6 @@
                 @commonTextInfo(constants.Form.PEG_HASH, traderFeedbackHistory.pegHash)
             </div>
             <div class="centerText" >
-@*                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm('@traderFeedbackHistory.sellerAddress', '@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button>*@
                 @commonFormButton(constants.Form.SET_BUYER_FEEDBACK,'parameters -> s"'${traderFeedbackHistory.sellerAddress}','${traderFeedbackHistory.pegHash}'")
                 <br>
             </div>

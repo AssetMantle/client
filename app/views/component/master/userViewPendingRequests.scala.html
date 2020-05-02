@@ -12,7 +12,6 @@
     @identification match {
         case Some(identification) => {
             @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED)) && (identification.verificationStatus.getOrElse(false) && (organization.isDefined || trader.isDefined))) {
-@*                <button type="button" class="cmuk-button cmuk-button-small cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>*@
                 @commonFormButton(constants.Form.ADD_TRADER)
             }
         }
@@ -53,7 +52,6 @@
                             }
                             @if(organization.isEmpty && trader.isEmpty) {
                                 <div class="cmuk-position-center">
-@*                                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER.legend)</button>*@
                                     @commonFormButton(constants.Form.ADD_TRADER)
                                 </div>
                             }

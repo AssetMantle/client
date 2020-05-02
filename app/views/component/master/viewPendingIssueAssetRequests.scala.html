@@ -18,8 +18,7 @@
                     @commonIntInfo(constants.Form.ASSET_PRICE, assetRequest.price)
                     @commonBooleanInfo(constants.Form.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
-@*                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@assetRequest.id'))">@Messages(constants.Form.APPROVE)</button>*@
-                    @commonFormButton(constants.Form.ZONE_ISSUE_ASSET,'parameters -> s"'${assetRequest.id}'")
+                    @commonFormButton(constants.Form.ZONE_ISSUE_ASSET,'parameters -> s"'${assetRequest.id}'", 'class -> "cmuk-button-success cmuk-button-small")
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>
                 }
                 </div>

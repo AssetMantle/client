@@ -11,8 +11,8 @@
     } {
       @commonTextInfo(constants.View.ACCOUNT_ID, faucetRequest.accountID)
       @commonIntInfo(constants.Form.AMOUNT, faucetRequest.amount)
-      @commonFormButton(constants.Form.APPROVE_FAUCET_REQUEST, 'parameters -> s"'${faucetRequest.id}','${faucetRequest.accountID}'")
-      @commonFormButton(constants.Form.REJECT_FAUCET_REQUEST,'parameters -> s"'${faucetRequest.id}'")
+      @commonFormButton(constants.Form.APPROVE_FAUCET_REQUEST, 'parameters -> s"'${faucetRequest.id}','${faucetRequest.accountID}'",'class -> "cmuk-button-success cmuk-button-small")
+      @commonFormButton(constants.Form.REJECT_FAUCET_REQUEST,'parameters -> s"'${faucetRequest.id}'",'class -> "cmuk-button-success cmuk-button-small")
     }
     </div>
   }

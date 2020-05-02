@@ -9,7 +9,7 @@
     <h4>@Messages(constants.Form.ORGANIZATION_BACKGROUND_CHECK)</h4>
     @for(documentType <- constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(constants.Form.UPLOAD + " " + documentType,routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm,'parameters -> s"'${documentType}','${organization.id}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm,'parameters -> s"'${documentType}','${organization.id}'")
         </div>
     }
     @for(organizationBackgroundCheck <- organizationBackgroundChecks) {
@@ -18,7 +18,7 @@
         } {
             <a href="@routes.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationBackgroundCheck.id, organizationBackgroundCheck.fileName, organizationBackgroundCheck.documentType)" target="_blank">@Messages(organizationBackgroundCheck.documentType)</a>
         } {
-            @commonModalButton(constants.Form.UPDATE + " " + organizationBackgroundCheck.documentType,routes.javascript.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm,'parameters -> s"'${organizationBackgroundCheck.documentType}','${organization.id}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(organizationBackgroundCheck.documentType)).mkString(" "),routes.javascript.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm,'parameters -> s"'${organizationBackgroundCheck.documentType}','${organization.id}'")
             <script>hideElement('upload@organizationBackgroundCheck.documentType')</script>
         }
     }

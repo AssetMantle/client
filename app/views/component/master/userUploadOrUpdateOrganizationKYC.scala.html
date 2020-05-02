@@ -9,7 +9,7 @@
     <h4>@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(constants.Form.UPLOAD + " " + documentType,routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
     @for(organizationKYC <- organizationKYCs) {
@@ -18,12 +18,12 @@
         } {
             <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)" target="_blank">@Messages(organizationKYC.documentType)</a>
         } {
-            @commonModalButton(constants.Form.UPDATE + " " + organizationKYC.documentType,routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages( organizationKYC.documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
 </div>
-@commonFormButton(constants.Form.ADD_ORGANIZATION)
+@commonModalButton(constants.View.BACK, constants.Form.ADD_ORGANIZATION.get)
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
-    @commonFormButton(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST)
+    @commonFormButton(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST,'id -> "getOrganizationKYCReviewForm")
 }

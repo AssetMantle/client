@@ -16,8 +16,8 @@
                     <script>componentResource('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKYCDocuments('@zoneVerificationRequest.id'))</script>
                 </span>
                 <br>
-                @commonFormButton(constants.Form.VERIFY_ZONE,'parameters -> s"'${zoneVerificationRequest.id}'")
-                @commonFormButton(constants.Form.REJECT_VERIFY_ZONE_REQUEST,'parameters -> s"'${zoneVerificationRequest.id}'")
+                @commonFormButton(constants.Form.VERIFY_ZONE,'parameters -> s"'${zoneVerificationRequest.id}'",'class ->"cmuk-button cmuk-button-success cmuk-button-small")
+                @commonFormButton(constants.Form.REJECT_VERIFY_ZONE_REQUEST,'parameters -> s"'${zoneVerificationRequest.id}'",'class ->"cmuk-button cmuk-button-danger cmuk-button-small")
             }
         }
     </div>
