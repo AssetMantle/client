@@ -23,23 +23,23 @@
 }
 
 @center = {
-    <div id="traderViewFiatTransactions"></div>
+    <div id="traderViewIssueFiatRequests"></div>
     <div class="cmuk-container cmuk-margin-bottom">
 
-        <div id="organizationViewFiatTransactions"></div>
-        <div id="zoneViewFiatTransactions"></div>
+        <div id="organizationViewIssueFiatRequests"></div>
+        <div id="zoneViewIssueFiatRequests"></div>
 
     </div>
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
-            componentResource('traderViewFiatTransactions', jsRoutes.controllers.ComponentViewController.traderViewFiatTransactions());
+            componentResource('traderViewIssueFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewIssueFiatRequests());
             }
             case constants.User.ORGANIZATION => {
-                componentResource('organizationViewFiatTransactions', jsRoutes.controllers.ComponentViewController.organizationViewFiatTransactions());
+                componentResource('organizationViewIssueFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewIssueFiatRequests());
             }
             case constants.User.ZONE => {
-                componentResource('zoneViewFiatTransactions', jsRoutes.controllers.ComponentViewController.zoneViewFiatTransactions());
+                componentResource('zoneViewIssueFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewIssueFiatRequests());
             }
             case constants.User.GENESIS => {}
             case _ => {}

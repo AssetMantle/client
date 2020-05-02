@@ -1678,9 +1678,8 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewFiatTransactions: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewIssueFiatRequests: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      println("traderViewFiatTransactions------------------------traderViewFiatTransactions")
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def issueFiatRequests(traderID: String) = westernUnionFiatRequests.Service.getAll(traderID)
@@ -1691,10 +1690,10 @@ class ComponentViewController @Inject()(
         traderID <- traderID
         issueFiatRequests <- issueFiatRequests(traderID)
         rtcbList <- rtcbList(issueFiatRequests.map(_.id))
-      } yield Ok(views.html.component.master.traderViewFiatTransactions(issueFiatRequests, rtcbList))
+      } yield Ok(views.html.component.master.traderViewIssueFiatRequests(issueFiatRequests, rtcbList))
   }
 
-  def organizationViewFiatTransactions: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationViewIssueFiatRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -1709,11 +1708,11 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         issueFiatRequests <- issueFiatRequests(traders.map(_.id))
         rtcbList <- rtcbList(issueFiatRequests.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewFiatTransactions(traders, issueFiatRequests, rtcbList))
+      } yield Ok(views.html.component.master.organizationViewIssueFiatRequests(traders, issueFiatRequests, rtcbList))
 
   }
 
-  def zoneViewFiatTransactions: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
       val zoneID = masterZones.Service.tryGetID(loginState.username)
@@ -1732,7 +1731,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         issueFiatRequests <- issueFiatRequests(traders.map(_.id))
         rtcbList <- rtcbList(issueFiatRequests.map(_.id))
-      } yield Ok(views.html.component.master.zoneViewFiatTransactions(traders, organizations, issueFiatRequests, rtcbList))
+      } yield Ok(views.html.component.master.zoneViewIssueFiatRequests(traders, organizations, issueFiatRequests, rtcbList))
   }
 
 }
