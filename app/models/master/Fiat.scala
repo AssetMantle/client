@@ -60,6 +60,16 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def updateAmountByOwnerIDAndTransactionID(ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int): Future[Int] = db.run(fiatTable.filter(_.transactionID === transactionID).filter(_.ownerID === ownerID).map(x => (x.transactionAmount, x.amountRedeemed)).update((transactionAmount, amountRedeemed)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateTransactionAmount(ownerID: String, transactionAmount: Int): Future[Int] = db.run(fiatTable.filter(_.ownerID === ownerID).map(_.transactionAmount).update(transactionAmount).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -78,7 +88,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] class FiatTable(tag: Tag) extends Table[Fiat](tag, "Fiat") {
 
-    def * = ( ownerID, transactionID, transactionAmount, amountRedeemed, status.?) <> (Fiat.tupled, Fiat.unapply)
+    def * = (ownerID, transactionID, transactionAmount, amountRedeemed, status.?) <> (Fiat.tupled, Fiat.unapply)
 
     def ownerID = column[String]("ownerID", O.PrimaryKey)
 
@@ -109,5 +119,10 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def markFailure(ownerID: String, transactionID: String): Future[Int] = updateStatus(ownerID, transactionID, status = false)
 
+    def updateAmounts(ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int): Future[Int] = updateAmountByOwnerIDAndTransactionID(ownerID = ownerID, transactionID = transactionID, transactionAmount = transactionAmount, amountRedeemed = amountRedeemed)
+
+    def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: Int, amountRedeemed: Int, status: Option[Boolean]): Future[Int] = upsert(Fiat(ownerID, transactionID = transactionID, transactionAmount = transactionAmount, amountRedeemed = amountRedeemed, status = status))
+
   }
+
 }

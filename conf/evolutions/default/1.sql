@@ -1302,7 +1302,7 @@ ALTER TABLE BLOCKCHAIN."Negotiation_BC"
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
     ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
-    ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
+    ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE BLOCKCHAIN."TransactionFeedBack_BC"
     ADD CONSTRAINT TransactionFeedBack_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
@@ -1314,7 +1314,7 @@ ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
 ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
     ADD CONSTRAINT TraderFeedbackHistory_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Zone_BC"
-    ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES Master."Zone" ("id");
+    ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
     ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");

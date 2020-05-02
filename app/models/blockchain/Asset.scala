@@ -209,39 +209,38 @@ class Assets @Inject()(
       val dirtyAssets = Service.getDirtyAssets
       Thread.sleep(sleepTime)
 
-      def insertOrUpdateAndSendCometMessage(dirtyAssets: Seq[Asset]): Future[Seq[Unit]] = {
-        Future.sequence {
-          dirtyAssets.map { dirtyAsset =>
-            val accountResponse = getAccount.Service.get(dirtyAsset.ownerAddress)
+      def updateAndSendCometMessage(dirtyAssets: Seq[Asset]): Future[Seq[Unit]] = {
+        Future.traverse(dirtyAssets)(dirtyAsset => {
+          val accountResponse = getAccount.Service.get(dirtyAsset.ownerAddress)
 
-            def updateOrDelete(ownerAccount: Response): Future[Int] = {
-              ownerAccount.value.assetPegWallet match {
-                case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
-                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
-                  case None => Service.deleteAsset(dirtyAsset.pegHash)
-                }
-                case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
+          def updateOrDelete(ownerAccount: Response): Future[Int] = {
+            ownerAccount.value.assetPegWallet match {
+              case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
+                case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
+                case None => Service.deleteAsset(dirtyAsset.pegHash)
               }
+              case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
             }
-
-            def accountID: Future[String] = masterAccounts.Service.tryGetId(dirtyAsset.ownerAddress)
-
-            for {
-              accountResponse <- accountResponse
-              _ <- updateOrDelete(accountResponse)
-              accountID <- accountID
-            } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
           }
-        }
+
+          def accountID: Future[String] = masterAccounts.Service.tryGetId(dirtyAsset.ownerAddress)
+
+          for {
+            accountResponse <- accountResponse
+            _ <- updateOrDelete(accountResponse)
+            accountID <- accountID
+          } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
+        })
       }
 
       (for {
         dirtyAssets <- dirtyAssets
-        _ <- insertOrUpdateAndSendCometMessage(dirtyAssets)
+        _ <- updateAndSendCometMessage(dirtyAssets)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
+
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

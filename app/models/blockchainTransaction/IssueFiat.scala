@@ -1,11 +1,10 @@
 package models.blockchainTransaction
 
-import java.net.ConnectException
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.master.{Fiat => masterFiat, Trader}
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueFiat] {
@@ -188,13 +187,14 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueFiat = Service.getTransaction(ticketID)
 
-      def account(issueFiat: IssueFiat): Future[AccountResponse.Response] = getAccount.Service.get(issueFiat.to)
+      def getAccountResponse(issueFiat: IssueFiat): Future[AccountResponse.Response] = getAccount.Service.get(issueFiat.to)
 
-      def insertOrUpdate(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = {
-        account.value.fiatPegWallet match {
-          case Some(fiats) => Future.sequence(fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
-          case None => Future {}
+      def create(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = {
+        val fiat = account.value.fiatPegWallet match {
+          case Some(fiatPegWallet) => fiatPegWallet.find(_.transactionID == issueFiat.transactionID).getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
+          case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
         }
+        blockchainFiats.Service.create(pegHash = fiat.pegHash, ownerAddress = issueFiat.to, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)
       }
 
       def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
@@ -208,13 +208,13 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       (for {
         _ <- markTransactionSuccessful
         issueFiat <- issueFiat
-        account <- account(issueFiat)
-        _ <- insertOrUpdate(account, issueFiat)
-        _ <- markDirty(issueFiat)
-        fromAccountID <- getAccountID(issueFiat.from)
+        accountResponse <- getAccountResponse(issueFiat)
         toAccountID <- getAccountID(issueFiat.to)
         traderID <- traderID(toAccountID)
+        _ <- create(accountResponse, issueFiat)
         _ <- markSuccess(traderID, issueFiat.transactionID)
+        _ <- markDirty(issueFiat)
+        fromAccountID <- getAccountID(issueFiat.from)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
@@ -233,7 +233,6 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
-
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
 

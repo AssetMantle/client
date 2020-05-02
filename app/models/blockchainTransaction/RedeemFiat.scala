@@ -191,11 +191,11 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
       val redeemFiat = Service.getTransaction(ticketID)
 
       def markDirty(redeemFiat: RedeemFiat): Future[Unit] = {
-        val markDirtyBlockchainFiatsFrom = blockchainFiats.Service.markDirty(redeemFiat.from)
-        val markDirtyBlockchainAccountsFrom = blockchainAccounts.Service.markDirty(redeemFiat.from)
+        val markFiatsDirty = blockchainFiats.Service.markDirty(redeemFiat.from)
+        val markBlockchainAccountDirty = blockchainAccounts.Service.markDirty(redeemFiat.from)
         for {
-          _ <- markDirtyBlockchainFiatsFrom
-          _ <- markDirtyBlockchainAccountsFrom
+          _ <- markFiatsDirty
+          _ <- markBlockchainAccountDirty
         } yield {}
       }
 
@@ -211,7 +211,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
         _ <- markBlockchainSuccess
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {
