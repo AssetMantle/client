@@ -7,7 +7,7 @@
 @import models.master.Organization
 @import models.westernUnion.FiatRequest
 @import models.westernUnion.RTCB
-@(traders: Seq[Trader], fiatRequestList: Seq[FiatRequest], rtcbList: Seq[RTCB])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(traderList: Seq[Trader], fiatRequestList: Seq[FiatRequest], rtcbList: Seq[RTCB])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
     @commonCard(constants.View.FIAT_TRANSACTIONS) {
     } {
@@ -15,7 +15,7 @@
             @commonVerticalInfoBox() {
                 @commonTextInfo(constants.Form.REQUEST_ID, fiatRequest.id)
 
-                @traders.find(_.id == fiatRequest.traderID) match {
+                @traderList.find(_.id == fiatRequest.traderID) match {
                     case Some(trader) => {
                         @commonTextInfo(constants.View.TRADER_NAME, trader.name)
                     }
