@@ -126,3 +126,17 @@ function closeReply() {
     $("#REPLY_TO_MESSAGE").val("");
     $("#replyBox").fadeOut();
 }
+
+function loadMoreChatsOnScroll(chatID) {
+    $('#chatMessages').on('scroll', function () {
+        if (!$('#chatMessages .chatMessages > li').hasClass("noChats")) {
+            var scrollTop = $(this).scrollTop();
+            if (scrollTop <= 0) {
+                setTimeout(function () {
+                    loadMoreChats(chatID);
+                    $('#chatMessages').scrollTop(100);
+                }, 100);
+            }
+        }
+    });
+}

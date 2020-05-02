@@ -26,13 +26,13 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
                             $("#checkUsernameAvailableResult span").hide();
-                            $(".checkIcon").fadeOut();
-                            $(".userNameNotAvailable").show();
+                            $("#checkIcon").fadeOut();
+                            $("#checkUsernameAvailableResult .userNameNotAvailable").show();
                         },
                     }
                 });
             } else {
-                $("#checkUsernameAvailableResult span, .checkIcon").hide();
+                $("#checkUsernameAvailableResult span, #checkIcon").hide();
             }
         }, 1500);
     }

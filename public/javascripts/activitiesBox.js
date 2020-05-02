@@ -53,3 +53,19 @@ function markNotificationRead(target, accountID) {
     });
 }
 
+function loadMoreActivitiesOnScroll(negotiationID) {
+    $('.recentActivityMessages').on('scroll', function () {
+        if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
+            if ($(this).scrollTop() +
+                $(this).innerHeight() >=
+                $(this)[0].scrollHeight) {
+                if(negotiationID){
+                    loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, negotiationID)
+                }
+                else {
+                    loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
+                }
+            }
+        }
+    });
+}
