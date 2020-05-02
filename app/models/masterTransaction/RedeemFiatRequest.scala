@@ -1,15 +1,25 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+import models.common.Node
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: Int, status: String)
+case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[RedeemFiatRequest] {
+
+def createLog()(implicit node: Node): RedeemFiatRequest = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
+
+def updateLog()(implicit node: Node): RedeemFiatRequest = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+
+}
 
 @Singleton
 class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -24,9 +34,11 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
   import databaseConfig.profile.api._
 
+  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
+
   private[models] val redeemFiatTable = TableQuery[RedeemFiatTable]
 
-  private def add(redeemFiat: RedeemFiatRequest): Future[String] = db.run((redeemFiatTable returning redeemFiatTable.map(_.id) += redeemFiat).asTry).map {
+  private def add(redeemFiat: RedeemFiatRequest): Future[String] = db.run((redeemFiatTable returning redeemFiatTable.map(_.id) += redeemFiat.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +58,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
-  private def update(redeemFiat: RedeemFiatRequest): Future[Int] = db.run(redeemFiatTable.update(redeemFiat).asTry).map {
+  private def update(redeemFiat: RedeemFiatRequest): Future[Int] = db.run(redeemFiatTable.update(redeemFiat.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -86,7 +98,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private[models] class RedeemFiatTable(tag: Tag) extends Table[RedeemFiatRequest](tag, "RedeemFiatRequest") {
 
-    def * = (id, traderID, ticketID, amount, status) <> (RedeemFiatRequest.tupled, RedeemFiatRequest.unapply)
+    def * = (id, traderID, ticketID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedeemFiatRequest.tupled, RedeemFiatRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -98,6 +110,17 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def status = column[String]("status")
 
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {

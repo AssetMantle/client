@@ -213,6 +213,7 @@ class SendFiats @Inject()(
 
       def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
 
+      //TODO make it upsert, inset throws error in case of sending fiat multiple times.
       def updateBCFiat(negotiationID: String, orderResponse: OrderResponse.Response): Future[Seq[String]] = orderResponse.value.fiatPegWallet match {
         case Some(fiatPegWallet) => blockchainFiats.Service.insertList(fiatPegWallet.map(fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = negotiationID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)))
         case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
@@ -222,7 +223,7 @@ class SendFiats @Inject()(
 
       def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
         val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
-        val masterOrderCreate = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+        def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.FIAT_SENT_ASSET_PENDING))
 
         for {
           _ <- bcOrderCreate

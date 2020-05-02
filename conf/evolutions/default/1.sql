@@ -1125,6 +1125,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."RedeemFiatRequest"
     "ticketID"  VARCHAR NOT NULL UNIQUE,
     "amount"   INT NOT NULL,
     "status"   VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -1136,6 +1142,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest"
     "ticketID"  VARCHAR NOT NULL UNIQUE,
     "amount"   INT NOT NULL,
     "status"   VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 

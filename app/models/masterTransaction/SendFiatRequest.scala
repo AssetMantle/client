@@ -1,15 +1,26 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
+import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendFiatRequest(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String)
+case class SendFiatRequest(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[SendFiatRequest] {
+
+  def createLog()(implicit node: Node): SendFiatRequest = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
+
+  def updateLog()(implicit node: Node): SendFiatRequest = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+
+}
 
 @Singleton
 class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -24,9 +35,11 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   import databaseConfig.profile.api._
 
+  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
+
   private[models] val sendFiatTable = TableQuery[SendFiatTable]
 
-  private def add(sendFiat: SendFiatRequest): Future[String] = db.run((sendFiatTable returning sendFiatTable.map(_.id) += sendFiat).asTry).map {
+  private def add(sendFiat: SendFiatRequest): Future[String] = db.run((sendFiatTable returning sendFiatTable.map(_.id) += sendFiat.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +59,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequest]] = db.run(sendFiatTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
-  private def update(sendFiat: SendFiatRequest): Future[Int] = db.run(sendFiatTable.update(sendFiat).asTry).map {
+  private def update(sendFiat: SendFiatRequest): Future[Int] = db.run(sendFiatTable.update(sendFiat.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -86,7 +99,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private[models] class SendFiatTable(tag: Tag) extends Table[SendFiatRequest](tag, "SendFiatRequest") {
 
-    def * = (id, traderID, ticketID, negotiationID, amount, status) <> (SendFiatRequest.tupled, SendFiatRequest.unapply)
+    def * = (id, traderID, ticketID, negotiationID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendFiatRequest.tupled, SendFiatRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -100,6 +113,17 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def status = column[String]("status")
 
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
