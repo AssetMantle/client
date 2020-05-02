@@ -124,7 +124,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
         Ok(views.html.component.master.docusignReturnView(event))
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.component.master.docusignReturnView(constants.View.UNEXPECTED_EVENT))
+        case _: BaseException => InternalServerError(views.html.component.master.docusignReturnView(constants.View.UNEXPECTED_EVENT))
       }
   }
 
@@ -145,8 +145,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-      }
-        ).recover {
+      }).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
   }
