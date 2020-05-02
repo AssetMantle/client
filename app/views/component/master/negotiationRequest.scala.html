@@ -4,13 +4,14 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssets: Seq[Asset], counterPartyTraders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@import models.master.Organization
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
     <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
-        @tradableAssets.map { asset =>
+        @tradableAssetList.map { asset =>
             <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.otherDetails.shippingDetails.shippingPeriod, asset.otherDetails.shippingDetails.portOfDischarge, asset.otherDetails.shippingDetails.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
                 @asset.id | @asset.description | @Messages(asset.status)</li>
         }
@@ -21,8 +22,13 @@
     <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_COUNTER_PARTY)</div>
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
-        @counterPartyTraders.map { trader =>
-            <li onclick="fillCounterPartyField('@trader.id')">@trader.accountID | @trader.name</li>
+        @counterPartyTraderList.map { trader =>
+                @counterPartyOrganizationList.find(_.id== trader.organizationID) match {
+                    case Some(organization)=> {
+                        <li onclick="fillCounterPartyField('@trader.id')">@trader.accountID | @trader.name | @constants.View.ORGANIZATION: @organization.name</li>
+                        }
+                    case None=>{}
+            }
         }
         </ul>
     </div>
