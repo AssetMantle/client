@@ -36,6 +36,8 @@ object FormConstraint {
     val errors = {
       if ((paymentTermsData.advancePercentage < 100.0 && paymentTermsData.credit.isEmpty) || (paymentTermsData.advancePercentage == 100.0 && paymentTermsData.credit.isDefined)) Seq(ValidationError(constants.Response.INVALID_PAYMENT_TERMS.message))
       else if (paymentTermsData.credit.isDefined && (paymentTermsData.credit.get.tenure.isDefined && paymentTermsData.credit.get.tentativeDate.isDefined)) Seq(ValidationError(constants.Response.TENURE_AND_TENTATIVE_DATE_BOTH_FOUND.message))
+      else if (paymentTermsData.credit.isDefined &&  (paymentTermsData.credit.get.tenure.isDefined && paymentTermsData.credit.get.reference.isEmpty)) Seq(ValidationError(constants.Response.REFRENCE_REQUIRED_WITH_TENURE.message))
+      else if (paymentTermsData.credit.isDefined &&  (paymentTermsData.credit.get.tentativeDate.isDefined && paymentTermsData.credit.get.reference.isDefined)) Seq(ValidationError(constants.Response.REFRENCE_NOT_REQUIRED.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

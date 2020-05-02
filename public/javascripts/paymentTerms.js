@@ -21,8 +21,10 @@ function advancePercentageInput() {
 function tentativeDateInput() {
     if ($('#tentativeDate').val()) {
         $('#tenure').val('').prop('disabled', true);
+        $('#reference').val('').prop('disabled', true);
     } else {
         $('#tenure').prop('disabled', false);
+        $('#reference').val('').prop('disabled', false);
     }
 }
 

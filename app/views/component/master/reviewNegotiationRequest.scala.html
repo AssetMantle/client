@@ -26,9 +26,11 @@
         case Some(creditTerms) => {
             @creditTerms.tentativeDate match {
                 case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
-                case None => {@commonIntInfo(constants.View.TENURE, creditTerms.tenure.getOrElse(0))}
+                case None => {
+                    @commonIntInfo(constants.View.TENURE, creditTerms.tenure.getOrElse(0))
+                    @commonTextInfo(constants.View.REFERENCE, creditTerms.reference.getOrElse(""))
+                }
             }
-            @commonTextInfo(constants.View.REFERENCE, creditTerms.reference)
         }
         case None => {}
     }
