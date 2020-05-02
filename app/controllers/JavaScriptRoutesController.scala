@@ -197,6 +197,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewAssetDocumentContent,
         routes.javascript.ComponentViewController.zoneViewNegotiationDocumentContent,
         routes.javascript.ComponentViewController.zoneViewAssetDocumentContent,
+        routes.javascript.ComponentViewController.traderViewFiatTransactions,
+        routes.javascript.ComponentViewController.organizationViewFiatTransactions,
+        routes.javascript.ComponentViewController.zoneViewFiatTransactions,
+
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,

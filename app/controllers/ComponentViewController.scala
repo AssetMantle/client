@@ -1680,6 +1680,7 @@ class ComponentViewController @Inject()(
 
   def traderViewFiatTransactions: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      println("traderViewFiatTransactions------------------------traderViewFiatTransactions")
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def issueFiatRequests(traderID: String) = westernUnionFiatRequests.Service.getAll(traderID)
@@ -1712,7 +1713,7 @@ class ComponentViewController @Inject()(
 
   }
 
-  def zoneViewFiatTransactions: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def zoneViewFiatTransactions: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
       val zoneID = masterZones.Service.tryGetID(loginState.username)

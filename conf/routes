@@ -284,6 +284,10 @@ GET         /component/traderViewTradeRoomFinancialAndChecks                    
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
 
+GET         /component/traderViewFiatTransactions                                                 controllers.ComponentViewController.traderViewFiatTransactions
+GET         /component/organizationViewFiatTransactions                                           controllers.ComponentViewController.organizationViewFiatTransactions
+GET         /component/zoneViewFiatTransactions                                                   controllers.ComponentViewController.zoneViewFiatTransactions
+
 GET         /component/organizationSubscription                                                   controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                         controllers.ComponentViewController.traderSubscription
 
