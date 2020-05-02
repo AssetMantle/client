@@ -216,7 +216,7 @@ class IssueAssets @Inject()(
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def accountResponse(toAddress: String): Future[AccountResponse.Response] = getAccount.Service.get(toAddress)
+      def getAccountResponse(toAddress: String): Future[AccountResponse.Response] = getAccount.Service.get(toAddress)
 
       def getAccountIDByAddress(address: String): Future[String] = masterAccounts.Service.getId(address)
 
@@ -260,7 +260,7 @@ class IssueAssets @Inject()(
       (for {
         _ <- markTransactionSuccessful
         issueAsset <- issueAsset
-        accountResponse <- accountResponse(issueAsset.to)
+        accountResponse <- getAccountResponse(issueAsset.to)
         ownerAccountID <- getAccountIDByAddress(issueAsset.to)
         seller <- getTrader(ownerAccountID)
         masterAsset <- getMasterAsset(traderID = seller.id, documentHash = issueAsset.documentHash)
