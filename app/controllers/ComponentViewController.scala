@@ -32,6 +32,7 @@ class ComponentViewController @Inject()(
                                          masterTraders: master.Traders,
                                          masterTraderRelations: master.TraderRelations,
                                          masterZones: master.Zones,
+                                         masterOrders: master.Orders,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
@@ -69,7 +70,6 @@ class ComponentViewController @Inject()(
     implicit request =>
       val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
       val traderID = masterTraders.Service.tryGetID(loginState.username)
-
       def negotiations(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
 
       (for {
@@ -1572,10 +1572,12 @@ class ComponentViewController @Inject()(
       //TODO: show correct FINANCIALS after orderTable
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      (for{
+      val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
+      (for {
         traderID <- traderID
         negotiation <- negotiation
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(0, 0, 0, traderID, negotiation))
+        fiatsInOrder <- fiatsInOrder
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(negotiation.price, 0, negotiation.price - fiatsInOrder, traderID, negotiation))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }

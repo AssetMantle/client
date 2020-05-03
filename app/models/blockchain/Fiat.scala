@@ -75,8 +75,15 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def updateByPegHash(fiat: Fiat): Future[Int] = db.run(fiatTable.filter(_.pegHash === fiat.pegHash).update(fiat.updateLog()).asTry).map {
-    case Success(result) => result
+  private def updateByPegHash(fiat: Fiat): Future[Int] = db.run(fiatTable.filter(_.pegHash === fiat.pegHash).filter(_.ownerAddress === fiat.ownerAddress).update(fiat.updateLog()).asTry).map {
+    case Success(result) => if (result > 0) result else {
+      val create = add(fiat)
+      for {
+        _ <- create
+      } yield 1
+      1
+    }
+
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -93,13 +100,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String): Future[Option[Fiat]] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.headOption)
 
   private def getFiatPegWalletByAddress(address: String): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerAddress === address).result)
 
@@ -108,7 +109,13 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def getFiatsByDirtyBit(dirtyBit: Boolean): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.dirtyBit === dirtyBit).result)
 
   private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(fiatTable.filter(_.ownerAddress === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
-    case Success(result) => result
+    case Success(result) => if (result > 0) result else {
+      val create = add(Fiat(pegHash = utilities.IDGenerator.hexadecimal, address, "", "", "", true))
+      for {
+        _ <- create
+      } yield 1
+      1
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -197,6 +204,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def getDirtyFiats: Future[Seq[Fiat]] = getFiatsByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
+
   }
 
   object Utility {
@@ -219,9 +227,13 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
                 val updateFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).intersect(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
                   Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false))
                 })
+                val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)
+                })
                 for {
                   _ <- deleteFiats
                   _ <- updateFiats
+                  _ <- insertFiats
                 } yield updatedFiatPegWallet.map(_.transactionAmount.toInt).sum.toString
               case None =>
                 for {
@@ -232,26 +244,43 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
           val accountID = masterAccounts.Service.tryGetId(dirtyFiat.ownerAddress)
 
-          def insertOrUpdateMasterFiat(accountOwnerAddress: Response): Future[Unit] = {
+          def insertOrUpdateMasterFiat(accountOwnerAddress: Response, oldFiatPegWallet: Seq[Fiat]): Future[Unit] = {
             val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
 
             def upsertMasterFiat(accountID: Option[String]): Future[Unit] = {
               accountID match {
                 case Some(traderAccountID) => {
                   val traderID = masterTraders.Service.tryGetID(traderAccountID)
+
                   def upsert(traderID: String) =
                     accountOwnerAddress.value.fiatPegWallet match {
-                      case Some(wallet) => Future.sequence(wallet.map { fiatPeg =>
-                        if (wallet.map(_.pegHash) contains dirtyFiat.pegHash) {
+                      case Some(updatedFiatPegWallet) => {
+                        val updateTransactionAmountToZero = Future.traverse(oldFiatPegWallet.map(_.pegHash).diff(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => oldFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+                          masterFiats.Service.updateTransactionAmount(traderID, fiatPeg.transactionID, 0)
+                        })
+                        val updateFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).intersect(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+                          masterFiats.Service.updateFiat(traderID, fiatPeg.transactionID, fiatPeg.transactionAmount.toInt, fiatPeg.redeemedAmount.toInt)
+                        })
+                        val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
                           masterFiats.Service.insertOrUpdate(traderID, fiatPeg.transactionID, fiatPeg.transactionAmount.toInt, fiatPeg.redeemedAmount.toInt)
-                        } else {masterFiats.Service.insertOrUpdate(traderID, dirtyFiat.transactionID, 0, dirtyFiat.redeemedAmount.toInt)}
-                      })
-                      case None => masterFiats.Service.updateAllTransactionAmounts(traderID)
+                        })
+                        for {
+                          _ <- updateTransactionAmountToZero
+                          _ <- updateFiats
+                          _ <- insertFiats
+                        } yield ()
+                      }
+                      case None => {
+                        val updateTransactionAmountToZero = masterFiats.Service.updateAllTransactionAmountsToZero(traderID)
+                        for {
+                          _ <- updateTransactionAmountToZero
+                        } yield ()
+                      }
                     }
                   for {
                     traderID <- traderID
                     _ <- upsert(traderID)
-                  } yield println(accountOwnerAddress.value.fiatPegWallet)
+                  } yield Unit
                 }
                 case None => Future(Unit)
               }
@@ -265,8 +294,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           for {
             accountResponse <- accountResponse
             oldFiatPegWallet <- oldFiatPegWallet
+            _ <- insertOrUpdateMasterFiat(accountResponse, oldFiatPegWallet)
             totalAmount <- updateAndDelete(accountResponse = accountResponse, oldFiatPegWallet = oldFiatPegWallet)
-            _ <- insertOrUpdateMasterFiat(accountResponse)
             accountID <- accountID
           } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.FIAT, messageContent = actors.Message.Fiat(totalAmount))
         })

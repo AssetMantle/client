@@ -40,6 +40,7 @@ class SendFiats @Inject()(
                            blockchainNegotiations: blockchain.Negotiations,
                            utilitiesNotification: utilities.Notification,
                            masterAccounts: master.Accounts,
+                           masterAssets: master.Assets,
                            blockchainAccounts: blockchain.Accounts,
                            masterNegotiations: master.Negotiations,
                            masterOrders: master.Orders,
@@ -203,6 +204,7 @@ class SendFiats @Inject()(
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
+      val markBlockchainSuccess = masterTransactionSendFiatRequests.Service.markBlockchainSuccess(ticketID)
 
       def orderResponse(negotiationID: String): Future[OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
@@ -218,17 +220,40 @@ class SendFiats @Inject()(
 
       def checkOrderExists(negotiationID: String): Future[Boolean] = blockchainOrders.Service.checkOrderExists(negotiationID)
 
-      def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
-        val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
+      def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation, amountSent: Int): Future[Unit] = {
+        def status(fiatsInOrder: Int, assetSent: Boolean): String = {
+          if (fiatsInOrder >= negotiation.price && assetSent) {
+            constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+          } else if (fiatsInOrder >= negotiation.price && !assetSent){
+            constants.Status.Order.FIAT_SENT_ASSET_PENDING
+          }else if (fiatsInOrder < negotiation.price && assetSent){
+            constants.Status.Order.ASSET_SENT_FIAT_PENDING
+          }else {
+            constants.Status.Order.ASSET_AND_FIAT_PENDING
+          }
+        }
 
-        def masterOrderCreate = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+        if (!orderExists) {
+          val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
 
-        for {
-          _ <- bcOrderCreate
-          _ <- masterOrderCreate
-        } yield ()
+          def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = status(amountSent, false)))
 
-      } else Future()
+          for {
+            _ <- bcOrderCreate
+            _ <- masterOrderCreate
+          } yield ()
+
+        } else {
+          val assetSent = masterAssets.Service.tryGetStatus(negotiation.assetID)
+          val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
+          def masterOrderUpdate(fiatsInOrder:Int, assetSent: String): Future[Int] =  masterOrders.Service.update(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = status(fiatsInOrder, assetSent == constants.Status.Asset.IN_ORDER)))
+          for{
+            assetSent <- assetSent
+            fiatsInOrder <- fiatsInOrder
+            _ <- masterOrderUpdate(fiatsInOrder, assetSent)
+          } yield ()
+        }
+      }
 
       def markDirty(sendFiat: SendFiat): Future[Unit] = {
         val markFiatsDirty = blockchainFiats.Service.markDirty(sendFiat.from)
@@ -243,21 +268,19 @@ class SendFiats @Inject()(
 
       def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
 
-      val markBlockchainSuccess = masterTransactionSendFiatRequests.Service.markBlockchainSuccess(ticketID)
-
       (for {
         _ <- markTransactionSuccessful
         sendFiat <- sendFiat
+        _ <- markBlockchainSuccess
         negotiationID <- getNegotiationID(sendFiat)
         orderResponse <- orderResponse(negotiationID)
         masterNegotiation <- getMasterNegotiation(negotiationID)
         _ <- updateBCFiat(negotiationID = negotiationID, orderResponse = orderResponse)
         orderExists <- checkOrderExists(negotiationID)
-        _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation)
+        _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation, sendFiat.amount)
         _ <- markDirty(sendFiat)
         fromAccountID <- getAccountID(sendFiat.from)
         toAccountID <- getAccountID(sendFiat.to)
-        _ <- markBlockchainSuccess
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield ()).recover {

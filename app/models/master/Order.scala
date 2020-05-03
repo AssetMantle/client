@@ -55,7 +55,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateStatusByOrderID(id: String, status: String): Future[Int] = db.run(orderTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+  private def updateStatusByOrderID(orderID: String, status: String): Future[Int] = db.run(orderTable.filter(_.orderID === orderID).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -121,11 +121,13 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def update(order: Order): Future[Int] = updateByOrder(order)
 
-    def markStatusCompletedByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(id = orderID, status = constants.Status.Order.COMPLETED)
+    def markStatusCompletedByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.COMPLETED)
 
-    def markStatusReversedByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(id = orderID, status = constants.Status.Order.REVERSED)
+    def markStatusReversedByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.REVERSED)
 
-    def markStatusAssetSentFiatPendingByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(id = orderID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING)
+    def markBuyerExecuteOrderPendingByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING)
+
+    def markSellerExecuteOrderPendingByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING)
 
     def get(id: String): Future[Option[Order]] = getByID(id)
 

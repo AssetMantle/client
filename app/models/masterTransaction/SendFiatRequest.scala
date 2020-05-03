@@ -59,6 +59,8 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequest]] = db.run(sendFiatTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
+  private def getByNegotiationIDAndStatuses(negotiationID: String, statuses: Seq[String]):Future[Int] = db.run(sendFiatTable.filter(_.negotiationID === negotiationID).filter(_.status inSet statuses).map(_.amount).sum.getOrElse(0).result)
+
   private def update(sendFiat: SendFiatRequest): Future[Int] = db.run(sendFiatTable.update(sendFiat.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -128,6 +130,8 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
     def create(traderID: String, ticketID: String, negotiationID: String, amount: Int): Future[String] = add(SendFiatRequest(id = utilities.IDGenerator.requestID(), traderID, ticketID, negotiationID, amount, status = constants.Status.SendFiat.AWAITING_BLOCKCHAIN_RESPONSE))
+
+    def getFiatsInOrder(negotiationID: String):Future[Int] = getByNegotiationIDAndStatuses(negotiationID, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT))
 
     def getPendingSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.BLOCKCHAIN_SUCCESS)
 

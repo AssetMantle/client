@@ -189,6 +189,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val redeemFiat = Service.getTransaction(ticketID)
+      val markBlockchainSuccess = masterTransactionRedeemFiats.Service.markBlockchainSuccess(ticketID)
 
       def markDirty(redeemFiat: RedeemFiat): Future[Unit] = {
         val markFiatsDirty = blockchainFiats.Service.markDirty(redeemFiat.from)
@@ -200,15 +201,14 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
       }
 
       def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
-      val markBlockchainSuccess = masterTransactionRedeemFiats.Service.markBlockchainSuccess(ticketID)
 
       (for {
         _ <- markTransactionSuccessful
         redeemFiat <- redeemFiat
+        _ <- markBlockchainSuccess
         _ <- markDirty(redeemFiat)
         fromAccountID <- getAccountID(redeemFiat.from)
         toAccountID <- getAccountID(redeemFiat.to)
-        _ <- markBlockchainSuccess
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield ()).recover {
