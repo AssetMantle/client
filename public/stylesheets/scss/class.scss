@@ -884,6 +884,12 @@ position: relative;
       fill: red;
     }
   }
+  .logoutIcon{
+    .icon{
+      width: 30px;
+      height: 30px;
+    }
+  }
 }
 
 .notificationDropdown{
@@ -2046,6 +2052,16 @@ header:before,
     .primayDocs{
       font-size: $paragraphFontSizeMedium;
       color: #636363;
+    }
+    .contractBox{
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .cmuk-button{
+      line-height: 28px;
+      padding: 0px 12px;
     }
   }
   .cmuk-card-default{

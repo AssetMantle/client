@@ -33,6 +33,7 @@ class ComponentViewController @Inject()(
                                          masterTraderRelations: master.TraderRelations,
                                          masterZones: master.Zones,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                         masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          withLoginAction: WithLoginAction,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
@@ -1122,11 +1123,14 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-
+          val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-          } yield Ok(views.html.component.master.traderViewNegotiationDocumentList(negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList))
+            docusignEnvelopeList <- docusignEnvelopeList
+          } yield {
+            Ok(views.html.component.master.traderViewNegotiationDocumentList(traderID = traderID, negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList, docusignEnvelopeList = docusignEnvelopeList))
+          }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1350,10 +1354,12 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+          val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
+            docusignEnvelopeList <- docusignEnvelopeList
+          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }

@@ -1,0 +1,10 @@
+@import controllers.actions.LoginState
+@import play.api.Logger
+@import views.companion.master.MarkContractSigned
+@import views.html.base._
+
+@(markContractSignedForm: Form[MarkContractSigned.Data] = MarkContractSigned.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@commonForm(constants.Form.MARK_CONTRACT_SIGNED, markContractSignedForm) {
+    @commonInputText(markContractSignedForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonCheckbox(markContractSignedForm, constants.FormField.CONFIRM)
+}

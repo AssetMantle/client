@@ -687,6 +687,9 @@ html, body {
     padding-top: 3px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
       fill: red; }
+  .header .logoutIcon .icon {
+    width: 30px;
+    height: 30px; }
 
 .notificationDropdown .cmuk-dropdown {
   max-height: 500px;
@@ -1555,6 +1558,14 @@ header:before,
 .docView .documentlist .primayDocs {
   font-size: 1rem;
   color: #636363; }
+.docView .documentlist .contractBox {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; }
+.docView .documentlist .cmuk-button {
+  line-height: 28px;
+  padding: 0px 12px; }
 .docView .cmuk-card-default {
   height: 360px; }
 .docView .cmuk-card-body .cmuk-tab {

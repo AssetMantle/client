@@ -207,6 +207,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
 
+        routes.javascript.DocusignController.send,
+        routes.javascript.DocusignController.sign,
+        routes.javascript.DocusignController.authorization,
+
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
         routes.javascript.FileController.storeAccountFile,
@@ -258,6 +262,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,
         routes.javascript.NegotiationController.buyerConfirmForm,
         routes.javascript.NegotiationController.sellerConfirmForm,
+        routes.javascript.NegotiationController.markContractSignedForm,
 
         routes.javascript.NegotiationController.tradeActivityMessages,
 

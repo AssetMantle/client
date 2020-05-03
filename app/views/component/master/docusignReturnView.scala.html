@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.Chat
+
+@(event:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+@event match{
+    case constants.View.DOCUSIGN_EVENT_SEND=>{
+        @Messages(constants.View.DOCUMENT_SENT_FOR_SIGNING)
+    }
+    case constants.View.DOCUSIGN_EVENT_SEND_SIGNING_COMPLETE=>{
+        @Messages(constants.View.DOCUMENT_SIGNED)
+    }
+    case _=>{ @Messages(constants.View.UNEXPECTED_EVENT)}
+}
