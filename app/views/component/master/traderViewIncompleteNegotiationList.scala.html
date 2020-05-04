@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Organization
-@(incompleteNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(incompleteNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @incompleteNegotiationList.map { incompleteNegotiation =>
     @commonInfoBox() {
@@ -36,4 +36,4 @@
         @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
         @commonFormButton(constants.Form.NEGOTIATION_PAYMENT_TERMS, 'parameters -> s"'${incompleteNegotiation.id}'")
     }
-}
+    }

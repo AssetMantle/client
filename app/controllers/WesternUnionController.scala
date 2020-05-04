@@ -76,11 +76,11 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
 
         def traderDetails(traderID: String) = masterTraders.Service.tryGet(traderID)
 
-        def traderAddress(traderAccountID: String) = masterAccounts.Service.getAddress(traderAccountID)
+        def traderAddress(traderAccountID: String) = masterAccounts.Service.tryGetAddress(traderAccountID)
 
         def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
 
-        def zoneAddress(zoneAccountID: String) = masterAccounts.Service.getAddress(zoneAccountID)
+        def zoneAddress(zoneAccountID: String) = masterAccounts.Service.tryGetAddress(zoneAccountID)
 
         def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat(traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount.toInt)
 
