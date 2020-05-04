@@ -183,6 +183,7 @@ object Response {
   val ORGANIZATION_NOT_VERIFIED = new Failure("ORGANIZATION_NOT_VERIFIED")
   val INVALID_PAYMENT_TERMS = new Failure("INVALID_PAYMENT_TERMS")
   val TENURE_AND_TENTATIVE_DATE_BOTH_FOUND = new Failure("TENURE_AND_TENTATIVE_DATE_BOTH_FOUND")
+  val ERROR_OCCURED_DURING_FILE_UPLOAD= new Failure("ERROR_OCCURED_DURING_FILE_UPLOAD")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

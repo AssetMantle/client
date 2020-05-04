@@ -300,11 +300,16 @@ EMAIL.FORGOT_PASSWORD_OTP.MESSAGE=Your OTP is {0}
 EMAIL.LOGIN.SUBJECT = New Login
 EMAIL.LOGIN.MESSAGE = You have logged in {0}
 EMAIL.VERIFY_EMAIL.SUBJECT = Verify Email
-EMAIL.VERIFY_EMAIL.MESSAGE = YOTP for registering your Comdex account is {0}. Do not share this number with anyone. Comdex will never call you for this code.
+EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP for registering your Comdex account is {0}. Do not share this number with anyone. Comdex will never call you for this code.
 EMAIL.TRADER_INVITATION.SUBJECT = Invitation to become Trader.
-EMAIL.TRADER_INVITATION.MESSAGE = Hi {0},\
-  You have been invited to be a part of Comdex by Organization: {1}.\
-  Please use this id:{2} to add as Trader for this organization. Click on <a href="{3}">Comdex</a>.\
+EMAIL.TRADER_INVITATION.MESSAGE = Dear {0},\
+  <br>\
+  {1} from your organization, {2}, has invited to register on Comdex. \
+  Click <a href="{3}">here</a> to Sign Up on Comdex. Your organization ID is {4}. You will need this ID to register with your organisation while signing up.\
+  <br>\
+  Cheers,\
+  <br>\
+  Team Comdex
 LATEST_BLOCK_HEIGHT=Latest block height
 AVERAGE_BLOCK_TIME=Average block time
 TOKENS=Tokens
@@ -752,7 +757,7 @@ TRADE_ACTIVITY.ASSET_DETAILS_UPDATED.TITLE=Document List Updated
 TRADE_ACTIVITY.ASSET_DETAILS_UPDATED.MESSAGE=Asset Details updated by {0}.
 REVIEW_FORM_DECLARATION=I confirm that the information given in this form is true, complete and accurate.
 REGISTER_TO_AN_ORGANIZATION_NOTE="If you wish to register with an organization that is already on Comdex, enter their Organization ID below (This is an alphanumeric code provided by Comdex to each registered organization on Comdex to allow tarders to register with organizations on Comdex. Please contact your organization admin personnel to obtain the ID)
-REGISTER_AS_AN_ORGANIZATION_NOTE=If your organization isn't on Comdex, click on Add Organization below to continue
+REGISTER_AS_AN_ORGANIZATION_NOTE="If you wish to register your organization on Comdex, click on 'Register Organization' below (Note: Only authorized directors or board members can register and control their Organizations' accounts on Comdex)"
 SELECT_ZONE=Please select corresponding Comdex office for your organization:
 PROVIDE_ID_PROOF=Provide proof of identity
 FORM.ADD_OR_UPDATE_MOBILE_NUMBER.LEGEND=Mobile Number
@@ -765,3 +770,4 @@ FORM.ISSUE_ASSET.BUTTON=Create New Commodity
 FORM.NEGOTIATION_REQUEST.BUTTON=Create New Sales Quote
 UPDATE_MOBILE_NUMBER=Update Mobile Number
 UPDATE_EMAIL_ADDRESS=Update Email Address
+RESPONSE.FAILURE.ERROR_OCCURED_DURING_FILE_UPLOAD=Error occured during file upload. Please contact Comdex Admin

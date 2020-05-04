@@ -127,7 +127,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
-        throw new BaseException(baseException.failure)
+        throw new BaseException(constants.Response.ERROR_OCCURED_DURING_FILE_UPLOAD)
       case e: Exception => logger.error(e.getMessage)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
@@ -155,7 +155,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
-        throw new BaseException(baseException.failure)
+        throw new BaseException(constants.Response.ERROR_OCCURED_DURING_FILE_UPLOAD)
       case e: Exception => logger.error(e.getMessage)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
