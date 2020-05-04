@@ -20,9 +20,6 @@ html, body {
   width: 7px;
   height: 7px; }
 
-::-webkit-scrollbar-track {
-  background: #FFFFFF; }
-
 ::-webkit-scrollbar,
 ::-webkit-scrollbar-thumb {
   overflow: visible;
@@ -97,6 +94,8 @@ html, body {
 
 .title {
   font-size: 0.875rem;
+  color: #848A91;
+  text-transform: uppercase;
   font-weight: bold; }
 
 .logoutContainer .commonCheckBox {
@@ -719,7 +718,7 @@ html, body {
   text-align: center; }
   .modal .modalContent {
     word-break: break-all;
-    top: 20%;
+    top: 15%;
     border-radius: 3px;
     padding: 20px;
     margin: auto;
@@ -729,7 +728,7 @@ html, body {
     max-width: 100%;
     width: auto;
     overflow-y: auto;
-    max-height: 600px;
+    max-height: 750px;
     display: inline-block; }
     .modal .modalContent .modalBody {
       padding: 15px;
@@ -744,11 +743,30 @@ html, body {
         border-radius: 0;
         box-shadow: none; }
       .modal .modalContent .modalBody form .formBody {
-        max-height: 356px;
+        max-height: 600px;
         overflow: auto;
         padding: 0px 20px; }
       .modal .modalContent .modalBody .documentItem form {
         width: auto; }
+      .modal .modalContent .modalBody .modalInnerContainerFirst {
+        min-width: 500px; }
+      .modal .modalContent .modalBody .modalInnerContainer {
+        width: 1000px;
+        display: flex;
+        justify-content: space-between;
+        height: 600px;
+        border: 1px solid rgba(5, 60, 117, 0.12);
+        box-sizing: border-box;
+        border-radius: 2px;
+        overflow: auto;
+        padding: 20px; }
+        .modal .modalContent .modalBody .modalInnerContainer .sides:first-child {
+          padding-right: 30px; }
+        .modal .modalContent .modalBody .modalInnerContainer .sides {
+          flex: 1; }
+          .modal .modalContent .modalBody .modalInnerContainer .sides .innerSideRight {
+            border-left: 1px solid rgba(5, 60, 117, 0.12);
+            padding-left: 30px; }
 
 .MnemonicQuiz .titleMnemonic {
   font-weight: bold; }

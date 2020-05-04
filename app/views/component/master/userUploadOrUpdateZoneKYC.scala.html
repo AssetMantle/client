@@ -3,8 +3,11 @@
 
 @(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="centerText">
-    <h4>@Messages(constants.Form.ZONE_KYC_FILES)</h4>
+<legend class="cmuk-legend">
+    @Messages(constants.Form.ZONE_KYC_FILES)
+</legend>
+<hr>
+<div class="modalInnerContainerFirst centerText">
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
@@ -20,9 +23,9 @@
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }
-</div>
 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.View.BACK)</button>
 
 @if(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(zoneKYCs.map(_.documentType)).isEmpty) {
     <button type="button" class="cmuk-button cmuk-button-primary" id="getZoneKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddZoneController.userReviewAddZoneRequestForm())">@Messages(constants.Form.NEXT)</button>
 }
+</div>

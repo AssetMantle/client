@@ -5,8 +5,10 @@
 
 @(acceptNegotiationRequestForm: Form[AcceptNegotiationRequest.Data] = AcceptNegotiationRequest.form, negotiation: Negotiation, sellerName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ACCEPT_NEGOTIATION_REQUEST, acceptNegotiationRequestForm) {
+    <div class="modalInnerContainerFirst">
     @commonTextInfo(constants.View.SELLER, sellerName)
     @commonInputText(acceptNegotiationRequestForm, constants.FormField.ID, 'value -> negotiation.id, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputInt(acceptNegotiationRequestForm, constants.FormField.GAS)
     @commonInputPassword(acceptNegotiationRequestForm, constants.FormField.PASSWORD)
+    </div>
 }

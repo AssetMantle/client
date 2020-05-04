@@ -4,6 +4,8 @@
 @(addBillOfLadingForm: Form[AddBillOfLading.Data] = AddBillOfLading.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.ADD_BILL_OF_LADING, addBillOfLadingForm) {
+    <div class="modalInnerContainer">
+        <div class="sides">
     @commonInputText(addBillOfLadingForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden")
     @commonInputText(addBillOfLadingForm, constants.FormField.BILL_OF_LADING_NUMBER)
     @commonInputText(addBillOfLadingForm, constants.FormField.PORT_OF_LOADING)
@@ -12,8 +14,12 @@
     @commonInputText(addBillOfLadingForm, constants.FormField.NOTIFY_PARTY_NAME)
     @commonInputText(addBillOfLadingForm, constants.FormField.NOTIFY_PARTY_ADDRESS)
     @commonInputDate(addBillOfLadingForm, constants.FormField.SHIPMENT_DATE)
+    </div>
+    <div class="sides">
     @commonSelect(addBillOfLadingForm, constants.FormField.DELIVERY_TERM)
     @commonInputInt(addBillOfLadingForm, constants.FormField.ASSET_QUANTITY)
     @commonInputInt(addBillOfLadingForm, constants.FormField.ASSET_PRICE)
+    </div>
+    </div>
 }
 

@@ -10,7 +10,9 @@
     @Messages(constants.View.ORGANIZATION_REQUEST): @organization.id
 </legend>
 <hr>
-<div class="title cmuk-text-left">@Messages(constants.Form.ORGANIZATION_DETAILS): </div>
+<div class="modalInnerContainer">
+    <div class="sideLeft sides">
+<div class="title cmuk-text-left">@Messages(constants.Form.ORGANIZATION_DETAILS) </div>
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
     @commonTextInfo(constants.Form.ZONE_ID, organization.zoneID)
     @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
@@ -18,29 +20,34 @@
     @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
     @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
     @commonTextInfo(constants.Form.EMAIL, organization.email)
-<div class="title cmuk-text-left">@Messages(constants.FormField.REGISTERED_ADDRESS.name) :</div>
+<div class="title cmuk-text-left">@Messages(constants.FormField.REGISTERED_ADDRESS.name)</div>
 @streetAddress(organization.registeredAddress)
-<div class="title cmuk-text-left">@Messages(constants.FormField.POSTAL_ADDRESS.name) : </div>
+<div class="title cmuk-text-left">@Messages(constants.FormField.POSTAL_ADDRESS.name) </div>
 @streetAddress(organization.postalAddress)
-<div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_UBO_DETAIL): </div>
-@for(ubo <- organization.ubos.data) {
-    @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
-    @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
-    @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
-    @commonTextInfo(constants.View.TITLE, ubo.title)
-}
-<div class="title cmuk-text-left">@Messages(constants.Form.DOCUMENTS):</div>
-    @organizationKYCs.map { organizationKYC =>
-        @component.master.commonDocumentViewer(organizationKYC) {
-            @routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)
-        } {
-            <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
-        } {
-            @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC)
+    </div>
+    <div class="sideRight sides">
+        <div class="innerSideRight">
+        <div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_UBO_DETAIL) </div>
+        @for(ubo <- organization.ubos.data) {
+            @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
+            @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
+            @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
+            @commonTextInfo(constants.View.TITLE, ubo.title)
         }
-    }
+        <div class="title cmuk-text-left">@Messages(constants.Form.DOCUMENTS)</div>
+            @organizationKYCs.map { organizationKYC =>
+                @component.master.commonDocumentViewer(organizationKYC) {
+                    @routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)
+                } {
+                    <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+                } {
+                    @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC)
+                }
+            }
 
-<span class="cmuk-text-left">@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</span>
-<br>
+        <span class="cmuk-text-left">@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</span>
+        </div>
+    </div>
+</div>
 @commonModalButton(constants.Form.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
 @commonFormButton(constants.Form.REJECT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")

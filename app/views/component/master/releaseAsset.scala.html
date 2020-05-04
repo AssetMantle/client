@@ -4,7 +4,9 @@
 
 @(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.RELEASE_ASSET, releaseAssetForm) {
+    <div class="modalInnerContainerFirst">
     @commonInputText(releaseAssetForm, constants.FormField.ASSET_ID, 'value -> assetID, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputInt(releaseAssetForm, constants.FormField.GAS)
     @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD)
+    </div>
 }

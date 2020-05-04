@@ -4,7 +4,9 @@
 
 @(verifyZoneForm: Form[VerifyZone.Data] = VerifyZone.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.VERIFY_ZONE, verifyZoneForm) {
+    <div class="modalInnerContainerFirst">
     @commonInputText(verifyZoneForm, constants.FormField.ZONE_ID, 'value -> zoneID)
     @commonInputInt(verifyZoneForm, constants.FormField.GAS)
     @commonInputPassword(verifyZoneForm, constants.FormField.PASSWORD)
+    </div>
 }

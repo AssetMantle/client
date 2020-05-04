@@ -8,7 +8,8 @@
 @(userReviewIdentificationForm: Form[UserReviewIdentification.Data] = UserReviewIdentification.form, identification: Identification, accountKYC: AccountKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 
 @commonForm(constants.Form.USER_REVIEW_IDENTIFICATION, userReviewIdentificationForm) {
-    <div>
+    <div class="modalInnerContainer">
+        <div class="sides">
         @commonTextInfo(constants.Form.FIRST_NAME, identification.firstName)
         @commonTextInfo(constants.Form.LAST_NAME, identification.lastName)
         @commonTextInfo(constants.Form.DATE_OF_BIRTH, identification.dateOfBirth.toString)
@@ -19,13 +20,13 @@
         @commonTextInfo(constants.FormField.ADDRESS_LINE_1.name, identification.address.addressLine1)
         @commonTextInfo(constants.FormField.ADDRESS_LINE_2.name, identification.address.addressLine2)
         @commonTextInfo(constants.FormField.LANDMARK.name, identification.address.landmark.getOrElse(""))
+        </div>
+        <div class="sides">
         @commonTextInfo(constants.FormField.CITY.name, identification.address.city)
         @commonTextInfo(constants.FormField.COUNTRY.name, identification.address.country)
         @commonTextInfo(constants.FormField.ZIP_CODE.name, identification.address.zipCode)
         @commonTextInfo(constants.Form.PHONE, identification.address.phone)
-    </div>
-    <br>
-    <div class="title cmuk-text-left">@Messages(constants.View.ID_PROOF)</div>
+         <div class="title cmuk-text-left">@Messages(constants.View.ID_PROOF)</div>
         @component.master.commonDocumentViewer(accountKYC) {
             @routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)
         } {
@@ -33,6 +34,8 @@
         } {
 
         }
-    @commonCheckbox(userReviewIdentificationForm, constants.FormField.COMPLETION)
+        @commonCheckbox(userReviewIdentificationForm, constants.FormField.COMPLETION)
+        </div>
+    </div>
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userViewUploadOrUpdateIdentification())">@Messages(constants.View.BACK)</button>
 }

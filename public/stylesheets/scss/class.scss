@@ -29,9 +29,9 @@ html, body{
   height: 7px;
 }
 
-::-webkit-scrollbar-track {
-  background: #FFFFFF;
-}
+//::-webkit-scrollbar-track {
+//  background: #FFFFFF;
+//}
 
 ::-webkit-scrollbar,
 ::-webkit-scrollbar-thumb {
@@ -128,6 +128,8 @@ html, body{
 
 .title{
   font-size: $paragraphFontSizeSmall;
+  color: #848A91;
+  text-transform: uppercase;
   font-weight: bold;
 }
 
@@ -925,7 +927,7 @@ position: relative;
   text-align: center;
   .modalContent {
     word-break: break-all;
-    top: 20%;
+    top: 15%;
     border-radius:$buttonBorderRadius;
     padding: 20px;
     margin: auto;
@@ -935,7 +937,7 @@ position: relative;
     max-width: 100%;
     width: auto;
     overflow-y: auto;
-    max-height: 600px;
+    max-height:750px;
     display: inline-block;
     .modalBody {
       padding: 15px;
@@ -954,7 +956,7 @@ position: relative;
           box-shadow: none;
         }
         .formBody{
-          max-height: 356px;
+          max-height:600px;
           overflow: auto;
           padding: 0px 20px;
         }
@@ -962,6 +964,30 @@ position: relative;
       .documentItem{
         form{
           width: auto;
+        }
+      }
+      .modalInnerContainerFirst{
+        min-width: 500px;
+      }
+      .modalInnerContainer{
+        width: 1000px;
+        display: flex;
+        justify-content: space-between;
+        height: 600px;
+        border: 1px solid rgba(5, 60, 117, 0.12);
+        box-sizing: border-box;
+        border-radius: 2px;
+        overflow: auto;
+        padding: 20px;
+        .sides:first-child{
+          padding-right: 30px;
+        }
+        .sides{
+          flex:1;
+          .innerSideRight{
+            border-left: 1px solid rgba(5, 60, 117, 0.12);
+            padding-left: 30px;
+          }
         }
       }
     }

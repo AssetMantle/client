@@ -9,14 +9,13 @@
     @Messages(constants.View.TRADER): @trader.id
 </legend>
 <hr>
+<div class="modalInnerContainerFirst">
 @commonTextInfo(constants.View.TRADER_ID, trader.id)
 @commonTextInfo(constants.View.NAME, trader.name)
 @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-
-<br>
-
-<div>@Messages(constants.View.ORGANIZATION_DETAILS)</div>
+<div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_DETAILS)</div>
 @commonTextInfo(constants.View.NAME, organization.name)
 @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
 @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
 @commonTextInfo(constants.Form.EMAIL_ADDRESS, organization.email)
+</div>
