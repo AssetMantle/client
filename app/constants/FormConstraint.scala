@@ -1,7 +1,7 @@
 package constants
 
 import play.api.data.validation._
-import views.companion.master.{IssueAsset, SignUp, PaymentTerms, ChangePassword}
+import views.companion.master.{IssueAsset, SignUp, PaymentTerms, ChangePassword, DocumentList}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -38,6 +38,14 @@ object FormConstraint {
       else if (paymentTermsData.credit.isDefined && (paymentTermsData.credit.get.tenure.isDefined && paymentTermsData.credit.get.tentativeDate.isDefined)) Seq(ValidationError(constants.Response.TENURE_AND_TENTATIVE_DATE_BOTH_FOUND.message))
       else if (paymentTermsData.credit.isDefined &&  (paymentTermsData.credit.get.tenure.isDefined && paymentTermsData.credit.get.reference.isEmpty)) Seq(ValidationError(constants.Response.REFRENCE_REQUIRED_WITH_TENURE.message))
       else if (paymentTermsData.credit.isDefined &&  (paymentTermsData.credit.get.tentativeDate.isDefined && paymentTermsData.credit.get.reference.isDefined)) Seq(ValidationError(constants.Response.REFRENCE_NOT_REQUIRED.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val documentListConstraint: Constraint[DocumentList.Data] = Constraint("constraints.documentList")({ documentListData: DocumentList.Data =>
+    val errors = {
+      if (documentListData.documentListCompleted == true && documentListData.physicalDocumentsHandledVia.isEmpty) Seq(ValidationError(constants.Response.PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

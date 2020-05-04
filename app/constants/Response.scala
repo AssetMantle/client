@@ -183,6 +183,7 @@ object Response {
   val TENURE_AND_TENTATIVE_DATE_BOTH_FOUND = new Failure("TENURE_AND_TENTATIVE_DATE_BOTH_FOUND")
   val REFRENCE_REQUIRED_WITH_TENURE = new Failure("REFRENCE_REQUIRED_WITH_TENURE")
   val REFRENCE_NOT_REQUIRED = new Failure("REFRENCE_NOT_REQUIRED")
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED= new Failure("PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

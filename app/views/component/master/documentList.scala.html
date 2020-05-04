@@ -29,7 +29,7 @@
     }
     @commonJavascriptButton(constants.View.ADD, JavaScript("onDocumentListIncomplete(this)"))
     @commonCheckbox(documentsListForm, constants.FormField.DOCUMENT_LIST_COMPLETED, 'containerDivClass -> "hidden", 'id -> "negotiationDocumentListCompleted")
-    @commonSelect(documentsListForm, constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA)
+    @commonSelect(documentsListForm, constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA, 'required -> false)
     @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_PAYMENT_TERMS.get, 'parameters -> s"'${id}'")
 }
 
