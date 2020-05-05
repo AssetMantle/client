@@ -190,7 +190,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         val create = blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         val verifyZone = masterZones.Service.verifyZone(addZone.zoneID)
 
-        def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+        def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
         def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
 
@@ -231,7 +231,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addZone = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

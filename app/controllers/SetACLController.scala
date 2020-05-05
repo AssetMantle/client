@@ -15,6 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SetACLController @Inject()(
+                                  blockchainAccounts: blockchain.Accounts,
                                   messagesControllerComponents: MessagesControllerComponents,
                                   transaction: utilities.Transaction,
                                   masterTransactionTraderInvitations: masterTransaction.TraderInvitations,
@@ -203,7 +204,7 @@ class SetACLController @Inject()(
             if (trader.zoneID != zoneID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (trader.organizationID != verifyTraderData.organizationID) throw new BaseException(constants.Response.ORGANIZATION_ID_MISMATCH)
             if (organizationVerificationStatus) {
-              val aclAddress = masterAccounts.Service.tryGetAddress(verifyTraderData.accountID)
+              val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               val createACL = blockchainAclHashes.Service.create(acl)
 
@@ -287,7 +288,7 @@ class SetACLController @Inject()(
             if (trader.organizationID != verifyTraderData.organizationID || traderOrganization.id != organization.id) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_MISMATCH)
             if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
-            val aclAddress = masterAccounts.Service.tryGetAddress(verifyTraderData.accountID)
+            val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
             val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
 
             def createACL: Future[String] = blockchainAclHashes.Service.create(acl)

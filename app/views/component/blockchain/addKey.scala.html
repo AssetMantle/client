@@ -4,5 +4,6 @@
 @(addKeyFrom: Form[AddKey.Data] = AddKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_ADD_KEY, addKeyFrom) {
     @commonInputText(addKeyFrom, constants.FormField.NAME)
+    @commonInputText(addKeyFrom, constants.FormField.MNEMONICS)
     @commonInputPassword(addKeyFrom, constants.FormField.PASSWORD)
 }
