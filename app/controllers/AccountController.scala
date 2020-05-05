@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction}
+import controllers.actions.{LoginState, WithLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -12,7 +12,6 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import services.SFTPScheduler
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 
@@ -50,43 +49,85 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm(mnemonic: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form, mnemonic))
+  private val userMnemonicShown = 3
+
+  def signUpForm(): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp())
   }
 
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.signUp(formWithErrors, formWithErrors.data(constants.FormField.MNEMONIC.name))))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
       },
       signUpData => {
-        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.mnemonic))
+        val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
 
-        def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey)
-
-        def addLogin(createAccount: String): Future[String] = masterAccounts.Service.addLogin(signUpData.username, signUpData.password, createAccount, request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+        def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - userMnemonicShown), language = request.lang)
 
         (for {
-          addKeyResponse <- addKeyResponse
-          createAccount <- createAccount(addKeyResponse)
-          _ <- addLogin(createAccount)
+          mnemonics <- mnemonics
+          _ <- addLogin(mnemonics)
         } yield {
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
-        }).recover {
+          logger.info(mnemonics.toString)
+          PartialContent(views.html.component.master.createBlockchainAccount(username = signUpData.username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
+        }
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
   }
 
-  def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
-    val mnemonicResponse = queriesMnemonic.Service.get()
+  def createBlockchainForm(username: String): Action[AnyContent] = Action.async { implicit request =>
+    val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
+
+    def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) queriesMnemonic.Service.get().map(_.body.split(" ")) else throw new BaseException(constants.Response.UNAUTHORIZED)
+
+    def updatePartialMnemonic(mnemonics: Seq[String], bcAccountExists: Boolean) = if (!bcAccountExists) {
+      masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - userMnemonicShown))
+    } else throw new BaseException(constants.Response.UNAUTHORIZED)
+
     (for {
-      mnemonicResponse <- mnemonicResponse
-    } yield Ok(views.html.component.master.noteAndVerifyMnemonic(mnemonic = mnemonicResponse.body))
+      bcAccountExists <- bcAccountExists
+      mnemonics <- getMnemonics(bcAccountExists)
+      - <- updatePartialMnemonic(mnemonics, bcAccountExists)
+    } yield Ok(views.html.component.master.createBlockchainAccount(username = username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
+  }
+
+  def createBlockchain(): Action[AnyContent] = Action.async { implicit request =>
+    views.companion.master.CreateBlockchainAccount.form.bindFromRequest().fold(
+      formWithErrors => {
+        Future(BadRequest(views.html.component.master.createBlockchainAccount(formWithErrors, formWithErrors.data(constants.FormField.USERNAME.name), formWithErrors.data(constants.FormField.MNEMONICS.name).split(" "))))
+      },
+      createBlockchainData => {
+        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = createBlockchainData.username, password = createBlockchainData.password)
+        val masterAccount = masterAccounts.Service.tryGet(createBlockchainData.username)
+
+        def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
+          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createBlockchainData.username, password = createBlockchainData.password, seed = Seq(masterAccount.partialMnemonic.mkString(" "), createBlockchainData.mnemonics).mkString(" ")))
+
+          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createBlockchainData.username, pubkey = addKeyResponse.pubkey)
+
+          for {
+            addKeyResponse <- addKeyResponse
+            _ <- createAccount(addKeyResponse)
+          } yield Ok(views.html.index(successes = Seq(constants.Response.ACCOUNT_CREATED)))
+        } else Future(BadRequest(views.html.component.master.createBlockchainAccount(username = createBlockchainData.username, mnemonics = createBlockchainData.mnemonics.split(" "))))
+
+        (for {
+          validateUsernamePassword <- validateUsernamePassword
+          masterAccount <- masterAccount
+          result <- createAccountAndGetResult(validateUsernamePassword, masterAccount)
+        } yield result)
+          .recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+      }
+    )
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
@@ -100,8 +141,11 @@ class AccountController @Inject()(
       },
       loginData => {
         val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
+        val bcAccountExists = blockchainAccounts.Service.checkAccountExists(loginData.username)
 
         def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
+
+        def getAddress: Future[String] = blockchainAccounts.Service.tryGetAddress(loginData.username)
 
         def firstLoginUserTypeUpdate(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
           val markUserTypeUser = masterAccounts.Service.markUserTypeUser(id = loginData.username)
@@ -147,22 +191,37 @@ class AccountController @Inject()(
           }
         }
 
-        def checkLoginAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
-          for {
-            account <- getAccount
-            userType <- firstLoginUserTypeUpdate(account.userType)
-            loginState <- getLoginState(address = account.accountAddress, userType = userType)
-            _ <- sendNotification(loginState)
-            contactWarnings <- getContactWarnings
-            result <- getResult(contactWarnings)(loginState)
-          } yield result
-        } else {
-          Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
+        def checkLoginAndGetResult(validateUsernamePassword: Boolean, bcAccountExists: Boolean): Future[Result] = {
+          if (validateUsernamePassword) {
+            if (bcAccountExists) {
+              for {
+                account <- getAccount
+                address <- getAddress
+                userType <- firstLoginUserTypeUpdate(account.userType)
+                loginState <- getLoginState(address = address, userType = userType)
+                _ <- sendNotification(loginState)
+                contactWarnings <- getContactWarnings
+                result <- getResult(contactWarnings)(loginState)
+              } yield result
+            } else {
+              val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
+
+              def updatePartialMnemonic(mnemonics: Seq[String]) = masterAccounts.Service.updatePartialMnemonic(id = loginData.username, partialMnemonic = mnemonics.take(mnemonics.length - userMnemonicShown))
+
+              for {
+                mnemonics <- mnemonics
+                _ <- updatePartialMnemonic(mnemonics)
+              } yield PartialContent(views.html.component.master.createBlockchainAccount(username = loginData.username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
+            }
+          } else {
+            Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
+          }
         }
 
         (for {
           validateUsernamePassword <- validateUsernamePassword
-          result <- checkLoginAndGetResult(validateUsernamePassword)
+          bcAccountExists <- bcAccountExists
+          result <- checkLoginAndGetResult(validateUsernamePassword = validateUsernamePassword, bcAccountExists = bcAccountExists)
         } yield result
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -225,7 +284,7 @@ class AccountController @Inject()(
             for {
               _ <- postRequest
               _ <- updatePassword()
-              result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+              result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
           } else {
             Future(BadRequest(views.html.component.master.changePassword(views.companion.master.ChangePassword.form.fill(value = views.companion.master.ChangePassword.Data(changePasswordData.oldPassword, changePasswordData.newPassword, changePasswordData.confirmNewPassword)).withError(constants.FormField.OLD_PASSWORD.name, constants.Response.INVALID_PASSWORD.message))))
@@ -278,11 +337,16 @@ class AccountController @Inject()(
 
         def updateAndGetResult(validOTP: Boolean): Future[Result] = {
           if (validOTP) {
-            val post = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
-            val updatePassword = masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
+            val partialMnemonic = masterAccounts.Service.tryGetPartialMnemonic(forgotPasswordData.username)
+
+            def post(partialMnemonic: Seq[String]) = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = Seq(partialMnemonic.mkString(" "), forgotPasswordData.mnemonic).mkString(" "), newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
+
+            def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
+
             for {
-              _ <- post
-              _ <- updatePassword
+              partialMnemonic <- partialMnemonic
+              _ <- post(partialMnemonic)
+              _ <- updatePassword()
             } yield Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
           } else {
             Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))

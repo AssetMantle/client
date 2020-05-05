@@ -18,12 +18,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AssetController @Inject()(
+                                 blockchainAccounts: blockchain.Accounts,
                                  blockchainAssets: blockchain.Assets,
                                  blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
                                  blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
                                  blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
                                  blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets,
                                  masterAccounts: master.Accounts,
+                                 masterOrganizations: master.Organizations,
                                  masterTraders: master.Traders,
                                  masterTradeRelations: master.TraderRelations,
                                  masterZones: master.Zones,
@@ -69,7 +71,7 @@ class AssetController @Inject()(
 
     def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-    def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+    def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
     def getTakerAddress(takerID: Option[String]): Future[String] = {
       takerID match {
@@ -129,11 +131,13 @@ class AssetController @Inject()(
 
                 def getResult(traderID: String): Future[Result] = {
 
-                  def getAllTradableAssets(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
+                  def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
 
                   def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
 
-                  def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+                  def getCounterPartyTraderList(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+                  def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
                   if (issueAssetData.moderated) {
                     val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
@@ -141,10 +145,11 @@ class AssetController @Inject()(
                     for {
                       assetID <- addModeratedAsset
                       _ <- issueModeratedAsset(assetID)
-                      tradableAssets <- getAllTradableAssets(traderID)
+                      tradableAssetList <- getAllTradableAssetList(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
-                      counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                      counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+                      counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                     } yield result
                   } else {
                     val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
@@ -165,10 +170,11 @@ class AssetController @Inject()(
                       for {
                         documentHash <- addUnmoderatedAsset
                         ticketID <- sendTransaction(documentHash)
-                        tradableAssets <- getAllTradableAssets(traderID)
+                        tradableAssetList <- getAllTradableAssetList(traderID)
                         counterPartyList <- getCounterPartyList(traderID)
-                        counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                        counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+                        counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                       } yield result
                     }
                     else {
@@ -288,7 +294,7 @@ class AssetController @Inject()(
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
 
@@ -349,7 +355,7 @@ class AssetController @Inject()(
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String): Future[String] = {
             if (asset.ownerID != sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -407,7 +413,7 @@ class AssetController @Inject()(
 
           def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[String] = {
             if (asset.ownerID != trader.id) throw new BaseException(constants.Response.UNAUTHORIZED)

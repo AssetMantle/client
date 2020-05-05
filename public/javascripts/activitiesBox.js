@@ -12,8 +12,7 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
         statusCode: {
             200: function (data) {
                 const loadMore = $(".recentActivityBox .notification:last");
-                loadMore.before(data);
-                loadMore.remove();
+                loadMore.after(data);
             }
         }
     });
@@ -49,6 +48,23 @@ function markNotificationRead(target, accountID) {
             200: function (data) {
                 $(target).addClass("read");
                 $('#notificationBadge').html(data);
+            }
+        }
+    });
+}
+
+function loadMoreActivitiesOnScroll(negotiationID) {
+    $('.recentActivityMessages').on('scroll', function () {
+        if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
+            if ($(this).scrollTop() +
+                $(this).innerHeight() >=
+                $(this)[0].scrollHeight) {
+                if(negotiationID){
+                    loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, negotiationID)
+                }
+                else {
+                    loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
+                }
             }
         }
     });

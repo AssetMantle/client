@@ -240,7 +240,7 @@ class SendFiats @Inject()(
         } yield ()
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -277,7 +277,7 @@ class SendFiats @Inject()(
 
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

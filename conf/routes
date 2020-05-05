@@ -31,9 +31,11 @@ GET         /tradeRoom                                                          
 
 GET         /profilePicture                                                                       controllers.ComponentViewController.profilePicture
 
-GET         /account/noteAndVerifyMnemonic                                                        controllers.AccountController.noteAndVerifyMnemonic
-GET         /account/signUp                                                                       controllers.AccountController.signUpForm(mnemonic:String)
+GET         /account/signUp                                                                       controllers.AccountController.signUpForm
 POST        /account/signUp                                                                       controllers.AccountController.signUp
+
+GET         /account/createBlockchain                                                             controllers.AccountController.createBlockchainForm(username: String)
+POST        /account/createBlockchain                                                             controllers.AccountController.createBlockchain
 
 GET         /account/login                                                                        controllers.AccountController.loginForm
 POST        /account/login                                                                        controllers.AccountController.login
@@ -296,6 +298,10 @@ GET         /component/organizationViewTradeRoomChecks                          
 GET         /component/traderViewTradeRoomFinancialAndChecks                                      controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
+
+GET         /component/traderViewIssueFiatRequestList                                             controllers.ComponentViewController.traderViewIssueFiatRequestList
+GET         /component/organizationViewIssueFiatRequestList                                       controllers.ComponentViewController.organizationViewIssueFiatRequestList
+GET         /component/zoneViewIssueFiatRequestList                                               controllers.ComponentViewController.zoneViewIssueFiatRequestList
 
 GET         /component/organizationSubscription                                                   controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                         controllers.ComponentViewController.traderSubscription

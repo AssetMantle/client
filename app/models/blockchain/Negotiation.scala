@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.master
+import models.{blockchain, master}
 import models.master.{Trader, Negotiation => masterNegotiation, Order => masterOrder}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,6 +14,7 @@ import play.api.{Configuration, Logger}
 import queries.responses.NegotiationResponse.Response
 import slick.jdbc.JdbcProfile
 import models.common.Node
+
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -28,7 +29,7 @@ case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, 
 
 @Singleton
 class Negotiations @Inject()(
-                              masterAccounts: master.Accounts,
+                              blockchainAccounts: blockchain.Accounts,
                               actorSystem: ActorSystem,
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               getNegotiation: queries.GetNegotiation,
@@ -256,7 +257,7 @@ class Negotiations @Inject()(
 
             def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
 
-            def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+            def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
             def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
