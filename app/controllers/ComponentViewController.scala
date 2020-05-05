@@ -5,7 +5,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
 import models.master.{Organization => _, Zone => _, _}
-import models.{blockchain, master, masterTransaction}
+import models.{blockchain, master, masterTransaction, westernUnion}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
@@ -34,6 +34,8 @@ class ComponentViewController @Inject()(
                                          masterZones: master.Zones,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                         westernUnionFiatRequests: westernUnion.FiatRequests,
+                                         westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
                                          withTraderLoginAction: WithTraderLoginAction,
@@ -1674,6 +1676,62 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
+  }
+
+  def traderViewIssueFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def getIssueFiatRequestList(traderID: String) = westernUnionFiatRequests.Service.getAll(traderID)
+
+      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+
+      for {
+        traderID <- traderID
+        issueFiatRequestList <- getIssueFiatRequestList(traderID)
+        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
+      } yield Ok(views.html.component.master.traderViewIssueFiatRequestList(issueFiatRequestList, rtcbList))
+  }
+
+  def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getTraderList(organizationID: String) = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
+
+      def getIssueFiatRequestList(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
+
+      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+
+      for {
+        organizationID <- organizationID
+        traderList <- getTraderList(organizationID)
+        issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
+        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
+      } yield Ok(views.html.component.master.organizationViewIssueFiatRequestList(traderList, issueFiatRequestList, rtcbList))
+
+  }
+
+  def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def getOrganizationList(zoneID: String) = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
+
+      def getTraderList(zoneID: String) = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
+
+      def getIssueFiatRequestList(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
+
+      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+
+      for {
+        zoneID <- zoneID
+        organizationList <- getOrganizationList(zoneID)
+        traderList <- getTraderList(zoneID)
+        issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
+        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
+      } yield Ok(views.html.component.master.zoneViewIssueFiatRequestList(traderList, organizationList, issueFiatRequestList, rtcbList))
   }
 
 }

@@ -142,6 +142,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def findTradersByZoneID(zoneID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).result)
 
+  private def findTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).result)
+
   private def findTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = db.run(traderTable.filter(_.zoneID === zoneID).map(_.id).result)
 
   private def findTraderIDsByOrganizationID(organizationID: String): Future[Seq[String]] = db.run(traderTable.filter(_.organizationID === organizationID).map(_.id).result)

@@ -23,7 +23,31 @@
 }
 
 @center = {
+
     <div class="cmuk-container cmuk-margin-bottom">
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            <div id="traderViewIssueFiatRequestList"></div>
+            <script>
+                componentResource('traderViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.traderViewIssueFiatRequestList());
+            </script>
+            }
+            case constants.User.ORGANIZATION => {
+                <div id="organizationViewIssueFiatRequestList"></div>
+                <script>
+                componentResource('organizationViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.organizationViewIssueFiatRequestList());
+            </script>
+            }
+            case constants.User.ZONE => {
+                <div id="zoneViewIssueFiatRequestList"></div>
+                <script>
+                componentResource('zoneViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.zoneViewIssueFiatRequestList());
+            </script>
+            }
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+
     </div>
 }
 
