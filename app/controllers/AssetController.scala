@@ -17,6 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AssetController @Inject()(
+                                 blockchainAccounts: blockchain.Accounts,
                                  blockchainAssets: blockchain.Assets,
                                  blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
                                  blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
@@ -67,7 +68,7 @@ class AssetController @Inject()(
 
     def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-    def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+    def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
     def getTakerAddress(takerID: Option[String]): Future[String] = {
       takerID match {
@@ -284,7 +285,7 @@ class AssetController @Inject()(
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
 
@@ -345,7 +346,7 @@ class AssetController @Inject()(
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String): Future[String] = {
             if (asset.ownerID != sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -403,7 +404,7 @@ class AssetController @Inject()(
 
           def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[String] = {
             if (asset.ownerID != trader.id) throw new BaseException(constants.Response.UNAUTHORIZED)

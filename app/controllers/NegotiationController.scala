@@ -8,8 +8,8 @@ import models.Abstract.AssetDocumentContent
 import models.Abstract.NegotiationDocumentContent
 import models.common.Serializable._
 import models.master.{Asset, Negotiation, Trader}
-import models.masterTransaction.{TradeActivity, NegotiationFile}
-import models.{blockchainTransaction, master, masterTransaction}
+import models.masterTransaction.{NegotiationFile, TradeActivity}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -18,6 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NegotiationController @Inject()(
+                                       blockchainAccounts: blockchain.Accounts,
                                        messagesControllerComponents: MessagesControllerComponents,
                                        blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
                                        masterAccounts: master.Accounts,
@@ -396,7 +397,7 @@ class NegotiationController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[String] = transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
             entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(negotiationDefaultTime), pegHash = pegHash, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
@@ -996,7 +997,7 @@ class NegotiationController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerTraderID: String, sellerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (buyerTraderID != negotiation.buyerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -1075,7 +1076,7 @@ class NegotiationController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(sellerTraderID: String, buyerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (sellerTraderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)

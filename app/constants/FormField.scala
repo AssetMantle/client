@@ -93,7 +93,7 @@ object FormField {
   val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 1, 128)
   val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val MNEMONIC = new StringFormField("MNEMONIC", 1, 200)
+  val MNEMONICS = new StringFormField("MNEMONICS", 1, 200)
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)

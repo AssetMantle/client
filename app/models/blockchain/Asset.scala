@@ -7,7 +7,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Node
-import models.master
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -32,7 +32,7 @@ class Assets @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         actorSystem: ActorSystem,
                         getAccount: GetAccount,
-                        masterAccounts: master.Accounts,
+                        blockchainAccounts: blockchain.Accounts,
                       )(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -224,7 +224,7 @@ class Assets @Inject()(
               }
             }
 
-            def accountID: Future[String] = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
+            def accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(dirtyAsset.ownerAddress)
 
             for {
               accountResponse <- accountResponse
