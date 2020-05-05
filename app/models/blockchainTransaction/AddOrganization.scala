@@ -190,7 +190,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
         def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addOrganization.from)
 
-        def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+        def getID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
         for {
           _ <- create
@@ -227,7 +227,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed
