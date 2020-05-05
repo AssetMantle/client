@@ -7,8 +7,9 @@ import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
 import models.Abstract.NegotiationDocumentContent
 import models.common.Serializable._
+import models.docusign
 import models.master.{Asset, Negotiation, Trader}
-import models.masterTransaction.{TradeActivity, NegotiationFile}
+import models.masterTransaction.{NegotiationFile, TradeActivity}
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -29,7 +30,7 @@ class NegotiationController @Inject()(
                                        masterNegotiations: master.Negotiations,
                                        masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                        masterTransactionChats: masterTransaction.Chats,
-                                       masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
+                                       masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                        masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                        transaction: utilities.Transaction,
@@ -1218,7 +1219,7 @@ class NegotiationController @Inject()(
       )
   }
 
-  def markContractSignedForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateContractSignedForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
@@ -1227,7 +1228,7 @@ class NegotiationController @Inject()(
         negotiation <- negotiation
       } yield {
         if (traderID == negotiation.sellerTraderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
-          Ok(views.html.component.master.markContractSigned(negotiationID = negotiationID))
+          Ok(views.html.component.master.updateContractSigned(negotiationID = negotiationID))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1236,26 +1237,26 @@ class NegotiationController @Inject()(
       }
   }
 
-  def markContractSigned: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateContractSigned: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.MarkContractSigned.form.bindFromRequest().fold(
+      views.companion.master.UpdateContractSigned.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.markContractSigned(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
+          Future(BadRequest(views.html.component.master.updateContractSigned(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
         },
-        markContractSignedData => {
+        updateContractSignedData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val negotiation = masterNegotiations.Service.tryGet(markContractSignedData.negotiationID)
+          val negotiation = masterNegotiations.Service.tryGet(updateContractSignedData.negotiationID)
 
-          def markContractSigned(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) masterNegotiations.Service.markContractSigned(markContractSignedData.negotiationID) else Future( throw new BaseException(constants.Response.UNAUTHORIZED))
+          def markContractSigned(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) masterNegotiations.Service.markContractSigned(updateContractSignedData.negotiationID) else Future( throw new BaseException(constants.Response.UNAUTHORIZED))
 
           (for {
             traderID <- traderID
             negotiation <- negotiation
             _ <- markContractSigned(traderID, negotiation)
-            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = markContractSignedData.negotiationID))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
           } yield result
             ).recover{
-            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = markContractSignedData.negotiationID, failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
           }
         }
 

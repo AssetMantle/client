@@ -129,7 +129,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
-
   }
 
   object Utility {

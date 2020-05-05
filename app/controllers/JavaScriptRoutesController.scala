@@ -262,7 +262,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,
         routes.javascript.NegotiationController.buyerConfirmForm,
         routes.javascript.NegotiationController.sellerConfirmForm,
-        routes.javascript.NegotiationController.markContractSignedForm,
+        routes.javascript.NegotiationController.updateContractSignedForm,
 
         routes.javascript.NegotiationController.tradeActivityMessages,
 

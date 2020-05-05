@@ -102,7 +102,7 @@ object Form {
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
   val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.javascript.NegotiationController.buyerConfirmForm)
   val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.javascript.NegotiationController.sellerConfirmForm)
-  val MARK_CONTRACT_SIGNED = new Form("MARK_CONTRACT_SIGNED", routes.NegotiationController.markContractSigned(), routes.javascript.NegotiationController.markContractSignedForm)
+  val UPDATE_CONTRACT_SIGNED = new Form("MARK_CONTRACT_SIGNED", routes.NegotiationController.updateContractSigned(), routes.javascript.NegotiationController.updateContractSignedForm)
 
   //OrderController
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
@@ -419,6 +419,13 @@ object Form {
   val BUYER_EMAIL = "buyer.email"
   val SERVICE_ID = "service.id"
   val SERVICE_AMOUNT = "service.amount"
+
+  //Docusign
+  val REFRESH_TOKEN="refresh_token"
+  val DOCUMENT_INDEX = "1"
+  val RECIPIENT_INDEX = "1"
+  val SIGNATURE_SCOPE = "signature"
+  val CODE = "code"
 
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"

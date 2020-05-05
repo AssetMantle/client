@@ -1,4 +1,4 @@
-package models.masterTransaction
+package models.docusign
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -10,12 +10,12 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class DocusignEnvelope(id: String, envelopeID: String, documentType: String, status: String)
+case class Envelope(id: String, envelopeID: String, documentType: String, status: String)
 
 @Singleton
-class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_DOCUSIGN_ENVELOPES
+  private implicit val module: String = constants.Module.DOCUSIGN_ENVELOPE
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -25,9 +25,9 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
 
   import databaseConfig.profile.api._
 
-  private[models] val docusignTable = TableQuery[DocusignEnvelopeTable]
+  private[models] val envelopeTable = TableQuery[EnvelopeTable]
 
-  private def add(docusign: DocusignEnvelope): Future[String] = db.run((docusignTable returning docusignTable.map(_.id) += docusign).asTry).map {
+  private def add(envelope: Envelope): Future[String] = db.run((envelopeTable returning envelopeTable.map(_.id) += envelope).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -35,7 +35,7 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateStatusByEnvelopeID(envelopeID: String, status: String): Future[Int] = db.run(docusignTable.filter(_.envelopeID === envelopeID).map(_.status).update(status).asTry).map {
+  private def updateStatusByEnvelopeID(envelopeID: String, status: String): Future[Int] = db.run(envelopeTable.filter(_.envelopeID === envelopeID).map(_.status).update(status).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -47,7 +47,7 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def findByEnvelopeID(envelopeID: String): Future[DocusignEnvelope] = db.run(docusignTable.filter(_.envelopeID === envelopeID).result.head.asTry).map {
+  private def findByEnvelopeID(envelopeID: String): Future[Envelope] = db.run(envelopeTable.filter(_.envelopeID === envelopeID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -55,7 +55,7 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def tryGetByID(id: String, documentType: String): Future[DocusignEnvelope] = db.run(docusignTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def tryGetByID(id: String, documentType: String): Future[Envelope] = db.run(envelopeTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -63,11 +63,11 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getByID(id: String, documentType: String) = db.run(docusignTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption)
+  private def getByID(id: String, documentType: String) = db.run(envelopeTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption)
 
-  private def getAllByID(id: String) = db.run(docusignTable.filter(_.id === id).result)
+  private def getAllByID(id: String) = db.run(envelopeTable.filter(_.id === id).result)
 
-  private def findEnvelopeIDByID(id: String) = db.run(docusignTable.filter(_.id === id).map(_.envelopeID).result.head.asTry).map {
+  private def findEnvelopeIDByID(id: String) = db.run(envelopeTable.filter(_.id === id).map(_.envelopeID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -75,9 +75,9 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getEnvelopeStatusByID(id: String): Future[Option[String]] = db.run(docusignTable.filter(_.id === id).map(_.status).result.headOption)
+  private def getEnvelopeStatusByID(id: String): Future[Option[String]] = db.run(envelopeTable.filter(_.id === id).map(_.status).result.headOption)
 
-  private def deleteById(id: String): Future[Int] = db.run(docusignTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(envelopeTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -87,9 +87,9 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private[models] class DocusignEnvelopeTable(tag: Tag) extends Table[DocusignEnvelope](tag, "DocusignEnvelope") {
+  private[models] class EnvelopeTable(tag: Tag) extends Table[Envelope](tag, "Envelope") {
 
-    def * = (id, envelopeID, documentType, status) <> (DocusignEnvelope.tupled, DocusignEnvelope.unapply)
+    def * = (id, envelopeID, documentType, status) <> (Envelope.tupled, Envelope.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -103,15 +103,15 @@ class DocusignEnvelopes @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(id: String, envelopeID: String, documentType: String): Future[String] = add(DocusignEnvelope(id, envelopeID, documentType, constants.Status.DocuSignEnvelopeStatus.CREATED))
+    def create(id: String, envelopeID: String, documentType: String): Future[String] = add(Envelope(id, envelopeID, documentType, constants.Status.DocuSignEnvelopeStatus.CREATED))
 
-    def get(id: String, documentType: String): Future[Option[DocusignEnvelope]] = getByID(id, documentType)
+    def get(id: String, documentType: String): Future[Option[Envelope]] = getByID(id, documentType)
 
     def tryGet(id: String, documentType: String) = tryGetByID(id, documentType)
 
-    def getAll(id: String): Future[Seq[DocusignEnvelope]] = getAllByID(id)
+    def getAll(id: String): Future[Seq[Envelope]] = getAllByID(id)
 
-    def tryGetByEnvelopeID(envelopeID: String): Future[DocusignEnvelope] = findByEnvelopeID(envelopeID)
+    def tryGetByEnvelopeID(envelopeID: String): Future[Envelope] = findByEnvelopeID(envelopeID)
 
     def markSent(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelopeStatus.SENT)
 

@@ -3,6 +3,7 @@ package controllers
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.docusign
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
 import models.master.{Organization => _, Zone => _, _}
 import models.{blockchain, master, masterTransaction}
@@ -33,7 +34,7 @@ class ComponentViewController @Inject()(
                                          masterTraderRelations: master.TraderRelations,
                                          masterZones: master.Zones,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                         masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
+                                         docusignEnvelopes: docusign.Envelopes,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          withLoginAction: WithLoginAction,
                                          withOrganizationLoginAction: WithOrganizationLoginAction,
@@ -1123,7 +1124,7 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-          val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+          val docusignEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
@@ -1354,7 +1355,7 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-          val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+          val docusignEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList

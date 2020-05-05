@@ -3,8 +3,8 @@
 @import models.masterTransaction.NegotiationFile
 @import models.masterTransaction.AssetFile
 @import models.master.Negotiation
-@import models.masterTransaction.DocusignEnvelope
-@(traderID: String,negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],docusignEnvelopeList: Seq[DocusignEnvelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.docusign.Envelope
+@(traderID: String,negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],docusignEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @negotiation.status match {
 
@@ -29,7 +29,7 @@
                         case None => {
                             @if(negotiation.sellerTraderID == traderID) {
                                 @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.send, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")
-                                @commonFormButton(constants.Form.MARK_CONTRACT_SIGNED,'parameters -> s"'${negotiation.id}'")
+                                @commonFormButton(constants.Form.UPDATE_CONTRACT_SIGNED,'parameters -> s"'${negotiation.id}'")
                             }
 
                         }
@@ -37,7 +37,6 @@
                 </div>
             }
             case None => {}
-
         }
     }
     case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED=> {

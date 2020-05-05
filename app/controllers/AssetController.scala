@@ -6,6 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
 import models.common.Serializable._
+import models.docusign
 import models.master.{Asset, Negotiation, Trader, Zone}
 import models.masterTransaction.AssetFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
@@ -30,7 +31,7 @@ class AssetController @Inject()(
                                  masterNegotiations: master.Negotiations,
                                  messagesControllerComponents: MessagesControllerComponents,
                                  masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                 masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
+                                 docusignEnvelopes: docusign.Envelopes,
                                  masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                  withTraderLoginAction: WithTraderLoginAction,
@@ -240,7 +241,7 @@ class AssetController @Inject()(
               val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.portOfLoading, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetQuantity, billOfLadingContentData.assetPrice))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(billOfLadingContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-              val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)
+              val docusignEnvelopeList = docusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
 
               for {

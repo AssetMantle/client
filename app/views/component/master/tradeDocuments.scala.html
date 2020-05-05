@@ -1,11 +1,11 @@
 @import controllers.actions.LoginState
-@import views.html.base._
 @import models.masterTransaction.NegotiationFile
 @import models.masterTransaction.AssetFile
 @import models.master.Negotiation
-@import models.masterTransaction.DocusignEnvelope
+@import views.html.base._
+@import models.docusign.Envelope
 
-@(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],docusignEnvelopeList:Seq[DocusignEnvelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],docusignEnvelopeList:Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @negotiation.status match {
     case constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS => {

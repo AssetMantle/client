@@ -8,9 +8,10 @@ GET         /firebase-messaging-sw.js                                           
 
 GET         /docusign/send                                                                        controllers.DocusignController.send(id:String, documentType: String)
 GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
-GET         /docusign/return                                                                      controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
-
 GET         /docusign/authorization                                                               controllers.DocusignController.authorization
+
+#DO NOT CHANGE /Docusign Return ENDPOINT
+GET         /docusign/return                                                                      controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
 GET         /docusign/authorizationReturn                                                         controllers.DocusignController.authorizationReturn(code:String)
 
 GET         /blockExplorer/lastBlockHeight                                                        controllers.BlockExplorerController.lastBlockHeight
@@ -136,8 +137,8 @@ POST        /negotiation/sellerConfirm                                          
 
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 
-GET         /negotiation/markContractSigned                                                       controllers.NegotiationController.markContractSignedForm(negotiationID: String)
-POST        /negotiation/markContractSigned                                                       controllers.NegotiationController.markContractSigned
+GET         /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
+POST        /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSigned
 
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 

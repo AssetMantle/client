@@ -1,0 +1,146 @@
+package models.docusign
+
+import java.net.ConnectException
+
+import akka.actor.ActorSystem
+import com.docusign.esign.client.auth.OAuth.OAuthToken
+import com.twilio.exception.ApiException
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
+import org.joda.time.{DateTime, DateTimeZone}
+import org.postgresql.util.PSQLException
+import play.api.{Configuration, Logger}
+import play.api.db.slick.DatabaseConfigProvider
+import queries.responses.DocusignRegenerateTokenResponse.Response
+import slick.jdbc.JdbcProfile
+import transactions.DocusignRegenerateToken
+
+import scala.concurrent.duration.{Duration, _}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Random, Success}
+
+case class OAuthToken(id: String, accessToken: String, expiresAt: Long, refreshToken: String)
+
+@Singleton
+class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, docusignRegenerateToken: DocusignRegenerateToken, utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+
+  private implicit val module: String = constants.Module.DOCUSIGN_OAUTH_TOKEN
+
+  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
+  val db = databaseConfig.db
+
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
+
+  private val accountID = configuration.get[String]("docusign.accountID")
+
+  private val docusignOAuthTokenInitialDelay = configuration.get[Int]("docusign.scheduler.initialDelay").seconds
+  private val docusignOAuthTokenIntervalTime = configuration.get[Int]("docusign.scheduler.intervalTime").minutes
+
+  private val logger: Logger = Logger(this.getClass)
+
+  import databaseConfig.profile.api._
+
+  private[models] val oauthTokenTable = TableQuery[OAuthTokenTable]
+
+  private def add(token: OAuthToken): Future[String] = db.run((oauthTokenTable returning oauthTokenTable.map(_.id) += token).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+
+  private def updateByID(id: String, accessToken: String, expiresAt: Long, refreshToken: String): Future[Int] = db.run(oauthTokenTable.filter(_.id === id).map(x => (x.accessToken, x.expiresAt, x.refreshToken)).update((accessToken, expiresAt, refreshToken)).asTry).map {
+    case Success(result) => result match {
+      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def tryGetByID(id: String): Future[OAuthToken] = db.run(oauthTokenTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getByID(id: String): Future[Option[OAuthToken]] = db.run(oauthTokenTable.filter(_.id === id).result.headOption)
+
+  private def deleteById(id: String): Future[Int] = db.run(oauthTokenTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private[models] class OAuthTokenTable(tag: Tag) extends Table[OAuthToken](tag, "OAuthToken") {
+
+    def * = (id, accessToken, expiresAt, refreshToken) <> (OAuthToken.tupled, OAuthToken.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def accessToken = column[String]("accessToken")
+
+    def expiresAt = column[Long]("expiresAt")
+
+    def refreshToken = column[String]("refreshToken")
+
+  }
+
+  object Service {
+
+    def create(id: String, accessToken: String, expiresAt: Long, refreshToken: String): Future[String] = add(OAuthToken(id, accessToken, expiresAt, refreshToken))
+
+    def get(id: String): Future[Option[OAuthToken]] = getByID(id)
+
+    def tryGet(id: String): Future[OAuthToken] = tryGetByID(id)
+
+    def update(id: String, accessToken: String, expiresAt: Long, refreshToken: String): Future[Int] = updateByID(id, accessToken, expiresAt, refreshToken)
+  }
+
+  object Utility {
+    def regenerateAccessToken(): Future[Unit] = {
+      val oauthToken = Service.tryGet(accountID)
+
+      def regenerateAndUpdateOAuthToken(oauthToken: OAuthToken): Future[Unit] = if (System.currentTimeMillis() > (oauthToken.expiresAt - docusignOAuthTokenIntervalTime.toMillis)) {
+        val response = docusignRegenerateToken.Service.post(docusignRegenerateToken.Request(constants.Form.REFRESH_TOKEN, oauthToken.refreshToken))
+
+        def updateOauthToken(response: Response): Future[Int] = Service.update(accountID, response.access_token, System.currentTimeMillis() + response.expires_in * 1000, response.refresh_token)
+
+        for {
+          response <- response
+          _ <- updateOauthToken(response)
+        } yield {}
+      } else Future()
+
+      (for {
+        oauthToken <- oauthToken
+        _ <- regenerateAndUpdateOAuthToken(oauthToken)
+      } yield {}
+        ).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          baseException.failure match {
+            case constants.Response.NO_SUCH_ELEMENT_EXCEPTION => utilitiesNotification.send(constants.User.MAIN_ACCOUNT, constants.Notification.DOCUSIGN_AUTHORIZATION_PENDING)
+            case _ => throw baseException
+          }
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      }
+    }
+  }
+
+  actorSystem.scheduler.schedule(initialDelay = docusignOAuthTokenInitialDelay, interval = docusignOAuthTokenIntervalTime) {
+    Utility.regenerateAccessToken()
+  }(schedulerExecutionContext)
+}
