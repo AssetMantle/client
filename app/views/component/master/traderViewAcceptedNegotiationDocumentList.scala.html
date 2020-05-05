@@ -4,17 +4,20 @@
 @import scala.collection.immutable.ListMap
 @import models.masterTransaction.NegotiationFile
 
-@(id: String, traderID: String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="docView">
-    @commonCard(Messages(constants.Form.DOCUMENTS)) {
-        @if(traderID == negotiation.sellerTraderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
-            @commonModalButton(constants.Form.UPLOAD, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${id}'")
-        }
-    } {
+@(id:String, traderID:String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="docView switcherCardSecond">
+    @commonInfoBox() {
         @commonHorizontalSwitcher(ListMap(
             constants.View.DOCUMENT_LIST -> routes.javascript.ComponentViewController.traderViewNegotiationDocumentList,
             constants.View.UPLOAD_HISTORY -> commonCard(constants.View.UPLOAD_HISTORY)(Html(""))(Html("")),
         ),
             'DOCUMENT_LIST_PARAMETERS -> s"'${id}'")
+
+        @if(traderID == negotiation.sellerTraderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
+            <div class="uploadDoc">
+            @commonModalButton(constants.Form.UPLOAD, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${id}'")
+            </div>
+        }
+
     }
 </div>

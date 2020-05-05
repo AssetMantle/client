@@ -6,44 +6,56 @@
 
 @(negotiationList: Seq[Negotiation],counterPartyTraderList:Seq[Trader], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@negotiationList.map { negotiation =>
-    <li class="commonList">
+<div class="SalesQuoteCard">
+    @negotiationList.map { negotiation =>
+        @commonVerticalInfoBox() {
+            <div class="firstPart salesChild">
+                <div class="content">
+                @assetList.find(_.id == negotiation.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetIcon">
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                        </div>
+                        <div class="assetIntialData">
+                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetQuantity">@Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@negotiation.price</p>
+                        </div>
+                    }
+                    case None => {}
+                }
+                </div>
+            </div>
+            <div class="secondPart salesChild">
+                <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_ID)">@negotiation.buyerTraderID</span>
+                    <span class="lines">---</span>
+                    <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_ID)">@negotiation.sellerTraderID</span>
+                </p>
 
-        @commonVerticalTextInfo(constants.View.BUYER_TRADER_ID, negotiation.buyerTraderID)
-        @commonVerticalTextInfo(constants.View.SELLER_TRADER_ID, negotiation.sellerTraderID)
-        @counterPartyTraderList.find(_.id == negotiation.buyerTraderID) match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.BUYER_ORGANIZATION_ID, trader.organizationID)
-            }
-            case None => {}
-        }
-        @counterPartyTraderList.find(_.id == negotiation.sellerTraderID) match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.SELLER_ORGANIZATION_ID, trader.organizationID)
-            }
-            case None => {}
-        }
+                    @counterPartyTraderList.find(_.id == negotiation.buyerTraderID) match {
+                        case Some(trader) => {
+                           <p> <span cmuk-tooltip="@Messages(constants.View.BUYER_ORGANIZATION_ID)">@trader.organizationID</span> <span class="lines">---</span>
+                        }
+                        case None => {}
+                    }
+                    @counterPartyTraderList.find(_.id == negotiation.sellerTraderID) match {
+                        case Some(trader) => {
+                            <span cmuk-tooltip="@Messages(constants.View.SELLER_ORGANIZATION_ID)">@trader.organizationID</span></p>
+                        }
+                        case None => {}
+                    }
 
-        @assetList.find(_.id == negotiation.assetID) match {
-            case Some(asset) => {
-                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
-            }
-            case None => {}
+                <p><span>@negotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
+                    <span class="lines">---</span>
+                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="lines">---</span>
+                    <span>@negotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
+                </p>
+            </div>
+            <div class="thirdPart salesChild">
+            @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(negotiation.id), 'class->"secondaryFont")
+            </div>
+
         }
-        @commonVerticalIntInfo(constants.View.PRICE, negotiation.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-        @commonVerticalTextInfo(constants.View.STATUS, negotiation.status)
-        <div class="listItemChild">
-            <p class="listItemChildTitle">
-            @Messages(constants.View.ACTION)
-            </p>
-            <p class="listItemChildValue">
-                <button class="cmuk-button cmuk-button-primary cmuk-button-small">
-                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(negotiation.id), 'class->"secondaryFont")
-                </button>
-            </p>
-        </div>
-    </li>
-}
+    }
+</div>

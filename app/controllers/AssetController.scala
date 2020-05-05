@@ -23,6 +23,7 @@ class AssetController @Inject()(
                                  blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
                                  blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets,
                                  masterAccounts: master.Accounts,
+                                 masterOrganizations: master.Organizations,
                                  masterTraders: master.Traders,
                                  masterTradeRelations: master.TraderRelations,
                                  masterZones: master.Zones,
@@ -127,11 +128,13 @@ class AssetController @Inject()(
 
                 def getResult(traderID: String): Future[Result] = {
 
-                  def getAllTradableAssets(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
+                  def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
 
                   def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
 
-                  def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+                  def getCounterPartyTraderList(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+                  def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
                   if (issueAssetData.moderated) {
                     val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.price, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
@@ -139,10 +142,11 @@ class AssetController @Inject()(
                     for {
                       assetID <- addModeratedAsset
                       _ <- issueModeratedAsset(assetID)
-                      tradableAssets <- getAllTradableAssets(traderID)
+                      tradableAssetList <- getAllTradableAssetList(traderID)
                       counterPartyList <- getCounterPartyList(traderID)
-                      counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                      counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+                      counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                     } yield result
                   } else {
                     val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
@@ -163,10 +167,11 @@ class AssetController @Inject()(
                       for {
                         documentHash <- addUnmoderatedAsset
                         ticketID <- sendTransaction(documentHash)
-                        tradableAssets <- getAllTradableAssets(traderID)
+                        tradableAssetList <- getAllTradableAssetList(traderID)
                         counterPartyList <- getCounterPartyList(traderID)
-                        counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+                        counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+                        counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                       } yield result
                     }
                     else {

@@ -1,14 +1,13 @@
 function loadMoreChats(chatID) {
-    const route = jsRoutes.controllers.TradeRoomController.loadMoreChats(chatID, ($(".chatMessages").length));
+    const route = jsRoutes.controllers.ChatController.loadMoreChats(chatID, ($(".chatMessages").length));
     $.ajax({
         url: route.url,
-        type: route.type,
+        type: route.type,                                       
         async: true,
         statusCode: {
             200: function (data) {
                 const loadMore = $(".chatMessages .chatMessage:first");
-                loadMore.after(data);
-                loadMore.remove();
+                loadMore.before(data);
             }
         }
     });
@@ -45,6 +44,7 @@ function submitChat(source, target = '#chatMessages') {
                     $("#replyBox").fadeOut();
                     const loadMore = $(".chatMessages .chatMessage:last");
                     loadMore.after(data);
+                    $('.noChats').remove();
                 },
             }
         }).fail(function (XMLHttpRequest) {
@@ -125,4 +125,18 @@ function unReadBar(count) {
 function closeReply() {
     $("#REPLY_TO_MESSAGE").val("");
     $("#replyBox").fadeOut();
+}
+
+function loadMoreChatsOnScroll(chatID) {
+    $('#chatMessages').on('scroll', function () {
+        if (!$('#chatMessages .chatMessages > li').hasClass("noChats")) {
+            var scrollTop = $(this).scrollTop();
+            if (scrollTop <= 0) {
+                setTimeout(function () {
+                    loadMoreChats(chatID);
+                    $('#chatMessages').scrollTop(100);
+                }, 100);
+            }
+        }
+    });
 }

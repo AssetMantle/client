@@ -35,12 +35,10 @@
     @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit.isDefined))
     <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
     @negotiation.documentList.assetDocuments.map { assetDocument =>
-        @assetDocument
-        <br>
+        <p  class="cmuk-text-left cmuk-margin-remove"><span>@Messages(assetDocument)</span></p>
     }
     @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-        @negotiationDocument
-        <br>
+        <p  class="cmuk-text-left cmuk-margin-remove"><span class="cmuk-text-left">@Messages(negotiationDocument)</span></p>
     }
 
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)

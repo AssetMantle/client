@@ -15,12 +15,14 @@
         <div class="inputFieldBody">
             @commonInputPassword(loginForm, constants.FormField.PASSWORD)
         </div>
+        @commonFormButton(constants.Form.EMAIL_OTP_FORGOT_PASSWORD, 'class -> "cmuk-button-link forgotPassword")
     </div>
     <div class="pushNotification hiddenLabel">
     @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'containerDivClass -> "hidden", 'readonly -> true)
     </div>
 }
-    @commonFormButton(constants.Form.EMAIL_OTP_FORGOT_PASSWORD,'class -> "cmuk-button-link")
+
+
 </div>
 <script src="@routes.Assets.versioned("javascripts/pushNotification.js")" type="text/javascript"></script>
 

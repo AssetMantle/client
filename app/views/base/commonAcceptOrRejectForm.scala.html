@@ -17,7 +17,6 @@
             }
             </ul>
         }
-    <span class="red">@Messages(constants.FormField.STATUS.name):</span>
         @approvalStatus match {
             case Some(status: Boolean) => {
                 @if(status) {
