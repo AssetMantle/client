@@ -5,6 +5,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
 import models.master.{Organization => _, Zone => _, _}
+import models.masterTransaction.SendFiatRequest
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -32,6 +33,7 @@ class ComponentViewController @Inject()(
                                          masterTraders: master.Traders,
                                          masterTraderRelations: master.TraderRelations,
                                          masterZones: master.Zones,
+                                         masterFiats: master.Fiats,
                                          masterOrders: master.Orders,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
@@ -68,15 +70,106 @@ class ComponentViewController @Inject()(
 
   def traderFinancials: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
       val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def fiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
+
       def negotiations(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
 
+      def incompleteNegotiations(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+
+      def completedOrders(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
+
+      def fiatsInOrders(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
+
+      def payable(traderID: String, fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
+        incompleteNegotiations(negotiations.filter(_.buyerTraderID == traderID), completedOrders).map(_.price).sum - fiatsInOrders.filter(_.traderID == traderID).map(_.amount).sum
+      }
+
+      def receivable(incompleteNegotiations: Seq[Negotiation], traderID: String) = incompleteNegotiations.filter(_.sellerTraderID == traderID).map(_.price).sum
+
+
       (for {
-        fiatPegWallet <- fiatPegWallet
         traderID <- traderID
+        fiatPegWallet <- fiatPegWallet(traderID)
         negotiations <- negotiations(traderID)
-      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = negotiations.filter(_.buyerTraderID == traderID).map(_.price).sum, receivable = negotiations.filter(_.sellerTraderID == traderID).map(_.price).sum))
+        completedOrders <- completedOrders(negotiations.map(_.negotiationID.getOrElse("")))
+        fiatsInOrders <- fiatsInOrders(incompleteNegotiations(negotiations, completedOrders).map(_.id))
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = payable(traderID, fiatsInOrders, completedOrders, negotiations), receivable = receivable(incompleteNegotiations(negotiations, completedOrders), traderID)))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationFinancial: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String) = masterTraders.Service.getVerifiedTraderIDsByOrganizationID(organizationID)
+
+      def fiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
+
+      def negotiations(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
+
+      def incompleteNegotiations(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+
+      def completedOrders(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
+
+      def fiatsInOrders(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
+
+      def payable(traderIDs: Seq[String], fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
+        val buyingNegotiations = negotiations.filter(traderIDs contains _.buyerTraderID)
+        incompleteNegotiations(buyingNegotiations, completedOrders).map(_.price).sum - fiatsInOrders.filter(buyingNegotiations.map(_.id) contains _.negotiationID).filter( traderIDs contains _.traderID).map(_.amount).sum
+      }
+
+      def receivable(incompleteNegotiations: Seq[Negotiation], traderIDs: Seq[String]) = incompleteNegotiations.filter(traderIDs contains _.sellerTraderID).map(_.price).sum
+
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        fiatPegWallet <- fiatPegWallet(traderIDs)
+        negotiations <- negotiations(traderIDs)
+        completedOrders <- completedOrders(negotiations.map(_.negotiationID.getOrElse("")))
+        fiatsInOrders <- fiatsInOrders(incompleteNegotiations(negotiations, completedOrders).map(_.id))
+      } yield Ok(views.html.component.master.organizationFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = payable(traderIDs, fiatsInOrders, completedOrders, negotiations), receivable = receivable(incompleteNegotiations(negotiations, completedOrders), traderIDs)))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def zoneFinancial: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def traderIDs(zoneID: String) = masterTraders.Service.getVerifiedTraderIDsByZoneID(zoneID)
+
+      def fiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
+
+      def negotiations(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
+
+      def incompleteNegotiations(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+
+      def completedOrders(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
+
+      def fiatsInOrders(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
+
+      def payable(traderIDs: Seq[String], fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
+        val buyingNegotiations = negotiations.filter(traderIDs contains _.buyerTraderID)
+        incompleteNegotiations(buyingNegotiations, completedOrders).map(_.price).sum - fiatsInOrders.filter(buyingNegotiations.map(_.id) contains _.negotiationID).filter( traderIDs contains _.traderID).map(_.amount).sum
+      }
+
+      def receivable(incompleteNegotiations: Seq[Negotiation], traderIDs: Seq[String]) = incompleteNegotiations.filter(traderIDs contains _.sellerTraderID).map(_.price).sum
+
+
+      (for {
+        zoneID <- zoneID
+        traderIDs <- traderIDs(zoneID)
+        fiatPegWallet <- fiatPegWallet(traderIDs)
+        negotiations <- negotiations(traderIDs)
+        completedOrders <- completedOrders(negotiations.map(_.negotiationID.getOrElse("")))
+        fiatsInOrders <- fiatsInOrders(incompleteNegotiations(negotiations, completedOrders).map(_.id))
+      } yield Ok(views.html.component.master.zoneFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = payable(traderIDs, fiatsInOrders, completedOrders, negotiations), receivable = receivable(incompleteNegotiations(negotiations, completedOrders), traderIDs)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -1533,8 +1626,15 @@ class ComponentViewController @Inject()(
 
   def zoneViewTradeRoomFinancial(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      //TODO: show correct FINANCIALS after orderTable
-      Future(Ok(views.html.component.master.zoneViewTradeRoomFinancial(0, 0, 0)))
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+      val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
+      (for {
+        negotiation <- negotiation
+        fiatsInOrder <- fiatsInOrder
+      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(negotiation.price, 0, negotiation.price - fiatsInOrder))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+      }
   }
 
   //TODO: Whoever did this correct it
@@ -1551,8 +1651,15 @@ class ComponentViewController @Inject()(
 
   def organizationViewTradeRoomFinancial(negotiationID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      //TODO: show correct FINANCIALS after orderTable
-      Future(Ok(views.html.component.master.organizationViewTradeRoomFinancial(0, 0, 0)))
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+      val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
+      (for {
+        negotiation <- negotiation
+        fiatsInOrder <- fiatsInOrder
+      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(negotiation.price, 0, negotiation.price - fiatsInOrder))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+      }
   }
 
   //TODO: Whoever did this correct it
@@ -1569,7 +1676,6 @@ class ComponentViewController @Inject()(
 
   def traderViewTradeRoomFinancial(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      //TODO: show correct FINANCIALS after orderTable
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
       val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)

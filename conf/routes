@@ -219,6 +219,8 @@ GET         /component/zoneViewAssetDocumentContent                             
 
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials
+GET         /component/organizationFinancial                                                      controllers.ComponentViewController.organizationFinancial
+GET         /component/zonwFinancial                                                              controllers.ComponentViewController.zoneFinancial
 
 GET         /component/traderViewNegotiationDocumentList                                          controllers.ComponentViewController.traderViewNegotiationDocumentList(id:String)
 GET         /component/traderViewNegotiationDocument                                              controllers.ComponentViewController.traderViewNegotiationDocument(id:String, documentType: Option[String])

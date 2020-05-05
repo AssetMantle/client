@@ -73,6 +73,18 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
+  private def tryGetByOrderID(orderID: String): Future[Order] = db.run(orderTable.filter(_.orderID === orderID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = db.run(orderTable.filter(_.orderID inSet orderIDs).result)
+
+  private def getByOrderIDsAndStatuses(orderIDs: Seq[String], statuses: Seq[String]): Future[Seq[Order]] = db.run(orderTable.filter(_.orderID inSet orderIDs).filter(_.status inSet statuses).result)
+
   private def getByID(id: String): Future[Option[Order]] = db.run(orderTable.filter(_.id === id).result.headOption)
 
   private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
@@ -132,6 +144,15 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def get(id: String): Future[Option[Order]] = getByID(id)
 
     def tryGet(id: String): Future[Order] = tryGetByID(id)
+
+    def tryGetOrderByOrderID(orderID: String): Future[Order] = tryGetByOrderID(orderID)
+
+    def getOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDs(orderIDs)
+
+    def getIncompleteOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDsAndStatuses(orderIDs, Seq(constants.Status.Order.ASSET_AND_FIAT_PENDING, constants.Status.Order.ASSET_AND_FIAT_PENDING, constants.Status.Order.ASSET_SENT_FIAT_PENDING,
+      constants.Status.Order.FIAT_SENT_ASSET_PENDING, constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING))
+
+    def getCompletedOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDsAndStatuses(orderIDs, Seq(constants.Status.Order.COMPLETED, constants.Status.Order.REVERSED, constants.Status.Order.TIMED_OUT))
 
   }
 

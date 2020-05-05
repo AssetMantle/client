@@ -206,15 +206,27 @@ class SendFiats @Inject()(
       val sendFiat = Service.getTransaction(ticketID)
       val markBlockchainSuccess = masterTransactionSendFiatRequests.Service.markBlockchainSuccess(ticketID)
 
+      def bcFiatsInOrder(negotiationID: String): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(negotiationID)
+
       def orderResponse(negotiationID: String): Future[OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
       def getNegotiationID(sendFiat: SendFiat): Future[String] = blockchainNegotiations.Service.tryGetID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
 
       def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
 
-      //TODO make it upsert, inset throws error in case of sending fiat multiple times.
-      def updateBCFiat(negotiationID: String, orderResponse: OrderResponse.Response): Future[Seq[String]] = orderResponse.value.fiatPegWallet match {
-        case Some(fiatPegWallet) => blockchainFiats.Service.insertList(fiatPegWallet.map(fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = negotiationID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)))
+      def updateBCFiat(bcFiatsInOrder: Seq[Fiat], negotiationID: String, orderResponse: OrderResponse.Response): Future[Unit] = orderResponse.value.fiatPegWallet match {
+        case Some(fiatPegWallet) => {
+          val updateFiats = Future.traverse(bcFiatsInOrder.map(_.pegHash).intersect(fiatPegWallet.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+            blockchainFiats.Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false))
+          })
+          val insertFiats = Future.traverse(fiatPegWallet.map(_.pegHash).diff(bcFiatsInOrder.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+            blockchainFiats.Service.create(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)
+          })
+          for {
+            _ <- updateFiats
+            _ <- insertFiats
+          } yield Unit
+        }
         case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
       }
 
@@ -273,9 +285,10 @@ class SendFiats @Inject()(
         sendFiat <- sendFiat
         _ <- markBlockchainSuccess
         negotiationID <- getNegotiationID(sendFiat)
+        bcFiatsInOrder <- bcFiatsInOrder(negotiationID)
         orderResponse <- orderResponse(negotiationID)
         masterNegotiation <- getMasterNegotiation(negotiationID)
-        _ <- updateBCFiat(negotiationID = negotiationID, orderResponse = orderResponse)
+        _ <- updateBCFiat(bcFiatsInOrder = bcFiatsInOrder, negotiationID = negotiationID, orderResponse = orderResponse)
         orderExists <- checkOrderExists(negotiationID)
         _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation, sendFiat.amount)
         _ <- markDirty(sendFiat)

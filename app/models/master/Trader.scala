@@ -138,6 +138,10 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def getTradersByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).result)
 
+  private def getTraderIDsByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[String]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).map(_.id).result)
+
+  private def getTraderIDsByStatusByZoneID(zoneID: String, status: Option[Boolean]): Future[Seq[String]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.status.? === status).map(_.id).result)
+
   private def getTradersByTraderIDs(traderIDs: Seq[String]): Future[Seq[Trader]] = db.run(traderTable.filter(_.id inSet traderIDs).result)
 
   private def findTradersByZoneID(zoneID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).result)
@@ -225,6 +229,10 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def tryGetStatus(id: String): Future[Boolean] = tryGetStatusById(id).map(_.getOrElse(false))
 
     def getOrganizationAcceptedTraderList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = Option(true))
+
+    def getVerifiedTraderIDsByOrganizationID(organizationID: String): Future[Seq[String]] = getTraderIDsByStatusByOrganizationID(organizationID = organizationID, status = Option(true))
+
+    def getVerifiedTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = getTraderIDsByStatusByZoneID(zoneID = zoneID, status = Option(true))
 
     def getOrganizationPendingTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = null)
 

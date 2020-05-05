@@ -34,9 +34,7 @@ class Orders @Inject()(
                         masterAssets: master.Assets,
                         actorSystem: ActorSystem,
                         protected val databaseConfigProvider: DatabaseConfigProvider,
-                        getAccount: queries.GetAccount,
                         blockchainNegotiations: Negotiations,
-                        blockchainTraderFeedbackHistories: TraderFeedbackHistories,
                         blockchainAssets: Assets,
                         blockchainFiats: Fiats,
                         getOrder: queries.GetOrder,
@@ -181,13 +179,14 @@ class Orders @Inject()(
             val negotiation = blockchainNegotiations.Service.tryGet(dirtyOrder.id)
             val assetPegWallet = blockchainAssets.Service.getAssetPegWallet(dirtyOrder.id)
             val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(dirtyOrder.id)
+            val masterOrder = masterOrders.Service.tryGetOrderByOrderID(dirtyOrder.id)
 
-            def completeOrReverseOrder(negotiation: Negotiation, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], orderResponse: OrderResponse.Response): Future[Unit] = {
+            def completeOrReverseOrder(masterOrder: master.Order, negotiation: Negotiation, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], orderResponse: OrderResponse.Response): Future[Unit] = {
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
                 val updateAsset = blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.buyerAddress))
                 val sellerMarkDirty = blockchainFiats.Service.markDirty(negotiation.sellerAddress)
                 val deleteOrderFiats = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
-                val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash)
+                val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash, masterOrder.buyerTraderID)
                 val markMasterOrderStatusCompleted = masterOrders.Service.markStatusCompletedByBCOrderID(dirtyOrder.id)
                 for {
                   _ <- updateAsset
@@ -200,7 +199,7 @@ class Orders @Inject()(
                 val updateAsset = if (assetPegWallet.nonEmpty) blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.sellerAddress)) else Future(0)
                 val buyerMarkDirty = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.markDirty(negotiation.buyerAddress) else Future(0)
                 val deleteOrderFiats = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id) else Future(0)
-                val resetMasterAssetStatus = if (assetPegWallet.nonEmpty) masterAssets.Service.resetStatusByPegHash(assetPegWallet.head.pegHash) else Future(0)
+                val resetMasterAssetStatus = if (assetPegWallet.nonEmpty) masterAssets.Service.resetStatusByPegHash(assetPegWallet.head.pegHash, masterOrder.sellerTraderID) else Future(0)
                 val markMasterOrderStatusReversed = masterOrders.Service.markStatusReversedByBCOrderID(dirtyOrder.id)
                 for {
                   _ <- updateAsset
@@ -231,7 +230,8 @@ class Orders @Inject()(
               negotiation <- negotiation
               assetPegWallet <- assetPegWallet
               fiatPegWallet <- fiatPegWallet
-              _ <- completeOrReverseOrder(negotiation, assetPegWallet = assetPegWallet, fiatPegWallet = fiatPegWallet, orderResponse = orderResponse)
+              masterOrder <- masterOrder
+              _ <- completeOrReverseOrder(masterOrder = masterOrder, negotiation = negotiation, assetPegWallet = assetPegWallet, fiatPegWallet = fiatPegWallet, orderResponse = orderResponse)
               _ <- update(orderResponse)
               buyerAccountID <- getAccountID(negotiation.buyerAddress)
               sellerAccountID <- getAccountID(negotiation.sellerAddress)
