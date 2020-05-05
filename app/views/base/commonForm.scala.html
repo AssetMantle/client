@@ -9,6 +9,7 @@
         @Messages(formTemplate.legend)
         </legend>
         <hr>
+        <div class="formBody">
         @CSRF.formField
         @fieldset
         @if(formData.hasGlobalErrors) {
@@ -19,5 +20,6 @@
             </ul>
         }
         @commonJavascriptButton(formTemplate.submit, JavaScript("""submitForm(this)"""))
+        </div>
     </fieldset>
 }

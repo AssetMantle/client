@@ -6,7 +6,8 @@
     max-width: 500px; }
 
   .bannerContainer {
-    background-size: contain; }
+    background-size: contain;
+    background-position: center bottom; }
     .bannerContainer .bannerText {
       width: 100%; }
       .bannerContainer .bannerText h3 {
@@ -16,7 +17,54 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #0862BE; } }
+    background-color: #0862BE; }
+
+  .switcherCard .cmuk-subnav {
+    flex-wrap: nowrap;
+    justify-content: start;
+    overflow: auto;
+    overflow: -moz-scrollbars-none; }
+    .switcherCard .cmuk-subnav li {
+      flex: none; }
+    .switcherCard .cmuk-subnav::-webkit-scrollbar {
+      height: 0 !important; }
+  .switcherCard .cmuk-subnav-pill > * > :first-child {
+    padding: 5px 20px; }
+
+  .commonList {
+    display: block;
+    padding: 20px; }
+    .commonList .listItemChild {
+      display: flex;
+      padding: 5px 0px; }
+      .commonList .listItemChild .listItemChildTitle {
+        width: 100px; }
+      .commonList .listItemChild .listItemChildValue {
+        margin: 0px;
+        white-space: normal; }
+
+  .modal {
+    padding: 30px 15px; }
+    .modal .modalContent {
+      padding: 15px;
+      min-height: 150px;
+      max-height: calc(100% - 20px);
+      top: auto;
+      transform: translateY(0);
+      margin: 0 auto;
+      width: 600px;
+      transition: .3s linear;
+      transition-property: opacity,transform; }
+      .modal .modalContent form {
+        text-align: center; }
+
+  .MnemonicQuiz {
+    text-align: center; }
+    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
+      width: 95px; }
+
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
+    flex-wrap: wrap; } }
 @media (min-width: 640px) {
   .modalBody form {
     width: 500px;
@@ -33,8 +81,13 @@
     display: flex; }
 
   .cmuk-card-body .cmuk-subnav li a {
-    font-size: 12px;
     text-transform: capitalize; } }
+@media (min-width: 960px) and (max-width: 1080px) {
+  .header .cmuk-navbar-nav > li > a {
+    padding: 0px 15px; }
+
+  .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
+    padding: 0px 15px; } }
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex; }
@@ -42,28 +95,13 @@
   .comdex .mobileNavigation {
     display: flex;
     flex: auto; } }
-@media screen and (max-width: 768px) {
-  .timeline {
-    margin: 30px;
-    padding: 0; }
-    .timeline:before {
-      left: 0; }
-    .timeline .timeline-item .timeline-content {
-      width: 80%;
-      float: right; }
-    .timeline .timeline-item .timeline-content:before,
-    .timeline .timeline-item .timeline-content.right:before {
-      left: -5px;
-      right: inherit; }
-    .timeline .timeline-item .timeline-icon {
-      left: 0; } }
 @media (min-width: 1200px) {
   .pageContainer .leftSide {
     height: 100%;
     float: left;
     left: 0;
     margin-right: 0.5%;
-    width: 24%;
+    width: 24.5%;
     margin-bottom: 5px; }
   .pageContainer .middle {
     width: 50%;
@@ -71,11 +109,14 @@
     float: left; }
   .pageContainer .rightSide {
     height: 100%;
-    width: 24%;
+    width: 24.5%;
     float: left;
     margin-left: 0.5%;
     right: 0;
     margin-bottom: 5px; } }
+@media (max-width: 1200px) {
+  .pageContainer .middle {
+    margin-bottom: 20px; } }
 @media (max-width: 992px) {
   .MnemonicQuiz .mnemonicNote {
     background-image: none; }
@@ -83,71 +124,72 @@
       width: 100%; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
-    max-height: 470px; }
+    top: 10%;
+    max-height: 530px; }
 
-  .leftTradeFinancial .financial {
+  .leftSideContainer .financial {
     margin-bottom: 15px; }
-  .leftTradeFinancial .cmuk-card-header {
-    font-size: 12px; }
-  .leftTradeFinancial .financial .cmuk-card-body {
-    height: 210px; }
-  .leftTradeFinancial .financial ul li {
+    .leftSideContainer .financial .cmuk-card {
+      height: 265px; }
+  .leftSideContainer .financial .cmuk-switcher ul li {
     padding: 10px 0; }
-    .leftTradeFinancial .financial ul li .wallet .cmuk-comment-meta, .leftTradeFinancial .financial ul li .wallet .ctitle {
-      font-size: 14px; }
-  .leftTradeFinancial .addBalanceButton {
+  .leftSideContainer .addBalanceButton {
     text-transform: capitalize;
     font-family: Rubik;
     padding: 8px 8px;
-    font-size: 12px;
     line-height: normal;
     background: rgba(8, 98, 190, 0.1);
     border-radius: 103px;
     color: #0862BE;
-    font-size: 10px;
     border: 0; }
-  .leftTradeFinancial .docView .cmuk-card-header, .leftTradeFinancial .docView .cmuk-card-body, .leftTradeFinancial .docView .documentlist {
+  .leftSideContainer .docView .cmuk-card-header, .leftSideContainer .docView .cmuk-card-body, .leftSideContainer .docView .documentlist {
     padding: 0px; }
-  .leftTradeFinancial .docView .cmuk-card-body {
-    height: 300px; }
-
-  .recentActivity .recentActivityContainer {
-    margin-bottom: 15px; }
-    .recentActivity .recentActivityContainer .cmuk-card-body {
+  .leftSideContainer .docView .documentlist {
+    height: 150px; }
+  .leftSideContainer .docView .cmuk-card {
+    height: 265px; }
+  .leftSideContainer .zoneTradeFinancial .cmuk-card-body {
+    height: auto; }
+    .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
       height: 210px; }
-    .recentActivity .recentActivityContainer .cmuk-card-header {
-      font-size: 12px; }
-  .recentActivity .chatRoom .cmuk-card-body {
-    height: 300px; }
-    .recentActivity .chatRoom .cmuk-card-body .chatMessages {
-      height: 190px; }
 
-  .timeline {
-    margin: 20px 0px; }
+  .rightSideContainer .recentActivityContainer {
+    margin-bottom: 15px; }
+    .rightSideContainer .recentActivityContainer .cmuk-card-body {
+      height: 210px; }
+      .rightSideContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
+        height: 210px; }
+  .rightSideContainer .chatRoom .cmuk-card-body {
+    height: 264px; }
+    .rightSideContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
+      height: 160px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
 
   .comdex .cmuk-height-medium {
     height: 210px; }
+  .comdex .cmuk-card-header .cmuk-button {
+    line-height: 26px; }
 
   .switcherCard .cmuk-switcher {
-    height: 140px; }
+    height: 179px; }
 
-  .salesQuoteList .cmuk-card-body .cmuk-switcher {
-    height: 138px; } }
-@media (max-width: 1600px) {
-  .commonList .listItemChild {
-    font-size: 14px; }
+  .timeline:before {
+    left: 20px; }
+  .timeline .timeline-item .timeline-icon {
+    left: 0px; }
 
-  .leftTradeFinancial .financial ul li .ctitle {
-    font-size: 14px; }
+  .SalesQuoteCard .firstPart {
+    flex: 32%; }
+  .SalesQuoteCard .secondPart {
+    flex: 45%; }
+  .SalesQuoteCard .thirdPart {
+    flex: 23%; } }
+@media (max-width: 1599px) {
+  :root {
+    font-size: 13px; }
 
-  .timeline .timeline-item .timeline-content .activityContent {
-    font-size: 14px; }
-
-  .profileContainer .infoRow {
-    font-size: 14px; }
   .profileContainer .identificationDetails .documentItem {
     padding: 10px; }
     .profileContainer .identificationDetails .documentItem .documentContentTop {
@@ -161,12 +203,7 @@
         margin-right: 5px; }
 
   .cmuk-card-body .cmuk-subnav li a {
-    font-size: 12px;
     text-transform: capitalize; }
-
-  .modal .modalContent {
-    top: 10%;
-    max-height: 530px; }
 
   .tabsSection .cmuk-grid-divider {
     display: block; }
@@ -176,15 +213,21 @@
   .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
     border: none; }
 
-  .headerFontSize {
-    font-size: 14px; } }
+  .mobileNumberUpdate .countryCode {
+    margin-top: 28px; } }
+@media (min-width: 1600px) {
+  :root {
+    font-size: 16px; }
+
+  .showpassword, .checkIcon {
+    top: 37px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }
 @media (min-width: 1921px) {
   .comdex .cmuk-container {
     max-width: 1920px; } }
-@media (max-width: 960px) {
+@media (max-width: 959px) {
   .comdex .mobileNavigationHeader {
     display: flex; }
   .comdex .mobileNavigation {
@@ -196,7 +239,6 @@
     border: none; }
   .comdex .header .buttonRegister {
     background-color: #FE4350;
-    font-size: 14px;
     font-family: Rubik;
     color: #FFFFFF;
     line-height: inherit;
