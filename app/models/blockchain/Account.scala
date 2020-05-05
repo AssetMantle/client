@@ -53,16 +53,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def tryGetAddressByUsername(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.BLOCKCHAIN_ACCOUNT_NOT_FOUND.message, noSuchElementException)
-        throw new BaseException(constants.Response.BLOCKCHAIN_ACCOUNT_NOT_FOUND)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
   private def tryGetUsernameByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.username).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.BLOCKCHAIN_ACCOUNT_NOT_FOUND.message, noSuchElementException)
-        throw new BaseException(constants.Response.BLOCKCHAIN_ACCOUNT_NOT_FOUND)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 

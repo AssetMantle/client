@@ -1397,14 +1397,17 @@ VALUES ('main',
         'GMT+5:30');
 
 INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
-                                     "dirtyBit")
+                                     "dirtyBit", "createdBy", "createdOn", "createdOnTimeZone")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
-        true);
+        true,
+        'dev.webapp',
+        CURRENT_TIMESTAMP,
+        'GMT+5:30');
 
 # --- !Downs
 
