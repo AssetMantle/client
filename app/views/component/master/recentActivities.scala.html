@@ -4,13 +4,13 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.RECENT_ACTIVITY) {
+@commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
 } {
     <div class="scroller">
-        <div id="recentActivityMessages"></div>
-        <div class="cover-bar"></div>
+        <div id="recentActivityMessages" class="recentActivityMessages"></div>
     </div>
 }
 <script>
+        loadMoreActivitiesOnScroll();
     componentResource('recentActivityMessages', jsRoutes.controllers.NotificationController.recentActivityMessages(1));
 </script>

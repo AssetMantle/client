@@ -27,20 +27,9 @@ dl{
 }
 
 label{
-  font-size: $paragraphFontSizeMedium;
+  font-size: var(--paragraphFontSizeMedium);
   font-family: $fontFamilySecondary;
   font-weight: normal;
   color: #272829;;
   line-height: 2;
-}
-
-// Media Queries
-@media (max-width: 600px) {
-  table thead {
-    font-size: 12px;
-  }
-  form{
-    max-width:500px;
-    text-align: center;
-  }
 }
