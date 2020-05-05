@@ -200,7 +200,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
         } yield {}
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -230,7 +230,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val redeemFiat = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       val markBlockchainFailure = masterTransactionRedeemFiats.Service.markBlockchainFailure(ticketID)
       (for {

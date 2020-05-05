@@ -202,7 +202,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         } yield ()
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def sendFromAccountNotifications(buyerExecuteOrder: BuyerExecuteOrder): Future[Unit] = if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
         for {
@@ -243,7 +243,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
       def markDirty(buyerExecuteOrder: BuyerExecuteOrder): Future[Int] = if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) blockchainAccounts.Service.markDirty(buyerExecuteOrder.from) else blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

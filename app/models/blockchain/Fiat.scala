@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Node
 import models.westernUnion.FiatRequests
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
@@ -34,7 +34,7 @@ case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, tr
 @Singleton
 class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider,
                       actorSystem: ActorSystem, getAccount: GetAccount,
-                      masterAccounts: master.Accounts, masterTraders: master.Traders,
+                      blockchainAccounts: blockchain.Accounts, masterTraders: master.Traders,
                       masterFiats: master.Fiats)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -242,10 +242,10 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
             }
           }
 
-          val accountID = masterAccounts.Service.tryGetId(dirtyFiat.ownerAddress)
+          val accountID = blockchainAccounts.Service.tryGetUsername(dirtyFiat.ownerAddress)
 
           def insertOrUpdateMasterFiat(accountOwnerAddress: Response, oldFiatPegWallet: Seq[Fiat]): Future[Unit] = {
-            val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+            val accountID = blockchainAccounts.Service.getUsername(dirtyFiat.ownerAddress)
 
             def upsertMasterFiat(accountID: Option[String]): Future[Unit] = {
               accountID match {

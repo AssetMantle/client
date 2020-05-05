@@ -237,7 +237,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
         } yield ()
       }
 
-      def getID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
@@ -309,7 +309,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
       def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

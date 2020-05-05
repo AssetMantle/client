@@ -43,6 +43,10 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def findAllByID(traderID: String): Future[Seq[FiatRequest]]= db.run(fiatRequestTable.filter(_.traderID === traderID).result)
+
+  private def findAllByTraderIDs(traderIDs: Seq[String]): Future[Seq[FiatRequest]]= db.run(fiatRequestTable.filter(_.traderID inSet traderIDs).result)
+
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => if (result > 0) {
       result
@@ -96,6 +100,10 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def tryGetByID(id: String): Future[FiatRequest] = findByID(id)
 
     def getStatus(id: String): Future[String] = getStatusByID(id)
+
+    def getAll(traderID:String)= findAllByID(traderID)
+
+    def getAllByTraderIDs(traderIDs:Seq[String])= findAllByTraderIDs(traderIDs)
 
     def markRTCBReceived(id: String, amountRequested: Int, totalRTCBAmount: Int): Future[Int] = {
       if (amountRequested == totalRTCBAmount) {

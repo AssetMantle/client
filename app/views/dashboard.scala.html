@@ -7,8 +7,8 @@
 @common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
 
 @left={
-    <div class="leftTradeFinancial">
-        <div id="financials"></div>
+    <div class="leftSideContainer">
+        <div id="financials" class="financial"></div>
     </div>
     <script>
         @loginState.userType match {
@@ -30,46 +30,36 @@
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.ZONE => {
-            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-                <div class="cmuk-width-expand@@m">
-                    <div id="zoneTradeStatistics"></div>
+                <div>
+                    <div id="zoneTradeStatistics" class="cmuk-margin-bottom"></div>
                 </div>
 
-            </div>
-            <div class="cmuk-grid-match cmuk-grid cmuk-margin-bottom" cmuk-grid>
-
-                <div class="cmuk-width-expand@@m">
-                    <div id="zoneViewOrganizationAccountList"></div>
+                <div>
+                    <div id="zoneViewOrganizationAccountList" class="switcherCard"></div>
                 </div>
 
-            </div>
-            <div class="tradeList cmuk-margin-bottom">
-
-            @commonCard(constants.View.TRADE_ROOMS) {
-            } {
-                <div id="zoneViewAcceptedNegotiationList"></div>
-            }
-
-            </div>
-            <script>
+                <div class="tradeList cmuk-margin-bottom">
+                @commonCard(constants.View.TRADE_ROOMS) {
+                } {
+                    <div id="zoneViewAcceptedNegotiationList"></div>
+                }
+                </div>
+                <script>
                     componentResource('zoneTradeStatistics', jsRoutes.controllers.ComponentViewController.zoneTradeStatistics());
                     componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
                     componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
             </script>
         }
         case constants.User.ORGANIZATION => {
-            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-                <div class="cmuk-width-expand@@m">
-                    <div id="organizationTradeStatistics"></div>
+                <div>
+                    <div id="organizationTradeStatistics" class="cmuk-margin-bottom"></div>
                 </div>
                 <div>
-                    <div id="organizationViewAcceptedNegotiationList"></div>
+                    <div id="organizationViewAcceptedNegotiationList" class="switcherCard"></div>
                 </div>
                 <div>
-                    <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
+                    <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
                 </div>
-            </div>
             <script>
                 componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
                 componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
@@ -77,13 +67,10 @@
             </script>
         }
         case constants.User.TRADER => {
-            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
-                <div class="cmuk-width-expand@@m">
+                <div>
                     <div id="traderTradeStatistics"></div>
                 </div>
 
-            </div>
             <script>
                     componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
             </script>
@@ -95,8 +82,10 @@
 }
 
 @right = {
+    <div class="rightSideContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
+    </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

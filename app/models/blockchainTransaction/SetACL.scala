@@ -200,7 +200,7 @@ class SetACLs @Inject()(
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setACL = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
@@ -253,7 +253,7 @@ class SetACLs @Inject()(
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setACL = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 

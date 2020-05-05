@@ -15,8 +15,8 @@ import models.master
 
 @Singleton
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                   blockchainAccounts: blockchain.Accounts,
                                    blockchainTransactionSendFiats: blockchainTransaction.SendFiats,
-                                   masterAccounts: master.Accounts,
                                    masterAssets: master.Assets,
                                    masterTraders: master.Traders,
                                    masterNegotiations: master.Negotiations,
@@ -54,7 +54,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
           def sellerAccountID(sellerTraderID: String): Future[String] = masterTraders.Service.tryGetAccountId(sellerTraderID)
-          def sellerAddress(sellerAccountID: String): Future[String] = masterAccounts.Service.tryGetAddress(sellerAccountID)
+          def sellerAddress(sellerAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(sellerAccountID)
           def assetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
           def transactionProcess(sellerAddress:String, pegHash: String): Future[String] = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](

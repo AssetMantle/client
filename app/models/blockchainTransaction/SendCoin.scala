@@ -198,7 +198,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } yield {}
       }
 
-      def toAccount(toAddress: String): Future[Account] = masterAccounts.Service.getAccountByAddress(toAddress)
+      def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
+
+      def toAccount(accountID: String): Future[Account] = masterAccounts.Service.tryGet(accountID)
 
       def unknownUserTypeUpdate(toAccount: Account): Future[Int] = {
         if (toAccount.userType == constants.User.UNKNOWN) {
@@ -206,13 +208,12 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } else Future(0)
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
-
       (for {
         _ <- markTransactionSuccessful
         sendCoin <- sendCoin
         _ <- markDirty(sendCoin)
-        toAccount <- toAccount(sendCoin.to)
+        accountID <- getAccountID(sendCoin.to)
+        toAccount <- toAccount(accountID)
         _ <- unknownUserTypeUpdate(toAccount)
         fromAccountID <- getAccountID(sendCoin.from)
         _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
@@ -236,7 +237,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

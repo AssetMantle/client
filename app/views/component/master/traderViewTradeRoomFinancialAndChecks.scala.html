@@ -3,11 +3,11 @@
 @import scala.collection.immutable.ListMap
 
 @(negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-@commonCard("") {
-} {
+<div class="switcherCardSecond">
+@commonInfoBox() {
     @commonHorizontalSwitcher(ListMap(
         constants.View.FINANCIALS -> routes.javascript.ComponentViewController.traderViewTradeRoomFinancial,
         constants.View.CHECKS -> routes.javascript.ComponentViewController.traderViewTradeRoomChecks,
     ), 'FINANCIALS_PARAMETERS ->  s"'${negotiationID}'")
 }
+</div>

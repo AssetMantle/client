@@ -3,7 +3,7 @@ package models.blockchain
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -15,10 +15,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
+case class Account(address: String, username: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -49,6 +49,24 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
+
+  private def tryGetAddressByUsername(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def tryGetUsernameByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.username).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getUsernameByAddress(address: String): Future[Option[String]] = db.run(accountTable.filter(_.address === address).map(_.username).result.headOption)
 
   private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
@@ -98,11 +116,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def checkAccountExistsByUsername(username: String): Future[Boolean] = db.run(accountTable.filter(_.username === username).exists.result)
+
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account_BC") {
 
-    def * = (address, coins, publicKey, accountNumber, sequence, dirtyBit) <> (Account.tupled, Account.unapply)
+    def * = (address, username, coins, publicKey, accountNumber, sequence, dirtyBit) <> (Account.tupled, Account.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
+
+    def username = column[String]("username")
 
     def coins = column[String]("coins")
 
@@ -117,7 +139,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(address: String, pubkey: String): Future[String] = add(Account(address = address, publicKey = pubkey, dirtyBit = false))
+    def create(address: String, username: String, pubkey: String): Future[String] = add(Account(address = address, username = username, publicKey = pubkey, dirtyBit = false))
 
     def refreshDirty(address: String, accountNumber: String, sequence: String, coins: String): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, coins, dirtyBit = false)
 
@@ -129,7 +151,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
+    def tryGetAddress(username: String): Future[String] = tryGetAddressByUsername(username)
 
+    def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
+
+    def tryGetUsername(address: String): Future[String] = tryGetUsernameByAddress(address)
+
+    def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
   }
 
   object Utility {
@@ -141,7 +169,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         Future.sequence {
           dirtyAddresses.map { dirtyAddress =>
             val responseAccount = getAccount.Service.get(dirtyAddress)
-            val accountID = masterAccounts.Service.tryGetId(dirtyAddress)
+            val accountID = Service.tryGetUsername(dirtyAddress)
 
             def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.account_number, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).headOption.getOrElse(""))
 

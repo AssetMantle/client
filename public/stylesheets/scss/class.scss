@@ -1,14 +1,26 @@
 
 @import "variables.scss";
 
-html, body{
-  height: 100%;
-  background: #F0F0F0;
-  scroll-behavior: smooth;
+:root{
+  font-family: Oxygen, sans-serif !important;
+  box-sizing: border-box;
 }
 
+*,
+::after,
+::before{
+  box-sizing: border-box;
+}
+
+html, body{
+  height: 100%;
+  position: relative;
+  background: #F0F0F0;
+}
+
+
 .scroller{
-  scrollbar-color: #7f7f7f white;
+  scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin;
 }
 
@@ -18,7 +30,7 @@ html, body{
 }
 
 ::-webkit-scrollbar-track {
-  background: white;
+  background: #FFFFFF;
 }
 
 ::-webkit-scrollbar,
@@ -28,13 +40,13 @@ html, body{
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #7f7f7f;
+  background: #E2E4E6;
   border-right: 1px solid white;
 }
 
 %iconBackground{
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   margin-right: 15px;
   position: relative;
@@ -98,16 +110,11 @@ html, body{
 }
 
 .bodyContainer{
-  height:auto;
-  min-height: 100%;
+  min-height: 100vh;
+  display: block;
+  position: relative;
   background: #F0F0F0;
-  margin: 0 auto -138px;
-}
-
-.pageContainer,
-.dataContainer,
-.pageContent{
-  height: 100%;
+  padding-bottom: 115px;
 }
 
 .toolTip:hover .toolTipText {
@@ -121,7 +128,6 @@ html, body{
 
 .title{
   font-size: $paragraphFontSizeSmall;
-  font-family: $fontFamilySecondary;
   font-weight: bold;
 }
 
@@ -166,13 +172,6 @@ html, body{
   flex-grow: 1;
 }
 
-.box {
-  background: lightblue;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
-  margin: 0px 5px 10px 0px;
-  border-radius: 5px;
-  padding-bottom: 15px;
-}
 
 .firstBox {
   width: 30%;
@@ -327,14 +326,14 @@ html, body{
 }
 
 .footer {
-  margin-top: 20px;
+  position: absolute;
+  bottom: 0;
   width: 100%;
   padding: 30px 0px;
   font-size: $paragraphFontSizeSmall;
   background: #031221;
   .copyright{
     margin: 10px 0px;
-    font-family:$fontFamilySecondary;
     font-weight: bold;
     color:$colorSecondary;
     a{
@@ -351,10 +350,6 @@ html, body{
 
 .copyIcon{
   cursor: pointer;
-}
-
-.leftSide .leftSideMenuIcon{
-  color:#fff;
 }
 
 .tableName{
@@ -377,10 +372,9 @@ html, body{
   box-shadow: 0 5px 15px rgba(0,0,0,.08);
 }
 
-.alretName{
+.alertName{
   font-weight: bold;
   font-size: $paragraphFontSizeSmall;
-  font-family: $fontFamilySecondary;
 }
 
 .cmuk-accordion-buttons{
@@ -454,6 +448,7 @@ html, body{
 
 .signupErrorList{
   padding: 0px;
+  margin: 0;
   list-style: none;
   li{
     text-align: left;
@@ -464,14 +459,48 @@ html, body{
   position: relative;
   .result {
     position: absolute;
-    right: -25px;
-    top:40px;
+    top: 69px;
+    left: 5px;
+  }
+  .checkIcon{
+    display: none;
+    position: absolute;
+    right: 15px;
+    top: 35px;
+    width: 20px;
+    height: 20px;
+    .icon{
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .userNameNotAvailable,
+  .passwordNotMatched{
+    display: none;
   }
 }
 
-.mainlist{
-  padding:0px;
+.showPassword{
+  position: absolute;
+  right: 15px;
+  top: 35px;
+  .eyeIcon{
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    .icon{
+      fill:#ccc;
+      width:25px;
+    }
+  }
+  .eyeIcon.active .icon{
+    fill: #FE4350;
+  }
+  .mainlist{
+    padding:0px;
+  }
 }
+
 
 .listItem{
   display: inline-flex;
@@ -507,14 +536,10 @@ html, body{
 
 .fileName{
   font-size: $paragraphFontSizeSmall;
-  font-family: $fontFamilySecondary;
   color: $colorPrimary;
   margin-bottom: 5px;
 }
 
-.dropBox{
-  font-family: $fontFamilySecondary;
-}
 
 .profileDocuments{
   display: flex;
@@ -550,7 +575,6 @@ html, body{
   margin: auto;
   padding: 40px;
   border-radius: $buttonBorderRadius;
-  font-family: $fontFamilySecondary;
   font-size: $paragraphFontSizeSmall;
   background: #e6e6e6;
   width: 100px;
@@ -590,6 +614,16 @@ html, body{
 font-family: $fontFamilyPrimary;
 }
 
+.updateDocumentField{
+position: relative;
+  button{
+    position: absolute;
+    top: 6px;
+    left: 30%;
+    font-weight: bold;
+  }
+}
+
 .comdex {
   .cmuk-sticky-fixed{
     width: 100% !important;
@@ -598,7 +632,6 @@ font-family: $fontFamilyPrimary;
     background:$colorPrimary;
     color: #FFFFFF;
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
     font-weight: bold;
   }
   .buttonForm:active, .buttonForm.cmuk-active{
@@ -611,11 +644,9 @@ font-family: $fontFamilyPrimary;
     border-radius: 2px;
     border: 1px solid rgba(5, 60, 117, 0.22);
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
     &::placeholder {
       color: #848A91;
       font-size: $paragraphFontSizeSmall;
-      font-family: $fontFamilySecondary;
     }
     &:focus {
       border: 1px solid  #0862BE;
@@ -632,7 +663,6 @@ font-family: $fontFamilyPrimary;
   }
   .error {
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
     color: #f0506e;
   }
   .cmuk-badge.verified{
@@ -647,12 +677,8 @@ font-family: $fontFamilyPrimary;
     @extend %verifiedLabel;
     background-color: #faa05a;
   }
-  .cmuk-button{
-    font-family: $fontFamilySecondary;
-  }
   .cmuk-button-primary{
     border: none;
-    font-size: $paragraphFontSizeSmall;
   }
   .primaryFont{
     font-family:$fontFamilyPrimary;
@@ -678,13 +704,11 @@ font-family: $fontFamilyPrimary;
       }
     }
     p{
-      font-family: $fontFamilySecondary;
       font-size: $paragraphFontSizeSmall;
     }
   }
   .cmuk-card-header{
     color:#061728;
-    font-family: $fontFamilySecondary;
     padding: 15px 20px;
     .cmuk-button{
       padding: 0 15px;
@@ -693,6 +717,9 @@ font-family: $fontFamilyPrimary;
   }
   .cmuk-button-link{
     color: $colorPrimary;
+    &:hover, &:focus {
+      text-decoration: none;
+    }
   }
   .cmuk-button-primary{
     background-color: $colorPrimary;
@@ -702,8 +729,7 @@ font-family: $fontFamilyPrimary;
     text-align: center;
     color: #061728;
     font-weight: bold;
-    font-family: $fontFamilySecondary;
-    font-size: $paragraphFontSizeLarge;
+    font-size:  $paragraphFontSizeLarge;
   }
   .cmuk-spinner>*>*{
     stroke-width:2 !important;
@@ -754,16 +780,32 @@ font-family: $fontFamilyPrimary;
   }
   .panelHeader{
     font-size: $paragraphFontSizeMedium;
-    font-family: $fontFamilySecondary;
     font-weight: normal;
     color: #272829;
     line-height: 2;
+  }
+  .check svg{
+    border-radius: 50%;
+    background: #49A948;
+    padding: 2px;
+  }
+  .close svg{
+    border-radius: 50%;
+    padding: 2px;
+    background: #FE4350;
+  }
+  .close svg >*{
+    stroke-width:2 !important;
+    stroke:#ffffff !important;
+  }
+  .check>*>*{
+    stroke-width:2 !important;
+    stroke:#ffffff !important;
   }
 }
 
 .header{
   background: $colorSecondary;
-
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
     background: $colorSecondary;
     padding: 0px 0px 0px 35px;
@@ -772,7 +814,6 @@ font-family: $fontFamilyPrimary;
   .cmuk-navbar-nav>li>a,
   .cmuk-navbar-toggle{
     min-height:60px;
-    font-family: $fontFamilySecondary;
     text-transform: none;
   }
   .cmuk-logo{
@@ -891,12 +932,10 @@ font-family: $fontFamilyPrimary;
     max-height: 600px;
     display: inline-block;
     .modalBody {
-      padding: 20px;
+      padding: 15px;
       text-align:center;
-      font-family: $fontFamilySecondary;
       .infoRowLabel{
         text-align: left;
-        font-family: $fontFamilySecondary;
       }
       .title{
         margin: 10px 0px;
@@ -907,6 +946,11 @@ font-family: $fontFamilyPrimary;
           border: none;
           border-radius: 0;
           box-shadow: none;
+        }
+        .formBody{
+          max-height: 356px;
+          overflow: auto;
+          padding: 0px 20px;
         }
       }
       .documentItem{
@@ -927,7 +971,6 @@ font-family: $fontFamilyPrimary;
     color: red;
     padding: 10px;
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
   }
   .verifyMnemonic {
     flex-wrap: wrap;
@@ -935,7 +978,6 @@ font-family: $fontFamilyPrimary;
     .verifyMnemonicbutton {
       width: 114px;
       height: 38px;
-      font-family: $fontFamilySecondary;
       margin-right: 10px;
       margin-bottom: 10px;
       border-radius: $buttonBorderRadius;
@@ -953,7 +995,6 @@ font-family: $fontFamilyPrimary;
   }
   .mnemonicNote{
     background-color: #FF2938;
-    font-family:$fontFamilySecondary;
     font-size: $paragraphFontSizeSmall;
     text-align: justify;
     letter-spacing: 0.01em;
@@ -998,14 +1039,12 @@ font-family: $fontFamilyPrimary;
     max-width: 600px;
     padding: 50px 0px;
     h3 {
-      font-family: $fontFamilySecondary;
       margin: 0px;
       font-size: 45px;
       font-weight: normal;
       color: #FFFFFF;
     }
     p {
-      font-family: $fontFamilySecondary;
       font-size: $headingFontSizeSmall;
       line-height: 172%;
       letter-spacing: 0.01em;
@@ -1038,7 +1077,6 @@ font-family: $fontFamilyPrimary;
       li .sliderItemName {
         font-weight: bold;
         color: #6C7883;
-        font-family: $fontFamilySecondary;
       }
       li .sliderItemValue {
         font-weight: bold;
@@ -1047,7 +1085,6 @@ font-family: $fontFamilyPrimary;
       }
       li .sliderItemPercentage {
         color: #5EB55C;
-        font-family: $fontFamilySecondary;
       }
     }
   }
@@ -1055,7 +1092,6 @@ font-family: $fontFamilyPrimary;
 
 .tabsSection {
   p {
-    font-family:$fontFamilySecondary;
     font-size:$headingFontSizeLarge;
     letter-spacing: 0.01em;
     color: #000000;
@@ -1077,9 +1113,8 @@ font-family: $fontFamilyPrimary;
       }
       a{
         background-color: #FAFBFD;
-        padding: 15px 0px 15px 20px;
-        font-family: $fontFamilySecondary;
-        font-size: $paragraphFontSizeLarge;
+        padding: 15px 20px;
+        font-size:  $paragraphFontSizeLarge;
         text-transform: capitalize;
         color:#0862BE;
         font-weight: bold;
@@ -1107,8 +1142,7 @@ font-family: $fontFamilyPrimary;
   }
   .cmuk-switcher{
     li{
-      font-family: $fontFamilySecondary;
-      font-size: $paragraphFontSizeLarge;
+      font-size:  $paragraphFontSizeLarge;
       color: #365575;
       letter-spacing: 0.01em;
       line-height: 1.8;
@@ -1182,12 +1216,9 @@ font-family: $fontFamilyPrimary;
 
 .right{
   padding:0px 0px  15px 0px;
-  height: 30px;
   justify-content: flex-end;
   .refresh {
-    font-family: $fontFamilySecondary;
     padding: 5px 10px;
-    border-radius: 20px;
     font-size: 10px;
     background: #FFFFFF;
     border: 0.908233px solid #EDEDED;
@@ -1226,11 +1257,11 @@ font-family: $fontFamilyPrimary;
 }
 
 .pageContainer{
-  padding-bottom: 137px;
   .pageContent{
     padding-top: 10px;
   }
   .middle{
+    margin-bottom: 10px;
     .cmuk-card-default{
       background: #FAFAFA;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -1238,6 +1269,7 @@ font-family: $fontFamilyPrimary;
     }
     .mainTabs{
       .cmuk-card-body{
+        min-height: 820px;
         padding: 0px;
         .cmuk-switcher{
           padding: 15px 30px;
@@ -1253,17 +1285,15 @@ font-family: $fontFamilyPrimary;
             border-right: 1px solid #cccccc;
           }
           padding: 0px;
-          width: 49%;
+          flex:1;
           text-align: center;
           a{
             padding: 15px 0px;
-            font-family: $fontFamilySecondary;
             text-transform: capitalize;
             font-size: $paragraphFontSizeMedium;
           }
         }
         .cmuk-subnav>.cmuk-active>a{
-          font-family: $fontFamilySecondary;
           color: #061728;
           background: none;
           font-weight: bold;
@@ -1281,10 +1311,11 @@ font-family: $fontFamilyPrimary;
           align-items: center;
           margin: 15px 0px;
           .commodityImage{
-            width: 30px;
-            height: 30px;
+            width: 44px;
+            height: 44px;
             display: inline-flex;
-            background: #cccc;
+            background: #F2F2F2;
+            border: 1.51312px solid #E3E3E3;
             position: relative;
             text-align: center;
             border-radius: 50%;
@@ -1303,7 +1334,6 @@ font-family: $fontFamilyPrimary;
           .tradeName{
             color: #4B4B4B;
             font-weight: bold;
-            font-family: $fontFamilySecondary;
             font-size: $paragraphFontSizeMedium;
           }
         }
@@ -1312,7 +1342,6 @@ font-family: $fontFamilyPrimary;
           border-bottom: 1px solid #E8E8E8;
           padding: 25px 0px 15px 0px;
           margin-bottom: 25px;
-          font-family: $fontFamilySecondary;
           color: #848A91;
           font-size: $paragraphFontSizeSmall;
           font-weight: bold;
@@ -1345,33 +1374,46 @@ font-family: $fontFamilyPrimary;
             }
             .termName{
               color: #0862BE;
-              font-family: $fontFamilySecondary;
               font-size: $paragraphFontSizeSmall;
               font-weight: bold;
               text-transform: uppercase;
               letter-spacing: 0.01em;
+              font-style: normal;
             }
             .termValue{
               color: #061728;
-              font-family: $fontFamilySecondary;
               font-size: $paragraphFontSizeMedium;
               margin-right: 10px;
             }
             .creditTerms{
-              text-indent: 40px;
+              text-indent: 30px;
               margin-top: 5px;
               p{
-                font-family: $fontFamilySecondary;
-                font-size: $paragraphFontSizeMedium;
+                font-size: $paragraphFontSizeSmall;
                 color: #061728;
+                font-weight: normal;
                 margin: 0px;
                 margin-bottom: 5px;
+              }
+              .infoRowLabel{
+                width: auto;
+                color: #061728;
+                font-size: $paragraphFontSizeSmall;
+                font-weight: normal;
+                text-transform: uppercase;
+                margin:2px 0px 3px 0px;
+              }
+              .infoRowValue{
+                color: #061728;
+                font-weight: bold;
+                font-size: $paragraphFontSizeSmall;
+                margin-left: 20px;
               }
             }
             .termStatus{
               display: flex;
               align-items: center;
-              font-family: $fontFamilySecondary;
+              font-family: $fontFamilyPrimary;
               color:#061728;
               .commonCheckBox dt{
                 width: auto;
@@ -1381,8 +1423,9 @@ font-family: $fontFamilyPrimary;
                 margin-bottom: 0px;
               }
               .cmuk-checkbox{
-                height: 20px;
-                width: 20px;
+                height: 22px;
+                width: 22px;
+                border:1px solid #5EB55C;
               }
               .cmuk-checkbox:focus, .cmuk-radio:focus{
                 border-color: #5EB55C;
@@ -1391,7 +1434,20 @@ font-family: $fontFamilyPrimary;
                 background-color: #5EB55C;
               }
             }
-
+            .subTerms{
+              text-indent:30px;
+              margin-top: 10px;
+              .infoRowLabel{
+                color: #061728;
+                font-weight: normal;
+                width: auto;
+                margin:2px 0px 3px 0px;
+              }
+              .infoRowValue{
+                color: #061728;
+                font-weight: bold;
+              }
+            }
           }
           hr{
             margin: 15px 0px;
@@ -1410,16 +1466,50 @@ font-family: $fontFamilyPrimary;
           .infoRowLabel{
             width: auto;
             color: #0862BE;
-            font-family: $fontFamilySecondary;
             font-size: $paragraphFontSizeSmall;
             font-weight: bold;
             text-transform: uppercase;
+            margin:2px 0px 3px 0px;
           }
           .infoRowValue{
-            font-family: Oxygen;
             color: #061728;
             font-size: $paragraphFontSizeSmall;
             margin-left: 20px;
+          }
+          .sellerTermStatus{
+            font-family: $fontFamilyPrimary;
+            color:#061728;
+          }
+          .documentTitle{
+            color: #061728;
+            font-size: $paragraphFontSizeSmall;
+            margin:0px 0px 5px 0px;
+          }
+          .termIcon {
+            margin-right: 10px;
+            .icon {
+              width: 16px;
+              height: 16px;
+            }
+          }
+          .subTerms{
+            text-indent:20px;
+            margin-top: 10px;
+            p{
+              margin: 0;
+              color: #061728;
+              font-size: $paragraphFontSizeSmall;
+            }
+            .infoRowLabel{
+              color: #061728;
+              font-weight: normal;
+              width: auto;
+              margin:2px 0px 3px 0px;
+            }
+            .infoRowValue{
+              color: #061728;
+              font-weight: bold;
+            }
           }
         }
         button{
@@ -1432,7 +1522,7 @@ font-family: $fontFamilyPrimary;
   }
 }
 
-.leftTradeFinancial{
+.leftSideContainer{
   .financial{
     margin-bottom: 20px;
   }
@@ -1443,9 +1533,10 @@ font-family: $fontFamilyPrimary;
     padding: 15px 20px;
     color: #061728;
     font-size: $paragraphFontSizeMedium;
-    font-family: $fontFamilySecondary;
     .icon{
       margin-bottom: 2px;
+      width: 18px;
+      height: 18px;
     }
   }
   .cmuk-card-body{
@@ -1458,7 +1549,6 @@ font-family: $fontFamilyPrimary;
     .refresh{
       padding: 10px 0px 10px 0px;
       margin: 0px 20px;
-      font-family: $fontFamilySecondary;
       font-size: $paragraphFontSizeSmall;
       button{
         text-decoration: none;
@@ -1475,63 +1565,82 @@ font-family: $fontFamilyPrimary;
     }
   }
   .financial {
-    ul li{
-      justify-content: space-between;
-      padding: 15px 0px;
-      margin: 0px 20px;
-      &:first-child{
-        padding-top: 25px;
-      }
-      &:last-child{
-        border: 0px;
-      }
-      .wallet{
-        align-items: center;
-        .walletIcon{
-          @extend %iconBackground;
-          opacity: 0.7;
-          background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
+    .cmuk-card{
+      height: 357px;
+    }
+    .cmuk-switcher, .financialCard{
+      ul li {
+        justify-content: space-between;
+        padding: 15px 0px;
+        margin: 0px 20px;
+
+        &:first-child {
+          padding-top: 25px;
         }
-        .cmuk-comment-meta{
-          @extend %cmuk-comment-meta;
+
+        &:last-child {
+          border: 0px;
         }
-      }
-      .ctitle{
-        color: #5C6166;
-        line-height: 2;
-        font-size: $paragraphFontSizeSmall;
-        font-family: $fontFamilySecondary;
-      }
-      .payable{
-        align-items: center;
-        .payableIcon{
-          @extend %iconBackground;
-          opacity: 0.7;
-          background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
+
+        .wallet {
+          align-items: center;
+
+          .walletIcon {
+            @extend %iconBackground;
+            background: #053C75;
+            box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
         }
-        .cmuk-comment-meta{
-          @extend %cmuk-comment-meta;
+
+        .ctitle {
+          color: #5C6166;
+          line-height: 2;
+          font-size: $paragraphFontSizeSmall;
         }
-      }
-      .receivable{
-        align-items: center;
-        .receivableIcon{
-          @extend %iconBackground;
-          opacity: 0.7;
-          background: linear-gradient(180deg, #37CE34 0%, #1D8C1A 100%);
+
+        .payable {
+          align-items: center;
+
+          .payableIcon {
+            @extend %iconBackground;
+            background: #B004DB;
+            box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
         }
-        .cmuk-comment-meta{
-          @extend %cmuk-comment-meta;
+
+        .receivable {
+          align-items: center;
+
+          .receivableIcon {
+            @extend %iconBackground;
+            background: #0CCB08;
+            box-shadow: 0 0 0 3px rgba(83, 217, 81, 0.25);
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
         }
-      }
-      .leftDays{
-        align-items: center;
-        .leftDaysIcon{
-          @extend %iconBackground;
-          background: rgba(94, 181, 92, 0.27);
-        }
-        .cmuk-comment-meta{
-          @extend %cmuk-comment-meta;
+
+        .leftDays {
+          align-items: center;
+
+          .leftDaysIcon {
+            @extend %iconBackground;
+            background: rgba(94, 181, 92, 0.27);
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
         }
       }
     }
@@ -1555,19 +1664,62 @@ font-family: $fontFamilyPrimary;
   }
   .walletIcon .icon, .receivableIcon .icon, .payableIcon .icon{
     position: absolute;
-    left: 2px;
+    left: 0px;
     top: 0px;
     margin: auto;
     right: 0;
     bottom: 2px;
   }
   .icon{
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
+  }
+  .zoneTradeFinancial{
+    .cmuk-card-body {
+      padding: 0;
+      .cmuk-subnav {
+        border-bottom: 1px solid #e5e5e5;
+        li{
+        &:first-child {
+          border-right: 1px solid #cccccc;
+        }
+        padding: 0px;
+        flex: 1;
+        text-align: center;
+        margin: 0;
+        a {
+          padding: 15px 0px;
+          text-transform: capitalize;
+          font-size: $paragraphFontSizeMedium;
+        }
+      }
+      }
+      .cmuk-subnav>.cmuk-active>a{
+        color: #061728;
+        background: none;
+        font-weight: bold;
+        border-bottom: 2px solid #0862BE;
+      }
+      .cmuk-switcher{
+        height: 300px;
+        overflow: auto;
+        .cmuk-comment-meta{
+          color: #061728;
+          font-size:$paragraphFontSizeMedium;
+        }
+      }
+      .cmuk-switcher>li{
+        padding: 0px;
+        margin: 0px;
+        li {
+          margin:0 30px;
+        }
+      }
+    }
   }
 }
 
-.recentActivity{
+.rightSideContainer{
   .recentActivityContainer{
     margin-bottom: 20px;
     .cmuk-card-header{
@@ -1580,6 +1732,12 @@ font-family: $fontFamilyPrimary;
     }
     .cmuk-card-body{
       overflow-y: auto;
+      padding: 0px;
+      .recentActivityMessages{
+        height: 300px;
+        padding: 0px 15px;
+        overflow:auto
+      }
     }
   }
   .cmuk-card-default{
@@ -1590,10 +1748,8 @@ font-family: $fontFamilyPrimary;
   .cmuk-card-header{
     font-size: $paragraphFontSizeMedium;
     padding:15px 20px;
-    font-family: $fontFamilySecondary;
   }
   .cmuk-card-body{
-    font-family: $fontFamilySecondary;
     padding: 0px 13px;
   }
   .chatRoom .cmuk-card-body{
@@ -1606,7 +1762,7 @@ font-family: $fontFamilyPrimary;
         margin: 0px 5px;
       }
     }
-    .chatMessages{
+    .chatMessagesContainer{
       height: 250px;
       overflow: auto;
     }
@@ -1662,7 +1818,6 @@ font-family: $fontFamilyPrimary;
   .chatContainer{
     .cmuk-card-body
     {
-      font-family: $fontFamilySecondary;
       padding: 0px;
       .chat_history ul{
         margin: 0;
@@ -1688,7 +1843,6 @@ font-family: $fontFamilyPrimary;
       text-transform: capitalize;
       font-weight: bold;
       padding: 0px 20px;
-      font-family: $fontFamilySecondary;
       font-size: $paragraphFontSizeSmall;
       font-weight: bold;
     }
@@ -1707,7 +1861,6 @@ font-family: $fontFamilyPrimary;
   background: #ffffff;
   .documentContentTop{
     font-size: $paragraphFontSizeMedium;
-    font-family: $fontFamilySecondary;
     margin: 10px;
     a{
       color:$colorSecondary;
@@ -1816,7 +1969,6 @@ header:before,
       transition: all 0.3s ease;
       .activityContent{
         color: #000000;
-        font-family: $fontFamilySecondary;
         font-size: $paragraphFontSizeSmall;
       }
     }
@@ -1832,7 +1984,6 @@ header:before,
   }
   .NotificationButton{
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
     font-weight: bold;
     padding:0px 0px 0px 40px;
   }
@@ -1843,16 +1994,10 @@ header:before,
     padding:0px;
   }
   .documentlist{
-    height: 200px;
-    overflow-y:scroll;
+    height: 250px;
+    overflow: auto;
   }
-  .cmuk-tab>.cmuk-active>a{
-    font-family: "Oxygen", sans-serif;
-    color: #636363;
-    font-weight: bold;
-    font-size: $paragraphFontSizeSmall;
-    border-bottom: 2px solid #0862BE;
-  }
+
   .documentlist{
     .cmuk-table td {
       padding: 16px 5px;
@@ -1904,8 +2049,7 @@ header:before,
     }
   }
   .cmuk-card-default{
-    overflow-y:auto;
-    height: calc(100% - 400px);
+    height: 360px;
   }
   .cmuk-card-body .cmuk-tab{
     width: 100%;
@@ -1924,7 +2068,6 @@ header:before,
       a{
         padding:15px 0px;
         font-size: $paragraphFontSizeSmall;
-        font-family: $fontFamilySecondary;
         text-transform: capitalize;
       }
     }
@@ -1937,14 +2080,15 @@ header:before,
       bottom: 0px;
       right: 0;
       left: 0;
+      padding: 10px;
       background: #fff;
-      padding: 15px 10px;
       margin: auto;
-    }
-    .js-upload{
       width: 100%;
+      border-top: 1px solid #E0E0E0;
       .cmuk-button{
         background:#EDEDED;
+        color: #000000;
+        font-weight: normal;
         border: 1px dashed #848A91;
         box-sizing: border-box;
         border-radius: 10px;
@@ -1959,6 +2103,7 @@ header:before,
 
 .loginForm {
   .inputField {
+    position: relative;
     display: flex;
     .inputFieldIcon {
       display: flex;
@@ -1970,17 +2115,20 @@ header:before,
     }
     .inputFieldBody {
       width: 100%;
-    }
-    .inputFieldBody input {
+      input {
       font-size: $paragraphFontSizeSmall;
+    }
     }
   }
   .cmuk-button-link{
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
-    font-weight: bold;
+    font-weight: normal;
     margin: 5px;
     text-decoration: none;
+  }
+  .forgotPassword{
+    position: absolute;
+    right: 0px;
   }
 }
 
@@ -1989,7 +2137,6 @@ header:before,
   align-items: flex-start;
   word-break: break-all;
   font-size: $paragraphFontSizeSmall;
-  font-family: $fontFamilySecondary;
   .infoRowLabel {
     color: #4B4B4B;
     width: 125px;
@@ -2147,7 +2294,6 @@ header:before,
     margin: 0px;
     padding: 20px 0px;
     font-size: $paragraphFontSizeSmall;
-    font-family: $fontFamilySecondary;
     font-weight: bold;
     &:last-child .listItemChildValue{
       max-width: 100%;
@@ -2186,12 +2332,11 @@ header:before,
   margin: 0px;
   width: 0;
   height: 0;
-  border: 15px solid;
-  border-color: #5EB55C transparent transparent #5EB55C;
+  border: 20px solid;
   span {
     position:absolute;
-    top: -15px;
-    left: -10px;
+    top: -18px;
+    left: -18px;
     text-align: center;
     font-size:$paragraphFontSizeSmall;
     font-weight: bold;
@@ -2199,10 +2344,15 @@ header:before,
     display:block;
   }
 }
+.accountName.buy{
+  background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
+}
+.accountName.sell{
+  background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
+}
 
 .salesQuoteList{
   .cmuk-card-header{
-    padding: 15px 20px;
     .cmuk-button{
       padding: 0 15px;
       line-height: 28px;
@@ -2212,6 +2362,7 @@ header:before,
     .commonList .cmuk-button {
       padding: 0 15px;
       line-height: 28px;
+      margin-bottom: 5px;
     }
     .cmuk-card{
       margin-bottom: 10px;
@@ -2225,29 +2376,27 @@ header:before,
 .profileContainer{
   .infoRow{
     font-size: $paragraphFontSizeSmall;
-    line-height: 2;
+    line-height: 2.2;
   }
   .infoRowLabel{
     color:#061728;
-    font-family: $fontFamilySecondary;
   }
   .infoRowValue{
     text-align: right;
-    font-family: $fontFamilySecondary;
   }
   .cmuk-card-header{
-    font-family: $fontFamilySecondary;
     padding: 15px 20px;
   }
   .cmuk-card-body {
-    font-family: $fontFamilyPrimary;
-    .cmuk-card-body {
+    .cmuk-card {
+      box-shadow: none;
       background-color: #FFFFFF;
+      border: 1px solid rgba(5, 60, 117, 0.12);
     }
   }
   .icon{
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     margin-right: 5px;
     margin-bottom: 3px;
   }
@@ -2261,16 +2410,17 @@ header:before,
 .profileDetails{
   .cmuk-button-link{
     @extend %cmuk-button-link;
+    margin-bottom: 5px;
   }
   .cmuk-badge{
     @extend  %verifiedLabel;
   }
   .editIcon,
   .editIcon .icon, .icon{
-      height: 16px;
-      width: 16px;
+      height: 18px;
+      width: 18px;
       margin-right: 5px;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 }
 
@@ -2284,13 +2434,9 @@ header:before,
   }
   .cmuk-button-link{
     @extend %cmuk-button-link;
-    font-family: $fontFamilySecondary;
   }
   .cmuk-badge{
     margin-left: 10px;
-  }
-  .cmuk-card-default{
-    margin-bottom: 5px;
   }
   .cmuk-card-header{
     padding: 15px 20px;
@@ -2300,12 +2446,19 @@ header:before,
     .cmuk-card {
       border: 1px solid #EDEDED;
       border-radius: 5px;
+      margin-bottom: 5px;
       box-shadow: none;
       .cmuk-card-body {
         padding: 10px 15px;
         border-radius: 5px;
         background-color: #FFFFFF;
       }
+    }
+  }
+  .contactUpdateButton{
+    text-align: right;
+    button{
+      font-weight: normal;
     }
   }
 }
@@ -2408,10 +2561,6 @@ dl .info {
 }
 
 .tradeList{
-  .cmuk-card-header{
-    padding: 15px 20px;
-    font-family: $fontFamilySecondary;
-  }
   .cmuk-card-body{
     .cmuk-card{
       margin-bottom: 10px;
@@ -2441,28 +2590,32 @@ dl .info {
   .cmuk-subnav{
     margin:0px;
     justify-content:center;
-    border-bottom: 1px solid $colorPrimary;
+    border-bottom: 1px solid #e7eaf3;
     li{
       text-align: center;
       padding: 0;
       flex: 1;
-      font-family: $fontFamilySecondary;
       a{
         font-size: $paragraphFontSizeSmall;
       }
     }
   }
   .cmuk-subnav-pill>.cmuk-active>a{
-    background-color: $colorPrimary;
-    color: #FFffff;
-  }
-  .cmuk-subnav-pill>*>:first-child{
-    color:$colorPrimary;
-    text-transform: capitalize;
+    background:none;
+    color: #061728;
+    font-weight: bold;
+    border-bottom: 2px solid #0862BE;
     font-weight: bold;
   }
+  .cmuk-subnav-pill li:not(:last-child){
+    border-right: 1px solid #e7eaf3;
+  }
+  .cmuk-subnav-pill>*>:first-child{
+    color:#999;
+    text-transform: capitalize;
+  }
   .cmuk-switcher{
-    height: 220px;
+    height: 266px;
     overflow: auto;
     padding: 20px;
     .cmuk-button{
@@ -2471,6 +2624,34 @@ dl .info {
     }
   }
 }
+
+.switcherCardSecond{
+  .cmuk-subnav{
+    margin: 0px;
+    border-bottom: 1px solid #e5e5e5;
+    li{
+      text-align: center;
+      padding: 0;
+      &:first-child{
+        border-right: 1px solid #cccccc;
+      }
+      a{
+        padding: 15px 0px;
+      }
+    }
+  }
+  .cmuk-subnav>*{
+    flex: 1;
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    color: #636363;
+    font-weight: bold;
+    font-size: $paragraphFontSizeSmall;
+    border-bottom: 2px solid #0862BE;
+    background: none;
+  }
+}
+
 .traderRelationList{
   .cmuk-card-header{
     padding: 13px 20px;
@@ -2492,16 +2673,178 @@ dl .info {
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
   font-size: 14px;
-  font-family: Oxygen;
   ul{
     li{
       font-size:$paragraphFontSizeSmall;
-      font-family: $fontFamilySecondary;
       color: #272829;
       text-align: left;
       cursor: pointer;
       padding: 10px;
       background: #e7eaf3;
+    }
+  }
+}
+
+
+figure.zoom {
+  & img:hover {
+    opacity: 0;
+  }
+  img {
+    transition: opacity .5s;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  background-position: 50% 50%;
+  position: relative;
+  width: 100%;
+  height: 800px;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.SalesQuoteCard{
+  .commonList{
+    flex:1;
+    padding: 0px;
+    flex-wrap: nowrap;
+  }
+  .firstPart{
+    position: relative;
+    flex: 30%;
+    display: flex;
+    .content{
+      display: flex;
+      flex: 1;
+      padding:20px 10px 20px 20px;
+      align-items: center;
+    }
+    .assetIcon{
+      flex: 20%;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .commodityImage{
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        background: #F2F2F2;
+        border: 1.51312px solid #E3E3E3;
+        position: relative;
+        text-align: center;
+        border-radius: 50%;
+        align-items: center;
+        margin-right: 20px;
+        justify-content: center;
+      }
+    }
+    .assetIntialData{
+      flex:80%;
+      p{
+        margin: 0;
+        color: #848A90;
+        font-weight: bold;
+        line-height: 2;
+      }
+      .assetTitle{
+        text-transform: uppercase;
+      }
+      .assetQuantity{
+        font-family: $fontFamilyPrimary;
+      }
+      .assetPrice{
+        font-family: $fontFamilyPrimary;
+        color: #254364;
+      }
+    }
+    .salesQuoteCategory{
+      width: 30px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      border-radius:2px;
+      span{
+        transform: rotate(-90deg);
+        position: absolute;
+        color: #FFFFFF;
+        font-weight: bold;
+        font-width: $paragraphFontSizeSmall;
+      }
+    }
+    .salesQuoteCategory.buy{
+      background: linear-gradient(180deg, #0862BE 0%, #05488C 100%);
+    }
+    .salesQuoteCategory.sell{
+      background: linear-gradient(180deg, #862E9C 0%, #520E63 100%);
+    }
+  }
+  .secondPart{
+    border-radius: 2px;
+    padding:20px 10px 20px 0px;
+    flex: 45%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    p{
+      margin: 0;
+      line-height: 2;
+      span{
+        color: #848A91;
+        font-weight: bold;
+        font-size:$paragraphFontSizeSmall;
+        word-break: break-all;
+      }
+      .arrowIcon{
+        width:30px;
+        height: 30px;
+        .icon{
+          width: 25px;
+          height: 25px;
+        }
+      }
+      .lines{
+        letter-spacing: 1px;
+        color:#D0D0D0;
+      }
+    }
+    .organizationName{
+      color: #4B4B4B;
+      font-weight: bold;
+      font-size:$paragraphFontSizeSmall;
+    }
+  }
+  .thirdPart{
+    padding: 20px 20px 20px 0px;
+    flex: 25%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    p{
+      margin: 0;
+      color: #4B4B4B;
+      font-weight: bold;
+    }
+    .cmuk-button-link{
+      color: #0862BE;
+      border: 1.65px solid #0862BE;
+      box-sizing: border-box;
+      border-radius: 2px;
+      padding: 5px;
+    &:hover{
+      color: #FFFFFF;
+      background: #0862BE;
+    }
+    }
+  }
+}
+.traderTradeRooms, .traderSalesQuotes{
+  .SalesQuoteCard{
+    .secondPart{
+      flex:40%;
+      text-align: center;
     }
   }
 }

@@ -254,7 +254,7 @@ class SendAssets @Inject()(
         } yield ()
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -290,11 +290,11 @@ class SendAssets @Inject()(
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendAsset = Service.getTransaction(ticketID)
 
-      def address(sendAsset: SendAsset): Future[String] = masterAccounts.Service.tryGetAddress(sendAsset.from)
+      def address(sendAsset: SendAsset): Future[String] = blockchainAccounts.Service.tryGetAddress(sendAsset.from)
 
       def markDirty(address: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(address)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

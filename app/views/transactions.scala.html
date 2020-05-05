@@ -6,8 +6,8 @@
 @common(Messages(constants.View.TRANSACTIONS), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftTradeFinancial">
-        <div id="financials"></div>
+    <div class="leftSideContainer">
+        <div id="financials" class="financial"></div>
     </div>
     <script>
         @loginState.userType match {
@@ -27,9 +27,39 @@
 }
 
 @center = {
+
     <div class="cmuk-container cmuk-margin-bottom">
         <div id="sendFiatRequests"></div>
         <div id="redeemFiatRequests"></div>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            <div id="traderViewIssueFiatRequestList"></div>
+                <script>
+                    componentResource('traderViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.traderViewIssueFiatRequestList());
+                    componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewSendFiatRequests());
+                    componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewRedeemFiatRequests());
+                </script>
+            }
+            case constants.User.ORGANIZATION => {
+                <div id="organizationViewIssueFiatRequestList"></div>
+                <script>
+                    componentResource('organizationViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.organizationViewIssueFiatRequestList());
+                    componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewSendFiatRequests());
+                    componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewRedeemFiatRequests());
+                </script>
+            }
+            case constants.User.ZONE => {
+                <div id="zoneViewIssueFiatRequestList"></div>
+                <script>
+                    componentResource('zoneViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.zoneViewIssueFiatRequestList());
+                    componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequests());
+                    componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequests());
+                </script>
+            }
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+
     </div>
     <script>
         @loginState.userType match {
@@ -52,8 +82,10 @@
 }
 
 @right = {
+    <div class="rightSideContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
+    </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

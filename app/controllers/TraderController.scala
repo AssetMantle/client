@@ -21,7 +21,7 @@ class TraderController @Inject()(
                                   withUsernameToken: WithUsernameToken,
                                   masterOrganizations: master.Organizations,
                                   masterZones: master.Zones,
-                                  masterAccounts: master.Accounts,
+                                  blockchainAccounts: blockchain.Accounts,
                                   messagesControllerComponents: MessagesControllerComponents,
                                   withTraderLoginAction: WithTraderLoginAction,
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
@@ -273,7 +273,7 @@ class TraderController @Inject()(
             if (trader.organizationID == organizationID) {
               val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
               val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-              val aclAddress = masterAccounts.Service.tryGetAddress(modifyTraderData.accountID)
+              val aclAddress = blockchainAccounts.Service.tryGetAddress(modifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = modifyTraderData.issueAsset, issueFiat = modifyTraderData.issueFiat, sendAsset = modifyTraderData.sendAsset, sendFiat = modifyTraderData.sendFiat, redeemAsset = modifyTraderData.redeemAsset, redeemFiat = modifyTraderData.redeemFiat, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder, changeBuyerBid = modifyTraderData.changeBuyerBid, changeSellerBid = modifyTraderData.changeSellerBid, confirmBuyerBid = modifyTraderData.confirmBuyerBid, confirmSellerBid = modifyTraderData.changeSellerBid, negotiation = modifyTraderData.negotiation, releaseAsset = modifyTraderData.releaseAsset)
               val createACL = blockchainAclHashes.Service.create(acl)
 

@@ -199,7 +199,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def traderID(accountID: String): Future[String] = masterTraders.Service.tryGetID(accountID)
 
@@ -236,7 +236,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def traderID(accountID: String): Future[String] = masterTraders.Service.tryGetID(accountID)
 

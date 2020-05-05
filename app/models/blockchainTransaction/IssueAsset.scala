@@ -216,9 +216,9 @@ class IssueAssets @Inject()(
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def getAccountResponse(toAddress: String): Future[AccountResponse.Response] = getAccount.Service.get(toAddress)
+      def accountResponse(toAddress: String): Future[AccountResponse.Response] = getAccount.Service.get(toAddress)
 
-      def getAccountIDByAddress(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountIDByAddress(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
@@ -260,7 +260,7 @@ class IssueAssets @Inject()(
       (for {
         _ <- markTransactionSuccessful
         issueAsset <- issueAsset
-        accountResponse <- getAccountResponse(issueAsset.to)
+        accountResponse <- accountResponse(issueAsset.to)
         ownerAccountID <- getAccountIDByAddress(issueAsset.to)
         seller <- getTrader(ownerAccountID)
         masterAsset <- getMasterAsset(traderID = seller.id, documentHash = issueAsset.documentHash)
@@ -293,7 +293,7 @@ class IssueAssets @Inject()(
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def getAccountIDByAddress(address: String): Future[String] = masterAccounts.Service.tryGetId(address)
+      def getAccountIDByAddress(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 

@@ -21,8 +21,7 @@
                 </div>
             </div>
         }
-        <div class = "notification NotificationButton"><a onclick="loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, '@tradeActivities.head.negotiationID')">@Messages(constants.View.LOAD_MORE_ACTIVITIES)</a></div>
     } else {
-        <p class='cmuk-position-center'>@Messages(constants.View.NO_TRADE_ACTIVITIES_FOUND)</p>
+        <div class="noActivity cmuk-position-center cmuk-margin-top">@Messages(constants.View.NO_ACTIVITIES)</div>
     }
 </div>
