@@ -110,7 +110,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
   }
 
   object Utility {
-    def regenerateAccessToken(): Future[Unit] = {
+    def regenerateOAuthToken(): Future[Unit] = {
       val oauthToken = Service.tryGet(accountID)
 
       def regenerateAndUpdateOAuthToken(oauthToken: OAuthToken): Future[Unit] = if (System.currentTimeMillis() > (oauthToken.expiresAt - docusignOAuthTokenIntervalTime.toMillis)) {
@@ -141,6 +141,6 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
   }
 
   actorSystem.scheduler.schedule(initialDelay = docusignOAuthTokenInitialDelay, interval = docusignOAuthTokenIntervalTime) {
-    Utility.regenerateAccessToken()
+    Utility.regenerateOAuthToken()
   }(schedulerExecutionContext)
 }
