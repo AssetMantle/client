@@ -247,18 +247,18 @@ class AssetController @Inject()(
               val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.portOfLoading, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetQuantity, billOfLadingContentData.assetPrice))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(billOfLadingContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-              val docusignEnvelopeList = docusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)
+              val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
 
               for {
                 _ <- updateBillOfLadingContent
                 negotiationFileList <- negotiationFileList
                 assetFileList <- assetFileList
-                docusignEnvelopeList <- docusignEnvelopeList
+                negotiationEnvelopeList <- negotiationEnvelopeList
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))

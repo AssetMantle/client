@@ -32,12 +32,12 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      val docusignEnvelope = docusignEnvelopes.Service.get(negotiationID, documentType)
+      val envelope = docusignEnvelopes.Service.get(negotiationID, documentType)
 
-      def getSenderViewURL(docusignEnvelope: Option[docusign.Envelope], traderID: String, negotiation: Negotiation): Future[String] = {
+      def getSenderViewURL(envelope: Option[docusign.Envelope], traderID: String, negotiation: Negotiation): Future[String] = {
         if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
-          docusignEnvelope match {
-            case Some(docusignEnvelope) => if (docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.CREATED) utilitiesDocusign.createSenderViewURL(docusignEnvelope.envelopeID) else throw new BaseException(constants.Response.UNAUTHORIZED)
+          envelope match {
+            case Some(envelope) => if (envelope.status == constants.Status.DocuSignEnvelopeStatus.CREATED) utilitiesDocusign.createSenderViewURL(envelope.envelopeID) else throw new BaseException(constants.Response.UNAUTHORIZED)
             case None => {
               val file = masterTransactionNegotiationFiles.Service.tryGet(negotiationID, documentType)
               val buyerTrader = masterTraders.Service.tryGet(negotiation.buyerTraderID)
@@ -65,8 +65,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        docusignEnvelope <- docusignEnvelope
-        senderViewURL <- getSenderViewURL(docusignEnvelope, traderID, negotiation)
+        envelope <- envelope
+        senderViewURL <- getSenderViewURL(envelope, traderID, negotiation)
       } yield Ok(views.html.component.master.docusignView(senderViewURL))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
@@ -75,7 +75,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
   def docusignReturn(envelopeId: String, event: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val docusignEnvelope = docusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
+      val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
 
       def getNegotiation(negotiationID: String):Future[Negotiation]  = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -112,13 +112,13 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
 
       (for {
-        docusignEnvelope <- docusignEnvelope
-        negotiation <- getNegotiation(docusignEnvelope.id)
+        envelope <- envelope
+        negotiation <- getNegotiation(envelope.id)
         traders <- getTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
-        _ <- updateStatus(docusignEnvelope, traders.map(_.accountID))
+        _ <- updateStatus(envelope, traders.map(_.accountID))
       } yield {
-        actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
-        actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(docusignEnvelope.id)))
+        actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(envelope.id)))
+        actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(envelope.id)))
         Ok(views.html.component.master.docusignReturnView(event))
       }).recover {
         case _: BaseException => InternalServerError(views.html.component.master.docusignReturnView(constants.View.UNEXPECTED_EVENT))
@@ -130,15 +130,15 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      val docusignEnvelope = docusignEnvelopes.Service.tryGet(negotiationID, documentType)
+      val envelope = docusignEnvelopes.Service.tryGet(negotiationID, documentType)
       (for {
         emailAddress <- emailAddress
         trader <- trader
         negotiation <- negotiation
-        docusignEnvelope <- docusignEnvelope
-        recepientViewURL <- utilitiesDocusign.createRecipientView(docusignEnvelope.envelopeID, emailAddress, trader)
+        envelope <- envelope
+        recepientViewURL <- utilitiesDocusign.createRecipientView(envelope.envelopeID, emailAddress, trader)
       } yield {
-        if (negotiation.buyerTraderID == trader.id && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS && docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.SENT) {
+        if (negotiation.buyerTraderID == trader.id && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS && envelope.status == constants.Status.DocuSignEnvelopeStatus.SENT) {
           Ok(views.html.component.master.docusignView(recepientViewURL))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)

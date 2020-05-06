@@ -879,17 +879,17 @@ class NegotiationController @Inject()(
               val updateInvoiceContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateInvoiceContentData.negotiationID, constants.File.Negotiation.INVOICE, Invoice(updateInvoiceContentData.invoiceNumber, utilities.Date.utilDateToSQLDate(updateInvoiceContentData.invoiceDate)))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateInvoiceContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-              val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(updateInvoiceContentData.negotiationID)
+              val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(updateInvoiceContentData.negotiationID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
               for {
                 _ <- updateInvoiceContent
                 negotiationFileList <- negotiationFileList
                 assetFileList <- assetFileList
-                docusignEnvelopeList <- docusignEnvelopeList
+                negotiationEnvelopeList <- negotiationEnvelopeList
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -946,17 +946,17 @@ class NegotiationController @Inject()(
               val updateContractContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateContractContentData.negotiationID, constants.File.Negotiation.CONTRACT, Contract(updateContractContentData.contractNumber))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateContractContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-              val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(updateContractContentData.negotiationID)
+              val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(updateContractContentData.negotiationID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
               for {
                 _ <- updateContractContent
                 negotiationFileList <- negotiationFileList
                 assetFileList <- assetFileList
-                docusignEnvelopeList <- docusignEnvelopeList
+                negotiationEnvelopeList <- negotiationEnvelopeList
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))

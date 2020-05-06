@@ -1126,13 +1126,13 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-          val docusignEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
+          val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-            docusignEnvelopeList <- docusignEnvelopeList
+            negotiationEnvelopeList <- negotiationEnvelopeList
           } yield {
-            Ok(views.html.component.master.traderViewNegotiationDocumentList(traderID = traderID, negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList, docusignEnvelopeList = docusignEnvelopeList))
+            Ok(views.html.component.master.traderViewNegotiationDocumentList(traderID = traderID, negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList, negotiationEnvelopeList = negotiationEnvelopeList))
           }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -1357,12 +1357,12 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-          val docusignEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
+          val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-            docusignEnvelopeList <- docusignEnvelopeList
-          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+            negotiationEnvelopeList <- negotiationEnvelopeList
+          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }

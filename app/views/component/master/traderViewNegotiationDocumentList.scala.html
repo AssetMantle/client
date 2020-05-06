@@ -5,7 +5,7 @@
 @import models.master.Negotiation
 @import models.docusign.Envelope
 
-@(traderID:String, negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],docusignEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(traderID:String, negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],negotiationEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 
 @negotiation.status match {
@@ -23,7 +23,7 @@
                         </span>
                     </td>
                     <td>
-                    @docusignEnvelopeList.find(_.documentType == constants.File.Negotiation.CONTRACT) match {
+                    @negotiationEnvelopeList.find(_.documentType == constants.File.Negotiation.CONTRACT) match {
                         case Some(docusignEnvelope) => {
                             @if(docusignEnvelope.status == constants.Status.DocuSignEnvelopeStatus.CREATED && negotiation.sellerTraderID == traderID) {
                                 @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.send, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")

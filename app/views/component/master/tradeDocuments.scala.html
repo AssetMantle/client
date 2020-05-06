@@ -5,7 +5,7 @@
 @import views.html.base._
 @import models.docusign.Envelope
 
-@(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],docusignEnvelopeList:Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],negotiationEnvelopeList:Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @negotiation.status match {
     case constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS => {
@@ -19,7 +19,7 @@
                 } {
                     <a href="@routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)">@Messages(document.documentType)</a>
                 } {
-                    @docusignEnvelopeList.find(_.documentType == document.documentType) match {
+                    @negotiationEnvelopeList.find(_.documentType == document.documentType) match {
                         case Some(docusignEnvelope)=> {
                             <span>@constants.View.CONTRACT_SIGNATURE_PENDING</span>
                         }
