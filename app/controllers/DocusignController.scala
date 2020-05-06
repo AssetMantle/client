@@ -7,7 +7,7 @@ import models.{docusign, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import models.master.{Negotiation, Trader}
+import models.master.{Email, Negotiation, Trader}
 import models.masterTransaction.NegotiationFile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,15 +42,15 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
               val file = masterTransactionNegotiationFiles.Service.tryGet(negotiationID, documentType)
               val buyerTrader = masterTraders.Service.tryGet(negotiation.buyerTraderID)
 
-              def getBuyerEmailAddress(accountID: String): Future[String] = masterEmails.Service.tryGetVerifiedEmailAddress(accountID)
+              def getBuyerEmail(accountID: String): Future[Email] = masterEmails.Service.tryGet(accountID)
 
               def create(negotiationID: String, envelopeID: String): Future[String] = docusignEnvelopes.Service.create(negotiationID, envelopeID, documentType)
 
               for {
                 file <- file
                 buyerTrader <- buyerTrader
-                buyerEmailAddress <- getBuyerEmailAddress(buyerTrader.accountID)
-                envelopeID <- utilitiesDocusign.createEnvelope(buyerEmailAddress, file, buyerTrader)
+                buyerEmail <- getBuyerEmail(buyerTrader.accountID)
+                envelopeID <- utilitiesDocusign.createEnvelope(Seq(buyerEmail), Seq(file), Seq(buyerTrader))
                 _ <- create(negotiationID, envelopeID)
                 senderViewURL <- utilitiesDocusign.createSenderViewURL(envelopeID)
               } yield senderViewURL
@@ -73,8 +73,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def callBack(envelopeId: String, event: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
+  def callBack(envelopeId: String, event: String): Action[AnyContent] = Action.async { implicit request =>
       val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
 
       def getNegotiation(negotiationID: String): Future[Negotiation] = masterNegotiations.Service.tryGet(negotiationID)
@@ -82,14 +81,14 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
       def updateStatus(docusignEnvelope: docusign.Envelope, traderAccountIDs: Seq[String]) = event match {
-        case constants.Docusign.SEND => {
+        case constants.External.Docusign.SEND => {
           docusignEnvelopes.Service.markSent(envelopeId)
         }
-        case constants.Docusign.SIGNING_COMPLETE => {
+        case constants.External.Docusign.SIGNING_COMPLETE => {
           val oldFile = masterTransactionNegotiationFiles.Service.tryGet(docusignEnvelope.id, docusignEnvelope.documentType)
-          val signedDocument = utilitiesDocusign.updateSignedDocuemnt(envelopeId, docusignEnvelope.documentType)
+          val signedFileNameList = utilitiesDocusign.updateSignedDocumentList(envelopeId, docusignEnvelope.documentType)
 
-          def updateFile(negotiationFile: NegotiationFile, newFileNme: String) = masterTransactionNegotiationFiles.Service.updateOldDocument(negotiationFile.updateFileName(newFileNme))
+          def updateFile(negotiationFile: NegotiationFile, newFileNme: Option[String]) = masterTransactionNegotiationFiles.Service.updateOldDocument(negotiationFile.updateFileName(newFileNme.getOrElse(throw new BaseException(constants.Response.FAILED_TO_FETCH_SIGNED_DOCUMENT))))
 
           def markSigningComplete = docusignEnvelopes.Service.markComplete(envelopeId)
 
@@ -99,8 +98,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
           for {
             oldFile <- oldFile
-            fileName <- signedDocument
-            _ <- updateFile(oldFile, fileName)
+            signedFileNameList <- signedFileNameList
+            _ <- updateFile(oldFile, signedFileNameList.headOption)
             _ <- markSigningComplete
             _ <- markContractSigned(docusignEnvelope.id)
             _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)

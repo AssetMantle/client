@@ -1,8 +1,5 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import models.masterTransaction.Chat
 
-@(event:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(event:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @event match{
     case constants.Docusign.SEND=>{

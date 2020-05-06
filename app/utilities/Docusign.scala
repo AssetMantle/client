@@ -8,7 +8,7 @@ import com.sun.jersey.core.util.{Base64 => Base64Docusign}
 import com.docusign.esign.client.ApiException
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.Trader
+import models.master.{Email, Trader}
 import models.master
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
@@ -20,7 +20,7 @@ import controllers.routes
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import models.docusign
-
+import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -47,30 +47,37 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
   private val apiClient = new ApiClient(basePath)
   private val envelopesApi = new EnvelopesApi(apiClient)
 
-  private def createDocusignEnvelope(emailAddress: String, file: Document[_], trader: Trader)(implicit language: Lang): Future[String] = {
+  private def createDocusignEnvelope(emailList: Seq[Email], fileList: Seq[Document[_]], traderList: Seq[Trader]): Future[String] = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
-      val document = new DocusignDocument()
-      document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(file.documentType), file.fileName)))))
-      document.setName(file.fileName.split("""\.""")(0))
-      document.setFileExtension(utilities.FileOperations.fileExtensionFromName(file.fileName))
-      document.setDocumentId(constants.Docusign.DOCUMENT_INDEX)
 
-      val signer = new Signer()
-      signer.setEmail(emailAddress)
-      signer.setName(trader.name)
-      signer.clientUserId(trader.id)
-      signer.recipientId(constants.Docusign.RECIPIENT_INDEX)
+      val documentList = fileList.zipWithIndex.map { case (file, index) =>
+        val document = new DocusignDocument()
+        document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(file.documentType), file.fileName)))))
+        document.setName(file.fileName.split("""\.""")(0))
+        document.setFileExtension(utilities.FileOperations.fileExtensionFromName(file.fileName))
+        document.setDocumentId((index + 1).toString)
+        document
+      }
+
+      val signerList = traderList.zipWithIndex.map { case (trader, index) =>
+        val signer = new Signer()
+        signer.setEmail(emailList.find(_.id == trader.accountID).map(_.emailAddress).getOrElse(""))
+        signer.setName(trader.name)
+        signer.clientUserId(trader.id)
+        signer.recipientId((index + 1).toString)
+        signer
+      }
 
       val envelopeDefinition = new EnvelopeDefinition()
-      envelopeDefinition.setEmailSubject(messagesApi(constants.View.PLEASE_SIGN_THIS_DOCUMENT))
-      envelopeDefinition.setDocuments(Arrays.asList(document))
+      envelopeDefinition.setEmailSubject(constants.View.PLEASE_SIGN_THIS_DOCUMENT)
+      envelopeDefinition.setDocuments(JavaConverters.seqAsJavaList(documentList))
 
       val recipients = new Recipients()
-      recipients.setSigners(Arrays.asList(signer))
+      recipients.setSigners(JavaConverters.seqAsJavaList(signerList))
 
       envelopeDefinition.setRecipients(recipients)
       envelopeDefinition.setStatus(constants.Status.DocuSignEnvelope.CREATED)
@@ -87,13 +94,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     }
   }
 
-  def createEnvelope(emailAddress: String, file: Document[_], trader: Trader): Future[String] = {
-    val language = masterAccounts.Service.tryGetLanguage(trader.accountID)
-    for {
-      language <- language
-      envelopeID <- createDocusignEnvelope(emailAddress, file, trader)(Lang(language))
-    } yield envelopeID
-  }
+  def createEnvelope(emailList: Seq[Email], fileList: Seq[Document[_]], traderList: Seq[Trader]): Future[String] = createDocusignEnvelope(emailList, fileList, traderList)
 
   def createSenderViewURL(envelopeID: String): Future[String] = generateSenderViewURL(envelopeID)
 
@@ -142,21 +143,24 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   def createRecipientView(envelopeID: String, emailAddress: String, trader: Trader): Future[String] = createRecipientViewAndGetUrl(envelopeID, emailAddress, trader)
 
-  def updateSignedDocuemnt(envelopeID: String, documentType: String): Future[String] = fetchAndStoreSignedDocument(envelopeID, documentType)
+  def updateSignedDocumentList(envelopeID: String, documentType: String): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentType)
 
-  def fetchAndStoreSignedDocument(envelopeID: String, documentType: String): Future[String] = {
+  def fetchAndStoreSignedDocumentList(envelopeID: String, documentType: String): Future[Seq[String]] = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
-      val result = envelopesApi.getDocument(accountID, envelopeID, constants.Docusign.DOCUMENT_INDEX)
-      val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(result)).toString, constants.File.PDF).mkString(".")
-      val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
-      val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
-      bufferedOutputStream.write(result)
-      bufferedOutputStream.close()
-      newFileName
+      val documentList = JavaConverters.asScalaIteratorConverter(envelopesApi.getEnvelope(accountID, envelopeID).getEnvelopeDocuments.iterator()).asScala.toSeq
+      documentList.map { document =>
+        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID, document.getDocumentId)
+        val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileByteArray)).toString, constants.File.PDF).mkString(".")
+        val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
+        val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
+        bufferedOutputStream.write(fileByteArray)
+        bufferedOutputStream.close()
+        newFileName
+      }
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
@@ -211,7 +215,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private def fetchAuthorizationURI: String = {
     try {
-      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.Docusign.CODE).toString
+      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.Docusign.CODE).toString
     } catch {
       case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
         throw new BaseException(constants.Response.INVALID_INPUT)
