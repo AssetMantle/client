@@ -77,9 +77,9 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
 
-      def getNegotiation(negotiationID: String):Future[Negotiation]  = masterNegotiations.Service.tryGet(negotiationID)
+      def getNegotiation(negotiationID: String): Future[Negotiation] = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getTraders(traderIDs: Seq[String]):Future[Seq[Trader]]  = masterTraders.Service.getTraders(traderIDs)
+      def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
       def updateStatus(docusignEnvelope: docusign.Envelope, traderAccountIDs: Seq[String]) = event match {
         case constants.Event.Docusign.SEND => {

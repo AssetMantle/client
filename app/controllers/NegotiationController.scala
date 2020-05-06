@@ -1241,7 +1241,7 @@ class NegotiationController @Inject()(
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-      }).recover{
+      }).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
   }
@@ -1256,7 +1256,7 @@ class NegotiationController @Inject()(
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(updateContractSignedData.negotiationID)
 
-          def markContractSigned(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) masterNegotiations.Service.markContractSigned(updateContractSignedData.negotiationID) else Future( throw new BaseException(constants.Response.UNAUTHORIZED))
+          def markContractSigned(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) masterNegotiations.Service.markContractSigned(updateContractSignedData.negotiationID) else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
 
           (for {
             traderID <- traderID
@@ -1264,7 +1264,7 @@ class NegotiationController @Inject()(
             _ <- markContractSigned(traderID, negotiation)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
           } yield result
-            ).recover{
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
           }
         }
