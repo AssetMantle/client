@@ -70,7 +70,7 @@ class AccountController @Inject()(
           _ <- addLogin(mnemonics)
         } yield {
           logger.info(mnemonics.toString)
-          PartialContent(views.html.component.master.createBlockchainAccount(username = signUpData.username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
+          PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
         }
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -79,7 +79,7 @@ class AccountController @Inject()(
     )
   }
 
-  def createBlockchainForm(username: String): Action[AnyContent] = Action.async { implicit request =>
+  def createWalletForm(username: String): Action[AnyContent] = Action.async { implicit request =>
     val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
     def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) queriesMnemonic.Service.get().map(_.body.split(" ")) else throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -92,31 +92,31 @@ class AccountController @Inject()(
       bcAccountExists <- bcAccountExists
       mnemonics <- getMnemonics(bcAccountExists)
       - <- updatePartialMnemonic(mnemonics, bcAccountExists)
-    } yield Ok(views.html.component.master.createBlockchainAccount(username = username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
+    } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
-  def createBlockchain(): Action[AnyContent] = Action.async { implicit request =>
-    views.companion.master.CreateBlockchainAccount.form.bindFromRequest().fold(
+  def createWallet(): Action[AnyContent] = Action.async { implicit request =>
+    views.companion.master.CreateWallet.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.createBlockchainAccount(formWithErrors, formWithErrors.data(constants.FormField.USERNAME.name), formWithErrors.data(constants.FormField.MNEMONICS.name).split(" "))))
+        Future(BadRequest(views.html.component.master.createWallet(formWithErrors, formWithErrors.data(constants.FormField.USERNAME.name), formWithErrors.data(constants.FormField.MNEMONICS.name).split(" "))))
       },
-      createBlockchainData => {
-        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = createBlockchainData.username, password = createBlockchainData.password)
-        val masterAccount = masterAccounts.Service.tryGet(createBlockchainData.username)
+      createWalletData => {
+        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = createWalletData.username, password = createWalletData.password)
+        val masterAccount = masterAccounts.Service.tryGet(createWalletData.username)
 
         def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
-          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createBlockchainData.username, password = createBlockchainData.password, seed = Seq(masterAccount.partialMnemonic.mkString(" "), createBlockchainData.mnemonics).mkString(" ")))
+          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, password = createWalletData.password, seed = Seq(masterAccount.partialMnemonic.mkString(" "), createWalletData.mnemonics).mkString(" ")))
 
-          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createBlockchainData.username, pubkey = addKeyResponse.pubkey)
+          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createWalletData.username, pubkey = addKeyResponse.pubkey)
 
           for {
             addKeyResponse <- addKeyResponse
             _ <- createAccount(addKeyResponse)
           } yield Ok(views.html.index(successes = Seq(constants.Response.ACCOUNT_CREATED)))
-        } else Future(BadRequest(views.html.component.master.createBlockchainAccount(username = createBlockchainData.username, mnemonics = createBlockchainData.mnemonics.split(" "))))
+        } else Future(BadRequest(views.html.component.master.createWallet(views.companion.master.CreateWallet.form.withGlobalError(constants.Response.INCORRECT_PASSWORD.message), username = createWalletData.username, mnemonics = createWalletData.mnemonics.split(" "))))
 
         (for {
           validateUsernamePassword <- validateUsernamePassword
@@ -211,7 +211,7 @@ class AccountController @Inject()(
               for {
                 mnemonics <- mnemonics
                 _ <- updatePartialMnemonic(mnemonics)
-              } yield PartialContent(views.html.component.master.createBlockchainAccount(username = loginData.username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
+              } yield PartialContent(views.html.component.master.createWallet(username = loginData.username, mnemonics = mnemonics.takeRight(userMnemonicShown)))
             }
           } else {
             Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))

@@ -26,8 +26,8 @@ GET         /profilePicture                                                     
 GET         /account/signUp                                                                       controllers.AccountController.signUpForm
 POST        /account/signUp                                                                       controllers.AccountController.signUp
 
-GET         /account/createBlockchain                                                             controllers.AccountController.createBlockchainForm(username: String)
-POST        /account/createBlockchain                                                             controllers.AccountController.createBlockchain
+GET         /account/createWallet                                                                 controllers.AccountController.createWalletForm(username: String)
+POST        /account/createWallet                                                                 controllers.AccountController.createWallet
 
 GET         /account/login                                                                        controllers.AccountController.loginForm
 POST        /account/login                                                                        controllers.AccountController.login
