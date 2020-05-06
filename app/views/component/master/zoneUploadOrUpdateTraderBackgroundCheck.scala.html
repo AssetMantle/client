@@ -9,7 +9,7 @@
     <h4>@Messages(constants.Form.TRADER_BACKGROUND_CHECK)</h4>
     @for(documentType <- constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(constants.Form.UPLOAD + " " + documentType ,routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,'parameters -> s"'${documentType}','${trader.id}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages(documentType)).mkString(" ") ,routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,'parameters -> s"'${documentType}','${trader.id}'")
         </div>
     }
     @for(traderBackgroundCheck <- traderBackgroundChecks) {
@@ -18,7 +18,7 @@
         } {
             <a href="@routes.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderBackgroundCheck.id, traderBackgroundCheck.fileName, traderBackgroundCheck.documentType)" target="_blank">@Messages(traderBackgroundCheck.documentType)</a>
         } {
-            @commonModalButton(constants.Form.UPDATE + " "+ traderBackgroundCheck.documentType,routes.javascript.BackgroundCheckController.updateTraderBackgroundCheckFileForm,'parameters -> s"'${traderBackgroundCheck.documentType}','${trader.id}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages(traderBackgroundCheck.documentType)).mkString(" "),routes.javascript.BackgroundCheckController.updateTraderBackgroundCheckFileForm,'parameters -> s"'${traderBackgroundCheck.documentType}','${trader.id}'")
             <script>hideElement('upload@traderBackgroundCheck.documentType')</script>
         }
     }
