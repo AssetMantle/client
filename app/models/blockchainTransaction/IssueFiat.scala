@@ -106,6 +106,16 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String]): Future[Int] = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(x => x.txHash.?).update(txHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -159,6 +169,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[IssueFiat] = findByTicketID(ticketID)
@@ -187,32 +199,36 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
 
-      def getIDs(issueFiat: IssueFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(issueFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def traderID(accountID: String): Future[String] = masterTraders.Service.tryGetID(accountID)
+
       def markSuccess(traderID: String, transactionID: String): Future[Int] = masterFiats.Service.markSuccess(traderID, transactionID)
+
       (for {
         _ <- markTransactionSuccessful
         issueFiat <- issueFiat
         account <- account(issueFiat)
         _ <- insertOrUpdate(account, issueFiat)
         _ <- markDirty(issueFiat)
-        (toAccountID, fromAccountID) <- getIDs(issueFiat)
+        fromAccountID <- getAccountID(issueFiat.from)
+        toAccountID <- getAccountID(issueFiat.to)
         traderID <- traderID(toAccountID)
         _ <- markSuccess(traderID, issueFiat.transactionID)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -221,26 +237,22 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
 
-      def getIDs(issueFiat: IssueFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(issueFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
+
       def traderID(accountID: String): Future[String] = masterTraders.Service.tryGetID(accountID)
+
       def markFailure(traderID: String, transactionID: String): Future[Int] = masterFiats.Service.markFailure(traderID, transactionID)
 
       (for {
         _ <- markTransactionFailed
         issueFiat <- issueFiat
-        (toAccountID, fromAccountID) <- getIDs(issueFiat)
+        fromAccountID <- getAccountID(issueFiat.from)
+        toAccountID <- getAccountID(issueFiat.to)
         traderID <- traderID(toAccountID)
         _ <- markFailure(traderID, issueFiat.transactionID)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

@@ -150,10 +150,9 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
       (for {
         dirtyAddresses <- dirtyAddresses
         _ <- insertOrUpdateAll(dirtyAddresses)
-      } yield {}
-        ).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }(schedulerExecutionContext)
+      }
     }
   }
 

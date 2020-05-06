@@ -5,7 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.westernUnion.FiatRequests
-import models.{blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                     blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
                                     masterTraders: master.Traders,
-                                    masterAccounts: master.Accounts,
+                                    blockchainAccounts: blockchain.Accounts,
                                     masterFiats: master.Fiats,
                                     masterTransactionIssueFiatRequests: FiatRequests,
                                     transactionsIssueFiat: transactions.IssueFiat,
@@ -49,7 +49,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
           def getResult(status: Option[Boolean]): Future[Result] = {
             if (status.isEmpty) {
-              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
+              val toAddress = blockchainAccounts.Service.tryGetAddress(issueFiatData.accountID)
 
               def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
                 entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),

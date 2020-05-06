@@ -6,33 +6,35 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchainTransaction, westernUnion}
+import models.{blockchain, blockchainTransaction, master, westernUnion}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import models.master
 import services.SFTPScheduler
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                       blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
-                                       sftpScheduler: SFTPScheduler,
-                                       masterOrganizations: master.Organizations,
-                                       masterTraders: master.Traders,
-                                       masterZones: master.Zones,
-                                       masterEmails: master.Emails,
-                                       masterIdentifications: master.Identifications,
-                                       masterAccounts: master.Accounts,
-                                       masterFiats: master.Fiats,
-                                       westernUnionFiatRequests: westernUnion.FiatRequests,
-                                       westernUnionRTCBs: westernUnion.RTCBs,
-                                       transactionsIssueFiat: transactions.IssueFiat,
-                                       transaction: utilities.Transaction,
-                                       withTraderLoginAction: WithTraderLoginAction,
-                                       withZoneLoginAction: WithZoneLoginAction,
-                                       withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WesternUnionController @Inject()(
+                                        blockchainAccounts: blockchain.Accounts,
+                                        messagesControllerComponents: MessagesControllerComponents,
+                                        blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
+                                        sftpScheduler: SFTPScheduler,
+                                        masterOrganizations: master.Organizations,
+                                        masterTraders: master.Traders,
+                                        masterZones: master.Zones,
+                                        masterEmails: master.Emails,
+                                        masterIdentifications: master.Identifications,
+                                        masterAccounts: master.Accounts,
+                                        masterFiats: master.Fiats,
+                                        westernUnionFiatRequests: westernUnion.FiatRequests,
+                                        westernUnionRTCBs: westernUnion.RTCBs,
+                                        transactionsIssueFiat: transactions.IssueFiat,
+                                        transaction: utilities.Transaction,
+                                        withTraderLoginAction: WithTraderLoginAction,
+                                        withZoneLoginAction: WithZoneLoginAction,
+                                        withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
 
   private val rtcbSecretKey = configuration.get[String]("westernUnion.rtcbSecretKey")
@@ -76,11 +78,11 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
 
         def traderDetails(traderID: String) = masterTraders.Service.tryGet(traderID)
 
-        def traderAddress(traderAccountID: String) = masterAccounts.Service.getAddress(traderAccountID)
+        def traderAddress(traderAccountID: String) = blockchainAccounts.Service.tryGetAddress(traderAccountID)
 
         def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
 
-        def zoneAddress(zoneAccountID: String) = masterAccounts.Service.getAddress(zoneAccountID)
+        def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
         def zoneAutomation(traderAddress: String, zoneAddress: String) = issueFiat(traderAddress, zoneAddress, requestBody.reference, requestBody.paidOutAmount.toInt)
 

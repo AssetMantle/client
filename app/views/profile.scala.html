@@ -6,8 +6,8 @@
 @views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftTradeFinancial">
-        <div id="financials"></div>
+    <div class="leftSideContainer">
+        <div id="financials" class="financial"></div>
     </div>
     <script>
         @loginState.userType match {
@@ -100,8 +100,10 @@
 }
 
 @right = {
+    <div class="rightSideContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
+    </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

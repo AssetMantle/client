@@ -127,7 +127,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
           def getResult(status: Option[Boolean]): Future[Result] = {
             if (status.isEmpty) {
-              val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
+              val toAddress = blockchainAccounts.Service.tryGetAddress(approveFaucetRequestFormData.accountID)
 
               def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
                 entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, ticketID = "", mode = transactionMode),

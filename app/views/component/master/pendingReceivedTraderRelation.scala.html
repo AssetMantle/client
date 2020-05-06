@@ -6,4 +6,6 @@
 @(traderRelation: TraderRelation, traderName: String, organizationName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonVerticalTextInfo(constants.View.TRADER_NAME, traderName)
 @commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organizationName)
-@acceptOrRejectTraderRelation(traderRelation = traderRelation)
+<div class="listItemChild cmuk-flex cmuk-flex-middle">
+    @acceptOrRejectTraderRelation(traderRelation = traderRelation)
+    </div>

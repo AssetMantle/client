@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import models.master.{Organization, Zone}
 @import views.html.base.common
 @import views.html.base._
 @import scala.collection.immutable.ListMap
@@ -8,28 +7,28 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftTradeFinancial secondaryFont">
-        <div id="financial"></div>
+    <div class="leftSideContainer">
+        <div id="financial" class="financial"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
-                <div id="traderViewNegotiationDocuments"></div>
+                <div id="traderViewAcceptedNegotiationDocumentList"></div>
                 <script type="text/javascript">
                     componentResource('financial', jsRoutes.controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks('@negotiationID'));
-                    componentResource('traderViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationFiles('@negotiationID'));
+                    componentResource('traderViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList('@negotiationID'));
                 </script>
             }
             case constants.User.ORGANIZATION => {
-                <div id="organizationViewNegotiationDocuments"></div>
+                <div id="organizationViewAcceptedNegotiationDocumentList"></div>
                 <script type="text/javascript">
                     componentResource('financial', jsRoutes.controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks('@negotiationID'));
-                    componentResource('organizationViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles('@negotiationID'));
+                    componentResource('organizationViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationDocumentList('@negotiationID'));
                 </script>
             }
             case constants.User.ZONE => {
-                <div id="zoneViewNegotiationDocuments"></div>
+                <div id="zoneViewAcceptedNegotiationDocumentList"></div>
                 <script type="text/javascript">
                       componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@negotiationID'));
-                    componentResource('zoneViewNegotiationDocuments', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationFiles('@negotiationID'));
+                    componentResource('zoneViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationDocumentList('@negotiationID'));
                 </script>
 
             }
@@ -72,21 +71,15 @@
 }
 
 @right = {
-    <div class="right cmuk-flex">
-        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-amend")"/></svg></span>@Messages(constants.View.AMEND)</button>
-        <button class="refresh"><span><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-refresh2")"/></svg></span>
-            @Messages(constants.View.REFRESH)</button>
-        <div class="cmuk-flex live">
-            <span class="liveText secondaryFont">@Messages(constants.View.LIVE_TRADE_ROOM)</span>
-            <div class="liveIcon"></div>
+
+    <div>
+        <div class="rightSideContainer">
+            <div class="recentActivityContainer">
+                <div id="tradeActivities"></div>
+            </div>
+            <div id="chatRoom" class="chatRoom"></div>
+            <div id="orderActions"></div>
         </div>
-    </div>
-    <div class="recentActivity">
-        <div class="recentActivityContainer">
-            <div id="tradeActivities"></div>
-        </div>
-        <div id="chatRoom" class="chatRoom"></div>
-        <div id="orderActions"></div>
     </div>
     <script>
     componentResource('tradeActivities', jsRoutes.controllers.ComponentViewController.tradeActivities('@negotiationID'));
@@ -100,5 +93,4 @@
     case _ => {}
     }
     </script>
-
 }

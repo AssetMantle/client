@@ -7,42 +7,58 @@
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity">
-            <span class="commodityImage">@asset.assetType.mkString.substring(0, 1)</span><span class="tradeName">@asset.assetType</span>
+            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType</span>
         </div>
         <div class="terms">
-
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
             </div>
-
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
+                <div class="cmuk-flex">
+                    <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-description")"/></svg></span>
+                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
+                </div>
                 <div>
                 @negotiation.buyerAcceptedAssetDescription
                 </div>
             </div>
             <div class="sellerTerm">
-                @commonIntInfo(constants.View.PRICE, negotiation.price)
+                <div class="cmuk-flex">
+                    <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-contract-price")"/></svg></span>
+                    @commonIntInfo(constants.View.PRICE, negotiation.price)
+                </div>
                 <div>
                 @negotiation.buyerAcceptedPrice
                 </div>
             </div>
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity, negotiation.quantityUnit).mkString(" "))
+                <div class="cmuk-flex">
+                    <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-quantity")"/></svg></span>
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
+                </div>
                 <div>
                 @negotiation.buyerAcceptedQuantity
                 </div>
             </div>
+
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
             </div>
             <div class="sellerTerm">
-                @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
-                <br>
-                @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-                <br>
-                @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
-                <br>
+                <div>
+                    <div class="cmuk-flex">
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-port")"/></svg></span>
+                        @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                    </div>
+                    <div class="cmuk-flex">
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-port")"/></svg></span>
+                        @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
+                    </div>
+                    <div class="cmuk-flex">
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-shipment-period")"/></svg></span>
+                        @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
+                    </div>
+                </div>
                 <div>
                 @negotiation.buyerAcceptedAssetOtherDetails
                 </div>
@@ -54,24 +70,24 @@
                 <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
             </div>
             <div class="sellerTerm">
-                @commonBooleanInfo(constants.View.ADVANCE_PAYMENT, Option(negotiation.paymentTerms.advancePayment))
-                <br>
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage.getOrElse(0.0))
-                <br>
-                @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit))
-                <br>
-                @commonIntInfo(constants.View.TENURE, negotiation.paymentTerms.tenure.getOrElse(0))
-                <br>
-                @negotiation.paymentTerms.tentativeDate match {
-                    case Some(date) => {
-                        @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                <div>
+                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                @negotiation.paymentTerms.credit match {
+                    case Some(credit) => {
+                        @Messages(constants.View.CREDIT_TERMS):
+                        @credit.tentativeDate match {
+                            case Some(date) => {
+                                @commonDateInfo(constants.View.TENTATIVE_DATE, date)
+                            }
+                            case None => {
+                                @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
+                            }
+                        }
+                        @commonTextInfo(constants.View.REFERENCE, credit.reference)
                     }
-                    case None => {
-                        @commonTextInfo(constants.View.TENTATIVE_DATE, "")
-                    }
+                    case None => {}
                 }
-                <br>
-                @commonTextInfo(constants.View.REFERENCE, negotiation.paymentTerms.reference.getOrElse(""))
+                </div>
                 <div>
                 @negotiation.buyerAcceptedPaymentTerms
                 </div>
@@ -83,22 +99,27 @@
                 <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
             </div>
             <div class="sellerTerm">
+                <div>
+                @Messages(constants.View.ASSET_DOCUMENTS):
                 @negotiation.documentList.assetDocuments.map { document =>
-                    @document
-                    <br>
+                    <div>
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
+                        @Messages(document)
+                    </div>
                 }
+                <br>
+                @Messages(constants.View.NEGOTIATION_DOCUMENTS):
                 @negotiation.documentList.negotiationDocuments.map { document =>
-                    @document
-                    <br>
+                    <div>
+                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
+                        @Messages(document)
+                    </div>
                 }
+                </div>
                 <div>
                 @negotiation.buyerAcceptedDocumentList
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-<script>
-    @*Add here comet source for component id = '@Seq(negotiation.id, "TermsView").mkString("")'*@
-</script>

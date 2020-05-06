@@ -6,7 +6,9 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.blockchain.Fiat
 import models.{blockchain, master}
+import models.master.{Negotiation => masterNegotiation, Order => masterOrder}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -26,7 +28,21 @@ case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas:
 
 
 @Singleton
-class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendFiats @Inject()(
+                           actorSystem: ActorSystem,
+                           transaction: utilities.Transaction,
+                           protected val databaseConfigProvider: DatabaseConfigProvider,
+                           blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
+                           getOrder: GetOrder,
+                           blockchainFiats: blockchain.Fiats,
+                           blockchainOrders: blockchain.Orders,
+                           blockchainNegotiations: blockchain.Negotiations,
+                           utilitiesNotification: utilities.Notification,
+                           masterAccounts: master.Accounts,
+                           blockchainAccounts: blockchain.Accounts,
+                           masterNegotiations: master.Negotiations,
+                           masterOrders: master.Orders,
+                         )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
@@ -86,6 +102,16 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -160,6 +186,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[SendFiat] = findByTicketID(ticketID)
@@ -177,54 +205,69 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
 
-      def getNegotiationID(sendFiat: SendFiat): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash).map(_.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND)))
-
-      def insertOrUpdate(negotiationID: String): Future[Int] = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
-
       def orderResponse(negotiationID: String): Future[OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
-      def insertOrUpdateFiats(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = {
-        orderResponse.value.fiatPegWallet match {
-          case Some(fiats) => Future.sequence(fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
-          case None => Future {}
-        }
+      def getNegotiationID(sendFiat: SendFiat): Future[String] = blockchainNegotiations.Service.tryGetID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
+
+      def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
+
+      def updateBCFiat(negotiationID: String, orderResponse: OrderResponse.Response): Future[Seq[String]] = orderResponse.value.fiatPegWallet match {
+        case Some(fiatPegWallet) => blockchainFiats.Service.insertList(fiatPegWallet.map(fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = negotiationID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)))
+        case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
       }
+
+      def checkOrderExists(negotiationID: String): Future[Boolean] = blockchainOrders.Service.checkOrderExists(negotiationID)
+
+      def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
+        val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
+        val masterOrderCreate = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+
+        for {
+          _ <- bcOrderCreate
+          _ <- masterOrderCreate
+        } yield ()
+
+      } else Future()
 
       def markDirty(sendFiat: SendFiat): Future[Unit] = {
-        val markDirtyBlockchainFiats = blockchainFiats.Service.markDirty(sendFiat.from)
-        val markDirtyBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
-        val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendFiat.from)
+        val markFiatsDirty = blockchainFiats.Service.markDirty(sendFiat.from)
+        val markBuyerTransactionFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
+        val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(sendFiat.from)
         for {
-          _ <- markDirtyBlockchainFiats
-          _ <- markDirtyBlockchainTransactionFeedbacks
-          _ <- markDirtyBlockchainAccounts
-        } yield {}
+          _ <- markFiatsDirty
+          _ <- markBuyerTransactionFeedbackDirty
+          _ <- markBuyerAccountDirty
+        } yield ()
       }
 
-      def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionSuccessful
         sendFiat <- sendFiat
         negotiationID <- getNegotiationID(sendFiat)
-        _ <- insertOrUpdate(negotiationID)
         orderResponse <- orderResponse(negotiationID)
-        _ <- insertOrUpdateFiats(orderResponse, negotiationID)
+        masterNegotiation <- getMasterNegotiation(negotiationID)
+        _ <- updateBCFiat(negotiationID = negotiationID, orderResponse = orderResponse)
+        orderExists <- checkOrderExists(negotiationID)
+        _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation)
         _ <- markDirty(sendFiat)
-        (toAccountID, fromAccountID) <- getIDs(sendFiat)
+        fromAccountID <- getAccountID(sendFiat.from)
+        toAccountID <- getAccountID(sendFiat.to)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -234,21 +277,13 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
-      def getIDs(sendFiat: SendFiat): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed
         sendFiat <- sendFiat
         _ <- markDirty(sendFiat.from)
-        (toAccountID, fromAccountID) <- getIDs(sendFiat)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        fromAccountID <- getAccountID(sendFiat.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

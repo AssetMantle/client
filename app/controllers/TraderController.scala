@@ -21,8 +21,7 @@ class TraderController @Inject()(
                                   withUsernameToken: WithUsernameToken,
                                   masterOrganizations: master.Organizations,
                                   masterZones: master.Zones,
-                                  masterAccounts: master.Accounts,
-                                  masterTraderKYCs: master.TraderKYCs,
+                                  blockchainAccounts: blockchain.Accounts,
                                   messagesControllerComponents: MessagesControllerComponents,
                                   withTraderLoginAction: WithTraderLoginAction,
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
@@ -127,7 +126,7 @@ class TraderController @Inject()(
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
-          def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.verificationStatus.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
+          def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.status.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
             masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
           } else {
             if (fromTrader.organizationID == toTrader.organizationID) {
@@ -270,17 +269,11 @@ class TraderController @Inject()(
           val trader = masterTraders.Service.tryGetByAccountID(modifyTraderData.accountID)
           val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-          def checkAllKYCFilesVerified(trader: Trader, organizationID: String): Future[Boolean] = if (trader.organizationID == organizationID) {
-            masterTraderKYCs.Service.checkAllKYCFilesVerified(trader.id)
-          } else {
-            throw new BaseException(constants.Response.UNAUTHORIZED)
-          }
-
-          def getResult(checkAllKYCFilesVerified: Boolean): Future[Result] = {
-            if (checkAllKYCFilesVerified) {
+          def getResult(trader: Trader, organizationID: String): Future[Result] = {
+            if (trader.organizationID == organizationID) {
               val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
               val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-              val aclAddress = masterAccounts.Service.getAddress(modifyTraderData.accountID)
+              val aclAddress = blockchainAccounts.Service.tryGetAddress(modifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = modifyTraderData.issueAsset, issueFiat = modifyTraderData.issueFiat, sendAsset = modifyTraderData.sendAsset, sendFiat = modifyTraderData.sendFiat, redeemAsset = modifyTraderData.redeemAsset, redeemFiat = modifyTraderData.redeemFiat, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder, changeBuyerBid = modifyTraderData.changeBuyerBid, changeSellerBid = modifyTraderData.changeSellerBid, confirmBuyerBid = modifyTraderData.confirmBuyerBid, confirmSellerBid = modifyTraderData.changeSellerBid, negotiation = modifyTraderData.negotiation, releaseAsset = modifyTraderData.releaseAsset)
               val createACL = blockchainAclHashes.Service.create(acl)
 
@@ -302,16 +295,13 @@ class TraderController @Inject()(
                 _ <- transactionProcess(aclAddress, zoneID, organizationID)
                 result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
               } yield result
-            } else {
-              Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
-            }
+            } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
           (for {
             trader <- trader
             organizationID <- organizationID
-            checkAllKYCFilesVerified <- checkAllKYCFilesVerified(trader, organizationID)
-            result <- getResult(checkAllKYCFilesVerified)
+            result <- getResult(trader, organizationID)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

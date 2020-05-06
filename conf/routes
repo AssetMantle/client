@@ -13,8 +13,6 @@ GET         /blockExplorer/transactionHash                                      
 
 GET         /genesisRequest                                                                       controllers.ViewController.genesisRequest
 GET         /zoneRequest                                                                          controllers.ViewController.zoneRequest
-GET         /organizationRequest                                                                  controllers.ViewController.organizationRequest
-GET         /market                                                                               controllers.ViewController.market
 
 GET         /profile                                                                              controllers.ViewController.profile
 GET         /account                                                                              controllers.ViewController.account
@@ -25,9 +23,11 @@ GET         /tradeRoom                                                          
 
 GET         /profilePicture                                                                       controllers.ComponentViewController.profilePicture
 
-GET         /account/noteAndVerifyMnemonic                                                        controllers.AccountController.noteAndVerifyMnemonic
-GET         /account/signUp                                                                       controllers.AccountController.signUpForm(mnemonic:String)
+GET         /account/signUp                                                                       controllers.AccountController.signUpForm
 POST        /account/signUp                                                                       controllers.AccountController.signUp
+
+GET         /account/createBlockchain                                                             controllers.AccountController.createBlockchainForm(username: String)
+POST        /account/createBlockchain                                                             controllers.AccountController.createBlockchain
 
 GET         /account/login                                                                        controllers.AccountController.loginForm
 POST        /account/login                                                                        controllers.AccountController.login
@@ -54,6 +54,32 @@ POST        /account/userReviewIdentification                                   
 
 GET         /asset/issue                                                                          controllers.AssetController.issueForm
 POST        /asset/issue                                                                          controllers.AssetController.issue
+
+GET         /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLadingForm(negotiationID: String)
+POST        /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLading
+
+GET         /asset/send                                                                           controllers.AssetController.sendForm(orderID: String)
+POST        /asset/send                                                                           controllers.AssetController.send
+
+GET         /asset/release                                                                        controllers.AssetController.releaseForm(assetID: String)
+POST        /asset/release                                                                        controllers.AssetController.release
+
+GET         /asset/redeem                                                                         controllers.AssetController.redeemForm(assetID: String)
+POST        /asset/redeem                                                                         controllers.AssetController.redeem
+
+GET         /contact                                                                              controllers.ContactController.contact
+
+GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
+POST        /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddress
+
+GET         /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumberForm
+POST        /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumber
+
+GET         /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddressForm
+POST        /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddress
+
+GET         /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumberForm
+POST        /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumber
 
 GET         /negotiation/request                                                                  controllers.NegotiationController.requestForm
 POST        /negotiation/request                                                                  controllers.NegotiationController.request
@@ -88,33 +114,40 @@ POST        /negotiation/updateDocumentList                                     
 GET         /negotiation/acceptOrRejectNegotiationTerms                                           controllers.NegotiationController.acceptOrRejectNegotiationTermsForm(id: String, termType: String)
 POST        /negotiation/acceptOrRejectNegotiationTerms                                           controllers.NegotiationController.acceptOrRejectNegotiationTerms
 
-GET         /negotiation/oblContent                                                               controllers.NegotiationController.oblContentForm(id: String)
-POST        /negotiation/oblContent                                                               controllers.NegotiationController.oblContent
+GET         /negotiation/addInvoice                                                               controllers.NegotiationController.addInvoiceForm(id: String)
+POST        /negotiation/addInvoice                                                               controllers.NegotiationController.addInvoice
 
-GET         /negotiation/invoiceContent                                                           controllers.NegotiationController.invoiceContentForm(id: String)
-POST        /negotiation/invoiceContent                                                           controllers.NegotiationController.invoiceContent
-
-GET         /negotiation/contractContent                                                          controllers.NegotiationController.contractContentForm(id: String)
-POST        /negotiation/contractContent                                                          controllers.NegotiationController.contractContent
+GET         /negotiation/addContract                                                              controllers.NegotiationController.addContractForm(id: String)
+POST        /negotiation/addContract                                                              controllers.NegotiationController.addContract
 
 GET         /negotiation/confirmAllNegotiationTerms                                               controllers.NegotiationController.confirmAllNegotiationTermsForm(id: String)
 POST        /negotiation/confirmAllNegotiationTerms                                               controllers.NegotiationController.confirmAllNegotiationTerms
 
+GET         /negotiation/buyerConfirm                                                             controllers.NegotiationController.buyerConfirmForm(id: String)
+POST        /negotiation/buyerConfirm                                                             controllers.NegotiationController.buyerConfirm
+
+GET         /negotiation/sellerConfirm                                                            controllers.NegotiationController.sellerConfirmForm(id: String)
+POST        /negotiation/sellerConfirm                                                            controllers.NegotiationController.sellerConfirm
+
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 
-GET         /contact                                                                              controllers.ContactController.contact
+GET         /order/moderatedBuyerExecute                                                          controllers.OrderController.moderatedBuyerExecuteForm(orderID: String)
+POST        /order/moderatedBuyerExecute                                                          controllers.OrderController.moderatedBuyerExecute
 
-GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
-POST        /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddress
+GET         /order/moderatedSellerExecute                                                         controllers.OrderController.moderatedSellerExecuteForm(orderID: String)
+POST        /order/moderatedSellerExecute                                                         controllers.OrderController.moderatedSellerExecute
 
-GET         /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumberForm
-POST        /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumber
+GET         /order/buyerExecute                                                                   controllers.OrderController.buyerExecuteForm(orderID: String)
+POST        /order/buyerExecute                                                                   controllers.OrderController.buyerExecute
 
-GET         /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddressForm
-POST        /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddress
+GET         /order/sellerExecute                                                                  controllers.OrderController.sellerExecuteForm(orderID: String)
+POST        /order/sellerExecute                                                                  controllers.OrderController.sellerExecute
 
-GET         /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumberForm
-POST        /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumber
+GET         /order/blockchainBuyerExecute                                                         controllers.OrderController.blockchainBuyerExecuteForm
+POST        /order/blockchainBuyerExecute                                                         controllers.OrderController.blockchainBuyerExecute
+
+GET         /order/blockchainSellerExecute                                                        controllers.OrderController.blockchainSellerExecuteForm
+POST        /order/blockchainSellerExecute                                                        controllers.OrderController.blockchainSellerExecute
 
 GET         /trader/organizationRejectRequest                                                     controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organizationRejectRequest                                                     controllers.TraderController.organizationRejectRequest
@@ -186,20 +219,20 @@ GET         /component/organizationViewAssetDocumentContent                     
 GET         /component/zoneViewNegotiationDocumentContent                                         controllers.ComponentViewController.zoneViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/zoneViewAssetDocumentContent                                               controllers.ComponentViewController.zoneViewAssetDocumentContent(id: String, documentType: String)
 
-
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials
-GET         /component/traderViewNegotiationFileList                                              controllers.ComponentViewController.traderViewNegotiationFileList(id:String)
-GET         /component/traderViewNegotiationFile                                                  controllers.ComponentViewController.traderViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/traderViewAcceptedNegotiationFiles                                         controllers.ComponentViewController.traderViewAcceptedNegotiationFiles(id:String)
 
-GET         /component/organizationViewNegotiationFileList                                        controllers.ComponentViewController.organizationViewNegotiationFileList(id:String)
-GET         /component/organizationViewNegotiationFile                                            controllers.ComponentViewController.organizationViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/organizationViewAcceptedNegotiationFiles                                   controllers.ComponentViewController.organizationViewAcceptedNegotiationFiles(id:String)
+GET         /component/traderViewNegotiationDocumentList                                          controllers.ComponentViewController.traderViewNegotiationDocumentList(id:String)
+GET         /component/traderViewNegotiationDocument                                              controllers.ComponentViewController.traderViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/traderViewAcceptedNegotiationDocumentList                                  controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(id:String)
 
-GET         /component/zoneViewNegotiationFileList                                                controllers.ComponentViewController.zoneViewNegotiationFileList(id:String)
-GET         /component/zoneViewNegotiationFile                                                    controllers.ComponentViewController.zoneViewNegotiationFile(id:String, documentType: Option[String])
-GET         /component/zoneViewAcceptedNegotiationFiles                                           controllers.ComponentViewController.zoneViewAcceptedNegotiationFiles(id:String)
+GET         /component/organizationViewNegotiationDocumentList                                    controllers.ComponentViewController.organizationViewNegotiationDocumentList(id:String)
+GET         /component/organizationViewNegotiationDocument                                        controllers.ComponentViewController.organizationViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/organizationViewAcceptedNegotiationDocumentList                            controllers.ComponentViewController.organizationViewAcceptedNegotiationDocumentList(id:String)
+
+GET         /component/zoneViewNegotiationDocumentList                                            controllers.ComponentViewController.zoneViewNegotiationDocumentList(id:String)
+GET         /component/zoneViewNegotiationDocument                                                controllers.ComponentViewController.zoneViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/zoneViewAcceptedNegotiationDocumentList                                    controllers.ComponentViewController.zoneViewAcceptedNegotiationDocumentList(id:String)
 
 GET         /component/traderViewAcceptedNegotiationTerms                                         controllers.ComponentViewController.traderViewAcceptedNegotiationTerms(id: String)
 GET         /component/traderViewAcceptedNegotiation                                              controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
@@ -253,6 +286,10 @@ GET         /component/traderViewTradeRoomFinancialAndChecks                    
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
 
+GET         /component/traderViewIssueFiatRequestList                                             controllers.ComponentViewController.traderViewIssueFiatRequestList
+GET         /component/organizationViewIssueFiatRequestList                                       controllers.ComponentViewController.organizationViewIssueFiatRequestList
+GET         /component/zoneViewIssueFiatRequestList                                               controllers.ComponentViewController.zoneViewIssueFiatRequestList
+
 GET         /component/organizationSubscription                                                   controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                         controllers.ComponentViewController.traderSubscription
 
@@ -265,34 +302,27 @@ GET         /zone/inviteZone                                                    
 POST        /zone/inviteZone                                                                      controllers.AddZoneController.inviteZone
 GET         /zone/acceptInvitation                                                                controllers.AddZoneController.acceptInvitation(token: String)
 
-GET         /master/component/releaseAssetList                                                    controllers.ReleaseAssetController.releaseAssetList
-GET         /master/component/buyerExecuteOrderList                                               controllers.OrderController.moderatedBuyerExecuteOrderList
-GET         /master/component/sellerExecuteOrderList                                              controllers.OrderController.moderatedSellerExecuteOrderList
 GET         /master/component/setBuyerFeedbackList                                                controllers.SetBuyerFeedbackController.buyerFeedbackList
 GET         /master/component/setSellerFeedbackList                                               controllers.SetSellerFeedbackController.sellerFeedbackList
-GET         /master/component/viewTradersInOrganizationForZone                                    controllers.SetACLController.viewTradersInOrganizationForZone(organizationID: String)
-GET         /master/component/viewTradersInOrganizationForGenesis                                 controllers.SetACLController.viewTradersInOrganizationForGenesis(organizationID: String)
 
 GET         /master/getGenesisAccessedFile                                                        controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                                               controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
-GET         /master/organizationAccessedTraderKYCFile                                             controllers.FileController.organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String)
-GET         /master/getZoneAccessedTraderKYCFile                                                  controllers.FileController.zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String)
 GET         /master/file                                                                          controllers.FileController.file(fileName: String, documentType: String)
 GET         /master/tradingFile                                                                   controllers.FileController.tradingFile(id: String, fileName: String, documentType: String)
 GET         /master/organizationAccessedTradingFile                                               controllers.FileController.organizationAccessedTradingFile(id: String, fileName: String, documentType: String)
 GET         /master/zoneAccessedTradingFile                                                       controllers.FileController.zoneAccessedTradingFile(id: String, fileName: String, documentType: String)
 
-GET         /traderUpload/assetForm                                                               controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
-POST        /traderUpload/assetDocument                                                           controllers.FileController.uploadTraderAsset(documentType: String)
-GET         /traderUpload/storeAssetDocument                                                      controllers.FileController.storeTraderAsset(name: String, documentType: String, id: String)
-GET         /traderUpdate/assetForm                                                               controllers.FileController.updateTraderAssetForm(documentType: String, issueAssetRequestID :String)
-GET         /traderUpdate/assetDocument                                                           controllers.FileController.updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
+GET         /traderUpload/assetForm                                                               controllers.FileController.uploadAssetForm(documentType: String, issueAssetRequestID: String)
+POST        /traderUpload/assetDocument                                                           controllers.FileController.uploadAsset(documentType: String)
+GET         /traderUpload/storeAssetDocument                                                      controllers.FileController.storeAsset(name: String, documentType: String, id: String)
+GET         /traderUpdate/assetForm                                                               controllers.FileController.updateAssetForm(documentType: String, issueAssetRequestID :String)
+GET         /traderUpdate/assetDocument                                                           controllers.FileController.updateAsset(name: String, documentType: String, issueAssetRequestID: String)
 
-GET         /traderUpload/negotiationForm                                                         controllers.FileController.uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String)
-POST        /traderUpload/negotiationDocument                                                     controllers.FileController.uploadTraderNegotiation(documentType: String)
-GET         /traderUpload/storeNegotiationDocument                                                controllers.FileController.storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
-GET         /traderUpdate/negotiationForm                                                         controllers.FileController.updateTraderNegotiationForm(documentType: String, negotiationRequestID :String)
-GET         /traderUpdate/negotiationDocument                                                     controllers.FileController.updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
+GET         /traderUpload/negotiationForm                                                         controllers.FileController.uploadNegotiationForm(documentType: String, negotiationRequestID: String)
+POST        /traderUpload/negotiationDocument                                                     controllers.FileController.uploadNegotiation(documentType: String)
+GET         /traderUpload/storeNegotiationDocument                                                controllers.FileController.storeNegotiation(name: String, documentType: String, negotiationRequestID: String)
+GET         /traderUpdate/negotiationForm                                                         controllers.FileController.updateNegotiationForm(documentType: String, negotiationRequestID :String)
+GET         /traderUpdate/negotiationDocument                                                     controllers.FileController.updateNegotiation(name: String, documentType: String, negotiationRequestID: String)
 
 GET         /accountUpload                                                                        controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                                                   controllers.FileController.uploadAccountFile(documentType: String)
@@ -307,20 +337,6 @@ GET         /userUpdate                                                         
 GET         /userUpdate/updateFile                                                                controllers.FileController.updateAccountKYC(name: String, documentType: String)
 GET         /userUpload/getFile                                                                   controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
 
-
-GET         /traderUpload/assetForm                                                               controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
-POST        /traderUpload/assetDocument                                                           controllers.FileController.uploadTraderAsset(documentType: String)
-GET         /traderUpload/storeAssetDocument                                                      controllers.FileController.storeTraderAsset(name: String, documentType: String, id: String)
-GET         /traderUpdate/assetForm                                                               controllers.FileController.updateTraderAssetForm(documentType: String, issueAssetRequestID :String)
-GET         /traderUpdate/assetDocument                                                           controllers.FileController.updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
-
-GET         /traderUpload/negotiationForm                                                         controllers.FileController.uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String)
-POST        /traderUpload/negotiationDocument                                                     controllers.FileController.uploadTraderNegotiation(documentType: String)
-GET         /traderUpload/storeNegotiationDocument                                                controllers.FileController.storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
-GET         /traderUpdate/negotiationForm                                                         controllers.FileController.updateTraderNegotiationForm(documentType: String, negotiationRequestID :String)
-GET         /traderUpdate/negotiationDocument                                                     controllers.FileController.updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
-
-
 GET         /userUpload/zoneKYC                                                                   controllers.AddZoneController.userUploadZoneKYCForm(documentType: String)
 POST        /userUpload/userZoneKYCDocument                                                       controllers.AddZoneController.userUploadZoneKYC(documentType: String)
 GET         /userUpload/storeUserZoneKYCDocument                                                  controllers.AddZoneController.userStoreZoneKYC(name: String, documentType: String)
@@ -333,39 +349,18 @@ GET         /zoneUpdate                                                         
 GET         /zoneUpload/updateFile                                                                controllers.AddZoneController.updateZoneKYC(name: String, documentType: String)
 
 GET         /master/userAccessedOrganizationKYCFile                                               controllers.FileController.userAccessedOrganizationKYCFile(documentType: String)
-GET         /master/userAccessedTraderKYCFile                                                     controllers.FileController.userAccessedTraderKYCFile(documentType: String)
 GET         /master/userAccessedZoneKYCFile                                                       controllers.FileController.userAccessedZoneKYCFile(documentType: String)
 
 GET         /master/inviteTrader                                                                  controllers.SetACLController.inviteTraderForm
 POST        /master/inviteTrader                                                                  controllers.SetACLController.inviteTrader
 GET         /master/addTrader                                                                     controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                                                     controllers.SetACLController.addTrader
-GET         /master/userUploadOrUpdateTraderKYCView                                               controllers.SetACLController.userUploadOrUpdateTraderKYCView
-GET         /master/userUploadTraderKYCForm                                                       controllers.SetACLController.userUploadTraderKYCForm(documentType: String)
-POST        /master/userUploadTraderKYC                                                           controllers.SetACLController.userUploadTraderKYC(documentType: String)
-GET         /master/userStoreTraderKYC                                                            controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
-GET         /master/userUpdateTraderKYCForm                                                       controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
-GET         /master/userUpdateTraderKYC                                                           controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
-GET         /master/userReviewAddTraderRequest                                                    controllers.SetACLController.userReviewAddTraderRequestForm
-POST        /master/userReviewAddTraderRequest                                                    controllers.SetACLController.userReviewAddTraderRequest
 
 GET         /master/zoneVerifyTrader                                                              controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
 POST        /master/zoneVerifyTrader                                                              controllers.SetACLController.zoneVerifyTrader
-GET         /master/zoneViewTraderKYCDocuments                                                    controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
-GET         /master/zoneAcceptOrRejectTraderKYCDocument                                           controllers.SetACLController.zoneAcceptOrRejectTraderKYCDocumentForm(traderID: String, documentType: String)
-POST        /master/zoneAcceptOrRejectTraderKYCDocument                                           controllers.SetACLController.zoneAcceptOrRejectTraderKYCDocument
-GET         /master/zoneViewVerifyTraderRequests                                                  controllers.SetACLController.zoneViewPendingVerifyTraderRequests
 
 GET         /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTrader
-GET         /master/organizationAcceptOrRejectTraderKYCDocument                                   controllers.SetACLController.organizationAcceptOrRejectTraderKYCDocumentForm(traderID: String, documentType: String)
-POST        /master/organizationAcceptOrRejectTraderKYCDocument                                   controllers.SetACLController.organizationAcceptOrRejectTraderKYCDocument
-
-GET         /traderUpload                                                                         controllers.SetACLController.uploadTraderKYCForm(documentType: String)
-POST        /traderUpload/file                                                                    controllers.SetACLController.uploadTraderKYC(documentType: String)
-GET         /traderUpload/storeFile                                                               controllers.SetACLController.storeTraderKYC(name: String, documentType: String)
-GET         /traderUpdate                                                                         controllers.SetACLController.updateTraderKYCForm(documentType: String)
-GET         /traderUpload/updateFile                                                              controllers.SetACLController.updateTraderKYC(name: String, documentType: String)
 
 GET         /mc                                                                                   controllers.BackgroundCheckController.memberCheck(id: String)
 GET         /worldCheck/traderBackgroundCheckUpload                                               controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
@@ -438,14 +433,6 @@ GET         /master/viewVerifyZoneRequests                                      
 GET         /master/rejectVerifyZoneRequest                                                       controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
 POST        /master/rejectVerifyZoneRequest                                                       controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/buyerExecuteOrderDocument                                                     controllers.OrderController.buyerExecuteOrderDocument(orderID: String)
-GET         /master/buyerExecuteOrder                                                             controllers.OrderController.buyerExecuteOrderForm(requestID: String)
-POST        /master/buyerExecuteOrder                                                             controllers.OrderController.buyerExecuteOrder
-
-GET         /master/moderatedBuyerExecuteOrderDocument                                            controllers.OrderController.moderatedBuyerExecuteOrderDocument(negotiationID: String)
-GET         /master/moderatedBuyerExecuteOrder                                                    controllers.OrderController.moderatedBuyerExecuteOrderForm(requestID: String)
-POST        /master/moderatedBuyerExecuteOrder                                                    controllers.OrderController.moderatedBuyerExecuteOrder
-
 GET         /master/viewPendingIssueAssetRequests                                                 controllers.IssueAssetController.viewPendingIssueAssetRequests
 
 GET         /master/issueAsset                                                                    controllers.IssueAssetController.issueAssetForm(assetID: String)
@@ -458,25 +445,8 @@ GET         /master/issueFiatRequest                                            
 GET         /master/issueFiat                                                                     controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                                                     controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemAsset                                                                   controllers.RedeemAssetController.redeemAssetForm(username: String, pegHash: String)
-POST        /master/redeemAsset                                                                   controllers.RedeemAssetController.redeemAsset
-
 GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiat
-
-GET         /master/releaseAsset                                                                  controllers.ReleaseAssetController.releaseAssetForm(assetID: String)
-POST        /master/releaseAsset                                                                  controllers.ReleaseAssetController.releaseAsset
-
-GET         /master/sellerExecuteOrderDocument                                                    controllers.OrderController.sellerExecuteOrderDocument(orderID:String)
-GET         /master/sellerExecuteOrder                                                            controllers.OrderController.sellerExecuteOrderForm(requestID:String)
-POST        /master/sellerExecuteOrder                                                            controllers.OrderController.sellerExecuteOrder
-
-GET         /master/moderatedSellerExecuteOrderDocument                                           controllers.OrderController.moderatedSellerExecuteOrderDocument(negotiationID: String)
-GET         /master/moderatedSellerExecuteOrder                                                   controllers.OrderController.moderatedSellerExecuteOrderForm(requestID: String)
-POST        /master/moderatedSellerExecuteOrder                                                   controllers.OrderController.moderatedSellerExecuteOrder
-
-GET         /master/sendAsset                                                                     controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
-POST        /master/sendAsset                                                                     controllers.SendAssetController.sendAsset
 
 GET         /master/sendCoin                                                                      controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                                                      controllers.SendCoinController.sendCoin
@@ -521,9 +491,6 @@ POST        /blockchain/addOrganization                                         
 GET         /blockchain/addZone                                                                   controllers.AddZoneController.blockchainAddZoneForm
 POST        /blockchain/addZone                                                                   controllers.AddZoneController.blockchainAddZone
 
-GET         /blockchain/buyerExecuteOrder                                                         controllers.OrderController.blockchainBuyerExecuteOrderForm
-POST        /blockchain/buyerExecuteOrder                                                         controllers.OrderController.blockchainBuyerExecuteOrder
-
 GET         /blockchain/changeBuyerBid                                                            controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm
 POST        /blockchain/changeBuyerBid                                                            controllers.ChangeBuyerBidController.blockchainChangeBuyerBid
 
@@ -550,9 +517,6 @@ POST        /blockchain/redeemFiat                                              
 
 GET         /blockchain/releaseAsset                                                              controllers.ReleaseAssetController.blockchainReleaseAssetForm
 POST        /blockchain/releaseAsset                                                              controllers.ReleaseAssetController.blockchainReleaseAsset
-
-GET         /blockchain/sellerExecuteOrder                                                        controllers.OrderController.blockchainSellerExecuteOrderForm
-POST        /blockchain/sellerExecuteOrder                                                        controllers.OrderController.blockchainSellerExecuteOrder
 
 GET         /blockchain/sendAsset                                                                 controllers.SendAssetController.blockchainSendAssetForm
 POST        /blockchain/sendAsset                                                                 controllers.SendAssetController.blockchainSendAsset

@@ -100,6 +100,16 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
     }
   }
 
+  private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(releaseAssetTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(releaseAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def deleteByTicketID(ticketID: String) = db.run(releaseAssetTable.filter(_.ticketID === ticketID).delete.asTry).map {
@@ -155,6 +165,8 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
+    def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
+
     def getTransaction(ticketID: String): Future[ReleaseAsset] = findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
@@ -179,25 +191,28 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         } yield {}
       }
 
-      def getIDs(releaseAsset: ReleaseAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionSuccessful
         releaseAsset <- releaseAsset
         _ <- markDirty(releaseAsset)
-        (toAccountID, fromAccountID) <- getIDs(releaseAsset)
+        fromAccountID <- getAccountID(releaseAsset.from)
+        toAccountID <- getAccountID(releaseAsset.to)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+          if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+            (for {
+              _ <- Service.resetTransactionStatus(ticketID)
+            } yield ()
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                throw baseException
+            }
+          }
+          throw baseException
       }
     }
 
@@ -205,21 +220,13 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val releaseAsset = Service.getTransaction(ticketID)
 
-      def getIDs(releaseAsset: ReleaseAsset): Future[(String, String)] = {
-        val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
-        val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
-        for {
-          toAccountID <- toAccountID
-          fromAccountID <- fromAccountID
-        } yield (toAccountID, fromAccountID)
-      }
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed
         releaseAsset <- releaseAsset
-        (toAccountID, fromAccountID) <- getIDs(releaseAsset)
+        fromAccountID <- getAccountID(releaseAsset.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
