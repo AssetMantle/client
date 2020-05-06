@@ -421,13 +421,6 @@ object Form {
   val SERVICE_ID = "service.id"
   val SERVICE_AMOUNT = "service.amount"
 
-  //Docusign
-  val REFRESH_TOKEN="refresh_token"
-  val DOCUMENT_INDEX = "1"
-  val RECIPIENT_INDEX = "1"
-  val SIGNATURE_SCOPE = "signature"
-  val CODE = "code"
-
   //Gatling Test
   val ADDRESS_ADDRESS_LINE_1 = "ADDRESS.ADDRESS_LINE_1"
   val ADDRESS_ADDRESS_LINE_2 = "ADDRESS.ADDRESS_LINE_2"

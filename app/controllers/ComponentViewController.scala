@@ -1693,11 +1693,14 @@ class ComponentViewController @Inject()(
 
       def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
-      for {
+      (for {
         traderID <- traderID
         issueFiatRequestList <- getIssueFiatRequestList(traderID)
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.traderViewIssueFiatRequestList(issueFiatRequestList, rtcbList))
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -1710,13 +1713,15 @@ class ComponentViewController @Inject()(
 
       def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
-      for {
+      (for {
         organizationID <- organizationID
         traderList <- getTraderList(organizationID)
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.organizationViewIssueFiatRequestList(traderList, issueFiatRequestList, rtcbList))
-
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -1732,13 +1737,16 @@ class ComponentViewController @Inject()(
 
       def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
-      for {
+      (for {
         zoneID <- zoneID
         organizationList <- getOrganizationList(zoneID)
         traderList <- getTraderList(zoneID)
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.zoneViewIssueFiatRequestList(traderList, organizationList, issueFiatRequestList, rtcbList))
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
 }
