@@ -10,9 +10,9 @@ GET         /docusign/send                                                      
 GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
 GET         /docusign/authorization                                                               controllers.DocusignController.authorization
 
-#DO NOT CHANGE /Docusign Return ENDPOINT
-GET         /docusign/return                                                                      controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
-GET         /docusign/authorizationReturn                                                         controllers.DocusignController.authorizationReturn(code:String)
+#DO NOT CHANGE /Docusign CallBack ENDPOINT
+GET         /docusign/callBack                                                                    controllers.DocusignController.callBack(envelopeId:String, event:String)
+GET         /docusign/authorizationCallBack                                                       controllers.DocusignController.authorizationCallBack(code:String)
 
 GET         /blockExplorer/lastBlockHeight                                                        controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                                           controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)

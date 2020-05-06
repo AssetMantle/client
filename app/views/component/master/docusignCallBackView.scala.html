@@ -5,10 +5,10 @@
 @(event:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 @event match{
-    case constants.Event.Docusign.SEND=>{
+    case constants.Docusign.SEND=>{
         @Messages(constants.View.DOCUMENT_SENT_FOR_SIGNING)
     }
-    case constants.Event.Docusign.SIGNING_COMPLETE=>{
+    case constants.Docusign.SIGNING_COMPLETE=>{
         @Messages(constants.View.DOCUMENT_SIGNED)
     }
     case _=>{ @Messages(constants.View.UNEXPECTED_EVENT)}
