@@ -9,7 +9,7 @@
     <h4>@Messages(constants.Form.TRADER_BACKGROUND_CHECK)</h4>
     @for(documentType <- constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages(documentType)).mkString(" ") ,routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,'parameters -> s"'${documentType}','${trader.id}'")
+            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" ") ,routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,'parameters -> s"'${documentType}','${trader.id}'")
         </div>
     }
     @for(traderBackgroundCheck <- traderBackgroundChecks) {
