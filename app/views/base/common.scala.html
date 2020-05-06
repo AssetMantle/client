@@ -54,26 +54,26 @@
                             case null => {}
                             case default => {
                                 <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-dashboard")"/></svg>
+                                    @commonIcon("dashboard")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
                                 <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
+                                    @commonIcon("trader")
                                 </span>
                                     @Messages(constants.View.TRADES)
                                 </a>
                                 </li>
                                 <li>
                                     <a href="@controllers.routes.ViewController.transactions()"><span class="transactionIcon">
-                                        <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>
+                                        @commonIcon("transaction")
                                     </span>
                                         @Messages(constants.Form.TRANSACTIONS)
                                     </a>
                                 </li>
                                 <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
+                                    @commonIcon("account")
                                 </span>
                                     @Messages(constants.View.ACCOUNT)
                                 </a>
@@ -122,7 +122,7 @@
                                 </li>
                                 <li>
                                     <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                        <span class="logoutIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-logout")"/></svg></span>
+                                        <span class="logoutIcon">@commonIcon("logout")</span>
                                     </a>
                                 </li>
 
@@ -143,32 +143,32 @@
                 @for(failure <- failures) {
                     <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="failureIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-fail")"/></svg></span>
-                            <span class="alertName">@Messages(constants.Form.FAILURE):</span>
+                        <p><span class="failureIcon">@commonIcon("fail")</span>
+                            <span class="cmuk-alert-name">@Messages(constants.Form.FAILURE):</span>
                             @Messages(failure.message)</p>
                     </div>
                 }
                 @for(warning <- warnings) {
                     <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="warningIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-warning")"/></svg></span>
-                            <span class="alertName">@Messages(constants.Form.WARNING):</span>
+                        <p><span class="warningIcon">@commonIcon("warning")</span>
+                            <span class="cmuk-alert-name">@Messages(constants.Form.WARNING):</span>
                             @Messages(warning.message)</p>
                     </div>
                 }
                 @for(success <- successes) {
                     <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="successIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-success")"/></svg></span>
-                            <span class="alertName">@Messages(constants.Form.SUCCESS):</span>
+                        <p><span class="successIcon">@commonIcon("success")</span>
+                            <span class="cmuk-alert-name">@Messages(constants.Form.SUCCESS):</span>
                             @Messages(success.message)</p>
                     </div>
                 }
                 @for(info <- infos) {
                     <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="infoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info")"/></svg></span>
-                            <span class="alertName">@Messages(constants.Form.INFORMATION):</span>
+                        <p><span class="infoIcon">@commonIcon("info")</span>
+                            <span class="cmuk-alert-name">@Messages(constants.Form.INFORMATION):</span>
                             @Messages(info.message)</p>
                     </div>
 

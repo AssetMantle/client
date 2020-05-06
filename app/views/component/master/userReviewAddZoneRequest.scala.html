@@ -21,6 +21,7 @@
             @commonTextInfo(constants.Form.PHONE, zone.address.phone)
         </div>
         <div class="sides">
+            <div class="innerSideRight">
             <div id="zoneKYCs">
                 <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_KYC_FILES)</div>
                 @for(zoneKYC <- zoneKYCs) {
@@ -34,6 +35,7 @@
                 }
             </div>
             @commonCheckbox(zoneCompletionForm, constants.FormField.COMPLETION)
+        </div>
         </div>
     </div>
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.View.BACK)</button>

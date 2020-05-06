@@ -286,8 +286,7 @@ html, body{
   flex-direction: column;
   min-width: 200px;
   width: 30%;
-  margin-top: 20px;
-  margin: auto;
+  margin:20px auto auto auto;
 }
 
 .uploadProgressOuter {
@@ -374,7 +373,7 @@ html, body{
   box-shadow: 0 5px 15px rgba(0,0,0,.08);
 }
 
-.alertName{
+.cmuk-alert-name{
   font-weight: bold;
   font-size: $paragraphFontSizeSmall;
 }
@@ -382,20 +381,6 @@ html, body{
 .cmuk-accordion-buttons{
   background: #fff;
   padding:10px;
-}
-
-
-.profileDropdown li{
-  padding: 5px 20px;
-}
-
-.tablePadding tr td,
-.tablePadding tr th{
-  padding: 5px 12px;
-}
-
-.tablePadding tr th{
-  font-weight:700;
 }
 
 .profileDocuments{
@@ -448,7 +433,7 @@ html, body{
   }
 }
 
-.signupErrorList{
+.signUpErrorList{
   padding: 0px;
   margin: 0;
   list-style: none;
@@ -457,7 +442,7 @@ html, body{
   }
 }
 
-.usernameAvailibilty {
+.usernameAvailability {
   position: relative;
   .result {
     position: absolute;
@@ -498,38 +483,6 @@ html, body{
   .eyeIcon.active .icon{
     fill: #FE4350;
   }
-  .mainlist{
-    padding:0px;
-  }
-}
-
-
-.listItem{
-  display: inline-flex;
-  background: #cccc;
-  margin: 0;
-  margin-bottom: 10px;
-}
-
-.listItemchild{
-  margin: 10px;
-}
-
-.listItemchildhTitle{
-  font-weight: bold;
-  color: black;
-}
-
-.Editdropdown{
-  display: none;
-  position: absolute;
-  z-index: 1020;
-  box-sizing: border-box;
-  width: 200px;
-  padding: 25px;
-  background: #fff;
-  color: #666;
-  box-shadow: 0 5px 12px rgba(0,0,0,.15);
 }
 
 .hiddenLabel label{
@@ -540,13 +493,6 @@ html, body{
   font-size: $paragraphFontSizeSmall;
   color: $colorPrimary;
   margin-bottom: 5px;
-}
-
-
-.profileDocuments{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
 }
 
 .mobileNumberUpdate {
@@ -560,13 +506,6 @@ html, body{
   }
   .mobileNumber label{
     margin-left: -77px;
-  }
-}
-
-.commonhomeData{
-  font-size: $paragraphFontSizeSmall;
-  p, h3{
-    margin:5px 0px;
   }
 }
 
@@ -610,10 +549,6 @@ html, body{
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.loginButton{
-font-family: $fontFamilyPrimary;
 }
 
 .updateDocumentField{
@@ -966,6 +901,9 @@ position: relative;
           width: auto;
         }
       }
+      .legendModalContainer{
+        max-height: 600px;
+      }
       .modalInnerContainerFirst{
         min-width: 500px;
       }
@@ -973,21 +911,23 @@ position: relative;
         width: 1000px;
         display: flex;
         justify-content: space-between;
-        height: 600px;
-        border: 1px solid rgba(5, 60, 117, 0.12);
+        //border: 1px solid rgba(5, 60, 117, 0.12);
         box-sizing: border-box;
         border-radius: 2px;
         overflow: auto;
         padding: 20px;
         .sides:first-child{
-          padding-right: 30px;
+          padding-right: 70px;
         }
         .sides{
           flex:1;
           .innerSideRight{
             border-left: 1px solid rgba(5, 60, 117, 0.12);
-            padding-left: 30px;
+            padding-left: 70px;
           }
+        }
+        .infoRow{
+          line-height: 2.4;
         }
       }
     }
@@ -1056,10 +996,7 @@ position: relative;
 }
 
 .bannerContainer {
-  background-color: #031221;
-  background-image: url("../../images/bannerImage.svg");
-  background-repeat: no-repeat;
-  background-position: 80% 8%;
+  background: #031221 url("../../images/bannerImage.svg") no-repeat 80% 8%;
   height: 363px;
   display: flex;
   position: relative;
@@ -1122,7 +1059,7 @@ position: relative;
   }
 }
 
-.tabsSection {
+.tab-section {
   p {
     font-size:$headingFontSizeLarge;
     letter-spacing: 0.01em;
@@ -1157,9 +1094,7 @@ position: relative;
           padding-right: 0px;
           margin-left: 25px;
           float: right;
-          background-repeat: no-repeat;
-          background-position: 50% 50%;
-          background-image: url(../../images/chevron-down-blue.svg);
+          background:url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
           padding-left: 25px;
         }
       }
@@ -1201,13 +1136,13 @@ position: relative;
     color: $colorSecondary;
     font-weight: bold;
   }
-  .quoteIdTtitle{
+  .quoteIdTitle{
     color: #6C7883;
     font-weight: bold;
     font-size: $paragraphFontSizeSmall;
   }
   .quoteId{
-    font-size: $paragraphFontSizeSmall  ;
+    font-size: $paragraphFontSizeSmall ;
   }
 }
 
@@ -2021,16 +1956,16 @@ header:before,
   }
 }
 
-.docView{
-  .cmuk-card-header, .cmuk-card-body, .documentlist{
+.documentView{
+  .cmuk-card-header, .cmuk-card-body, .documentList{
     padding:0px;
   }
-  .documentlist{
+  .documentList{
     height: 250px;
     overflow: auto;
   }
 
-  .documentlist{
+  .documentList{
     .cmuk-table td {
       padding: 16px 5px;
       vertical-align: top;
@@ -2746,7 +2681,7 @@ figure.zoom {
   cursor: zoom-in;
 }
 
-.SalesQuoteCard{
+.salesQuoteCard{
   .commonList{
     flex:1;
     padding: 0px;
@@ -2883,7 +2818,7 @@ figure.zoom {
   }
 }
 .traderTradeRooms, .traderSalesQuotes{
-  .SalesQuoteCard{
+  .salesQuoteCard{
     .secondPart{
       flex:40%;
       text-align: center;

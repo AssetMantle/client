@@ -10,7 +10,7 @@
     @Messages(constants.View.ORGANIZATION): @organization.id
 </legend>
 <hr>
-<div class="modalInnerContainer">
+<div class="modalInnerContainer legendModalContainer">
     <div class="sides">
     <div class="cmuk-text-left title">@Messages(constants.Form.ORGANIZATION_DETAILS):</div>
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
@@ -26,6 +26,7 @@
     @streetAddress(organization.postalAddress)
     </div>
     <div class="sides">
+        <div class="innerSideRight">
     <div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_UBO_DETAIL):</div>
     @for(ubo <- organization.ubos.data) {
         @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
@@ -43,5 +44,6 @@
             @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
         }
     }
+        </div>
     </div>
 </div>

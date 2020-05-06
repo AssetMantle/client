@@ -20,6 +20,7 @@
         @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked-> true)
         </div>
         <div class="sides">
+            <div class="innerSideRight">
         @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_BUYER_BID, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked-> true)
@@ -27,6 +28,7 @@
         @commonCheckbox(modifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked-> true)
         @commonInputInt(modifyTraderForm, constants.FormField.GAS)
         @commonInputPassword(modifyTraderForm, constants.FormField.PASSWORD)
+        </div>
         </div>
     </div>
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'parameters -> s"'${trader.id}'")

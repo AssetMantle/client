@@ -179,6 +179,14 @@
   .modal .modalContent{
     top:10%;
     max-height: 530px;
+    .modalBody {
+      form .formBody {
+        max-height: 409px;
+      }
+      .legendModalContainer{
+        max-height: 399px;
+      }
+    }
   }
   .leftSideContainer{
     .financial{
@@ -204,7 +212,7 @@
       color: #0862BE;
       border: 0;
     }
-    .docView{
+    .documentView{
       .cmuk-card-header, .cmuk-card-body, .documentlist{
         padding:0px;
       }
@@ -270,7 +278,7 @@
       left: 0px;
     }
   }
-  .SalesQuoteCard{
+  .salesQuoteCard{
     .firstPart{
       flex: 32%;
     }
@@ -315,7 +323,7 @@
       }
     }
   }
-  .tabsSection{
+  .tab-section{
     .cmuk-grid-divider{
       display: block;
     }

@@ -15,7 +15,7 @@
             </div>
             <div class="sellerTerm">
                 <div class="cmuk-flex">
-                    <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-description")"/></svg></span>
+                    <span class="termIcon">@commonIcon("description")</span>
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
                 </div>
                 <div>
@@ -24,7 +24,7 @@
             </div>
             <div class="sellerTerm">
                 <div class="cmuk-flex">
-                    <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-contract-price")"/></svg></span>
+                    <span class="termIcon">@commonIcon("contract-price")</span>
                     @commonIntInfo(constants.View.PRICE, negotiation.price)
                 </div>
                 <div>
@@ -33,7 +33,7 @@
             </div>
             <div class="sellerTerm">
                 <div class="cmuk-flex">
-                    <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-quantity")"/></svg></span>
+                    <span class="termIcon">@commonIcon("quantity")</span>
                     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
@@ -47,15 +47,15 @@
             <div class="sellerTerm">
                 <div>
                     <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-port")"/></svg></span>
+                        <span class="termIcon">@commonIcon("port")</span>
                         @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
                     </div>
                     <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-port")"/></svg></span>
+                        <span class="termIcon">@commonIcon("port")</span>
                         @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                     </div>
                     <div class="cmuk-flex">
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-shipment-period")"/></svg></span>
+                        <span class="termIcon">@commonIcon("shipment-period")</span>
                         @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                 @Messages(constants.View.ASSET_DOCUMENTS):
                 @negotiation.documentList.assetDocuments.map { document =>
                     <div>
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
+                        <span class="termIcon">@commonIcon("document")</span>
                         @Messages(document)
                     </div>
                 }
@@ -111,7 +111,7 @@
                 @Messages(constants.View.NEGOTIATION_DOCUMENTS):
                 @negotiation.documentList.negotiationDocuments.map { document =>
                     <div>
-                        <span class="termIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-document")"/></svg></span>
+                        <span class="termIcon">@commonIcon("document")</span>
                         @Messages(document)
                     </div>
                 }

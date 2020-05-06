@@ -5,7 +5,7 @@
     <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
-                <span class="walletIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-wallet")"/></svg></span>
+                <span class="walletIcon">@commonIcon("wallet")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.TOTAL_AMOUNT_DUE)</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountDue</p>
@@ -14,7 +14,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex receivable">
-                <span class="receivableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-receivable")"/></svg></span>
+                <span class="receivableIcon">@commonIcon("receivable")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid</p>
@@ -23,7 +23,7 @@
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex payable">
-                <span class="payableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-payable")"/></svg></span>
+                <span class="payableIcon">@commonIcon("payable")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@amountPending</p>

@@ -16,11 +16,13 @@
         @commonInputText(identificationForm, constants.FormField.ADDRESS_LINE_2)
         </div>
         <div class="sides">
-        @commonInputText(identificationForm, constants.FormField.LANDMARK, 'required -> false)
-        @commonInputText(identificationForm, constants.FormField.CITY)
-        @commonInputText(identificationForm, constants.FormField.COUNTRY)
-        @commonInputText(identificationForm, constants.FormField.ZIP_CODE)
-        @commonInputText(identificationForm, constants.FormField.PHONE)
+            <div class="innerSideRight">
+            @commonInputText(identificationForm, constants.FormField.LANDMARK, 'required -> false)
+            @commonInputText(identificationForm, constants.FormField.CITY)
+            @commonInputText(identificationForm, constants.FormField.COUNTRY)
+            @commonInputText(identificationForm, constants.FormField.ZIP_CODE)
+            @commonInputText(identificationForm, constants.FormField.PHONE)
+            </div>
         </div>
     </div>
     }

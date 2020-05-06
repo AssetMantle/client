@@ -6,7 +6,7 @@
 
 @import models.master.Organization
 @(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
- <div class="SalesQuoteCard">
+ <div class="salesQuoteCard">
     @incompleteNegotiationList.map { incompleteNegotiation =>
         @commonVerticalInfoBox(){
             <div class="firstPart salesChild">
@@ -51,7 +51,7 @@
                 }
                 <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
                     <span class="lines">---</span>
-                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="arrowIcon">@commonIcon("rounded-right-arrow")</span>
                     <span class="lines">---</span>
                     <span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>

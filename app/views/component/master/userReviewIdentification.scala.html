@@ -22,6 +22,7 @@
         @commonTextInfo(constants.FormField.LANDMARK.name, identification.address.landmark.getOrElse(""))
         </div>
         <div class="sides">
+            <div class="innerSideRight">
         @commonTextInfo(constants.FormField.CITY.name, identification.address.city)
         @commonTextInfo(constants.FormField.COUNTRY.name, identification.address.country)
         @commonTextInfo(constants.FormField.ZIP_CODE.name, identification.address.zipCode)
@@ -36,6 +37,7 @@
         }
         @commonCheckbox(userReviewIdentificationForm, constants.FormField.COMPLETION)
         </div>
+    </div>
     </div>
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userViewUploadOrUpdateIdentification())">@Messages(constants.View.BACK)</button>
 }

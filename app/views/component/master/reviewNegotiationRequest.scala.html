@@ -21,6 +21,7 @@
     @commonBooleanInfo(constants.Form.MODERATED, Option(asset.moderated))
     </div>
         <div class="sides">
+            <div class="innerSideRight">
         @commonIntInfo(constants.Form.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
     @commonTextInfo(constants.Form.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
     @commonTextInfo(constants.Form.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
@@ -45,6 +46,7 @@
         <p  class="cmuk-text-left cmuk-margin-remove"><span class="cmuk-text-left">@Messages(negotiationDocument)</span></p>
     }
         </div>
+    </div>
     </div>
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'parameters -> s"'${negotiation.id}'")

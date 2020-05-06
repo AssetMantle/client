@@ -6,7 +6,7 @@
 
 @(mobileNumber: Option[Mobile], emailAddress: Option[Email])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
+@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#contactDetails") {
    } {
     <div class="contactUpdateButton">
     @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm, 'class -> "cmuk-button-link")}

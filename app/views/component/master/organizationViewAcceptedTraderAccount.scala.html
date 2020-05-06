@@ -8,7 +8,9 @@
     @Messages(constants.View.TRADER): @trader.id
 </legend>
 <hr>
+<div class="modalInnerContainerFirst">
 @commonTextInfo(constants.View.TRADER_ID, trader.id)
 @commonTextInfo(constants.View.NAME, trader.name)
 @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
 @commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
+</div>

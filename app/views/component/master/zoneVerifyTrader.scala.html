@@ -19,6 +19,7 @@
         @commonCheckbox(verifyTraderForm, constants.FormField.SELLER_EXECUTE_ORDER, 'checked -> true)
         </div>
         <div class="sides">
+            <div class="innerSideRight">
         @commonCheckbox(verifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER, 'checked -> true)
         @commonCheckbox(verifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked -> true)
         @commonCheckbox(verifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked -> true)
@@ -28,6 +29,7 @@
         @commonCheckbox(verifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> true)
         @commonInputInt(verifyTraderForm, constants.FormField.GAS)
         @commonInputPassword(verifyTraderForm, constants.FormField.PASSWORD)
+        </div>
         </div>
     </div>
     @commonModalButton(constants.View.BACK, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'")

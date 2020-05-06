@@ -1,4 +1,5 @@
 @(mnemonic: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import views.html.base._
 <div class="MnemonicQuiz">
     <legend class="cmuk-legend cmuk-text-center">
         @Messages(constants.Form.PLEASE_BACKUP_THIS_MNEMONIC)
@@ -11,7 +12,7 @@
     }
     </div>
     <div class="mnemonicNote">
-        <div><span class="mnemonicInfoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info-rounded")"/></svg></span></div>
+        <div><span class="mnemonicInfoIcon">@commonIcon("info-rounded")</span></div>
         <div class="mnemonicNoteText">
         @Messages(constants.View.MNEMONIC_NOTE)
         </div>

@@ -32,6 +32,7 @@
             }
         </div>
         <div class="sides">
+            <div class="innerSideRight">
             <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name):</div>
             @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
             @defining(Option(constants.FormField.POSTAL_ADDRESS)) { implicit nestedFormField =>
@@ -43,6 +44,7 @@
             @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
             @commonInputText(addOrganizationForm, constants.FormField.PHONE)
             }
+            </div>
         </div>
     </div>
 }
