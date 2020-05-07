@@ -707,6 +707,30 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Asset_History"
+(
+    "id"                VARCHAR NOT NULL,
+    "ownerID"           VARCHAR NOT NULL,
+    "pegHash"           VARCHAR UNIQUE,
+    "assetType"         VARCHAR NOT NULL,
+    "description"       VARCHAR NOT NULL,
+    "documentHash"      VARCHAR NOT NULL UNIQUE,
+    "quantity"          INT     NOT NULL,
+    "quantityUnit"      VARCHAR NOT NULL,
+    "price"             INT     NOT NULL,
+    "moderated"         BOOLEAN NOT NULL,
+    "takerID"           VARCHAR,
+    "otherDetails"      VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Email"
 (
     "id"                VARCHAR NOT NULL,
@@ -984,6 +1008,23 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
+(
+    "id"                  VARCHAR NOT NULL,
+    "documentType"        VARCHAR NOT NULL,
+    "fileName"            VARCHAR NOT NULL UNIQUE,
+    "file"                BYTEA,
+    "documentContentJson" VARCHAR,
+    "status"              BOOLEAN,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
+    PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile_History"
 (
     "id"                  VARCHAR NOT NULL,
     "documentType"        VARCHAR NOT NULL,
@@ -1293,7 +1334,7 @@ ALTER TABLE MASTER."AccountFile"
 ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Asset"
-    ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
+    ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash") ON DELETE CASCADE;
 ALTER TABLE MASTER."Asset"
     ADD CONSTRAINT Asset_Trader_TakerID FOREIGN KEY ("takerID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Email"
@@ -1348,7 +1389,7 @@ ALTER TABLE MASTER."ZoneKYC"
     ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."AssetFile"
-    ADD CONSTRAINT AssetFile_Asset_id FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id");
+    ADD CONSTRAINT AssetFile_Asset_id FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER_TRANSACTION."Chat"
     ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Message"
@@ -1383,20 +1424,67 @@ ALTER TABLE WESTERN_UNION."FiatRequest"
 ALTER TABLE WESTERN_UNION."RTCB"
     ADD CONSTRAINT RTCB_FiatRequest_externalReference FOREIGN KEY ("externalReference") REFERENCES WESTERN_UNION."FiatRequest" ("id");
 
+/*Triggers*/
+
+CREATE OR REPLACE FUNCTION create_asset_history()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER."Asset_History" ( "id", "ownerID", "pegHash", "assetType", "description", "documentHash"
+                                       , "quantity", "quantityUnit", "price", "moderated", "takerID", "otherDetails"
+                                       , "status", "createdBy", "createdOn", "createdOnTimeZone", "updatedBy"
+                                       , "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."ownerID", old."pegHash", old."assetType", old.description, old."documentHash", old.quantity,
+            old."quantityUnit", old.price, old.moderated, old."takerID", old."otherDetails", old.status,
+            old."createdBy", old."createdOn", old."createdOnTimeZone", current_user, current_timestamp,
+            current_setting('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER deleteAsset
+    BEFORE DELETE
+    ON MASTER."Asset"
+    FOR EACH ROW
+EXECUTE PROCEDURE create_asset_history();
+
+CREATE OR REPLACE FUNCTION create_asset_file_history()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER_TRANSACTION."AssetFile_History" ("id", "documentType", "fileName", "file", "documentContentJson",
+                                                        "status", "createdBy", "createdOn", "createdOnTimeZone",
+                                                        "updatedBy", "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
+            old."createdBy", old."createdOn", old."createdOnTimeZone", current_user, current_timestamp,
+            current_setting('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER deleteAssetFile
+    BEFORE DELETE
+    ON MASTER_TRANSACTION."AssetFile"
+    FOR EACH ROW
+EXECUTE PROCEDURE create_asset_file_history();
+
 /*Initial State*/
 
-INSERT INTO master."Account" ("id", "secretHash", "partialMnemonic", "language", "userType", "createdBy", "createdOn",
+
+INSERT INTO MASTER."Account" ("id", "secretHash", "partialMnemonic", "language", "userType", "createdBy", "createdOn",
                               "createdOnTimeZone")
 VALUES ('main',
         '711213004',
         '["fluid","cereal","trash","miracle","casino","menu","true","method","exhaust","pen","fiber","rural","grape","purchase","rather","table","omit","youth","gain","cage","erase"]',
         'en',
         'GENESIS',
-        'dev.webapp',
-        CURRENT_TIMESTAMP,
-        'GMT+5:30');
+        current_user,
+        current_timestamp,
+        current_setting('TIMEZONE'));
 
-INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
+INSERT INTO BLOCKCHAIN."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
                                      "dirtyBit", "createdBy", "createdOn", "createdOnTimeZone")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
@@ -1405,9 +1493,9 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '0',
         '0',
         true,
-        'dev.webapp',
-        CURRENT_TIMESTAMP,
-        'GMT+5:30');
+        current_user,
+        current_timestamp,
+        current_setting('TIMEZONE'));
 
 # --- !Downs
 
@@ -1446,6 +1534,7 @@ DROP TABLE IF EXISTS MASTER."Account" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Asset" CASCADE;
+DROP TABLE IF EXISTS MASTER."Asset_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Email" CASCADE;
 DROP TABLE IF EXISTS MASTER."Fiat" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
@@ -1463,6 +1552,7 @@ DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Chat" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
