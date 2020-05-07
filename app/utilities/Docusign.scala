@@ -80,7 +80,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       recipients.setSigners(JavaConverters.seqAsJavaList(signerList))
 
       envelopeDefinition.setRecipients(recipients)
-      envelopeDefinition.setStatus(constants.Status.DocuSignEnvelope.CREATED)
+      envelopeDefinition.setStatus(constants.External.Docusign.Status.CREATED)
 
       envelopesApi.createEnvelope(accountID, envelopeDefinition).getEnvelopeId
     }).recover {

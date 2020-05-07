@@ -11,6 +11,12 @@ object External {
     //Docusign Events
     val SEND = "Send"
     val SIGNING_COMPLETE = "signing_complete"
+
+    object Status {
+      val CREATED = "created"
+      val SENT = "sent"
+      val COMPLETED = "completed"
+    }
   }
 
 }

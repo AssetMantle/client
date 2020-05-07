@@ -37,7 +37,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       def getSenderViewURL(envelope: Option[docusign.Envelope], traderID: String, negotiation: Negotiation): Future[String] = {
         if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
           envelope match {
-            case Some(envelope) => if (envelope.status == constants.Status.DocuSignEnvelope.CREATED) utilitiesDocusign.createSenderViewURL(envelope.envelopeID) else throw new BaseException(constants.Response.UNAUTHORIZED)
+            case Some(envelope) => if (envelope.status == constants.External.Docusign.Status.CREATED) utilitiesDocusign.createSenderViewURL(envelope.envelopeID) else throw new BaseException(constants.Response.UNAUTHORIZED)
             case None => {
               val file = masterTransactionNegotiationFiles.Service.tryGet(negotiationID, documentType)
               val buyerTrader = masterTraders.Service.tryGet(negotiation.buyerTraderID)
@@ -137,7 +137,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         envelope <- envelope
         recepientViewURL <- utilitiesDocusign.createRecipientView(envelope.envelopeID, emailAddress, trader)
       } yield {
-        if (negotiation.buyerTraderID == trader.id && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS && envelope.status == constants.Status.DocuSignEnvelope.SENT) {
+        if (negotiation.buyerTraderID == trader.id && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS && envelope.status == constants.External.Docusign.Status.SENT) {
           Ok(views.html.component.master.docusignView(recepientViewURL))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
