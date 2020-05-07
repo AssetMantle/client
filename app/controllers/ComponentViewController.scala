@@ -3,6 +3,7 @@ package controllers
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.docusign
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
 import models.master.{Organization => _, Zone => _, _}
 import models.{blockchain, master, masterTransaction, westernUnion}
@@ -33,6 +34,7 @@ class ComponentViewController @Inject()(
                                          masterTraderRelations: master.TraderRelations,
                                          masterZones: master.Zones,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
+                                         docusignEnvelopes: docusign.Envelopes,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
                                          westernUnionRTCBs: westernUnion.RTCBs,
@@ -1124,11 +1126,14 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
-
+          val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-          } yield Ok(views.html.component.master.traderViewNegotiationDocumentList(negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList))
+            negotiationEnvelopeList <- negotiationEnvelopeList
+          } yield {
+            Ok(views.html.component.master.traderViewNegotiationDocumentList(traderID = traderID, negotiation = negotiation, assetFileList = assetFileList, negotiationFileList = negotiationFileList, negotiationEnvelopeList = negotiationEnvelopeList))
+          }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1352,10 +1357,12 @@ class ComponentViewController @Inject()(
         if (negotiation.sellerTraderID == traderID || negotiation.buyerTraderID == traderID) {
           val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
           val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+          val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(negotiationID)
           for {
             negotiationFileList <- negotiationFileList
             assetFileList <- assetFileList
-          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
+            negotiationEnvelopeList <- negotiationEnvelopeList
+          } yield Ok(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1686,11 +1693,14 @@ class ComponentViewController @Inject()(
 
       def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
-      for {
+      (for {
         traderID <- traderID
         issueFiatRequestList <- getIssueFiatRequestList(traderID)
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.traderViewIssueFiatRequestList(issueFiatRequestList, rtcbList))
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -1703,13 +1713,15 @@ class ComponentViewController @Inject()(
 
       def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
-      for {
+      (for {
         organizationID <- organizationID
         traderList <- getTraderList(organizationID)
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.organizationViewIssueFiatRequestList(traderList, issueFiatRequestList, rtcbList))
-
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -1725,13 +1737,16 @@ class ComponentViewController @Inject()(
 
       def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
 
-      for {
+      (for {
         zoneID <- zoneID
         organizationList <- getOrganizationList(zoneID)
         traderList <- getTraderList(zoneID)
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.zoneViewIssueFiatRequestList(traderList, organizationList, issueFiatRequestList, rtcbList))
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
 }

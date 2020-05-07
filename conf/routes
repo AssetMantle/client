@@ -6,6 +6,14 @@ GET         /javascriptRoutes                                                   
 
 GET         /firebase-messaging-sw.js                                                             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
+GET         /docusign/send                                                                        controllers.DocusignController.send(id:String, documentType: String)
+GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
+GET         /docusign/authorization                                                               controllers.DocusignController.authorization
+
+#DO NOT CHANGE /Docusign CallBack ENDPOINT
+GET         /docusign/callBack                                                                    controllers.DocusignController.callBack(envelopeId:String, event:String)
+GET         /docusign/authorizationCallBack                                                       controllers.DocusignController.authorizationCallBack(code:String)
+
 GET         /blockExplorer/lastBlockHeight                                                        controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                                           controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
 GET         /blockExplorer/stakingValidators                                                      controllers.BlockExplorerController.stakingValidators
@@ -128,6 +136,11 @@ POST        /negotiation/buyerConfirm                                           
 
 GET         /negotiation/sellerConfirm                                                            controllers.NegotiationController.sellerConfirmForm(id: String)
 POST        /negotiation/sellerConfirm                                                            controllers.NegotiationController.sellerConfirm
+
+GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
+
+GET         /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
+POST        /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSigned
 
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 
