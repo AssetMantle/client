@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: Long)
 
 @Singleton
-class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_SESSION_TOKEN
 

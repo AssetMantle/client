@@ -14,7 +14,7 @@ import scala.util.{Failure, Success}
 case class PushNotificationToken(id: String, token: String)
 
 @Singleton
-class PushNotificationTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class PushNotificationTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_PUSH_NOTIFICATION_TOKEN
 

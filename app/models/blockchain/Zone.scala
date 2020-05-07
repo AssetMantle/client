@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 case class Zone(id: String, address: String, dirtyBit: Boolean)
 
 @Singleton
-class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getZone: GetZone)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getZone: GetZone, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

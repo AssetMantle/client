@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,15 +13,11 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationKYC] with Logged[OrganizationKYC] {
+case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationKYC] with Logged {
 
   def updateFileName(newFileName: String): OrganizationKYC = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = copy(file = newFile)
-
-  def createLog()(implicit node: Node): OrganizationKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): OrganizationKYC = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -37,13 +32,11 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   val db = databaseConfig.db
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   import databaseConfig.profile.api._
 
   private[models] val organizationKYCTable = TableQuery[OrganizationKYCTable]
 
-  private def add(organizationKYC: OrganizationKYC): Future[String] = db.run((organizationKYCTable returning organizationKYCTable.map(_.id) += organizationKYC.createLog()).asTry).map {
+  private def add(organizationKYC: OrganizationKYC): Future[String] = db.run((organizationKYCTable returning organizationKYCTable.map(_.id) += organizationKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -51,7 +44,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def update(organizationKYC: OrganizationKYC): Future[Int] = db.run(organizationKYCTable.filter(_.id === organizationKYC.id).filter(_.documentType === organizationKYC.documentType).update(organizationKYC.updateLog()).asTry).map {
+  private def update(organizationKYC: OrganizationKYC): Future[Int] = db.run(organizationKYCTable.filter(_.id === organizationKYC.id).filter(_.documentType === organizationKYC.documentType).update(organizationKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -77,7 +70,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.status.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((status, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

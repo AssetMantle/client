@@ -10,18 +10,12 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import models.Trait.Logged
-import models.common.Node
-import play.api.libs.json.{JsString, JsValue, Json, OWrites, Reads, Writes}
+import play.api.libs.json.{JsString, Json, OWrites, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Message(id: String, fromAccountID: String, chatID: String, text: String, replyToID: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Message] {
-  def createLog()(implicit node: Node): Message = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Message = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class Message(id: String, fromAccountID: String, chatID: String, text: String, replyToID: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -42,9 +36,7 @@ class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val messageTable = TableQuery[MessageTable]
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
-  private def add(message: Message): Future[String] = db.run((messageTable returning messageTable.map(_.id) += message.createLog()).asTry).map {
+  private def add(message: Message): Future[String] = db.run((messageTable returning messageTable.map(_.id) += message).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

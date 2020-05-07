@@ -9,19 +9,15 @@ import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import models.common.Node
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountKYC] with Logged[AccountKYC] {
+case class AccountKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountKYC] with Logged {
 
   def updateFileName(newFileName: String): AccountKYC = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): AccountKYC = copy(file = newFile)
 
-  def createLog()(implicit node: Node): AccountKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): AccountKYC = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 }
 
 @Singleton
@@ -37,11 +33,9 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val accountKYCTable = TableQuery[AccountKYCTable]
 
-  private def add(accountKYC: AccountKYC): Future[String] = db.run((accountKYCTable returning accountKYCTable.map(_.id) += accountKYC.createLog()).asTry).map {
+  private def add(accountKYC: AccountKYC): Future[String] = db.run((accountKYCTable returning accountKYCTable.map(_.id) += accountKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -49,7 +43,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def update(accountKYC: AccountKYC): Future[Int] = db.run(accountKYCTable.filter(_.id === accountKYC.id).filter(_.documentType === accountKYC.documentType).update(accountKYC.updateLog()).asTry).map {
+  private def update(accountKYC: AccountKYC): Future[Int] = db.run(accountKYCTable.filter(_.id === accountKYC.id).filter(_.documentType === accountKYC.documentType).update(accountKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -77,7 +71,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.status.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((status, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)

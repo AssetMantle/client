@@ -6,7 +6,6 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
 import models.Trait.{Document, Logged}
-import models.common.Node
 import models.common.Serializable._
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
@@ -18,15 +17,11 @@ import slick.lifted.TableQuery
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[AssetDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AssetFile] with Logged[AssetFile] {
+case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[AssetDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AssetFile] with Logged {
 
   def updateFileName(newFileName: String): AssetFile = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): AssetFile = copy(file = newFile)
-
-  def createLog()(implicit node: Node): AssetFile = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): AssetFile = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -41,19 +36,17 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   val db = databaseConfig.db
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val assetFileTable = TableQuery[AssetFileTable]
 
   case class AssetFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String] = None, status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AssetFile =AssetFile(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content=>utilities.JSON.convertJsonStringToObject[AssetDocumentContent](content)) , status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content => utilities.JSON.convertJsonStringToObject[AssetDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  private def serialize(assetFile: AssetFile): AssetFileSerialized = AssetFileSerialized(id = assetFile.id, documentType = assetFile.documentType, fileName = assetFile.fileName, file = assetFile.file, assetFile.documentContent.map(content=>Json.toJson(content).toString), status = assetFile.status, createdBy = assetFile.createdBy, createdOn = assetFile.createdOn, createdOnTimeZone = assetFile.createdOnTimeZone, updatedBy = assetFile.updatedBy, updatedOn = assetFile.updatedOn, updatedOnTimeZone = assetFile.updatedOnTimeZone)
+  private def serialize(assetFile: AssetFile): AssetFileSerialized = AssetFileSerialized(id = assetFile.id, documentType = assetFile.documentType, fileName = assetFile.fileName, file = assetFile.file, assetFile.documentContent.map(content => Json.toJson(content).toString), status = assetFile.status, createdBy = assetFile.createdBy, createdOn = assetFile.createdOn, createdOnTimeZone = assetFile.createdOnTimeZone, updatedBy = assetFile.updatedBy, updatedOn = assetFile.updatedOn, updatedOnTimeZone = assetFile.updatedOnTimeZone)
 
   import databaseConfig.profile.api._
 
-  private def add(assetFile: AssetFile): Future[String] = db.run((assetFileTable returning assetFileTable.map(_.id) += serialize(assetFile.createLog())).asTry).map {
+  private def add(assetFile: AssetFile): Future[String] = db.run((assetFileTable returning assetFileTable.map(_.id) += serialize(assetFile)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -61,17 +54,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def update(assetFile: AssetFile): Future[Int] = db.run(assetFileTable.filter(_.id === assetFile.id).filter(_.documentType === assetFile.documentType).update(serialize(assetFile.updateLog())).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.documentContentJson.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update(documentContentJson, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone).asTry).map {
+  private def update(assetFile: AssetFile): Future[Int] = db.run(assetFileTable.filter(_.id === assetFile.id).filter(_.documentType === assetFile.documentType).update(serialize(assetFile)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -81,7 +64,17 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateStatusByIDAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.status.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((status, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContentJson.?).update(documentContentJson).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByIDAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

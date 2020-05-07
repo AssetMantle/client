@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import models.common.Serializable.TradeActivityTemplate
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
@@ -16,14 +15,10 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TradeActivity(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[TradeActivity] {
+case class TradeActivity(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   val title: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.TITLE_SUFFIX).mkString(".")
 
   val template: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.MESSAGE_SUFFIX).mkString(".")
-
-  def createLog()(implicit node: Node): TradeActivity = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): TradeActivity = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -40,8 +35,6 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class TradeActivitySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -52,7 +45,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] val tradeActivityTable = TableQuery[TradeActivityTable]
 
-  private def add(tradeActivity: TradeActivity): Future[String] = db.run((tradeActivityTable returning tradeActivityTable.map(_.id) += serialize(tradeActivity.createLog())).asTry).map {
+  private def add(tradeActivity: TradeActivity): Future[String] = db.run((tradeActivityTable returning tradeActivityTable.map(_.id) += serialize(tradeActivity)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

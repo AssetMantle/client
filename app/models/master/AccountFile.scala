@@ -5,27 +5,20 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountFile] with Logged[AccountFile] {
+case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountFile] with Logged {
 
   val status: Option[Boolean] = Option(true)
 
   def updateFileName(newFileName: String): AccountFile = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): AccountFile = copy(file = newFile)
-
-  def createLog()(implicit node: Node): AccountFile = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): AccountFile = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -42,11 +35,9 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val accountFileTable = TableQuery[AccountFileTable]
 
-  private def add(accountFile: AccountFile): Future[String] = db.run((accountFileTable returning accountFileTable.map(_.id) += accountFile.createLog()).asTry).map {
+  private def add(accountFile: AccountFile): Future[String] = db.run((accountFileTable returning accountFileTable.map(_.id) += accountFile).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -54,7 +45,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def update(accountFile: AccountFile): Future[Int] = db.run(accountFileTable.filter(_.id === accountFile.id).filter(_.documentType === accountFile.documentType).update(accountFile.updateLog()).asTry).map {
+  private def update(accountFile: AccountFile): Future[Int] = db.run(accountFileTable.filter(_.id === accountFile.id).filter(_.documentType === accountFile.documentType).update(accountFile).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

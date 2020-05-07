@@ -6,7 +6,6 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -19,13 +18,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Asset] {
-
-  def createLog()(implicit node: Node): Asset = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Asset = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Assets @Inject()(
@@ -55,9 +48,7 @@ class Assets @Inject()(
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
-  private def add(asset: Asset): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset.createLog()).asTry).map {
+  private def add(asset: Asset): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -65,7 +56,7 @@ class Assets @Inject()(
     }
   }
 
-  private def updateByPegHash(asset: Asset): Future[Int] = db.run(assetTable.filter(_.pegHash === asset.pegHash).update(asset.updateLog()).asTry).map {
+  private def updateByPegHash(asset: Asset): Future[Int] = db.run(assetTable.filter(_.pegHash === asset.pegHash).update(asset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

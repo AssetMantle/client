@@ -9,16 +9,10 @@ import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import models.common.Node
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Order(id: String, orderID: String, buyerTraderID: String, sellerTraderID: String, assetID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Order] {
-
-  def createLog()(implicit node: Node): Order = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Order = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-}
+case class Order(id: String, orderID: String, buyerTraderID: String, sellerTraderID: String, assetID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -33,11 +27,9 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val orderTable = TableQuery[OrderTable]
 
-  private def add(order: Order): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order.createLog()).asTry).map {
+  private def add(order: Order): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -45,7 +37,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateByOrder(order: Order): Future[Int] = db.run(orderTable.filter(_.id === order.id).update(order.updateLog()).asTry).map {
+  private def updateByOrder(order: Order): Future[Int] = db.run(orderTable.filter(_.id === order.id).update(order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

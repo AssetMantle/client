@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import models.common.Serializable.{AssetOtherDetails, DocumentList, PaymentTerms}
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
@@ -17,13 +16,7 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Negotiation(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, physicalDocumentsHandledVia: Option[String] = None, chatID: Option[String] = None, status: String, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Negotiation] {
-
-  def createLog()(implicit node: Node): Negotiation = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Negotiation = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class Negotiation(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, physicalDocumentsHandledVia: Option[String] = None, chatID: Option[String] = None, status: String, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -39,8 +32,6 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
   import databaseConfig.profile.api._
 
   private[models] val negotiationTable = TableQuery[NegotiationTable]
-
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   case class AssetAndBuyerAcceptedSerialize(assetDescription: String, price: Int, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean, buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean)
 
@@ -79,7 +70,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     createdBy = negotiation.createdBy, createdOn = negotiation.createdOn, createdOnTimeZone = negotiation.createdOnTimeZone,
     updatedBy = negotiation.updatedBy, updatedOn = negotiation.updatedOn, updatedOnTimeZone = negotiation.updatedOnTimeZone)
 
-  private def add(negotiation: Negotiation): Future[String] = db.run((negotiationTable returning negotiationTable.map(_.id) += serialize(negotiation.createLog())).asTry).map {
+  private def add(negotiation: Negotiation): Future[String] = db.run((negotiationTable returning negotiationTable.map(_.id) += serialize(negotiation)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -87,7 +78,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def updateByID(negotiation: Negotiation): Future[Int] = db.run(negotiationTable.filter(_.id === negotiation.id).update(serialize(negotiation.updateLog())).asTry).map {
+  private def updateByID(negotiation: Negotiation): Future[Int] = db.run(negotiationTable.filter(_.id === negotiation.id).update(serialize(negotiation)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

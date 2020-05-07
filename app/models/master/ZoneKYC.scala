@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,15 +13,11 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[ZoneKYC] with Logged[ZoneKYC] {
+case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[ZoneKYC] with Logged {
 
   def updateFileName(newFileName: String): ZoneKYC = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): ZoneKYC = copy(file = newFile)
-
-  def createLog()(implicit node: Node): ZoneKYC = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): ZoneKYC = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -37,13 +32,11 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   val db = databaseConfig.db
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   import databaseConfig.profile.api._
 
   private[models] val zoneKYCTable = TableQuery[ZoneKYCTable]
 
-  private def add(zoneKYC: ZoneKYC): Future[String] = db.run((zoneKYCTable returning zoneKYCTable.map(_.id) += zoneKYC.createLog()).asTry).map {
+  private def add(zoneKYC: ZoneKYC): Future[String] = db.run((zoneKYCTable returning zoneKYCTable.map(_.id) += zoneKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -51,7 +44,7 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def update(zoneKYC: ZoneKYC): Future[Int] = db.run(zoneKYCTable.filter(_.id === zoneKYC.id).filter(_.documentType === zoneKYC.documentType).update(zoneKYC.updateLog()).asTry).map {
+  private def update(zoneKYC: ZoneKYC): Future[Int] = db.run(zoneKYCTable.filter(_.id === zoneKYC.id).filter(_.documentType === zoneKYC.documentType).update(zoneKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -77,7 +70,7 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.status.?, x.updatedBy, x.updatedOn, x.updatedOnTimeZone)).update((status, node.id, new Timestamp(System.currentTimeMillis()), node.timeZone)).asTry).map {
+  private def updateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.common.Node
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,12 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, language: Lang, userType: String, partialMnemonic: Seq[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) {
-  def createLog()(implicit node: Node): Account = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Account = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class Account(id: String, secretHash: String, language: Lang, userType: String, partialMnemonic: Seq[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -35,8 +30,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val accountTable = TableQuery[AccountTable]
 
   case class AccountSerialized(id: String, secretHash: String, language: String, userType: String, partialMnemonic: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -45,7 +38,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   def serialize(account: Account): AccountSerialized = AccountSerialized(id = account.id, secretHash = account.secretHash, language = account.language.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0), userType = account.userType, partialMnemonic = Json.toJson(account.partialMnemonic).toString, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
-  private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.id) += serialize(account.createLog())).asTry).map {
+  private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.id) += serialize(account)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

@@ -140,7 +140,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
 
-  private def getOrganizationsByIDs(organizationIDs: Seq[String]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.id inSet(organizationIDs)).result)
+  private def getOrganizationsByIDs(organizationIDs: Seq[String]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.id inSet (organizationIDs)).result)
 
   private def updateVerificationStatusAndCommentOnID(id: String, verificationStatus: Option[Boolean], comment: Option[String]): Future[Int] = db.run(organizationTable.filter(_.id === id).map(x => (x.verificationStatus.?, x.comment.?)).update((verificationStatus, comment)).asTry).map {
     case Success(result) => result
@@ -295,7 +295,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def updateUBOs(id: String, ubos: Seq[UBO]): Future[Int] = updateUBOsOnID(id, Option(Json.toJson(UBOs(data = ubos)).toString))
 
-    def getOrganizations(organizationIDs: Seq[String]): Future[Seq[Organization]]= getOrganizationsByIDs(organizationIDs).map(_.map(_.deserialize))
+    def getOrganizations(organizationIDs: Seq[String]): Future[Seq[Organization]] = getOrganizationsByIDs(organizationIDs).map(_.map(_.deserialize))
   }
 
 }
