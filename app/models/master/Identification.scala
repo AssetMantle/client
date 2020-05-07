@@ -70,13 +70,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry)map {
-    case Success(result) => Some(result)
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def getByAccountID(accountID: String): Future[Option[IdentificationSerialized]] = db.run(identificationTable.filter(_.accountID === accountID).result.headOption)
 
   private def tryGetByAccountID(accountID: String): Future[IdentificationSerialized] = db.run(identificationTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
@@ -134,9 +128,9 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def markIdentificationFormCompleted(accountID: String): Future[Int] = updateCompletionStatusByAccountID(accountID = accountID, completionStatus = true)
 
-    def tryGet(accountID: String): Future[Identification] = tryGetByAccountID(accountID+"fsdfsd").map(_.deserialize)
+    def tryGet(accountID: String): Future[Identification] = tryGetByAccountID(accountID).map(_.deserialize)
 
-    def get(accountID: String): Future[Option[Identification]] = getByAccountID(accountID+"fsdfsd").map(_.map(_.deserialize))
+    def get(accountID: String): Future[Option[Identification]] = getByAccountID(accountID).map(_.map(_.deserialize))
 
     def tryGetName(accountID: String): Future[String] = tryGetByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 
