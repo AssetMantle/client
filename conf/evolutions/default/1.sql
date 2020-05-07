@@ -1207,7 +1207,6 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
     PRIMARY KEY ("id")
 );
 
-
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
 (
     "id"                VARCHAR   NOT NULL,
@@ -1385,29 +1384,109 @@ ALTER TABLE WESTERN_UNION."RTCB"
 
 /*Initial State*/
 
-INSERT INTO master."Account" ("id", "secretHash", "partialMnemonic", "language", "userType", "createdBy", "createdOn",
-                              "createdOnTimeZone")
+CREATE OR REPLACE FUNCTION public.insert_or_update_log() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new."createdOn" IS NULL THEN
+        new."createdOn" = current_timestamp;;
+        new."createdOnTimeZone" = current_setting('TIMEZONE');;
+        new."createdBy" = current_user;;
+    ELSE
+        new."updatedOn" = current_timestamp;;
+        new."updatedOnTimeZone" = current_setting('TIMEZONE');;
+        new."updatedBy" = current_user;;
+    END IF;;
+    RETURN NEW;;
+END;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER Account_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Account_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ACLAccount_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."ACLAccount_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ACLHash_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."ACLHash_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Asset_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Asset_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Fiat_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Fiat_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Negotiation_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Negotiation_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Order_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Order_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Organization_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Organization_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER TraderFeedbackHistory_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."TraderFeedbackHistory_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER TransactionFeedBack_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."TransactionFeedBack_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Zone_BC_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN."Zone_BC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+
+CREATE TRIGGER AddOrganization_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."AddOrganization" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER AddZone_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."AddZone" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER BuyerExecuteOrder_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ChangeBuyerBid_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."ChangeBuyerBid" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ChangeSellerBid_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."ChangeSellerBid" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ConfirmBuyerBid_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ConfirmSellerBid_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."ConfirmSellerBid" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER IssueAsset_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."IssueAsset" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER IssueFiat_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."IssueFiat" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER RedeemAsset_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."RedeemAsset" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER RedeemFiat_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."RedeemFiat" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ReleaseAsset_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."ReleaseAsset" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SellerExecuteOrder_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SellerExecuteOrder" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SendAsset_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SendAsset" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SendCoin_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SendCoin" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SendFiat_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SendFiat" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SetACL_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SetACL" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SetBuyerFeedback_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SetBuyerFeedback" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SetSellerFeedback_Log BEFORE INSERT OR UPDATE ON BLOCKCHAIN_TRANSACTION."SetSellerFeedback" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+
+CREATE TRIGGER Account_Log BEFORE INSERT OR UPDATE ON MASTER."Account" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER AccountFile_Log BEFORE INSERT OR UPDATE ON MASTER."AccountFile" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER AccountKYC_Log BEFORE INSERT OR UPDATE ON MASTER."AccountKYC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Asset_Log BEFORE INSERT OR UPDATE ON MASTER."Asset" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Email_Log BEFORE INSERT OR UPDATE ON MASTER."Email" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Fiat_Log BEFORE INSERT OR UPDATE ON MASTER."Fiat" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Identification_Log BEFORE INSERT OR UPDATE ON MASTER."Identification" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Mobile_Log BEFORE INSERT OR UPDATE ON MASTER."Mobile" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Negotiation_Log BEFORE INSERT OR UPDATE ON MASTER."Negotiation" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Order_Log BEFORE INSERT OR UPDATE ON MASTER."Order" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Organization_Log BEFORE INSERT OR UPDATE ON MASTER."Organization" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER OrganizationBackgroundCheck_Log BEFORE INSERT OR UPDATE ON MASTER."OrganizationBackgroundCheck" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER OrganizationBankAccountDetail_Log BEFORE INSERT OR UPDATE ON MASTER."OrganizationBankAccountDetail" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER OrganizationKYC_Log BEFORE INSERT OR UPDATE ON MASTER."OrganizationKYC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Trader_Log BEFORE INSERT OR UPDATE ON MASTER."Trader" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER TraderBackgroundCheck_Log BEFORE INSERT OR UPDATE ON MASTER."TraderBackgroundCheck" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER TraderRelation_Log BEFORE INSERT OR UPDATE ON MASTER."TraderRelation" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Zone_Log BEFORE INSERT OR UPDATE ON MASTER."Zone" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ZoneKYC_Log BEFORE INSERT OR UPDATE ON MASTER."ZoneKYC" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+
+CREATE TRIGGER AssetFile_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."AssetFile" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Chat_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."Chat" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER EmailOTP_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."EmailOTP" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER FaucetRequest_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."FaucetRequest" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Message_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."Message" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER MessageRead_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."MessageRead" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER NegotiationFile_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."NegotiationFile" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER Notification_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."Notification" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER PushNotificationToken_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."PushNotificationToken" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SessionToken_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."SessionToken" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SMSOTP_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."SMSOTP" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER TradeActivity_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."TradeActivity" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER TraderInvitation_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."TraderInvitation" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER ZoneInvitation_Log BEFORE INSERT OR UPDATE ON MASTER_TRANSACTION."ZoneInvitation" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+
+CREATE TRIGGER FiatRequest_Log BEFORE INSERT OR UPDATE ON WESTERN_UNION."FiatRequest" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER RTCB_Log BEFORE INSERT OR UPDATE ON WESTERN_UNION."RTCB" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+CREATE TRIGGER SFTPFileTransaction_Log BEFORE INSERT OR UPDATE ON WESTERN_UNION."SFTPFileTransaction" FOR EACH ROW EXECUTE PROCEDURE public.insert_or_update_log();
+
+INSERT INTO master."Account" ("id", "secretHash", "partialMnemonic", "language", "userType")
 VALUES ('main',
         '711213004',
         '["fluid","cereal","trash","miracle","casino","menu","true","method","exhaust","pen","fiber","rural","grape","purchase","rather","table","omit","youth","gain","cage","erase"]',
         'en',
-        'GENESIS',
-        'dev.webapp',
-        CURRENT_TIMESTAMP,
-        'GMT+5:30');
+        'GENESIS');
 
 INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
-                                     "dirtyBit", "createdBy", "createdOn", "createdOnTimeZone")
+                                     "dirtyBit")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
-        true,
-        'dev.webapp',
-        CURRENT_TIMESTAMP,
-        'GMT+5:30');
+        true);
 
 # --- !Downs
 
@@ -1417,6 +1496,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."ACLHash_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Fiat_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Organization_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
@@ -1453,14 +1533,14 @@ DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
-DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
+DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Chat" CASCADE;
