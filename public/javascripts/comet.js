@@ -35,6 +35,9 @@ function cometMessageHandler(message){
             if ($('#organizationViewAcceptedNegotiation').length) {
                 comet('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation(parsedMessage.messageContent.id));
             }
+            if ($('#traderViewAcceptedNegotiationDocumentList').length) {
+                comet('traderViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(parsedMessage.messageContent.id));
+            }
             break;
         case 'CHAT' :
             if( $('#chatMessages').length ){

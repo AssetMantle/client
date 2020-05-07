@@ -103,6 +103,7 @@ object Form {
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
   val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.javascript.NegotiationController.buyerConfirmForm)
   val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.javascript.NegotiationController.sellerConfirmForm)
+  val UPDATE_CONTRACT_SIGNED = new Form("UPDATE_CONTRACT_SIGNED", routes.NegotiationController.updateContractSigned(), routes.javascript.NegotiationController.updateContractSignedForm)
 
   //OrderController
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
