@@ -14,7 +14,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
-
+import org.slf4j.MDC
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -140,6 +140,8 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
+        MDC.put("method","Login")
+        logger.info("user trying to login")
         val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
         val bcAccountExists = blockchainAccounts.Service.checkAccountExists(loginData.username)
 
@@ -217,12 +219,15 @@ class AccountController @Inject()(
             Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
           }
         }
-
+        logger.info("user Logging In")
         (for {
           validateUsernamePassword <- validateUsernamePassword
           bcAccountExists <- bcAccountExists
           result <- checkLoginAndGetResult(validateUsernamePassword = validateUsernamePassword, bcAccountExists = bcAccountExists)
-        } yield result
+        } yield {
+          logger.info("user Logged in")
+          result
+        }
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
