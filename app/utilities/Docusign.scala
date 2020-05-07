@@ -143,17 +143,16 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   def createRecipientView(envelopeID: String, emailAddress: String, trader: Trader): Future[String] = createRecipientViewAndGetUrl(envelopeID, emailAddress, trader)
 
-  def updateSignedDocumentList(envelopeID: String, documentType: String): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentType)
+  def updateSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentTypeList)
 
-  def fetchAndStoreSignedDocumentList(envelopeID: String, documentType: String): Future[Seq[String]] = {
+  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String])= {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
-      val documentList = JavaConverters.asScalaIteratorConverter(envelopesApi.getEnvelope(accountID, envelopeID).getEnvelopeDocuments.iterator()).asScala.toSeq
-      documentList.map { document =>
-        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID, document.getDocumentId)
+      documentTypeList.zipWithIndex.map { case (documentType, index) =>
+        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID,(index+1).toString)
         val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileByteArray)).toString, constants.File.PDF).mkString(".")
         val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
         val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
@@ -215,7 +214,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private def fetchAuthorizationURI: String = {
     try {
-      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.Docusign.CODE).toString
+      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.External.Docusign.CODE).toString
     } catch {
       case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
         throw new BaseException(constants.Response.INVALID_INPUT)

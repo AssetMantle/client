@@ -114,7 +114,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
       val oauthToken = Service.tryGet(accountID)
 
       def regenerateAndUpdateOAuthToken(oauthToken: OAuthToken): Future[Unit] = if (System.currentTimeMillis() > (oauthToken.expiresAt - docusignOAuthTokenIntervalTime.toMillis)) {
-        val response = docusignRegenerateToken.Service.post(docusignRegenerateToken.Request(constants.Docusign.REFRESH_TOKEN, oauthToken.refreshToken))
+        val response = docusignRegenerateToken.Service.post(docusignRegenerateToken.Request(constants.External.Docusign.REFRESH_TOKEN, oauthToken.refreshToken))
 
         def updateOauthToken(response: Response): Future[Int] = Service.update(accountID, response.access_token, System.currentTimeMillis() + response.expires_in * 1000, response.refresh_token)
 
