@@ -1,10 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.master.Negotiation
-@import models.master.Asset
 @import models.master.Trader
-
-@import models.master.Organization
 @import models.westernUnion.FiatRequest
 @import models.westernUnion.RTCB
 @(traderList: Seq[Trader], fiatRequestList: Seq[FiatRequest], rtcbList: Seq[RTCB])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)

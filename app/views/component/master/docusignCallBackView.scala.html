@@ -1,0 +1,12 @@
+
+@(event:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@event match{
+    case constants.External.Docusign.SEND=>{
+        @Messages(constants.View.DOCUMENT_SENT_FOR_SIGNING)
+    }
+    case constants.External.Docusign.SIGNING_COMPLETE=>{
+        @Messages(constants.View.DOCUMENT_SIGNED)
+    }
+    case _=>{ @Messages(constants.View.UNEXPECTED_EVENT)}
+}
