@@ -60,7 +60,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-
+  
   private def tryGetLanguageById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.language).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

@@ -9,6 +9,7 @@ import models.Abstract.BaseTransaction
 import models.blockchain.Fiat
 import models.{blockchain, master}
 import models.master.{Negotiation => masterNegotiation, Order => masterOrder}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -39,16 +40,21 @@ class SendFiats @Inject()(
                            blockchainNegotiations: blockchain.Negotiations,
                            utilitiesNotification: utilities.Notification,
                            masterAccounts: master.Accounts,
+                           masterAssets: master.Assets,
                            blockchainAccounts: blockchain.Accounts,
                            masterNegotiations: master.Negotiations,
                            masterOrders: master.Orders,
+                           masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -56,20 +62,14 @@ class SendFiats @Inject()(
   private[models] val sendFiatTable = TableQuery[SendFiatTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendFiat: SendFiat): Future[String] = db.run((sendFiatTable returning sendFiatTable.map(_.ticketID) += sendFiat).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(sendFiat: SendFiat): Future[Int] = db.run(sendFiatTable.insertOrUpdate(sendFiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -204,6 +204,9 @@ class SendFiats @Inject()(
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
+      val markBlockchainSuccess = masterTransactionSendFiatRequests.Service.markBlockchainSuccess(ticketID)
+
+      def bcFiatsInOrder(negotiationID: String): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(negotiationID)
 
       def orderResponse(negotiationID: String): Future[OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
@@ -211,23 +214,55 @@ class SendFiats @Inject()(
 
       def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
 
-      def updateBCFiat(negotiationID: String, orderResponse: OrderResponse.Response): Future[Seq[String]] = orderResponse.value.fiatPegWallet match {
-        case Some(fiatPegWallet) => blockchainFiats.Service.insertList(fiatPegWallet.map(fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = negotiationID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)))
+      def updateBCFiat(bcFiatsInOrder: Seq[Fiat], negotiationID: String, orderResponse: OrderResponse.Response): Future[Unit] = orderResponse.value.fiatPegWallet match {
+        case Some(fiatPegWallet) => {
+          val updateFiats = Future.traverse(bcFiatsInOrder.map(_.pegHash).intersect(fiatPegWallet.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+            blockchainFiats.Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false))
+          })
+          val insertFiats = Future.traverse(fiatPegWallet.map(_.pegHash).diff(bcFiatsInOrder.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
+            blockchainFiats.Service.create(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)
+          })
+          for {
+            _ <- updateFiats
+            _ <- insertFiats
+          } yield Unit
+        }
         case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
       }
 
       def checkOrderExists(negotiationID: String): Future[Boolean] = blockchainOrders.Service.checkOrderExists(negotiationID)
 
-      def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
-        val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
-        val masterOrderCreate = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+      def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation, amountSent: Int): Future[Unit] = {
+        def status(fiatsInOrder: Int, assetSent: Boolean): String = {
+          if (fiatsInOrder >= negotiation.price && assetSent) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+          else if (fiatsInOrder >= negotiation.price && !assetSent) constants.Status.Order.FIAT_SENT_ASSET_PENDING
+          else if (fiatsInOrder < negotiation.price && assetSent) constants.Status.Order.ASSET_SENT_FIAT_PENDING
+          else constants.Status.Order.ASSET_AND_FIAT_PENDING
+        }
 
-        for {
-          _ <- bcOrderCreate
-          _ <- masterOrderCreate
-        } yield ()
+        if (!orderExists) {
+          val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
 
-      } else Future()
+          def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = status(amountSent, false)))
+
+          for {
+            _ <- bcOrderCreate
+            _ <- masterOrderCreate
+          } yield ()
+
+        } else {
+          val assetSent = masterAssets.Service.tryGetStatus(negotiation.assetID)
+          val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
+
+          def masterOrderUpdate(fiatsInOrder: Int, assetSent: String): Future[Int] = masterOrders.Service.update(masterOrder(id = negotiation.id, orderID = negotiationID, status = status(fiatsInOrder, assetSent == constants.Status.Asset.IN_ORDER)))
+
+          for {
+            assetSent <- assetSent
+            fiatsInOrder <- fiatsInOrder
+            _ <- masterOrderUpdate(fiatsInOrder, assetSent)
+          } yield ()
+        }
+      }
 
       def markDirty(sendFiat: SendFiat): Future[Unit] = {
         val markFiatsDirty = blockchainFiats.Service.markDirty(sendFiat.from)
@@ -245,12 +280,14 @@ class SendFiats @Inject()(
       (for {
         _ <- markTransactionSuccessful
         sendFiat <- sendFiat
+        _ <- markBlockchainSuccess
         negotiationID <- getNegotiationID(sendFiat)
+        bcFiatsInOrder <- bcFiatsInOrder(negotiationID)
         orderResponse <- orderResponse(negotiationID)
         masterNegotiation <- getMasterNegotiation(negotiationID)
-        _ <- updateBCFiat(negotiationID = negotiationID, orderResponse = orderResponse)
+        _ <- updateBCFiat(bcFiatsInOrder = bcFiatsInOrder, negotiationID = negotiationID, orderResponse = orderResponse)
         orderExists <- checkOrderExists(negotiationID)
-        _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation)
+        _ <- createOrder(orderExists = orderExists, negotiationID = negotiationID, negotiation = masterNegotiation, sendFiat.amount)
         _ <- markDirty(sendFiat)
         fromAccountID <- getAccountID(sendFiat.from)
         toAccountID <- getAccountID(sendFiat.to)
@@ -274,6 +311,7 @@ class SendFiats @Inject()(
     def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendFiat = Service.getTransaction(ticketID)
+      val markBlockchainFailure = masterTransactionSendFiatRequests.Service.markBlockchainFailure(ticketID)
 
       def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
@@ -284,6 +322,7 @@ class SendFiats @Inject()(
         sendFiat <- sendFiat
         _ <- markDirty(sendFiat.from)
         fromAccountID <- getAccountID(sendFiat.from)
+        _ <- markBlockchainFailure
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

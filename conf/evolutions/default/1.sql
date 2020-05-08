@@ -1269,6 +1269,39 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."RedeemFiatRequest"
+(
+    "id"                VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
+    "ticketID"          VARCHAR NOT NULL UNIQUE,
+    "amount"            INT     NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest"
+(
+    "id"                VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
+    "negotiationID"     VARCHAR NOT NULL,
+    "ticketID"          VARCHAR NOT NULL UNIQUE,
+    "amount"            INT     NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 (
     "id"                VARCHAR NOT NULL,
@@ -1436,7 +1469,7 @@ ALTER TABLE BLOCKCHAIN."Negotiation_BC"
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
     ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
-    ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
+    ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE BLOCKCHAIN."TransactionFeedBack_BC"
     ADD CONSTRAINT TransactionFeedBack_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
@@ -1448,7 +1481,7 @@ ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
 ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
     ADD CONSTRAINT TraderFeedbackHistory_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Zone_BC"
-    ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES Master."Zone" ("id");
+    ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
     ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
@@ -1529,6 +1562,16 @@ ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
     ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
+    ADD CONSTRAINT RedeemFiatRequest_RedeemFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."RedeemFiat" ("ticketID");
+ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
+    ADD CONSTRAINT RedeemFiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
+    ADD CONSTRAINT SendFiatRequest_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
+ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
+    ADD CONSTRAINT SendFiatRequest_SendFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."SendFiat" ("ticketID");
+ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
+    ADD CONSTRAINT SendFiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
@@ -1808,6 +1851,8 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."PushNotificationToken" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."RedeemFiatRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SendFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;

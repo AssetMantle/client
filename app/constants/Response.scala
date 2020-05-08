@@ -73,6 +73,7 @@ object Response {
   val ZONE_ADDED = new Success("ZONE_ADDED")
   val ZONE_REQUEST_SENT = new Success("ZONE_REQUEST_SENT")
   val ORGANIZATION_REQUEST_REJECTED = new Success("ORGANIZATION_REQUEST_REJECTED")
+  val FIATS_EXCEED_PENDING_AMOUNT = new Success("FIATS_EXCEED_PENDING_AMOUNT")
   val FILE_UPLOAD_SUCCESSFUL = new Success("FILE_UPLOAD_SUCCESSFUL")
   val FILE_UPDATE_SUCCESSFUL = new Success("FILE_UPDATE_SUCCESSFUL")
   val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
@@ -192,6 +193,7 @@ object Response {
   val INVALID_PAYMENT_TERMS = new Failure("INVALID_PAYMENT_TERMS")
   val TENURE_AND_TENTATIVE_DATE_BOTH_FOUND = new Failure("TENURE_AND_TENTATIVE_DATE_BOTH_FOUND")
   val BLOCKCHAIN_ACCOUNT_NOT_FOUND = new Failure("BLOCKCHAIN_ACCOUNT_NOT_FOUND")
+  val FIAT_PEG_NOT_FOUND = new Failure("FIAT_PEG_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

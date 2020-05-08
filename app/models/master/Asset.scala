@@ -210,11 +210,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markStatusAwaitingBlockchainResponse(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)
 
-    def markTradeCompletedByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.TRADED)
+    def markTradeCompletedByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDAndStatusByPegHash(pegHash = pegHash, ownerID = ownerID, status = constants.Status.Asset.TRADED)
 
-    def markStatusInOrderByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.IN_ORDER)
-
-    def resetStatusByPegHash(pegHash: String): Future[Int] = updateStatusByPegHash(pegHash = pegHash, status = constants.Status.Asset.ISSUED)
+    def resetStatusByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDAndStatusByPegHash(pegHash = pegHash, ownerID = ownerID, status = constants.Status.Asset.ISSUED)
 
     def getPendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(ownerIDs = traderIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
