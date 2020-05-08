@@ -13,7 +13,7 @@ import models.common.Node
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Order(id: String, orderID: String, buyerTraderID: String, sellerTraderID: String, assetID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Order] {
+case class Order(id: String, orderID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Order] {
 
   def createLog()(implicit node: Node): Order = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
@@ -87,17 +87,11 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class OrderTable(tag: Tag) extends Table[Order](tag, "Order") {
 
-    def * = (id, orderID, buyerTraderID, sellerTraderID, assetID, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Order.tupled, Order.unapply)
+    def * = (id, orderID, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Order.tupled, Order.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def orderID = column[String]("orderID")
-
-    def buyerTraderID = column[String]("buyerTraderID")
-
-    def sellerTraderID = column[String]("sellerTraderID")
-
-    def assetID = column[String]("assetID")
 
     def status = column[String]("status")
 

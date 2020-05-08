@@ -653,6 +653,21 @@ CREATE TABLE IF NOT EXISTS DOCUSIGN."Envelope"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS DOCUSIGN."Envelope_History"
+(
+    "id"                VARCHAR NOT NULL,
+    "envelopeID"        VARCHAR NOT NULL,
+    "documentType"      VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS DOCUSIGN."OAuthToken"
 (
     "id"                VARCHAR NOT NULL,
@@ -743,10 +758,10 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset_History"
 (
     "id"                VARCHAR NOT NULL,
     "ownerID"           VARCHAR NOT NULL,
-    "pegHash"           VARCHAR UNIQUE,
+    "pegHash"           VARCHAR,
     "assetType"         VARCHAR NOT NULL,
     "description"       VARCHAR NOT NULL,
-    "documentHash"      VARCHAR NOT NULL UNIQUE,
+    "documentHash"      VARCHAR NOT NULL,
     "quantity"          INT     NOT NULL,
     "quantityUnit"      VARCHAR NOT NULL,
     "price"             INT     NOT NULL,
@@ -862,13 +877,58 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
     UNIQUE ("buyerTraderID", "sellerTraderID", "assetID")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Negotiation_History"
+(
+    "id"                             VARCHAR NOT NULL,
+    "negotiationID"                  VARCHAR,
+    "buyerTraderID"                  VARCHAR NOT NULL,
+    "sellerTraderID"                 VARCHAR NOT NULL,
+    "assetID"                        VARCHAR NOT NULL,
+    "assetDescription"               VARCHAR NOT NULL,
+    "price"                          INT     NOT NULL,
+    "quantity"                       INT     NOT NULL,
+    "quantityUnit"                   VARCHAR NOT NULL,
+    "buyerAcceptedAssetDescription"  BOOLEAN NOT NULL,
+    "buyerAcceptedPrice"             BOOLEAN NOT NULL,
+    "buyerAcceptedQuantity"          BOOLEAN NOT NULL,
+    "assetOtherDetails"              VARCHAR NOT NULL,
+    "buyerAcceptedAssetOtherDetails" BOOLEAN NOT NULL,
+    "time"                           INT,
+    "paymentTerms"                   VARCHAR NOT NULL,
+    "buyerAcceptedPaymentTerms"      BOOLEAN NOT NULL,
+    "documentList"                   VARCHAR NOT NULL,
+    "buyerAcceptedDocumentList"      BOOLEAN NOT NULL,
+    "physicalDocumentsHandledVia"    VARCHAR,
+    "chatID"                         VARCHAR,
+    "status"                         VARCHAR NOT NULL,
+    "comment"                        VARCHAR,
+    "createdBy"                      VARCHAR,
+    "createdOn"                      TIMESTAMP,
+    "createdOnTimeZone"              VARCHAR,
+    "updatedBy"                      VARCHAR,
+    "updatedOn"                      TIMESTAMP,
+    "updatedOnTimeZone"              VARCHAR,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Order"
 (
     "id"                VARCHAR NOT NULL,
     "orderID"           VARCHAR NOT NULL UNIQUE,
-    "buyerTraderID"     VARCHAR NOT NULL,
-    "sellerTraderID"    VARCHAR NOT NULL,
-    "assetID"           VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Order_History"
+(
+    "id"                VARCHAR NOT NULL,
+    "orderID"           VARCHAR NOT NULL,
     "status"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1060,7 +1120,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile_History"
 (
     "id"                  VARCHAR NOT NULL,
     "documentType"        VARCHAR NOT NULL,
-    "fileName"            VARCHAR NOT NULL UNIQUE,
+    "fileName"            VARCHAR NOT NULL,
     "file"                BYTEA,
     "documentContentJson" VARCHAR,
     "status"              BOOLEAN,
@@ -1164,6 +1224,23 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
     PRIMARY KEY ("id", "documentType")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile_History"
+(
+    "id"                  VARCHAR NOT NULL,
+    "documentType"        VARCHAR NOT NULL,
+    "fileName"            VARCHAR NOT NULL,
+    "file"                BYTEA,
+    "documentContentJson" VARCHAR,
+    "status"              BOOLEAN,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
+    PRIMARY KEY ("id", "documentType")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
     "id"                       VARCHAR NOT NULL,
@@ -1220,6 +1297,21 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
+(
+    "id"                        VARCHAR NOT NULL,
+    "negotiationID"             VARCHAR NOT NULL,
+    "tradeActivityTemplateJson" VARCHAR NOT NULL,
+    "read"                      BOOLEAN NOT NULL,
+    "createdBy"                 VARCHAR,
+    "createdOn"                 TIMESTAMP,
+    "createdOnTimeZone"         VARCHAR,
+    "updatedBy"                 VARCHAR,
+    "updatedOn"                 TIMESTAMP,
+    "updatedOnTimeZone"         VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity_History"
 (
     "id"                        VARCHAR NOT NULL,
     "negotiationID"             VARCHAR NOT NULL,
@@ -1385,17 +1477,11 @@ ALTER TABLE MASTER."Negotiation"
 ALTER TABLE MASTER."Negotiation"
     ADD CONSTRAINT Negotiation_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."Negotiation"
-    ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
+    ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
+    ADD CONSTRAINT Order_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER."Order"
     ADD CONSTRAINT Order_BCOrder_orderID FOREIGN KEY ("orderID") REFERENCES BLOCKCHAIN."Order_BC" ("id");
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_MasterTrader_buyerTraderID FOREIGN KEY ("buyerTraderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
 ALTER TABLE MASTER."Organization"
     ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Organization"
@@ -1461,7 +1547,26 @@ ALTER TABLE WESTERN_UNION."RTCB"
 
 /*Triggers*/
 
-CREATE OR REPLACE FUNCTION master.create_asset_history()
+CREATE OR REPLACE FUNCTION DOCUSIGN.CREATE_ENVELOPE_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO DOCUSIGN."Envelope_History" ( "id", "envelopeID", "documentType", "status", "createdBy", "createdOn"
+                                            , "createdOnTimeZone", "updatedBy", "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."envelopeID", old."documentType", old.status, old."createdBy", old."createdOn",
+            old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER Delete_Envelope
+    BEFORE DELETE
+    ON DOCUSIGN."Envelope"
+    FOR EACH ROW
+EXECUTE PROCEDURE DOCUSIGN.CREATE_ENVELOPE_HISTORY();
+
+CREATE OR REPLACE FUNCTION MASTER.CREATE_ASSET_HISTORY()
     RETURNS trigger
 AS
 $$
@@ -1470,21 +1575,71 @@ BEGIN
                                        , "quantity", "quantityUnit", "price", "moderated", "takerID", "otherDetails"
                                        , "status", "createdBy", "createdOn", "createdOnTimeZone", "updatedBy"
                                        , "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."ownerID", old."pegHash", old."assetType", old.description, old."documentHash", old.quantity,
+    VALUES (old.id, old."ownerID", old."pegHash", old."assetType", old.description, old."documentHash", old."quantity",
             old."quantityUnit", old.price, old.moderated, old."takerID", old."otherDetails", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", current_user, current_timestamp,
-            current_setting('TIMEZONE'));;
+            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
+            CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
 
-CREATE TRIGGER deleteAsset
+CREATE TRIGGER Delete_Asset
     BEFORE DELETE
     ON MASTER."Asset"
     FOR EACH ROW
-EXECUTE PROCEDURE master.create_asset_history();
+EXECUTE PROCEDURE MASTER.CREATE_ASSET_HISTORY();
 
-CREATE OR REPLACE FUNCTION master_transaction.create_asset_file_history()
+CREATE OR REPLACE FUNCTION MASTER.CREATE_NEGOTIATION_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER."Negotiation_History" ( "id", "negotiationID", "buyerTraderID", "sellerTraderID", "assetID"
+                                             , "assetDescription", price, quantity, "quantityUnit"
+                                             , "buyerAcceptedAssetDescription", "buyerAcceptedPrice"
+                                             , "buyerAcceptedQuantity", "assetOtherDetails"
+                                             , "buyerAcceptedAssetOtherDetails", "time", "paymentTerms"
+                                             , "buyerAcceptedPaymentTerms", "documentList", "buyerAcceptedDocumentList"
+                                             , "physicalDocumentsHandledVia", "chatID", "status", "comment"
+                                             , "createdBy", "createdOn", "createdOnTimeZone", "updatedBy", "updatedOn"
+                                             , "updatedOnTimeZone")
+    VALUES (old.id, old."negotiationID", old."buyerTraderID", old."sellerTraderID", old."assetID",
+            old."assetDescription", old.price, old."quantity", old."quantityUnit", old."buyerAcceptedAssetDescription",
+            old."buyerAcceptedPrice", old."buyerAcceptedQuantity", old."assetOtherDetails",
+            old."buyerAcceptedAssetOtherDetails", old.time, old."paymentTerms", old."buyerAcceptedPaymentTerms",
+            old."documentList", old."buyerAcceptedDocumentList", old."physicalDocumentsHandledVia", old."chatID",
+            old."status", old."comment", old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER,
+            CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER Delete_Negotiation
+    BEFORE DELETE
+    ON MASTER."Negotiation"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER.CREATE_NEGOTIATION_HISTORY();
+
+CREATE OR REPLACE FUNCTION MASTER.CREATE_ORDER_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER."Order_History" ("id", "orderID", "status", "createdBy", "createdOn", "createdOnTimeZone",
+                                        "updatedBy", "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."orderID", old."status", old."createdBy", old."createdOn", old."createdOnTimeZone",
+            CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER Delete_Order
+    BEFORE DELETE
+    ON MASTER."Order"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER.CREATE_ORDER_HISTORY();
+
+CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_ASSET_FILE_HISTORY()
     RETURNS trigger
 AS
 $$
@@ -1493,20 +1648,60 @@ BEGIN
                                                         "status", "createdBy", "createdOn", "createdOnTimeZone",
                                                         "updatedBy", "updatedOn", "updatedOnTimeZone")
     VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", current_user, current_timestamp,
-            current_setting('TIMEZONE'));;
+            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
+            CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
 
-CREATE TRIGGER deleteAssetFile
+CREATE TRIGGER Delete_Asset_File
     BEFORE DELETE
     ON MASTER_TRANSACTION."AssetFile"
     FOR EACH ROW
-EXECUTE PROCEDURE master_transaction.create_asset_file_history();
+EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_ASSET_FILE_HISTORY();
+
+CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER_TRANSACTION."NegotiationFile" ("id", "documentType", "fileName", "file", "documentContentJson",
+                                                      "status", "createdBy", "createdOn", "createdOnTimeZone",
+                                                      "updatedBy", "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
+            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
+            CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER Delete_Negotiation_File
+    BEFORE DELETE
+    ON MASTER_TRANSACTION."NegotiationFile"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY();
+
+CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_TRADE_ACTIVITY_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER_TRANSACTION."TradeActivity_History" ("id", "negotiationID", "tradeActivityTemplateJson", "read",
+                                                            "createdBy", "createdOn", "createdOnTimeZone", "updatedBy",
+                                                            "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."negotiationID", old."tradeActivityTemplateJson", old."read", old."createdBy", old."createdOn",
+            old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER Delete_Trade_Activity
+    BEFORE DELETE
+    ON MASTER_TRANSACTION."TradeActivity"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_TRADE_ACTIVITY_HISTORY();
 
 /*Initial State*/
-
 
 INSERT INTO MASTER."Account" ("id", "secretHash", "partialMnemonic", "language", "userType", "createdBy", "createdOn",
                               "createdOnTimeZone")
@@ -1515,9 +1710,9 @@ VALUES ('main',
         '["fluid","cereal","trash","miracle","casino","menu","true","method","exhaust","pen","fiber","rural","grape","purchase","rather","table","omit","youth","gain","cage","erase"]',
         'en',
         'GENESIS',
-        current_user,
-        current_timestamp,
-        current_setting('TIMEZONE'));
+        CURRENT_USER,
+        CURRENT_TIMESTAMP,
+        CURRENT_SETTING('TIMEZONE'));
 
 INSERT INTO BLOCKCHAIN."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
                                      "dirtyBit", "createdBy", "createdOn", "createdOnTimeZone")
@@ -1528,14 +1723,21 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '0',
         '0',
         true,
-        current_user,
-        current_timestamp,
-        current_setting('TIMEZONE'));
+        CURRENT_USER,
+        CURRENT_TIMESTAMP,
+        CURRENT_SETTING('TIMEZONE'));
 
 # --- !Downs
 
-DROP TRIGGER IF EXISTS deleteAsset ON MASTER."Asset" CASCADE;
-DROP TRIGGER IF EXISTS deleteAssetFile ON MASTER_TRANSACTION."AssetFile" CASCADE;
+DROP TRIGGER IF EXISTS Delete_Envelope ON DOCUSIGN."Envelope" CASCADE;
+
+DROP TRIGGER IF EXISTS Delete_Asset ON MASTER."Asset" CASCADE;
+DROP TRIGGER IF EXISTS Delete_Negotiation ON MASTER."Negotiation" CASCADE;
+DROP TRIGGER IF EXISTS Delete_Order ON MASTER."Order" CASCADE;
+
+DROP TRIGGER IF EXISTS Delete_Asset_File ON MASTER_TRANSACTION."AssetFile" CASCADE;
+DROP TRIGGER IF EXISTS Delete_Negotiation_File ON MASTER_TRANSACTION."NegotiationFile" CASCADE;
+DROP TRIGGER IF EXISTS Delete_Trade_Activity ON MASTER_TRANSACTION."TradeActivity" CASCADE;
 
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."ACLAccount_BC" CASCADE;
@@ -1569,6 +1771,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetBuyerFeedback" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback" CASCADE;
 
 DROP TABLE IF EXISTS DOCUSIGN."Envelope" CASCADE;
+DROP TABLE IF EXISTS DOCUSIGN."Envelope_History" CASCADE;
 DROP TABLE IF EXISTS DOCUSIGN."OAuthToken" CASCADE;
 
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
@@ -1581,7 +1784,9 @@ DROP TABLE IF EXISTS MASTER."Fiat" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
+DROP TABLE IF EXISTS MASTER."Negotiation_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order" CASCADE;
+DROP TABLE IF EXISTS MASTER."Order_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
@@ -1600,11 +1805,13 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Message" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."MessageRead" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."PushNotificationToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TraderInvitation" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."ZoneInvitation" CASCADE;
 

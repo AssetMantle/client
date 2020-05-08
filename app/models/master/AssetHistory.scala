@@ -18,10 +18,10 @@ case class AssetHistory(id: String, ownerID: String, pegHash: Option[String] = N
 class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   case class AssetHistorySerializable(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String) {
-    def deserialize(): Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status)
+    def deserialize(): AssetHistory = AssetHistory(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status)
   }
 
-  def serialize(asset: Asset): AssetHistorySerializable = AssetHistorySerializable(id = asset.id, ownerID = asset.ownerID, pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity, quantityUnit = asset.quantityUnit, price = asset.price, moderated = asset.moderated, takerID = asset.takerID, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status)
+  def serialize(assetHistory: AssetHistory): AssetHistorySerializable = AssetHistorySerializable(id = assetHistory.id, ownerID = assetHistory.ownerID, pegHash = assetHistory.pegHash, assetType = assetHistory.assetType, description = assetHistory.description, documentHash = assetHistory.documentHash, quantity = assetHistory.quantity, quantityUnit = assetHistory.quantityUnit, price = assetHistory.price, moderated = assetHistory.moderated, takerID = assetHistory.takerID, otherDetails = Json.toJson(assetHistory.otherDetails).toString(), status = assetHistory.status)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -51,7 +51,7 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def getPegHashByID(id: String): Future[Option[String]] = db.run(assetHistoryTable.filter(_.id === id).map(_.pegHash.?).result.head.asTry).map {
+  private def tryGetPegHashByID(id: String): Future[Option[String]] = db.run(assetHistoryTable.filter(_.id === id).map(_.pegHash.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -93,11 +93,11 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def tryGet(id: String): Future[Asset] = tryGetByID(id).map(serializedAsset => serializedAsset.deserialize())
+    def tryGet(id: String): Future[AssetHistory] = tryGetByID(id).map(_.deserialize())
 
     def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
 
-    def tryGetPegHash(id: String): Future[String] = getPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+    def tryGetPegHash(id: String): Future[String] = tryGetPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
   }
 

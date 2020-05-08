@@ -277,7 +277,7 @@ class Negotiations @Inject()(
               val order = masterOrders.Service.get(negotiation.id)
 
               def create(order: Option[masterOrder]): Future[String] = if (order.isEmpty && negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) {
-                masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = dirtyNegotiation.id, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_AND_FIAT_PENDING))
+                masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = dirtyNegotiation.id, status = constants.Status.Order.ASSET_AND_FIAT_PENDING))
               } else Future("")
 
               for {

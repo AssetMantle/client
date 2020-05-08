@@ -220,7 +220,7 @@ class SendFiats @Inject()(
 
       def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
         val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
-        val masterOrderCreate = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+        val masterOrderCreate = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
 
         for {
           _ <- bcOrderCreate

@@ -45,10 +45,10 @@ class AssetFileHistories @Inject()(protected val databaseConfigProvider: Databas
   private[models] val assetFileHistoryTable = TableQuery[AssetFileHistoryTable]
 
   case class AssetFileHistorySerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String] = None, status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AssetFileHistory =AssetFileHistory(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content=>utilities.JSON.convertJsonStringToObject[AssetDocumentContent](content)) , status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: AssetFileHistory = AssetFileHistory(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content => utilities.JSON.convertJsonStringToObject[AssetDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  private def serialize(assetFile: AssetFileHistory): AssetFileHistorySerialized = AssetFileHistorySerialized(id = assetFile.id, documentType = assetFile.documentType, fileName = assetFile.fileName, file = assetFile.file, assetFile.documentContent.map(content=>Json.toJson(content).toString), status = assetFile.status, createdBy = assetFile.createdBy, createdOn = assetFile.createdOn, createdOnTimeZone = assetFile.createdOnTimeZone, updatedBy = assetFile.updatedBy, updatedOn = assetFile.updatedOn, updatedOnTimeZone = assetFile.updatedOnTimeZone)
+  private def serialize(assetFile: AssetFileHistory): AssetFileHistorySerialized = AssetFileHistorySerialized(id = assetFile.id, documentType = assetFile.documentType, fileName = assetFile.fileName, file = assetFile.file, assetFile.documentContent.map(content => Json.toJson(content).toString), status = assetFile.status, createdBy = assetFile.createdBy, createdOn = assetFile.createdOn, createdOnTimeZone = assetFile.createdOnTimeZone, updatedBy = assetFile.updatedBy, updatedOn = assetFile.updatedOn, updatedOnTimeZone = assetFile.updatedOnTimeZone)
 
   import databaseConfig.profile.api._
 
@@ -81,7 +81,7 @@ class AssetFileHistories @Inject()(protected val databaseConfigProvider: Databas
 
     def documentType = column[String]("documentType", O.PrimaryKey)
 
-    def fileName = column[String]("fileName", O.Unique)
+    def fileName = column[String]("fileName")
 
     def file = column[Array[Byte]]("file")
 
@@ -111,9 +111,7 @@ class AssetFileHistories @Inject()(protected val databaseConfigProvider: Databas
 
     def tryGetFileName(id: String, documentType: String): Future[String] = tryGetFileNameByIDAndDocumentType(id = id, documentType = documentType)
 
-    def getAllDocuments(id: String): Future[Seq[AssetFileHistory]] = getAllDocumentsById(id = id).map {
-      _.map(_.deserialize)
-    }
+    def getAllDocuments(id: String): Future[Seq[AssetFileHistory]] = getAllDocumentsById(id = id).map(_.map(_.deserialize))
 
     def getDocumentContent(id: String, documentType: String): Future[Option[AssetDocumentContent]] = tryGetByIDAndDocumentType(id = id, documentType = documentType).map(_.deserialize).map(_.documentContent)
   }
