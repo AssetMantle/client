@@ -1,7 +1,5 @@
 package controllers
 
-import java.nio.file.Files
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
