@@ -154,9 +154,9 @@ class AccountController @Inject()(
 
         def getLoginState(address: String, userType: String): Future[LoginState] = {
           if (userType == constants.User.TRADER) {
-            val aclHash = blockchainAclAccounts.Service.getACLHash(address)
+            val aclHash = blockchainAclAccounts.Service.tryGetACLHash(address)
 
-            def acl(aclHash: String): Future[ACL] = blockchainAclHashes.Service.getACL(aclHash)
+            def acl(aclHash: String): Future[ACL] = blockchainAclHashes.Service.tryGetACL(aclHash)
 
             for {
               aclHash <- aclHash

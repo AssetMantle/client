@@ -1302,6 +1302,23 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest_History"
+(
+    "id"                VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
+    "negotiationID"     VARCHAR NOT NULL,
+    "ticketID"          VARCHAR NOT NULL,
+    "amount"            INT     NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 (
     "id"                VARCHAR NOT NULL,
@@ -1567,7 +1584,7 @@ ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
 ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
     ADD CONSTRAINT RedeemFiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
-    ADD CONSTRAINT SendFiatRequest_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
+    ADD CONSTRAINT SendFiatRequest_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
     ADD CONSTRAINT SendFiatRequest_SendFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."SendFiat" ("ticketID");
 ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
@@ -1708,9 +1725,10 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."NegotiationFile" ("id", "documentType", "fileName", "file", "documentContentJson",
-                                                      "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                                      "updatedBy", "updatedOn", "updatedOnTimeZone")
+    INSERT INTO MASTER_TRANSACTION."NegotiationFile_History" ("id", "documentType", "fileName", "file",
+                                                              "documentContentJson", "status", "createdBy", "createdOn",
+                                                              "createdOnTimeZone", "updatedBy", "updatedOn",
+                                                              "updatedOnTimeZone")
     VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
             old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
             CURRENT_SETTING('TIMEZONE'));;
@@ -1723,6 +1741,27 @@ CREATE TRIGGER DELETE_NEGOTIATION_FILE
     ON MASTER_TRANSACTION."NegotiationFile"
     FOR EACH ROW
 EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY();
+
+CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_SEND_FIAT_REQUEST_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER_TRANSACTION."SendFiatRequest_History" ("id", "traderID", "negotiationID", "ticketID", "amount",
+                                                              "status", "createdBy", "createdOn", "createdOnTimeZone",
+                                                              "updatedBy", "updatedOn", "updatedOnTimeZone")
+    VALUES (old.id, old."traderID", old."negotiationID", old."ticketID", old."amount", old.status,
+            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
+            CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER DELETE_SEND_FIAT_REQUEST
+    BEFORE DELETE
+    ON MASTER_TRANSACTION."SendFiatRequest"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_SEND_FIAT_REQUEST_HISTORY();
 
 CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_TRADE_ACTIVITY_HISTORY()
     RETURNS trigger
@@ -1780,6 +1819,7 @@ DROP TRIGGER IF EXISTS DELETE_ORDER ON MASTER."Order" CASCADE;
 
 DROP TRIGGER IF EXISTS DELETE_ASSET_FILE ON MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TRIGGER IF EXISTS DELETE_NEGOTIATION_FILE ON MASTER_TRANSACTION."NegotiationFile" CASCADE;
+DROP TRIGGER IF EXISTS DELETE_SEND_FIAT_REQUEST ON MASTER_TRANSACTION."SendFiatRequest" CASCADE;
 DROP TRIGGER IF EXISTS DELETE_TRADE_ACTIVITY ON MASTER_TRANSACTION."TradeActivity" CASCADE;
 
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
@@ -1853,6 +1893,7 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."PushNotificationToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."RedeemFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SendFiatRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SendFiatRequest_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TradeActivity" CASCADE;
