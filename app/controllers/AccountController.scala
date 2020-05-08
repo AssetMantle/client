@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{LoginState, WithLoginAction}
+import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -15,6 +16,7 @@ import play.api.{Configuration, Logger}
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 import org.slf4j.MDC
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -37,7 +39,9 @@ class AccountController @Inject()(
                                    masterEmails: master.Emails,
                                    masterMobiles: master.Mobiles,
                                    masterIdentifications: master.Identifications,
-                                   masterAccountKYCs: master.AccountKYCs
+                                   masterAccountKYCs: master.AccountKYCs,
+                                   withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
+                                   withActionLoggingFilter: WithActionLoggingFilter
                                  )
                                  (implicit
                                   executionContext: ExecutionContext,
@@ -51,11 +55,11 @@ class AccountController @Inject()(
 
   private val userMnemonicShown = 3
 
-  def signUpForm(): Action[AnyContent] = Action { implicit request =>
+  def signUpForm(): Action[AnyContent] = withActionLoggingFilter.next { implicit request =>
     Ok(views.html.component.master.signUp())
   }
 
-  def signUp: Action[AnyContent] = Action.async { implicit request =>
+  def signUp: Action[AnyContent] = withActionAsyncLoggingFilter.next { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
@@ -79,7 +83,7 @@ class AccountController @Inject()(
     )
   }
 
-  def createBlockchainForm(username: String): Action[AnyContent] = Action.async { implicit request =>
+  def createBlockchainForm(username: String): Action[AnyContent] = withActionAsyncLoggingFilter.next { implicit request =>
     val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
     def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) queriesMnemonic.Service.get().map(_.body.split(" ")) else throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -98,7 +102,7 @@ class AccountController @Inject()(
     }
   }
 
-  def createBlockchain(): Action[AnyContent] = Action.async { implicit request =>
+  def createBlockchain(): Action[AnyContent] = withActionAsyncLoggingFilter.next { implicit request =>
     views.companion.master.CreateBlockchainAccount.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.createBlockchainAccount(formWithErrors, formWithErrors.data(constants.FormField.USERNAME.name), formWithErrors.data(constants.FormField.MNEMONICS.name).split(" "))))
@@ -130,18 +134,16 @@ class AccountController @Inject()(
     )
   }
 
-  def loginForm: Action[AnyContent] = Action { implicit request =>
+  def loginForm: Action[AnyContent] = withActionLoggingFilter.next { implicit request =>
     Ok(views.html.component.master.login())
   }
 
-  def login: Action[AnyContent] = Action.async { implicit request =>
+  def login: Action[AnyContent] = withActionAsyncLoggingFilter.next { implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
-        MDC.put("method","Login")
-        logger.info("user trying to login")
         val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
         val bcAccountExists = blockchainAccounts.Service.checkAccountExists(loginData.username)
 
@@ -235,7 +237,7 @@ class AccountController @Inject()(
     )
   }
 
-  def logoutForm: Action[AnyContent] = Action { implicit request =>
+  def logoutForm: Action[AnyContent] = withActionLoggingFilter.next { implicit request =>
     Ok(views.html.component.master.logout())
   }
 
@@ -268,7 +270,7 @@ class AccountController @Inject()(
       )
   }
 
-  def changePasswordForm: Action[AnyContent] = Action { implicit request =>
+  def changePasswordForm: Action[AnyContent] = withActionLoggingFilter.next { implicit request =>
     Ok(views.html.component.master.changePassword())
   }
 
@@ -305,11 +307,11 @@ class AccountController @Inject()(
       )
   }
 
-  def emailOTPForgotPasswordForm: Action[AnyContent] = Action { implicit request =>
+  def emailOTPForgotPasswordForm: Action[AnyContent] = withActionLoggingFilter.next { implicit request =>
     Ok(views.html.component.master.emailOTPForgotPassword())
   }
 
-  def emailOTPForgotPassword: Action[AnyContent] = Action.async { implicit request =>
+  def emailOTPForgotPassword: Action[AnyContent] = withActionAsyncLoggingFilter.next { implicit request =>
     views.companion.master.EmailOTPForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.emailOTPForgotPassword(formWithErrors)))
@@ -368,7 +370,7 @@ class AccountController @Inject()(
     )
   }
 
-  def checkUsernameAvailable(username: String): Action[AnyContent] = Action.async { implicit request =>
+  def checkUsernameAvailable(username: String): Action[AnyContent] = withActionAsyncLoggingFilter.next { implicit request =>
     val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
     for {
       checkUsernameAvailable <- checkUsernameAvailable
