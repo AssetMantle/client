@@ -4,6 +4,9 @@ function getFileTypes(documentType) {
         case "PROFILE_PICTURE":
             fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG'];
             break;
+        case "CONTRACT":
+            fileTypes = ['pdf'];
+            break;
         default:
             fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG', 'pdf', 'doc', 'docx'];
             break;

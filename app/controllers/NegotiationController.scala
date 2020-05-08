@@ -7,9 +7,12 @@ import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
 import models.Abstract.NegotiationDocumentContent
 import models.common.Serializable._
+import models.docusign
 import models.master.{Asset, Negotiation, Trader}
 import models.masterTransaction.{NegotiationFile, TradeActivity}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.masterTransaction.{NegotiationFile, TradeActivity}
+import models.{blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -30,6 +33,7 @@ class NegotiationController @Inject()(
                                        masterNegotiations: master.Negotiations,
                                        masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                        masterTransactionChats: masterTransaction.Chats,
+                                       masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                        masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                        transaction: utilities.Transaction,
@@ -882,15 +886,17 @@ class NegotiationController @Inject()(
               val updateInvoiceContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateInvoiceContentData.negotiationID, constants.File.Negotiation.INVOICE, Invoice(updateInvoiceContentData.invoiceNumber, utilities.Date.utilDateToSQLDate(updateInvoiceContentData.invoiceDate)))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateInvoiceContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+              val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(updateInvoiceContentData.negotiationID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
               for {
                 _ <- updateInvoiceContent
                 negotiationFileList <- negotiationFileList
                 assetFileList <- assetFileList
+                negotiationEnvelopeList <- negotiationEnvelopeList
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -947,15 +953,17 @@ class NegotiationController @Inject()(
               val updateContractContent = masterTransactionNegotiationFiles.Service.updateDocumentContent(updateContractContentData.negotiationID, constants.File.Negotiation.CONTRACT, Contract(updateContractContentData.contractNumber))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(updateContractContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+              val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(updateContractContentData.negotiationID)
               val buyerAccountID = masterTraders.Service.tryGetAccountId(negotiation.buyerTraderID)
               for {
                 _ <- updateContractContent
                 negotiationFileList <- negotiationFileList
                 assetFileList <- assetFileList
+                negotiationEnvelopeList <- negotiationEnvelopeList
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
-                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -1057,7 +1065,6 @@ class NegotiationController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
@@ -1223,6 +1230,49 @@ class NegotiationController @Inject()(
             }
           } else {
             Future(BadRequest(views.html.component.master.confirmAllNegotiationTerms(negotiationID = confirmAllNegotiationTermsData.negotiationID)))
+          }
+        }
+      )
+  }
+
+  def updateContractSignedForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+      (for {
+        traderID <- traderID
+        negotiation <- negotiation
+      } yield {
+        if (traderID == negotiation.sellerTraderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
+          Ok(views.html.component.master.updateContractSigned(negotiationID = negotiationID))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+      }
+  }
+
+  def updateContractSigned: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.UpdateContractSigned.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.updateContractSigned(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
+        },
+        updateContractSignedData => {
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
+          val negotiation = masterNegotiations.Service.tryGet(updateContractSignedData.negotiationID)
+
+          def markContractSigned(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) masterNegotiations.Service.markContractSigned(updateContractSignedData.negotiationID) else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
+
+          (for {
+            traderID <- traderID
+            negotiation <- negotiation
+            _ <- markContractSigned(traderID, negotiation)
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
           }
         }
       )

@@ -17,7 +17,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
-        routes.javascript.AccountController.createBlockchainForm,
+        routes.javascript.AccountController.createWalletForm,
         routes.javascript.AccountController.addIdentificationForm,
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
@@ -238,6 +238,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
 
+        routes.javascript.DocusignController.send,
+        routes.javascript.DocusignController.sign,
+        routes.javascript.DocusignController.authorization,
+
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
         routes.javascript.FileController.storeAccountFile,
@@ -289,6 +293,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,
         routes.javascript.NegotiationController.buyerConfirmForm,
         routes.javascript.NegotiationController.sellerConfirmForm,
+        routes.javascript.NegotiationController.updateContractSignedForm,
 
         routes.javascript.NegotiationController.tradeActivityMessages,
 
