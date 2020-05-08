@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import models.master.AccountKYC
+@import views.html.base._
 
 @(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
@@ -8,7 +9,7 @@
 </div>
 <div class="centerText">
     <div id="@Seq("upload", documentType).mkString("")">
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
     </div>
     @accountKYC match {
         case Some(file) => {
@@ -17,11 +18,11 @@
             } {
                 <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@file.documentType'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+                @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
                 <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
             }
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.identificationForm())">@Messages(constants.View.BACK)</button>
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userReviewIdentificationForm())">@Messages(constants.Form.NEXT)</button>
+            @commonModalButton(constants.View.BACK, constants.Form. ADD_IDENTIFICATION.get)
+            @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION)
         }
         case None => {}
     }

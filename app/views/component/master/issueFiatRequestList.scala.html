@@ -13,8 +13,8 @@
                 @commonTextInfo(constants.View.TRADER_ID, issueFiatRequest.traderID)
                 @commonTextInfo(constants.Form.TRANSACTION_ID, issueFiatRequest.id)
                 @commonTextInfo(constants.Form.TRANSACTION_AMOUNT, issueFiatRequest.transactionAmount.toString)
-                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.traderID', '@issueFiatRequest.id', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
-                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+                @commonFormButton(constants.Form.ISSUE_FIAT,'parameters -> s"'${issueFiatRequest.id}','${issueFiatRequest.traderID}','${issueFiatRequest.id}'",'class -> "cmuk-button-success cmuk-button-small")
+                @commonJavascriptButton(constants.View.REJECT,JavaScript("getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))"),'class -> "cmuk-button-danger cmuk-button-small")
             </div>
         }
 
