@@ -19,7 +19,6 @@
                     @commonBooleanInfo(constants.Form.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
                     @commonFormButton(constants.Form.ZONE_ISSUE_ASSET,'parameters -> s"'${assetRequest.id}'", 'class -> "cmuk-button-success cmuk-button-small")
-                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectassetRequestForm('@assetRequest.id'))">@Messages(constants.Form.REJECT)</button>
                 }
                 </div>
             }
