@@ -4,16 +4,16 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(zoneID: String, traders: Seq[Trader], negotiaion: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(zoneID: String, traders: Seq[Trader], negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.ORDER_ACTIONS){
 }{
     @traders.map { trader =>
-        @if(trader.zoneID == zoneID && trader.id == negotiaion.buyerTraderID){
-            @commonJavascriptButton(constants.View.MODERATED_BUYER_EXECUTE_ORDER_DOCUMENT, JavaScript(s"getForm(jsRoutes.controllers.OrderController.moderatedBuyerExecuteOrderDocument('${negotiaion.id}'))"))
+        @if(trader.zoneID == zoneID && trader.id == negotiation.buyerTraderID){
+            @commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
         }
-        @if(trader.zoneID == zoneID && trader.id == negotiaion.sellerTraderID){
-            @commonJavascriptButton(constants.View.MODERATED_SELLER_EXECUTE_ORDER_DOCUMENT, JavaScript(s"getForm(jsRoutes.controllers.OrderController.moderatedSellerExecuteOrderDocument('${negotiaion.id}'))"))
+        @if(trader.zoneID == zoneID && trader.id == negotiation.sellerTraderID){
+            @commonFormButton(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
             @if(asset.moderated){
                 @commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")
             }

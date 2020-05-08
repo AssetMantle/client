@@ -95,7 +95,7 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.Fiat.REQUEST_INITIATED))
+    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.IssueFiat.REQUEST_INITIATED))
 
     def tryGetByID(id: String): Future[FiatRequest] = findByID(id)
 
@@ -107,11 +107,11 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markRTCBReceived(id: String, amountRequested: Int, totalRTCBAmount: Int): Future[Int] = {
       if (amountRequested == totalRTCBAmount) {
-        updateStatusByID(id, constants.Status.Fiat.FULLY_PAID)
+        updateStatusByID(id, constants.Status.IssueFiat.FULLY_PAID)
       } else if (amountRequested < totalRTCBAmount) {
-        updateStatusByID(id, constants.Status.Fiat.OVER_PAID)
+        updateStatusByID(id, constants.Status.IssueFiat.OVER_PAID)
       } else {
-        updateStatusByID(id, constants.Status.Fiat.PARTIALLY_PAID)
+        updateStatusByID(id, constants.Status.IssueFiat.PARTIALLY_PAID)
       }
     }
   }

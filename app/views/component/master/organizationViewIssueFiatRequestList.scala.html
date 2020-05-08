@@ -19,7 +19,7 @@
                 }
 
                 @commonIntInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.transactionAmount)
-                @if(fiatRequest.status == constants.Status.Fiat.REQUEST_INITIATED) {
+                @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED) {
                     @commonTextInfo(constants.View.STATUS, fiatRequest.status)
                 } else {
                     @rtcbList.find(_.externalReference == fiatRequest.id) match {
