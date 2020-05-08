@@ -640,19 +640,31 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 
 CREATE TABLE IF NOT EXISTS DOCUSIGN."Envelope"
 (
-    "id"             VARCHAR NOT NULL,
-    "envelopeID"     VARCHAR NOT NULL,
-    "documentType"   VARCHAR NOT NULL,
-    "status"         VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "envelopeID"        VARCHAR NOT NULL,
+    "documentType"      VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS DOCUSIGN."OAuthToken"
 (
-    "id"               VARCHAR NOT NULL,
-    "accessToken"      VARCHAR NOT NULL,
-    "expiresAt"        VARCHAR NOT NULL,
-    "refreshToken"     VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "accessToken"       VARCHAR NOT NULL,
+    "expiresAt"         BIGINT  NOT NULL,
+    "refreshToken"      VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -1449,7 +1461,7 @@ ALTER TABLE WESTERN_UNION."RTCB"
 
 /*Triggers*/
 
-CREATE OR REPLACE FUNCTION create_asset_history()
+CREATE OR REPLACE FUNCTION master.create_asset_history()
     RETURNS trigger
 AS
 $$
@@ -1470,9 +1482,9 @@ CREATE TRIGGER deleteAsset
     BEFORE DELETE
     ON MASTER."Asset"
     FOR EACH ROW
-EXECUTE PROCEDURE create_asset_history();
+EXECUTE PROCEDURE master.create_asset_history();
 
-CREATE OR REPLACE FUNCTION create_asset_file_history()
+CREATE OR REPLACE FUNCTION master_transaction.create_asset_file_history()
     RETURNS trigger
 AS
 $$
@@ -1491,7 +1503,7 @@ CREATE TRIGGER deleteAssetFile
     BEFORE DELETE
     ON MASTER_TRANSACTION."AssetFile"
     FOR EACH ROW
-EXECUTE PROCEDURE create_asset_file_history();
+EXECUTE PROCEDURE master_transaction.create_asset_file_history();
 
 /*Initial State*/
 
@@ -1521,6 +1533,9 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         current_setting('TIMEZONE'));
 
 # --- !Downs
+
+DROP TRIGGER IF EXISTS deleteAsset ON MASTER."Asset" CASCADE;
+DROP TRIGGER IF EXISTS deleteAssetFile ON MASTER_TRANSACTION."AssetFile" CASCADE;
 
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."ACLAccount_BC" CASCADE;
@@ -1599,6 +1614,7 @@ DROP TABLE IF EXISTS WESTERN_UNION."SFTPFileTransaction" CASCADE;
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;
+DROP SCHEMA IF EXISTS DOCUSIGN CASCADE;
 DROP SCHEMA IF EXISTS MASTER CASCADE;
 DROP SCHEMA IF EXISTS MASTER_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS WESTERN_UNION CASCADE;
