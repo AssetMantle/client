@@ -1,0 +1,45 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Trader
+@import models.master.Organization
+@import models.westernUnion.FiatRequest
+@import models.westernUnion.RTCB
+@(traderList: Seq[Trader], organizationList: Seq[Organization], fiatRequestList: Seq[FiatRequest], rtcbList: Seq[RTCB])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+    @commonCard(constants.View.FIAT_TRANSACTIONS) {
+    } {
+        @fiatRequestList.map { fiatRequest =>
+            @commonVerticalInfoBox() {
+                @commonTextInfo(constants.Form.REQUEST_ID, fiatRequest.id)
+
+                @traderList.find(_.id == fiatRequest.traderID) match {
+                    case Some(trader) => {
+                        @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                        @organizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+                            }
+                            case None => {}
+                        }
+                    }
+                    case None => {}
+                }
+
+                @commonIntInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.transactionAmount)
+                @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED) {
+                    @commonTextInfo(constants.View.STATUS, fiatRequest.status)
+                } else {
+                    @rtcbList.find(_.externalReference == fiatRequest.id) match {
+                        case Some(rtcb) => {
+                            @commonTextInfo(constants.View.STATUS, fiatRequest.status)
+                            @commonIntInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
+                        }
+                        case None => {}
+
+                    }
+                }
+            }
+
+        }
+    }
+

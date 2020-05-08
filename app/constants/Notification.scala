@@ -122,6 +122,7 @@ object Notification {
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val CONTRACT_SIGNED = new Notification(notificationType = "CONTRACT_SIGNED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
@@ -153,6 +154,9 @@ object Notification {
   val INVOICE_CONTENT_ADDED = new Notification(notificationType = "INVOICE_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val CONTRACT_CONTENT_ADDED = new Notification(notificationType = "CONTRACT_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  //docusign
+  val DOCUSIGN_AUTHORIZATION_PENDING = new Notification(notificationType = "DOCUSIGN_AUTHORIZATION_PENDING", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)

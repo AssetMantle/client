@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class OrderController @Inject()(
                                  blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders,
                                  blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
-                                 masterAccounts: master.Accounts,
+                                 blockchainAccounts: blockchain.Accounts,
                                  masterAssets: master.Assets,
                                  masterNegotiations: master.Negotiations,
                                  masterOrders: master.Orders,
@@ -62,7 +62,7 @@ class OrderController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           //TODO: Integrate with WesterUnion
           def fiatProofHash: Future[String] = Future("fiatProofHash")
@@ -127,7 +127,7 @@ class OrderController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile): Future[String] = {
             if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING)) {
@@ -189,7 +189,7 @@ class OrderController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order): Future[String] = {
             if (asset.status == constants.Status.Asset.IN_ORDER && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING)) {
@@ -248,7 +248,7 @@ class OrderController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile): Future[String] = {
             if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING)) {

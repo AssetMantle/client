@@ -5,5 +5,5 @@
 @(addTraderForm: Form[AddTrader.Data] = AddTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_TRADER, addTraderForm) {
     @commonInputText(addTraderForm, constants.FormField.ORGANIZATION_ID)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION.legend)</button>
+    @commonFormButton(constants.Form.ADD_ORGANIZATION)
 }

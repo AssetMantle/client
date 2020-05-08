@@ -28,9 +28,9 @@ class AddOrganizationController @Inject()(
                                            masterOrganizationKYCs: master.OrganizationKYCs,
                                            transactionsAddOrganization: transactions.AddOrganization,
                                            masterZones: master.Zones,
+                                           blockchainAccounts: blockchain.Accounts,
                                            blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations,
                                            masterOrganizations: master.Organizations,
-                                           masterAccounts: master.Accounts,
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
@@ -558,7 +558,7 @@ class AddOrganizationController @Inject()(
             if (checkAllKYCFilesVerified) {
               val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)
 
-              def getOrganizationAccountAddress(accountId: String): Future[String] = masterAccounts.Service.tryGetAddress(accountId)
+              def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
               def getTicketID(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
                 entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),

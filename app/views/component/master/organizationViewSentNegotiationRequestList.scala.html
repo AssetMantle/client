@@ -7,40 +7,58 @@
 @import models.master.Organization
 @(sentNegotiationRequestList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@sentNegotiationRequestList.map { sentNegotiationRequest =>
-    <li class="commonList">
-        @traderList.find(_.id == sentNegotiationRequest.sellerTraderID) match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
-            }
-            case None => {
-                @commonTextInfo(constants.View.SELLER_TRADER_ID, sentNegotiationRequest.buyerTraderID)
-            }
-        }
-
-        @counterPartyTraderList.find(_.id == sentNegotiationRequest.buyerTraderID) match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
-                    case Some(organization) => {
-                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+    <div class="SalesQuoteCard">
+    @sentNegotiationRequestList.map { sentNegotiationRequest =>
+        @commonVerticalInfoBox(){
+            <div class="firstPart salesChild">
+                <div class="content">
+                @assetList.find(_.id == sentNegotiationRequest.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetIcon">
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                        </div>
+                        <div class="assetIntialData">
+                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetQuantity">@Seq(sentNegotiationRequest.quantity.toString, sentNegotiationRequest.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@sentNegotiationRequest.price</p>
+                        </div>
                     }
                     case None => {}
                 }
-            }
-            case None => {}
+                </div>
+            </div>
+            <div class="secondPart salesChild">
+                @counterPartyTraderList.find(_.id == sentNegotiationRequest.buyerTraderID) match {
+                    case Some(trader) => {
+                        @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
+                            }
+                            case None => {}
+                        }
+                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)"> @trader.name</span>
+                        <span class="lines">---</span>
+                    }
+                    case None => {}
+                }
+                @traderList.find(_.id == sentNegotiationRequest.sellerTraderID) match {
+                    case Some(trader) => {
+                        <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)">@trader.name</span></p>
+                            }
+                    case None => {
+                        <span>@sentNegotiationRequest.buyerTraderID</span></p>
+                    }
+                }
+                <p><span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span>
+                    <span class="lines">---</span>
+                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="lines">---</span>
+                    <span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+            </div>
+            <div class="thirdPart salesChild">
+            <span>@sentNegotiationRequest.status</span>
+            </div>
+
         }
-        @assetList.find(_.id == sentNegotiationRequest.assetID) match {
-            case Some(asset) => {
-                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
-            }
-            case None => {}
-        }
-        @commonTextInfo(constants.View.ASSET_DESCRIPTION, sentNegotiationRequest.assetDescription)
-        @commonVerticalIntInfo(constants.View.PRICE, sentNegotiationRequest.price)
-        @commonVerticalTextInfo(constants.View.QUANTITY, Seq(sentNegotiationRequest.quantity.toString, sentNegotiationRequest.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge)
-        @commonVerticalTextInfo(constants.View.STATUS, sentNegotiationRequest.status)
-    </li>
-}
+    }
+</div>

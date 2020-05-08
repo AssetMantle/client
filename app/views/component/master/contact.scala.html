@@ -2,16 +2,14 @@
 @import views.html.base._
 @import models.master.Mobile
 @import models.master.Email
-@import constants.Status.Contact
 
 @(mobileNumber: Option[Mobile], emailAddress: Option[Email])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
-    @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm)}
-    @emailAddress.map{email => @commonModalButton(constants.View.UPDATE_EMAIL_ADDRESS, routes.javascript.ContactController.addOrUpdateEmailAddressForm)}
-
-} {
-
+   } {
+    <div class="contactUpdateButton">
+    @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm, 'class -> "cmuk-button-link")}
+    </div>
     @mobileNumber match {
         case Some(mobile) => {
             @commonInfoBox() {
@@ -26,12 +24,14 @@
             }
         }
         case None => {
-            <div class="">
+            <div class="cmuk-position-center">
             @commonFormButton(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER)
             </div>
         }
     }
-
+    <div class="contactUpdateButton">
+    @emailAddress.map{email => @commonModalButton(constants.View.UPDATE_EMAIL_ADDRESS, routes.javascript.ContactController.addOrUpdateEmailAddressForm, 'class -> "cmuk-button-link")}
+    </div>
     @emailAddress match {
         case Some(email) => {
             @commonInfoBox() {
@@ -46,12 +46,9 @@
             }
         }
         case None => {
-            <div class="">
+            <div class="cmuk-position-center cmuk-margin-medium-top">
             @commonFormButton(constants.Form.ADD_OR_UPDATE_EMAIL_ADDRESS)
             </div>
         }
     }
-
-
-
 }

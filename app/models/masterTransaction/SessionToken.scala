@@ -145,7 +145,6 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIDs
-
     (for {
       ids <- ids
     } yield {

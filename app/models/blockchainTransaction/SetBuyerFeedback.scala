@@ -193,7 +193,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield {}
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionSuccessful
@@ -222,7 +222,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setBuyerFeedback = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

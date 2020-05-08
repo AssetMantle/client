@@ -7,7 +7,6 @@ object Contact {
   def getWarnings(mobile: Option[master.Mobile], email: Option[master.Email]): Seq[constants.Response.Warning] = {
     mobile.map(number => if(!number.status) Seq(constants.Response.VERIFY_MOBILE_NUMBER) else Seq()).getOrElse(Seq(constants.Response.UPDATE_MOBILE_NUMBER)) ++
     email.map(address => if(!address.status)  Seq(constants.Response.VERIFY_EMAIL_ADDRESS) else Seq()).getOrElse(Seq(constants.Response.UPDATE_EMAIL_ADDRESS))
-
   }
 
   def getStatus(mobile: Option[master.Mobile], email: Option[master.Email]): Seq[String] = {
