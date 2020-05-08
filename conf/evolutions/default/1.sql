@@ -1487,7 +1487,7 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
     ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
 
 ALTER TABLE DOCUSIGN."Envelope"
-    ADD CONSTRAINT Envelope_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
+    ADD CONSTRAINT Envelope_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
 
 ALTER TABLE MASTER."AccountFile"
     ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
@@ -1557,7 +1557,7 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
     ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
-    ADD CONSTRAINT NegotiationFile_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id");
+    ADD CONSTRAINT NegotiationFile_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
@@ -1577,7 +1577,7 @@ ALTER TABLE MASTER_TRANSACTION."SessionToken"
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
     ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
+    ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
