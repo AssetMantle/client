@@ -14,7 +14,7 @@
 
         @if(traderID == negotiation.sellerTraderID && (negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS || negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED)) {
             <div class="uploadDoc">
-            @commonModalButton(constants.Form.UPLOAD, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${id}'")
+            @commonModalButton(constants.View.UPLOAD, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${id}'")
             </div>
         }
 

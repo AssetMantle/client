@@ -6,8 +6,8 @@
 
 @redeemFiatRequests.map { redeemFiatRequest =>
     @commonVerticalInfoBox() {
-        @commonVerticalTextInfo(constants.Form.ID, redeemFiatRequest.id)
-        @commonVerticalIntInfo(constants.Form.AMOUNT, redeemFiatRequest.amount)
+        @commonVerticalTextInfo(constants.View.ID, redeemFiatRequest.id)
+        @commonVerticalIntInfo(constants.View.AMOUNT, redeemFiatRequest.amount)
         @commonVerticalTextInfo(constants.View.STATUS, redeemFiatRequest.status)
     }
 }
