@@ -74,7 +74,7 @@ class SetACLController @Inject()(
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
               def sendEmailAndGetResult(organization: Organization,organizationAdminIdentification:Identification): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organizationAdminIdentification.firstName+" "+organizationAdminIdentification.lastName, organization.name, comdexURL, organization.id)
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name,Seq(organizationAdminIdentification.firstName,organizationAdminIdentification.lastName).mkString(" "), organization.name, comdexURL, organization.id)
                 withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_INVITATION_EMAIL_SENT)))
               }
 
