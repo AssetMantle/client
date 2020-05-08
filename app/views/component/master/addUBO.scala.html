@@ -5,7 +5,7 @@
 
 @(addUBOForm: Form[AddUBO.Data] = AddUBO.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_UBO, addUBOForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(addUBOForm, constants.FormField.PERSON_NAME)
     @commonInputDouble(addUBOForm, constants.FormField.SHARE_PERCENTAGE)
     @commonInputText(addUBOForm, constants.FormField.RELATIONSHIP)

@@ -6,8 +6,8 @@
 
 @(zoneCompletionForm: Form[ReviewAddZoneRequest.Data] = ReviewAddZoneRequest.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
-    <div class="modalInnerContainer">
-        <div class="sides">
+    <div class="info-block">
+        <div class="info-block-item">
             <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_DETAILS):</div>
             @commonTextInfo(constants.View.NAME, zone.name)
             @commonTextInfo(constants.Form.CURRENCY, zone.currency)
@@ -20,8 +20,8 @@
             @commonTextInfo(constants.FormField.ZIP_CODE.name, zone.address.zipCode)
             @commonTextInfo(constants.Form.PHONE, zone.address.phone)
         </div>
-        <div class="sides">
-            <div class="innerSideRight">
+        <div class="info-block-item">
+            <div class="info-block-right">
             <div id="zoneKYCs">
                 <div class="cmuk-text-left title">@Messages(constants.Form.ZONE_KYC_FILES)</div>
                 @for(zoneKYC <- zoneKYCs) {

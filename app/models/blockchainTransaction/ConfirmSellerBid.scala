@@ -221,7 +221,7 @@ class ConfirmSellerBids @Inject()(
         } yield ()
       }
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       def masterNegotiationID(bcNegotiationID: String): Future[String] = masterNegotiations.Service.tryGetIDByNegotiationID(bcNegotiationID)
 
@@ -257,7 +257,7 @@ class ConfirmSellerBids @Inject()(
 
       def markDirty(confirmSellerBid: ConfirmSellerBid): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
 
-      def getID(address: String): Future[String] = masterAccounts.Service.getId(address)
+      def getID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

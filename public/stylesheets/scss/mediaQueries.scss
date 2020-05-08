@@ -1,16 +1,16 @@
 @import "variables.scss";
 
 @media (max-width: 640px) {
-  .pageContent {
+  .page-content {
     margin: 20px;
   }
   .MnemonicQuiz{
     max-width: 500px;
   }
-  .bannerContainer {
+  .banner {
     background-size: contain;
     background-position: center bottom;
-    .bannerText {
+    .banner-text {
       width: 100%;
       h3 {
         font-size: 30px;
@@ -74,7 +74,7 @@
   }
   .MnemonicQuiz {
     text-align: center;
-    .verifyMnemonic .verifyMnemonicbutton {
+    .verifyMnemonic .verifyMnemonicButton {
       width: 95px;
     }
   }
@@ -92,7 +92,7 @@
   }
   form{
     hr{
-      margin-top: 10px;
+      margin: 0px;
     }
   }
   .MnemonicQuiz {
@@ -173,6 +173,23 @@
       width: 100%;
     }
   }
+  .modal .modalContent{
+    .modalBody {
+      .info-block {
+       flex-direction: column;
+        max-width: 500px;
+        max-height: 410px;
+        .info-block-item{
+          flex: none;
+          .info-block-right{
+            padding: 0;
+            border: none;
+
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (min-width:992px) and (max-width:1600px){
@@ -183,12 +200,15 @@
       form .formBody {
         max-height: 409px;
       }
-      .legendModalContainer{
+      .info-block-height{
         max-height: 399px;
+      }
+      .info-block {
+        width: 800px;
       }
     }
   }
-  .leftSideContainer{
+  .leftContainer{
     .financial{
       margin-bottom: 15px;
       .cmuk-card{
@@ -213,10 +233,10 @@
       border: 0;
     }
     .documentView{
-      .cmuk-card-header, .cmuk-card-body, .documentlist{
+      .cmuk-card-header, .cmuk-card-body, .documentList{
         padding:0px;
       }
-      .documentlist{
+      .documentList{
         height: 150px;
       }
       .cmuk-card{
@@ -232,7 +252,7 @@
       }
     }
   }
-  .rightSideContainer{
+  .rightContainer{
     .recentActivityContainer{
       margin-bottom: 15px;
       .cmuk-card-body{
@@ -267,7 +287,7 @@
   }
   .switcherCard{
     .cmuk-switcher{
-      height: 179px;
+      height: 170px;
     }
   }
   .timeline {
@@ -279,13 +299,13 @@
     }
   }
   .salesQuoteCard{
-    .firstPart{
+    .salesQuoteCardLeft{
       flex: 32%;
     }
-    .secondPart{
+    .salesQuoteCardMiddle{
       flex: 45%;
     }
-    .thirdPart{
+    .salesQuoteCardRight{
       flex: 23%;
     }
   }
@@ -295,7 +315,10 @@
   :root {
     font-size: 13px;
   }
-
+  .signUpForm .usernameAvailability .checkIcon,
+  .signUpForm .showPassword{
+    top:51px
+  }
   .profileContainer{
     .identificationDetails{
       .documentItem{
@@ -336,7 +359,7 @@
     }
   }
   .mobileNumberUpdate .countryCode{
-    margin-top:28px;
+    margin-top:38px;
   }
 }
 
@@ -344,7 +367,7 @@
   :root {
     font-size: 16px;
   }
-  .showpassword, .checkIcon{
+  .showPassword, .checkIcon{
     top:37px;
   }
 }

@@ -9,14 +9,14 @@
     <div class="salesQuoteCard">
     @sellNegotiationList.map { sellNegotiation =>
         @commonVerticalInfoBox() {
-            <div class="firstPart salesChild">
+            <div class="salesQuoteCardLeft salesChild">
                 <div class="content">
                 @assetList.find(_.id == sellNegotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetIcon">
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
-                        <div class="assetIntialData">
+                        <div class="assetInitialData">
                             <p class="assetTitle">@asset.assetType</p>
                             <p class="assetQuantity">@Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@sellNegotiation.price</p>
@@ -26,7 +26,7 @@
                 }
                 </div>
             </div>
-            <div class="secondPart salesChild">
+            <div class="salesQuoteCardMiddle salesChild">
                 @counterPartyTraderList.find(_.id == sellNegotiation.buyerTraderID) match {
                     case Some(trader) => {
                         @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -55,7 +55,7 @@
                     <span>@sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
                 </p>
             </div>
-            <div class="thirdPart salesChild">
+            <div class="salesQuoteCardRight salesChild">
             @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sellNegotiation.id))
             </div>
         }

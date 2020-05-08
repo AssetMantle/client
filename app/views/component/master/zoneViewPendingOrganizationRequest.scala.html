@@ -10,8 +10,8 @@
     @Messages(constants.View.ORGANIZATION_REQUEST): @organization.id
 </legend>
 <hr>
-<div class="modalInnerContainer legendModalContainer">
-    <div class="sideLeft sides">
+<div class="info-block info-block-height">
+    <div class="sideLeft info-block-item">
 <div class="title cmuk-text-left">@Messages(constants.Form.ORGANIZATION_DETAILS) </div>
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
     @commonTextInfo(constants.Form.ZONE_ID, organization.zoneID)
@@ -25,8 +25,8 @@
 <div class="title cmuk-text-left">@Messages(constants.FormField.POSTAL_ADDRESS.name) </div>
 @streetAddress(organization.postalAddress)
     </div>
-    <div class="sideRight sides">
-        <div class="innerSideRight">
+    <div class="sideRight info-block-item">
+        <div class="info-block-right">
         <div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_UBO_DETAIL) </div>
         @for(ubo <- organization.ubos.data) {
             @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
@@ -45,9 +45,9 @@
                 }
             }
 
-        <span class="cmuk-text-left">@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</span>
+        <p class="cmuk-text-left">@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</p>
+            @commonModalButton(constants.Form.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
+            @commonFormButton(constants.Form.REJECT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")
         </div>
     </div>
 </div>
-@commonModalButton(constants.Form.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
-@commonFormButton(constants.Form.REJECT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")

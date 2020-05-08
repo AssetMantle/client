@@ -5,8 +5,8 @@
 
 @(updateDocumentListForm: Form[DocumentList.Data] = DocumentList.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.UPDATE_DOCUMENT_LIST, updateDocumentListForm) {
-    <div class="modalInnerContainer">
-        <div class="sides">
+    <div class="info-block">
+        <div class="info-block-item">
         @commonInputText(updateDocumentListForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
         @commonCheckbox(updateDocumentListForm, constants.FormField.BILL_OF_LADING, 'onclick -> "onDocumentSelect(this)")
         @commonCheckbox(updateDocumentListForm, constants.FormField.COO, 'onclick -> "onDocumentSelect(this)")
@@ -29,7 +29,7 @@
         }
     }
         </div>
-        <div class="sides">
+        <div class="info-block-item">
         @commonJavascriptButton(constants.View.ADD, JavaScript("onDocumentListIncomplete(this)"))
         @commonCheckbox(updateDocumentListForm, constants.FormField.DOCUMENT_LIST_COMPLETED, 'containerDivClass -> "hidden", 'id -> "negotiationDocumentListCompleted")
         @commonSelect(updateDocumentListForm, constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA)

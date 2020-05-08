@@ -27,6 +27,7 @@
         <script src="@routes.Assets.versioned("javascripts/replaceDocument.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/submitFormOnEnter.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/submitForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/rippleEffect.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/validateForm.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
@@ -53,26 +54,26 @@
                         @loginState match {
                             case null => {}
                             case default => {
-                                <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
+                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
                                     @commonIcon("dashboard")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
+                                <li><a href="@controllers.routes.ViewController.trades()" class="navItemRippleEffect"><span class="traderIcon">
                                     @commonIcon("trader")
                                 </span>
                                     @Messages(constants.View.TRADES)
                                 </a>
                                 </li>
                                 <li>
-                                    <a href="@controllers.routes.ViewController.transactions()"><span class="transactionIcon">
+                                    <a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionIcon">
                                         @commonIcon("transaction")
                                     </span>
                                         @Messages(constants.Form.TRANSACTIONS)
                                     </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
+                                <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect"><span class="accountIcon">
                                     @commonIcon("account")
                                 </span>
                                     @Messages(constants.View.ACCOUNT)
@@ -88,7 +89,7 @@
                             case null => {
                                 <li>
                                     <a>
-                                    @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.noteAndVerifyMnemonic, 'class -> "buttonRegister")
+                                    @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.signUpForm, 'class -> "buttonRegister")
                                     </a>
                                 </li>
                                 <li>
@@ -100,10 +101,10 @@
                             case default => {
                                 @loginState.userType match {
                                     case constants.User.ZONE => {
-                                        <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                        <li><a href="@controllers.routes.ViewController.zoneRequest()" class="navItemRippleEffect">@Messages(constants.View.REQUEST)</a></li>
                                     }
                                     case constants.User.GENESIS => {
-                                        <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                        <li><a href="@controllers.routes.ViewController.genesisRequest()" class="navItemRippleEffect">@Messages(constants.View.REQUEST)</a></li>
                                     }
                                     case _ => {}
                                 }
@@ -114,14 +115,14 @@
                                     </script>
                                 <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
-                                <li>
-                                    <a href="@controllers.routes.ViewController.profile()">
+                                <li class="login-nav-item">
+                                    <a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
                                         @loginState.username
                                     <span cmuk-icon="user" class="loginIcon"></span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
                                         <span class="logoutIcon">@commonIcon("logout")</span>
                                     </a>
                                 </li>
@@ -136,7 +137,7 @@
             @* End of Header *@
 
             @* Main Container *@
-        <div class="mainSection">
+        <div class="main-container">
             @* Data container *@
         <div class="dataContainer">
             <div class="cmuk-text-center">
@@ -178,14 +179,14 @@
             <div class="pageContainer">
             @loginState match {
                 case null => {
-                    <div class="bannerContainer cmuk-container">
-                        <div class="bannerText">
+                    <div class="banner cmuk-container">
+                        <div class="banner-text">
                             <h3>@Messages(constants.View.INDEX_1)</h3>
                             <p>@Messages(constants.View.INDEX_2)</p>
                         </div>
                     </div>
 
-                    <div class="pageContent cmuk-container">
+                    <div class="page-content cmuk-container">
                         <div class="leftSide sticky">
                         @left
                         </div>
@@ -198,7 +199,7 @@
                     </div>
                 }
                 case default => {
-                    <div class="pageContent cmuk-container">
+                    <div class="page-content cmuk-container">
                         <div class="leftSide sticky">
                         @left
                         </div>
@@ -217,8 +218,7 @@
                 <div class="modalContent">
                     <button class="cmuk-modal-close-default" id="modalClose" type="button" cmuk-close></button>
                     <div class="modalBody" id="commonModalContent">
-
-                            </div>
+                    </div>
                 </div>
             </div>
 
@@ -242,11 +242,11 @@
         <div class="footer">
             <div class="cmuk-container">
                 <div>
-                    <div class="footerLogo">
+                    <div class="footer-logo">
                         <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.Form.FOOTER_LOGO)"/>
                     </div>
                 </div>
-                <div class="copyright">
+                <div class="footer-copyright">
                             &copy;
                     <script>document.write(new Date().getFullYear())</script>
                     <a href="" target="_blank">@Messages(constants.View.FOOTER_TEXT)</a>

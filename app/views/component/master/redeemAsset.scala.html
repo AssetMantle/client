@@ -3,7 +3,7 @@
 
 @(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.REDEEM_ASSET, redeemAssetForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(redeemAssetForm, constants.FormField.ASSET_ID, 'value -> assetID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputInt(redeemAssetForm, constants.FormField.GAS)
     @commonInputPassword(redeemAssetForm, constants.FormField.PASSWORD)

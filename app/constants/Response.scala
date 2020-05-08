@@ -97,6 +97,7 @@ object Response {
   val BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Success("BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT")
   val BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Success("BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT")
   val ZONE_RELEASED_ASSET = new Success("ZONE_RELEASED_ASSET")
+  val ACCOUNT_CREATED = new Success("ACCOUNT_CREATED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.ContactController.verifyMobileNumberForm)
@@ -186,6 +187,7 @@ object Response {
   val ORGANIZATION_NOT_VERIFIED = new Failure("ORGANIZATION_NOT_VERIFIED")
   val INVALID_PAYMENT_TERMS = new Failure("INVALID_PAYMENT_TERMS")
   val TENURE_AND_TENTATIVE_DATE_BOTH_FOUND = new Failure("TENURE_AND_TENTATIVE_DATE_BOTH_FOUND")
+  val BLOCKCHAIN_ACCOUNT_NOT_FOUND = new Failure("BLOCKCHAIN_ACCOUNT_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

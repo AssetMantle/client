@@ -9,14 +9,14 @@
 <div class="salesQuoteCard">
     @negotiationList.map { negotiation =>
         @commonVerticalInfoBox() {
-            <div class="firstPart salesChild">
+            <div class="salesQuoteCardLeft salesChild">
                 <div class="content">
                 @assetList.find(_.id == negotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetIcon">
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
-                        <div class="assetIntialData">
+                        <div class="assetInitialData">
                             <p class="assetTitle">@asset.assetType</p>
                             <p class="assetQuantity">@Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@negotiation.price</p>
@@ -26,7 +26,7 @@
                 }
                 </div>
             </div>
-            <div class="secondPart salesChild">
+            <div class="salesQuoteCardMiddle salesChild">
                 <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_ID)">@negotiation.buyerTraderID</span>
                     <span class="lines">---</span>
                     <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_ID)">@negotiation.sellerTraderID</span>
@@ -52,7 +52,7 @@
                     <span>@negotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
                 </p>
             </div>
-            <div class="thirdPart salesChild">
+            <div class="salesQuoteCardRight salesChild">
             @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(negotiation.id), 'class->"secondaryFont")
             </div>
 

@@ -5,8 +5,8 @@
 
 @(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String, trader: Trader)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
-    <div class="modalInnerContainer">
-        <div class="sides">
+    <div class="info-block">
+        <div class="info-block-item">
         @commonTextInfo(constants.View.NAME, trader.name)
         @commonInputText(modifyTraderForm, constants.FormField.ACCOUNT_ID, 'value -> accountID, 'readonly -> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_ASSET, 'checked-> true)
@@ -19,8 +19,8 @@
         @commonCheckbox(modifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked-> true)
         </div>
-        <div class="sides">
-            <div class="innerSideRight">
+        <div class="info-block-item">
+            <div class="info-block-right">
         @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_BUYER_BID, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked-> true)

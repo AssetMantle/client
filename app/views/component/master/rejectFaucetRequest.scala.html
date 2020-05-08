@@ -4,7 +4,7 @@
 
 @(rejectFaucetRequestForm: Form[RejectFaucetRequest.Data] = RejectFaucetRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_FAUCET_REQUEST, rejectFaucetRequestForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(rejectFaucetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
     @commonInputText(rejectFaucetRequestForm, constants.FormField.COMMENT, 'required -> false)
     </div>

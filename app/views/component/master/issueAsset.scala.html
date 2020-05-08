@@ -4,7 +4,7 @@
 
 @(issueAssetForm: Form[IssueAsset.Data] = IssueAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ISSUE_ASSET, issueAssetForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)
     @commonInputText(issueAssetForm, constants.FormField.ASSET_DESCRIPTION)
     @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)

@@ -8,7 +8,7 @@
     @Messages(constants.Form.TRADER_BACKGROUND_CHECK)
 </legend>
 <hr>
-<div class="modalInnerContainerFirst centerText">
+<div class="modal-info-block centerText">
     @for(documentType <- constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm('@documentType', '@trader.id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>

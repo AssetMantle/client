@@ -4,7 +4,7 @@
 
 @(updatePaymentTerms: Form[PaymentTerms.Data] = PaymentTerms.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.UPDATE_PAYMENT_TERMS, updatePaymentTerms) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(updatePaymentTerms, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
     @Messages(constants.View.ADVANCE_PAYMENT)
     @commonInputDouble(updatePaymentTerms, constants.FormField.ADVANCE_PERCENTAGE, 'id -> "advancePercentage", 'oninput -> "advancePercentageInput()")

@@ -3,7 +3,7 @@
 
 @(inviteZoneForm: Form[InviteZone.Data] = InviteZone.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.INVITE_ZONE, inviteZoneForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(inviteZoneForm, constants.FormField.EMAIL_ADDRESS)
     </div>
 }

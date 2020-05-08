@@ -8,8 +8,8 @@ import models.Abstract.AssetDocumentContent
 import models.Abstract.NegotiationDocumentContent
 import models.common.Serializable._
 import models.master.{Asset, Negotiation, Trader}
-import models.masterTransaction.{TradeActivity, NegotiationFile}
-import models.{blockchainTransaction, master, masterTransaction}
+import models.masterTransaction.{NegotiationFile, TradeActivity}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -18,6 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NegotiationController @Inject()(
+                                       blockchainAccounts: blockchain.Accounts,
                                        messagesControllerComponents: MessagesControllerComponents,
                                        blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
                                        masterAccounts: master.Accounts,
@@ -56,18 +57,21 @@ class NegotiationController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-      def getAllTradableAssets(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
+      def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
 
       def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
 
-      def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+      def getCounterPartyTraderList(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
       (for {
         traderID <- traderID
-        tradableAssets <- getAllTradableAssets(traderID)
+        tradableAssetList <- getAllTradableAssetList(traderID)
         counterPartyList <- getCounterPartyList(traderID)
-        counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-      } yield Ok(views.html.component.master.negotiationRequest(tradableAssets = tradableAssets, counterPartyTraders = counterPartyTraders))
+        counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+        counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+      } yield Ok(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -79,18 +83,21 @@ class NegotiationController @Inject()(
         formWithErrors => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-          def getAssets(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllAssets(traderID)
+          def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
 
           def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
 
-          def getCounterPartyTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+          def getCounterPartyTraderList(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+          def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
           (for {
             traderID <- traderID
-            assets <- getAssets(traderID)
+            tradableAssetList <- getAllTradableAssetList(traderID)
             counterPartyList <- getCounterPartyList(traderID)
-            counterPartyTraders <- getCounterPartyTraders(counterPartyList)
-          } yield BadRequest(views.html.component.master.negotiationRequest(formWithErrors, assets, counterPartyTraders))
+            counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+            counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+          } yield BadRequest(views.html.component.master.negotiationRequest(formWithErrors, tradableAssetList, counterPartyTraderList, counterPartyOrganizationList))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
@@ -397,7 +404,7 @@ class NegotiationController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[String] = transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
             entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(negotiationDefaultTime), pegHash = pegHash, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
@@ -1001,7 +1008,7 @@ class NegotiationController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerTraderID: String, sellerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (buyerTraderID != negotiation.buyerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -1080,7 +1087,7 @@ class NegotiationController @Inject()(
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def getAddress(accountID: String): Future[String] = masterAccounts.Service.tryGetAddress(accountID)
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(sellerTraderID: String, buyerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[String] = {
             if (sellerTraderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)

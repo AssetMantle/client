@@ -57,7 +57,7 @@
                         <tr><td colspan="3">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
                         @assetFileList.filter(assetFile => negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
                             <tr>
-                                <td><span class="docIcon">@commonIcon("doc2")</span>
+                                <td colspan="2"><span class="docIcon">@commonIcon("doc2")</span>
                                     <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocument('@negotiation.id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
                                 </td>
                                 @assetFile.documentType match {
@@ -67,7 +67,7 @@
                                             </span>
                                         </td>
                                     }
-                                    case _=>{<td></td>}
+                                    case _=>{}
                                 }
                             </tr>
                         }

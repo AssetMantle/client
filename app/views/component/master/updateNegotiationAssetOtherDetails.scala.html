@@ -4,7 +4,7 @@
 
 @(updateNegotiationAssetOtherDetailsForm: Form[UpdateNegotiationAssetOtherDetails.Data] = UpdateNegotiationAssetOtherDetails.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.UPDATE_ASSET_OTHER_DETAILS, updateNegotiationAssetOtherDetailsForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(updateNegotiationAssetOtherDetailsForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputInt(updateNegotiationAssetOtherDetailsForm, constants.FormField.SHIPPING_PERIOD)
     @commonInputText(updateNegotiationAssetOtherDetailsForm, constants.FormField.PORT_OF_LOADING)

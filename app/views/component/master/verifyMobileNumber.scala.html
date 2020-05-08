@@ -4,7 +4,7 @@
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data] = VerifyMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.VERIFY_MOBILE_NUMBER, verifyMobileNumberForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(verifyMobileNumberForm, constants.FormField.OTP)
     </div>
 }

@@ -17,7 +17,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
-        routes.javascript.AccountController.noteAndVerifyMnemonic,
+        routes.javascript.AccountController.createBlockchainForm,
         routes.javascript.AccountController.addIdentificationForm,
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
@@ -197,6 +197,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewAssetDocumentContent,
         routes.javascript.ComponentViewController.zoneViewNegotiationDocumentContent,
         routes.javascript.ComponentViewController.zoneViewAssetDocumentContent,
+        routes.javascript.ComponentViewController.traderViewIssueFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewIssueFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewIssueFiatRequestList,
+
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,

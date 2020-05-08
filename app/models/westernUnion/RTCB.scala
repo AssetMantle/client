@@ -54,6 +54,8 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def getAllByByTransactionIDs(externalReferences: Seq[String]) = db.run(rtcbTable.filter(_.externalReference inSet externalReferences).result)
+
   private def getSumAmountsByExternalReference(externalReference: String): Future[Int] = db.run(rtcbTable.filter(_.externalReference === externalReference).map(_.paidOutAmount).sum.getOrElse(0).result)
 
     private def deleteById(id: String): Future[Int] = db.run(rtcbTable.filter(_.id === id).delete.asTry).map {
@@ -107,6 +109,8 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def get(id: String): Future[RTCB] = findById(id)
 
     def totalRTCBAmountByTransactionID(transactionID: String): Future[Int] = getSumAmountsByExternalReference(transactionID)
+
+    def getAll(transactionIDs: Seq[String])= getAllByByTransactionIDs(transactionIDs)
   }
 
 }

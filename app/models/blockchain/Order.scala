@@ -8,7 +8,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Node
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -29,7 +29,7 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 
 @Singleton
 class Orders @Inject()(
-                        masterAccounts: master.Accounts,
+                        blockchainAccounts: blockchain.Accounts,
                         masterNegotiations: master.Negotiations,
                         masterAssets: master.Assets,
                         actorSystem: ActorSystem,
@@ -215,7 +215,7 @@ class Orders @Inject()(
 
             def update(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.update(Order(id = dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false))
 
-            def getAccountID(address: String): Future[String] = masterAccounts.Service.getId(address)
+            def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
             for {
               orderResponse <- orderResponse

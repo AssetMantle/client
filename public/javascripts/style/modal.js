@@ -3,10 +3,10 @@ $(document).mouseup(function (e) {
         const modal = $(this);
         const modalConnectionError = $('#connectionError');
         if (modalConnectionError.is(e.target)) {
-            modalConnectionError.fadeOut(400)
+            modalConnectionError.fadeOut(100)
         }
         $('#modalClose').click(function() {
-            modal.fadeOut(400);
+            modal.fadeOut(100);
         })
     })
 });

@@ -4,7 +4,7 @@
 
 @(faucetRequestForm: Form[FaucetRequest.Data] = FaucetRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
     @commonForm(constants.Form.FAUCET_REQUEST, faucetRequestForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(faucetRequestForm, constants.FormField.COUPON)
     </div>
 }

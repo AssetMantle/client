@@ -4,7 +4,7 @@
 
 @(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_COIN, sendCoinForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(sendCoinForm, constants.FormField.TO)
     @commonInputInt(sendCoinForm, constants.FormField.AMOUNT)
     @commonInputInt(sendCoinForm, constants.FormField.GAS)

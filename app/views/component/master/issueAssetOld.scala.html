@@ -4,7 +4,7 @@
 
 @(issueAssetForm: Form[IssueAssetOld.Data] = IssueAssetOld.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ZONE_ISSUE_ASSET, issueAssetForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(issueAssetForm, constants.FormField.ID, 'readonly -> true)
     @commonInputText(issueAssetForm, constants.FormField.TRADER_ID)
     @commonInputText(issueAssetForm, constants.FormField.DOCUMENT_HASH)

@@ -4,7 +4,7 @@
 
 @(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data] = ApproveFaucetRequest.form, requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.APPROVE_FAUCET_REQUEST, approveFaucetRequestForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(approveFaucetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
     @commonInputText(approveFaucetRequestForm, constants.FormField.ACCOUNT_ID, 'value -> accountID)
     @commonInputInt(approveFaucetRequestForm, constants.FormField.GAS)

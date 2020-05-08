@@ -5,7 +5,7 @@ import akka.stream.scaladsl.Source
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.westernUnion.FiatRequests
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -178,7 +178,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               } yield fiatPegWallet
             }
 
-            val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+            val accountID = blockchainAccounts.Service.tryGetUsername(dirtyFiat.ownerAddress)
             (for {
               accountOwnerAddress <- accountOwnerAddress
               fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
@@ -188,7 +188,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
                   val deleteFiatPegWallet = Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
-                  val id = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+                  val id = blockchainAccounts.Service.tryGetUsername(dirtyFiat.ownerAddress)
                   for {
                     _ <- deleteFiatPegWallet
                     id <- id

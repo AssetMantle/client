@@ -4,7 +4,7 @@
 
 @(redeemFiatForm: Form[RedeemFiat.Data] = RedeemFiat.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REDEEM_FIAT, redeemFiatForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonInputText(redeemFiatForm, constants.FormField.ZONE_ID, 'value -> zoneID)
     @commonInputInt(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
     @commonInputInt(redeemFiatForm, constants.FormField.GAS)

@@ -6,7 +6,7 @@
     @Messages(constants.Form.ORGANIZATION_KYC_FILES)
 </legend>
 <hr>
-<div class="modalInnerContainerFirst centerText">
+<div class="modal-info-block centerText">
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>

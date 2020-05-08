@@ -5,7 +5,7 @@
 @(logoutForm: Form[Logout.Data] = Logout.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div class="logoutContainer">
 @commonForm(constants.Form.LOGOUT, logoutForm) {
-    <div class="modalInnerContainerFirst">
+    <div class="modal-info-block">
     @commonCheckbox(logoutForm, constants.FormField.RECEIVE_NOTIFICATIONS)
     </div>
 }

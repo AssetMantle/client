@@ -10,8 +10,8 @@
     @Messages(constants.View.ORGANIZATION): @organization.id
 </legend>
 <hr>
-<div class="modalInnerContainer legendModalContainer">
-    <div class="sides">
+<div class="info-block info-block-height">
+    <div class="info-block-item">
     <div class="cmuk-text-left title">@Messages(constants.Form.ORGANIZATION_DETAILS):</div>
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
     @commonTextInfo(constants.Form.ZONE_ID, organization.zoneID)
@@ -25,8 +25,8 @@
     <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name): </div>
     @streetAddress(organization.postalAddress)
     </div>
-    <div class="sides">
-        <div class="innerSideRight">
+    <div class="info-block-item">
+        <div class="info-block-right">
     <div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_UBO_DETAIL):</div>
     @for(ubo <- organization.ubos.data) {
         @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)

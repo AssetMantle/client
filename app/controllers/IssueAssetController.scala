@@ -5,7 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.Asset
-import models.{blockchainTransaction, master, masterTransaction}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -19,7 +19,7 @@ class IssueAssetController @Inject()(
                                       masterTraders: master.Traders,
                                       transaction: utilities.Transaction,
                                       masterZones: master.Zones,
-                                      masterAccounts: master.Accounts,
+                                      blockchainAccounts: blockchain.Accounts,
                                       masterAssets: master.Assets,
                                       masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                       withTraderLoginAction: WithTraderLoginAction,
@@ -73,7 +73,7 @@ class IssueAssetController @Inject()(
         issueAssetData => {
           val traderAccountID = masterTraders.Service.tryGetAccountId(issueAssetData.tarderID)
 
-          def toAddress(toAccountID: String): Future[String] = masterAccounts.Service.tryGetAddress(toAccountID)
+          def toAddress(toAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(toAccountID)
 
           val verifyRequestedStatus = masterAssets.Service.verifyAssetPendingRequestStatus(issueAssetData.id)
 

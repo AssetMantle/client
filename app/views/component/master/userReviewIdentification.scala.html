@@ -8,8 +8,8 @@
 @(userReviewIdentificationForm: Form[UserReviewIdentification.Data] = UserReviewIdentification.form, identification: Identification, accountKYC: AccountKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 
 @commonForm(constants.Form.USER_REVIEW_IDENTIFICATION, userReviewIdentificationForm) {
-    <div class="modalInnerContainer">
-        <div class="sides">
+    <div class="info-block">
+        <div class="info-block-item">
         @commonTextInfo(constants.Form.FIRST_NAME, identification.firstName)
         @commonTextInfo(constants.Form.LAST_NAME, identification.lastName)
         @commonTextInfo(constants.Form.DATE_OF_BIRTH, identification.dateOfBirth.toString)
@@ -21,8 +21,8 @@
         @commonTextInfo(constants.FormField.ADDRESS_LINE_2.name, identification.address.addressLine2)
         @commonTextInfo(constants.FormField.LANDMARK.name, identification.address.landmark.getOrElse(""))
         </div>
-        <div class="sides">
-            <div class="innerSideRight">
+        <div class="info-block-item">
+            <div class="info-block-right">
         @commonTextInfo(constants.FormField.CITY.name, identification.address.city)
         @commonTextInfo(constants.FormField.COUNTRY.name, identification.address.country)
         @commonTextInfo(constants.FormField.ZIP_CODE.name, identification.address.zipCode)

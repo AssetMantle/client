@@ -21,7 +21,7 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
                             $("#checkUsernameAvailableResult span").hide();
-                            $(".checkIcon").fadeIn();
+                            $("#checkIcon").fadeIn();
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;

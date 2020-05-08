@@ -7,7 +7,7 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftSideContainer">
+    <div class="leftContainer">
         <div id="financial" class="financial"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
@@ -38,7 +38,7 @@
 }
 
 @center = {
-    <div class="mainTabs">
+    <div class="mainTabs switcherCardSecond">
         <div class="cmuk-card cmuk-card-default">
             <div class="cmuk-card-body">
             @loginState.userType match {
@@ -50,7 +50,7 @@
                 </script>
                 }
                 case constants.User.ORGANIZATION => {
-                    <div id="organizationViewAcceptedNegotiation">FORM_INCOMPLETE
+                    <div id="organizationViewAcceptedNegotiation">
                 </div>
                     <script type="text/javascript">
                     componentResource('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation('@negotiationID'));
@@ -73,7 +73,7 @@
 @right = {
 
     <div>
-        <div class="rightSideContainer">
+        <div class="rightContainer">
             <div class="recentActivityContainer">
                 <div id="tradeActivities"></div>
             </div>
