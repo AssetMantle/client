@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object CreateBlockchainAccount {
+object CreateWallet {
   val form = Form(
     mapping(
       constants.FormField.USERNAME.name -> constants.FormField.USERNAME.field,

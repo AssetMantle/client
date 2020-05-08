@@ -67,10 +67,4 @@ object Status {
     val TIMED_OUT = "TIMED_OUT"
   }
 
-  object DocuSignEnvelope {
-    val CREATED = "created"
-    val SENT = "sent"
-    val COMPLETED = "completed"
-  }
-
 }

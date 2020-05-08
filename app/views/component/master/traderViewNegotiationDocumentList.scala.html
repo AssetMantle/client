@@ -25,13 +25,13 @@
                     <td>
                     @negotiationEnvelopeList.find(_.documentType == constants.File.Negotiation.CONTRACT) match {
                         case Some(docusignEnvelope) => {
-                            @if(docusignEnvelope.status == constants.Status.DocuSignEnvelope.CREATED && negotiation.sellerTraderID == traderID) {
+                            @if(docusignEnvelope.status == constants.External.Docusign.Status.CREATED && negotiation.sellerTraderID == traderID) {
                                 @commonModalButton(constants.View.SEND_FOR_SIGNATURE, routes.javascript.DocusignController.send, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")
                             }
-                            @if(docusignEnvelope.status == constants.Status.DocuSignEnvelope.SENT && negotiation.buyerTraderID == traderID) {
+                            @if(docusignEnvelope.status == constants.External.Docusign.Status.SENT && negotiation.buyerTraderID == traderID) {
                                 @commonModalButton(constants.View.E_SIGN, routes.javascript.DocusignController.sign, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")
                             }
-                            @if(docusignEnvelope.status == constants.Status.DocuSignEnvelope.COMPLETED) {
+                            @if(docusignEnvelope.status == constants.External.Docusign.Status.COMPLETED) {
                                 <span>@constants.View.SIGNED</span>
                             }
                         }

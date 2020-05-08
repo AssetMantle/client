@@ -103,7 +103,7 @@ class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   object Service {
 
-    def create(id: String, envelopeID: String, documentType: String): Future[String] = add(Envelope(id, envelopeID, documentType, constants.Status.DocuSignEnvelope.CREATED))
+    def create(id: String, envelopeID: String, documentType: String): Future[String] = add(Envelope(id, envelopeID, documentType, constants.External.Docusign.Status.CREATED))
 
     def get(id: String, documentType: String): Future[Option[Envelope]] = getByID(id, documentType)
 
@@ -113,9 +113,9 @@ class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
     def tryGetByEnvelopeID(envelopeID: String): Future[Envelope] = findByEnvelopeID(envelopeID)
 
-    def markSent(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelope.SENT)
+    def markSent(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.External.Docusign.Status.SENT)
 
-    def markComplete(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.Status.DocuSignEnvelope.COMPLETED)
+    def markComplete(envelopeID: String): Future[Int] = updateStatusByEnvelopeID(envelopeID, constants.External.Docusign.Status.COMPLETED)
 
     def tryGetEnvelopeID(id: String): Future[String] = findEnvelopeIDByID(id)
 
