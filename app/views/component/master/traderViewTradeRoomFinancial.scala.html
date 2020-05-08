@@ -32,13 +32,8 @@
             </div>
 
         </li>
-        <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
-            @Messages(constants.View.ADD_BALANCE)</button>
-        <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
-            @Messages(constants.View.REDEEM_BALANCE)</button>
-        @if(traderID == negotiation.buyerTraderID){
-        <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.id'))">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
-            @Messages(constants.View.SEND_FIAT)</button>
-        }
+        @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST,'class -> "addBalanceButton")
+        @commonFormButton(constants.Form.REDEEM_FIAT,'class -> "addBalanceButton")
+        @commonFormButton(constants.Form.SEND_FIAT,'parameters -> s"'${negotiation.id}'", 'class -> "addBalanceButton")
     </ul>
 </div>

@@ -15,8 +15,7 @@
             </div>
             <div>
                 @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST,'class -> "addBalanceButton")
-                <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
-                    @Messages(constants.View.REDEEM_BALANCE)</button>
+                @commonFormButton(constants.Form.REDEEM_FIAT,'class -> "addBalanceButton")
             </div>
         </li>
         <li class="cmuk-flex">
