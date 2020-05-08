@@ -54,9 +54,9 @@
                                     <p>@Messages(constants.View.TENURE)
                                         - <span class="cmuk-text-bold"> @credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span>
                                     </p>
+                                    @commonTextInfo(constants.View.REFERENCE, credit.reference)
                                 }
                             }
-                            @commonTextInfo(constants.View.REFERENCE, credit.reference)
                         }
                         case None => {}
                     }
@@ -180,11 +180,11 @@
                                     case None => {
                                         <p>@Messages(constants.View.TENURE)
                                             - <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
+                                        <p>@Messages(constants.View.REFERENCE)
+                                            - <span class="cmuk-text-bold">@credit.reference</span>
+                                        </p>
                                     }
                                 }
-                                <p>@Messages(constants.View.REFERENCE)
-                                    - <span class="cmuk-text-bold">@credit.reference</span>
-                                </p>
                             }
                             case None => {}
                         }
