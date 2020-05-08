@@ -184,7 +184,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             assetStatus <- getAssetStatus(negotiation.assetID)
             _ <- updatePaymentTerms(traderID = traderID, assetStatus = assetStatus, negotiation = negotiation)
-            result <- withUsernameToken.PartialContent(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = negotiation.id, (negotiation.documentList.assetDocuments ++ negotiation.documentList.negotiationDocuments).map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia.getOrElse(""))), id = negotiation.id))
+            result <- withUsernameToken.PartialContent(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = negotiation.id, (negotiation.documentList.assetDocuments ++ negotiation.documentList.negotiationDocuments).map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia)), id = negotiation.id))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -199,7 +199,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = (negotiation.documentList.assetDocuments ++ negotiation.documentList.negotiationDocuments).map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia.getOrElse(""))), id = id))
+        withUsernameToken.Ok(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = (negotiation.documentList.assetDocuments ++ negotiation.documentList.negotiationDocuments).map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia)), id = id))
       } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
       (for {
@@ -229,7 +229,7 @@ class NegotiationController @Inject()(
               negotiation.status match {
                 case constants.Status.Negotiation.FORM_INCOMPLETE | constants.Status.Negotiation.ISSUE_ASSET_PENDING =>
                   assetStatus match {
-                    case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(assetDocuments = documentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = documentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))), physicalDocumentsHandledVia = documentListData.physicalDocumentsHandledVia)
+                    case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED => masterNegotiations.Service.updateDocumentList(id = documentListData.id, documentList = DocumentList(assetDocuments = documentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = documentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))), physicalDocumentsHandledVia = documentListData.physicalDocumentsHandledVia.getOrElse(""))
                     case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
                   }
                 case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -726,7 +726,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = negotiation.documentList.assetDocuments.map(document => Option(document)) ++ negotiation.documentList.negotiationDocuments.map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia.getOrElse("")))))
+        withUsernameToken.Ok(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = negotiation.documentList.assetDocuments.map(document => Option(document)) ++ negotiation.documentList.negotiationDocuments.map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia))))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -752,15 +752,15 @@ class NegotiationController @Inject()(
           val negotiation = masterNegotiations.Service.tryGet(updateDocumentListData.id)
 
           def updateDocumentList(traderID: String, negotiation: Negotiation): Future[Int] = if (traderID == negotiation.sellerTraderID) {
-            masterNegotiations.Service.updateDocumentList(id = updateDocumentListData.id, documentList = DocumentList(assetDocuments = updateDocumentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = updateDocumentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))), physicalDocumentsHandledVia = updateDocumentListData.physicalDocumentsHandledVia)
+            masterNegotiations.Service.updateDocumentList(id = updateDocumentListData.id, documentList = DocumentList(assetDocuments = updateDocumentListData.documentList.flatten.filter(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType)), negotiationDocuments = updateDocumentListData.documentList.flatten.filterNot(documentType => constants.File.ASSET_DOCUMENTS.contains(documentType))), physicalDocumentsHandledVia = updateDocumentListData.physicalDocumentsHandledVia.getOrElse(""))
           } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
           def getResult(negotiation: Negotiation): Future[Result] = if (updateDocumentListData.documentListCompleted) {
-            withUsernameToken.PartialContent(views.html.tradeRoom(negotiationID = negotiation.id, successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
+            withUsernameToken.Ok(views.html.tradeRoom(negotiationID = negotiation.id, successes = Seq(constants.Response.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED)))
           } else {
-            withUsernameToken.PartialContent(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = updateDocumentListData.id, documentList = updateDocumentListData.documentList, documentListCompleted = true, physicalDocumentsHandledVia = updateDocumentListData.physicalDocumentsHandledVia)), id = negotiation.id))
+            withUsernameToken.PartialContent(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = updateDocumentListData.id, documentList = updateDocumentListData.documentList, documentListCompleted = true, physicalDocumentsHandledVia = updateDocumentListData.physicalDocumentsHandledVia))))
           }
 
           (for {

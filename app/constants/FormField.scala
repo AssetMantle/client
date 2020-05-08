@@ -120,7 +120,7 @@ object FormField {
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
   val DELIVERY_TERM = new SelectFormField("DELIVERY_TERM", constants.SelectFieldOptions.DELIVERY_TERMS)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_BY", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
   val REFERENCE = new SelectFormField("REFERENCE", constants.SelectFieldOptions.REFERENCE_DATES)
