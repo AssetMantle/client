@@ -1,5 +1,5 @@
 package constants
 
 object Negotiation {
-  val DefaultTime = 10000
+  val DefaultTime = 2000000
 }
