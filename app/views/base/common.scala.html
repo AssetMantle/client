@@ -88,7 +88,7 @@
                             case null => {
                                 <li>
                                     <a>
-                                    @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.noteAndVerifyMnemonic, 'class -> "buttonRegister")
+                                    @commonModalButton(constants.View.REGISTER, routes.javascript.AccountController.signUpForm, 'class -> "buttonRegister")
                                     </a>
                                 </li>
                                 <li>
@@ -144,7 +144,7 @@
                     <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
                         <p><span class="failureIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-fail")"/></svg></span>
-                            <span class="alretName">@Messages(constants.Form.FAILURE):</span>
+                            <span class="alertName">@Messages(constants.Form.FAILURE):</span>
                             @Messages(failure.message)</p>
                     </div>
                 }
@@ -152,7 +152,7 @@
                     <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
                         <p><span class="warningIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-warning")"/></svg></span>
-                            <span class="alretName">@Messages(constants.Form.WARNING):</span>
+                            <span class="alertName">@Messages(constants.Form.WARNING):</span>
                             @Messages(warning.message)</p>
                     </div>
                 }
@@ -167,7 +167,7 @@
                     <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
                         <p><span class="infoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info")"/></svg></span>
-                            <span class="alretName">@Messages(constants.Form.INFORMATION):</span>
+                            <span class="alertName">@Messages(constants.Form.INFORMATION):</span>
                             @Messages(info.message)</p>
                     </div>
 
@@ -230,15 +230,13 @@
         </div>
             @* End of Data container *@
 
-        <div class = "modal centerScreen hidden" id="connectionError">
-            <div class="connectionError">
-                <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
-                <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
+                <div class = "modal centerScreen hidden" id="connectionError">
+                    <div class="connectionError">
+                        <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
+                        <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        </div>
-            @* End of MainContainer *@
-        </div>
         @* Footer *@
         <div class="footer">
             <div class="cmuk-container">
@@ -255,12 +253,13 @@
             </div>
         </div>
         @* End of Footer *@
+            @* End of MainContainer *@
+        </div>
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/activeLink.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/stickyCard.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/style/sideBar.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/copyToClipboard.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/navigationBar.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>

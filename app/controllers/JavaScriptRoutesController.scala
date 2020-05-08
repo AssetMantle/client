@@ -17,7 +17,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
-        routes.javascript.AccountController.noteAndVerifyMnemonic,
+        routes.javascript.AccountController.createWalletForm,
         routes.javascript.AccountController.addIdentificationForm,
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
@@ -140,6 +140,31 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewTradeRoomChecks,
         routes.javascript.ComponentViewController.zoneOrderActions,
 
+        routes.javascript.ComponentViewController.zoneViewSendFiatRequests,
+        routes.javascript.ComponentViewController.zoneViewPendingSendFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewCompleteSendFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewFailedSendFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewRedeemFiatRequests,
+        routes.javascript.ComponentViewController.zoneViewPendingRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewCompleteRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewFailedRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewSendFiatRequests,
+        routes.javascript.ComponentViewController.organizationViewPendingSendFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewCompleteSendFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewFailedSendFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewRedeemFiatRequests,
+        routes.javascript.ComponentViewController.organizationViewPendingRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewCompleteRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewFailedRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewSendFiatRequests,
+        routes.javascript.ComponentViewController.traderViewPendingSendFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewCompleteSendFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewFailedSendFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewRedeemFiatRequests,
+        routes.javascript.ComponentViewController.traderViewPendingRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewCompleteRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewFailedRedeemFiatRequestList,
+
         routes.javascript.ComponentViewController.organizationSubscription,
         routes.javascript.ComponentViewController.traderSubscription,
 
@@ -173,6 +198,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.viewOrganizationUBOs,
         routes.javascript.ComponentViewController.recentActivities,
         routes.javascript.ComponentViewController.traderFinancials,
+        routes.javascript.ComponentViewController.organizationFinancial,
+        routes.javascript.ComponentViewController.zoneFinancial,
         routes.javascript.ComponentViewController.traderViewAcceptedNegotiation,
         routes.javascript.ComponentViewController.traderViewAcceptedNegotiationTerms,
         routes.javascript.ComponentViewController.organizationViewAcceptedNegotiation,
@@ -197,6 +224,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewAssetDocumentContent,
         routes.javascript.ComponentViewController.zoneViewNegotiationDocumentContent,
         routes.javascript.ComponentViewController.zoneViewAssetDocumentContent,
+        routes.javascript.ComponentViewController.traderViewIssueFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewIssueFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewIssueFiatRequestList,
+
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,
@@ -206,6 +237,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
+
+        routes.javascript.DocusignController.send,
+        routes.javascript.DocusignController.sign,
+        routes.javascript.DocusignController.authorization,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -258,6 +293,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NegotiationController.confirmAllNegotiationTermsForm,
         routes.javascript.NegotiationController.buyerConfirmForm,
         routes.javascript.NegotiationController.sellerConfirmForm,
+        routes.javascript.NegotiationController.updateContractSignedForm,
 
         routes.javascript.NegotiationController.tradeActivityMessages,
 
@@ -275,6 +311,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 
         routes.javascript.RedeemFiatController.redeemFiatForm,
+        routes.javascript.RedeemFiatController.zoneRedeemFiatForm,
         routes.javascript.RedeemFiatController.blockchainRedeemFiatForm,
 
         routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
@@ -289,6 +326,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendCoinController.blockchainSendCoinForm,
 
         routes.javascript.SendFiatController.sendFiatForm,
+        routes.javascript.SendFiatController.zoneSendFiatForm,
         routes.javascript.SendFiatController.blockchainSendFiatForm,
 
         routes.javascript.SetACLController.inviteTraderForm,

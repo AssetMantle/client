@@ -43,6 +43,10 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def findAllByID(traderID: String): Future[Seq[FiatRequest]]= db.run(fiatRequestTable.filter(_.traderID === traderID).result)
+
+  private def findAllByTraderIDs(traderIDs: Seq[String]): Future[Seq[FiatRequest]]= db.run(fiatRequestTable.filter(_.traderID inSet traderIDs).result)
+
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => if (result > 0) {
       result
@@ -91,19 +95,23 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.Fiat.REQUEST_INITIATED))
+    def create(traderID: String, transactionAmount: Int): Future[String] = add(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.IssueFiat.REQUEST_INITIATED))
 
     def tryGetByID(id: String): Future[FiatRequest] = findByID(id)
 
     def getStatus(id: String): Future[String] = getStatusByID(id)
 
+    def getAll(traderID:String)= findAllByID(traderID)
+
+    def getAllByTraderIDs(traderIDs:Seq[String])= findAllByTraderIDs(traderIDs)
+
     def markRTCBReceived(id: String, amountRequested: Int, totalRTCBAmount: Int): Future[Int] = {
       if (amountRequested == totalRTCBAmount) {
-        updateStatusByID(id, constants.Status.Fiat.FULLY_PAID)
+        updateStatusByID(id, constants.Status.IssueFiat.FULLY_PAID)
       } else if (amountRequested < totalRTCBAmount) {
-        updateStatusByID(id, constants.Status.Fiat.OVER_PAID)
+        updateStatusByID(id, constants.Status.IssueFiat.OVER_PAID)
       } else {
-        updateStatusByID(id, constants.Status.Fiat.PARTIALLY_PAID)
+        updateStatusByID(id, constants.Status.IssueFiat.PARTIALLY_PAID)
       }
     }
   }

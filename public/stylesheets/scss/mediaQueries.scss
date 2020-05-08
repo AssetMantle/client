@@ -1,4 +1,5 @@
 @import "variables.scss";
+
 @media (max-width: 640px) {
   .pageContent {
     margin: 20px;
@@ -8,23 +9,80 @@
   }
   .bannerContainer {
     background-size: contain;
-
+    background-position: center bottom;
     .bannerText {
       width: 100%;
-
       h3 {
         font-size: 30px;
       }
     }
   }
-
   .mobile .cmuk-offcanvas-bar{
     padding: 30px;
   }
   .mobile .cmuk-button{
     background-color: $colorPrimary;
   }
+  .switcherCard{
+    .cmuk-subnav{
+      flex-wrap: nowrap;
+      justify-content: start;
+      overflow: auto;
+      overflow: -moz-scrollbars-none;
+      li{
+        flex: none;
+      }
+      &::-webkit-scrollbar {
+        height: 0 !important
+      }
+    }
+    .cmuk-subnav-pill>*>:first-child{
+      padding: 5px 20px;
+    }
+  }
+  .commonList{
+    display: block;
+    padding: 20px;
+    .listItemChild {
+      display: flex;
+      padding: 5px 0px;
+      .listItemChildTitle{
+        width: 100px;
+      }
+      .listItemChildValue {
+        margin: 0px;
+        white-space: normal;
+      }
+    }
+  }
+  .modal{
+    padding: 30px 15px;
+    .modalContent{
+      padding: 15px;
+      min-height: 150px;
+      max-height: calc(100% - 20px);
+      top:auto;
+      transform: translateY(0);
+      margin: 0 auto;
+      width: 600px;
+      transition: .3s linear;
+      transition-property: opacity,transform;
+      form{
+        text-align: center;
+      }
+    }
+  }
+  .MnemonicQuiz {
+    text-align: center;
+    .verifyMnemonic .verifyMnemonicbutton {
+      width: 95px;
+    }
+  }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm{
+    flex-wrap: wrap;
+  }
 }
+
 @media (min-width: 640px) {
   .modalBody{
     form{
@@ -47,12 +105,21 @@
   .cmuk-card-body {
     .cmuk-subnav {
       li a {
-        font-size: 12px;
         text-transform: capitalize;
       }
     }
   }
 }
+
+@media (min-width: 960px) and (max-width: 1080px) {
+  .header .cmuk-navbar-nav > li > a{
+    padding: 0px 15px;
+  }
+  .header .cmuk-navbar-right .cmuk-navbar-nav > li > a{
+    padding: 0px 15px;
+  }
+}
+
 @media (min-width: 960px) {
   .verticalDataTabsData {
     display: flex;
@@ -64,29 +131,6 @@
     }
   }
 }
-@media screen and (max-width: 768px) {
-  .timeline {
-    margin: 30px;
-    padding: 0;
-    &:before {
-      left: 0;
-    }
-    .timeline-item{
-      .timeline-content {
-        width: 80%;
-        float: right;
-      }
-      .timeline-content:before,
-      .timeline-content.right:before {
-        left: -5px;
-        right: inherit;
-      }
-      .timeline-icon {
-        left: 0;
-      }
-    }
-  }
-}
 
 @media (min-width:1200px) {
   .pageContainer {
@@ -95,23 +139,29 @@
       float: left;
       left: 0;
       margin-right: 0.5%;
-      width: 24%;
+      width: 24.5%;
       margin-bottom: 5px;
     }
-
     .middle {
       width: 50%;
       height: calc(100% - 128px);
       float: left;
     }
-
     .rightSide {
       height: 100%;
-      width: 24%;
+      width: 24.5%;
       float: left;
       margin-left: 0.5%;
       right: 0;
       margin-bottom: 5px;
+    }
+  }
+}
+
+@media (max-width:1200px ) {
+  .pageContainer {
+    .middle{
+      margin-bottom: 20px;
     }
   }
 }
@@ -124,75 +174,74 @@
     }
   }
 }
+
 @media (min-width:992px) and (max-width:1600px){
   .modal .modalContent{
-    max-height: 470px;
+    top:10%;
+    max-height: 530px;
   }
-  .leftTradeFinancial{
+  .leftSideContainer{
     .financial{
       margin-bottom: 15px;
-    }
-    .cmuk-card-header{
-      font-size: 12px;;
-    }
-
-    .financial {
-      .cmuk-card-body{
-        height:210px;
+      .cmuk-card{
+        height: 265px;
       }
-
+    }
+    .financial {
+      .cmuk-switcher{
         ul li {
           padding: 10px 0;
-          .wallet {
-          .cmuk-comment-meta, .ctitle {
-            font-size:$paragraphFontSizeSmall;
-          }
-        }
+      }
       }
     }
     .addBalanceButton{
       text-transform: capitalize;
       font-family: $fontFamilyPrimary;
       padding: 8px 8px;
-      font-size: 12px;
       line-height:normal;
       background: rgba(8, 98, 190, 0.1);
       border-radius: 103px;
       color: #0862BE;
-      font-size: 10px;
       border: 0;
     }
     .docView{
       .cmuk-card-header, .cmuk-card-body, .documentlist{
         padding:0px;
       }
-      .cmuk-card-body{
-        height: 300px;
+      .documentlist{
+        height: 150px;
+      }
+      .cmuk-card{
+        height: 265px;
+      }
+    }
+    .zoneTradeFinancial{
+      .cmuk-card-body {
+        height: auto;
+        .cmuk-switcher{
+        height: 210px;
+        }
       }
     }
   }
-  .recentActivity{
+  .rightSideContainer{
     .recentActivityContainer{
       margin-bottom: 15px;
       .cmuk-card-body{
         height: 210px;
-      }
-      .cmuk-card-header{
-        font-size:12px;
+        .recentActivityMessages{
+          height: 210px;
+        }
       }
     }
     .chatRoom{
       .cmuk-card-body{
-        height: 300px;
-        .chatMessages {
-          height: 190px;
+        height: 264px;
+        .chatMessagesContainer {
+          height: 160px;
         }
-
       }
     }
-  }
-  .timeline{
-    margin: 20px 0px;
   }
   .switcherViewCard {
     .cmuk-subnav li a {
@@ -203,47 +252,43 @@
     .cmuk-height-medium{
       height: 210px;
     }
-  }
-
-  .switcherCard{
-    .cmuk-switcher{
-      height: 140px;
+    .cmuk-card-header .cmuk-button
+    {
+      line-height: 26px;
     }
   }
-  .salesQuoteList .cmuk-card-body .cmuk-switcher{
-    height: 138px;
+  .switcherCard{
+    .cmuk-switcher{
+      height: 179px;
+    }
+  }
+  .timeline {
+    &:before{
+      left: 20px;
+    }
+    .timeline-item .timeline-icon {
+      left: 0px;
+    }
+  }
+  .SalesQuoteCard{
+    .firstPart{
+      flex: 32%;
+    }
+    .secondPart{
+      flex: 45%;
+    }
+    .thirdPart{
+      flex: 23%;
+    }
   }
 }
 
-@media (max-width: 1600px){
-  .commonList{
-    .listItemChild{
-      font-size: $paragraphFontSizeSmall;
-    }
+@media (max-width: 1599px){
+  :root {
+    font-size: 13px;
   }
-  .leftTradeFinancial {
-    .financial{
-      ul{
-        li .ctitle{
-          font-size: $paragraphFontSizeSmall;
-        }
-      }
-    }
-  }
-  .timeline
-  {
-    .timeline-item{
-      .timeline-content{
-        .activityContent{
-          font-size:$paragraphFontSizeSmall;
-        }
-      }
-    }
-  }
+
   .profileContainer{
-    .infoRow{
-      font-size: $paragraphFontSizeSmall;
-    }
     .identificationDetails{
       .documentItem{
         padding: 10px;
@@ -266,14 +311,9 @@
   .cmuk-card-body{
     .cmuk-subnav {
       li a {
-        font-size:12px;
         text-transform: capitalize;
       }
     }
-  }
-  .modal .modalContent{
-    top:10%;
-    max-height: 530px;
   }
   .tabsSection{
     .cmuk-grid-divider{
@@ -287,8 +327,17 @@
       border: none;
     }
   }
-  .headerFontSize {
-    font-size: 14px;
+  .mobileNumberUpdate .countryCode{
+    margin-top:28px;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    font-size: 16px;
+  }
+  .showpassword, .checkIcon{
+    top:37px;
   }
 }
 
@@ -303,7 +352,7 @@
   }
 }
 
-@media (max-width: 960px){
+@media (max-width: 959px){
   .comdex {
     .mobileNavigationHeader{
       display: flex;
@@ -323,8 +372,7 @@
       }
       .buttonRegister {
         background-color: #FE4350;
-        font-size: 14px;
-        font-family: Rubik;
+        font-family:$fontFamilyPrimary;
         color: #FFFFFF;
         line-height: inherit;
         padding: 5px 30px;
@@ -342,8 +390,7 @@
           border:none;
           padding: 0px;
         }
-        }
+      }
     }
-
   }
 }

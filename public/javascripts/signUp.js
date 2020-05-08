@@ -11,7 +11,7 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
             const result = $(resultID);
             const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
-
+            let userNameNotAvailable = "";
             if (username.length > 0) {
                 $.ajax({
                     url: route.url,
@@ -20,16 +20,19 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
-                            result.attr('cmuk-icon', 'check');
+                            $("#checkUsernameAvailableResult span").hide();
+                            $("#checkIcon").fadeIn();
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
-                            result.attr('cmuk-icon', 'ban');
+                            $("#checkUsernameAvailableResult span").hide();
+                            $("#checkIcon").fadeOut();
+                            $("#checkUsernameAvailableResult .userNameNotAvailable").show();
                         },
                     }
                 });
             } else {
-                result.removeAttr('cmuk-icon');
+                $("#checkUsernameAvailableResult span, #checkIcon").hide();
             }
         }, 1500);
     }
@@ -40,12 +43,24 @@ function checkPasswords() {
     let password = $('#signUpPassword').val();
     let matchPasswordsResult = $('#matchPasswordsResult');
     let matchConfirmPasswordsResult = $('#matchConfirmPasswordsResult');
-
+    let passwordNotMatch = "Passwords Do Not Match"
     if (confirmPassword !== password) {
-        matchPasswordsResult.attr('cmuk-icon', 'ban');
-        matchConfirmPasswordsResult.attr('cmuk-icon', 'ban');
+        $('#matchConfirmPasswordsResult span').hide();
+        $(".passwordNotMatched").show();
     } else {
-        matchPasswordsResult.attr('cmuk-icon', 'check');
-        matchConfirmPasswordsResult.attr('cmuk-icon', 'check');
+        $('#matchConfirmPasswordsResult span').hide();
+    }
+}
+
+function showPassword() {
+    $('#showPassword span').toggleClass('active');
+    let password = $('#signUpPassword')[0];
+    let matchPassword =$('#signUpConfirmPassword')[0];
+    if (password.type && matchPassword.type === "password") {
+        password.type = "text";
+        matchPassword.type="text"
+    } else {
+        password.type = "password";
+        matchPassword.type="password";
     }
 }

@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @(walletBalance: Int, payable: Int, receivable: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<div class="financial">
+<div class="financialCard">
 @commonCard(constants.View.FINANCIALS, 'cardIconPath -> "images/icons/icons.svg#icon-tradeFinance") {
 } {
     <ul class="">
@@ -14,13 +14,22 @@
                 </div>
             </div>
             <div>
-                <button class="cmuk-button addBalanceButton" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">  <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>
-                    @Messages(constants.View.ADD_BALANCE)</button>
+                @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST,'class -> "addBalanceButton")
+                @commonFormButton(constants.Form.REDEEM_FIAT,'class -> "addBalanceButton")
             </div>
         </li>
         <li class="cmuk-flex">
             <div class="cmuk-flex receivable">
-                <span class="receivableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-payable")"/></svg></span>
+                <span class="receivableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-receivable")"/></svg></span>
+                <div>
+                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.RECEIVABLE)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@receivable</p>
+                </div>
+            </div>
+        </li>
+        <li class="cmuk-flex">
+            <div class="cmuk-flex payable">
+                <span class="payableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-payable")"/></svg></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.PAYABLE)</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @payable</p>
@@ -30,16 +39,7 @@
                 <button class="cmuk-button addBalanceButton cmuk-text-danger primaryFont">@Messages(constants.View.PAY)</button>
             </div>
         </li>
-        <li class="cmuk-flex">
-            <div class="cmuk-flex payable">
-                <span class="payableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-receivable")"/></svg></span>
-                <div>
-                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.RECEIVABLE)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@receivable</p>
-                </div>
-            </div>
 
-        </li>
     </ul>
     <div class="refresh">
         <button class="cmuk-button cmuk-button-link">

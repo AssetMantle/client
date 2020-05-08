@@ -6,14 +6,20 @@
 
 @(messages: Seq[Message], readMessages: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-<div class = "chatMessage loadMoreButton"><a onclick="loadMoreChats('@chatID')" >@Messages(constants.View.LOAD_MORE_CHATS)</a></div>
-@for(message <- messages.reverse) {
-    @messageBox(message) {
-        @if(readMessages.filter(x => x.messageID == message.id && x.accountID == loginState.username && message.fromAccountID != loginState.username).length == 0) {
-            <script>
-                    unReadBar(@messages.filter(_.fromAccountID != loginState.username).length - @readMessages.filter(_.accountID == loginState.username).length)
-            </script>
+<div class="chatMessages">
+    <div class="chatMessage"></div>
+    @if(messages.nonEmpty) {
+        @for(message <- messages.reverse) {
+            @messageBox(message) {
+                @if(readMessages.filter(x => x.messageID == message.id && x.accountID == loginState.username && message.fromAccountID != loginState.username).length == 0) {
+                    <script>
+                            unReadBar(@messages.filter(_.fromAccountID != loginState.username).length - @readMessages.filter(_.accountID == loginState.username).length)
+                    </script>
+                }
+            }
         }
+    } else{
+        <li class="noChats">@Messages(constants.View.MESSAGES_NOT_FOUND)</li>
     }
-}
+</div>
 <script src="@routes.Assets.versioned("javascripts/style/chatMessages.js")" type="text/javascript"></script>

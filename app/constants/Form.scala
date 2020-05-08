@@ -14,6 +14,7 @@ object Form {
 
   //AccountController
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp(), routes.javascript.AccountController.signUpForm)
+  val CREATE_WALLET = new Form("CREATE_WALLET", routes.AccountController.createWallet(), routes.javascript.AccountController.createWalletForm)
   val LOGIN = new Form("LOGIN", routes.AccountController.login(), routes.javascript.AccountController.loginForm)
   val LOGOUT = new Form("LOGOUT", routes.AccountController.logout(), routes.javascript.AccountController.logoutForm)
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword(), routes.javascript.AccountController.changePasswordForm)
@@ -102,6 +103,7 @@ object Form {
   val CONFIRM_ALL_NEGOTIATION_TERMS = new Form("CONFIRM_ALL_NEGOTIATION_TERMS", routes.NegotiationController.confirmAllNegotiationTerms(), routes.javascript.NegotiationController.confirmAllNegotiationTermsForm)
   val BUYER_CONFIRM_NEGOTIATION = new Form("BUYER_CONFIRM_NEGOTIATION", routes.NegotiationController.buyerConfirm(), routes.javascript.NegotiationController.buyerConfirmForm)
   val SELLER_CONFIRM_NEGOTIATION = new Form("SELLER_CONFIRM_NEGOTIATION", routes.NegotiationController.sellerConfirm(), routes.javascript.NegotiationController.sellerConfirmForm)
+  val UPDATE_CONTRACT_SIGNED = new Form("UPDATE_CONTRACT_SIGNED", routes.NegotiationController.updateContractSigned(), routes.javascript.NegotiationController.updateContractSignedForm)
 
   //OrderController
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.OrderController.moderatedBuyerExecute(), routes.javascript.OrderController.moderatedBuyerExecuteForm)
@@ -117,6 +119,7 @@ object Form {
   //RedeemFiatController
   val REDEEM_FIAT = new Form("REDEEM_FIAT", routes.RedeemFiatController.redeemFiat(), routes.javascript.RedeemFiatController.redeemFiatForm)
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat(), routes.javascript.RedeemFiatController.blockchainRedeemFiatForm)
+  val ZONE_REDEEM_FIAT = new Form("ZONE_REDEEM_FIAT",  routes.RedeemFiatController.zoneRedeemFiat(), routes.javascript.RedeemFiatController.zoneRedeemFiatForm)
 
   //ReleaseAssetController
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset(), routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm)
@@ -134,6 +137,7 @@ object Form {
   //SendFiatController
   val SEND_FIAT = new Form("SEND_FIAT", routes.SendFiatController.sendFiat(), routes.javascript.SendFiatController.sendFiatForm)
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat(), routes.javascript.SendFiatController.blockchainSendFiatForm)
+  val ZONE_SEND_FIAT = new Form("ZONE_SEND_FIAT",  routes.SendFiatController.zoneSendFiat(), routes.javascript.SendFiatController.zoneSendFiatForm)
 
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader(), routes.javascript.SetACLController.inviteTraderForm)

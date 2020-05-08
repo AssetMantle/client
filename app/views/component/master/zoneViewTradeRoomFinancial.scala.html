@@ -1,35 +1,24 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@(amountDue: Int, amountPaid: Int, amountPending: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(totalAmount: Int, amountPaid: Int, amountPending: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="financial">
     <ul class="">
         <li class="cmuk-flex">
-            <div class="cmuk-flex wallet">
-                <span class="walletIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-wallet")"/></svg></span>
                 <div>
-                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.TOTAL_AMOUNT_DUE)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountDue</p>
+                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.TOTAL_AMOUNT)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @totalAmount</p>
                 </div>
-            </div>
         </li>
         <li class="cmuk-flex">
-            <div class="cmuk-flex receivable">
-                <span class="receivableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-receivable")"/></svg></span>
-                <div>
+            <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid</p>
-                </div>
             </div>
         </li>
         <li class="cmuk-flex">
-            <div class="cmuk-flex payable">
-                <span class="payableIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-payable")"/></svg></span>
-                <div>
+            <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
                     <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@amountPending</p>
-                </div>
             </div>
-
         </li>
     </ul>
-</div>

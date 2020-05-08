@@ -35,5 +35,5 @@
         }
     @Messages(constants.View.REVIEW_FORM_DECLARATION)
     @commonCheckbox(userReviewIdentificationForm, constants.FormField.COMPLETION)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.userViewUploadOrUpdateIdentification())">@Messages(constants.View.BACK)</button>
+    @commonModalButton(constants.View.BACK,routes.javascript.AccountController.userViewUploadOrUpdateIdentification)
 }

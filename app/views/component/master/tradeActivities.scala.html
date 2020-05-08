@@ -4,13 +4,16 @@
 
 @(negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.RECENT_ACTIVITY) {
+@commonCard(constants.View.RECENT_ACTIVITY,'cardIconPath -> "images/icons/icons.svg#icon-recentActivity") {
 } {
     <div class="scroller">
-        <div id="tradeActivityMessages"></div>
-        <div class="cover-bar"></div>
+        <div id="tradeActivityMessages" class="recentActivityMessages"></div>
     </div>
 }
 <script>
-    componentResource('tradeActivityMessages', jsRoutes.controllers.NegotiationController.tradeActivityMessages('@negotiationID', 1));
+        loadMoreActivitiesOnScroll('@negotiationID');
+        componentResource('tradeActivityMessages', jsRoutes.controllers.NegotiationController.tradeActivityMessages('@negotiationID', 1));
 </script>
+
+
+

@@ -7,7 +7,7 @@
 
 @commonInfoBox() {
     <div class="chatList">
-        <button onclick="componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))" title="@chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString">@chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1)</button>
+    @commonComponentButton("chatWindow", chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1), routes.javascript.ChatController.chatWindow, 'parameters -> s"'${chatID}', 0")
     </div>
     <div id="chatWindow"></div>
     <script>

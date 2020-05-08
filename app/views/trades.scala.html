@@ -6,16 +6,20 @@
 @common(Messages(constants.View.TRADES), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftTradeFinancial">
-        <div id="financials"></div>
+    <div class="leftSideContainer">
+        <div id="financials" class="financial"></div>
     </div>
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
             componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
-            case constants.User.ORGANIZATION => {}
-            case constants.User.ZONE => {}
+            case constants.User.ORGANIZATION => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+            }
+            case constants.User.ZONE => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+            }
             case constants.User.GENESIS => {}
             case _ => {}
         }
@@ -40,11 +44,11 @@
             </script>
         }
         case constants.User.ORGANIZATION => {
-            <div class="tradeList cmuk-margin-bottom">
+            <div class="tradeList switcherCard">
                 <div id="organizationViewAcceptedNegotiationList"></div>
             </div>
 
-            <div class="salesQuoteList">
+            <div class="salesQuoteList switcherCard">
                 <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList"></div>
             </div>
 
@@ -71,8 +75,10 @@
 }
 
 @right = {
+    <div class="rightSideContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
+    </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

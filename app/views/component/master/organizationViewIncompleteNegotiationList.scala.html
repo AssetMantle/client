@@ -6,40 +6,59 @@
 
 @import models.master.Organization
 @(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@incompleteNegotiationList.map { incompleteNegotiation =>
-    @commonInfoBox() {
-        @traderList.find(_.id == incompleteNegotiation.sellerTraderID) match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.SELLER_TRADER_NAME, trader.name)
-            }
-            case None => {
-                @commonTextInfo(constants.View.SELLER_TRADER_ID, incompleteNegotiation.buyerTraderID)
-            }
-        }
-        @counterPartyTraderList.find(_.id == incompleteNegotiation.buyerTraderID) match {
-            case Some(trader) => {
-                @commonTextInfo(constants.View.TRADER_NAME, trader.name)
-                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
-                    case Some(organization) => {
-                        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+ <div class="SalesQuoteCard">
+    @incompleteNegotiationList.map { incompleteNegotiation =>
+        @commonVerticalInfoBox(){
+            <div class="firstPart salesChild">
+                <div class="content">
+                @assetList.find(_.id == incompleteNegotiation.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetIcon">
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                        </div>
+                        <div class="assetIntialData">
+                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetQuantity">@Seq(incompleteNegotiation.quantity.toString, incompleteNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@incompleteNegotiation.price</p>
+                        </div>
                     }
                     case None => {}
                 }
-            }
-            case None => {}
+                </div>
+            </div>
+            <div class="secondPart salesChild">
+                @counterPartyTraderList.find(_.id == incompleteNegotiation.buyerTraderID) match {
+                    case Some(trader) => {
+                        @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization) => {
+                                <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
+                            }
+                            case None => {}
+                        }
+                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)"> @trader.name</span>
+                            <span class="lines">---</span>
+                    }
+                    case None => {}
+                }
+
+                @traderList.find(_.id == incompleteNegotiation.sellerTraderID) match {
+                    case Some(trader) => {
+                        <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)">@trader.name</span> </p>
+                    }
+                    case None => {
+                        <span>@incompleteNegotiation.buyerTraderID</span></p>
+                    }
+                }
+                <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
+                    <span class="lines">---</span>
+                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="lines">---</span>
+                    <span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+            </div>
+            <div class="thirdPart salesChild">
+                <span>@incompleteNegotiation.status</span>
+            </div>
+
         }
-        @assetList.find(_.id == incompleteNegotiation.assetID) match {
-            case Some(asset) => {
-                @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
-            }
-            case None => {}
-        }
-        @commonTextInfo(constants.View.ASSET_DESCRIPTION, incompleteNegotiation.assetDescription)
-        @commonIntInfo(constants.View.PRICE, incompleteNegotiation.price)
-        @commonTextInfo(constants.View.QUANTITY, Seq(incompleteNegotiation.quantity.toString, incompleteNegotiation.quantityUnit).mkString(" "))
-        @commonVerticalTextInfo(constants.View.LOAD_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
-        @commonVerticalTextInfo(constants.View.DISCHARGE_PORT, incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
-        @commonTextInfo(constants.View.STATUS, incompleteNegotiation.status)
     }
-    }
+</div>
