@@ -1,0 +1,10 @@
+@import controllers.actions.LoginState
+@import transactions.responses.MemberCheckMemberScanResponse
+
+@(result: MemberCheckMemberScanResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<html lang="en">
+
+<body>
+<div>@result</div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package transactions.responses
+package queries.responses
 
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
@@ -14,7 +14,17 @@ object MemberCheckMemberScanResponse {
 
   implicit val scanEntityReads: Reads[ScanEntity] = Json.reads[ScanEntity]
 
-  case class Response(scanId: Int, resultUrl: String, matchedNumber: Int, matchedEntities: Option[Seq[ScanEntity]]) extends BaseResponse
+  case class ScanResult(scanID: Int, resultUrl: String, matchedNumber: Int, matchedEntities: Option[Seq[ScanEntity]])
+
+  implicit val scanResult: Reads[ScanResult] = Json.reads[ScanResult]
+
+  case class ScanInputParam(matchType: String, closeMatchRateThreshold: Int, whitelist: String, residence: String,
+                            pepJurisdiction: String, memberNumber: String, firstName: String, middleName: String, lastName: String,
+                            originalScriptName: String, gender: String, dob: String, address: String, updateMonitoringList: Boolean)
+
+  implicit val scanInputParamResult: Reads[ScanInputParam] = Json.reads[ScanInputParam]
+
+  case class Response(ScanInputParam: ScanInputParam, scanResult: ScanResult) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

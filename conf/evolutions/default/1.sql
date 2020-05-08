@@ -10,7 +10,8 @@ CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION
     AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS WESTERN_UNION
     AUTHORIZATION "commit";
-
+CREATE SCHEMA IF NOT EXISTS MEMBER_CHECK
+    AUTHORIZATION "commit";
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
 (
@@ -1254,6 +1255,116 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."SFTPFileTransaction"
     PRIMARY KEY ("transactionReference")
 );
 
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "firstName"         VARCHAR NOT NULL,
+    "lastName"          VARCHAR NOT NULL,
+    "scanID"            INT NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id"),
+    UNIQUE ("firstName", "lastName")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "firstName"         VARCHAR NOT NULL,
+    "lastName"          VARCHAR NOT NULL,
+    "scanID"            INT NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "companyName"       VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT MemberScanDecision_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "vesselName"        VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "assetID"           VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
+
+
+
 ALTER TABLE BLOCKCHAIN."Account_BC"
     ADD CONSTRAINT Account_BC_Master_Account_username FOREIGN KEY ("username") REFERENCES MASTER."Account" ("id");
 ALTER TABLE BLOCKCHAIN."Asset_BC"
@@ -1481,8 +1592,14 @@ DROP TABLE IF EXISTS WESTERN_UNION."FiatRequest" CASCADE;
 DROP TABLE IF EXISTS WESTERN_UNION."RTCB" CASCADE;
 DROP TABLE IF EXISTS WESTERN_UNION."SFTPFileTransaction" CASCADE;
 
+DROP TABLE IF EXISTS MEMBER_CHECK."Scan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."OrganizationScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."VesselScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."UBOScan" CASCADE;
+
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS MASTER CASCADE;
 DROP SCHEMA IF EXISTS MASTER_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS WESTERN_UNION CASCADE;
+DROP SCHEMA IF EXISTS MEMBER_CHECK CASCADE;

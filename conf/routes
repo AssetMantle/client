@@ -342,46 +342,48 @@ POST        /userUpload/userZoneKYCDocument                                     
 GET         /userUpload/storeUserZoneKYCDocument                                                  controllers.AddZoneController.userStoreZoneKYC(name: String, documentType: String)
 GET         /userUpdate/zoneKYC                                                                   controllers.AddZoneController.userUpdateZoneKYCForm(documentType: String)
 GET         /userUpdate/updateUserZoneKYCDocument                                                 controllers.AddZoneController.userUpdateZoneKYC(name: String, documentType: String)
-GET         /zoneUpload                                                                           controllers.AddZoneController.uploadZoneKYCForm(documentType: String)
-POST        /zoneUpload/file                                                                      controllers.AddZoneController.uploadZoneKYC(documentType: String)
-GET         /zoneUpload/storeFile                                                                 controllers.AddZoneController.storeZoneKYC(name: String, documentType: String)
-GET         /zoneUpdate                                                                           controllers.AddZoneController.updateZoneKYCForm(documentType: String)
-GET         /zoneUpload/updateFile                                                                controllers.AddZoneController.updateZoneKYC(name: String, documentType: String)
+GET         /zoneUpload                                                     controllers.AddZoneController.uploadZoneKYCForm(documentType: String)
+POST        /zoneUpload/file                                                controllers.AddZoneController.uploadZoneKYC(documentType: String)
+GET         /zoneUpload/storeFile                                           controllers.AddZoneController.storeZoneKYC(name: String, documentType: String)
+GET         /zoneUpdate                                                     controllers.AddZoneController.updateZoneKYCForm(documentType: String)
+GET         /zoneUpload/updateFile                                          controllers.AddZoneController.updateZoneKYC(name: String, documentType: String)
 
-GET         /master/userAccessedOrganizationKYCFile                                               controllers.FileController.userAccessedOrganizationKYCFile(documentType: String)
-GET         /master/userAccessedZoneKYCFile                                                       controllers.FileController.userAccessedZoneKYCFile(documentType: String)
+GET         /master/userAccessedOrganizationKYCFile                         controllers.FileController.userAccessedOrganizationKYCFile(documentType: String)
+GET         /master/userAccessedZoneKYCFile                                 controllers.FileController.userAccessedZoneKYCFile(documentType: String)
 
-GET         /master/inviteTrader                                                                  controllers.SetACLController.inviteTraderForm
-POST        /master/inviteTrader                                                                  controllers.SetACLController.inviteTrader
-GET         /master/addTrader                                                                     controllers.SetACLController.addTraderForm
-POST        /master/addTrader                                                                     controllers.SetACLController.addTrader
+GET         /master/inviteTrader                                            controllers.SetACLController.inviteTraderForm
+POST        /master/inviteTrader                                            controllers.SetACLController.inviteTrader
+GET         /master/addTrader                                               controllers.SetACLController.addTraderForm
+POST        /master/addTrader                                               controllers.SetACLController.addTrader
 
-GET         /master/zoneVerifyTrader                                                              controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
-POST        /master/zoneVerifyTrader                                                              controllers.SetACLController.zoneVerifyTrader
+GET         /master/zoneVerifyTrader                                        controllers.SetACLController.zoneVerifyTraderForm(traderID: String)
+POST        /master/zoneVerifyTrader                                        controllers.SetACLController.zoneVerifyTrader
 
-GET         /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
-POST        /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTrader
+GET         /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
+POST        /master/organizationVerifyTrader                                controllers.SetACLController.organizationVerifyTrader
 
-GET         /mc                                                                                   controllers.BackgroundCheckController.memberCheck(id: String)
-GET         /worldCheck/traderBackgroundCheckUpload                                               controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
-POST        /worldCheck/traderBackgroundCheckUpload/file                                          controllers.BackgroundCheckController.uploadTraderBackgroundCheckFile(documentType: String)
-GET         /worldCheck/traderBackgroundCheckUpload/storeFile                                     controllers.BackgroundCheckController.storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
-GET         /worldCheck/traderBackgroundCheckUpdate                                               controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm(documentType: String, traderID :String)
-GET         /worldCheck/traderBackgroundCheckUpdate/updateFile                                    controllers.BackgroundCheckController.updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
-GET         /worldCheck/uploadOrUpdateTraderBackgroundCheck                                       controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile(traderID: String)
+GET         /background/memberScan                                          controllers.BackgroundCheckController.memberScanForm(firstName: String, lastName: String)
+POST        /background/memberScan                                          controllers.BackgroundCheckController.memberScan
+GET         /mc                                                             controllers.BackgroundCheckController.memberCheck(id: String)
+GET         /worldCheck/traderBackgroundCheckUpload                         controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
+POST        /worldCheck/traderBackgroundCheckUpload/file                    controllers.BackgroundCheckController.uploadTraderBackgroundCheckFile(documentType: String)
+GET         /worldCheck/traderBackgroundCheckUpload/storeFile               controllers.BackgroundCheckController.storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
+GET         /worldCheck/traderBackgroundCheckUpdate                         controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm(documentType: String, traderID :String)
+GET         /worldCheck/traderBackgroundCheckUpdate/updateFile              controllers.BackgroundCheckController.updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
+GET         /worldCheck/uploadOrUpdateTraderBackgroundCheck                 controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile(traderID: String)
 
-GET         /worldCheck/organizationBackgroundCheckUpload                                         controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
-POST        /worldCheck/organizationBackgroundCheckUpload/file                                    controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFile(documentType: String)
-GET         /worldCheck/organizationBackgroundCheckUpload/storeFile                               controllers.BackgroundCheckController.storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
-GET         /worldCheck/organizationBackgroundCheckUpdate                                         controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
-GET         /worldCheck/organizationBackgroundCheckUpdate/updateFile                              controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
-GET         /worldCheck/uploadOrUpdateOrganizationBackgroundCheck                                 controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String)
+GET         /worldCheck/organizationBackgroundCheckUpload                   controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
+POST        /worldCheck/organizationBackgroundCheckUpload/file              controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFile(documentType: String)
+GET         /worldCheck/organizationBackgroundCheckUpload/storeFile         controllers.BackgroundCheckController.storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
+GET         /worldCheck/organizationBackgroundCheckUpdate                   controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
+GET         /worldCheck/organizationBackgroundCheckUpdate/updateFile        controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
+GET         /worldCheck/uploadOrUpdateOrganizationBackgroundCheck           controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String)
 
-GET         /worldCheck/zoneAccessedTraderBackgroundCheckFile                                     controllers.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String)
-GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile                               controllers.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String)
+GET         /worldCheck/zoneAccessedTraderBackgroundCheckFile               controllers.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String)
+GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile         controllers.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String)
 
-GET         /master/addOrganization                                                               controllers.AddOrganizationController.addOrganizationForm
-POST        /master/addOrganization                                                               controllers.AddOrganizationController.addOrganization
+GET         /master/addOrganization                                         controllers.AddOrganizationController.addOrganizationForm
+POST        /master/addOrganization                                         controllers.AddOrganizationController.addOrganization
 
 GET         /master/userAddOrUpdateUBOs                                                           controllers.AddOrganizationController.userAddOrUpdateUBOsForm
 POST        /master/userAddOrUpdateUBOs                                                           controllers.AddOrganizationController.userAddOrUpdateUBOs

@@ -41,7 +41,7 @@ class MemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configuration
   // Either of originalScriptName or firstName + lastName are necessary. To specify a mononym (single name), enter a dash (-) in firstName parameter and the mononym in lastName.
   //dob field requires DD/MM/YYYY
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
-  case class Request(matchType: String = "Exact", closeMatchRateThreshold: Option[Int], whitelist: String = "Apply", residence: String = "ApplyPEP", pepJurisdiction: String = "Apply", memberNumber: Option[String], firstName: String, middleName: Option[String], lastName: String, originalScriptName: Option[String], gender: Option[String], dob: Option[String], address: Option[String], updateMonitoringList: Boolean = false) extends BaseRequest
+  case class Request(matchType: String = "Exact", closeMatchRateThreshold: Option[Int] = None, whitelist: String = "Apply", residence: String = "ApplyPEP", pepJurisdiction: String = "Apply", memberNumber: Option[String] = None, firstName: String, middleName: Option[String] = None, lastName: String, originalScriptName: Option[String] = None, gender: Option[String] = None, dob: Option[String] = None, address: Option[String] = None, updateMonitoringList: Boolean = true) extends BaseRequest
 
   object Service {
 

@@ -23,6 +23,9 @@
     </script>
 }
 @center = {
+    <div>
+    @commonFormButton(constants.Form.MEMBER_CHECK_MEMBER_SCAN)
+    </div>
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.ZONE => {
