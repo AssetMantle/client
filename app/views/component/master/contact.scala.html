@@ -1,9 +1,7 @@
 @import controllers.actions.LoginState
-@import models.master.Contact
 @import views.html.base._
 @import models.master.Mobile
 @import models.master.Email
-@import constants.Status.Contact
 
 @(mobileNumber: Option[Mobile], emailAddress: Option[Email])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
