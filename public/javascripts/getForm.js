@@ -5,8 +5,8 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
         async: true,
         statusCode: {
             200: function (data) {
+                $(modal).fadeIn(200);
                 $(modalContent).html(data);
-                $(modal).fadeIn(100);
                 $('.modalContent').addClass('fadeInEffect');
             },
             500: function (data) {
@@ -15,7 +15,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
         }
     }).fail(function (XMLHttpRequest) {
         if (XMLHttpRequest.readyState === 0) {
-            $('#connectionError').fadeIn(300);
+            $('#connectionError').fadeIn(100);
         }
     });
 }

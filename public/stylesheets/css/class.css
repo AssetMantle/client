@@ -250,11 +250,11 @@ html, body {
   padding: 30px 0;
   font-size: 0.875rem;
   background: #031221; }
-  .footer .footer-copyright {
+  .footer .copyRight {
     margin: 10px 0;
     font-weight: bold;
     color: #053C75; }
-    .footer .footer-copyright a {
+    .footer .copyRight a {
       text-decoration: none;
       color: #053C75; }
 
@@ -421,7 +421,7 @@ html, body {
     margin-bottom: 5px; }
 .comdex .cmuk-alert p {
   font-size: 0.875rem; }
-.comdex .cmuk-alert .cmuk-alert-name {
+.comdex .cmuk-alert .alertName {
   font-weight: bold;
   font-size: 0.875rem; }
 .comdex .cmuk-alert-success {
