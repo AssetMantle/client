@@ -7,11 +7,10 @@ import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.{AssetOtherDetails, DocumentList, PaymentTerms}
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-
-import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
