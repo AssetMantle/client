@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.SendFiatRequest
+
+@(sendFiatRequests: Seq[SendFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@sendFiatRequests.map { sendFiatRequest =>
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
+        @commonVerticalTextInfo(constants.View.TRADER_ID, sendFiatRequest.traderID)
+        @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, sendFiatRequest.negotiationID)
+        @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
+        @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
+    }
+}

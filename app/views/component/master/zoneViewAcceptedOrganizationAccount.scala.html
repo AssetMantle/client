@@ -10,14 +10,14 @@
     @Messages(constants.View.ORGANIZATION): @organization.id
 </legend>
 <hr>
-<div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+<div>@Messages(constants.View.ORGANIZATION_DETAILS): <br>
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
-    @commonTextInfo(constants.Form.ZONE_ID, organization.zoneID)
+    @commonTextInfo(constants.View.ZONE_ID, organization.zoneID)
     @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
     @commonTextInfo(constants.View.NAME, organization.name)
-    @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
-    @commonTextInfo(constants.Form.EMAIL, organization.email)
+    @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
+    @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
+    @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
 </div>
 <div>@Messages(constants.FormField.REGISTERED_ADDRESS.name) : <br>
 @streetAddress(organization.registeredAddress)
@@ -36,7 +36,7 @@
 </div>
 
 <div>
-    @Messages(constants.Form.DOCUMENTS):<br>
+    @Messages(constants.View.DOCUMENTS):<br>
     @organizationKYCs.map { organizationKYC =>
         @component.master.commonDocumentViewer(organizationKYC) {
             @routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)

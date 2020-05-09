@@ -66,6 +66,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def getUsernameByAddress(address: String): Future[Option[String]] = db.run(accountTable.filter(_.address === address).map(_.username).result.headOption)
+
   private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -78,7 +80,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
 
-  private def updateSequenceCoinsAndDirtyBitByAddress(address: String, sequence: String, coins: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.sequence, x.coins, x.dirtyBit)).update((sequence, coins, dirtyBit)).asTry).map {
+  private def updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address: String, accountNumber: String, sequence: String, coins: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.accountNumber, x.sequence, x.coins, x.dirtyBit)).update((accountNumber, sequence, coins, dirtyBit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -139,7 +141,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def create(address: String, username: String, pubkey: String): Future[String] = add(Account(address = address, username = username, publicKey = pubkey, dirtyBit = false))
 
-    def refreshDirty(address: String, sequence: String, coins: String): Future[Int] = updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false)
+    def refreshDirty(address: String, accountNumber: String, sequence: String, coins: String): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, coins, dirtyBit = false)
 
     def get(address: String): Future[Account] = findByAddress(address)
 
@@ -150,6 +152,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
     def tryGetAddress(username: String): Future[String] = tryGetAddressByUsername(username)
+
+    def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
 
     def tryGetUsername(address: String): Future[String] = tryGetUsernameByAddress(address)
 
@@ -167,7 +171,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
             val responseAccount = getAccount.Service.get(dirtyAddress)
             val accountID = Service.tryGetUsername(dirtyAddress)
 
-            def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
+            def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.account_number, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).headOption.getOrElse(""))
 
             for {
               responseAccount <- responseAccount

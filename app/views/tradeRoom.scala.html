@@ -4,7 +4,7 @@
 @import scala.collection.immutable.ListMap
 @(negotiationID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.View.HOME), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
     <div class="leftSideContainer">
@@ -27,7 +27,7 @@
             case constants.User.ZONE => {
                 <div id="zoneViewAcceptedNegotiationDocumentList"></div>
                 <script type="text/javascript">
-                      componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@negotiationID'));
+                    componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@negotiationID'));
                     componentResource('zoneViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationDocumentList('@negotiationID'));
                 </script>
 

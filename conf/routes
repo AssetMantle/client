@@ -234,6 +234,8 @@ GET         /component/zoneViewAssetDocumentContent                             
 
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials
+GET         /component/organizationFinancial                                                      controllers.ComponentViewController.organizationFinancial
+GET         /component/zonwFinancial                                                              controllers.ComponentViewController.zoneFinancial
 
 GET         /component/traderViewNegotiationDocumentList                                          controllers.ComponentViewController.traderViewNegotiationDocumentList(id:String)
 GET         /component/traderViewNegotiationDocument                                              controllers.ComponentViewController.traderViewNegotiationDocument(id:String, documentType: Option[String])
@@ -295,9 +297,38 @@ GET         /component/organizationViewTradeRoomFinancialAndChecks          cont
 GET         /component/organizationViewTradeRoomFinancial                   controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
 GET         /component/organizationViewTradeRoomChecks                      controllers.ComponentViewController.organizationViewTradeRoomChecks(negotiationID: String)
 
-GET         /component/traderViewTradeRoomFinancialAndChecks                controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
-GET         /component/traderViewTradeRoomFinancial                         controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
-GET         /component/traderViewTradeRoomChecks                            controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
+GET         /component/zoneViewSendFiatRequests                                                   controllers.ComponentViewController.zoneViewSendFiatRequests()
+GET         /component/zoneViewPendingSendFiatRequestList                                         controllers.ComponentViewController.zoneViewPendingSendFiatRequestList()
+GET         /component/zoneViewCompleteSendFiatRequestList                                        controllers.ComponentViewController.zoneViewCompleteSendFiatRequestList()
+GET         /component/zoneViewFailedSendFiatRequestList                                          controllers.ComponentViewController.zoneViewFailedSendFiatRequestList()
+GET         /component/zoneViewRedeemFiatRequests                                                 controllers.ComponentViewController.zoneViewRedeemFiatRequests()
+GET         /component/zoneViewPendingRedeemFiatRequestList                                       controllers.ComponentViewController.zoneViewPendingRedeemFiatRequestList()
+GET         /component/zoneViewCompleteRedeemFiatRequestList                                      controllers.ComponentViewController.zoneViewCompleteRedeemFiatRequestList()
+GET         /component/zoneViewFailedRedeemFiatRequestList                                        controllers.ComponentViewController.zoneViewFailedRedeemFiatRequestList()
+GET         /component/organizationViewSendFiatRequests                                           controllers.ComponentViewController.organizationViewSendFiatRequests()
+GET         /component/organizationViewPendingSendFiatRequestList                                 controllers.ComponentViewController.organizationViewPendingSendFiatRequestList()
+GET         /component/organizationViewCompleteSendFiatRequestList                                controllers.ComponentViewController.organizationViewCompleteSendFiatRequestList()
+GET         /component/organizationViewFailedSendFiatRequestList                                  controllers.ComponentViewController.organizationViewFailedSendFiatRequestList()
+GET         /component/organizationViewRedeemFiatRequests                                         controllers.ComponentViewController.organizationViewRedeemFiatRequests()
+GET         /component/organizationViewPendingRedeemFiatRequestList                               controllers.ComponentViewController.organizationViewPendingRedeemFiatRequestList()
+GET         /component/organizationViewCompleteRedeemFiatRequestList                              controllers.ComponentViewController.organizationViewCompleteRedeemFiatRequestList()
+GET         /component/organizationViewFailedRedeemFiatRequestList                                controllers.ComponentViewController.organizationViewFailedRedeemFiatRequestList()
+GET         /component/traderViewSendFiatRequests                                                 controllers.ComponentViewController.traderViewSendFiatRequests()
+GET         /component/traderViewPendingSendFiatRequestList                                       controllers.ComponentViewController.traderViewPendingSendFiatRequestList()
+GET         /component/traderViewCompleteSendFiatRequestList                                      controllers.ComponentViewController.traderViewCompleteSendFiatRequestList()
+GET         /component/traderViewFailedSendFiatRequestList                                        controllers.ComponentViewController.traderViewFailedSendFiatRequestList()
+GET         /component/traderViewRedeemFiatRequests                                               controllers.ComponentViewController.traderViewRedeemFiatRequests()
+GET         /component/traderViewPendingRedeemFiatRequestList                                     controllers.ComponentViewController.traderViewPendingRedeemFiatRequestList()
+GET         /component/traderViewCompleteRedeemFiatRequestList                                    controllers.ComponentViewController.traderViewCompleteRedeemFiatRequestList()
+GET         /component/traderViewFailedRedeemFiatRequestList                                      controllers.ComponentViewController.traderViewFailedRedeemFiatRequestList()
+
+GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
+GET         /component/organizationViewTradeRoomChecks                                            controllers.ComponentViewController.organizationViewTradeRoomChecks(negotiationID: String)
+
+GET         /component/traderViewTradeRoomFinancialAndChecks                                      controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
+GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
 
 GET         /component/traderViewIssueFiatRequestList                       controllers.ComponentViewController.traderViewIssueFiatRequestList
 GET         /component/organizationViewIssueFiatRequestList                 controllers.ComponentViewController.organizationViewIssueFiatRequestList
@@ -471,8 +502,10 @@ GET         /master/issueFiatRequest                                        cont
 GET         /master/issueFiat                                               controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                               controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemFiat                                              controllers.RedeemFiatController.redeemFiatForm(username: String)
-POST        /master/redeemFiat                                              controllers.RedeemFiatController.redeemFiat
+GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm
+POST        /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiat
+GET         /master/zoneRedeemFiat                                                                controllers.RedeemFiatController.zoneRedeemFiatForm(id: String)
+POST        /master/zoneRedeemFiat                                                                controllers.RedeemFiatController.zoneRedeemFiat
 
 GET         /master/sendCoin                                                controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                                controllers.SendCoinController.sendCoin
@@ -487,8 +520,10 @@ POST        /master/approveFaucetRequests                                   cont
 GET         /master/rejectFaucetRequest                                     controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/rejectFaucetRequest                                     controllers.SendCoinController.rejectFaucetRequest
 
-GET         /master/sendFiat                                                controllers.SendFiatController.sendFiatForm(sellerAddress: String, pegHash: String, amount: Int)
-POST        /master/sendFiat                                                controllers.SendFiatController.sendFiat
+GET         /master/sendFiat                                                                      controllers.SendFiatController.sendFiatForm(negotiationID: String)
+POST        /master/sendFiat                                                                      controllers.SendFiatController.sendFiat
+GET         /master/zoneSendFiat                                                                  controllers.SendFiatController.zoneSendFiatForm(id: String)
+POST        /master/zoneSendFiat                                                                  controllers.SendFiatController.zoneSendFiat
 
 GET         /master/setBuyerFeedback                                        controllers.SetBuyerFeedbackController.setBuyerFeedbackForm(sellerAddress: String, pegHash: String)
 POST        /master/setBuyerFeedback                                        controllers.SetBuyerFeedbackController.setBuyerFeedback

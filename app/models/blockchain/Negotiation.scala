@@ -273,20 +273,6 @@ class Negotiations @Inject()(
               else Future(0)
             }
 
-            def createMasterOrder(negotiation: masterNegotiation, negotiationResponse: Response): Future[Unit] = {
-              val order = masterOrders.Service.get(negotiation.id)
-
-              def create(order: Option[masterOrder]): Future[String] = if (order.isEmpty && negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) {
-                masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = dirtyNegotiation.id, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_AND_FIAT_PENDING))
-              } else Future("")
-
-              for {
-                order <- order
-                _ <- create(order)
-              } yield ()
-
-            }
-
             for {
               negotiationResponse <- negotiationResponse
               _ <- refreshDirty(negotiationResponse)
@@ -297,7 +283,6 @@ class Negotiations @Inject()(
               assetID <- getAssetID(negotiationResponse.value.pegHash)
               negotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
               _ <- updateMasterNegotiationStatus(negotiation = negotiation, negotiationResponse = negotiationResponse)
-              _ <- createMasterOrder(negotiation = negotiation, negotiationResponse = negotiationResponse)
             } yield {
               actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
               actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation())
