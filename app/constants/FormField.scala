@@ -102,6 +102,7 @@ object FormField {
   val ID_TYPE = new StringFormField("ID_TYPE", 2, 100)
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
+  val COMPANY_NAME = new StringFormField("COMPANY_NAME", 2, 100)
   val OTHER_DOCUMENTS = new StringFormField("OTHER_DOCUMENTS", 0, 1000)
   val ASSET_DESCRIPTION = new StringFormField("ASSET_DESCRIPTION", 1, 1000)
   val TRADE_ID = new StringFormField("TRADE_ID", 1, 132)
@@ -125,6 +126,8 @@ object FormField {
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
   val REFERENCE = new SelectFormField("REFERENCE", constants.SelectFieldOptions.REFERENCE_DATES)
+  val MATCH_DECISION = new SelectFormField("MATCH_DECISION", constants.SelectFieldOptions.MATCH_DECISION)
+  val ASSESSED_RISK = new SelectFormField("ASSESSED_RISK", constants.SelectFieldOptions.ASSESSED_RISK)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
@@ -134,6 +137,8 @@ object FormField {
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
   val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
+  val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
+  val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)

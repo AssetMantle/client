@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AddUBOBackgroundCheck
+
+@(addUBOBackgroundCheckForm: Form[AddUBOBackgroundCheck.Data] = AddUBOBackgroundCheck.form, organizationID: String, scanID: Int, resultID: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ADD_UBO_MEMBER_CHECK, addUBOBackgroundCheckForm) {
+  @commonInputText(addUBOBackgroundCheckForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID, 'readonly -> true)
+  @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.SCAN_ID, 'value -> scanID, 'readonly -> true)
+  @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true)
+  @commonCheckbox(addUBOBackgroundCheckForm, constants.FormField.STATUS)
+
+}

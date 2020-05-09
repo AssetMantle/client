@@ -1,10 +1,31 @@
 @import controllers.actions.LoginState
-@import transactions.responses.MemberCheckMemberScanResponse
+@import queries.responses.MemberCheckMemberScanResponse
+@import views.html.base._
 
-@(result: MemberCheckMemberScanResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-<html lang="en">
+@(memberScanResponse: MemberCheckMemberScanResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<body>
-<div>@result</div>
-</body>
-</html>
+<div>
+    @memberScanResponse.scanResult.scanId
+    @memberScanResponse.scanResult.resultUrl
+    @memberScanResponse.scanResult.matchedNumber
+    @memberScanResponse.scanResult.matchedEntities match {
+        case Some(entities) => {
+            @entities.map { entity =>
+                @entity.matchRate
+                @entity.firstName
+                @entity.lastName
+                @entity.decisionDetail
+                @entity.category
+                @entity.primaryLocation
+                @entity.monitoringStatus
+            @commonJavascriptButton(constants.View.DETAILS, JavaScript(s"componentResource('scanDetailedResult', jsRoutes.controllers.BackgroundCheckController.memberScanResult(${entity.resultId}))"))
+            @commonFormButton(constants.Form.MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION, 'parameters -> s"${entity.resultId}")
+            @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${"orgID_changeTHIS"}', ${memberScanResponse.scanResult.scanId}, ${entity.resultId}")
+            }
+        }
+        case None => {
+                    @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${"orgID_changeTHIS"}', ${memberScanResponse.scanResult.scanId}")
+        }
+    }
+    <div id="scanDetailedResult"></div>
+</div>

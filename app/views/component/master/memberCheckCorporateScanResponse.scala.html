@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+@import queries.responses.MemberCheckCorporateScanResponse
+@import views.html.base._
+
+@(memberScanResponse: MemberCheckCorporateScanResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div>
+    @memberScanResponse.scanResult.scanId
+    @memberScanResponse.scanResult.resultUrl
+    @memberScanResponse.scanResult.matchedNumber
+    @memberScanResponse.scanResult.matchedEntities match {
+        case Some(entities) => {
+            @entities.map { entity =>
+                @entity.name
+                @entity.decisionDetail
+                @entity.category
+                @entity.primaryLocation
+                @entity.monitoringStatus
+            @commonJavascriptButton(constants.View.DETAILS, JavaScript(s"componentResource('scanDetailedResult', jsRoutes.controllers.BackgroundCheckController.corporateScanResult(${entity.resultId}))"))
+            @commonFormButton(constants.Form.MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION, 'parameters -> s"${entity.resultId}")
+            @commonFormButton(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, 'parameters -> s" '${"orgID_changeTHIS"}', ${memberScanResponse.scanResult.scanId}, ${entity.resultId}")
+            }
+        }
+        case None => {
+                    @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${"orgID_changeTHIS"}', ${memberScanResponse.scanResult.scanId}")
+        }
+    }
+    <div id="scanDetailedResult"></div>
+</div>

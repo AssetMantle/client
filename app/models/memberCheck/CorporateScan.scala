@@ -14,16 +14,16 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class MemberScan(id: String, firstName: String, lastName: String, scanID: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[MemberScan] {
+case class CorporateScan(id: String, companyName: String, scanID: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[CorporateScan] {
 
-  def createLog()(implicit node: Node): MemberScan = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
+  def createLog()(implicit node: Node): CorporateScan = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
-  def updateLog()(implicit node: Node): MemberScan = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+  def updateLog()(implicit node: Node): CorporateScan = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
 @Singleton
-class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class CorporateScans @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MEMBER_CHECK_MEMBER_SCAN
 
@@ -37,9 +37,9 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
-  private[models] val memberScanTable = TableQuery[MemberScanTable]
+  private[models] val corporateScanTable = TableQuery[CorporateScanTable]
 
-  private def add(memberScan: MemberScan): Future[String] = db.run((memberScanTable returning memberScanTable.map(_.id) += memberScan.createLog()).asTry).map {
+  private def add(corporateScan: CorporateScan): Future[String] = db.run((corporateScanTable returning corporateScanTable.map(_.id) += corporateScan.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -47,7 +47,7 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def upsert(memberScan: MemberScan): Future[Int] = db.run(memberScanTable.insertOrUpdate(memberScan.updateLog()).asTry).map {
+  private def upsert(corporateScan: CorporateScan): Future[Int] = db.run(corporateScanTable.insertOrUpdate(corporateScan.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -55,9 +55,9 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def findById(id: String): Future[Option[MemberScan]] = db.run(memberScanTable.filter(_.id === id).result.headOption)
+  private def findById(id: String): Future[Option[CorporateScan]] = db.run(corporateScanTable.filter(_.id === id).result.headOption)
 
-  private def findByScanID(scanID: Int): Future[MemberScan] = db.run(memberScanTable.filter(_.scanID === scanID).result.head.asTry).map {
+  private def findByScanID(scanID: Int): Future[CorporateScan] = db.run(corporateScanTable.filter(_.scanID === scanID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -65,9 +65,9 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def findScanIDByFirstNameAndLastName(firstName: String, lastName: String): Future[Option[Int]] = db.run(memberScanTable.filter(_.firstName === firstName).filter(_.lastName === lastName).map(_.scanID).result.headOption)
+  private def findScanIDByCompanyName(companyName: String): Future[Option[Int]] = db.run(corporateScanTable.filter(_.companyName === companyName).map(_.scanID).result.headOption)
 
-  private def deleteById(id: String): Future[Int] = db.run(memberScanTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(corporateScanTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -77,15 +77,13 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private[models] class MemberScanTable(tag: Tag) extends Table[MemberScan](tag, "MemberScan") {
+  private[models] class CorporateScanTable(tag: Tag) extends Table[CorporateScan](tag, "CorporateScan") {
 
-    def * = (id, firstName, lastName, scanID, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MemberScan.tupled, MemberScan.unapply)
+    def * = (id, companyName, scanID, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CorporateScan.tupled, CorporateScan.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def firstName = column[String]("firstName")
-
-    def lastName = column[String]("lastName")
+    def companyName = column[String]("companyName", O.Unique)
 
     def scanID = column[Int]("scanID", O.Unique)
 
@@ -105,13 +103,13 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(id: String, firstName: String, lastName: String, scanID: Int): Future[String] = add(MemberScan(id, firstName, lastName, scanID))
+    def create(id: String, companyName: String, scanID: Int): Future[String] = add(CorporateScan(id, companyName, scanID))
 
-    def get(id: String): Future[Option[MemberScan]] = findById(id)
+    def get(id: String): Future[Option[CorporateScan]] = findById(id)
 
-    def tryGetByScanID(scanID: Int): Future[MemberScan] = findByScanID(scanID)
+    def tryGetByScanID(scanID: Int): Future[CorporateScan] = findByScanID(scanID)
 
-    def getScanID(firstName: String, lastName: String): Future[Option[Int]] = findScanIDByFirstNameAndLastName(firstName, lastName)
+    def getScanID(companyName: String): Future[Option[Int]] = findScanIDByCompanyName(companyName)
   }
 
 }

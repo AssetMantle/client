@@ -1,7 +1,7 @@
 @import helper._
 @import views.html.base._
 
-@(formTemplate: constants.Form, formData: Form[_])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], target: String = "commonModalContent")(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
@@ -19,7 +19,7 @@
             }
             </ul>
         }
-        @commonJavascriptButton(formTemplate.submit, JavaScript("""submitForm(this)"""))
+        @commonJavascriptButton(formTemplate.submit, JavaScript(s"submitForm(this, '${target}')"))
         </div>
     </fieldset>
 }

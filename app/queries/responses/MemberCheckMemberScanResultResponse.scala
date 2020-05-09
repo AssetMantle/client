@@ -5,9 +5,6 @@ import transactions.Abstract.BaseResponse
 
 object MemberCheckMemberScanResultResponse {
 
-  //  case class ()
-  //
-  //  implicit val Reads: Reads[] = Json.reads[]
   case class AssociateCorp(name: String, categories: String, subcategories: Option[String], description: Option[String])
 
   implicit val associateCorpReads: Reads[AssociateCorp] = Json.reads[AssociateCorp]

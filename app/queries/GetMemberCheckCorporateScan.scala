@@ -6,14 +6,14 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.MemberCheckMemberScanResponse.Response
+import queries.responses.MemberCheckCorporateScanResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetMemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_MEMBER_CHECK_MEMBER_SCAN
+  private implicit val module: String = constants.Module.QUERIES_GET_MEMBER_CHECK_CORPORATE_SCAN
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -31,7 +31,7 @@ class GetMemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configurat
 
   private val baseURL = configuration.get[String]("memberCheck.url")
 
-  private val endpoint = configuration.get[String]("memberCheck.endpoints.singleMemberScan")
+  private val endpoint = configuration.get[String]("memberCheck.endpoints.singleCorporateScan")
 
   private val url = baseURL + endpoint + "/"
 

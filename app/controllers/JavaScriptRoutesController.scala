@@ -330,6 +330,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.tradeRoom,
 
         routes.javascript.BackgroundCheckController.memberScanForm,
+        routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
+        routes.javascript.BackgroundCheckController.addUBOMemberCheckForm,
+        routes.javascript.BackgroundCheckController.memberScanResult,
+        routes.javascript.BackgroundCheckController.corporateScanForm,
+        routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm,
+        routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm,
+        routes.javascript.BackgroundCheckController.corporateScanResult,
         routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,
         routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFile,
         routes.javascript.BackgroundCheckController.storeTraderBackgroundCheckFile,

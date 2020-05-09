@@ -3,14 +3,14 @@ package queries.responses
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
 
-object MemberCheckMemberScanResponse {
+object MemberCheckCorporateScanResponse {
 
   case class DecisionDetail(text: String, matchDecision: String, assessedRisk: String, comment: String)
 
   implicit val decisionDetailReads: Reads[DecisionDetail] = Json.reads[DecisionDetail]
 
-  case class ScanEntity(resultId: Int, uniqueId: Option[Int], monitoringStatus: Option[String], category: Option[String], firstName: String, middleName: Option[String],
-                        lastName: String, matchRate: Option[Int], dob: Option[String], primaryLocation: Option[String], decisionDetail: Option[DecisionDetail])
+  case class ScanEntity(resultId: Int, uniqueId: Option[Int], monitoringStatus: Option[String], category: Option[String],
+                        name: String, primaryLocation: Option[String], decisionDetail: Option[DecisionDetail])
 
   implicit val scanEntityReads: Reads[ScanEntity] = Json.reads[ScanEntity]
 
@@ -18,9 +18,8 @@ object MemberCheckMemberScanResponse {
 
   implicit val scanResult: Reads[ScanResult] = Json.reads[ScanResult]
 
-  case class ScanInputParam(matchType: String, closeMatchRateThreshold: Int, whitelist: String, residence: String,
-                            pepJurisdiction: String, memberNumber: String, firstName: String, middleName: String, lastName: String,
-                            originalScriptName: String, gender: String, dob: String, address: String, updateMonitoringList: Boolean)
+  case class ScanInputParam(matchType: String, whitelist: String, companyName: String,
+                            idNumber: String, entityNumber: String, address: String, updateMonitoringList: Boolean)
 
   implicit val scanInputParamResult: Reads[ScanInputParam] = Json.reads[ScanInputParam]
 

@@ -1,0 +1,7 @@
+@import controllers.actions.LoginState
+@import queries.responses.MemberCheckCorporateScanResultResponse
+
+@(result: MemberCheckCorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<div>
+    @result
+</div>

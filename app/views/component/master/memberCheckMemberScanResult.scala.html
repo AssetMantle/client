@@ -2,9 +2,6 @@
 @import queries.responses.MemberCheckMemberScanResultResponse
 
 @(result: MemberCheckMemberScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-<html lang="en">
-
-<body>
-<div>@result</div>
-</body>
-</html>
+<div>
+    @result
+</div>

@@ -1,19 +1,21 @@
-package queries
+package transactions
 
 import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.WSClient
+import play.api.libs.json.{Json, OWrites}
+import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import queries.responses.MemberCheckMemberScanResponse.Response
+import transactions.Abstract.BaseRequest
+import transactions.responses.MemberCheckMemberScanResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_MEMBER_CHECK_MEMBER_SCAN
+  private implicit val module: String = constants.Module.TRANSACTIONS_MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -31,15 +33,19 @@ class GetMemberCheckMemberScan @Inject()(wsClient: WSClient)(implicit configurat
 
   private val baseURL = configuration.get[String]("memberCheck.url")
 
-  private val endpoint = configuration.get[String]("memberCheck.endpoints.singleMemberScan")
+  private val endpoint = configuration.get[String]("memberCheck.endpoints.singleMemberScanResult")
 
-  private val url = baseURL + endpoint + "/"
+  private val url = baseURL + endpoint
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
+  private def action(id: String, request: Request): Future[WSResponse] = wsClient.url(url + id + "/decisions").withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request))
+
+  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+
+  case class Request(matchDecision: String, assessedRisk: String, comment: String) extends BaseRequest
 
   object Service {
 
-    def get(scanID: String): Future[Response] = action(scanID).recover {
+    def post(id: String, request: Request): Future[WSResponse] = action(id, request).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
