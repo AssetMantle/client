@@ -30,7 +30,8 @@ class Negotiations @Inject()(
                               masterOrders: master.Orders,
                               masterAssets: master.Assets,
                               masterTraders: master.Traders,
-                            )(implicit executionContext: ExecutionContext, configuration: Configuration) {
+                              configuration: Configuration,
+                            )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

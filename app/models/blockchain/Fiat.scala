@@ -21,10 +21,13 @@ import scala.util.{Failure, Success}
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider,
-                      actorSystem: ActorSystem, getAccount: GetAccount,
-                      blockchainAccounts: blockchain.Accounts, masterTraders: master.Traders,
-                      masterFiats: master.Fiats)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(
+                       protected val databaseConfigProvider: DatabaseConfigProvider,
+                       actorSystem: ActorSystem, getAccount: GetAccount,
+                       configuration: Configuration,
+                       blockchainAccounts: blockchain.Accounts,
+                       masterTraders: master.Traders,
+                       masterFiats: master.Fiats)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

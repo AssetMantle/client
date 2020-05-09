@@ -20,7 +20,12 @@ import scala.util.{Failure, Success}
 case class Account(address: String, username: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(
+                          protected val databaseConfigProvider: DatabaseConfigProvider,
+                          actorSystem: ActorSystem,
+                          getAccount: GetAccount,
+                          configuration: Configuration
+                        )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

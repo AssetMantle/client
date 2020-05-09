@@ -1,16 +1,16 @@
 package models.masterTransaction
 
-import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
-import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
-import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import org.postgresql.util.PSQLException
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsString, Json, OWrites, Writes}
+import play.api.{Configuration, Logger}
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

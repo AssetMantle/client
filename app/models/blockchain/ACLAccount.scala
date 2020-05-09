@@ -22,7 +22,12 @@ case class ACLAccount(address: String, zoneID: String, organizationID: String, a
 case class ACL(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
 
 @Singleton
-class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, aclHashes: ACLHashes, getACL: GetACL)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class ACLAccounts @Inject()(
+                             protected val databaseConfigProvider: DatabaseConfigProvider,
+                             actorSystem: ActorSystem, aclHashes: ACLHashes,
+                             configuration: Configuration,
+                             getACL: GetACL,
+                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

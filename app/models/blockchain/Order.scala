@@ -32,7 +32,8 @@ class Orders @Inject()(
                         blockchainFiats: Fiats,
                         getOrder: queries.GetOrder,
                         masterOrders: master.Orders,
-                      )(implicit executionContext: ExecutionContext, configuration: Configuration) {
+                        configuration: Configuration,
+                      )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

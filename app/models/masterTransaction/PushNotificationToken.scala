@@ -1,17 +1,19 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class PushNotificationToken(id: String, token: String)
+case class PushNotificationToken(id: String, token: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class PushNotificationTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -66,11 +68,23 @@ class PushNotificationTokens @Inject()(protected val databaseConfigProvider: Dat
 
   private[models] class PushNotificationTokenTable(tag: Tag) extends Table[PushNotificationToken](tag, "PushNotificationToken") {
 
-    def * = (id, token) <> (PushNotificationToken.tupled, PushNotificationToken.unapply)
+    def * = (id, token, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (PushNotificationToken.tupled, PushNotificationToken.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def token = column[String]("token")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

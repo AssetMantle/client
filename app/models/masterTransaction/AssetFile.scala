@@ -8,9 +8,9 @@ import models.Abstract.AssetDocumentContent
 import models.Trait.{Document, Logged}
 import models.common.Serializable._
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
 

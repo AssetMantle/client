@@ -5,9 +5,9 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.TradeActivityTemplate
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}

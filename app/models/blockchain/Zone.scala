@@ -19,7 +19,12 @@ import scala.util.{Failure, Success}
 case class Zone(id: String, address: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getZone: GetZone, configuration: Configuration)(implicit executionContext: ExecutionContext) {
+class Zones @Inject()(
+                       protected val databaseConfigProvider: DatabaseConfigProvider,
+                       actorSystem: ActorSystem,
+                       getZone: GetZone,
+                       configuration: Configuration,
+                     )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

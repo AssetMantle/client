@@ -16,7 +16,10 @@ import scala.util.{Failure, Success}
 case class TraderFeedbackHistory(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class TraderFeedbackHistories @Inject()(
+                                         protected val databaseConfigProvider: DatabaseConfigProvider,
+                                         configuration: Configuration
+                                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

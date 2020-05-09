@@ -43,7 +43,12 @@ case class ConfirmSellerBidCounts(confirmSellerBidPositiveTx: String, confirmSel
 case class NegotiationCounts(negotiationPositiveTx: String, negotiationNegativeTx: String)
 
 @Singleton
-class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getTraderReputation: GetTraderReputation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class TransactionFeedbacks @Inject()(
+                                      protected val databaseConfigProvider: DatabaseConfigProvider,
+                                      actorSystem: ActorSystem,
+                                      configuration: Configuration,
+                                      getTraderReputation: GetTraderReputation
+                                    )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -60,7 +65,9 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
   private[models] val transactionFeedbackTable = TableQuery[TransactionFeedbackTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(transactionFeedback: TransactionFeedback): Future[String] = db.run((transactionFeedbackTable returning transactionFeedbackTable.map(_.address) += transactionFeedback).asTry).map {

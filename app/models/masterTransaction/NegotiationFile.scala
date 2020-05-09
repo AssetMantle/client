@@ -2,20 +2,16 @@ package models.masterTransaction
 
 import java.sql.Timestamp
 
-import models.common.Serializable._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
 import models.Trait.{Document, Logged}
-import models.Trait.Document
-import models.common.Serializable
+import models.common.Serializable._
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import models.common.Serializable._
-import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

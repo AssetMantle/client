@@ -26,7 +26,8 @@ class Assets @Inject()(
                         actorSystem: ActorSystem,
                         getAccount: GetAccount,
                         blockchainAccounts: blockchain.Accounts,
-                      )(implicit executionContext: ExecutionContext, configuration: Configuration) {
+                        configuration: Configuration,
+                      )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

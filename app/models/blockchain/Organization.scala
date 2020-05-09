@@ -19,7 +19,12 @@ import scala.util.{Failure, Success}
 case class Organization(id: String, address: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getOrganization: GetOrganization)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Organizations @Inject()(
+                               protected val databaseConfigProvider: DatabaseConfigProvider,
+                               actorSystem: ActorSystem,
+                               configuration: Configuration,
+                               getOrganization: GetOrganization
+                             )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
