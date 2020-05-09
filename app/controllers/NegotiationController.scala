@@ -1261,17 +1261,24 @@ class NegotiationController @Inject()(
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(updateContractSignedData.negotiationID)
 
-          def markContractSigned(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) masterNegotiations.Service.markContractSigned(updateContractSignedData.negotiationID) else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
+          def updateStatus(traderID: String, negotiation: Negotiation) = if (negotiation.sellerTraderID == traderID && negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS) {
+            val markContractSigned = masterNegotiations.Service.markContractSigned(updateContractSignedData.negotiationID)
+            val updateContractStatus = masterTransactionNegotiationFiles.Service.accept(negotiation.id, constants.File.Negotiation.CONTRACT)
+            for {
+              _ <- markContractSigned
+              _ <- updateContractStatus
+            } yield 0
+          } else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
 
-          (for {
-            traderID <- traderID
-            negotiation <- negotiation
-            _ <- markContractSigned(traderID, negotiation)
-            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
-          }
+            (for {
+              traderID <- traderID
+              negotiation <- negotiation
+              _ <- updateStatus(traderID, negotiation)
+              result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
+            } yield result
+              ).recover {
+              case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
+            }
         }
       )
   }
