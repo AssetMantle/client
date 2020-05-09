@@ -103,6 +103,7 @@ object FormField {
   val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
   val LAST_NAME = new StringFormField("LAST_NAME", 2, 100)
   val COMPANY_NAME = new StringFormField("COMPANY_NAME", 2, 100)
+  val VESSEL_NAME = new StringFormField("VESSEL_NAME", 2, 100)
   val OTHER_DOCUMENTS = new StringFormField("OTHER_DOCUMENTS", 0, 1000)
   val ASSET_DESCRIPTION = new StringFormField("ASSET_DESCRIPTION", 1, 1000)
   val TRADE_ID = new StringFormField("TRADE_ID", 1, 132)

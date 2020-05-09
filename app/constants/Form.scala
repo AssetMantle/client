@@ -63,6 +63,9 @@ object Form {
   val MEMBER_CHECK_CORPORATE_SCAN = new Form("MEMBER_CHECK_CORPORATE_SCAN", routes.BackgroundCheckController.corporateScan(), routes.javascript.BackgroundCheckController.corporateScanForm)
   val MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION", routes.BackgroundCheckController.corporateScanResultDecision(), routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm)
   val ADD_ORGANIZATION_MEMBER_CHECK = new Form("ADD_ORGANIZATION_MEMBER_CHECK", routes.BackgroundCheckController.addOrganizationMemberCheck(), routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm)
+  val MEMBER_CHECK_VESSEL_SCAN = new Form("MEMBER_CHECK_VESSEL_SCAN", routes.BackgroundCheckController.vesselScan(), routes.javascript.BackgroundCheckController.vesselScanForm)
+  val MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION", routes.BackgroundCheckController.vesselScanResultDecision(), routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm)
+  val ADD_ASSET_MEMBER_CHECK = new Form("ADD_ASSET_MEMBER_CHECK", routes.BackgroundCheckController.addAssetMemberCheck(), routes.javascript.BackgroundCheckController.addAssetMemberCheckForm)
 
 
   //ChangeBuyerBidController

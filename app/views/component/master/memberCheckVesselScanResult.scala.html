@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import queries.responses.MemberCheckCorporateScanResultResponse
 @import base._
+
 @(response: MemberCheckCorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div>
     @commonIntInfo(constants.View.ID, response.id)

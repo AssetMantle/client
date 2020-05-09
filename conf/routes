@@ -420,6 +420,14 @@ GET         /background/corporateScanResultDecision                             
 POST        /background/corporateScanResultDecision                                               controllers.BackgroundCheckController.corporateScanResultDecision
 GET         /background/addOrganization                                                           controllers.BackgroundCheckController.addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int])
 POST        /background/addOrganization                                                           controllers.BackgroundCheckController.addOrganizationMemberCheck
+GET         /background/vesselScan                                                             controllers.BackgroundCheckController.vesselScanForm(companyName: String)
+POST        /background/vesselScan                                                             controllers.BackgroundCheckController.vesselScan
+GET         /background/vesselScanResult                                                       controllers.BackgroundCheckController.vesselScanResult(resultID: Int)
+GET         /background/vesselScanResultDecision                                               controllers.BackgroundCheckController.vesselScanResultDecisionForm(resultID: Int)
+POST        /background/vesselScanResultDecision                                               controllers.BackgroundCheckController.vesselScanResultDecision
+GET         /background/addAsset                                                           controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addAsset                                                           controllers.BackgroundCheckController.addAssetMemberCheck
+
 GET         /worldCheck/traderBackgroundCheckUpload                                               controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
 POST        /worldCheck/traderBackgroundCheckUpload/file                                          controllers.BackgroundCheckController.uploadTraderBackgroundCheckFile(documentType: String)
 GET         /worldCheck/traderBackgroundCheckUpload/storeFile                                     controllers.BackgroundCheckController.storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)

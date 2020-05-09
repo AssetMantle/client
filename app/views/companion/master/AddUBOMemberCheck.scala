@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms._
 
-object AddUBOBackgroundCheck {
+object AddUBOMemberCheck {
 
   val form = Form(
     mapping(
