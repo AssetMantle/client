@@ -14,8 +14,12 @@
             case constants.User.TRADER => {
             componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
-            case constants.User.ORGANIZATION => {}
-            case constants.User.ZONE => {}
+            case constants.User.ORGANIZATION => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+            }
+            case constants.User.ZONE => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+            }
             case constants.User.GENESIS => {}
             case _ => {}
         }
@@ -25,30 +29,56 @@
 @center = {
 
     <div class="cmuk-container cmuk-margin-bottom">
+        <div id="sendFiatRequests"></div>
+        <div id="redeemFiatRequests"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
             <div id="traderViewIssueFiatRequestList"></div>
-            <script>
-                componentResource('traderViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.traderViewIssueFiatRequestList());
-            </script>
+                <script>
+                    componentResource('traderViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.traderViewIssueFiatRequestList());
+                    componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewSendFiatRequests());
+                    componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewRedeemFiatRequests());
+                </script>
             }
             case constants.User.ORGANIZATION => {
                 <div id="organizationViewIssueFiatRequestList"></div>
                 <script>
-                componentResource('organizationViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.organizationViewIssueFiatRequestList());
-            </script>
+                    componentResource('organizationViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.organizationViewIssueFiatRequestList());
+                    componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewSendFiatRequests());
+                    componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewRedeemFiatRequests());
+                </script>
             }
             case constants.User.ZONE => {
                 <div id="zoneViewIssueFiatRequestList"></div>
                 <script>
-                componentResource('zoneViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.zoneViewIssueFiatRequestList());
-            </script>
+                    componentResource('zoneViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.zoneViewIssueFiatRequestList());
+                    componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequests());
+                    componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequests());
+                </script>
             }
             case constants.User.GENESIS => {}
             case _ => {}
         }
 
     </div>
+    <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewSendFiatRequests());
+                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewRedeemFiatRequests());
+            }
+            case constants.User.ORGANIZATION => {
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewSendFiatRequests());
+                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewRedeemFiatRequests());
+            }
+            case constants.User.ZONE => {
+                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequests());
+                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequests());
+            }
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
+    </script>
 }
 
 @right = {

@@ -3,7 +3,7 @@
 @import models.master.Negotiation
 @import scala.collection.immutable.ListMap
 
-@(id:String, traderID:String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(id: String, traderID: String, negotiation: Negotiation)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="docView switcherCardSecond">
     @commonInfoBox() {
         @commonHorizontalSwitcher(ListMap(
@@ -12,9 +12,9 @@
         ),
             'DOCUMENT_LIST_PARAMETERS -> s"'${id}'")
 
-        @if(traderID == negotiation.sellerTraderID && (negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS ||negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED)) {
+        @if(traderID == negotiation.sellerTraderID && (negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS || negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED)) {
             <div class="uploadDoc">
-            @commonModalButton(constants.Form.UPLOAD, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${id}'")
+            @commonModalButton(constants.View.UPLOAD, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${id}'")
             </div>
         }
 

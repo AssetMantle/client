@@ -4,6 +4,7 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain.{ACL, ACLAccount}
 import models.common.Serializable._
 import models.master.{Asset, Negotiation, Order}
 import models.masterTransaction.AssetFile
@@ -20,6 +21,8 @@ class OrderController @Inject()(
                                  blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders,
                                  blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
                                  blockchainAccounts: blockchain.Accounts,
+                                 blockchainACLAccounts: blockchain.ACLAccounts,
+                                 blockchainACLHashes: blockchain.ACLHashes,
                                  masterAssets: master.Assets,
                                  masterNegotiations: master.Negotiations,
                                  masterOrders: master.Orders,
@@ -64,11 +67,15 @@ class OrderController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
+          def getACLHash(address: String) = blockchainACLAccounts.Service.tryGetACLHash(address)
+
+          def getACL(aclHash: String) = blockchainACLHashes.Service.tryGetACL(aclHash)
+
           //TODO: Integrate with WesterUnion
           def fiatProofHash: Future[String] = Future("fiatProofHash")
 
-          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String): Future[String] = {
-            if (asset.status == constants.Status.Asset.IN_ORDER && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING)) {
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String, buyerACL: ACL): Future[String] = {
+            if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && buyerACL.buyerExecuteOrder) {
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
                   entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = moderatedBuyerExecuteData.gas, ticketID = "", mode = transactionMode),
@@ -91,17 +98,19 @@ class OrderController @Inject()(
             buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
+            buyerACLHash <- getACLHash(buyerAddress)
+            buyerACL <- getACL(buyerACLHash)
             sellerAddress <- getAddress(sellerAccountID)
             fiatProofHash <- fiatProofHash
-            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = fiatProofHash)
+            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = fiatProofHash, buyerACL = buyerACL)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.MODERATED_BUY_ORDER_EXECUTED, ticketID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = moderatedBuyerExecuteData.orderID, successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = moderatedBuyerExecuteData.orderID, failures = Seq(baseException.failure)))
           }
         }
       )
@@ -129,8 +138,12 @@ class OrderController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile): Future[String] = {
-            if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING)) {
+          def getACLHash(address: String) = blockchainACLAccounts.Service.tryGetACLHash(address)
+
+          def getACL(aclHash: String) = blockchainACLHashes.Service.tryGetACL(aclHash)
+
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile, sellerACL: ACL): Future[String] = {
+            if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING).contains(order.status) && sellerACL.sellerExecuteOrder) {
               val awbProofHash = utilities.String.sha256Sum(Json.toJson(billOfLading.documentContent.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND))).toString)
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
@@ -157,15 +170,17 @@ class OrderController @Inject()(
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
             sellerAddress <- getAddress(sellerAccountID)
-            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = sellerAddress, asset = asset, order = order, billOfLading = billOfLading)
+            sellerACLHash <- getACLHash(sellerAddress)
+            sellerACL <- getACL(sellerACLHash)
+            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = sellerAddress, asset = asset, order = order, billOfLading = billOfLading, sellerACL = sellerACL)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.MODERATED_SELL_ORDER_EXECUTED, ticketID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = moderatedSellerExecuteOrderData.orderID, successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = moderatedSellerExecuteOrderData.orderID, failures = Seq(baseException.failure)))
           }
         }
       )
@@ -192,7 +207,7 @@ class OrderController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order): Future[String] = {
-            if (asset.status == constants.Status.Asset.IN_ORDER && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING)) {
+            if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder) {
               val fiatProofHash = utilities.String.sha256Sum(buyerExecuteData.fiatProof)
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
@@ -219,10 +234,10 @@ class OrderController @Inject()(
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.BUYER_ORDER_EXECUTED, ticketID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = buyerExecuteData.orderID, successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = buyerExecuteData.orderID, failures = Seq(baseException.failure)))
           }
         }
       )
@@ -251,7 +266,7 @@ class OrderController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile): Future[String] = {
-            if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && (order.status == constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING || order.status == constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING)) {
+            if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sellerExecuteOrder) {
               val awbProofHash = utilities.String.sha256Sum(Json.toJson(billOfLading.documentContent.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND))).toString)
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
@@ -280,10 +295,10 @@ class OrderController @Inject()(
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.SELLER_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SELLER_ORDER_EXECUTED, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.SELLER_ORDER_EXECUTED, ticketID)
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sellerExecuteData.orderID, successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sellerExecuteData.orderID, failures = Seq(baseException.failure)))
           }
         }
       )

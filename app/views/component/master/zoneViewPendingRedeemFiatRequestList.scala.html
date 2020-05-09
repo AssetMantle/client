@@ -1,0 +1,22 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.RedeemFiatRequest
+
+@(sendFiatRequests: Seq[RedeemFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@sendFiatRequests.map { sendFiatRequest =>
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
+        @commonVerticalTextInfo(constants.View.TRADER_ID, sendFiatRequest.traderID)
+        @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
+        @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+                @commonModalButton(constants.View.VIEW, routes.javascript.RedeemFiatController.zoneRedeemFiatForm, 'parameters -> s"'${sendFiatRequest.id}'")
+            </p>
+        </div>
+    }
+}

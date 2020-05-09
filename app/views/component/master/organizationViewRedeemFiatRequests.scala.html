@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.REDEEM_FIAT_REQUESTS) {
+}{
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.PENDING_REDEEM_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewPendingRedeemFiatRequestList,
+        constants.View.COMPLETE_REDEEM_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewCompleteRedeemFiatRequestList,
+        constants.View.FAILED_REDEEM_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewFailedRedeemFiatRequestList,
+    ))
+}

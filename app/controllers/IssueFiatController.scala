@@ -50,23 +50,27 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           def getResult(status: Option[Boolean]): Future[Result] = {
             if (status.isEmpty) {
               val toAddress = blockchainAccounts.Service.tryGetAddress(issueFiatData.accountID)
-
-              def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
-                entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
-                action = transactionsIssueFiat.Service.post,
-                onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
-                onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
-              )
-
               val traderID = masterTraders.Service.tryGetID(issueFiatData.accountID)
+
+              def sendTransaction(toAddress: String): Future[String] = {
+                if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).issueFiat) {
+                  transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
+                    entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
+                    request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
+                    action = transactionsIssueFiat.Service.post,
+                    onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
+                    onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
+                  )
+                } else throw new BaseException(constants.Response.UNAUTHORIZED)
+              }
+
               def create(traderID: String) = masterFiats.Service.create(traderID, issueFiatData.transactionID, issueFiatData.transactionAmount, 0)
 
               for {
                 toAddress <- toAddress
-                ticketID <- ticketID(toAddress)
+                ticketID <- sendTransaction(toAddress)
                 traderID <- traderID
                 _ <- create(traderID)
                 result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
@@ -78,6 +82,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
           (for {
             status <- status
+            //TODO @puneet
             result <- getResult(None)
           } yield result
             ).recover {

@@ -81,9 +81,9 @@
                             }
                             case None => {
                                 @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
+                                @commonTextInfo(constants.View.REFERENCE, credit.reference.getOrElse(""))
                             }
                         }
-                        @commonTextInfo(constants.View.REFERENCE, credit.reference)
                     }
                     case None => {}
                 }

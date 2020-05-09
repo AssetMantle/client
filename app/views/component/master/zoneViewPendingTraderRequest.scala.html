@@ -18,9 +18,9 @@
 @commonTextInfo(constants.View.NAME, organization.name)
 @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
 @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
-@commonTextInfo(constants.Form.EMAIL_ADDRESS, organization.email)
+@commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
 @commonBooleanInfo(constants.View.STATUS, organization.verificationStatus)
 <br>
 @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)
-@commonModalButton(constants.Form.NEXT, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'")
+@commonModalButton(constants.View.NEXT, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'")
 @commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")

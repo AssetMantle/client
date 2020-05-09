@@ -190,7 +190,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       getStatusForAllDocumentsById(id).map { documentStatuses => if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false }
     }
 
-    def getDocumentContent(id: String, documentType: String) = tryGetByIDAndDocumentType(id = id, documentType = documentType).map(_.deserialize).map(_.documentContent)
+    def getDocumentContent(id: String, documentType: String): Future[Option[AssetDocumentContent]] = tryGetByIDAndDocumentType(id = id, documentType = documentType).map(_.deserialize).map(_.documentContent)
   }
 
 }
