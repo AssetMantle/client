@@ -1,19 +1,22 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetOrganization
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Organization(id: String, address: String, dirtyBit: Boolean)
+case class Organization(id: String, address: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getOrganization: GetOrganization)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -92,7 +95,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization_BC") {
 
-    def * = (id, address, dirtyBit) <> (Organization.tupled, Organization.unapply)
+    def * = (id, address, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Organization.tupled, Organization.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -100,7 +103,17 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def address = column[String]("address")
 
-    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

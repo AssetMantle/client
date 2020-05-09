@@ -1,17 +1,19 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderFeedbackHistory(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String)
+case class TraderFeedbackHistory(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -72,7 +74,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   private[models] class TraderFeedbackHistoryTable(tag: Tag) extends Table[TraderFeedbackHistory](tag, "TraderFeedbackHistory_BC") {
 
-    def * = (address, buyerAddress, sellerAddress, pegHash, rating) <> (TraderFeedbackHistory.tupled, TraderFeedbackHistory.unapply)
+    def * = (address, buyerAddress, sellerAddress, pegHash, rating, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TraderFeedbackHistory.tupled, TraderFeedbackHistory.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -83,6 +85,18 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
     def rating = column[String]("rating")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 
