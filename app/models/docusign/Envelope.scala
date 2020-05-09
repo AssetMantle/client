@@ -107,7 +107,7 @@ class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
     def get(id: String, documentType: String): Future[Option[Envelope]] = getByID(id, documentType)
 
-    def tryGet(id: String, documentType: String) = tryGetByID(id, documentType)
+    def tryGet(id: String, documentType: String): Future[Envelope] = tryGetByID(id, documentType)
 
     def getAll(id: String): Future[Seq[Envelope]] = getAllByID(id)
 

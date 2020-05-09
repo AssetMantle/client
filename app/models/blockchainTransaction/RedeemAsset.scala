@@ -204,7 +204,7 @@ class RedeemAssets @Inject()(
         val markFromAccountDirty = blockchainAccounts.Service.markDirty(redeemAsset.from)
         for {
           _ <- markAssetDirty
-          _ <- markAssetDirty
+          _ <- markFromAccountDirty
         } yield ()
       }
 

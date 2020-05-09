@@ -5,10 +5,10 @@
 @(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <div class="centerText">
-    <h4>@Messages(constants.Form.ZONE_KYC_FILES)</h4>
+    <h4>@Messages(constants.View.ZONE_KYC_FILES)</h4>
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddZoneController.userUploadZoneKYCForm,'parameters -> s"'${documentType}'")
+            @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddZoneController.userUploadZoneKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
     @for(zoneKYC <- zoneKYCs) {
@@ -17,7 +17,7 @@
         } {
             <a href="@routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)" target="_blank">@Messages(zoneKYC.documentType)</a>
         } {
-            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages( zoneKYC.documentType)).mkString(" "),routes.javascript.AddZoneController.userUpdateZoneKYCForm,'parameters -> s"'${zoneKYC.documentType}'")
+            @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( zoneKYC.documentType)).mkString(" "),routes.javascript.AddZoneController.userUpdateZoneKYCForm,'parameters -> s"'${zoneKYC.documentType}'")
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }

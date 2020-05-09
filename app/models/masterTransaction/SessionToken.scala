@@ -73,7 +73,8 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
   private def getSessionTokenHashByID(id: String): Future[String] = db.run(sessionTokenTable.filter(_.id === id).map(_.sessionTokenHash).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(noSuchElementException.getMessage+"BBBBBBBBBB", noSuchElementException)
+        logger.info(noSuchElementException.toString+"AAAAAAAAAAAAAA",noSuchElementException.getCause)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }

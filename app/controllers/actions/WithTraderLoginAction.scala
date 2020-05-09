@@ -40,9 +40,9 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
       }
 
       def getLoginState(username: String, address: String): Future[LoginState] = {
-        val aclHash = blockchainACLAccounts.Service.getACLHash(address)
+        val aclHash = blockchainACLAccounts.Service.tryGetACLHash(address)
 
-        def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.getACL(aclHash)
+        def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
 
         for {
           aclHash <- aclHash

@@ -5,6 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
+import models.blockchain.ACL
 import models.common.Serializable._
 import models.docusign
 import models.master.{Asset, Negotiation, Trader, Zone}
@@ -20,6 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AssetController @Inject()(
                                  blockchainAccounts: blockchain.Accounts,
                                  blockchainAssets: blockchain.Assets,
+                                 blockchainACLAccounts: blockchain.ACLAccounts,
+                                 blockchainACLHash: blockchain.ACLHashes,
                                  blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
                                  blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
                                  blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
@@ -261,7 +264,7 @@ class AssetController @Inject()(
                 result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
-              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized(views.html.tradeRoom(negotiationID = negotiation.id, failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -296,10 +299,18 @@ class AssetController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
+          def getACL(address: String): Future[ACL] = {
+            val aclHash = blockchainACLAccounts.Service.tryGetACLHash(address)
+            for {
+              aclHash <- aclHash
+              acl <- blockchainACLHash.Service.tryGetACL(aclHash)
+            } yield acl
+          }
+
           def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
 
-          def sendTransaction(seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean): Future[String] = {
-            if (seller.zoneID != zoneID || asset.ownerID != seller.id) throw new BaseException(constants.Response.UNAUTHORIZED)
+          def sendTransaction(seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean, acl: ACL): Future[String] = {
+            if (seller.zoneID != zoneID || asset.ownerID != seller.id || !acl.releaseAsset) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
             else if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
             else if (billOfLading.status.contains(false)) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
@@ -322,10 +333,11 @@ class AssetController @Inject()(
             zoneID <- zoneID
             asset <- asset
             seller <- getTrader(asset.ownerID)
+            sellerAddress <- getAddress(seller.accountID)
+            acl <- getACL(sellerAddress)
             lockedStatus <- getLockedStatus(asset.pegHash)
             billOfLading <- billOfLading
-            sellerAddress <- getAddress(seller.accountID)
-            ticketID <- sendTransaction(seller = seller, zoneID = zoneID, sellerAddress = sellerAddress, billOfLading = billOfLading, asset = asset, lockedStatus = lockedStatus)
+            ticketID <- sendTransaction(seller = seller, zoneID = zoneID, sellerAddress = sellerAddress, billOfLading = billOfLading, asset = asset, lockedStatus = lockedStatus, acl = acl)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
             _ <- utilitiesNotification.send(seller.accountID, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
             result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ZONE_RELEASED_ASSET)))
@@ -357,9 +369,10 @@ class AssetController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String): Future[String] = {
-            if (asset.ownerID != sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String, negotiation: Negotiation): Future[String] = {
+            if (asset.ownerID != sellerTraderID || !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendAsset) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
+            else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
             else asset.pegHash match {
               case Some(pegHash) => if (asset.status == constants.Status.Asset.ISSUED) {
                 transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
@@ -383,7 +396,7 @@ class AssetController @Inject()(
             assetLocked <- getLockedStatus(asset.pegHash)
             buyer <- getTrader(negotiation.buyerTraderID)
             buyerAddress <- getAddress(buyer.accountID)
-            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked, sellerTraderID = negotiation.sellerTraderID)
+            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked, sellerTraderID = negotiation.sellerTraderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
             _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.orderID, successes = Seq(constants.Response.ASSET_SENT)))
@@ -416,7 +429,7 @@ class AssetController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[String] = {
-            if (asset.ownerID != trader.id) throw new BaseException(constants.Response.UNAUTHORIZED)
+            if (asset.ownerID != trader.id || !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemAsset) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
             else asset.pegHash match {
               case Some(pegHash) =>

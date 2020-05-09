@@ -9,7 +9,7 @@
 </div>
 <div class="centerText">
     <div id="@Seq("upload", documentType).mkString("")">
-        @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
+        @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
     </div>
     @accountKYC match {
         case Some(file) => {
@@ -18,7 +18,7 @@
             } {
                 <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
-                @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
+                @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
                 <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
             }
             @commonModalButton(constants.View.BACK, constants.Form. ADD_IDENTIFICATION.get)

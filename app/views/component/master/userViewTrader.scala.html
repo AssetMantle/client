@@ -6,18 +6,18 @@
 @(trader: Trader, organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div>
-    <div class="cmuk-text-left title"> <span>@Messages(constants.Form.TRADER_DETAILS)</span></div>
+    <div class="cmuk-text-left title"> <span>@Messages(constants.View.TRADER_DETAILS)</span></div>
     @commonTextInfo(constants.View.NAME, trader.name)
     @commonTextInfo(constants.View.TRADER_ID, trader.id)
-    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, trader.status)
+    @commonBooleanInfo(constants.View.VERIFIED_STATUS, trader.status)
 </div>
 <div>
-    <div class="cmuk-text-left title"><span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
-    @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
-    @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+    <div class="cmuk-text-left title"><span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
+    @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+    @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
     @commonTextInfo(constants.View.REGISTERED_ADDRESS, Seq(organization.registeredAddress.addressLine1, organization.registeredAddress.addressLine2, organization.registeredAddress.landmark.getOrElse(""), Seq(organization.registeredAddress.city, organization.registeredAddress.zipCode).mkString(" - "), organization.registeredAddress.country).mkString(",\n"))
     @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
-    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
-    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+    @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
+    @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
 </div>

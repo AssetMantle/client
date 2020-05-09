@@ -21,8 +21,8 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
   def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
 
-      val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
-      val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+      val username = Future(request.session.get(constants.Security.USERNAME).getOrElse("sddsgd"))
+      val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse("sddsgd"))
 
       def verifySessionTokenAndUserType(username: String, sessionToken: String) = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
@@ -39,9 +39,9 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
 
       def getLoginState(username: String, address: String, userType: String): Future[LoginState] = {
         if (userType == constants.User.TRADER) {
-          val aclHash = blockchainACLAccounts.Service.getACLHash(address)
+          val aclHash = blockchainACLAccounts.Service.tryGetACLHash(address)
 
-          def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.getACL(aclHash)
+          def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
 
           for {
             aclHash <- aclHash
