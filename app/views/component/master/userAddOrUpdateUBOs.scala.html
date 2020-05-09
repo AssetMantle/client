@@ -5,7 +5,7 @@
 
 @(userAddOrUpdateUBOsForm: Form[AddOrUpdateUBOs.Data] = AddOrUpdateUBOs.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.USER_ADD_OR_UPDATE_UBOS, userAddOrUpdateUBOsForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @defining(Option(constants.FormField.UBOS)) { implicit nestedUBOsFormField =>
         @repeatWithIndex(userAddOrUpdateUBOsForm(constants.FormField.UBOS.name), min = userAddOrUpdateUBOsForm(constants.FormField.UBOS.name).indexes.length + 1) { (uboSequentialFormField, i) =>
             @defining(Option(uboSequentialFormField)) { implicit uboSequentialField =>
@@ -14,7 +14,7 @@
                     @commonInputDouble(userAddOrUpdateUBOsForm, constants.FormField.SHARE_PERCENTAGE)
                     @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.RELATIONSHIP)
                     @commonInputText(userAddOrUpdateUBOsForm, constants.FormField.TITLE)
-                    @commonJavascriptButton(constants.Form.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
+                    @commonJavascriptButton(constants.View.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
                 </div>
             }
         }

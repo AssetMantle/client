@@ -1,8 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @(totalAmount: Int, amountPaid: Int, amountPending: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<div class="financial">
-    <ul class="">
+ <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
                 <span class="walletIcon">@commonIcon("wallet")</span>
@@ -32,4 +31,3 @@
 
         </li>
     </ul>
-</div>

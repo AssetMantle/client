@@ -5,8 +5,8 @@
 
 @(verifyTraderForm: Form[VerifyTrader.Data] = VerifyTrader.form, trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ZONE_VERIFY_TRADER, verifyTraderForm) {
-    <div class="info-block">
-        <div class="info-block-item">
+    <div class="infoBlock">
+        <div class="infoBlockItem">
         @commonTextInfo(constants.View.NAME, trader.name)
         @commonInputText(verifyTraderForm, constants.FormField.ACCOUNT_ID, 'value -> trader.accountID, 'readonly -> true)
         @commonInputText(verifyTraderForm, constants.FormField.ORGANIZATION_ID, 'value -> trader.organizationID, 'readonly -> true)
@@ -18,8 +18,8 @@
         @commonCheckbox(verifyTraderForm, constants.FormField.REDEEM_FIAT, 'checked -> true)
         @commonCheckbox(verifyTraderForm, constants.FormField.SELLER_EXECUTE_ORDER, 'checked -> true)
         </div>
-        <div class="info-block-item">
-            <div class="info-block-right">
+        <div class="infoBlockItem">
+            <div class="infoBlockItemRight">
         @commonCheckbox(verifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER, 'checked -> true)
         @commonCheckbox(verifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked -> true)
         @commonCheckbox(verifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked -> true)

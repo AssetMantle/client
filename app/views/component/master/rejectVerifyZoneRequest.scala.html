@@ -4,7 +4,7 @@
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data] = RejectVerifyZoneRequest.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_VERIFY_ZONE_REQUEST, rejectVerifyZoneRequestForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonInputText(rejectVerifyZoneRequestForm, constants.FormField.ZONE_ID, 'value -> zoneID)
     </div>
 }

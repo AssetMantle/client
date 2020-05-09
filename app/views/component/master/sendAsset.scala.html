@@ -4,7 +4,7 @@
 
 @(sendAssetForm: Form[SendAsset.Data] = SendAsset.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_ASSET, sendAssetForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonInputText(sendAssetForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputInt(sendAssetForm, constants.FormField.GAS)
     @commonInputPassword(sendAssetForm, constants.FormField.PASSWORD)

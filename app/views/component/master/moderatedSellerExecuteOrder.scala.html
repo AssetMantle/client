@@ -3,7 +3,7 @@
 
 @(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data] = ModeratedSellerExecuteOrder.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
     @commonForm(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, moderatedSellerExecuteOrderForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
         @commonInputText(moderatedSellerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
         @commonInputInt(moderatedSellerExecuteOrderForm, constants.FormField.GAS)
         @commonInputPassword(moderatedSellerExecuteOrderForm, constants.FormField.PASSWORD)

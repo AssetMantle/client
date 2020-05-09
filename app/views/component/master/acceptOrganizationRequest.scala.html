@@ -5,7 +5,7 @@
 
 @(acceptOrganizationRequestForm: Form[AcceptOrganizationRequest.Data] = AcceptOrganizationRequest.form, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ACCEPT_ORGANIZATION_REQUEST, acceptOrganizationRequestForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonTextInfo(constants.View.NAME, organization.name)
     @commonInputText(acceptOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organization.id, 'readonly -> true)
     @commonInputInt(acceptOrganizationRequestForm, constants.FormField.GAS)

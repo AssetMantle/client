@@ -5,7 +5,7 @@
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div class="signUpForm">
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     <div class="inputField">
         <div class="inputFieldBody">
             <div class="usernameAvailability">

@@ -8,17 +8,17 @@
     @Messages(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL): @organizationID
 </legend>
 <hr>
-<div class="modal-info-block">
+<div class="modalInfoBlock">
 @organizationBankAccountDetail match {
     case Some(organizationBankAccountDetail) => {
-        @commonTextInfo(constants.Form.ACCOUNT_HOLDER_NAME, organizationBankAccountDetail.accountHolder)
-        @commonTextInfo(constants.Form.NICK_NAME, organizationBankAccountDetail.nickName)
-        @commonTextInfo(constants.Form.ACCOUNT_NUMBER, organizationBankAccountDetail.accountNumber)
-        @commonTextInfo(constants.Form.BANK_NAME, organizationBankAccountDetail.bankName)
-        @commonTextInfo(constants.Form.SWIFT_CODE, organizationBankAccountDetail.swiftAddress)
-        @commonTextInfo(constants.Form.ADDRESS, organizationBankAccountDetail.address)
-        @commonTextInfo(constants.Form.COUNTRY, organizationBankAccountDetail.country)
-        @commonTextInfo(constants.Form.ZIP_CODE, organizationBankAccountDetail.zipCode)
+        @commonTextInfo(constants.View.ACCOUNT_HOLDER_NAME, organizationBankAccountDetail.accountHolder)
+        @commonTextInfo(constants.View.NICK_NAME, organizationBankAccountDetail.nickName)
+        @commonTextInfo(constants.View.ACCOUNT_NUMBER, organizationBankAccountDetail.accountNumber)
+        @commonTextInfo(constants.View.BANK_NAME, organizationBankAccountDetail.bankName)
+        @commonTextInfo(constants.View.SWIFT_CODE, organizationBankAccountDetail.swiftAddress)
+        @commonTextInfo(constants.View.ADDRESS, organizationBankAccountDetail.address)
+        @commonTextInfo(constants.View.COUNTRY, organizationBankAccountDetail.country)
+        @commonTextInfo(constants.View.ZIP_CODE, organizationBankAccountDetail.zipCode)
     }
     case _ => {
         @Messages(constants.View.BANK_ACCOUNT_NOT_FOUND)

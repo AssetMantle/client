@@ -1,7 +1,7 @@
 @import "variables.scss";
 
 @media (max-width: 640px) {
-  .page-content {
+  .pageContent {
     margin: 20px;
   }
   .MnemonicQuiz{
@@ -10,7 +10,7 @@
   .banner {
     background-size: contain;
     background-position: center bottom;
-    .banner-text {
+    .bannerText {
       width: 100%;
       h3 {
         font-size: 30px;
@@ -175,13 +175,13 @@
   }
   .modal .modalContent{
     .modalBody {
-      .info-block {
+      .infoBlock {
        flex-direction: column;
         max-width: 500px;
         max-height: 410px;
-        .info-block-item{
+        .infoBlockItem{
           flex: none;
-          .info-block-right{
+          .infoBlockItemRight{
             padding: 0;
             border: none;
 
@@ -200,10 +200,10 @@
       form .formBody {
         max-height: 409px;
       }
-      .info-block-height{
+      .infoBlockHeight{
         max-height: 399px;
       }
-      .info-block {
+      .infoBlock {
         width: 800px;
       }
     }
@@ -213,6 +213,10 @@
       margin-bottom: 15px;
       .cmuk-card{
         height: 265px;
+        .cmuk-switcher{
+          height: 210px;
+          overflow: auto;
+        }
       }
     }
     .financial {
@@ -292,7 +296,7 @@
   }
   .timeline {
     &:before{
-      left: 20px;
+      left: 19px;
     }
     .timeline-item .timeline-icon {
       left: 0px;
@@ -351,7 +355,7 @@
       }
     }
   }
-  .tab-section{
+  .tabSection{
     .cmuk-grid-divider{
       display: block;
     }

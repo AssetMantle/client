@@ -4,7 +4,7 @@
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data] = SetBuyerFeedback.form, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SET_BUYER_FEEDBACK, setBuyerFeedbackForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonInputText(setBuyerFeedbackForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
     @commonInputText(setBuyerFeedbackForm, constants.FormField.PEG_HASH, 'value -> pegHash)
     @commonInputInt(setBuyerFeedbackForm, constants.FormField.RATING)

@@ -5,13 +5,13 @@
 @import views.html.base.commonFormButton
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <legend class="cmuk-legend">
-    @Messages(constants.Form.ORGANIZATION_KYC_FILES)
+    @Messages(constants.View.ORGANIZATION_KYC_FILES)
 </legend>
 <hr>
-<div class="modal-info-block centerText">
+<div class="modalInfoBlock centerText">
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
+            @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
     @for(organizationKYC <- organizationKYCs) {
@@ -20,7 +20,7 @@
         } {
             <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)" target="_blank">@Messages(organizationKYC.documentType)</a>
         } {
-            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages( organizationKYC.documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
+            @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( organizationKYC.documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }

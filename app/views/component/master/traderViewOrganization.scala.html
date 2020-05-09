@@ -4,11 +4,11 @@
 
 @(traderOrganization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.Form.ORGANIZATION_DETAILS, 'cardIconPath -> "images/icons/icons.svg#org-details") {
+@commonCard(constants.View.ORGANIZATION_DETAILS, 'cardIconPath -> "images/icons/icons.svg#org-details") {
 } {
-    @commonTextInfo(constants.Form.ORGANIZATION_NAME, traderOrganization.name)
-    @commonTextInfo(constants.Form.ABBREVIATION, traderOrganization.abbreviation.getOrElse(""))
+    @commonTextInfo(constants.View.ORGANIZATION_NAME, traderOrganization.name)
+    @commonTextInfo(constants.View.ABBREVIATION, traderOrganization.abbreviation.getOrElse(""))
     @commonTextInfo(constants.View.ORGANIZATION_ID, traderOrganization.id)
-    @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, traderOrganization.establishmentDate)
-    @commonBooleanInfo(constants.Form.VERIFIED_STATUS, traderOrganization.verificationStatus)
+    @commonDateInfo(constants.View.ESTABLISHMENT_DATE, traderOrganization.establishmentDate)
+    @commonBooleanInfo(constants.View.VERIFIED_STATUS, traderOrganization.verificationStatus)
 }

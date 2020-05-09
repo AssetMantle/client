@@ -4,7 +4,7 @@
 
 @(sendRelationRequestForm: Form[TraderRelationRequest.Data] = TraderRelationRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.TRADER_RELATION_REQUEST, sendRelationRequestForm) {
-  <div class="modal-info-block">
+  <div class="modalInfoBlock">
   @commonInputText(sendRelationRequestForm, constants.FormField.ACCOUNT_ID)
   </div>
 }

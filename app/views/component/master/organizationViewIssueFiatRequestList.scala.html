@@ -9,7 +9,7 @@
     } {
         @fiatRequestList.map { fiatRequest =>
             @commonVerticalInfoBox() {
-                @commonVerticalTextInfo(constants.Form.REQUEST_ID, fiatRequest.id)
+                @commonVerticalTextInfo(constants.View.REQUEST_ID, fiatRequest.id)
 
                 @traderList.find(_.id == fiatRequest.traderID) match {
                     case Some(trader) => {

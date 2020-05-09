@@ -50,15 +50,19 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
           def zoneAddress(zoneAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
-          def transactionProcess(toAddress: String): Future[String] = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
-            entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
-            blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
-            request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
-            action = transactionsRedeemFiat.Service.post,
-            onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
-            onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
-            updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
-          )
+          def sendTransaction(toAddress: String): Future[String] = {
+            if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
+              transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
+                entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
+                request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
+                action = transactionsRedeemFiat.Service.post,
+                onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
+                onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
+              )
+            } else throw new BaseException(constants.Response.UNAUTHORIZED)
+          }
 
           def createRedeemFiatRequests(traderID: String, ticketID: String): Future[String] = masterTransactionRedeemFiatRequests.Service.create(traderID, ticketID, redeemFiatData.redeemAmount)
 
@@ -66,7 +70,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             trader <- trader
             zoneAccountID <- zoneAccountID(trader.zoneID)
             zoneAddress <- zoneAddress(zoneAccountID)
-            ticketID <- transactionProcess(zoneAddress)
+            ticketID <- sendTransaction(zoneAddress)
             _ <- createRedeemFiatRequests(trader.id, ticketID)
             result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
           } yield result

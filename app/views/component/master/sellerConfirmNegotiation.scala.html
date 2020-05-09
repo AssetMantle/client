@@ -5,7 +5,7 @@
 
 @(sellerConfirmNegotiationForm: Form[ConfirmNegotiation.Data] = ConfirmNegotiation.form, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.SELLER_CONFIRM_NEGOTIATION, sellerConfirmNegotiationForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonInputText(sellerConfirmNegotiationForm, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET_DETAILS)</div>
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)

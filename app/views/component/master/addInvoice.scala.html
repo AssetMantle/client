@@ -5,7 +5,7 @@
 @(addInvoiceForm: Form[AddInvoice.Data] = AddInvoice.form, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.ADD_INVOICE, addInvoiceForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonInputText(addInvoiceForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
     @commonInputText(addInvoiceForm, constants.FormField.INVOICE_NUMBER)
     @commonInputDate(addInvoiceForm, constants.FormField.INVOICE_DATE)

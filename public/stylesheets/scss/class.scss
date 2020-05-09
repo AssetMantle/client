@@ -28,10 +28,6 @@ html, body{
   height: 7px;
 }
 
-//::-webkit-scrollbar-track {
-//  background: #FFFFFF;
-//}
-
 ::-webkit-scrollbar,
 ::-webkit-scrollbar-thumb {
   overflow:visible;
@@ -269,7 +265,7 @@ html, body{
 }
 
 .uploadForm {
-   .modal-info-block{
+   .modalInfoBlock{
      padding: 50px;
    }
   .uploadBox {
@@ -454,6 +450,7 @@ html, body{
     width: 100% !important;
   }
   .buttonForm {
+    border-radius: 0.25rem;
     background:$colorPrimary;
     color: #FFFFFF;
     font-size: $paragraphFontSizeSmall;
@@ -465,7 +462,6 @@ html, body{
   .cmuk-input {
     background: #FFFFFF;
     cursor: auto;
-    color: #272829;
     box-sizing: border-box;
     border-radius: 2px;
     border: 1px solid rgba(5, 60, 117, 0.22);
@@ -475,7 +471,6 @@ html, body{
       font-weight: 300;
       font-size: 15px;
       letter-spacing: 0.01em;
-      color: #272829;
     }
     &:focus {
       color: #272829;
@@ -660,8 +655,8 @@ html, body{
     position: relative;
     button{
       position: absolute;
-      top: 6px;
-      left: 30%;
+      top: 12px;
+      left: 115px;
       font-weight: bold;
     }
   }
@@ -800,7 +795,6 @@ html, body{
       text-align:center;
       .infoRowLabel{
         text-align: left;
-        color:#272829;
         font-weight: bold;
       }
       .infoRowValue{
@@ -825,11 +819,14 @@ html, body{
           .inputField{
             margin-top: 10px;
           }
-          .modal-info-block{
+          .modalInfoBlock{
             padding: 0;
           }
-          .info-block{
+          .infoBlock{
             padding: 0;
+            .cmuk-card-body{
+              padding: 0;
+            }
           }
         }
       }
@@ -852,15 +849,15 @@ form{
 }
 
 
-.info-block-height{
+.infoBlockHeight{
   max-height: 600px;
 }
-.modal-info-block{
+.modalInfoBlock{
   min-width: 500px;
   padding: 20px 60px 60px 60px;
 }
 
-.info-block{
+.infoBlock{
   width: 900px;
   display: flex;
   justify-content: space-between;
@@ -868,12 +865,12 @@ form{
   border-radius: 2px;
   overflow: auto;
   padding: 20px 60px 60px 60px;
-  .info-block-item:first-child{
+  .infoBlockItem:first-child{
     padding-right: 70px;
   }
-  .info-block-item{
+  .infoBlockItem{
     flex:1;
-    .info-block-right{
+    .infoBlockItemRight{
       border-left: 1px solid rgba(5, 60, 117, 0.12);
       padding-left: 70px;
     }
@@ -1071,7 +1068,7 @@ form{
       }
     }
   }
-  .info-success{
+  .infoSuccess{
     padding: 10px 0;
     .icon-success{
       .icon{
@@ -1096,7 +1093,7 @@ form{
   position: relative;
   flex-direction: column;
   text-align: center;
-  .banner-text {
+  .bannerText {
     max-width: 600px;
     padding: 50px 0;
     h3 {
@@ -1152,7 +1149,7 @@ form{
 }
 
 
-.tab-section {
+.tabSection {
   p {
     font-size:$headingFontSizeLarge;
     letter-spacing: 0.01em;
@@ -1334,7 +1331,7 @@ form{
 }
 
 .pageContainer{
-  .page-content{
+  .pageContent{
     padding-top: 10px;
   }
   .middle{
@@ -1471,6 +1468,13 @@ form{
                 font-weight: bold;
               }
             }
+            .modalInfoBlock{
+              min-width: auto;
+              padding: 0;
+              .commonCheckBox dl dd{
+                margin: 0;
+              }
+            }
           }
           hr{
             margin: 15px 0;
@@ -1587,14 +1591,28 @@ form{
   .financial {
     .cmuk-card{
       height: 357px;
+      .cmuk-switcher{
+        height: 300px;
+        overflow: auto;
+      }
+    }
+    .financialCard.cardPaddingRemove {
+      ul li {
+        padding: 10px 0;
+        margin: 0 20px;
+
+        &:first-child {
+          padding-top: 20px;
+        }
+      }
     }
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 10px 0;
+        padding: 15px 0;
         margin: 0 20px;
         &:first-child {
-          padding-top: 20px;
+          padding-top: 25px;
         }
         &:last-child {
           border: 0;
@@ -1770,6 +1788,7 @@ form{
       {
         padding: 5px 10px;
         margin: 0 5px;
+        line-height: 10px;
       }
     }
     .chatMessagesContainer{
@@ -1899,7 +1918,7 @@ header:before,
     width: 0;
     height: 100%;
     border-right:2px dashed #CECECE;
-    left: 30px;
+    left: 29px;
     top: 0;
     position: absolute; }
   .timeline-item {
@@ -2732,16 +2751,12 @@ figure.zoom {
       color: #4B4B4B;
       font-weight: bold;
     }
-    .cmuk-button-link{
-      color: $colorPrimary;
-      border: 1.65px solid $colorPrimary;
-      box-sizing: border-box;
-      border-radius: 2px;
-      padding: 5px;
-    &:hover{
-      color: #FFFFFF;
-      background: $colorPrimary;
-    }
+    .cmuk-button{
+      line-height: 38px;
+      &:hover{
+        color: #FFFFFF;
+        background: $colorPrimary;
+      }
     }
   }
 }

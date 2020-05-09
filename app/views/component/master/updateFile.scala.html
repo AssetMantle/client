@@ -5,14 +5,14 @@
 @(uploadRoute:String, updateRoute:String, documentType: String, id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="uploadForm">
 @CSRF.formField
-<div class="modal-info-block">
+<div class="modalInfoBlock">
 <div id="updateSelector" class="centerText uploadBox">
     <span class="uploadIcon" cmuk-icon="cloud-upload"></span>
     <div class="dropBox">
-        <p class="centerText"><small>@Messages(constants.Form.DROP_FILE)</small></p>
+        <p class="centerText"><small>@Messages(constants.View.DROP_FILE)</small></p>
     </div>
-    <p class="centerText"><small>@Messages(constants.Form.OR)</small></p>
-    <button type="button" class="cmuk-button cmuk-button-primary" id="browseUpdateButton">@Messages(constants.Form.BROWSE)</button>
+    <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
+    <button type="button" class="cmuk-button cmuk-button-primary" id="browseUpdateButton">@Messages(constants.View.BROWSE)</button>
 </div>
 
 <div id="updater" class="hidden centerText">
@@ -22,7 +22,7 @@
         <div class="progressContainer">
             <div class="progressBar" id="fileUpdateProgressBar"></div>
         </div>
-        <button type="button" class="cmuk-button cmuk-button-primary" id="updateButton" >@Messages(constants.Form.UPDATE)</button>
+        <button type="button" class="cmuk-button cmuk-button-primary" id="updateButton" >@Messages(constants.View.UPDATE)</button>
     </div>
 </div>
 

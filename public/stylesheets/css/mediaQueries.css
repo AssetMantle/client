@@ -1,5 +1,5 @@
 @media (max-width: 640px) {
-  .page-content {
+  .pageContent {
     margin: 20px; }
 
   .MnemonicQuiz {
@@ -8,9 +8,9 @@
   .banner {
     background-size: contain;
     background-position: center bottom; }
-    .banner .banner-text {
+    .banner .bannerText {
       width: 100%; }
-      .banner .banner-text h3 {
+      .banner .bannerText h3 {
         font-size: 30px; }
 
   .mobile .cmuk-offcanvas-bar {
@@ -123,13 +123,13 @@
     .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
       width: 100%; }
 
-  .modal .modalContent .modalBody .info-block {
+  .modal .modalContent .modalBody .infoBlock {
     flex-direction: column;
     max-width: 500px;
     max-height: 410px; }
-    .modal .modalContent .modalBody .info-block .info-block-item {
+    .modal .modalContent .modalBody .infoBlock .infoBlockItem {
       flex: none; }
-      .modal .modalContent .modalBody .info-block .info-block-item .info-block-right {
+      .modal .modalContent .modalBody .infoBlock .infoBlockItem .infoBlockItemRight {
         padding: 0;
         border: none; } }
 @media (min-width: 992px) and (max-width: 1600px) {
@@ -138,15 +138,18 @@
     max-height: 530px; }
     .modal .modalContent .modalBody form .formBody {
       max-height: 409px; }
-    .modal .modalContent .modalBody .info-block-height {
+    .modal .modalContent .modalBody .infoBlockHeight {
       max-height: 399px; }
-    .modal .modalContent .modalBody .info-block {
+    .modal .modalContent .modalBody .infoBlock {
       width: 800px; }
 
   .leftContainer .financial {
     margin-bottom: 15px; }
     .leftContainer .financial .cmuk-card {
       height: 265px; }
+      .leftContainer .financial .cmuk-card .cmuk-switcher {
+        height: 210px;
+        overflow: auto; }
   .leftContainer .financial .cmuk-switcher ul li {
     padding: 10px 0; }
   .leftContainer .addBalanceButton {
@@ -192,7 +195,7 @@
     height: 170px; }
 
   .timeline:before {
-    left: 20px; }
+    left: 19px; }
   .timeline .timeline-item .timeline-icon {
     left: 0px; }
 
@@ -228,12 +231,12 @@
   .cmuk-card-body .cmuk-subnav li a {
     text-transform: capitalize; }
 
-  .tab-section .cmuk-grid-divider {
+  .tabSection .cmuk-grid-divider {
     display: block; }
-  .tab-section .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin {
+  .tabSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin {
     margin: 10px 0px 0px 0px; }
-  .tab-section .cmuk-grid-divider > :not(.cmuk-first-column)::before,
-  .tab-section .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
+  .tabSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
+  .tabSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
     border: none; }
 
   .mobileNumberUpdate .countryCode {

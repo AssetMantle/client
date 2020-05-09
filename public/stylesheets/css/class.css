@@ -217,7 +217,7 @@ html, body {
   width: 70px;
   height: 70px; }
 
-.uploadForm .modal-info-block {
+.uploadForm .modalInfoBlock {
   padding: 50px; }
 .uploadForm .uploadBox .dropBox p {
   font-size: 1rem; }
@@ -357,6 +357,7 @@ html, body {
 .comdex .cmuk-sticky-fixed {
   width: 100% !important; }
 .comdex .buttonForm {
+  border-radius: 0.25rem;
   background: #0862BE;
   color: #FFFFFF;
   font-size: 0.875rem;
@@ -366,7 +367,6 @@ html, body {
 .comdex .cmuk-input {
   background: #FFFFFF;
   cursor: auto;
-  color: #272829;
   box-sizing: border-box;
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
@@ -375,8 +375,7 @@ html, body {
     font-style: normal;
     font-weight: 300;
     font-size: 15px;
-    letter-spacing: 0.01em;
-    color: #272829; }
+    letter-spacing: 0.01em; }
   .comdex .cmuk-input:focus {
     color: #272829;
     border: 1px solid #0862BE; }
@@ -510,8 +509,8 @@ html, body {
   position: relative; }
   .comdex .updateDocumentField button {
     position: absolute;
-    top: 6px;
-    left: 30%;
+    top: 12px;
+    left: 115px;
     font-weight: bold; }
 
 .header {
@@ -622,7 +621,6 @@ html, body {
       text-align: center; }
       .modal .modalContent .modalBody .infoRowLabel {
         text-align: left;
-        color: #272829;
         font-weight: bold; }
       .modal .modalContent .modalBody .infoRowValue {
         text-align: right; }
@@ -640,10 +638,12 @@ html, body {
         overflow: auto; }
         .modal .modalContent .modalBody form .formBody .inputField {
           margin-top: 10px; }
-        .modal .modalContent .modalBody form .formBody .modal-info-block {
+        .modal .modalContent .modalBody form .formBody .modalInfoBlock {
           padding: 0; }
-        .modal .modalContent .modalBody form .formBody .info-block {
+        .modal .modalContent .modalBody form .formBody .infoBlock {
           padding: 0; }
+          .modal .modalContent .modalBody form .formBody .infoBlock .cmuk-card-body {
+            padding: 0; }
       .modal .modalContent .modalBody .documentItem form {
         width: auto; }
       .modal .modalContent .modalBody .documentItem .infoRowLabel {
@@ -652,14 +652,14 @@ html, body {
 form .formBody {
   padding: 20px 60px 60px 60px; }
 
-.info-block-height {
+.infoBlockHeight {
   max-height: 600px; }
 
-.modal-info-block {
+.modalInfoBlock {
   min-width: 500px;
   padding: 20px 60px 60px 60px; }
 
-.info-block {
+.infoBlock {
   width: 900px;
   display: flex;
   justify-content: space-between;
@@ -667,14 +667,14 @@ form .formBody {
   border-radius: 2px;
   overflow: auto;
   padding: 20px 60px 60px 60px; }
-  .info-block .info-block-item:first-child {
+  .infoBlock .infoBlockItem:first-child {
     padding-right: 70px; }
-  .info-block .info-block-item {
+  .infoBlock .infoBlockItem {
     flex: 1; }
-    .info-block .info-block-item .info-block-right {
+    .infoBlock .infoBlockItem .infoBlockItemRight {
       border-left: 1px solid rgba(5, 60, 117, 0.12);
       padding-left: 70px; }
-  .info-block .infoRow {
+  .infoBlock .infoRow {
     line-height: 2.4; }
 
 .loginForm .formBody .inputField {
@@ -808,14 +808,14 @@ form .formBody {
     .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon .icon {
       width: 20px;
       height: 20px; }
-.MnemonicQuiz .info-success {
+.MnemonicQuiz .infoSuccess {
   padding: 10px 0; }
-  .MnemonicQuiz .info-success .icon-success .icon {
+  .MnemonicQuiz .infoSuccess .icon-success .icon {
     width: 25px;
     height: 25px;
     fill: #0F9C0C;
     margin-bottom: 5px; }
-  .MnemonicQuiz .info-success p {
+  .MnemonicQuiz .infoSuccess p {
     margin: 0;
     font-size: 1.25rem;
     color: #0F9C0C; }
@@ -826,15 +826,15 @@ form .formBody {
   position: relative;
   flex-direction: column;
   text-align: center; }
-  .banner .banner-text {
+  .banner .bannerText {
     max-width: 600px;
     padding: 50px 0; }
-    .banner .banner-text h3 {
+    .banner .bannerText h3 {
       margin: 0;
       font-size: 45px;
       font-weight: normal;
       color: #FFFFFF; }
-    .banner .banner-text p {
+    .banner .bannerText p {
       font-size: 1.25rem;
       line-height: 172%;
       letter-spacing: 0.01em;
@@ -868,29 +868,29 @@ form .formBody {
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C; }
 
-.tab-section p {
+.tabSection p {
   font-size: 1.625rem;
   letter-spacing: 0.01em;
   color: #000000;
   margin-bottom: 40px; }
-.tab-section .cmuk-subnav-pill {
+.tabSection .cmuk-subnav-pill {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   border-radius: 5px; }
-  .tab-section .cmuk-subnav-pill li:first-child a {
+  .tabSection .cmuk-subnav-pill li:first-child a {
     border-radius: 5px 5px 0 0; }
-  .tab-section .cmuk-subnav-pill li:nth-child(2) {
+  .tabSection .cmuk-subnav-pill li:nth-child(2) {
     border-top: 1px solid #e7eaf3;
     border-bottom: 1px solid #e7eaf3; }
-  .tab-section .cmuk-subnav-pill li:last-child a {
+  .tabSection .cmuk-subnav-pill li:last-child a {
     border-radius: 0 0 5px 5px; }
-  .tab-section .cmuk-subnav-pill li a {
+  .tabSection .cmuk-subnav-pill li a {
     background-color: #FAFBFD;
     padding: 15px 20px;
     font-size: 1.125rem;
     text-transform: capitalize;
     color: #0862BE;
     font-weight: bold; }
-    .tab-section .cmuk-subnav-pill li a:before {
+    .tabSection .cmuk-subnav-pill li a:before {
       content: "";
       width: 1.4em;
       height: 1.4em;
@@ -899,17 +899,17 @@ form .formBody {
       float: right;
       background: url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
       padding-left: 25px; }
-.tab-section .cmuk-subnav-pill > .cmuk-active > a {
+.tabSection .cmuk-subnav-pill > .cmuk-active > a {
   background: #053C75;
   color: #FFFFFF; }
-  .tab-section .cmuk-subnav-pill > .cmuk-active > a:before {
+  .tabSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
-.tab-section .cmuk-switcher li {
+.tabSection .cmuk-switcher li {
   font-size: 1.125rem;
   color: #365575;
   letter-spacing: 0.01em;
   line-height: 1.8; }
-  .tab-section .cmuk-switcher li div > div {
+  .tabSection .cmuk-switcher li div > div {
     text-align: justify; }
 
 .left {
@@ -1005,7 +1005,7 @@ form .formBody {
   margin-right: 15px;
   justify-content: center; }
 
-.pageContainer .page-content {
+.pageContainer .pageContent {
   padding-top: 10px; }
 .pageContainer .middle {
   margin-bottom: 10px; }
@@ -1111,6 +1111,11 @@ form .formBody {
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms .infoRowValue {
         color: #061728;
         font-weight: bold; }
+    .pageContainer .middle .mainTabs .tradeTerms .terms .term .modalInfoBlock {
+      min-width: auto;
+      padding: 0; }
+      .pageContainer .middle .mainTabs .tradeTerms .terms .term .modalInfoBlock .commonCheckBox dl dd {
+        margin: 0; }
   .pageContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
@@ -1192,12 +1197,20 @@ form .formBody {
       margin-right: 3px; }
 .leftContainer .financial .cmuk-card {
   height: 357px; }
-.leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
-  justify-content: space-between;
+  .leftContainer .financial .cmuk-card .cmuk-switcher {
+    height: 300px;
+    overflow: auto; }
+.leftContainer .financial .financialCard.cardPaddingRemove ul li {
   padding: 10px 0;
   margin: 0 20px; }
-  .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
+  .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
     padding-top: 20px; }
+.leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
+  justify-content: space-between;
+  padding: 15px 0;
+  margin: 0 20px; }
+  .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
+    padding-top: 25px; }
   .leftContainer .financial .cmuk-switcher ul li:last-child, .leftContainer .financial .financialCard ul li:last-child {
     border: 0; }
   .leftContainer .financial .cmuk-switcher ul li .wallet, .leftContainer .financial .financialCard ul li .wallet {
@@ -1304,7 +1317,8 @@ form .formBody {
     padding: 5px 0; }
     .rightContainer .chatRoom .cmuk-card-body .chatList button {
       padding: 5px 10px;
-      margin: 0 5px; }
+      margin: 0 5px;
+      line-height: 10px; }
   .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
     height: 250px;
     overflow: auto; }
@@ -1406,7 +1420,7 @@ header:before,
     width: 0;
     height: 100%;
     border-right: 2px dashed #CECECE;
-    left: 30px;
+    left: 29px;
     top: 0;
     position: absolute; }
   .timeline .timeline-item {
@@ -2036,13 +2050,9 @@ figure.zoom {
     margin: 0;
     color: #4B4B4B;
     font-weight: bold; }
-  .salesQuoteCard .salesQuoteCardRight .cmuk-button-link {
-    color: #0862BE;
-    border: 1.65px solid #0862BE;
-    box-sizing: border-box;
-    border-radius: 2px;
-    padding: 5px; }
-    .salesQuoteCard .salesQuoteCardRight .cmuk-button-link:hover {
+  .salesQuoteCard .salesQuoteCardRight .cmuk-button {
+    line-height: 38px; }
+    .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
       color: #FFFFFF;
       background: #0862BE; }
 

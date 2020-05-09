@@ -204,7 +204,7 @@ class SetACLs @Inject()(
 
       def getTrader(accountID: String): Future[Trader] = masterTraders.Service.tryGetByAccountID(accountID)
 
-      def getAcl(aclHash: String): Future[ACL] = blockchainAclHashes.Service.getACL(aclHash)
+      def getAcl(aclHash: String): Future[ACL] = blockchainAclHashes.Service.tryGetACL(aclHash)
 
       def aclAccountInsertOrUpdate(setACL: SetACL, acl: ACL): Future[Int] = blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, acl, dirtyBit = true)
 

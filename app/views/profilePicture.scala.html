@@ -8,17 +8,17 @@
             <span cmuk-icon="icon: user; ratio: 10" class="profilePicture"></span>
             <div class="cmuk-transition-slide-bottom cmuk-overlay-primary cmuk-position-bottom cmuk-overlay-default cmuk-text-center">
                 <p class="cmuk-h4 cmuk-margin-remove">
-                    @commonModalButton(constants.Form.UPLOAD,routes.javascript.FileController.uploadAccountFileForm,'parameters -> s"'${constants.File.Account.PROFILE_PICTURE}'",'class ->"cmuk-button-link")
+                    @commonModalButton(constants.View.UPLOAD,routes.javascript.FileController.uploadAccountFileForm,'parameters -> s"'${constants.File.Account.PROFILE_PICTURE}'",'class ->"cmuk-button-link")
                 </p>
             </div>
         </div>
 
     } else {
         <div class="cmuk-inline-clip cmuk-transition-toggle profilePictureContainer  cmuk-animation-fade" tabindex="0">
-            <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
+            <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.View.PROFILE_PICTURE">
             <div class="cmuk-transition-slide-bottom cmuk-position-bottom cmuk-overlay-default cmuk-text-center">
                 <p class="cmuk-h4 cmuk-margin-remove">
-                    @commonModalButton(constants.Form.UPDATE,routes.javascript.FileController.uploadAccountFileForm,'parameters -> s"'${constants.File.Account.PROFILE_PICTURE}'",'class ->"cmuk-button-link")
+                    @commonModalButton(constants.View.UPDATE,routes.javascript.FileController.uploadAccountFileForm,'parameters -> s"'${constants.File.Account.PROFILE_PICTURE}'",'class ->"cmuk-button-link")
                 </p>
             </div>
         </div>

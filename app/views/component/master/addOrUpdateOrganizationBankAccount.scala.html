@@ -4,7 +4,7 @@
 
 @(addOrUpdateOrganizationBankAccountForm: Form[AddOrUpdateOrganizationBankAccount.Data] = AddOrUpdateOrganizationBankAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.ADD_OR_UPDATE_ORGANIZATION_BANK_ACCOUNT, addOrUpdateOrganizationBankAccountForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     @commonInputText(addOrUpdateOrganizationBankAccountForm, constants.FormField.ACCOUNT_HOLDER_NAME)
     @commonInputText(addOrUpdateOrganizationBankAccountForm, constants.FormField.NICK_NAME)
     @commonInputText(addOrUpdateOrganizationBankAccountForm, constants.FormField.ACCOUNT_NUMBER)

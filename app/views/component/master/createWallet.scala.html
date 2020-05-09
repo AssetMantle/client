@@ -7,7 +7,7 @@
     @commonForm(constants.Form.CREATE_WALLET, createWalletForm) {
         @commonInputText(createWalletForm, constants.FormField.USERNAME, 'containerDivClass -> "hidden", 'value -> username, 'readonly -> true)
         @commonInputText(createWalletForm, constants.FormField.MNEMONICS, 'value -> mnemonics.mkString(" "), 'containerDivClass -> "hidden", 'readonly -> true)
-        <div class="info-success">
+        <div class="infoSuccess">
             <p><span class="icon-success">@commonIcon("success")</span> @Messages(constants.View.MNEMONIC_SUCCESS_MESSAGE)</p>
         </div>
         <div class="cmuk-flex verifyMnemonic">

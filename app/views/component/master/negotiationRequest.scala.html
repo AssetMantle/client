@@ -8,7 +8,7 @@
 @(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
-    <div class="modal-info-block">
+    <div class="modalInfoBlock">
     <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
     <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">

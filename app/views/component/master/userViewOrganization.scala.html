@@ -8,27 +8,27 @@
 @import views.html.component.master.streetAddress
 @(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-    <div class="info-block-item">
+    <div class="infoBlockItem">
     @commonInfoBox() {
-        <div class="title cmuk-text-left"> <span>@Messages(constants.Form.ZONE_DETAILS)</span></div>
+        <div class="title cmuk-text-left"> <span>@Messages(constants.View.ZONE_DETAILS)</span></div>
         @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
-        @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
-        @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+        @commonTextInfo(constants.View.CURRENCY, organizationZone.currency)
+        @commonTextInfo(constants.View.ZONE_ID, organizationZone.id)
     }
     @commonInfoBox() {
-        <div class="title cmuk-text-left"> <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
-        @commonTextInfo(constants.Form.ORGANIZATION_NAME, organization.name)
-        @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
+        <div class="title cmuk-text-left"> <span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
+        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+        @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
         @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
-        @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
-        @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+        @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
+        @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
     }
     @commonInfoBox() {
         <div class="title cmuk-text-left">@Messages(constants.View.REGISTERED_ADDRESS)</div>
         @streetAddress(organization.registeredAddress)
     }
     </div>
-    <div class="info-block-item">
+    <div class="infoBlockItem">
     @commonInfoBox() {
         <div class="title cmuk-text-left">@Messages(constants.View.POSTAL_ADDRESS)</div>
         @streetAddress(organization.postalAddress)

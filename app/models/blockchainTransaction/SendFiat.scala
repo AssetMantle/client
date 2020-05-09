@@ -44,7 +44,7 @@ class SendFiats @Inject()(
                            blockchainAccounts: blockchain.Accounts,
                            masterNegotiations: master.Negotiations,
                            masterOrders: master.Orders,
-                           masterTransactionSendFiatRequests : masterTransaction.SendFiatRequests,
+                           masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
@@ -234,21 +234,16 @@ class SendFiats @Inject()(
 
       def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation, amountSent: Int): Future[Unit] = {
         def status(fiatsInOrder: Int, assetSent: Boolean): String = {
-          if (fiatsInOrder >= negotiation.price && assetSent) {
-            constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
-          } else if (fiatsInOrder >= negotiation.price && !assetSent){
-            constants.Status.Order.FIAT_SENT_ASSET_PENDING
-          }else if (fiatsInOrder < negotiation.price && assetSent){
-            constants.Status.Order.ASSET_SENT_FIAT_PENDING
-          }else {
-            constants.Status.Order.ASSET_AND_FIAT_PENDING
-          }
+          if (fiatsInOrder >= negotiation.price && assetSent) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+          else if (fiatsInOrder >= negotiation.price && !assetSent) constants.Status.Order.FIAT_SENT_ASSET_PENDING
+          else if (fiatsInOrder < negotiation.price && assetSent) constants.Status.Order.ASSET_SENT_FIAT_PENDING
+          else constants.Status.Order.ASSET_AND_FIAT_PENDING
         }
 
         if (!orderExists) {
           val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
 
-          def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = status(amountSent, false)))
+          def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = status(amountSent, false)))
 
           for {
             _ <- bcOrderCreate
@@ -258,8 +253,10 @@ class SendFiats @Inject()(
         } else {
           val assetSent = masterAssets.Service.tryGetStatus(negotiation.assetID)
           val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
-          def masterOrderUpdate(fiatsInOrder:Int, assetSent: String): Future[Int] =  masterOrders.Service.update(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = status(fiatsInOrder, assetSent == constants.Status.Asset.IN_ORDER)))
-          for{
+
+          def masterOrderUpdate(fiatsInOrder: Int, assetSent: String): Future[Int] = masterOrders.Service.update(masterOrder(id = negotiation.id, orderID = negotiationID, status = status(fiatsInOrder, assetSent == constants.Status.Asset.IN_ORDER)))
+
+          for {
             assetSent <- assetSent
             fiatsInOrder <- fiatsInOrder
             _ <- masterOrderUpdate(fiatsInOrder, assetSent)
