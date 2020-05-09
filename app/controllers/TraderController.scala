@@ -126,18 +126,10 @@ class TraderController @Inject()(
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
-          def create(fromTrader: Trader, toTrader: Trader): Future[String] = if (toTrader.status.getOrElse(false) && fromTrader.organizationID != toTrader.organizationID) {
-            masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
-          } else {
-            if (fromTrader.organizationID == toTrader.organizationID) {
-              throw new BaseException(constants.Response.COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION)
-            }
-            throw new BaseException(constants.Response.UNVERIFIED_TRADER)
-          }
-
-          def getResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization): Future[Result] = {
-            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFUL)))
-          }
+          def create(fromTrader: Trader, toTrader: Trader): Future[String] =
+            if (fromTrader.organizationID == toTrader.organizationID) throw new BaseException(constants.Response.COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION)
+            else if (toTrader.status.getOrElse(false)) masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
+            else throw new BaseException(constants.Response.UNVERIFIED_TRADER)
 
           (for {
             fromTrader <- getTrader(loginState.username)
@@ -149,7 +141,7 @@ class TraderController @Inject()(
             _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_SENT, toTrader.name, toTraderOrganization.name)
             _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
             _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.name, fromTraderOrganization.name)
-            result <- getResult(fromTrader = fromTrader, fromTraderOrganization = fromTraderOrganization, toTrader = toTrader, toTraderOrganization = toTraderOrganization)
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFUL)))
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }

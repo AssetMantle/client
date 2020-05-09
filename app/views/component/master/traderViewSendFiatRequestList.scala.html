@@ -6,9 +6,9 @@
 
 @sendFiatRequests.map { sendFiatRequest =>
     @commonVerticalInfoBox() {
-        @commonVerticalTextInfo(constants.Form.ID, sendFiatRequest.id)
-        @commonVerticalTextInfo(constants.Form.NEGOTIATION_ID, sendFiatRequest.negotiationID)
-        @commonVerticalIntInfo(constants.Form.AMOUNT, sendFiatRequest.amount)
+        @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
+        @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, sendFiatRequest.negotiationID)
+        @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
         @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
     }
 }

@@ -15,9 +15,9 @@ import scala.util.{Failure, Success}
 
 case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[RedeemFiatRequest] {
 
-def createLog()(implicit node: Node): RedeemFiatRequest = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
+  def createLog()(implicit node: Node): RedeemFiatRequest = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
 
-def updateLog()(implicit node: Node): RedeemFiatRequest = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
+  def updateLog()(implicit node: Node): RedeemFiatRequest = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -30,15 +30,15 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
   private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
-  private[models] val redeemFiatTable = TableQuery[RedeemFiatTable]
+  private[models] val redeemFiatRequestTable = TableQuery[RedeemFiatRequestTable]
 
-  private def add(redeemFiat: RedeemFiatRequest): Future[String] = db.run((redeemFiatTable returning redeemFiatTable.map(_.id) += redeemFiat.createLog()).asTry).map {
+  private def add(redeemFiatRequest: RedeemFiatRequest): Future[String] = db.run((redeemFiatRequestTable returning redeemFiatRequestTable.map(_.id) += redeemFiatRequest.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +46,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def findByID(id: String): Future[RedeemFiatRequest] = db.run(redeemFiatTable.filter(_.id === id).result.head.asTry).map {
+  private def findByID(id: String): Future[RedeemFiatRequest] = db.run(redeemFiatRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -54,11 +54,11 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
+  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatRequestTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
 
-  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatTable.filter(_.traderID === traderID).filter(_.status === status).result)
+  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatRequestTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
-  private def update(redeemFiat: RedeemFiatRequest): Future[Int] = db.run(redeemFiatTable.update(redeemFiat.updateLog()).asTry).map {
+  private def update(redeemFiatRequest: RedeemFiatRequest): Future[Int] = db.run(redeemFiatRequestTable.update(redeemFiatRequest.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -66,17 +66,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusByTicketIDAndStatus(ticketID: String, statusPrecondition: String, status: String): Future[Int] = db.run(redeemFiatTable.filter(_.ticketID === ticketID).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusByIDAndStatus(id: String, statusPrecondition: String, status: String): Future[Int] = db.run(redeemFiatTable.filter(_.id === id).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
+  private def updateStatusByTicketIDAndStatus(ticketID: String, statusPrecondition: String, status: String): Future[Int] = db.run(redeemFiatRequestTable.filter(_.ticketID === ticketID).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -86,7 +76,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def deleteByID(id: String): Future[Int] = db.run(redeemFiatTable.filter(_.id === id).delete.asTry).map {
+  private def updateStatusByIDAndStatus(id: String, statusPrecondition: String, status: String): Future[Int] = db.run(redeemFiatRequestTable.filter(_.id === id).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -96,7 +86,17 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private[models] class RedeemFiatTable(tag: Tag) extends Table[RedeemFiatRequest](tag, "RedeemFiatRequest") {
+  private def deleteByID(id: String): Future[Int] = db.run(redeemFiatRequestTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private[models] class RedeemFiatRequestTable(tag: Tag) extends Table[RedeemFiatRequest](tag, "RedeemFiatRequest") {
 
     def * = (id, traderID, ticketID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedeemFiatRequest.tupled, RedeemFiatRequest.unapply)
 

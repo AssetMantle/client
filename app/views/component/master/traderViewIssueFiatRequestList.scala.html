@@ -13,7 +13,7 @@
     }{
         @fiatRequestList.map{fiatRequest=>
             @commonVerticalInfoBox() {
-                @commonTextInfo(constants.Form.REQUEST_ID,fiatRequest.id)
+                @commonTextInfo(constants.View.REQUEST_ID,fiatRequest.id)
                 @commonIntInfo(constants.View.AMOUNT_REQUESTED,fiatRequest.transactionAmount)
                 @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED){
                     @commonTextInfo(constants.View.STATUS,fiatRequest.status)

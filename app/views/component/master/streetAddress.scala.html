@@ -3,10 +3,10 @@
 
 @(address: Address)(implicit messagesProvider: MessagesProvider)
 
-@commonTextInfo(constants.FormField.ADDRESS_LINE_1.name, address.addressLine1)
-@commonTextInfo(constants.FormField.ADDRESS_LINE_2.name, address.addressLine2)
-@commonTextInfo(constants.FormField.LANDMARK.name, address.landmark.getOrElse(""))
-@commonTextInfo(constants.FormField.CITY.name, address.city)
-@commonTextInfo(constants.FormField.COUNTRY.name, address.country)
-@commonTextInfo(constants.FormField.ZIP_CODE.name, address.zipCode)
-@commonTextInfo(constants.Form.PHONE, address.phone)
+@commonTextInfo(constants.View.ADDRESS_LINE_1, address.addressLine1)
+@commonTextInfo(constants.View.ADDRESS_LINE_2, address.addressLine2)
+@commonTextInfo(constants.View.LANDMARK, address.landmark.getOrElse(""))
+@commonTextInfo(constants.View.CITY, address.city)
+@commonTextInfo(constants.View.COUNTRY, address.country)
+@commonTextInfo(constants.View.ZIP_CODE, address.zipCode)
+@commonTextInfo(constants.View.MOBILE_NUMBER, address.phone)

@@ -23,7 +23,7 @@ case class SendFiatRequest(id: String, traderID: String, ticketID: String, negot
 }
 
 @Singleton
-class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_SEND_FIAT_REQUEST
 
@@ -31,15 +31,15 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
   private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
-  private[models] val sendFiatTable = TableQuery[SendFiatTable]
+  private[models] val sendFiatRequestTable = TableQuery[SendFiatRequestTable]
 
-  private def add(sendFiat: SendFiatRequest): Future[String] = db.run((sendFiatTable returning sendFiatTable.map(_.id) += sendFiat.createLog()).asTry).map {
+  private def add(sendFiatRequest: SendFiatRequest): Future[String] = db.run((sendFiatRequestTable returning sendFiatRequestTable.map(_.id) += sendFiatRequest.createLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -47,7 +47,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def findByID(id: String): Future[SendFiatRequest] = db.run(sendFiatTable.filter(_.id === id).result.head.asTry).map {
+  private def findByID(id: String): Future[SendFiatRequest] = db.run(sendFiatRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -55,15 +55,15 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequest]] = db.run(sendFiatTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
+  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequest]] = db.run(sendFiatRequestTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
 
-  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequest]] = db.run(sendFiatTable.filter(_.traderID === traderID).filter(_.status === status).result)
+  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequest]] = db.run(sendFiatRequestTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
-  private def getAmountByNegotiationIDAndStatuses(negotiationID: String, statuses: Seq[String]):Future[Int] = db.run(sendFiatTable.filter(_.negotiationID === negotiationID).filter(_.status inSet statuses).map(_.amount).sum.getOrElse(0).result)
+  private def getAmountByNegotiationIDAndStatuses(negotiationID: String, statuses: Seq[String]): Future[Int] = db.run(sendFiatRequestTable.filter(_.negotiationID === negotiationID).filter(_.status inSet statuses).map(_.amount).sum.getOrElse(0).result)
 
-  private def getByNegotiationIDsAndStatuses(negotiationIDs: Seq[String], statuses: Seq[String]): Future[Seq[SendFiatRequest]] = db.run(sendFiatTable.filter(_.negotiationID inSet negotiationIDs).filter(_.status inSet statuses).result)
+  private def getByNegotiationIDsAndStatuses(negotiationIDs: Seq[String], statuses: Seq[String]): Future[Seq[SendFiatRequest]] = db.run(sendFiatRequestTable.filter(_.negotiationID inSet negotiationIDs).filter(_.status inSet statuses).result)
 
-  private def update(sendFiat: SendFiatRequest): Future[Int] = db.run(sendFiatTable.update(sendFiat.updateLog()).asTry).map {
+  private def update(sendFiatRequest: SendFiatRequest): Future[Int] = db.run(sendFiatRequestTable.update(sendFiatRequest.updateLog()).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -71,17 +71,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def updateStatusByTicketIDAndStatus(ticketID: String, statusPrecondition: String, status: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusByIDAndStatus(id: String, statusPrecondition: String, status: String): Future[Int] = db.run(sendFiatTable.filter(_.id === id).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
+  private def updateStatusByTicketIDAndStatus(ticketID: String, statusPrecondition: String, status: String): Future[Int] = db.run(sendFiatRequestTable.filter(_.ticketID === ticketID).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -91,7 +81,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def deleteByID(id: String): Future[Int] = db.run(sendFiatTable.filter(_.id === id).delete.asTry).map {
+  private def updateStatusByIDAndStatus(id: String, statusPrecondition: String, status: String): Future[Int] = db.run(sendFiatRequestTable.filter(_.id === id).filter(_.status === statusPrecondition).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -101,7 +91,17 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private[models] class SendFiatTable(tag: Tag) extends Table[SendFiatRequest](tag, "SendFiatRequest") {
+  private def deleteByID(id: String): Future[Int] = db.run(sendFiatRequestTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private[models] class SendFiatRequestTable(tag: Tag) extends Table[SendFiatRequest](tag, "SendFiatRequest") {
 
     def * = (id, traderID, ticketID, negotiationID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendFiatRequest.tupled, SendFiatRequest.unapply)
 
@@ -133,9 +133,9 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
   object Service {
     def create(traderID: String, ticketID: String, negotiationID: String, amount: Int): Future[String] = add(SendFiatRequest(id = utilities.IDGenerator.requestID(), traderID, ticketID, negotiationID, amount, status = constants.Status.SendFiat.AWAITING_BLOCKCHAIN_RESPONSE))
 
-    def getFiatsInOrder(negotiationID: String):Future[Int] = getAmountByNegotiationIDAndStatuses(negotiationID, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT))
+    def getFiatsInOrder(negotiationID: String): Future[Int] = getAmountByNegotiationIDAndStatuses(negotiationID, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT))
 
-    def getFiatRequestsInOrders(negotiationIDs: Seq[String]):Future[Seq[SendFiatRequest]] = getByNegotiationIDsAndStatuses(negotiationIDs, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT))
+    def getFiatRequestsInOrders(negotiationIDs: Seq[String]): Future[Seq[SendFiatRequest]] = getByNegotiationIDsAndStatuses(negotiationIDs, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT))
 
     def getPendingSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.BLOCKCHAIN_SUCCESS)
 

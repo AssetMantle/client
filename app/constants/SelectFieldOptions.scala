@@ -4,8 +4,8 @@ object SelectFieldOptions {
   val ASSET_TYPES: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
   val DELIVERY_TERMS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val COUNTRIES: Seq[String] = Seq("INDIA", "BHUTAN", "NEPAL", "PAKISTAN", "BANGLADESH", "SRI LANKA", "CHINA")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq(constants.Form.COMDEX, "BANK", "TRUST")
-  val PAYMENT_TERMS: Seq[String] = Seq(constants.Form.ONLY_SUPPLIER, constants.Form.ONLY_BUYER, constants.Form.BOTH_PARTIES)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq(constants.View.COMDEX, "BANK", "TRUST")
+  val PAYMENT_TERMS: Seq[String] = Seq(constants.View.ONLY_SUPPLIER, constants.View.ONLY_BUYER, constants.View.BOTH_PARTIES)
   val MODE: Seq[String] = Seq("async", "sync", "block")
   val REFERENCE_DATES: Seq[String] = Seq("INVOICE_DATE", "SHIPPING_DATE")
 

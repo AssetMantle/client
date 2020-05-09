@@ -6,9 +6,9 @@
 
 <div>
     @commonTextInfo(constants.View.NAME, Seq(identification.firstName, identification.lastName).mkString(" "))
-    @commonDateInfo(constants.Form.DATE_OF_BIRTH, identification.dateOfBirth)
-    @commonTextInfo(constants.Form.ID_NUMBER, identification.idNumber)
-    @commonTextInfo(constants.Form.ID_TYPE, identification.idType)
+    @commonDateInfo(constants.View.DATE_OF_BIRTH, identification.dateOfBirth)
+    @commonTextInfo(constants.View.ID_NUMBER, identification.idNumber)
+    @commonTextInfo(constants.View.ID_TYPE, identification.idType)
     @commonBooleanInfo(constants.View.STATUS, identification.verificationStatus)
     @component.master.streetAddress(identification.address)
 </div>

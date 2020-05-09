@@ -8,16 +8,16 @@
 @import views.html.component.master.streetAddress
 @(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.Form.ORGANIZATION_DETAILS) {
+@commonCard(constants.View.ORGANIZATION_DETAILS) {
 } {
     <div>
         @commonInfoBox() {
-            <div class="title"> <span>@Messages(constants.Form.ORGANIZATION_DETAILS)</span></div>
+            <div class="title"> <span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
             @commonTextInfo(constants.View.NAME, organization.name)
-            @commonTextInfo(constants.Form.ABBREVIATION, organization.abbreviation.getOrElse(""))
-            @commonTextInfo(constants.Form.ID, organization.id)
-            @commonDateInfo(constants.Form.ESTABLISHMENT_DATE, organization.establishmentDate)
-            @commonBooleanInfo(constants.Form.VERIFIED_STATUS, organization.verificationStatus)
+            @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
+            @commonTextInfo(constants.View.ID, organization.id)
+            @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
+            @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
         }
         @commonInfoBox() {
             <div class="title"><span>@Messages(constants.View.REGISTERED_ADDRESS):</span></div>
@@ -42,10 +42,10 @@
         }
 
         @commonInfoBox() {
-            <div class="title"><span>@Messages(constants.Form.ZONE_DETAILS)</span></div>
+            <div class="title"><span>@Messages(constants.View.ZONE_DETAILS)</span></div>
             @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
-            @commonTextInfo(constants.Form.CURRENCY, organizationZone.currency)
-            @commonTextInfo(constants.Form.ZONE_ID, organizationZone.id)
+            @commonTextInfo(constants.View.CURRENCY, organizationZone.currency)
+            @commonTextInfo(constants.View.ZONE_ID, organizationZone.id)
         }
     </div>
 }

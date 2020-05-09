@@ -222,7 +222,7 @@ class SendAssets @Inject()(
       def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
         val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
 
-        def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+        def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
 
         for {
           _ <- bcOrderCreate
@@ -231,14 +231,14 @@ class SendAssets @Inject()(
 
       } else {
         val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
+
         def status(fiatsInOrder: Int): String = {
-          if(fiatsInOrder >= negotiation.price){
-            constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
-          }else{
-            constants.Status.Order.ASSET_SENT_FIAT_PENDING
-          }
+          if (fiatsInOrder >= negotiation.price) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+          else constants.Status.Order.ASSET_SENT_FIAT_PENDING
         }
-        def masterOrderUpdate(status: String): Future[Int] = masterOrders.Service.update(masterOrder(id = negotiation.id, orderID = negotiationID, buyerTraderID = negotiation.buyerTraderID, sellerTraderID = negotiation.sellerTraderID, assetID = negotiation.assetID, status = status))
+
+        def masterOrderUpdate(status: String): Future[Int] = masterOrders.Service.update(masterOrder(id = negotiation.id, orderID = negotiationID, status = status))
+
         for {
           fiatsInOrder <- fiatsInOrder
           _ <- masterOrderUpdate(status(fiatsInOrder))

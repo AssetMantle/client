@@ -147,14 +147,14 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def authorization = withGenesisLoginAction.authenticated { implicit loginState =>
+  def authorization: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
         case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
-  def authorizationCallBack(code: String) = withGenesisLoginAction.authenticated { implicit loginState =>
+  def authorizationCallBack(code: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {
