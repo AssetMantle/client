@@ -125,7 +125,7 @@ class AddZoneController @Inject()(
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -142,7 +142,7 @@ class AddZoneController @Inject()(
         zoneKYCs <- zoneKYCs(zoneID)
       } yield Ok(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -158,14 +158,14 @@ class AddZoneController @Inject()(
       fileUploadInfo => {
         try {
           request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case None => BadRequest(views.html.account(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
               Ok
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -191,7 +191,7 @@ class AddZoneController @Inject()(
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -222,7 +222,7 @@ class AddZoneController @Inject()(
         result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -238,7 +238,7 @@ class AddZoneController @Inject()(
         result <- withUsernameToken.Ok(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = zoneKYCs))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -255,7 +255,7 @@ class AddZoneController @Inject()(
             zoneKYCs <- zoneKYCs(zone.id)
           } yield BadRequest(views.html.component.master.userReviewAddZoneRequest(formWithErrors, zone = zone, zoneKYCs = zoneKYCs))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         },
         userReviewAddZoneRequestData => {
@@ -268,7 +268,7 @@ class AddZoneController @Inject()(
               val markZoneFormCompleted = masterZones.Service.markZoneFormCompleted(id)
               for {
                 _ <- markZoneFormCompleted
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
+                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
               val zone = masterZones.Service.getByAccountID(loginState.username)
@@ -292,7 +292,7 @@ class AddZoneController @Inject()(
             result
           }
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -331,12 +331,12 @@ class AddZoneController @Inject()(
                 accountID <- accountID
                 zoneAccountAddress <- zoneAccountAddress(accountID)
                 _ <- transactionProcess(zoneAccountAddress)
-                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
                 _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
               } yield {
                 result
               }
-            } else Future(PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+            } else Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
           }
 
           (for {
@@ -346,7 +346,7 @@ class AddZoneController @Inject()(
           } yield {
             result
           }).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -359,7 +359,7 @@ class AddZoneController @Inject()(
         verifyZoneRequests <- verifyZoneRequests
       } yield Ok(views.html.component.master.viewPendingVerifyZoneRequests(verifyZoneRequests))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -370,7 +370,7 @@ class AddZoneController @Inject()(
         zoneKYCs <- zoneKYCs
       } yield Ok(views.html.component.master.viewVerificationZoneKYCDouments(zoneKYCs))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -381,7 +381,7 @@ class AddZoneController @Inject()(
         zoneKYC <- zoneKYC
       } yield Ok(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -394,7 +394,7 @@ class AddZoneController @Inject()(
             zoneKYC <- zoneKYC
           } yield BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors, zoneKYC))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         },
         updateZoneKYCDocumentStatusData => {
@@ -424,7 +424,7 @@ class AddZoneController @Inject()(
             result <- withUsernameToken.PartialContent(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -447,10 +447,10 @@ class AddZoneController @Inject()(
           (for {
             _ <- rejectZone
             accountID <- accountID
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -468,13 +468,13 @@ class AddZoneController @Inject()(
       fileUploadInfo => {
         try {
           request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case None => BadRequest(views.html.account(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
               Ok
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -497,7 +497,7 @@ class AddZoneController @Inject()(
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -525,7 +525,7 @@ class AddZoneController @Inject()(
         result <- withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -542,9 +542,9 @@ class AddZoneController @Inject()(
         val postRequest = transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
         (for {
           _ <- postRequest
-        } yield Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
+        } yield Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED)))
           ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
         }
       }
     )

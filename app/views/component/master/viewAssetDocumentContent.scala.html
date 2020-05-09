@@ -11,16 +11,16 @@
             case constants.File.Asset.BILL_OF_LADING => {
                 @Messages(constants.File.Asset.BILL_OF_LADING) :
                 @defining(content.asInstanceOf[Serializable.BillOfLading]){billOfLading=>
-                    @commonTextInfo(constants.Form.BILL_OF_LADING_NUMBER, billOfLading.id)
-                    @commonTextInfo(constants.Form.PORT_OF_LOADING, billOfLading.portOfLoading)
-                    @commonTextInfo(constants.Form.SHIPPER_NAME, billOfLading.shipperName)
-                    @commonTextInfo(constants.Form.SHIPPER_ADDRESS, billOfLading.shipperAddress)
-                    @commonTextInfo(constants.Form.NOTIFY_PARTY_NAME, billOfLading.notifyPartyName)
-                    @commonTextInfo(constants.Form.NOTIFY_PARTY_ADDRESS, billOfLading.notifyPartyAddress)
-                    @commonDateInfo(constants.Form.SHIPMENT_DATE, billOfLading.dateOfShipping)
-                    @commonTextInfo(constants.Form.DELIVERY_TERM, billOfLading.deliveryTerm)
-                    @commonIntInfo(constants.Form.ASSET_QUANTITY, billOfLading.weightOfConsignment)
-                    @commonIntInfo(constants.Form.ASSET_PRICE, billOfLading.declaredAssetValue)
+                    @commonTextInfo(constants.View.BILL_OF_LADING_NUMBER, billOfLading.id)
+                    @commonTextInfo(constants.View.PORT_OF_LOADING, billOfLading.portOfLoading)
+                    @commonTextInfo(constants.View.SHIPPER_NAME, billOfLading.shipperName)
+                    @commonTextInfo(constants.View.SHIPPER_ADDRESS, billOfLading.shipperAddress)
+                    @commonTextInfo(constants.View.NOTIFY_PARTY_NAME, billOfLading.notifyPartyName)
+                    @commonTextInfo(constants.View.NOTIFY_PARTY_ADDRESS, billOfLading.notifyPartyAddress)
+                    @commonDateInfo(constants.View.SHIPMENT_DATE, billOfLading.dateOfShipping)
+                    @commonTextInfo(constants.View.DELIVERY_TERM, billOfLading.deliveryTerm)
+                    @commonIntInfo(constants.View.ASSET_QUANTITY, billOfLading.weightOfConsignment)
+                    @commonIntInfo(constants.View.ASSET_PRICE, billOfLading.declaredAssetValue)
 
                 }
             }

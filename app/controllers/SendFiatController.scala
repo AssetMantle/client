@@ -12,6 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 import models.masterTransaction
 import models.master
+import models.master.Negotiation
 
 @Singleton
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
@@ -53,39 +54,44 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt)))
         },
         sendFiatData => {
-
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
           val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(sendFiatData.negotiationID)
 
-          def sellerAccountID(sellerTraderID: String): Future[String] = masterTraders.Service.tryGetAccountId(sellerTraderID)
-          def sellerAddress(sellerAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(sellerAccountID)
+          def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+
+          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
+
           def assetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
-          def transactionProcess(sellerAddress:String, pegHash: String): Future[String] = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
-            entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.amount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
-            blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-            request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = pegHash, mode = transactionMode),
-            action = transactionsSendFiat.Service.post,
-            onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
-            onFailure = blockchainTransactionSendFiats.Utility.onFailure,
-            updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
-          )
+          def sendTransaction(sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[String] = {
+            if (!loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendFiat) throw new BaseException(constants.Response.UNAUTHORIZED)
+            else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
+            else transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.amount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
+              blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
+              request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = pegHash, mode = transactionMode),
+              action = transactionsSendFiat.Service.post,
+              onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
+              onFailure = blockchainTransactionSendFiats.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
+            )
+          }
 
           def createFiatRequest(traderID: String, ticketID: String, negotiationID: String): Future[String] = masterTransactionSendFiatRequests.Service.create(traderID, ticketID, negotiationID, sendFiatData.amount)
 
 
           def getResult(fiatsInOrder: Int, negotiation: master.Negotiation): Future[Result] = {
-            if(fiatsInOrder + sendFiatData.amount <= negotiation.price){
-              for{
-                sellerAccountID <- sellerAccountID(negotiation.sellerTraderID)
-                sellerAddress <- sellerAddress(sellerAccountID)
+            if (fiatsInOrder + sendFiatData.amount <= negotiation.price) {
+              for {
+                sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
+                sellerAddress <- getAddress(sellerAccountID)
                 assetPegHash <- assetPegHash(negotiation.assetID)
-                ticketID <- transactionProcess(sellerAddress, assetPegHash)
+                ticketID <- sendTransaction(sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
                 _ <- createFiatRequest(negotiation.buyerTraderID, ticketID, negotiation.id)
                 result <- withUsernameToken.Ok(views.html.tradeRoom(sendFiatData.negotiationID, successes = Seq(constants.Response.FIAT_SENT)))
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(value = views.companion.master.SendFiat.Data( negotiationID = sendFiatData.negotiationID, amount = sendFiatData.amount, gas = sendFiatData.gas, password = sendFiatData.password)).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price-fiatsInOrder), sendFiatData.negotiationID, sendFiatData.amount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(value = views.companion.master.SendFiat.Data(negotiationID = sendFiatData.negotiationID, amount = sendFiatData.amount, gas = sendFiatData.gas, password = sendFiatData.password)).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price - fiatsInOrder), sendFiatData.negotiationID, sendFiatData.amount)))
             }
           }
 

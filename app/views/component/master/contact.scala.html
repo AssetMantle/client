@@ -14,7 +14,7 @@
         case Some(mobile) => {
             @commonInfoBox() {
                 <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
-                    @commonTextInfo(constants.Form.MOBILE_NUMBER, mobile.mobileNumber)
+                    @commonTextInfo(constants.View.MOBILE_NUMBER, mobile.mobileNumber)
                     @if(mobile.status) {
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {
@@ -36,7 +36,7 @@
         case Some(email) => {
             @commonInfoBox() {
                 <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
-                    @commonTextInfo(constants.Form.EMAIL_ADDRESS, email.emailAddress)
+                    @commonTextInfo(constants.View.EMAIL_ADDRESS, email.emailAddress)
                     @if(email.status) {
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                     } else {

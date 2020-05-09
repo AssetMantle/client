@@ -6,7 +6,7 @@
 
 @common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
+@left = {
     <div class="leftSideContainer">
         <div id="financials" class="financial"></div>
     </div>
@@ -26,40 +26,37 @@
         }
     </script>
 }
-@center = {
+    @center = {
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.ZONE => {
-                <div>
-                    <div id="zoneTradeStatistics" class="cmuk-margin-bottom"></div>
-                </div>
+            <div>
+                <div id="zoneTradeStatistics" class="cmuk-margin-bottom"></div>
+            </div>
 
-                <div>
-                    <div id="zoneViewOrganizationAccountList" class="switcherCard"></div>
-                </div>
+            <div>
+                <div id="zoneViewOrganizationAccountList" class="switcherCard"></div>
+            </div>
 
-                <div class="tradeList cmuk-margin-bottom">
-                @commonCard(constants.View.TRADE_ROOMS) {
-                } {
-                    <div id="zoneViewAcceptedNegotiationList"></div>
-                }
-                </div>
-                <script>
+            <div class="tradeList cmuk-margin-bottom">
+                <div id="zoneViewAcceptedNegotiationList"></div>
+            </div>
+            <script>
                     componentResource('zoneTradeStatistics', jsRoutes.controllers.ComponentViewController.zoneTradeStatistics());
                     componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
                     componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
             </script>
         }
         case constants.User.ORGANIZATION => {
-                <div>
-                    <div id="organizationTradeStatistics" class="cmuk-margin-bottom"></div>
-                </div>
-                <div>
-                    <div id="organizationViewAcceptedNegotiationList" class="switcherCard"></div>
-                </div>
-                <div>
-                    <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
-                </div>
+            <div>
+                <div id="organizationTradeStatistics" class="cmuk-margin-bottom"></div>
+            </div>
+            <div>
+                <div id="organizationViewAcceptedNegotiationList" class="switcherCard"></div>
+            </div>
+            <div>
+                <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
+            </div>
             <script>
                 componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
                 componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
@@ -67,10 +64,9 @@
             </script>
         }
         case constants.User.TRADER => {
-                <div>
-                    <div id="traderTradeStatistics"></div>
-                </div>
-
+            <div>
+                <div id="traderTradeStatistics"></div>
+            </div>
             <script>
                     componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
             </script>
@@ -83,9 +79,9 @@
 
 @right = {
     <div class="rightSideContainer">
-    <div class="recentActivityContainer">
-        <div id="recentActivities"></div>
-    </div>
+        <div class="recentActivityContainer">
+            <div id="recentActivities"></div>
+        </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

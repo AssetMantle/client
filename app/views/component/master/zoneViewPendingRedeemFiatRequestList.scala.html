@@ -6,9 +6,9 @@
 
 @sendFiatRequests.map { sendFiatRequest =>
     @commonVerticalInfoBox() {
-        @commonVerticalTextInfo(constants.Form.ID, sendFiatRequest.id)
+        @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
         @commonVerticalTextInfo(constants.View.TRADER_ID, sendFiatRequest.traderID)
-        @commonVerticalIntInfo(constants.Form.AMOUNT, sendFiatRequest.amount)
+        @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
         @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">
