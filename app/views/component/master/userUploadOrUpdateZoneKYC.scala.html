@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.ZoneKYC
 
+@import views.html.base._
 @(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
@@ -10,7 +11,7 @@
 <div class="modal-info-block centerText">
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+            @commonModalButton(Seq(Messages(constants.Form.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddZoneController.userUploadZoneKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
     @for(zoneKYC <- zoneKYCs) {
@@ -19,13 +20,12 @@
         } {
             <a href="@routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)" target="_blank">@Messages(zoneKYC.documentType)</a>
         } {
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUpdateZoneKYCForm('@zoneKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(zoneKYC.documentType)</button>
+            @commonModalButton(Seq(Messages(constants.Form.UPDATE), Messages( zoneKYC.documentType)).mkString(" "),routes.javascript.AddZoneController.userUpdateZoneKYCForm,'parameters -> s"'${zoneKYC.documentType}'")
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.View.BACK)</button>
-
+@commonModalButton(constants.View.BACK, constants.Form.ADD_ZONE.get)
 @if(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(zoneKYCs.map(_.documentType)).isEmpty) {
-    <button type="button" class="cmuk-button cmuk-button-primary" id="getZoneKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddZoneController.userReviewAddZoneRequestForm())">@Messages(constants.Form.NEXT)</button>
+    @commonFormButton(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION)
 }
 </div>

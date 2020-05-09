@@ -9,6 +9,7 @@ import javax.inject._
 import models.master.{AccountFile, AccountKYC, Negotiations}
 import models.{master, masterTransaction}
 import models.common.Serializable
+import models.docusign
 import models.master.{AccountKYC, Negotiation, Negotiations, Trader}
 import models.masterTransaction.{AssetFile, NegotiationFile}
 import models.{blockchain, master, masterTransaction}
@@ -33,7 +34,7 @@ class FileController @Inject()(
                                 masterOrganizations: master.Organizations,
                                 masterTraders: master.Traders,
                                 masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                masterTransactionDocusignEnvelopes: masterTransaction.DocusignEnvelopes,
+                                masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                 withLoginAction: WithLoginAction,
                                 withUserLoginAction: WithUserLoginAction,
@@ -213,14 +214,14 @@ class FileController @Inject()(
 
       def getResult(negotiation: Negotiation): Future[Result] = {
         val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
         val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
 
         for {
           negotiationFileList <- negotiationFileList
-          docusignEnvelopeList <- docusignEnvelopeList
+          negotiationEnvelopeList <- negotiationEnvelopeList
           assetFileList <- assetFileList
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
         } yield result
 
       }
@@ -248,16 +249,16 @@ class FileController @Inject()(
         updateOldDocument = masterTransactionAssetFiles.Service.updateOldDocument
       )
 
-      def getResult(negotiation: Negotiation) = {
+      def getResult(negotiation: Negotiation): Future[Result] = {
         val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
         val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
 
         for {
           negotiationFileList <- negotiationFileList
-          docusignEnvelopeList <- docusignEnvelopeList
+          negotiationEnvelopeList <- negotiationEnvelopeList
           assetFileList <- assetFileList
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
         } yield result
       }
 
@@ -312,16 +313,16 @@ class FileController @Inject()(
       def getResult: Future[Result] = {
         val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
         val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-        val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
 
         def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
 
         for {
           negotiationFileList <- negotiationFileList
           negotiation <- negotiation
-          docusignEnvelopeList <- docusignEnvelopeList
+          negotiationEnvelopeList <- negotiationEnvelopeList
           assetFileList <- getAssetFileList(negotiation.assetID)
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
         } yield result
       }
 
@@ -348,16 +349,16 @@ class FileController @Inject()(
       def getResult: Future[Result] = {
         val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
         val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-        val docusignEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
 
         def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
 
         for {
           negotiationFileList <- negotiationFileList
           negotiation <- negotiation
-          docusignEnvelopeList <- docusignEnvelopeList
+          negotiationEnvelopeList <- negotiationEnvelopeList
           assetFileList <- getAssetFileList(negotiation.assetID)
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, docusignEnvelopeList))
+          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
         } yield result
       }
 

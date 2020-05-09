@@ -1,11 +1,11 @@
 @import controllers.actions.LoginState
-@import views.html.base._
 @import models.masterTransaction.NegotiationFile
 @import models.masterTransaction.AssetFile
 @import models.master.Negotiation
-@import models.masterTransaction.DocusignEnvelope
+@import views.html.base._
+@import models.docusign.Envelope
 
-@(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],docusignEnvelopeList:Seq[DocusignEnvelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiation: Negotiation, assetFiles: Seq[AssetFile], negotiationFiles: Seq[NegotiationFile],negotiationEnvelopeList:Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @negotiation.status match {
     case constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS => {
@@ -19,7 +19,7 @@
                 } {
                     <a href="@routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)">@Messages(document.documentType)</a>
                 } {
-                    @docusignEnvelopeList.find(_.documentType == document.documentType) match {
+                    @negotiationEnvelopeList.find(_.documentType == document.documentType) match {
                         case Some(docusignEnvelope)=> {
                             <span>@constants.View.CONTRACT_SIGNATURE_PENDING</span>
                         }
@@ -28,13 +28,13 @@
                              @commonFormButton(constants.Form.ADD_CONTRACT, 'parameters -> s"'${negotiation.id}'")
                             }
                         }
-                }
+                    }
                 <script>hideElement('@Seq("UPLOAD", "NEGOTIATION", constants.File.Negotiation.CONTRACT).mkString("_")')</script>
                 <td><li><a href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.Form.SUBMIT)</a></li></td>
             }
             case None=> {}
-        }
-     }
+                }
+          }
     case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED=>{
         <div class="modal-info-block">
             <div class="cmuk-text-left title"> @Messages(constants.View.ASSET_DOCUMENTS)</div>
@@ -49,7 +49,7 @@
                 } {
                     <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)">@Messages(assetFile.documentType)</a>
                 } {
-                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateNegotiationForm('@assetFile.documentType', '@assetFile.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAssetForm('@assetFile.documentType', '@negotiation.id'))">@Messages(constants.Form.UPDATE)@Messages(assetFile.documentType)</button>
                     @assetFile.documentType match {
                         case constants.File.Asset.BILL_OF_LADING => {
                             @commonFormButton(constants.Form.ADD_BILL_OF_LADING, 'parameters -> s"'${negotiation.id}'")

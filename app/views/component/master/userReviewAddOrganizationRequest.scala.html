@@ -11,5 +11,5 @@
     @userViewOrganization(organizationZone = zone, organization = organization, organizationKYCs = organizationKYCs)
     </div>
     @commonCheckbox(userReviewAddOrganizationRequestForm, constants.FormField.COMPLETION)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView())">@Messages(constants.View.BACK)</button>
+    @commonModalButton(constants.View.BACK,routes.javascript.AddOrganizationController.userUploadOrUpdateOrganizationKYCView)
 }

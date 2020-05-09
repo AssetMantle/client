@@ -14,8 +14,12 @@
             case constants.User.TRADER => {
             componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
-            case constants.User.ORGANIZATION => {}
-            case constants.User.ZONE => {}
+            case constants.User.ORGANIZATION => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+            }
+            case constants.User.ZONE => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+            }
             case constants.User.GENESIS => {}
             case _ => {}
         }

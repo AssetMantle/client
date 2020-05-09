@@ -1,0 +1,28 @@
+@import views.companion.master.CreateWallet
+@import views.html.base._
+
+@(createWalletForm: Form[CreateWallet.Data] = CreateWallet.form, username: String, mnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="MnemonicQuiz">
+    @commonForm(constants.Form.CREATE_WALLET, createWalletForm) {
+        @commonInputText(createWalletForm, constants.FormField.USERNAME, 'containerDivClass -> "hidden", 'value -> username, 'readonly -> true)
+        @commonInputText(createWalletForm, constants.FormField.MNEMONICS, 'value -> mnemonics.mkString(" "), 'containerDivClass -> "hidden", 'readonly -> true)
+        <div class="info-success">
+            <p><span class="icon-success">@commonIcon("success")</span> @Messages(constants.View.MNEMONIC_SUCCESS_MESSAGE)</p>
+        </div>
+        <div class="cmuk-flex verifyMnemonic">
+        @for((str, i) <- mnemonics.zipWithIndex) {
+            <div class="verifyMnemonicButton">
+                <input type="text" id="mnemonicElement-@i" name="mnemonicElement-@i" class="cmuk-input" value="@str" autocomplete="off" readonly>
+            </div>
+        }
+        </div>
+        <div class="mnemonicNote">
+            <div><span class="mnemonicInfoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info-rounded")"/></svg></span></div>
+            <div class="mnemonicNoteText">
+            @Messages(constants.View.MNEMONIC_NOTE)
+            </div>
+        </div>
+        @commonInputPassword(createWalletForm, constants.FormField.PASSWORD)
+    }
+</div>

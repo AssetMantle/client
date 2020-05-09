@@ -447,15 +447,7 @@ html, body{
   overflow: hidden;
 }
 
-.updateDocumentField{
-  position: relative;
-  button{
-    position: absolute;
-    top: 6px;
-    left: 30%;
-    font-weight: bold;
-  }
-}
+
 
 .comdex {
   .cmuk-sticky-fixed{
@@ -664,6 +656,15 @@ html, body{
     top:20px;
     right: 20px;
   }
+  .updateDocumentField{
+    position: relative;
+    button{
+      position: absolute;
+      top: 6px;
+      left: 30%;
+      font-weight: bold;
+    }
+  }
 }
 
 .header{
@@ -761,6 +762,9 @@ html, body{
   }
 }
 
+.modal .modalContent.fadeInEffect{
+  transform: translateY(0);
+}
 .modal {
   display: none;
   position: fixed;
@@ -773,6 +777,14 @@ html, body{
   padding: 30px 30px;
   text-align: center;
   .modalContent {
+    transform: translateY(-100px);
+    transition: .3s linear;
+    transition-property: opacity,transform;
+    -webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -ms-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -o-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
     word-break: break-all;
     top: 15%;
     border-radius:$buttonBorderRadius;
@@ -836,13 +848,9 @@ html, body{
 form{
   .formBody{
     padding: 20px 60px 60px 60px;
-    .buttonForm{
-      width: 250px;
-      margin-top: 20px;
-      font-size: $paragraphFontSizeLarge;
-    }
   }
 }
+
 
 .info-block-height{
   max-height: 600px;
@@ -909,6 +917,7 @@ form{
 
     .buttonForm {
       width: 100%;
+      margin-top: 20px;
       padding: 5px 0;
     }
   }
@@ -918,6 +927,7 @@ form{
   form .formBody {
     .buttonForm {
       width: 100%;
+      margin-top: 20px;
       padding: 5px 0;
     }
   }
@@ -983,6 +993,8 @@ form{
         }
       }
       .buttonForm{
+        width: 250px;
+        margin-top: 20px;
         padding: 5px 0;
       }
     }
@@ -1000,6 +1012,7 @@ form{
       }
       .buttonForm{
         width: 450px;
+        margin-top: 20px;
         padding: 5px 0;
       }
     }
@@ -1578,10 +1591,10 @@ form{
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 15px 0;
+        padding: 10px 0;
         margin: 0 20px;
         &:first-child {
-          padding-top: 25px;
+          padding-top: 20px;
         }
         &:last-child {
           border: 0;
@@ -1656,6 +1669,7 @@ form{
     background: rgba(8, 98, 190, 0.1);
     border-radius: 103px;
     color: $colorPrimary;
+    margin:5px;
     border: 0;
     .plusIcon .icon{
       width: 10px;
@@ -2656,19 +2670,21 @@ figure.zoom {
       display: flex;
       align-items: center;
       border-radius:2px;
+      justify-content: space-around;
       span{
         transform: rotate(-90deg);
         position: absolute;
-        color: #FFFFFF;
         font-weight: bold;
         font-size: $paragraphFontSizeSmall;
       }
     }
     .salesQuoteCategory.buy{
-      background: linear-gradient(180deg, $colorPrimary 0%, #05488C 100%);
+      border: 1px solid #B004DB;
+      color: #B004DB;
     }
     .salesQuoteCategory.sell{
-      background: linear-gradient(180deg, $colorPrimary 0%, #520E63 100%);
+      border: 1px solid #5EB55C;
+      color: #5EB55C;
     }
   }
   .salesQuoteCardMiddle{

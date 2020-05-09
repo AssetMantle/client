@@ -354,14 +354,6 @@ html, body {
   -webkit-box-orient: vertical;
   overflow: hidden; }
 
-.updateDocumentField {
-  position: relative; }
-  .updateDocumentField button {
-    position: absolute;
-    top: 6px;
-    left: 30%;
-    font-weight: bold; }
-
 .comdex .cmuk-sticky-fixed {
   width: 100% !important; }
 .comdex .buttonForm {
@@ -514,6 +506,13 @@ html, body {
 .comdex [class*=cmuk-modal-close-] {
   top: 20px;
   right: 20px; }
+.comdex .updateDocumentField {
+  position: relative; }
+  .comdex .updateDocumentField button {
+    position: absolute;
+    top: 6px;
+    left: 30%;
+    font-weight: bold; }
 
 .header {
   background: #053C75; }
@@ -585,6 +584,9 @@ html, body {
     width: 20px;
     height: 20px; }
 
+.modal .modalContent.fadeInEffect {
+  transform: translateY(0); }
+
 .modal {
   display: none;
   position: fixed;
@@ -597,6 +599,14 @@ html, body {
   padding: 30px 30px;
   text-align: center; }
   .modal .modalContent {
+    transform: translateY(-100px);
+    transition: .3s linear;
+    transition-property: opacity,transform;
+    -webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -ms-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -o-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
     word-break: break-all;
     top: 15%;
     border-radius: 3px;
@@ -641,10 +651,6 @@ html, body {
 
 form .formBody {
   padding: 20px 60px 60px 60px; }
-  form .formBody .buttonForm {
-    width: 250px;
-    margin-top: 20px;
-    font-size: 1.125rem; }
 
 .info-block-height {
   max-height: 600px; }
@@ -695,10 +701,12 @@ form .formBody {
   top: 12px; }
 .loginForm .formBody .buttonForm {
   width: 100%;
+  margin-top: 20px;
   padding: 5px 0; }
 
 .signUpForm form .formBody .buttonForm {
   width: 100%;
+  margin-top: 20px;
   padding: 5px 0; }
 .signUpForm .usernameAvailability {
   position: relative; }
@@ -747,12 +755,15 @@ form .formBody {
         margin-top: 12px;
         margin-right: 25px; }
   .logoutContainer form .formBody .buttonForm {
+    width: 250px;
+    margin-top: 20px;
     padding: 5px 0; }
 
 .MnemonicQuiz form .formBody .commonInputPassword dd input {
   width: 450px; }
 .MnemonicQuiz form .formBody .buttonForm {
   width: 450px;
+  margin-top: 20px;
   padding: 5px 0; }
 .MnemonicQuiz .titleMnemonic {
   font-weight: bold; }
@@ -1183,10 +1194,10 @@ form .formBody {
   height: 357px; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 10px 0;
   margin: 0 20px; }
   .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
-    padding-top: 25px; }
+    padding-top: 20px; }
   .leftContainer .financial .cmuk-switcher ul li:last-child, .leftContainer .financial .financialCard ul li:last-child {
     border: 0; }
   .leftContainer .financial .cmuk-switcher ul li .wallet, .leftContainer .financial .financialCard ul li .wallet {
@@ -1221,6 +1232,7 @@ form .formBody {
   background: rgba(8, 98, 190, 0.1);
   border-radius: 103px;
   color: #0862BE;
+  margin: 5px;
   border: 0; }
   .leftContainer .addBalanceButton .plusIcon .icon {
     width: 10px;
@@ -1975,17 +1987,19 @@ figure.zoom {
     text-transform: uppercase;
     display: flex;
     align-items: center;
-    border-radius: 2px; }
+    border-radius: 2px;
+    justify-content: space-around; }
     .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory span {
       transform: rotate(-90deg);
       position: absolute;
-      color: #FFFFFF;
       font-weight: bold;
       font-size: 0.875rem; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory.buy {
-    background: linear-gradient(180deg, #0862BE 0%, #05488C 100%); }
+    border: 1px solid #B004DB;
+    color: #B004DB; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory.sell {
-    background: linear-gradient(180deg, #0862BE 0%, #520E63 100%); }
+    border: 1px solid #5EB55C;
+    color: #5EB55C; }
 .salesQuoteCard .salesQuoteCardMiddle {
   border-radius: 2px;
   padding: 20px 10px 20px 0;

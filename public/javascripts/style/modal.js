@@ -7,6 +7,7 @@ $(document).mouseup(function (e) {
         }
         $('#modalClose').click(function() {
             modal.fadeOut(100);
+            $('.modalContent').removeClass('fadeInEffect');
         })
     })
 });

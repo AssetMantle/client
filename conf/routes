@@ -7,11 +7,12 @@ GET         /javascriptRoutes                                                   
 GET         /firebase-messaging-sw.js                                                             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
 GET         /docusign/send                                                                        controllers.DocusignController.send(id:String, documentType: String)
-GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String)
-GET         /docusign/return                                                                      controllers.DocusignController.docusignReturn(envelopeId:String, event:String)
-
+GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
 GET         /docusign/authorization                                                               controllers.DocusignController.authorization
-GET         /docusign/authorizationReturn                                                         controllers.DocusignController.authorizationReturn(code:String)
+
+#DO NOT CHANGE /Docusign CallBack ENDPOINT
+GET         /docusign/callBack                                                                    controllers.DocusignController.callBack(envelopeId:String, event:String)
+GET         /docusign/authorizationCallBack                                                       controllers.DocusignController.authorizationCallBack(code:String)
 
 GET         /blockExplorer/lastBlockHeight                                                        controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                                           controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
@@ -33,8 +34,8 @@ GET         /profilePicture                                                     
 GET         /account/signUp                                                                       controllers.AccountController.signUpForm
 POST        /account/signUp                                                                       controllers.AccountController.signUp
 
-GET         /account/createBlockchain                                                             controllers.AccountController.createBlockchainForm(username: String)
-POST        /account/createBlockchain                                                             controllers.AccountController.createBlockchain
+GET         /account/createWallet                                                                 controllers.AccountController.createWalletForm(username: String)
+POST        /account/createWallet                                                                 controllers.AccountController.createWallet
 
 GET         /account/login                                                                        controllers.AccountController.loginForm
 POST        /account/login                                                                        controllers.AccountController.login
@@ -138,8 +139,8 @@ POST        /negotiation/sellerConfirm                                          
 
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 
-GET         /negotiation/markContractSigned                                                       controllers.NegotiationController.markContractSignedForm(negotiationID: String)
-POST        /negotiation/markContractSigned                                                       controllers.NegotiationController.markContractSigned
+GET         /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
+POST        /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSigned
 
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
 
@@ -233,6 +234,8 @@ GET         /component/zoneViewAssetDocumentContent                             
 
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials
+GET         /component/organizationFinancial                                                      controllers.ComponentViewController.organizationFinancial
+GET         /component/zonwFinancial                                                              controllers.ComponentViewController.zoneFinancial
 
 GET         /component/traderViewNegotiationDocumentList                                          controllers.ComponentViewController.traderViewNegotiationDocumentList(id:String)
 GET         /component/traderViewNegotiationDocument                                              controllers.ComponentViewController.traderViewNegotiationDocument(id:String, documentType: Option[String])
@@ -289,6 +292,35 @@ GET         /component/zoneViewTradeRoomFinancialAndChecks                      
 GET         /component/zoneViewTradeRoomFinancial                                                 controllers.ComponentViewController.zoneViewTradeRoomFinancial(negotiationID: String)
 GET         /component/zoneViewTradeRoomChecks                                                    controllers.ComponentViewController.zoneViewTradeRoomChecks(negotiationID: String)
 GET         /component/zoneOrderActions                                                           controllers.ComponentViewController.zoneOrderActions(negotiationID: String)
+
+GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
+GET         /component/organizationViewTradeRoomChecks                                            controllers.ComponentViewController.organizationViewTradeRoomChecks(negotiationID: String)
+
+GET         /component/zoneViewSendFiatRequests                                                   controllers.ComponentViewController.zoneViewSendFiatRequests()
+GET         /component/zoneViewPendingSendFiatRequestList                                         controllers.ComponentViewController.zoneViewPendingSendFiatRequestList()
+GET         /component/zoneViewCompleteSendFiatRequestList                                        controllers.ComponentViewController.zoneViewCompleteSendFiatRequestList()
+GET         /component/zoneViewFailedSendFiatRequestList                                          controllers.ComponentViewController.zoneViewFailedSendFiatRequestList()
+GET         /component/zoneViewRedeemFiatRequests                                                 controllers.ComponentViewController.zoneViewRedeemFiatRequests()
+GET         /component/zoneViewPendingRedeemFiatRequestList                                       controllers.ComponentViewController.zoneViewPendingRedeemFiatRequestList()
+GET         /component/zoneViewCompleteRedeemFiatRequestList                                      controllers.ComponentViewController.zoneViewCompleteRedeemFiatRequestList()
+GET         /component/zoneViewFailedRedeemFiatRequestList                                        controllers.ComponentViewController.zoneViewFailedRedeemFiatRequestList()
+GET         /component/organizationViewSendFiatRequests                                           controllers.ComponentViewController.organizationViewSendFiatRequests()
+GET         /component/organizationViewPendingSendFiatRequestList                                 controllers.ComponentViewController.organizationViewPendingSendFiatRequestList()
+GET         /component/organizationViewCompleteSendFiatRequestList                                controllers.ComponentViewController.organizationViewCompleteSendFiatRequestList()
+GET         /component/organizationViewFailedSendFiatRequestList                                  controllers.ComponentViewController.organizationViewFailedSendFiatRequestList()
+GET         /component/organizationViewRedeemFiatRequests                                         controllers.ComponentViewController.organizationViewRedeemFiatRequests()
+GET         /component/organizationViewPendingRedeemFiatRequestList                               controllers.ComponentViewController.organizationViewPendingRedeemFiatRequestList()
+GET         /component/organizationViewCompleteRedeemFiatRequestList                              controllers.ComponentViewController.organizationViewCompleteRedeemFiatRequestList()
+GET         /component/organizationViewFailedRedeemFiatRequestList                                controllers.ComponentViewController.organizationViewFailedRedeemFiatRequestList()
+GET         /component/traderViewSendFiatRequests                                                 controllers.ComponentViewController.traderViewSendFiatRequests()
+GET         /component/traderViewPendingSendFiatRequestList                                       controllers.ComponentViewController.traderViewPendingSendFiatRequestList()
+GET         /component/traderViewCompleteSendFiatRequestList                                      controllers.ComponentViewController.traderViewCompleteSendFiatRequestList()
+GET         /component/traderViewFailedSendFiatRequestList                                        controllers.ComponentViewController.traderViewFailedSendFiatRequestList()
+GET         /component/traderViewRedeemFiatRequests                                               controllers.ComponentViewController.traderViewRedeemFiatRequests()
+GET         /component/traderViewPendingRedeemFiatRequestList                                     controllers.ComponentViewController.traderViewPendingRedeemFiatRequestList()
+GET         /component/traderViewCompleteRedeemFiatRequestList                                    controllers.ComponentViewController.traderViewCompleteRedeemFiatRequestList()
+GET         /component/traderViewFailedRedeemFiatRequestList                                      controllers.ComponentViewController.traderViewFailedRedeemFiatRequestList()
 
 GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
@@ -456,8 +488,10 @@ GET         /master/issueFiatRequest                                            
 GET         /master/issueFiat                                                                     controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                                                     controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm(username: String)
+GET         /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiatForm
 POST        /master/redeemFiat                                                                    controllers.RedeemFiatController.redeemFiat
+GET         /master/zoneRedeemFiat                                                                controllers.RedeemFiatController.zoneRedeemFiatForm(id: String)
+POST        /master/zoneRedeemFiat                                                                controllers.RedeemFiatController.zoneRedeemFiat
 
 GET         /master/sendCoin                                                                      controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                                                      controllers.SendCoinController.sendCoin
@@ -472,8 +506,10 @@ POST        /master/approveFaucetRequests                                       
 GET         /master/rejectFaucetRequest                                                           controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/rejectFaucetRequest                                                           controllers.SendCoinController.rejectFaucetRequest
 
-GET         /master/sendFiat                                                                      controllers.SendFiatController.sendFiatForm(sellerAddress: String, pegHash: String, amount: Int)
+GET         /master/sendFiat                                                                      controllers.SendFiatController.sendFiatForm(negotiationID: String)
 POST        /master/sendFiat                                                                      controllers.SendFiatController.sendFiat
+GET         /master/zoneSendFiat                                                                  controllers.SendFiatController.zoneSendFiatForm(id: String)
+POST        /master/zoneSendFiat                                                                  controllers.SendFiatController.zoneSendFiat
 
 GET         /master/setBuyerFeedback                                                              controllers.SetBuyerFeedbackController.setBuyerFeedbackForm(sellerAddress: String, pegHash: String)
 POST        /master/setBuyerFeedback                                                              controllers.SetBuyerFeedbackController.setBuyerFeedback

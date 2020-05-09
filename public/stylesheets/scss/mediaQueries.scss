@@ -315,6 +315,11 @@
   :root {
     font-size: 13px;
   }
+  .comdex{
+    .cmuk-input, .cmuk-select:not([multiple]):not([size]){
+      height: 40px;
+    }
+  }
   .signUpForm .usernameAvailability .checkIcon,
   .signUpForm .showPassword{
     top:51px

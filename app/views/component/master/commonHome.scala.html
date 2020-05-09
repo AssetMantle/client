@@ -12,8 +12,8 @@
             @commonTextInfo(constants.User.USER_NAME, loginState.username)
             @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
             @commonTextInfo(constants.Form.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress")
-            <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)
-                <span class="editIcon">@commonIcon("edit")</span></button>
+            @commonFormButton(constants.Form.CHANGE_PASSWORD,'class -> "cmuk-button-link")
+            <span class="editIcon">@commonIcon("edit")</span>
         </div>
     </div>
 }
