@@ -23,7 +23,7 @@ class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   import databaseConfig.profile.api._
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private[models] val emailTable = TableQuery[EmailTable]
 

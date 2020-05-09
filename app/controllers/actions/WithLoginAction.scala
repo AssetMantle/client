@@ -61,7 +61,9 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
       } yield {
         result
       }).recover {
-        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+        case baseException: BaseException =>
+          println("message------------"+baseException.failure.message)
+          logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index()).withNewSession
       }
     }

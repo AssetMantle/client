@@ -23,7 +23,7 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   import databaseConfig.profile.api._
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private[models] val mobileTable = TableQuery[MobileTable]
 

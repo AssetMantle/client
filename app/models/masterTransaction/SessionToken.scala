@@ -74,6 +74,9 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(noSuchElementException.getMessage+"BBBBBBBBBB", noSuchElementException)
+        println("cause---------------------------"+noSuchElementException.getCause)
+        println("get Suppressed Throwable"+noSuchElementException.getSuppressed)
+        println(""+noSuchElementException.fillInStackTrace())
         logger.info(noSuchElementException.toString+"AAAAAAAAAAAAAA",noSuchElementException.getCause)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }

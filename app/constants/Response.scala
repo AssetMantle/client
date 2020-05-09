@@ -195,13 +195,14 @@ object Response {
   val TENURE_AND_TENTATIVE_DATE_BOTH_FOUND = new Failure("TENURE_AND_TENTATIVE_DATE_BOTH_FOUND")
   val REFRENCE_REQUIRED_WITH_TENURE = new Failure("REFRENCE_REQUIRED_WITH_TENURE")
   val REFRENCE_NOT_REQUIRED = new Failure("REFRENCE_NOT_REQUIRED")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED= new Failure("PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED")
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED = new Failure("PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED")
   val BLOCKCHAIN_ACCOUNT_NOT_FOUND = new Failure("BLOCKCHAIN_ACCOUNT_NOT_FOUND")
   val FIAT_PEG_NOT_FOUND = new Failure("FIAT_PEG_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.String.getJsRouteString(actionController)
+    val logMessage: String = response
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

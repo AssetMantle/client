@@ -28,7 +28,7 @@ class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_MESSAGE
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   implicit val timeWrites: Writes[Timestamp] = (t: Timestamp) => JsString(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(t))
 

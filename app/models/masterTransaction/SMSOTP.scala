@@ -20,7 +20,7 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 

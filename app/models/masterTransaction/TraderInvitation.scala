@@ -22,7 +22,7 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
