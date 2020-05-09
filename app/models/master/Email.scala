@@ -1,7 +1,10 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Email(id: String, emailAddress: String, status: Boolean = false)
+case class Email(id: String, emailAddress: String, status: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -109,13 +112,25 @@ class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class EmailTable(tag: Tag) extends Table[Email](tag, "Email") {
 
-    def * = (id, emailAddress, status) <> (Email.tupled, Email.unapply)
+    def * = (id, emailAddress, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Email.tupled, Email.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def emailAddress = column[String]("emailAddress")
 
     def status = column[Boolean]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 
@@ -131,6 +146,7 @@ class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def verifyEmailAddress(id: String): Future[Int] = {
       def verify: Future[Int] = updateEmailAddressVerificationStatusOnId(id, verificationStatus = true)
+
       for {
         email <- tryGet(id)
         _ <- unVerifyOldEmailAddresses(email.emailAddress)
