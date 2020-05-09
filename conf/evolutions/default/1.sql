@@ -1612,10 +1612,7 @@ CREATE OR REPLACE FUNCTION DOCUSIGN.CREATE_ENVELOPE_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO DOCUSIGN."Envelope_History" ( "id", "envelopeID", "documentType", "status", "createdBy", "createdOn"
-                                            , "createdOnTimeZone", "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."envelopeID", old."documentType", old.status, old."createdBy", old."createdOn",
-            old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO DOCUSIGN."Envelope_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1626,19 +1623,15 @@ CREATE TRIGGER DELETE_ENVELOPE
     FOR EACH ROW
 EXECUTE PROCEDURE DOCUSIGN.CREATE_ENVELOPE_HISTORY();
 
-CREATE OR REPLACE FUNCTION MASTER.CREATE_ASSET_HISTORY()
+CREATE OR REPLACE FUNCTION MASTER.CREATE_HISTORY()
     RETURNS trigger
 AS
 $$
 BEGIN
-    INSERT INTO MASTER."Asset_History" ( "id", "ownerID", "pegHash", "assetType", "description", "documentHash"
-                                       , "quantity", "quantityUnit", "price", "moderated", "takerID", "otherDetails"
-                                       , "status", "createdBy", "createdOn", "createdOnTimeZone", "updatedBy"
-                                       , "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."ownerID", old."pegHash", old."assetType", old.description, old."documentHash", old."quantity",
-            old."quantityUnit", old.price, old.moderated, old."takerID", old."otherDetails", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    RAISE NOTICE 'ABHINAV';;
+    INSERT INTO MASTER."Asset_History" VALUES (old.*);;
+--     EXECUTE format('INSERT INTO %."%" VALUES %', TG_TABLE_SCHEMA, TG_TABLE_NAME||'_History', '($old.*);;');;
+    RAISE NOTICE 'KUMAR';;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1647,29 +1640,14 @@ CREATE TRIGGER DELETE_ASSET
     BEFORE DELETE
     ON MASTER."Asset"
     FOR EACH ROW
-EXECUTE PROCEDURE MASTER.CREATE_ASSET_HISTORY();
+EXECUTE PROCEDURE MASTER.CREATE_HISTORY();
 
 CREATE OR REPLACE FUNCTION MASTER.CREATE_NEGOTIATION_HISTORY()
     RETURNS trigger
 AS
 $$
 BEGIN
-    INSERT INTO MASTER."Negotiation_History" ( "id", "negotiationID", "buyerTraderID", "sellerTraderID", "assetID"
-                                             , "assetDescription", price, quantity, "quantityUnit"
-                                             , "buyerAcceptedAssetDescription", "buyerAcceptedPrice"
-                                             , "buyerAcceptedQuantity", "assetOtherDetails"
-                                             , "buyerAcceptedAssetOtherDetails", "time", "paymentTerms"
-                                             , "buyerAcceptedPaymentTerms", "documentList", "buyerAcceptedDocumentList"
-                                             , "physicalDocumentsHandledVia", "chatID", "status", "comment"
-                                             , "createdBy", "createdOn", "createdOnTimeZone", "updatedBy", "updatedOn"
-                                             , "updatedOnTimeZone")
-    VALUES (old.id, old."negotiationID", old."buyerTraderID", old."sellerTraderID", old."assetID",
-            old."assetDescription", old.price, old."quantity", old."quantityUnit", old."buyerAcceptedAssetDescription",
-            old."buyerAcceptedPrice", old."buyerAcceptedQuantity", old."assetOtherDetails",
-            old."buyerAcceptedAssetOtherDetails", old.time, old."paymentTerms", old."buyerAcceptedPaymentTerms",
-            old."documentList", old."buyerAcceptedDocumentList", old."physicalDocumentsHandledVia", old."chatID",
-            old."status", old."comment", old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER,
-            CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER."Negotiation_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1685,10 +1663,7 @@ CREATE OR REPLACE FUNCTION MASTER.CREATE_ORDER_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER."Order_History" ("id", "orderID", "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                        "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."orderID", old."status", old."createdBy", old."createdOn", old."createdOnTimeZone",
-            CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER."Order_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1704,12 +1679,7 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_ASSET_FILE_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."AssetFile_History" ("id", "documentType", "fileName", "file", "documentContentJson",
-                                                        "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                                        "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."AssetFile_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1725,13 +1695,7 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."NegotiationFile_History" ("id", "documentType", "fileName", "file",
-                                                              "documentContentJson", "status", "createdBy", "createdOn",
-                                                              "createdOnTimeZone", "updatedBy", "updatedOn",
-                                                              "updatedOnTimeZone")
-    VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."NegotiationFile_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1747,12 +1711,7 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_SEND_FIAT_REQUEST_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."SendFiatRequest_History" ("id", "traderID", "negotiationID", "ticketID", "amount",
-                                                              "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                                              "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."traderID", old."negotiationID", old."ticketID", old."amount", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."SendFiatRequest_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1768,11 +1727,7 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_TRADE_ACTIVITY_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."TradeActivity_History" ("id", "negotiationID", "tradeActivityTemplateJson", "read",
-                                                            "createdBy", "createdOn", "createdOnTimeZone", "updatedBy",
-                                                            "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."negotiationID", old."tradeActivityTemplateJson", old."read", old."createdBy", old."createdOn",
-            old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."TradeActivity_History" VALUES (old.*);;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1805,6 +1760,24 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '0',
         '0',
         true,
+        CURRENT_USER,
+        CURRENT_TIMESTAMP,
+        CURRENT_SETTING('TIMEZONE'));
+
+INSERT INTO MASTER."Asset" ("id", "ownerID", "assetType", "description", "documentHash", "quantity", "quantityUnit",
+                            "price", "otherDetails", "moderated", "status", "createdBy", "createdOn",
+                            "createdOnTimeZone")
+VALUES ('ASSET_ID',
+        'OWNER_ID',
+        'ASSET_TYPE',
+        'DESCRIPTION',
+        'DOCUMENT_HASH',
+        100,
+        'QUANTITY_UNIT',
+        100,
+        'OTHER_DETAILS',
+        true,
+        'STATUS',
         CURRENT_USER,
         CURRENT_TIMESTAMP,
         CURRENT_SETTING('TIMEZONE'));
