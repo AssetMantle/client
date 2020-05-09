@@ -1,7 +1,10 @@
 package models.westernUnion
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SFTPFileTransaction(payerID: String, invoiceNumber: String, customerFirstName: String, customerLastName: String, customerEmailAddress: String, settlementDate: String, clientReceivedAmount: String, transactionType: String, productType: String, transactionReference: String)
+case class SFTPFileTransaction(payerID: String, invoiceNumber: String, customerFirstName: String, customerLastName: String, customerEmailAddress: String, settlementDate: String, clientReceivedAmount: String, transactionType: String, productType: String, transactionReference: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class SFTPFileTransactions @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -63,7 +66,7 @@ class SFTPFileTransactions @Inject()(protected val databaseConfigProvider: Datab
 
   private[models] class SFTPFileTransactionTable(tag: Tag) extends Table[SFTPFileTransaction](tag, "SFTPFileTransaction") {
 
-    def * = (payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) <> (SFTPFileTransaction.tupled, SFTPFileTransaction.unapply)
+    def * = (payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SFTPFileTransaction.tupled, SFTPFileTransaction.unapply)
 
     def transactionReference = column[String]("transactionReference", O.PrimaryKey)
 
@@ -84,6 +87,18 @@ class SFTPFileTransactions @Inject()(protected val databaseConfigProvider: Datab
     def transactionType = column[String]("transactionType")
 
     def productType = column[String]("productType")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

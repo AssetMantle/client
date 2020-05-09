@@ -1,10 +1,10 @@
 package models.westernUnion
 
 import java.sql.Timestamp
-import java.util.Date
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RTCB(id: String, reference: String, externalReference: String, invoiceNumber: String, buyerBusinessId: String, buyerFirstName: String, buyerLastName: String, createdDate: Timestamp, lastUpdatedDate: Timestamp, status: String, dealType: String, paymentTypeId: String, paidOutAmount: Int, requestSignature: String)
+case class RTCB(id: String, reference: String, externalReference: String, invoiceNumber: String, buyerBusinessId: String, buyerFirstName: String, buyerLastName: String, createdDate: Timestamp, lastUpdatedDate: Timestamp, status: String, dealType: String, paymentTypeId: String, paidOutAmount: Int, requestSignature: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -58,7 +58,7 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private def getSumAmountsByExternalReference(externalReference: String): Future[Int] = db.run(rtcbTable.filter(_.externalReference === externalReference).map(_.paidOutAmount).sum.getOrElse(0).result)
 
-    private def deleteById(id: String): Future[Int] = db.run(rtcbTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(rtcbTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -70,7 +70,7 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] class RTCBTable(tag: Tag) extends Table[RTCB](tag, "RTCB") {
 
-    def * = (id, reference, externalReference, invoiceNumber, buyerBusinessId, buyerFirstName, buyerLastName, createdDate, lastUpdatedDate, status, dealType, paymentTypeId, paidOutAmount, requestSignature) <> (RTCB.tupled, RTCB.unapply)
+    def * = (id, reference, externalReference, invoiceNumber, buyerBusinessId, buyerFirstName, buyerLastName, createdDate, lastUpdatedDate, status, dealType, paymentTypeId, paidOutAmount, requestSignature, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RTCB.tupled, RTCB.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -100,6 +100,18 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def requestSignature = column[String]("requestSignature")
 
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+
   }
 
   object Service {
@@ -110,7 +122,7 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def totalRTCBAmountByTransactionID(transactionID: String): Future[Int] = getSumAmountsByExternalReference(transactionID)
 
-    def getAll(transactionIDs: Seq[String])= getAllByByTransactionIDs(transactionIDs)
+    def getAll(transactionIDs: Seq[String]): Future[Seq[RTCB]] = getAllByByTransactionIDs(transactionIDs)
   }
 
 }
