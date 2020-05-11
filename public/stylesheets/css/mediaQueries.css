@@ -202,9 +202,9 @@
   .salesQuoteCard .salesQuoteCardLeft {
     flex: 32%; }
   .salesQuoteCard .salesQuoteCardMiddle {
-    flex: 45%; }
+    flex: 41%; }
   .salesQuoteCard .salesQuoteCardRight {
-    flex: 23%; } }
+    flex: 27%; } }
 @media (max-width: 1599px) {
   :root {
     font-size: 13px; }
