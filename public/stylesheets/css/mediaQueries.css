@@ -190,6 +190,11 @@
     height: 210px; }
   .comdex .cmuk-card-header .cmuk-button {
     line-height: 26px; }
+  .comdex .updateDocumentField button {
+    position: absolute;
+    top: 12px;
+    left: 115px;
+    font-weight: bold; }
 
   .switcherCard .cmuk-switcher {
     height: 170px; }
