@@ -810,7 +810,6 @@ CONTROLLERS_REQUEST_LOG=REQUEST  path-{0} {1}  by address-{2} username-{3}
 CONTROLLERS_RESPONSE_LOG=RESPONSE for-{0} {1}  by address-{2} username-{3}  returnedWithStatus-{4} in {5}ms
 RESPONSE.FAILURE.USERNAME_NOT_FOUND= Username not found parameter-0-{0}  parameter-1-{1} 
 
-NO_SUCH_ELEMENT_EXCEPTION_3=Unable to {0} in {1} with parameters {2}
-NO_SUCH_ELEMENT_EXCEPTION_4=Unable to {0} in {1} with parameters {2},{3}
-PSQL_EXCEPTION= Unable to {0} in {1}
-UNAUTHORIZED = User {0} is unauthorized for {1}
+NO_SUCH_ELEMENT_EXCEPTION_3=Unable to {0} in {1} for parameters {2}
+NO_SUCH_ELEMENT_EXCEPTION_4=Unable to {0} in {1} for parameters {2},{3}
+PSQL_EXCEPTION= Could not {0} in {1}

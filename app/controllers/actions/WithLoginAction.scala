@@ -21,8 +21,8 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
   def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
 
-      val username = Future(request.session.get(constants.Security.USERNAME).getOrElse("sddsgd"))
-      val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse("sddsgd"))
+      val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
+      val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
 
       def verifySessionTokenAndUserType(username: String, sessionToken: String) = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
@@ -62,7 +62,6 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         result
       }).recover {
         case baseException: BaseException =>
-          println("message------------"+baseException.failure.message)
           logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index()).withNewSession
       }

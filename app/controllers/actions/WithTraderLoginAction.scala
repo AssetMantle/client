@@ -18,10 +18,6 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
 
   def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
-     // logger.info("host:"+request.host+"-requested-path-"+request.path+"-method-"+request.method+"-requestedBY-"+request.session.get(constants.Security.USERNAME))
-      //println("remote Address"+request.remoteAddress)
-      val handlerDef= request.attrs(Router.Attrs.HandlerDef)
-     // println(handlerDef.controller+"."+handlerDef.method)
 
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
