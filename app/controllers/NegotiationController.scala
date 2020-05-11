@@ -1270,15 +1270,15 @@ class NegotiationController @Inject()(
             } yield 0
           } else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
 
-            (for {
-              traderID <- traderID
-              negotiation <- negotiation
-              _ <- updateStatus(traderID, negotiation)
-              result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
-            } yield result
-              ).recover {
-              case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
-            }
+          (for {
+            traderID <- traderID
+            negotiation <- negotiation
+            _ <- updateStatus(traderID, negotiation)
+            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))
+          }
         }
       )
   }
