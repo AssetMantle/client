@@ -75,14 +75,6 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
     }
   }
 
-  private def upsert(changeBuyerBid: ChangeBuyerBid): Future[Int] = db.run(changeBuyerBidTable.insertOrUpdate(changeBuyerBid).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[ChangeBuyerBid] = db.run(changeBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

@@ -38,14 +38,6 @@ class SFTPFileTransactions @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  private def upsert(wuSFTPFileTransaction: SFTPFileTransaction): Future[Int] = db.run(sftpFileTransactionTable.insertOrUpdate(wuSFTPFileTransaction).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findById(transactionReference: String): Future[SFTPFileTransaction] = db.run(sftpFileTransactionTable.filter(_.transactionReference === transactionReference).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

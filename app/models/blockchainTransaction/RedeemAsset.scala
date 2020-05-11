@@ -65,14 +65,6 @@ class RedeemAssets @Inject()(
     }
   }
 
-  private def upsert(redeemAsset: RedeemAsset): Future[Int] = db.run(redeemAssetTable.insertOrUpdate(redeemAsset).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[RedeemAsset] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

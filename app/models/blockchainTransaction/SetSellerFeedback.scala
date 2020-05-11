@@ -57,14 +57,6 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
     }
   }
 
-  private def upsert(setSellerFeedback: SetSellerFeedback): Future[Int] = db.run(setSellerFeedbackTable.insertOrUpdate(setSellerFeedback).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[SetSellerFeedback] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

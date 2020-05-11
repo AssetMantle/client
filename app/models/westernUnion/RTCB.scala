@@ -38,14 +38,6 @@ class RTCBs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsert(rtcb: RTCB): Future[Int] = db.run(rtcbTable.insertOrUpdate(rtcb).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findById(id: String): Future[RTCB] = db.run(rtcbTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

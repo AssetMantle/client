@@ -57,14 +57,6 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
     }
   }
 
-  private def upsert(releaseAsset: ReleaseAsset): Future[Int] = db.run(releaseAssetTable.insertOrUpdate(releaseAsset).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[ReleaseAsset] = db.run(releaseAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

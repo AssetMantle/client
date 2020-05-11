@@ -31,8 +31,11 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -40,20 +43,16 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private[models] val issueFiatTable = TableQuery[IssueFiatTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(issueFiat: IssueFiat): Future[String] = db.run((issueFiatTable returning issueFiatTable.map(_.ticketID) += issueFiat).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(issueFiat: IssueFiat): Future[Int] = db.run(issueFiatTable.insertOrUpdate(issueFiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

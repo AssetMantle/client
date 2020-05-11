@@ -24,7 +24,7 @@ case class ACL(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, send
 @Singleton
 class ACLAccounts @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
-                             actorSystem: ActorSystem, aclHashes: ACLHashes,
+                             actorSystem: ActorSystem,
                              configuration: Configuration,
                              getACL: GetACL,
                            )(implicit executionContext: ExecutionContext) {
@@ -44,7 +44,9 @@ class ACLAccounts @Inject()(
   private[models] val aclTable = TableQuery[ACLTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(aclTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)

@@ -77,14 +77,6 @@ class SendAssets @Inject()(
     }
   }
 
-  private def upsert(sendAsset: SendAsset): Future[Int] = db.run(sendAssetTable.insertOrUpdate(sendAsset).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[SendAsset] = db.run(sendAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

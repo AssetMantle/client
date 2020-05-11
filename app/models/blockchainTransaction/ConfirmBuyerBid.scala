@@ -67,14 +67,6 @@ class ConfirmBuyerBids @Inject()(
     }
   }
 
-  private def upsert(confirmBuyerBid: ConfirmBuyerBid): Future[Int] = db.run(confirmBuyerBidTable.insertOrUpdate(confirmBuyerBid).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[ConfirmBuyerBid] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

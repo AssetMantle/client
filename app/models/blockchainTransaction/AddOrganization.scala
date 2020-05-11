@@ -55,14 +55,6 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
     }
   }
 
-  private def upsert(addOrganization: AddOrganization): Future[Int] = db.run(addOrganizationTable.insertOrUpdate(addOrganization).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[AddOrganization] = db.run(addOrganizationTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

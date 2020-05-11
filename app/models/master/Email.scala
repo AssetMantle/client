@@ -70,14 +70,6 @@ class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def upsert(email: Email): Future[Int] = db.run(emailTable.insertOrUpdate(email).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def updateEmailAddressVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(emailTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
     case Success(result) => result match {
       case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)

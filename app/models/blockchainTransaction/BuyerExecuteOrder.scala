@@ -56,14 +56,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
     }
   }
 
-  private def upsert(buyerExecuteOrder: BuyerExecuteOrder): Future[Int] = db.run(buyerExecuteOrderTable.insertOrUpdate(buyerExecuteOrder).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def findByTicketID(ticketID: String): Future[BuyerExecuteOrder] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
