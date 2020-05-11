@@ -483,7 +483,7 @@ class AssetController @Inject()(
     implicit request =>
       views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          val negotiation = masterNegotiations.Service.tryGet(formWithErrors(constants.FormField.NEGOTIATION_ID.name).value.get)
+          val negotiation = masterNegotiations.Service.tryGet(formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))
 
           def getAssetFile(assetID: String) = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
 

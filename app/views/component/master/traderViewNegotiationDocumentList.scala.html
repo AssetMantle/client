@@ -66,7 +66,11 @@
                                         @assetFile.status match{
                                             case Some(true)=>{@constants.View.APPROVED}
                                             case Some(false)=>{@constants.View.REJECTED}
-                                            case None=>{@views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiation.id,assetFile = assetFile)}
+                                            case None=>{
+                                                @if(traderID == negotiation.buyerTraderID) {
+                                                    @views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiation.id, assetFile = assetFile)
+                                                }
+                                            }
                                         }
                                         </td>
                                     }
