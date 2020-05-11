@@ -51,6 +51,7 @@
             <div class="thirdPart salesChild">
             @Messages(sentNegotiationRequest.status)
             </div>
+        @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${sentNegotiationRequest.id}'")
     }
 }
 </div>

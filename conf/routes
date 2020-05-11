@@ -330,6 +330,9 @@ GET         /component/traderViewTradeRoomFinancialAndChecks                    
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
 
+GET         /component/traderViewNegotiation                                                      controllers.ComponentViewController.traderViewNegotiation(negotiationID: String)
+GET         /component/organizationViewNegotiation                                                controllers.ComponentViewController.organizationViewNegotiation(negotiationID: String)
+
 GET         /component/traderViewIssueFiatRequestList                                             controllers.ComponentViewController.traderViewIssueFiatRequestList
 GET         /component/organizationViewIssueFiatRequestList                                       controllers.ComponentViewController.organizationViewIssueFiatRequestList
 GET         /component/zoneViewIssueFiatRequestList                                               controllers.ComponentViewController.zoneViewIssueFiatRequestList

@@ -58,6 +58,7 @@
             <div class="thirdPart salesChild">
                 <span>@incompleteNegotiation.status</span>
             </div>
+            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${incompleteNegotiation.id}'")
 
         }
     }
