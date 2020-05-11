@@ -449,14 +449,14 @@ html, body{
   .cmuk-sticky-fixed{
     width: 100% !important;
   }
-  .buttonForm {
+  .buttonPrimary {
     border-radius: 0.25rem;
     background:$colorPrimary;
     color: #FFFFFF;
     font-size: $paragraphFontSizeSmall;
     font-weight: bold;
   }
-  .buttonForm:active, .buttonForm.cmuk-active{
+  .buttonPrimary:active, .buttonPrimary.cmuk-active{
     background-color: $colorSecondary;
   }
   .cmuk-input {
@@ -912,7 +912,7 @@ form{
       top: 12px;
     }
 
-    .buttonForm {
+    .buttonPrimary {
       width: 100%;
       margin-top: 20px;
       padding: 5px 0;
@@ -922,7 +922,7 @@ form{
 
 .signUpForm{
   form .formBody {
-    .buttonForm {
+    .buttonPrimary {
       width: 100%;
       margin-top: 20px;
       padding: 5px 0;
@@ -989,7 +989,7 @@ form{
           }
         }
       }
-      .buttonForm{
+      .buttonPrimary{
         width: 250px;
         margin-top: 20px;
         padding: 5px 0;
@@ -1007,7 +1007,7 @@ form{
           width: 450px;
         }
       }
-      .buttonForm{
+      .buttonPrimary{
         width: 450px;
         margin-top: 20px;
         padding: 5px 0;
@@ -1041,7 +1041,7 @@ form{
       }
     }
   }
-  .buttonForm{
+  .buttonPrimary{
     font-size: $paragraphFontSizeSmall;
   }
   .mnemonicNote{

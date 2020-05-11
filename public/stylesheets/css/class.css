@@ -356,13 +356,13 @@ html, body {
 
 .comdex .cmuk-sticky-fixed {
   width: 100% !important; }
-.comdex .buttonForm {
+.comdex .buttonPrimary {
   border-radius: 0.25rem;
   background: #0862BE;
   color: #FFFFFF;
   font-size: 0.875rem;
   font-weight: bold; }
-.comdex .buttonForm:active, .comdex .buttonForm.cmuk-active {
+.comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
   background-color: #053C75; }
 .comdex .cmuk-input {
   background: #FFFFFF;
@@ -699,12 +699,12 @@ form .formBody {
   position: absolute;
   right: 0;
   top: 12px; }
-.loginForm .formBody .buttonForm {
+.loginForm .formBody .buttonPrimary {
   width: 100%;
   margin-top: 20px;
   padding: 5px 0; }
 
-.signUpForm form .formBody .buttonForm {
+.signUpForm form .formBody .buttonPrimary {
   width: 100%;
   margin-top: 20px;
   padding: 5px 0; }
@@ -754,14 +754,14 @@ form .formBody {
       .logoutContainer form .formBody .commonCheckBox dl dd {
         margin-top: 12px;
         margin-right: 25px; }
-  .logoutContainer form .formBody .buttonForm {
+  .logoutContainer form .formBody .buttonPrimary {
     width: 250px;
     margin-top: 20px;
     padding: 5px 0; }
 
 .MnemonicQuiz form .formBody .commonInputPassword dd input {
   width: 450px; }
-.MnemonicQuiz form .formBody .buttonForm {
+.MnemonicQuiz form .formBody .buttonPrimary {
   width: 450px;
   margin-top: 20px;
   padding: 5px 0; }
@@ -786,7 +786,7 @@ form .formBody {
       text-align: center; }
     .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton .mnemonicField {
       background-color: #FFffff; }
-.MnemonicQuiz .buttonForm {
+.MnemonicQuiz .buttonPrimary {
   font-size: 0.875rem; }
 .MnemonicQuiz .mnemonicNote {
   font-size: 0.875rem;

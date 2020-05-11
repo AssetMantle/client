@@ -1,6 +1,6 @@
 (function(window, $) {
     $(function() {
-        $(document).on('click', 'button , .navItemRippleEffect', function(event) {
+        $(document).on('click', '.cmuk-button , .navItemRippleEffect', function(event) {
             var $btn = $(this),
                 $div = $('<div/>'),
                 btnOffset = $btn.offset(),
@@ -16,7 +16,6 @@
                     background: $btn.data("ripple-color") || "#fff"
                 });
             $btn.append($div);
-
             window.setTimeout(function() {
                 $div.remove();
             }, 200);
