@@ -5,8 +5,7 @@
 @import models.master.Negotiation
 @import models.docusign.Envelope
 
-@(traderID:String, negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],negotiationEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+@(traderID:String, negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile], negotiationEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider,flash: Flash, loginState: LoginState = null)
 
 @negotiation.status match {
 
@@ -61,9 +60,17 @@
                                     <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocument('@negotiation.id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
                                 </td>
                                 @assetFile.documentType match{
-                                    case constants.File.Asset.BILL_OF_LADING=> {<td> <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiation.assetID','@assetFile.documentType'))")> <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-seen")"/></svg></span></td>
+                                    case constants.File.Asset.BILL_OF_LADING=> {
+                                        <td> <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiation.assetID','@assetFile.documentType'))")> <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-seen")"/></svg></span></td>
+                                        <td>
+                                        @assetFile.status match{
+                                            case Some(true)=>{@constants.View.APPROVED}
+                                            case Some(false)=>{@constants.View.REJECTED}
+                                            case None=>{@views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiation.id,assetFile = assetFile)}
+                                        }
+                                        </td>
                                     }
-                                    case _=>{}
+                                    case _=> {}
                                 }
                             </tr>
                         }

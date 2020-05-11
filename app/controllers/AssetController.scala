@@ -11,10 +11,9 @@ import models.docusign
 import models.master.{Asset, Negotiation, Trader, Zone}
 import models.masterTransaction.AssetFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-
+import play.api.i18n.{I18nSupport, Messages}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -460,6 +459,73 @@ class AssetController @Inject()(
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def updateAssetDocumentStatusForm(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
+      def getAssetFile(assetID: String) = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = documentType)
+
+      (for {
+        negotiation <- negotiation
+        assetFile <- getAssetFile(negotiation.assetID)
+      } yield Ok(views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiationID, assetFile = assetFile))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def updateAssetDocumentStatus(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
+        formWithErrors => {
+          val negotiation = masterNegotiations.Service.tryGet(formWithErrors(constants.FormField.NEGOTIATION_ID.name).value.get)
+
+          def getAssetFile(assetID: String) = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+
+          (for {
+            negotiation <- negotiation
+            assetFile <- getAssetFile(negotiation.assetID)
+          } yield BadRequest(views.html.component.master.updateAssetDocumentStatus(formWithErrors, negotiation.id, assetFile))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
+        },
+        updateAssetDocumentStatusData => {
+          val negotiation = masterNegotiations.Service.tryGet(updateAssetDocumentStatusData.negotiationID)
+
+          def verifyOrRejectAndSendNotification(negotiation: Negotiation) = if (updateAssetDocumentStatusData.status) {
+            val verify = masterTransactionAssetFiles.Service.accept(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
+            val sellerAccountID = masterTraders.Service.tryGetAccountId(negotiation.sellerTraderID)
+            for {
+              _ <- verify
+              sellerAccountID <- sellerAccountID
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            } yield {}
+          } else {
+            val reject = masterTransactionAssetFiles.Service.reject(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
+            val sellerAccountID = masterTraders.Service.tryGetAccountId(negotiation.sellerTraderID)
+            for {
+              _ <- reject
+              sellerAccountID <- sellerAccountID
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+            } yield {}
+          }
+
+          def getAssetFile(assetID: String): Future[AssetFile] = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = updateAssetDocumentStatusData.documentType)
+
+          (for {
+            negotiation <- negotiation
+            _ <- verifyOrRejectAndSendNotification(negotiation)
+            assetFile <- getAssetFile(negotiation.assetID)
+            result <- withUsernameToken.PartialContent(views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiation.id, assetFile = assetFile))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )

@@ -400,19 +400,19 @@ class AddZoneController @Inject()(
         updateZoneKYCDocumentStatusData => {
           val verifyOrRejectAndSendNotification = if (updateZoneKYCDocumentStatusData.status) {
             val verify = masterZoneKYCs.Service.verify(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneAccountID = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- verify
-              zoneId <- zoneId
-              _ <- utilitiesNotification.send(zoneId, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              zoneAccountID <- zoneAccountID
+              _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
             } yield {}
           } else {
             val reject = masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneAccountID = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- reject
-              zoneId <- zoneId
-              _ <- utilitiesNotification.send(zoneId, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              zoneAccountID <- zoneAccountID
+              _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             } yield {}
           }
 
