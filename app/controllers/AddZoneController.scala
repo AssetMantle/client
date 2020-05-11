@@ -389,7 +389,7 @@ class AddZoneController @Inject()(
     implicit request =>
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          val zoneKYC = masterZoneKYCs.Service.tryGet(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val zoneKYC = masterZoneKYCs.Service.tryGet(id = formWithErrors.data(constants.FormField.ZONE_ID.name), documentType = formWithErrors.data(constants.FormField.DOCUMENT_TYPE.name))
           (for {
             zoneKYC <- zoneKYC
           } yield BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors, zoneKYC))
