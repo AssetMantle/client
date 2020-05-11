@@ -4,10 +4,10 @@
 
 @(addTraderForm: Form[AddTrader.Data] = AddTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_TRADER, addTraderForm) {
-    @Messages(constants.View.REGISTER_TO_AN_ORGANIZATION_NOTE)
+    @Messages(constants.View.REGISTER_TO_ORGANIZATION_NOTE)
     <br>
     @commonInputText(addTraderForm, constants.FormField.ORGANIZATION_ID)
-    @Messages(constants.View.REGISTER_AS_AN_ORGANIZATION_NOTE)
+    @Messages(constants.View.REGISTER_AS_ORGANIZATION_NOTE)
     <br>
     @commonFormButton(constants.Form.ADD_ORGANIZATION)
 }
