@@ -1615,6 +1615,10 @@ BEGIN
         new."createdOnTimeZone" = CURRENT_SETTING('TIMEZONE');;
         new."createdBy" = CURRENT_USER;;
     ELSEIF (TG_OP = 'UPDATE') THEN
+--         values of created needs to be set here otherwise insertOrUpdate of slick will omit created details
+        new."createdOn" = old."createdOn";;
+        new."createdOnTimeZone" = old."createdOnTimeZone";;
+        new."createdBy" = old."createdBy";;
         new."updatedOn" = CURRENT_TIMESTAMP;;
         new."updatedOnTimeZone" = CURRENT_SETTING('TIMEZONE');;
         new."updatedBy" = CURRENT_USER;;
