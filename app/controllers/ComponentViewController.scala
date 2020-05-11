@@ -2194,12 +2194,12 @@ class ComponentViewController @Inject()(
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getResult(trader: Trader, negotiation: Negotiation) = {
+      def getResult(trader: Trader, negotiation: Negotiation): Future[Result] = {
         if (trader.id == negotiation.buyerTraderID || trader.id == negotiation.sellerTraderID) {
           val asset = masterAssets.Service.tryGet(negotiation.assetID)
           val counterPartyTrader = masterTraders.Service.tryGet(if (trader.id == negotiation.sellerTraderID) negotiation.buyerTraderID else negotiation.sellerTraderID)
 
-          def getCounterPartyOrganization(organizationID: String) = masterOrganizations.Service.tryGet(organizationID)
+          def getCounterPartyOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           for {
             asset <- asset
@@ -2226,9 +2226,9 @@ class ComponentViewController @Inject()(
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def negotiationTraders(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+      def getNegotiationTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
-      def getResult(organizationID: String, negotiationTraders: Seq[Trader], negotiation: Negotiation) = {
+      def getResult(organizationID: String, negotiationTraders: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (negotiationTraders.map(_.organizationID) contains organizationID) {
           val asset = masterAssets.Service.tryGet(negotiation.assetID)
           val counterPartyOrganization = masterOrganizations.Service.tryGet(negotiationTraders.map(_.organizationID).filterNot(_ == organizationID).headOption.getOrElse(""))
@@ -2245,7 +2245,7 @@ class ComponentViewController @Inject()(
       (for {
         organizationID <- organizationID
         negotiation <- negotiation
-        negotiationTraders <- negotiationTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        negotiationTraders <- getNegotiationTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
         result <- getResult(organizationID, negotiationTraders, negotiation)
       } yield result
         ).recover {
