@@ -60,6 +60,7 @@
         <div class="salesQuoteCardRight salesChild">
             <span>@rejectedReceivedNegotiation.comment.getOrElse("")</span>
         </div>
+        @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
     }
     }
 </div>
@@ -117,6 +118,7 @@
             <div class="salesQuoteCardRight salesChild">
                 <span>@rejectedSentNegotiation.comment.getOrElse("")</span>
             </div>
+            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedSentNegotiation.id}'")
         }
         }
     </div>
@@ -175,6 +177,7 @@
             <div class="salesQuoteCardRight salesChild">
             <span>@failedNegotiation.status</span>
             </div>
+            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
         }
         }
     </div>

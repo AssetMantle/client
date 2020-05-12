@@ -78,30 +78,29 @@ class ComponentViewController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-      def fiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
+      def getFiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
 
-      def negotiations(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
+      def getNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
 
-      def incompleteNegotiations(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
 
-      def completedOrders(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
+      def getCompletedOrderList(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
 
-      def fiatsInOrders(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
+      def getFiatsInOrderList(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
 
-      def payable(traderID: String, fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
-        incompleteNegotiations(negotiations.filter(_.buyerTraderID == traderID), completedOrders).map(_.price).sum - fiatsInOrders.filter(_.traderID == traderID).map(_.amount).sum
+      def getPayable(traderID: String, fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
+        getIncompleteNegotiationList(negotiations.filter(_.buyerTraderID == traderID), completedOrders).map(_.price).sum - fiatsInOrders.filter(_.traderID == traderID).map(_.amount).sum
       }
 
-      def receivable(incompleteNegotiations: Seq[Negotiation], traderID: String) = incompleteNegotiations.filter(_.sellerTraderID == traderID).map(_.price).sum
-
+      def getReceivable(incompleteNegotiations: Seq[Negotiation], traderID: String) = incompleteNegotiations.filter(_.sellerTraderID == traderID).map(_.price).sum
 
       (for {
         traderID <- traderID
-        fiatPegWallet <- fiatPegWallet(traderID)
-        negotiations <- negotiations(traderID)
-        completedOrders <- completedOrders(negotiations.map(_.negotiationID.getOrElse("")))
-        fiatsInOrders <- fiatsInOrders(incompleteNegotiations(negotiations, completedOrders).map(_.id))
-      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = payable(traderID, fiatsInOrders, completedOrders, negotiations), receivable = receivable(incompleteNegotiations(negotiations, completedOrders), traderID)))
+        fiatPegWallet <- getFiatPegWallet(traderID)
+        negotiationList <- getNegotiationList(traderID)
+        completedOrderList <- getCompletedOrderList(negotiationList.map(_.negotiationID.getOrElse("")))
+        fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
+      } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderID, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderID)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -111,34 +110,34 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def traderIDs(organizationID: String) = masterTraders.Service.getVerifiedTraderIDsByOrganizationID(organizationID)
+      def getTraderIDList(organizationID: String) = masterTraders.Service.getVerifiedTraderIDsByOrganizationID(organizationID)
 
-      def fiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
+      def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
 
-      def negotiations(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
+      def getNegotiationList(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
 
-      def incompleteNegotiations(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
 
-      def completedOrders(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
+      def getCompletedOrderList(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
 
-      def fiatsInOrders(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
+      def getFiatsInOrderList(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
 
-      def payable(traderIDs: Seq[String], fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
+      def getPayable(traderIDs: Seq[String], fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
         val buyingNegotiations = negotiations.filter(traderIDs contains _.buyerTraderID)
-        incompleteNegotiations(buyingNegotiations, completedOrders).map(_.price).sum - fiatsInOrders.filter(buyingNegotiations.map(_.id) contains _.negotiationID).filter( traderIDs contains _.traderID).map(_.amount).sum
+        getIncompleteNegotiationList(buyingNegotiations, completedOrders).map(_.price).sum - fiatsInOrders.filter(buyingNegotiations.map(_.id) contains _.negotiationID).filter(traderIDs contains _.traderID).map(_.amount).sum
       }
 
-      def receivable(incompleteNegotiations: Seq[Negotiation], traderIDs: Seq[String]) = incompleteNegotiations.filter(traderIDs contains _.sellerTraderID).map(_.price).sum
+      def getReceivable(incompleteNegotiations: Seq[Negotiation], traderIDs: Seq[String]) = incompleteNegotiations.filter(traderIDs contains _.sellerTraderID).map(_.price).sum
 
 
       (for {
         organizationID <- organizationID
-        traderIDs <- traderIDs(organizationID)
-        fiatPegWallet <- fiatPegWallet(traderIDs)
-        negotiations <- negotiations(traderIDs)
-        completedOrders <- completedOrders(negotiations.map(_.negotiationID.getOrElse("")))
-        fiatsInOrders <- fiatsInOrders(incompleteNegotiations(negotiations, completedOrders).map(_.id))
-      } yield Ok(views.html.component.master.organizationFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = payable(traderIDs, fiatsInOrders, completedOrders, negotiations), receivable = receivable(incompleteNegotiations(negotiations, completedOrders), traderIDs)))
+        traderIDList <- getTraderIDList(organizationID)
+        fiatPegWallet <- getFiatPegWallet(traderIDList)
+        negotiationList <- getNegotiationList(traderIDList)
+        completedOrderList <- getCompletedOrderList(negotiationList.map(_.negotiationID.getOrElse("")))
+        fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
+      } yield Ok(views.html.component.master.organizationFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderIDList, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderIDList)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -148,34 +147,34 @@ class ComponentViewController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
-      def traderIDs(zoneID: String) = masterTraders.Service.getVerifiedTraderIDsByZoneID(zoneID)
+      def getTraderIDList(zoneID: String) = masterTraders.Service.getVerifiedTraderIDsByZoneID(zoneID)
 
-      def fiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
+      def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
 
-      def negotiations(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
+      def getNegotiationList(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
 
-      def incompleteNegotiations(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
 
-      def completedOrders(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
+      def getCompletedOrderList(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
 
-      def fiatsInOrders(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
+      def getFiatsInOrderList(masterNegotiationIDs: Seq[String]) = masterTransactionSendFiatRequests.Service.getFiatRequestsInOrders(masterNegotiationIDs)
 
-      def payable(traderIDs: Seq[String], fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
+      def getPayable(traderIDs: Seq[String], fiatsInOrders: Seq[SendFiatRequest], completedOrders: Seq[Order], negotiations: Seq[Negotiation]) = {
         val buyingNegotiations = negotiations.filter(traderIDs contains _.buyerTraderID)
-        incompleteNegotiations(buyingNegotiations, completedOrders).map(_.price).sum - fiatsInOrders.filter(buyingNegotiations.map(_.id) contains _.negotiationID).filter( traderIDs contains _.traderID).map(_.amount).sum
+        getIncompleteNegotiationList(buyingNegotiations, completedOrders).map(_.price).sum - fiatsInOrders.filter(buyingNegotiations.map(_.id) contains _.negotiationID).filter(traderIDs contains _.traderID).map(_.amount).sum
       }
 
-      def receivable(incompleteNegotiations: Seq[Negotiation], traderIDs: Seq[String]) = incompleteNegotiations.filter(traderIDs contains _.sellerTraderID).map(_.price).sum
+      def getReceivable(incompleteNegotiations: Seq[Negotiation], traderIDs: Seq[String]) = incompleteNegotiations.filter(traderIDs contains _.sellerTraderID).map(_.price).sum
 
 
       (for {
         zoneID <- zoneID
-        traderIDs <- traderIDs(zoneID)
-        fiatPegWallet <- fiatPegWallet(traderIDs)
-        negotiations <- negotiations(traderIDs)
-        completedOrders <- completedOrders(negotiations.map(_.negotiationID.getOrElse("")))
-        fiatsInOrders <- fiatsInOrders(incompleteNegotiations(negotiations, completedOrders).map(_.id))
-      } yield Ok(views.html.component.master.zoneFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount.toInt).sum, payable = payable(traderIDs, fiatsInOrders, completedOrders, negotiations), receivable = receivable(incompleteNegotiations(negotiations, completedOrders), traderIDs)))
+        traderIDList <- getTraderIDList(zoneID)
+        fiatPegWallet <- getFiatPegWallet(traderIDList)
+        negotiationList <- getNegotiationList(traderIDList)
+        completedOrderList <- getCompletedOrderList(negotiationList.map(_.negotiationID.getOrElse("")))
+        fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
+      } yield Ok(views.html.component.master.zoneFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderIDList, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderIDList)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -1836,7 +1835,7 @@ class ComponentViewController @Inject()(
         issueFiatRequestList <- getIssueFiatRequestList(traderID)
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.traderViewIssueFiatRequestList(issueFiatRequestList, rtcbList))
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -1857,7 +1856,7 @@ class ComponentViewController @Inject()(
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.organizationViewIssueFiatRequestList(traderList, issueFiatRequestList, rtcbList))
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -1882,7 +1881,7 @@ class ComponentViewController @Inject()(
         issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.zoneViewIssueFiatRequestList(traderList, organizationList, issueFiatRequestList, rtcbList))
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -2206,6 +2205,70 @@ class ComponentViewController @Inject()(
         redeemFiatRequestList <- redeemFiatRequestList(traderID)
       } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewNegotiation(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
+      def getResult(trader: Trader, negotiation: Negotiation): Future[Result] = {
+        if (trader.id == negotiation.buyerTraderID || trader.id == negotiation.sellerTraderID) {
+          val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val counterPartyTrader = masterTraders.Service.tryGet(if (trader.id == negotiation.sellerTraderID) negotiation.buyerTraderID else negotiation.sellerTraderID)
+
+          def getCounterPartyOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
+
+          for {
+            asset <- asset
+            counterPartyTrader <- counterPartyTrader
+            counterPartyOrganization <- getCounterPartyOrganization(counterPartyTrader.organizationID)
+          } yield Ok(views.html.component.master.traderViewNegotiation(negotiation = negotiation, asset = asset, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
+
+      (for {
+        trader <- trader
+        negotiation <- negotiation
+        result <- getResult(trader, negotiation)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewNegotiation(negotiationID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
+      def getNegotiationTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      def getResult(organizationID: String, negotiationTraders: Seq[Trader], negotiation: Negotiation): Future[Result] = {
+        if (negotiationTraders.map(_.organizationID) contains organizationID) {
+          val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val counterPartyOrganization = masterOrganizations.Service.tryGet(negotiationTraders.map(_.organizationID).filterNot(_ == organizationID).headOption.getOrElse(""))
+
+          for {
+            asset <- asset
+            counterPartyOrganization <- counterPartyOrganization
+          } yield Ok(views.html.component.master.organizationViewNegotiation(negotiation = negotiation, asset = asset, trader = negotiationTraders.find(_.organizationID == organizationID), counterPartyTrader = negotiationTraders.filterNot(_.organizationID == organizationID).headOption, counterPartyOrganization))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
+
+      (for {
+        organizationID <- organizationID
+        negotiation <- negotiation
+        negotiationTraders <- getNegotiationTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        result <- getResult(organizationID, negotiationTraders, negotiation)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
 

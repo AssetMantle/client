@@ -380,6 +380,7 @@ object View {
   val UPLOAD = "UPLOAD"
   val UPDATE = "UPDATE"
   val FOOTER_LOGO = "FOOTER_LOGO"
+  val VIEW_QUOTE = "VIEW_QUOTE"
 
   //Member Check
   val SCAN_ID = "SCAN_ID"

@@ -43,7 +43,7 @@
                 @component.master.commonDocumentViewer(organizationKYC) {
                         @routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)
                 } {
-                        <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+                        @commonLink(organizationKYC.documentType, routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType))
                 } {
                         @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
                 }
