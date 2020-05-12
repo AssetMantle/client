@@ -2,40 +2,32 @@ package models.blockchain
 
 import java.sql.Timestamp
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
-import models.westernUnion.FiatRequests
-import models.{blockchain, master, masterTransaction}
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
-import queries.responses.AccountResponse
+import queries.GetAccount
 import queries.responses.AccountResponse.Response
-import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Fiat] {
-
-  def createLog()(implicit node: Node): Fiat = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Fiat = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider,
-                      actorSystem: ActorSystem, getAccount: GetAccount,
-                      blockchainAccounts: blockchain.Accounts, masterTraders: master.Traders,
-                      masterFiats: master.Fiats)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(
+                       protected val databaseConfigProvider: DatabaseConfigProvider,
+                       actorSystem: ActorSystem, getAccount: GetAccount,
+                       configuration: Configuration,
+                       blockchainAccounts: blockchain.Accounts,
+                       masterTraders: master.Traders,
+                       masterFiats: master.Fiats)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -57,9 +49,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
-  private def add(fiat: Fiat): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat.createLog()).asTry).map {
+  private def add(fiat: Fiat): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -67,7 +57,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def insertMultiple(fiats: Seq[Fiat]): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats.map(_.createLog())).asTry).map {
+  private def insertMultiple(fiats: Seq[Fiat]): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -75,7 +65,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def updateByPegHash(fiat: Fiat): Future[Int] = db.run(fiatTable.filter(_.pegHash === fiat.pegHash).filter(_.ownerAddress === fiat.ownerAddress).update(fiat.updateLog()).asTry).map {
+  private def updateByPegHashAndOwnerAddress(fiat: Fiat): Future[Int] = db.run(fiatTable.filter(_.pegHash === fiat.pegHash).filter(_.ownerAddress === fiat.ownerAddress).update(fiat).asTry).map {
     case Success(result) => if (result > 0) result else {
       val create = add(fiat)
       for {
@@ -189,7 +179,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def insertList(fiats: Seq[Fiat]): Future[Seq[String]] = insertMultiple(fiats)
 
-    def update(fiat: Fiat): Future[Int] = updateByPegHash(fiat)
+    def update(fiat: Fiat): Future[Int] = updateByPegHashAndOwnerAddress(fiat)
 
     def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address)
 
@@ -277,6 +267,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
                         } yield ()
                       }
                     }
+
                   for {
                     traderID <- traderID
                     _ <- upsert(traderID)
@@ -285,7 +276,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
                 case None => Future(Unit)
               }
             }
-            for{
+
+            for {
               accountID <- accountID
               _ <- upsertMasterFiat(accountID)
             } yield Unit

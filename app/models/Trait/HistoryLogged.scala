@@ -2,7 +2,7 @@ package models.Trait
 
 import java.sql.Timestamp
 
-trait Logged {
+trait HistoryLogged {
   val createdOn: Option[Timestamp]
 
   val createdBy: Option[String]
@@ -15,4 +15,9 @@ trait Logged {
 
   val updatedOnTimeZone: Option[String]
 
+  val deletedBy: String
+
+  val deletedOn: Timestamp
+
+  val deletedOnTimeZone: String
 }

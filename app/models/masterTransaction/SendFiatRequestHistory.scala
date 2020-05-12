@@ -2,25 +2,15 @@ package models.masterTransaction
 
 import java.sql.Timestamp
 
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Logged
-import models.common.Node
-import org.postgresql.util.PSQLException
+import models.Trait.HistoryLogged
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
-case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[SendFiatRequestHistory] {
-
-  def createLog()(implicit node: Node): SendFiatRequestHistory = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): SendFiatRequestHistory = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
 
 @Singleton
 class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -35,8 +25,6 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val sendFiatRequestHistoryTable = TableQuery[SendFiatRequestHistoryTable]
 
   private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequestHistory]] = db.run(sendFiatRequestHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
@@ -49,7 +37,7 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
 
   private[models] class SendFiatRequestHistoryTable(tag: Tag) extends Table[SendFiatRequestHistory](tag, "SendFiatRequest_History") {
 
-    def * = (id, traderID, ticketID, negotiationID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendFiatRequestHistory.tupled, SendFiatRequestHistory.unapply)
+    def * = (id, traderID, ticketID, negotiationID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (SendFiatRequestHistory.tupled, SendFiatRequestHistory.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -74,6 +62,12 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
     def updatedOn = column[Timestamp]("updatedOn")
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+
+    def deletedBy = column[String]("deletedBy")
+
+    def deletedOn = column[Timestamp]("deletedOn")
+
+    def deletedOnTimeZone = column[String]("deletedOnTimeZone")
   }
 
   object Service {

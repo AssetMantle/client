@@ -1,7 +1,5 @@
 package controllers
 
-import java.nio.file.Files
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -57,7 +55,6 @@ class SetACLController @Inject()(
           Future(BadRequest(views.html.component.master.inviteTrader(formWithErrors)))
         },
         inviteTraderData => {
-
           val emailAddressAccount: Future[Option[String]] = masterEmails.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
 
           def inviteeUserType(emailAddressAccount: Option[String]): Future[String] = emailAddressAccount match {
@@ -69,21 +66,22 @@ class SetACLController @Inject()(
             if (inviteeUserType != constants.User.USER) {
               Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_TAKEN))))
             } else {
-
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
+              val identification = masterIdentifications.Service.tryGet(loginState.username)
 
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
-              def sendEmailAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
-                withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+              def sendEmailAndGetResult(organization: Organization, identification: Identification): Future[Result] = {
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, Seq(identification.firstName, identification.lastName).mkString(" "), organization.name, comdexURL, organization.id)
+                withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_INVITATION_EMAIL_SENT)))
               }
 
               for {
                 organization <- organization
+                identification <- identification
                 _ <- createInvitation(organization)
                 _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
-                result <- sendEmailAndGetResult(organization)
+                result <- sendEmailAndGetResult(organization, identification)
               } yield result
             }
 
