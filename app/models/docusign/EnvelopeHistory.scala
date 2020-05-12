@@ -1,7 +1,10 @@
 package models.docusign
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.HistoryLogged
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -9,7 +12,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class EnvelopeHistory(id: String, envelopeID: String, documentType: String, status: String)
+case class EnvelopeHistory(id: String, envelopeID: String, documentType: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
 
 @Singleton
 class EnvelopeHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -58,7 +61,7 @@ class EnvelopeHistories @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class EnvelopeHistoryTable(tag: Tag) extends Table[EnvelopeHistory](tag, "Envelope_History") {
 
-    def * = (id, envelopeID, documentType, status) <> (EnvelopeHistory.tupled, EnvelopeHistory.unapply)
+    def * = (id, envelopeID, documentType, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (EnvelopeHistory.tupled, EnvelopeHistory.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -67,6 +70,24 @@ class EnvelopeHistories @Inject()(protected val databaseConfigProvider: Database
     def documentType = column[String]("documentType")
 
     def status = column[String]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+
+    def deletedBy = column[String]("deletedBy")
+
+    def deletedOn = column[Timestamp]("deletedOn")
+
+    def deletedOnTimeZone = column[String]("deletedOnTimeZone")
 
   }
 
