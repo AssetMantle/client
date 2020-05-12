@@ -5,6 +5,6 @@
 @(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.RELEASE_ASSET, releaseAssetForm) {
     @commonInputText(releaseAssetForm, constants.FormField.ASSET_ID, 'value -> assetID, 'readonly -> true, 'containerDivClass -> "hidden")
-    @commonInputInt(releaseAssetForm, constants.FormField.GAS)
+    @commonInputInt(releaseAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD)
 }
