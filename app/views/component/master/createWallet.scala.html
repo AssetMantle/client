@@ -7,15 +7,18 @@
     @commonForm(constants.Form.CREATE_WALLET, createWalletForm) {
         @commonInputText(createWalletForm, constants.FormField.USERNAME, 'containerDivClass -> "hidden", 'value -> username, 'readonly -> true)
         @commonInputText(createWalletForm, constants.FormField.MNEMONICS, 'value -> mnemonics.mkString(" "), 'containerDivClass -> "hidden", 'readonly -> true)
+        <div class="infoSuccess hidden">
+            <p><span class="icon-success">@commonIcon("success")</span> @Messages(constants.View.MNEMONIC_SUCCESS_MESSAGE)</p>
+        </div>
         <div class="cmuk-flex verifyMnemonic">
         @for((str, i) <- mnemonics.zipWithIndex) {
-            <div class="verifyMnemonicbutton">
+            <div class="verifyMnemonicButton">
                 <input type="text" id="mnemonicElement-@i" name="mnemonicElement-@i" class="cmuk-input" value="@str" autocomplete="off" readonly>
             </div>
         }
         </div>
         <div class="mnemonicNote">
-            <div><span class="mnemonicInfoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info-rounded")"/></svg></span></div>
+            <div><span class="mnemonicInfoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-infoRounded")"/></svg></span></div>
             <div class="mnemonicNoteText">
             @Messages(constants.View.MNEMONIC_NOTE)
             </div>

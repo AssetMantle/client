@@ -9,18 +9,17 @@
     @Messages(constants.View.TRADER_REQUEST): @trader.id
 </legend>
 <hr>
+<div class="modalInfoBlock">
 @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
 @commonTextInfo(constants.View.NAME, trader.name)
-
-<br>
-
-<div>@Messages(constants.View.ORGANIZATION_DETAILS)</div>
+<div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_DETAILS)</div>
 @commonTextInfo(constants.View.NAME, organization.name)
 @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
 @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
 @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
 @commonBooleanInfo(constants.View.STATUS, organization.verificationStatus)
 <br>
-@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)
+    <p class="cmuk-text-left">* @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</p>
 @commonFormButton(constants.Form.ZONE_VERIFY_TRADER,  'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${trader.id}'")
 @commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")
+</div>

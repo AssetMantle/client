@@ -4,7 +4,7 @@
 @import models.common.Serializable
 @import models.Abstract.AssetDocumentContent
 @(documentType:String, documentContent: Option[AssetDocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="modalInfoBlock">
 @documentContent match {
     case Some(content)=> {
         @documentType match {
@@ -20,9 +20,9 @@
                     @commonTextInfo(constants.View.NOTIFY_PARTY_ADDRESS, billOfLading.notifyPartyAddress)
                     @commonDateInfo(constants.View.SHIPMENT_DATE, billOfLading.dateOfShipping)
                     @commonTextInfo(constants.View.DELIVERY_TERM, billOfLading.deliveryTerm)
+                    @commonTextInfo(constants.View.ASSET_DESCRIPTION, billOfLading.assetDescription)
                     @commonIntInfo(constants.View.ASSET_QUANTITY, billOfLading.weightOfConsignment)
                     @commonIntInfo(constants.View.ASSET_PRICE, billOfLading.declaredAssetValue)
-
                 }
             }
             case _ => {}
@@ -30,3 +30,4 @@
     }
     case None=>{@Messages(constants.View.CONTENT_NOT_FOUND)}
 }
+</div>

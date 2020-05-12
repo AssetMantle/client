@@ -5,40 +5,44 @@
 
 @(mobileNumber: Option[Mobile], emailAddress: Option[Email])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
+@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#contactDetails") {
    } {
-    <div class="contactUpdateButton">
-    @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm, 'class -> "cmuk-button-link")}
-    </div>
-    @mobileNumber match {
-        case Some(mobile) => {
-            @commonInfoBox() {
-                <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
-                    @commonTextInfo(constants.View.MOBILE_NUMBER, mobile.mobileNumber)
-                    @if(mobile.status) {
-                        <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
-                    } else {
-                        @commonFormButton(constants.Form.VERIFY_MOBILE_NUMBER, 'class -> "cmuk-button-link")
-                    }
+    <div class="contactInfoItem">
+        @mobileNumber match {
+            case Some(mobile) => {
+                @commonInfoBox() {
+                    <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
+                        @commonTextInfo(constants.View.MOBILE_NUMBER, mobile.mobileNumber)
+                        @if(mobile.status) {
+                            <div class="contactInfoItemStatus">
+                            <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
+                            </div>
+                        } else {
+                            @commonFormButton(constants.Form.VERIFY_MOBILE_NUMBER, 'class -> "cmuk-button-link")
+                        }
+                    </div>
+                }
+            }
+            case None => {
+                <div class="cmuk-position-center">
+                @commonFormButton(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER)
                 </div>
             }
         }
-        case None => {
-            <div class="cmuk-position-center">
-            @commonFormButton(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER)
-            </div>
-        }
-    }
-    <div class="contactUpdateButton">
-    @emailAddress.map{email => @commonModalButton(constants.View.UPDATE_EMAIL_ADDRESS, routes.javascript.ContactController.addOrUpdateEmailAddressForm, 'class -> "cmuk-button-link")}
+        <div class="contactUpdateButton">
+        @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm, 'class -> "cmuk-button-link")}
+        </div>
     </div>
+    <div class="contactInfoItem">
     @emailAddress match {
         case Some(email) => {
             @commonInfoBox() {
                 <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
                     @commonTextInfo(constants.View.EMAIL_ADDRESS, email.emailAddress)
                     @if(email.status) {
+                        <div class="contactInfoItemStatus">
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
+                        </div>
                     } else {
                         @commonFormButton(constants.Form.VERIFY_EMAIL_ADDRESS, 'class -> "cmuk-button-link")
                     }
@@ -51,4 +55,8 @@
             </div>
         }
     }
+        <div class="contactUpdateButton">
+        @emailAddress.map{email => @commonModalButton(constants.View.UPDATE_EMAIL_ADDRESS, routes.javascript.ContactController.addOrUpdateEmailAddressForm, 'class -> "cmuk-button-link")}
+        </div>
+    </div>
 }

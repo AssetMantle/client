@@ -7,7 +7,7 @@
   .MnemonicQuiz{
     max-width: 500px;
   }
-  .bannerContainer {
+  .banner {
     background-size: contain;
     background-position: center bottom;
     .bannerText {
@@ -74,7 +74,7 @@
   }
   .MnemonicQuiz {
     text-align: center;
-    .verifyMnemonic .verifyMnemonicbutton {
+    .verifyMnemonic .verifyMnemonicButton {
       width: 95px;
     }
   }
@@ -86,13 +86,13 @@
 @media (min-width: 640px) {
   .modalBody{
     form{
-      width: 500px;
+      width:620px;
       text-align: center;
     }
   }
   form{
     hr{
-      margin-top: 10px;
+      margin: 0px;
     }
   }
   .MnemonicQuiz {
@@ -173,18 +173,53 @@
       width: 100%;
     }
   }
+  .modal .modalContent{
+    .modalBody {
+      .infoBlock {
+       flex-direction: column;
+        max-width: 500px;
+        max-height: 410px;
+        .infoBlockItem{
+          flex: none;
+          .infoBlockItemRight{
+            padding: 0;
+            border: none;
+
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (min-width:992px) and (max-width:1600px){
   .modal .modalContent{
     top:10%;
     max-height: 530px;
+    .modalBody {
+      form .formBody {
+        max-height: 409px;
+      }
+      .modalInfoBlock{
+        max-height: 409px;
+      }
+      .infoBlockHeight{
+        max-height: 399px;
+      }
+      .infoBlock {
+        width: 800px;
+      }
+    }
   }
-  .leftSideContainer{
+  .leftContainer{
     .financial{
       margin-bottom: 15px;
       .cmuk-card{
         height: 265px;
+        .cmuk-switcher{
+          height: 210px;
+          overflow: auto;
+        }
       }
     }
     .financial {
@@ -204,11 +239,11 @@
       color: #0862BE;
       border: 0;
     }
-    .docView{
-      .cmuk-card-header, .cmuk-card-body, .documentlist{
+    .documentView{
+      .cmuk-card-header, .cmuk-card-body, .documentList{
         padding:0px;
       }
-      .documentlist{
+      .documentList{
         height: 150px;
       }
       .cmuk-card{
@@ -224,7 +259,7 @@
       }
     }
   }
-  .rightSideContainer{
+  .rightContainer{
     .recentActivityContainer{
       margin-bottom: 15px;
       .cmuk-card-body{
@@ -256,29 +291,35 @@
     {
       line-height: 26px;
     }
+    .updateDocumentField button {
+      position: absolute;
+      top: 12px;
+      left: 115px;
+      font-weight: bold;
+    }
   }
   .switcherCard{
     .cmuk-switcher{
-      height: 179px;
+      height: 170px;
     }
   }
   .timeline {
     &:before{
-      left: 20px;
+      left: 19px;
     }
     .timeline-item .timeline-icon {
       left: 0px;
     }
   }
-  .SalesQuoteCard{
-    .firstPart{
+  .salesQuoteCard{
+    .salesQuoteCardLeft{
       flex: 32%;
     }
-    .secondPart{
-      flex: 45%;
+    .salesQuoteCardMiddle{
+      flex: 41%;
     }
-    .thirdPart{
-      flex: 23%;
+    .salesQuoteCardRight{
+      flex: 27%;
     }
   }
 }
@@ -287,7 +328,15 @@
   :root {
     font-size: 13px;
   }
-
+  .comdex{
+    .cmuk-input, .cmuk-select:not([multiple]):not([size]){
+      height: 40px;
+    }
+  }
+  .signUpForm .usernameAvailability .checkIcon,
+  .signUpForm .showPassword{
+    top:45px
+  }
   .profileContainer{
     .identificationDetails{
       .documentItem{
@@ -315,7 +364,7 @@
       }
     }
   }
-  .tabsSection{
+  .tabSection{
     .cmuk-grid-divider{
       display: block;
     }
@@ -328,7 +377,7 @@
     }
   }
   .mobileNumberUpdate .countryCode{
-    margin-top:28px;
+    margin-top:38px;
   }
 }
 
@@ -336,7 +385,7 @@
   :root {
     font-size: 16px;
   }
-  .showpassword, .checkIcon{
+  .showPassword, .checkIcon{
     top:37px;
   }
 }

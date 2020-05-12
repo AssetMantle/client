@@ -12,7 +12,7 @@
         @fieldset
         @commonCheckbox(formData, constants.FormField.STATUS, 'containerDivClass -> "hidden")
         @if(formData.hasGlobalErrors) {
-            <ul class="signupErrorList">
+            <ul class="signUpErrorList">
             @for(error <- formData.globalErrors) {
                 <li class="error">@error.format</li>
             }

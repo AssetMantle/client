@@ -8,13 +8,12 @@
 @commonCard(constants.View.UBOS) {
     @if(ubos.nonEmpty) {
         @commonFormButton(constants.Form.ADD_UBO,'class -> "cmuk-button-small cmuk-button-link")
-        <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>@Messages(constants.Form.ADD_UBO.legend)</button>
     }
 } {
     @if(ubos.isEmpty) {
         <div class="cmuk-position-center">
+                <span class="plusIcon">@commonIcon("plus")</span>
                 @commonFormButton(constants.Form.ADD_UBO,'class -> "cmuk-button-small cmuk-button-link")
-            <span class="plusIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-plus")"/></svg></span>@Messages(constants.Form.ADD_UBO.legend)</button>
         </div>
     } else {
         @ubos.map{ubo =>
