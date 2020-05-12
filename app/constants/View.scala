@@ -379,6 +379,7 @@ object View {
   val UPLOAD = "UPLOAD"
   val UPDATE = "UPDATE"
   val FOOTER_LOGO = "FOOTER_LOGO"
+  val VIEW_QUOTE = "VIEW_QUOTE"
 
   //docusign
   val PLEASE_SIGN_THIS_DOCUMENT = "PLEASE_SIGN_THIS_DOCUMENT"

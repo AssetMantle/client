@@ -5,7 +5,7 @@
 @import models.master.Negotiation
 @import models.docusign.Envelope
 
-@(traderID:String, negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],negotiationEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(traderID:String, negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile],negotiationEnvelopeList: Seq[Envelope])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash,loginState: LoginState = null)
 <ul class="documentList scroller">
     <li>
 @negotiation.status match {

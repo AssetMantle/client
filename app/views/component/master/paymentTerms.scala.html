@@ -9,9 +9,9 @@
     @commonInputDouble(paymentTermsForm, constants.FormField.ADVANCE_PERCENTAGE, 'id -> "advancePercentage", 'oninput -> "advancePercentageInput()")
     <div class="cmuk-text-left title"> @Messages(constants.View.CREDIT_TERMS)</div>
     @defining(Option(constants.FormField.CREDIT)) { implicit nestedFormField =>
-        @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'required -> false, 'id -> "tentativeDate", 'oninput -> "tentativeDateInput()")
-        @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'required -> false, 'id -> "tenure", 'oninput -> "tenureInput()")
-        @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'required -> false, 'id -> "reference")
+        @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'id -> "tentativeDate", 'oninput -> "tentativeDateInput()")
+        @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'id -> "tenure", 'oninput -> "tenureInput()")
+        @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'id -> "reference")
     }
 }
 <script src="@routes.Assets.versioned("javascripts/paymentTerms.js")" type="text/javascript"></script>
