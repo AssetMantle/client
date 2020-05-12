@@ -4,10 +4,10 @@
 @import scala.collection.immutable.ListMap
 @(negotiationID: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.View.HOME), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.View.TRADE_ROOM), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftSideContainer">
+    <div class="leftContainer">
         <div id="financial" class="financial"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
@@ -38,7 +38,7 @@
 }
 
 @center = {
-    <div class="mainTabs">
+    <div class="mainTabs switcherCardSecond">
         <div class="cmuk-card cmuk-card-default">
             <div class="cmuk-card-body">
             @loginState.userType match {
@@ -73,7 +73,7 @@
 @right = {
 
     <div>
-        <div class="rightSideContainer">
+        <div class="rightContainer">
             <div class="recentActivityContainer">
                 <div id="tradeActivities"></div>
             </div>

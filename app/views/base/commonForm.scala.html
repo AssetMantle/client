@@ -13,7 +13,7 @@
         @CSRF.formField
         @fieldset
         @if(formData.hasGlobalErrors) {
-            <ul class="signupErrorList">
+            <ul class="signUpErrorList">
             @for(error <- formData.globalErrors) {
                 <li class="error">@error.format</li>
             }

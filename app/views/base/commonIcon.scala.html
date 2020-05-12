@@ -1,5 +1,2 @@
-@(name: String)(implicit messagesProvider: MessagesProvider)
-
-<svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#"+name)"/></svg>
-
-@*Exmaple Useage- @commonIcon("icon-seen")*@
+@(id: String = "")
+<svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#"+id)"/></svg>

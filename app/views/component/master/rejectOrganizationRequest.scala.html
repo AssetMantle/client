@@ -6,5 +6,5 @@
 @commonForm(constants.Form.REJECT_ORGANIZATION_REQUEST, rejectOrganizationRequestForm) {
     @commonInputText(rejectOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID, 'readonly -> true)
     @commonInputText(rejectOrganizationRequestForm, constants.FormField.COMMENT, 'required -> false)
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organizationID}'")
 }
-@commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organizationID}'")

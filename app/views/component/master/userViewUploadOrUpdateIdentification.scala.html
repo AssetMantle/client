@@ -4,10 +4,11 @@
 
 @(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="centerText">
-    <h4>@Messages(constants.View.PROVIDE_ID_PROOF)</h4>
-</div>
-<div class="centerText">
+<legend class="cmuk-legend">
+    @Messages(constants.View.PROVIDE_ID_PROOF)
+</legend>
+<hr>
+<div class="modalInfoBlock centerText">
     <div id="@Seq("UPLOAD", documentType).mkString(" ")">
     @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
     </div>
