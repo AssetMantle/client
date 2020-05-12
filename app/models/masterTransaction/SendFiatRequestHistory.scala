@@ -3,14 +3,14 @@ package models.masterTransaction
 import java.sql.Timestamp
 
 import javax.inject.{Inject, Singleton}
-import models.Trait.HistoryLogged
+import models.Trait.Logged
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
+case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -37,7 +37,7 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
 
   private[models] class SendFiatRequestHistoryTable(tag: Tag) extends Table[SendFiatRequestHistory](tag, "SendFiatRequest_History") {
 
-    def * = (id, traderID, ticketID, negotiationID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (SendFiatRequestHistory.tupled, SendFiatRequestHistory.unapply)
+    def * = (id, traderID, ticketID, negotiationID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendFiatRequestHistory.tupled, SendFiatRequestHistory.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -62,12 +62,6 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
     def updatedOn = column[Timestamp]("updatedOn")
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
-
-    def deletedBy = column[String]("deletedBy")
-
-    def deletedOn = column[Timestamp]("deletedOn")
-
-    def deletedOnTimeZone = column[String]("deletedOnTimeZone")
   }
 
   object Service {

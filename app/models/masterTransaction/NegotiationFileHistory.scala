@@ -5,17 +5,17 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
-import models.Trait.HistoryLogged
+import models.Trait.{Document, Logged}
 import models.common.Serializable._
-import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class NegotiationFileHistory(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[NegotiationDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged {
+case class NegotiationFileHistory(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[NegotiationDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[NegotiationFileHistory] with Logged {
 
   def updateFileName(newFileName: String): NegotiationFileHistory = copy(fileName = newFileName)
 
@@ -24,7 +24,7 @@ case class NegotiationFileHistory(id: String, documentType: String, fileName: St
 }
 
 @Singleton
-class NegotiationFileHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class NegotiationFileHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -36,11 +36,11 @@ class NegotiationFileHistories @Inject()(protected val databaseConfigProvider: D
 
   import databaseConfig.profile.api._
 
-  case class NegotiationFileHistorySerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String], status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
-    def deserialize: NegotiationFileHistory = NegotiationFileHistory(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content => utilities.JSON.convertJsonStringToObject[NegotiationDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
+  case class NegotiationFileHistorySerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String], status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: NegotiationFileHistory = NegotiationFileHistory(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content => utilities.JSON.convertJsonStringToObject[NegotiationDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  private def serialize(negotiationFileHistory: NegotiationFileHistory): NegotiationFileHistorySerialized = NegotiationFileHistorySerialized(id = negotiationFileHistory.id, documentType = negotiationFileHistory.documentType, fileName = negotiationFileHistory.fileName, file = negotiationFileHistory.file, documentContentJson = negotiationFileHistory.documentContent.map(content => Json.toJson(content).toString), status = negotiationFileHistory.status, createdBy = negotiationFileHistory.createdBy, createdOn = negotiationFileHistory.createdOn, createdOnTimeZone = negotiationFileHistory.createdOnTimeZone, updatedBy = negotiationFileHistory.updatedBy, updatedOn = negotiationFileHistory.updatedOn, updatedOnTimeZone = negotiationFileHistory.updatedOnTimeZone, deletedBy = negotiationFileHistory.deletedBy, deletedOn = negotiationFileHistory.deletedOn, deletedOnTimeZone = negotiationFileHistory.deletedOnTimeZone)
+  private def serialize(negotiationFileHistory: NegotiationFileHistory): NegotiationFileHistorySerialized = NegotiationFileHistorySerialized(id = negotiationFileHistory.id, documentType = negotiationFileHistory.documentType, fileName = negotiationFileHistory.fileName, file = negotiationFileHistory.file, documentContentJson = negotiationFileHistory.documentContent.map(content => Json.toJson(content).toString), status = negotiationFileHistory.status, createdBy = negotiationFileHistory.createdBy, createdOn = negotiationFileHistory.createdOn, createdOnTimeZone = negotiationFileHistory.createdOnTimeZone, updatedBy = negotiationFileHistory.updatedBy, updatedOn = negotiationFileHistory.updatedOn, updatedOnTimeZone = negotiationFileHistory.updatedOnTimeZone)
 
   private[models] val negotiationFileHistoryTable = TableQuery[NegotiationFileHistoryTable]
 
@@ -72,7 +72,7 @@ class NegotiationFileHistories @Inject()(protected val databaseConfigProvider: D
 
   private[models] class NegotiationFileHistoryTable(tag: Tag) extends Table[NegotiationFileHistorySerialized](tag, "NegotiationFile_History") {
 
-    def * = (id, documentType, fileName, file.?, documentContentJson.?, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (NegotiationFileHistorySerialized.tupled, NegotiationFileHistorySerialized.unapply)
+    def * = (id, documentType, fileName, file.?, documentContentJson.?, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NegotiationFileHistorySerialized.tupled, NegotiationFileHistorySerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -97,12 +97,6 @@ class NegotiationFileHistories @Inject()(protected val databaseConfigProvider: D
     def updatedOn = column[Timestamp]("updatedOn")
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
-
-    def deletedBy = column[String]("deletedBy")
-
-    def deletedOn = column[Timestamp]("deletedOn")
-
-    def deletedOnTimeZone = column[String]("deletedOnTimeZone")
 
   }
 
