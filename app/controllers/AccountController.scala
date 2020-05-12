@@ -61,14 +61,14 @@ class AccountController @Inject()(
       signUpData => {
         val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
 
-        def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - constants.Mnemonic.Shown), language = request.lang)
+        def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
 
         (for {
           mnemonics <- mnemonics
           _ <- addLogin(mnemonics)
         } yield {
           logger.info(mnemonics.toString)
-          PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Mnemonic.Shown)))
+          PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
         }
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -83,14 +83,14 @@ class AccountController @Inject()(
     def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) queriesMnemonic.Service.get().map(_.body.split(" ")) else throw new BaseException(constants.Response.UNAUTHORIZED)
 
     def updatePartialMnemonic(mnemonics: Seq[String], bcAccountExists: Boolean) = if (!bcAccountExists) {
-      masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Mnemonic.Shown))
+      masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
     } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
     (for {
       bcAccountExists <- bcAccountExists
       mnemonics <- getMnemonics(bcAccountExists)
       - <- updatePartialMnemonic(mnemonics, bcAccountExists)
-    } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(constants.Mnemonic.Shown)))
+    } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
@@ -204,12 +204,12 @@ class AccountController @Inject()(
             } else {
               val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
 
-              def updatePartialMnemonic(mnemonics: Seq[String]) = masterAccounts.Service.updatePartialMnemonic(id = loginData.username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Mnemonic.Shown))
+              def updatePartialMnemonic(mnemonics: Seq[String]) = masterAccounts.Service.updatePartialMnemonic(id = loginData.username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
 
               for {
                 mnemonics <- mnemonics
                 _ <- updatePartialMnemonic(mnemonics)
-              } yield PartialContent(views.html.component.master.createWallet(username = loginData.username, mnemonics = mnemonics.takeRight(constants.Mnemonic.Shown)))
+              } yield PartialContent(views.html.component.master.createWallet(username = loginData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
             }
           } else {
             Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
