@@ -61,7 +61,7 @@ class AddZoneController @Inject()(
           def sendEmailNotificationsAndGetResult(token: String): Future[Result] = {
             utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteZoneData.emailAddress, email = constants.Notification.ZONE_INVITATION, comdexURL, token)
             utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.ZONE_INVITATION_SENT)
-            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_INVITATION_EMAIL_SENT)))
           }
 
           (for {

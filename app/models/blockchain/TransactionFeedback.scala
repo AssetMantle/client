@@ -1,8 +1,11 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -11,11 +14,11 @@ import queries.responses.TraderReputationResponse
 import queries.responses.TraderReputationResponse.TransactionFeedbackResponse
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TransactionFeedback(address: String, sendAssetCounts: SendAssetCounts, sendFiatCounts: SendFiatCounts, ibcIssueAssetCounts: IBCIssueAssetCounts, ibcIssueFiatCounts: IBCIssueFiatCounts, buyerExecuteOrderCounts: BuyerExecuteOrderCounts, sellerExecuteOrderCounts: SellerExecuteOrderCounts, changeBuyerBidCounts: ChangeBuyerBidCounts, changeSellerBidCounts: ChangeSellerBidCounts, confirmBuyerBidCounts: ConfirmBuyerBidCounts, confirmSellerBidCounts: ConfirmSellerBidCounts, negotiationCounts: NegotiationCounts, dirtyBit: Boolean)
+case class TransactionFeedback(address: String, sendAssetCounts: SendAssetCounts, sendFiatCounts: SendFiatCounts, ibcIssueAssetCounts: IBCIssueAssetCounts, ibcIssueFiatCounts: IBCIssueFiatCounts, buyerExecuteOrderCounts: BuyerExecuteOrderCounts, sellerExecuteOrderCounts: SellerExecuteOrderCounts, changeBuyerBidCounts: ChangeBuyerBidCounts, changeSellerBidCounts: ChangeSellerBidCounts, confirmBuyerBidCounts: ConfirmBuyerBidCounts, confirmSellerBidCounts: ConfirmSellerBidCounts, negotiationCounts: NegotiationCounts, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 case class SendAssetCounts(sendAssetsPositiveTx: String, sendAssetsNegativeTx: String)
 
@@ -40,7 +43,12 @@ case class ConfirmSellerBidCounts(confirmSellerBidPositiveTx: String, confirmSel
 case class NegotiationCounts(negotiationPositiveTx: String, negotiationNegativeTx: String)
 
 @Singleton
-class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getTraderReputation: GetTraderReputation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class TransactionFeedbacks @Inject()(
+                                      protected val databaseConfigProvider: DatabaseConfigProvider,
+                                      actorSystem: ActorSystem,
+                                      configuration: Configuration,
+                                      getTraderReputation: GetTraderReputation
+                                    )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -57,7 +65,9 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
   private[models] val transactionFeedbackTable = TableQuery[TransactionFeedbackTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(transactionFeedback: TransactionFeedback): Future[String] = db.run((transactionFeedbackTable returning transactionFeedbackTable.map(_.address) += transactionFeedback).asTry).map {
@@ -118,8 +128,9 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   private[models] class TransactionFeedbackTable(tag: Tag) extends Table[TransactionFeedback](tag, "TransactionFeedBack_BC") {
 
-    def * = (address, (sendAssetsPositiveTx, sendAssetsNegativeTx), (sendFiatsPositiveTx, sendFiatsNegativeTx), (ibcIssueAssetsPositiveTx, ibcIssueAssetsNegativeTx), (ibcIssueFiatsPositiveTx, ibcIssueFiatsNegativeTx), (buyerExecuteOrderPositiveTx, buyerExecuteOrderNegativeTx), (sellerExecuteOrderPositiveTx, sellerExecuteOrderNegativeTx), (changeBuyerBidPositiveTx, changeBuyerBidNegativeTx), (changeSellerBidPositiveTx, changeSellerBidNegativeTx), (confirmBuyerBidPositiveTx, confirmBuyerBidNegativeTx), (confirmSellerBidPositiveTx, confirmSellerBidNegativeTx), (negotiationPositiveTx, negotiationNegativeTx), dirtyBit).shaped <> ( {
-      case (address, sendAssetCounts, sendFiatCounts, ibcIssueAssetCounts, ibcIssueFiatCounts, buyerExecuteOrderCounts, sellerExecuteOrderCounts, changeBuyerBidCounts, changeSellerBidCounts, confirmBuyerBidCounts, confirmSellerBidCounts, negotiationCounts, dirtyBit) => TransactionFeedback(address, SendAssetCounts.tupled.apply(sendAssetCounts), SendFiatCounts.tupled.apply(sendFiatCounts), IBCIssueAssetCounts.tupled.apply(ibcIssueAssetCounts), IBCIssueFiatCounts.tupled.apply(ibcIssueFiatCounts), BuyerExecuteOrderCounts.tupled.apply(buyerExecuteOrderCounts), SellerExecuteOrderCounts.tupled.apply(sellerExecuteOrderCounts), ChangeBuyerBidCounts.tupled.apply(changeBuyerBidCounts), ChangeSellerBidCounts.tupled.apply(changeSellerBidCounts), ConfirmBuyerBidCounts.tupled.apply(confirmBuyerBidCounts), ConfirmSellerBidCounts.tupled.apply(confirmSellerBidCounts), NegotiationCounts.tupled.apply(negotiationCounts), dirtyBit)
+    def * = (address, (sendAssetsPositiveTx, sendAssetsNegativeTx), (sendFiatsPositiveTx, sendFiatsNegativeTx), (ibcIssueAssetsPositiveTx, ibcIssueAssetsNegativeTx), (ibcIssueFiatsPositiveTx, ibcIssueFiatsNegativeTx), (buyerExecuteOrderPositiveTx, buyerExecuteOrderNegativeTx), (sellerExecuteOrderPositiveTx, sellerExecuteOrderNegativeTx), (changeBuyerBidPositiveTx, changeBuyerBidNegativeTx), (changeSellerBidPositiveTx, changeSellerBidNegativeTx), (confirmBuyerBidPositiveTx, confirmBuyerBidNegativeTx), (confirmSellerBidPositiveTx, confirmSellerBidNegativeTx), (negotiationPositiveTx, negotiationNegativeTx), dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?).shaped <> ( {
+      case (address, sendAssetCounts, sendFiatCounts, ibcIssueAssetCounts, ibcIssueFiatCounts, buyerExecuteOrderCounts, sellerExecuteOrderCounts, changeBuyerBidCounts, changeSellerBidCounts, confirmBuyerBidCounts, confirmSellerBidCounts, negotiationCounts, dirtyBit, createdBy, createdOn, createdOnTimeZone, updatedBy, updatedOn, updatedOnTimeZone) =>
+        TransactionFeedback(address, SendAssetCounts.tupled.apply(sendAssetCounts), SendFiatCounts.tupled.apply(sendFiatCounts), IBCIssueAssetCounts.tupled.apply(ibcIssueAssetCounts), IBCIssueFiatCounts.tupled.apply(ibcIssueFiatCounts), BuyerExecuteOrderCounts.tupled.apply(buyerExecuteOrderCounts), SellerExecuteOrderCounts.tupled.apply(sellerExecuteOrderCounts), ChangeBuyerBidCounts.tupled.apply(changeBuyerBidCounts), ChangeSellerBidCounts.tupled.apply(changeSellerBidCounts), ConfirmBuyerBidCounts.tupled.apply(confirmBuyerBidCounts), ConfirmSellerBidCounts.tupled.apply(confirmSellerBidCounts), NegotiationCounts.tupled.apply(negotiationCounts), dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
     }, { transactionFeedback: TransactionFeedback =>
       def f1(sendAssetCounts: SendAssetCounts) = SendAssetCounts.unapply(sendAssetCounts).get
 
@@ -143,7 +154,22 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
       def f11(negotiationCounts: NegotiationCounts) = NegotiationCounts.unapply(negotiationCounts).get
 
-      Some((transactionFeedback.address, f1(transactionFeedback.sendAssetCounts), f2(transactionFeedback.sendFiatCounts), f3(transactionFeedback.ibcIssueAssetCounts), f4(transactionFeedback.ibcIssueFiatCounts), f5(transactionFeedback.buyerExecuteOrderCounts), f6(transactionFeedback.sellerExecuteOrderCounts), f7(transactionFeedback.changeBuyerBidCounts), f8(transactionFeedback.changeSellerBidCounts), f9(transactionFeedback.confirmBuyerBidCounts), f10(transactionFeedback.confirmSellerBidCounts), f11(transactionFeedback.negotiationCounts), transactionFeedback.dirtyBit))
+      Some((transactionFeedback.address,
+        f1(transactionFeedback.sendAssetCounts),
+        f2(transactionFeedback.sendFiatCounts),
+        f3(transactionFeedback.ibcIssueAssetCounts),
+        f4(transactionFeedback.ibcIssueFiatCounts),
+        f5(transactionFeedback.buyerExecuteOrderCounts),
+        f6(transactionFeedback.sellerExecuteOrderCounts),
+        f7(transactionFeedback.changeBuyerBidCounts),
+        f8(transactionFeedback.changeSellerBidCounts),
+        f9(transactionFeedback.confirmBuyerBidCounts),
+        f10(transactionFeedback.confirmSellerBidCounts),
+        f11(transactionFeedback.negotiationCounts),
+        transactionFeedback.dirtyBit,
+        transactionFeedback.createdBy, transactionFeedback.createdOn, transactionFeedback.createdOnTimeZone,
+        transactionFeedback.updatedBy, transactionFeedback.updatedOn, transactionFeedback.updatedOnTimeZone
+      ))
     })
 
     def address = column[String]("address", O.PrimaryKey)
@@ -193,6 +219,18 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     def negotiationNegativeTx = column[String]("negotiationNegativeTx")
 
     def dirtyBit = column[Boolean]("dirtyBit")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

@@ -5,11 +5,11 @@
 @(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <div class="centerText">
-    <h4>@Messages(constants.View.ID_PROOF)</h4>
+    <h4>@Messages(constants.View.PROVIDE_ID_PROOF)</h4>
 </div>
 <div class="centerText">
-    <div id="@Seq("upload", documentType).mkString("")">
-        @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
+    <div id="@Seq("UPLOAD", documentType).mkString(" ")">
+    @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
     </div>
     @accountKYC match {
         case Some(file) => {
@@ -19,7 +19,7 @@
                 <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
                 @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
-                <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
+                <script>hideElement('@Seq("UPLOAD", file.documentType).mkString(" ")')</script>
             }
             @commonModalButton(constants.View.BACK, constants.Form. ADD_IDENTIFICATION.get)
             @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION)
