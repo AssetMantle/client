@@ -1,9 +1,8 @@
 package models.Trait
 
 import java.sql.Timestamp
-import models.common.Node
 
-trait Logged[T] {
+trait Logged {
   val createdOn: Option[Timestamp]
 
   val createdBy: Option[String]
@@ -16,7 +15,4 @@ trait Logged[T] {
 
   val updatedOnTimeZone: Option[String]
 
-  def createLog()(implicit node: Node): T
-
-  def updateLog()(implicit node: Node): T
 }

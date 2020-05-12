@@ -5,25 +5,19 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
-import models.common.Node
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationBackgroundCheck] with Logged[OrganizationBackgroundCheck] {
+case class OrganizationBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[OrganizationBackgroundCheck] with Logged {
 
   def updateFileName(newFileName: String): OrganizationBackgroundCheck = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationBackgroundCheck = copy(file = newFile)
-
-  def createLog()(implicit node: Node): OrganizationBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): OrganizationBackgroundCheck = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -38,13 +32,11 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
 
   val db = databaseConfig.db
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   import databaseConfig.profile.api._
 
   private[models] val organizationBackgroundCheckTable = TableQuery[OrganizationBackgroundCheckTable]
 
-  private def add(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = db.run((organizationBackgroundCheckTable returning organizationBackgroundCheckTable.map(_.id) += organizationBackgroundCheck.createLog()).asTry).map {
+  private def add(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[String] = db.run((organizationBackgroundCheckTable returning organizationBackgroundCheckTable.map(_.id) += organizationBackgroundCheck).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -52,7 +44,7 @@ class OrganizationBackgroundChecks @Inject()(protected val databaseConfigProvide
     }
   }
 
-  private def update(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = db.run(organizationBackgroundCheckTable.filter(_.id === organizationBackgroundCheck.id).filter(_.documentType === organizationBackgroundCheck.documentType).update(organizationBackgroundCheck.updateLog()).asTry).map {
+  private def update(organizationBackgroundCheck: OrganizationBackgroundCheck): Future[Int] = db.run(organizationBackgroundCheckTable.filter(_.id === organizationBackgroundCheck.id).filter(_.documentType === organizationBackgroundCheck.documentType).update(organizationBackgroundCheck).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

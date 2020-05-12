@@ -1,22 +1,25 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: Long)
+case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: Long, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_SESSION_TOKEN
 
@@ -102,13 +105,25 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
 
   private[models] class SessionTokenTable(tag: Tag) extends Table[SessionToken](tag, "SessionToken") {
 
-    def * = (id, sessionTokenHash, sessionTokenTime) <> (SessionToken.tupled, SessionToken.unapply)
+    def * = (id, sessionTokenHash, sessionTokenTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SessionToken.tupled, SessionToken.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def sessionTokenHash = column[String]("sessionTokenHash")
 
     def sessionTokenTime = column[Long]("sessionTokenTime")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 
@@ -155,6 +170,6 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
     }).recover {
       case baseException: BaseException => logger.info(baseException.failure.message)
     }
-  }
+  }(schedulerExecutionContext)
 }
 

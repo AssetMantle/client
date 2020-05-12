@@ -1,9 +1,12 @@
 package models.blockchainTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.Trait.Logged
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,7 +19,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SetSellerFeedback] {
+case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SetSellerFeedback] with Logged {
   def mutateTicketID(newTicketID: String): SetSellerFeedback = SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -27,8 +30,11 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -36,20 +42,14 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   private[models] val setSellerFeedbackTable = TableQuery[SetSellerFeedbackTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(setSellerFeedback: SetSellerFeedback): Future[String] = db.run((setSellerFeedbackTable returning setSellerFeedbackTable.map(_.ticketID) += setSellerFeedback).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(setSellerFeedback: SetSellerFeedback): Future[Int] = db.run(setSellerFeedbackTable.insertOrUpdate(setSellerFeedback).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -135,7 +135,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   private[models] class SetSellerFeedbackTable(tag: Tag) extends Table[SetSellerFeedback](tag, "SetSellerFeedback") {
 
-    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SetSellerFeedback.tupled, SetSellerFeedback.unapply)
+    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SetSellerFeedback.tupled, SetSellerFeedback.unapply)
 
     def from = column[String]("from")
 
@@ -156,6 +156,18 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {

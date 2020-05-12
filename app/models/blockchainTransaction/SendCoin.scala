@@ -1,9 +1,12 @@
 package models.blockchainTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.Trait.Logged
 import models.master.Account
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -18,7 +21,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendCoin] {
+case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendCoin] with Logged {
   def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -32,25 +35,22 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   val db = databaseConfig.db
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_COIN
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
   private[models] val sendCoinTable = TableQuery[SendCoinTable]
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += sendCoin).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(sendCoin: SendCoin): Future[Int] = db.run(sendCoinTable.insertOrUpdate(sendCoin).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -136,7 +136,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private[models] class SendCoinTable(tag: Tag) extends Table[SendCoin](tag, "SendCoin") {
 
-    def * = (from, to, amount, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendCoin.tupled, SendCoin.unapply)
+    def * = (from, to, amount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendCoin.tupled, SendCoin.unapply)
 
     def from = column[String]("from")
 
@@ -155,6 +155,18 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
@@ -181,7 +193,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
-    def updateTransactionHashAsync(ticketID: String, txHash: String) = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
+    def updateTransactionHashAsync(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
   }
 
   object Utility {

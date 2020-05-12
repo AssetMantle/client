@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -14,13 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendFiatRequest(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[SendFiatRequest] {
-
-  def createLog()(implicit node: Node): SendFiatRequest = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): SendFiatRequest = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class SendFiatRequest(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -35,11 +28,9 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val sendFiatRequestTable = TableQuery[SendFiatRequestTable]
 
-  private def add(sendFiatRequest: SendFiatRequest): Future[String] = db.run((sendFiatRequestTable returning sendFiatRequestTable.map(_.id) += sendFiatRequest.createLog()).asTry).map {
+  private def add(sendFiatRequest: SendFiatRequest): Future[String] = db.run((sendFiatRequestTable returning sendFiatRequestTable.map(_.id) += sendFiatRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -63,7 +54,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getByNegotiationIDsAndStatuses(negotiationIDs: Seq[String], statuses: Seq[String]): Future[Seq[SendFiatRequest]] = db.run(sendFiatRequestTable.filter(_.negotiationID inSet negotiationIDs).filter(_.status inSet statuses).result)
 
-  private def update(sendFiatRequest: SendFiatRequest): Future[Int] = db.run(sendFiatRequestTable.update(sendFiatRequest.updateLog()).asTry).map {
+  private def update(sendFiatRequest: SendFiatRequest): Future[Int] = db.run(sendFiatRequestTable.update(sendFiatRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
