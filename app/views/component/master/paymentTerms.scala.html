@@ -5,14 +5,13 @@
 @(paymentTermsForm: Form[PaymentTerms.Data] = PaymentTerms.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.NEGOTIATION_PAYMENT_TERMS, paymentTermsForm) {
     @commonInputText(paymentTermsForm, constants.FormField.ID, 'value -> id, 'containerDivClass -> "hidden", 'readonly -> true)
-    @Messages(constants.View.ADVANCE_PAYMENT)
+    <div class="cmuk-text-left title"> @Messages(constants.View.ADVANCE_PAYMENT)</div>
     @commonInputDouble(paymentTermsForm, constants.FormField.ADVANCE_PERCENTAGE, 'id -> "advancePercentage", 'oninput -> "advancePercentageInput()")
-    @Messages(constants.View.CREDIT_TERMS)
+    <div class="cmuk-text-left title"> @Messages(constants.View.CREDIT_TERMS)</div>
     @defining(Option(constants.FormField.CREDIT)) { implicit nestedFormField =>
         @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'id -> "tentativeDate", 'oninput -> "tentativeDateInput()")
         @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'id -> "tenure", 'oninput -> "tenureInput()")
         @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'id -> "reference")
     }
-
 }
 <script src="@routes.Assets.versioned("javascripts/paymentTerms.js")" type="text/javascript"></script>

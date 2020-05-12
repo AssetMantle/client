@@ -10,39 +10,34 @@
     @Messages(constants.View.ORGANIZATION): @organization.id
 </legend>
 <hr>
-<div>@Messages(constants.View.ORGANIZATION_DETAILS): <br>
-    @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
-    @commonTextInfo(constants.View.ZONE_ID, organization.zoneID)
-    @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
-    @commonTextInfo(constants.View.NAME, organization.name)
-    @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
-    @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
-    @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
-</div>
-<div>@Messages(constants.FormField.REGISTERED_ADDRESS.name) : <br>
-@streetAddress(organization.registeredAddress)
-</div>
-<div>@Messages(constants.FormField.POSTAL_ADDRESS.name) : <br>
-@streetAddress(organization.postalAddress)
-</div>
-<div>@Messages(constants.View.ORGANIZATION_UBO_DETAIL): <br>
-@for(ubo <- organization.ubos.data) {
-    @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
-    @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
-    @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
-    @commonTextInfo(constants.View.TITLE, ubo.title)
-}
-</div>
-
-<div>
-    @Messages(constants.View.DOCUMENTS):<br>
-    @organizationKYCs.map { organizationKYC =>
-        @component.master.commonDocumentViewer(organizationKYC) {
-            @routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)
-        } {
-            <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
-        } {
-            @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
+<div class="modalInfoBlock">
+        <div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_DETAILS) </div>
+        @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+        @commonTextInfo(constants.View.ZONE_ID, organization.zoneID)
+        @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
+        @commonTextInfo(constants.View.NAME, organization.name)
+        @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
+        @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
+        @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
+        <div class="cmuk-text-left title">@Messages(constants.FormField.REGISTERED_ADDRESS.name) </div>
+        @streetAddress(organization.registeredAddress)
+        <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name) </div>
+        @streetAddress(organization.postalAddress)
+        <div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_UBO_DETAIL)</div>
+        @for(ubo <- organization.ubos.data) {
+        @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
+        @commonDoubleInfo(constants.View.SHARE_PERCENTAGE, ubo.sharePercentage)
+        @commonTextInfo(constants.View.RELATIONSHIP, ubo.relationship)
+        @commonTextInfo(constants.View.TITLE, ubo.title)
         }
-    }
+        <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENTS)</div>
+        @organizationKYCs.map { organizationKYC =>
+            @component.master.commonDocumentViewer(organizationKYC) {
+                @routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)
+            } {
+                <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationID = organizationKYC.id, fileName = organizationKYC.fileName, documentType = organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+            } {
+                @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
+            }
+        }
 </div>

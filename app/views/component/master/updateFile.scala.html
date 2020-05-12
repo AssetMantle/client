@@ -3,14 +3,16 @@
 @import helper._
 
 @(uploadRoute:String, updateRoute:String, documentType: String, id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="uploadForm">
 @CSRF.formField
-<div id="updateSelector" class="centerText">
-    <button type="button" class="cmuk-button cmuk-button-primary" id="browseUpdateButton">@Messages(constants.View.BROWSE)</button>
-    <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
+<div class="modalInfoBlock">
+<div id="updateSelector" class="centerText uploadBox">
+    <span class="uploadIcon" cmuk-icon="cloud-upload"></span>
     <div class="dropBox">
         <p class="centerText"><small>@Messages(constants.View.DROP_FILE)</small></p>
     </div>
+    <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
+    <button type="button" class="cmuk-button cmuk-button-primary" id="browseUpdateButton">@Messages(constants.View.BROWSE)</button>
 </div>
 
 <div id="updater" class="hidden centerText">
@@ -25,7 +27,8 @@
 </div>
 
 <div id="updateCompletionMessage" class="hidden"></div>
-
+</div>
+</div>
 <script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/upload.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/style/progressBar.js")" type="text/javascript"></script>

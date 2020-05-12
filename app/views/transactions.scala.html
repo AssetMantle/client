@@ -6,7 +6,7 @@
 @common(Messages(constants.View.TRANSACTIONS), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftSideContainer">
+    <div class="leftContainer">
         <div id="financials" class="financial"></div>
     </div>
     <script>
@@ -29,8 +29,8 @@
 @center = {
 
     <div class="cmuk-container cmuk-margin-bottom">
-        <div id="sendFiatRequests"></div>
-        <div id="redeemFiatRequests"></div>
+        <div id="sendFiatRequests" class="switcherCard"></div>
+        <div id="redeemFiatRequests" class="switcherCard"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
             <div id="traderViewIssueFiatRequestList"></div>
@@ -82,7 +82,7 @@
 }
 
 @right = {
-    <div class="rightSideContainer">
+    <div class="rightContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
     </div>

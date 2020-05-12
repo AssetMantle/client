@@ -21,10 +21,12 @@ dl {
   text-align: left; }
 
 label {
-  font-size: var(--paragraphFontSizeMedium);
-  font-family: Oxygen;
-  font-weight: normal;
+  font-style: normal;
+  font-size: 1.125rem;
+  line-height: 2.6;
+  letter-spacing: 0.01em;
   color: #272829;
-  line-height: 2; }
+  font-family: Oxygen;
+  font-weight: normal; }
 
 /*# sourceMappingURL=tag.css.map */

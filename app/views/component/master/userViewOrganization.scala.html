@@ -7,7 +7,6 @@
 
 @import views.html.component.master.streetAddress
 @(organizationZone: Zone, organization: Organization, organizationKYCs: Seq[OrganizationKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
-<div>
     @commonInfoBox() {
         <div class="title cmuk-text-left"> <span>@Messages(constants.View.ZONE_DETAILS)</span></div>
         @commonTextInfo(constants.View.ZONE_NAME, organizationZone.name)
@@ -42,4 +41,3 @@
             }
         }
     }
-</div>

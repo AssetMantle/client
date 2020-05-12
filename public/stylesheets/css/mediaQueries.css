@@ -5,12 +5,12 @@
   .MnemonicQuiz {
     max-width: 500px; }
 
-  .bannerContainer {
+  .banner {
     background-size: contain;
     background-position: center bottom; }
-    .bannerContainer .bannerText {
+    .banner .bannerText {
       width: 100%; }
-      .bannerContainer .bannerText h3 {
+      .banner .bannerText h3 {
         font-size: 30px; }
 
   .mobile .cmuk-offcanvas-bar {
@@ -60,18 +60,18 @@
 
   .MnemonicQuiz {
     text-align: center; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicbutton {
+    .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
       width: 95px; }
 
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
     flex-wrap: wrap; } }
 @media (min-width: 640px) {
   .modalBody form {
-    width: 500px;
+    width: 620px;
     text-align: center; }
 
   form hr {
-    margin-top: 10px; }
+    margin: 0px; }
 
   .MnemonicQuiz {
     text-align: center;
@@ -121,19 +121,40 @@
   .MnemonicQuiz .mnemonicNote {
     background-image: none; }
     .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
-      width: 100%; } }
+      width: 100%; }
+
+  .modal .modalContent .modalBody .infoBlock {
+    flex-direction: column;
+    max-width: 500px;
+    max-height: 410px; }
+    .modal .modalContent .modalBody .infoBlock .infoBlockItem {
+      flex: none; }
+      .modal .modalContent .modalBody .infoBlock .infoBlockItem .infoBlockItemRight {
+        padding: 0;
+        border: none; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
     top: 10%;
     max-height: 530px; }
+    .modal .modalContent .modalBody form .formBody {
+      max-height: 409px; }
+    .modal .modalContent .modalBody .modalInfoBlock {
+      max-height: 409px; }
+    .modal .modalContent .modalBody .infoBlockHeight {
+      max-height: 399px; }
+    .modal .modalContent .modalBody .infoBlock {
+      width: 800px; }
 
-  .leftSideContainer .financial {
+  .leftContainer .financial {
     margin-bottom: 15px; }
-    .leftSideContainer .financial .cmuk-card {
+    .leftContainer .financial .cmuk-card {
       height: 265px; }
-  .leftSideContainer .financial .cmuk-switcher ul li {
+      .leftContainer .financial .cmuk-card .cmuk-switcher {
+        height: 210px;
+        overflow: auto; }
+  .leftContainer .financial .cmuk-switcher ul li {
     padding: 10px 0; }
-  .leftSideContainer .addBalanceButton {
+  .leftContainer .addBalanceButton {
     text-transform: capitalize;
     font-family: Rubik;
     padding: 8px 8px;
@@ -142,26 +163,26 @@
     border-radius: 103px;
     color: #0862BE;
     border: 0; }
-  .leftSideContainer .docView .cmuk-card-header, .leftSideContainer .docView .cmuk-card-body, .leftSideContainer .docView .documentlist {
+  .leftContainer .documentView .cmuk-card-header, .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
     padding: 0px; }
-  .leftSideContainer .docView .documentlist {
+  .leftContainer .documentView .documentList {
     height: 150px; }
-  .leftSideContainer .docView .cmuk-card {
+  .leftContainer .documentView .cmuk-card {
     height: 265px; }
-  .leftSideContainer .zoneTradeFinancial .cmuk-card-body {
+  .leftContainer .zoneTradeFinancial .cmuk-card-body {
     height: auto; }
-    .leftSideContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
+    .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
       height: 210px; }
 
-  .rightSideContainer .recentActivityContainer {
+  .rightContainer .recentActivityContainer {
     margin-bottom: 15px; }
-    .rightSideContainer .recentActivityContainer .cmuk-card-body {
+    .rightContainer .recentActivityContainer .cmuk-card-body {
       height: 210px; }
-      .rightSideContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
+      .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
         height: 210px; }
-  .rightSideContainer .chatRoom .cmuk-card-body {
+  .rightContainer .chatRoom .cmuk-card-body {
     height: 264px; }
-    .rightSideContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
+    .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
       height: 160px; }
 
   .switcherViewCard .cmuk-subnav li a {
@@ -171,24 +192,36 @@
     height: 210px; }
   .comdex .cmuk-card-header .cmuk-button {
     line-height: 26px; }
+  .comdex .updateDocumentField button {
+    position: absolute;
+    top: 12px;
+    left: 115px;
+    font-weight: bold; }
 
   .switcherCard .cmuk-switcher {
-    height: 179px; }
+    height: 170px; }
 
   .timeline:before {
-    left: 20px; }
+    left: 19px; }
   .timeline .timeline-item .timeline-icon {
     left: 0px; }
 
-  .SalesQuoteCard .firstPart {
+  .salesQuoteCard .salesQuoteCardLeft {
     flex: 32%; }
-  .SalesQuoteCard .secondPart {
-    flex: 45%; }
-  .SalesQuoteCard .thirdPart {
-    flex: 23%; } }
+  .salesQuoteCard .salesQuoteCardMiddle {
+    flex: 41%; }
+  .salesQuoteCard .salesQuoteCardRight {
+    flex: 27%; } }
 @media (max-width: 1599px) {
   :root {
     font-size: 13px; }
+
+  .comdex .cmuk-input, .comdex .cmuk-select:not([multiple]):not([size]) {
+    height: 40px; }
+
+  .signUpForm .usernameAvailability .checkIcon,
+  .signUpForm .showPassword {
+    top: 45px; }
 
   .profileContainer .identificationDetails .documentItem {
     padding: 10px; }
@@ -205,21 +238,21 @@
   .cmuk-card-body .cmuk-subnav li a {
     text-transform: capitalize; }
 
-  .tabsSection .cmuk-grid-divider {
+  .tabSection .cmuk-grid-divider {
     display: block; }
-  .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin {
+  .tabSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin {
     margin: 10px 0px 0px 0px; }
-  .tabsSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
-  .tabsSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
+  .tabSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
+  .tabSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
     border: none; }
 
   .mobileNumberUpdate .countryCode {
-    margin-top: 28px; } }
+    margin-top: 38px; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }
 
-  .showpassword, .checkIcon {
+  .showPassword, .checkIcon {
     top: 37px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {

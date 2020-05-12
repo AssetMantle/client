@@ -4,9 +4,11 @@
 @import views.html.base._
 
 @(organizationBackgroundChecks: Seq[OrganizationBackgroundCheck], organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
-<div class="centerText">
-    <h4>@Messages(constants.View.ORGANIZATION_BACKGROUND_CHECK)</h4>
+<legend class="cmuk-legend">
+    @Messages(constants.View.ORGANIZATION_BACKGROUND_CHECK)
+</legend>
+<hr>
+<div class="modalInfoBlock centerText">
     @for(documentType <- constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm,'parameters -> s"'${documentType}','${organization.id}'")
@@ -22,9 +24,8 @@
             <script>hideElement('upload@organizationBackgroundCheck.documentType')</script>
         }
     }
-</div>
-
 @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingOrganizationRequest, 'parameters -> s"'${organization.id}'")
 @if(constants.File.ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(organizationBackgroundChecks.map(_.documentType)).isEmpty) {
     @commonFormButton(constants.Form.ACCEPT_ORGANIZATION_REQUEST, 'parameters -> s"'${organization.id}'")
 }
+</div>

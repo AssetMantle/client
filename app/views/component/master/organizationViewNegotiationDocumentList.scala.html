@@ -6,20 +6,21 @@
 
 @import models.master.Negotiation
 @(negotiation: Negotiation, assetFileList: Seq[AssetFile], negotiationFileList: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<ul class="documentlist scroller">
-    <li class="documetnone">
+<ul class="documentList scroller">
+    <li>
         <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
             <tbody>
                 <tr><td colspan="2">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
                 @assetFileList.filter(assetFile=> negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
                     <tr>
-                        <td><span class="docIcon"> <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-doc2")"/></svg></span>
+                        <td><span class="docIcon">@commonIcon("doc2")
+                        </span>
                             <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.organizationViewNegotiationDocument('@negotiation.id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
                         </td>
                         @assetFile.documentType match{
                             case constants.File.Asset.BILL_OF_LADING=> {
                                 <td> <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewAssetDocumentContent('@negotiation.assetID','@assetFile.documentType'))")>
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-seen")"/></svg>
+                                    @commonIcon("seen")
                                     </span>
                                 </td>
                             }
@@ -30,14 +31,14 @@
                 <tr><td colspan="2">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</td></tr>
                 @negotiationFileList.filter(negotiationFile=> negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile=>
                     <tr>
-                        <td><span class="docIcon"> <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-doc2")"/></svg></span>
+                        <td><span class="docIcon"> @commonIcon("doc2")</span>
                             <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.organizationViewNegotiationDocument('@negotiation.id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
                         </td>
                         @negotiationFile.documentType match{
                             case constants.File.Negotiation.INVOICE | constants.File.Negotiation.CONTRACT=> {
                                 <td>
                                     <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewNegotiationDocumentContent('@negotiation.id','@negotiationFile.documentType'))")>
-                                        <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-seen")"/></svg>
+                                        @commonIcon("seen")
                                     </span>
                                 </td>
                             }
