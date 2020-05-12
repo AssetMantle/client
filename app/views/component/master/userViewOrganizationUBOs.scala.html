@@ -4,7 +4,7 @@
 
 @(organization: Option[Organization])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.UBOS_DETAILS) {
+@commonCard(constants.View.UBOS) {
     @organization match {
         case Some(organization) => {
             @if(organization.ubos.data.nonEmpty) {
