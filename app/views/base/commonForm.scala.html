@@ -10,16 +10,16 @@
         </legend>
         <hr>
         <div class="formBody">
-        @CSRF.formField
-        @fieldset
-        @if(formData.hasGlobalErrors) {
-            <ul class="signUpErrorList">
-            @for(error <- formData.globalErrors) {
-                <li class="error">@error.format</li>
+            @CSRF.formField
+            @fieldset
+            @if(formData.hasGlobalErrors) {
+                <ul class="signUpErrorList">
+                @for(error <- formData.globalErrors) {
+                    <li class="error">@error.format</li>
+                }
+                </ul>
             }
-            </ul>
-        }
-        @commonJavascriptButton(formTemplate.submit, JavaScript("""submitForm(this)"""))
+            @commonJavascriptButton(formTemplate.submit, JavaScript("submitForm(this)"), 'id -> formTemplate.submit.replace(".", "_"))
         </div>
     </fieldset>
 }

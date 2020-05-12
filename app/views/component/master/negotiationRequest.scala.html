@@ -5,7 +5,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
     <div id="selectAsset">
