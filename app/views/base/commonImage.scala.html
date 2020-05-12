@@ -1,4 +1,4 @@
 @(path: String, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
-<img src="@routes.Assets.versioned("images/" + path)" class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")'>
+<img src="@routes.Assets.versioned("images/" + path)" class='@Seq(arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")'>
 
 @*Exmaple Useage- @commonImage("icon/Coal.svg",  'class -> "navigationBarLogo")*@
