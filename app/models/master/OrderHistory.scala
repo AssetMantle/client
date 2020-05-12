@@ -4,21 +4,15 @@ import java.sql.Timestamp
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.{Document, Logged}
-import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
+import models.Trait.Logged
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import models.common.Node
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrderHistory(id: String, orderID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[OrderHistory] {
-
-  def createLog()(implicit node: Node): OrderHistory = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): OrderHistory = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-}
+case class OrderHistory(id: String, orderID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class OrderHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -32,8 +26,6 @@ class OrderHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
-
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   private[models] val orderHistoryTable = TableQuery[OrderHistoryTable]
 

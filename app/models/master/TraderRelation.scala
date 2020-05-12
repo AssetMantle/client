@@ -1,21 +1,28 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderRelation(id: String, fromID: String, toID: String, status: Option[Boolean] = None)
+case class TraderRelation(id: String, fromID: String, toID: String, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private[models] val traderRelationTable = TableQuery[TraderRelationTable]
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -70,7 +77,7 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class TraderRelationTable(tag: Tag) extends Table[TraderRelation](tag, "TraderRelation") {
 
-    def * = (id, fromID, toID, status.?) <> (TraderRelation.tupled, TraderRelation.unapply)
+    def * = (id, fromID, toID, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TraderRelation.tupled, TraderRelation.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -79,6 +86,18 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
     def toID = column[String]("toID")
 
     def status = column[Boolean]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 
