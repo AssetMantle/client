@@ -137,7 +137,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def generateDocumentHash(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean): String = utilities.String.sha256Sum(Seq(ownerID, assetType, description, quantity.toString(), quantity, price.toString(), moderated.toString()).mkString(""))
+  private def generateDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean): String = utilities.String.sha256Sum(Seq(ownerID, assetType, description, quantity.toString(), quantity, price.toString(), moderated.toString()).mkString(""))
 
   private[models] class AssetTable(tag: Tag) extends Table[AssetSerializable](tag, "Asset") {
 
@@ -187,13 +187,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def addModerated(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
-      val documentHash = generateDocumentHash(ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true)
+      val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true)
       add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.REQUESTED_TO_ZONE)))
     }
 
     def addUnmoderated(ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
-      val documentHash = generateDocumentHash(ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false)
+      val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false)
       for {
         _ <- add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE)))
       } yield documentHash
