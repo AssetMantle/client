@@ -48,8 +48,5 @@
 <br>
     @commonFormButton(constants.Form.MEMBER_CHECK_CORPORATE_SCAN, 'parameters -> s"'${organization.id}', '${organization.name}'")
 
-    @*
-@commonModalButton(constants.View.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
-*@
     @commonFormButton(constants.Form.ACCEPT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
     @commonFormButton(constants.Form.REJECT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")

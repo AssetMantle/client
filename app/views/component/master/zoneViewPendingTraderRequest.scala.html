@@ -23,7 +23,4 @@
 <br>
 @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)
 @commonFormButton(constants.Form.ZONE_VERIFY_TRADER,  'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${trader.id}'")
-@*
-@commonModalButton(constants.View.NEXT, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'")
-*@
 @commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")
