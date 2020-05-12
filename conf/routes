@@ -75,6 +75,9 @@ POST        /asset/release                                                      
 GET         /asset/redeem                                                                         controllers.AssetController.redeemForm(assetID: String)
 POST        /asset/redeem                                                                         controllers.AssetController.redeem
 
+GET         /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocumentForm(negotiationID: String, documentType: String)
+POST        /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocument
+
 GET         /contact                                                                              controllers.ContactController.contact
 
 GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
@@ -329,6 +332,9 @@ GET         /component/organizationViewTradeRoomChecks                          
 GET         /component/traderViewTradeRoomFinancialAndChecks                                      controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
+
+GET         /component/traderViewNegotiation                                                      controllers.ComponentViewController.traderViewNegotiation(negotiationID: String)
+GET         /component/organizationViewNegotiation                                                controllers.ComponentViewController.organizationViewNegotiation(negotiationID: String)
 
 GET         /component/traderViewIssueFiatRequestList                                             controllers.ComponentViewController.traderViewIssueFiatRequestList
 GET         /component/organizationViewIssueFiatRequestList                                       controllers.ComponentViewController.organizationViewIssueFiatRequestList

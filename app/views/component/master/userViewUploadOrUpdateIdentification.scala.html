@@ -4,11 +4,12 @@
 
 @(accountKYC: Option[AccountKYC], documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-<div class="centerText">
-    <h4>@Messages(constants.View.PROVIDE_ID_PROOF)</h4>
-</div>
-<div class="centerText">
-    @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "), routes.javascript.FileController.uploadAccountKYCForm, 'parameters -> s"'${documentType}'", 'id -> Seq("upload", documentType).mkString(""))
+<legend class="cmuk-legend">
+    @Messages(constants.View.PROVIDE_ID_PROOF)
+</legend>
+<hr>
+<div class="modalInfoBlock centerText">
+    @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "), routes.javascript.FileController.uploadAccountKYCForm, 'parameters -> s"'${documentType}'", 'id -> Seq(constants.View.UPLOAD, documentType).mkString("_"))
     @accountKYC match {
         case Some(file) => {
             @component.master.commonDocumentViewer(file) {
@@ -16,8 +17,8 @@
             } {
                 <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>
             } {
-                @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages(file.documentType)).mkString("_"), routes.javascript.FileController.updateAccountKYCForm, 'parameters -> s"'${file.documentType}'")
-                <script>hideElement('@Seq("upload", file.documentType).mkString("")')</script>
+                @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
+                <script>hideElement('@Seq(constants.View.UPLOAD, file.documentType).mkString("_")')</script>
             }
             @commonModalButton(constants.View.BACK, constants.Form.ADD_IDENTIFICATION.get)
             @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION)

@@ -2,7 +2,7 @@
 @import views.html.base._
 @(coins: String = "0", profilePicture: Array[Byte] = Array())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#icon-contactDetails") {
+@commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#contactDetails") {
 } {
     <div>
         <div>
@@ -13,7 +13,7 @@
             @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
             @commonTextInfo(constants.View.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress")
             @commonFormButton(constants.Form.CHANGE_PASSWORD,'class -> "cmuk-button-link")
-            <span class="editIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-edit")"/></svg></span>
+            <span class="editIcon">@commonIcon("edit")</span>
         </div>
     </div>
 }

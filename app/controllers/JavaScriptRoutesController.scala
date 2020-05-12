@@ -227,6 +227,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewIssueFiatRequestList,
         routes.javascript.ComponentViewController.organizationViewIssueFiatRequestList,
         routes.javascript.ComponentViewController.zoneViewIssueFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewNegotiation,
+        routes.javascript.ComponentViewController.organizationViewNegotiation,
 
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 

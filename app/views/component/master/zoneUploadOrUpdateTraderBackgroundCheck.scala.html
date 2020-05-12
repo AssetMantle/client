@@ -4,9 +4,11 @@
 @import views.html.base._
 
 @(traderBackgroundChecks: Seq[TraderBackgroundCheck], trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
-<div class="centerText">
-    <h4>@Messages(constants.View.TRADER_BACKGROUND_CHECK)</h4>
+<legend class="cmuk-legend">
+    @Messages(constants.View.TRADER_BACKGROUND_CHECK)
+</legend>
+<hr>
+<div class="modalInfoBlock centerText">
     @for(documentType <- constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" ") ,routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,'parameters -> s"'${documentType}','${trader.id}'")
@@ -22,9 +24,10 @@
             <script>hideElement('upload@traderBackgroundCheck.documentType')</script>
         }
     }
-</div>
+
 
 @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
 @if(constants.File.TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES.diff(traderBackgroundChecks.map(_.documentType)).isEmpty) {
     @commonFormButton(constants.Form.ZONE_VERIFY_TRADER, 'parameters -> s"'${trader.id}'")
 }
+</div>

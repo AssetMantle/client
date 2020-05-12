@@ -8,7 +8,7 @@
     @Messages(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL): @organizationID
 </legend>
 <hr>
-<div>
+<div class="modalInfoBlock">
 @organizationBankAccountDetail match {
     case Some(organizationBankAccountDetail) => {
         @commonTextInfo(constants.View.ACCOUNT_HOLDER_NAME, organizationBankAccountDetail.accountHolder)

@@ -4,7 +4,7 @@
 @import scala.collection.immutable.ListMap
 
 @(id:String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="docView switcherCardSecond">
+<div class="documentView switcherCardSecond">
     @commonInfoBox(){
         @commonHorizontalSwitcher(ListMap(
             constants.View.DOCUMENT_LIST -> routes.javascript.ComponentViewController.zoneViewNegotiationDocumentList,

@@ -43,7 +43,7 @@
             </ul>
         </div>
         @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
-        @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
+        @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'containerDivClass -> "hidden", 'readonly -> true)
         @commonTextInfo(constants.View.NAME, "", 'id -> "selectedCounterPartyName")
         @commonTextInfo(constants.View.ACCOUNT_ID, "", 'id -> "selectedCounterPartyAccountID")
         @commonTextInfo(constants.View.ORGANIZATION_NAME, "", 'id -> "selectedCounterPartyOrganizationName")

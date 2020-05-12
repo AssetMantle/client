@@ -1,24 +1,34 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @(totalAmount: Int, amountPaid: Int, amountPending: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<div class="financial">
-    <ul class="">
-        <li class="cmuk-flex">
-                <div>
-                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.TOTAL_AMOUNT)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @totalAmount</p>
-                </div>
-        </li>
-        <li class="cmuk-flex">
+
+<ul class="">
+    <li class="cmuk-flex">
+        <div class="cmuk-flex wallet">
+            <span class="walletIcon">@commonIcon("wallet")</span>
             <div>
-                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid</p>
+                <p class="cmuk-margin-remove ctitle">@Messages(constants.View.TOTAL_AMOUNT)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @totalAmount</p>
             </div>
-        </li>
-        <li class="cmuk-flex">
+        </div>
+    </li>
+    <li class="cmuk-flex">
+        <div class="cmuk-flex receivable">
+            <span class="receivableIcon">@commonIcon("receivable")</span>
             <div>
-                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@amountPending</p>
+                <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid</p>
             </div>
-        </li>
-    </ul>
+        </div>
+    </li>
+    <li class="cmuk-flex">
+        <div class="cmuk-flex payable">
+            <span class="payableIcon">@commonIcon("payable")</span>
+            <div>
+                <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPending</p>
+            </div>
+        </div>
+
+    </li>
+</ul>

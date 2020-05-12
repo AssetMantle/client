@@ -4,7 +4,7 @@
 @import models.common.Serializable
 @import models.Abstract.NegotiationDocumentContent
 @(documentType:String, documentContent: Option[NegotiationDocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
+<div class="modalInfoBlock">
 @documentContent match {
     case Some(content)=> {
         @documentType match {
@@ -26,3 +26,4 @@
     }
     case None=>{@Messages(constants.View.CONTENT_NOT_FOUND)}
 }
+</div>

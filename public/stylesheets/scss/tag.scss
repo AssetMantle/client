@@ -27,9 +27,11 @@ dl{
 }
 
 label{
-  font-size: var(--paragraphFontSizeMedium);
+  font-style: normal;
+  font-size:$paragraphFontSizeLarge;
+  line-height: 2.6;
+  letter-spacing: 0.01em;
+  color: #272829;
   font-family: $fontFamilySecondary;
   font-weight: normal;
-  color: #272829;;
-  line-height: 2;
 }
