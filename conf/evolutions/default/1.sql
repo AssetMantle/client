@@ -951,7 +951,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "email"              VARCHAR NOT NULL,
     "registeredAddress"  VARCHAR NOT NULL,
     "postalAddress"      VARCHAR NOT NULL,
-    "ubos"               VARCHAR,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     "comment"            VARCHAR,
@@ -963,6 +962,27 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id")
 );
+
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationUBO"
+(
+    "id"                VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "firstName"         VARCHAR NOT NULL,
+    "lastName"          VARCHAR NOT NULL,
+    "sharePercentage"   DOUBLE PRECISION NOT NULL,
+    "relationship"      VARCHAR NOT NULL,
+    "title"             VARCHAR NOT NULL,
+    "status"            VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+ALTER TABLE MASTER."OrganizationUBO"
+    ADD CONSTRAINT OrganizationUBO_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 (

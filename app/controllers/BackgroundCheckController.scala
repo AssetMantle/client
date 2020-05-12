@@ -6,7 +6,6 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
-import models.common.Serializable.UBO
 import models.master.{OrganizationBackgroundCheck, TraderBackgroundCheck}
 import models.{blockchain, master, masterTransaction, memberCheck}
 import play.api.i18n.I18nSupport
@@ -54,7 +53,6 @@ class BackgroundCheckController @Inject()(
 
   //UBO CHECKS
   def memberScanForm(firstName: String, lastName: String): Action[AnyContent] = Action.async { implicit request =>
-    val ubo = UBO("Abhishek", "Singh", 0.00, "Very Single", "Mr.")
     Future(Ok(views.html.component.master.memberCheckMemberScan(firstName = "Abhishek", lastName = "Singh")))
   }
 

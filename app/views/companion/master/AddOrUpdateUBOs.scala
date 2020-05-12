@@ -8,6 +8,7 @@ object AddOrUpdateUBOs {
   val form = Form(
     mapping(
       constants.FormField.UBOS.name -> seq(optional(mapping(
+        constants.FormField.ID.name -> optional(constants.FormField.ID.field),
         constants.FormField.PERSON_FIRST_NAME.name -> constants.FormField.PERSON_FIRST_NAME.field,
         constants.FormField.PERSON_LAST_NAME.name -> constants.FormField.PERSON_LAST_NAME.field,
         constants.FormField.SHARE_PERCENTAGE.name -> constants.FormField.SHARE_PERCENTAGE.field,
@@ -17,7 +18,7 @@ object AddOrUpdateUBOs {
     )(Data.apply)(Data.unapply)
   )
 
-  case class UBOData(personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String)
+  case class UBOData(id :Option[String], personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String)
 
   case class Data(ubos: Seq[Option[UBOData]])
 

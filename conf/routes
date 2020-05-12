@@ -454,9 +454,9 @@ GET         /master/userAddUBO                                                  
 POST        /master/userAddUBO                                                                    controllers.AddOrganizationController.userAddUBO
 GET         /master/addUBO                                                                        controllers.AddOrganizationController.addUBOForm
 POST        /master/addUBO                                                                        controllers.AddOrganizationController.addUBO
-GET         /master/userDeleteUBO                                                                 controllers.AddOrganizationController.userDeleteUBOForm(personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String)
+GET         /master/userDeleteUBO                                                                 controllers.AddOrganizationController.userDeleteUBOForm(id: String)
 POST        /master/userDeleteUBO                                                                 controllers.AddOrganizationController.userDeleteUBO
-GET         /master/deleteUBO                                                                     controllers.AddOrganizationController.deleteUBOForm(personFirstName: String, personLastName: String, sharePercentage: Double, relationship: String, title: String)
+GET         /master/deleteUBO                                                                     controllers.AddOrganizationController.deleteUBOForm(id: String)
 POST        /master/deleteUBO                                                                     controllers.AddOrganizationController.deleteUBO
 
 GET         /master/addOrUpdateOrganizationBankAccount                                            controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm
