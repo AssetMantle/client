@@ -981,8 +981,6 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationUBO"
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
-ALTER TABLE MASTER."OrganizationUBO"
-    ADD CONSTRAINT OrganizationUBO_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 (
@@ -1488,10 +1486,6 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
     PRIMARY KEY ("id")
 );
 
-ALTER TABLE MEMBER_CHECK."MemberScanDecision"
-    ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
-ALTER TABLE MEMBER_CHECK."MemberScanDecision"
-    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("id") REFERENCES MASTER."OrganizationUBO" ("id");
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
 (
@@ -1521,11 +1515,6 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
-ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
-    ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
-ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
-    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
 (
@@ -1555,11 +1544,6 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
-ALTER TABLE MEMBER_CHECK."VesselScanDecision"
-    ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
-ALTER TABLE MEMBER_CHECK."VesselScanDecision"
-    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id");
-
 
 
 ALTER TABLE BLOCKCHAIN."Account_BC"
@@ -1633,6 +1617,8 @@ ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."OrganizationUBO"
+    ADD CONSTRAINT OrganizationUBO_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Trader"
@@ -1688,6 +1674,19 @@ ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
     ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("id") REFERENCES MASTER."OrganizationUBO" ("id");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id");
 
 ALTER TABLE WESTERN_UNION."FiatRequest"
     ADD CONSTRAINT FiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
