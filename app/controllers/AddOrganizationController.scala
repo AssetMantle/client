@@ -530,7 +530,6 @@ class AddOrganizationController @Inject()(
             zoneID <- zoneID
             organization <- organization
             checkAllKYCFilesVerified <- checkAllKYCFilesVerified(zoneID, organization)
-//            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(organization.id)
             checkMemberCheckVerified <- checkMemberCheckVerified(organization.id)
             result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID)
           } yield result
