@@ -2,34 +2,24 @@ package models.masterTransaction
 
 import java.sql.Timestamp
 
-import models.common.Serializable._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
 import models.Trait.{Document, Logged}
-import models.common.Node
-import models.Trait.Document
-import models.common.Serializable
-import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
+import models.common.Serializable._
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import models.common.Serializable._
-import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class NegotiationFileHistory(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[NegotiationDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[NegotiationFileHistory] with Logged[NegotiationFileHistory] {
+case class NegotiationFileHistory(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[NegotiationDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[NegotiationFileHistory] with Logged {
 
   def updateFileName(newFileName: String): NegotiationFileHistory = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): NegotiationFileHistory = copy(file = newFile)
-
-  def createLog()(implicit node: Node): NegotiationFileHistory = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): NegotiationFileHistory = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -46,9 +36,7 @@ class NegotiationFileHistories @Inject()(protected val databaseConfigProvider: D
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
-  case class NegotiationFileHistorySerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String] = None, status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class NegotiationFileHistorySerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContentJson: Option[String], status: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: NegotiationFileHistory = NegotiationFileHistory(id = id, documentType = documentType, fileName = fileName, file = file, documentContent = documentContentJson.map(content => utilities.JSON.convertJsonStringToObject[NegotiationDocumentContent](content)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 

@@ -1,19 +1,17 @@
 package models.blockchainTransaction
 
-import java.net.ConnectException
+import java.sql.Timestamp
 
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.master.{Negotiation, Negotiations, Trader}
+import models.Trait.Logged
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.NegotiationResponse
-import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
@@ -21,7 +19,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] {
+case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] with Logged {
   def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -62,14 +60,6 @@ class ConfirmBuyerBids @Inject()(
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(confirmBuyerBid: ConfirmBuyerBid): Future[String] = db.run((confirmBuyerBidTable returning confirmBuyerBidTable.map(_.ticketID) += confirmBuyerBid).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(confirmBuyerBid: ConfirmBuyerBid): Future[Int] = db.run(confirmBuyerBidTable.insertOrUpdate(confirmBuyerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -155,7 +145,7 @@ class ConfirmBuyerBids @Inject()(
 
   private[models] class ConfirmBuyerBidTable(tag: Tag) extends Table[ConfirmBuyerBid](tag, "ConfirmBuyerBid") {
 
-    def * = (from, to, bid, time, pegHash, buyerContractHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (ConfirmBuyerBid.tupled, ConfirmBuyerBid.unapply)
+    def * = (from, to, bid, time, pegHash, buyerContractHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ConfirmBuyerBid.tupled, ConfirmBuyerBid.unapply)
 
     def from = column[String]("from")
 
@@ -180,6 +170,18 @@ class ConfirmBuyerBids @Inject()(
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
