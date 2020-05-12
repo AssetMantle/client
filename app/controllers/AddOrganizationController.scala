@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
 import models.common.Serializable._
 import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, OrganizationUBO, Zone}
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction, master, memberCheck}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -27,6 +27,7 @@ class AddOrganizationController @Inject()(
                                            utilitiesNotification: utilities.Notification,
                                            masterOrganizationKYCs: master.OrganizationKYCs,
                                            masterOrganizationUBOs: master.OrganizationUBOs,
+                                           memberCheckCorporateScanResultDecisions: memberCheck.CorporateScanDecisions,
                                            transactionsAddOrganization: transactions.AddOrganization,
                                            masterZones: master.Zones,
                                            blockchainAccounts: blockchain.Accounts,
@@ -35,7 +36,6 @@ class AddOrganizationController @Inject()(
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
-                                           masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -108,51 +108,6 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userAddOrUpdateUBOsForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val id = masterOrganizations.Service.tryGetID(loginState.username)
-
-      def getUBOs(id: String): Future[Seq[OrganizationUBO]] = masterOrganizationUBOs.Service.getUBOs(id)
-
-      (for {
-        id <- id
-        ubos <- getUBOs(id)
-        result <- withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(id = Some(ubo.id), personFirstName = ubo.firstName, personLastName = ubo.lastName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
-      } yield result
-        ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs())
-      }
-  }
-
-  def userAddOrUpdateUBOs(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.AddOrUpdateUBOs.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.userAddOrUpdateUBOs(formWithErrors)))
-        },
-        updateUBOsData => {
-          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-
-//          def updateUBOs(id: String): Future[Int] = {
-//            if (updateUBOsData.ubos.flatten.map(uboData => uboData.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-//            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.flatten.map(uboData => UBO(personFirstName = uboData.personFirstName, personLastName = uboData.personLastName, sharePercentage = uboData.sharePercentage, relationship = uboData.relationship, title = uboData.title)))
-//          }
-//
-          def getUBOs(organizationID: String): Future[Seq[OrganizationUBO]] = masterOrganizationUBOs.Service.getUBOs(organizationID)
-
-          (for {
-            organizationID <- organizationID
-//            _ <- updateUBOs(organizationID)
-            ubos <- getUBOs(organizationID)
-            result <- withUsernameToken.PartialContent(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(id = Some(ubo.id) ,personFirstName = ubo.firstName, personLastName = ubo.lastName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
   def userAddUBOForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.userAddUBO())
   }
@@ -170,7 +125,7 @@ class AddOrganizationController @Inject()(
 
           def createUBO(organizationID: String, oldUBOs: Seq[OrganizationUBO]): Future[String] = {
             if (oldUBOs.map(_.sharePercentage).sum + userAddUBOData.sharePercentage > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizationUBOs.Service.create(organizationID, userAddUBOData.personLastName, userAddUBOData.personLastName, userAddUBOData.sharePercentage, userAddUBOData.relationship, userAddUBOData.title)
+            masterOrganizationUBOs.Service.create(organizationID, userAddUBOData.personFirstName, userAddUBOData.personLastName, userAddUBOData.sharePercentage, userAddUBOData.relationship, userAddUBOData.title)
           }
 
           (for {
@@ -203,7 +158,7 @@ class AddOrganizationController @Inject()(
 
           def createUBO(organizationID: String, oldUBOs: Seq[OrganizationUBO]): Future[String] = {
             if (oldUBOs.map(_.sharePercentage).sum + addUBOData.sharePercentage > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizationUBOs.Service.create(organizationID, addUBOData.personLastName, addUBOData.personLastName, addUBOData.sharePercentage, addUBOData.relationship, addUBOData.title)
+            masterOrganizationUBOs.Service.create(organizationID, addUBOData.personFirstName, addUBOData.personLastName, addUBOData.sharePercentage, addUBOData.relationship, addUBOData.title)
           }
 
           (for {
@@ -538,11 +493,10 @@ class AddOrganizationController @Inject()(
             masterOrganizationKYCs.Service.checkAllKYCFilesVerified(acceptRequestData.organizationID)
           }
 
-//          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterOrganizationBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
-          def checkMemberCheckVerified(organizationID: String): Future[Boolean] = masterOrganizationUBOs.Service.checkScanStatus(organizationID)
+          def checkMemberCheckVerified(organizationID: String): Future[Boolean] = memberCheckCorporateScanResultDecisions.Service.checkOrganizationApproved(organizationID)
 
           def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String): Future[Result] = {
-            if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERFIED)
+            if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERIFIED)
 
             if (checkAllKYCFilesVerified) {
               val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)

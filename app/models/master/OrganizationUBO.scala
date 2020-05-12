@@ -4,7 +4,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,13 +13,7 @@ import slick.lifted.TableQuery
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationUBO(id: String, organizationID: String, firstName: String, lastName: String, sharePercentage: Double, relationship: String, title: String, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[OrganizationUBO] {
-
-  def createLog()(implicit node: Node): OrganizationUBO = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): OrganizationUBO = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class OrganizationUBO(id: String, organizationID: String, firstName: String, lastName: String, sharePercentage: Double, relationship: String, title: String, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -32,8 +25,6 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.MASTER_ORGANIZATION
-
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
 
   import databaseConfig.profile.api._
 
@@ -64,6 +55,17 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
   private def findByOrganizationID(organizationID: String): Future[Seq[OrganizationUBO]] = db.run(organizationUBOTable.filter(_.organizationID === organizationID).result)
 
   private def checkOrganizationIDAndStatus(organizationID: String, status: Boolean): Future[Boolean] = db.run(organizationUBOTable.filter(_.organizationID === organizationID).filter(_.status === status).exists.result)
+
+  private def updateStatus(id: String, status: Boolean): Future[Int] = db.run(organizationUBOTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
 
   private def deleteById(id: String, organizationID: String): Future[Int] = db.run(organizationUBOTable.filter(_.id === id).filter(_.organizationID === organizationID).delete.asTry).map {
     case Success(result) => result
@@ -117,6 +119,8 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
     def getUBOs(organizationID: String): Future[Seq[OrganizationUBO]] = findByOrganizationID(organizationID)
 
     def checkScanStatus(organizationID: String) : Future[Boolean] = checkOrganizationIDAndStatus(organizationID, status = true)
+
+    def markVerified(id: String, status: Boolean): Future[Int] = updateStatus(id, status)
 
     def delete(id:String, organizationID: String): Future [Int] = deleteById(id, organizationID)
   }

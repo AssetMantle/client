@@ -2,11 +2,11 @@
 @import views.html.base._
 @import views.companion.master.AddUBOMemberCheck
 
-@(addUBOBackgroundCheckForm: Form[AddUBOMemberCheck.Data] = AddUBOMemberCheck.form, organizationID: String, scanID: Int, resultID: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(addUBOBackgroundCheckForm: Form[AddUBOMemberCheck.Data] = AddUBOMemberCheck.form, uboID: String, scanID: Int, resultID: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_UBO_MEMBER_CHECK, addUBOBackgroundCheckForm) {
-  @commonInputText(addUBOBackgroundCheckForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID, 'readonly -> true)
+  @commonInputText(addUBOBackgroundCheckForm, constants.FormField.UBO_ID, 'value -> uboID, 'readonly -> true)
   @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.SCAN_ID, 'value -> scanID, 'readonly -> true)
-  @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true)
+  @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true, 'required -> false)
   @commonCheckbox(addUBOBackgroundCheckForm, constants.FormField.STATUS)
 
 }

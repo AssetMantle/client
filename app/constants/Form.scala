@@ -28,7 +28,6 @@ object Form {
 
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization(), routes.javascript.AddOrganizationController.addOrganizationForm)
-  val USER_ADD_OR_UPDATE_UBOS = new Form("USER_ADD_OR_UPDATE_UBOS", routes.AddOrganizationController.userAddOrUpdateUBOs(), routes.javascript.AddOrganizationController.userAddOrUpdateUBOsForm)
   val DELETE_UBO = new Form("DELETE_UBO", routes.AddOrganizationController.deleteUBO(), routes.javascript.AddOrganizationController.deleteUBOForm)
   val USER_DELETE_UBO = new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO(), routes.javascript.AddOrganizationController.userDeleteUBOForm)
   val ADD_UBO = new Form("ADD_UBO", routes.AddOrganizationController.addUBO(), routes.javascript.AddOrganizationController.addUBOForm)

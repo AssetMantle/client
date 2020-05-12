@@ -1005,22 +1005,6 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
-(
-    "id"                VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "fileName"          VARCHAR NOT NULL UNIQUE,
-    "file"              BYTEA,
-    "status"            BOOLEAN,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "documentType")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
     "id"                VARCHAR NOT NULL,
@@ -1053,22 +1037,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
-(
-    "id"                VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "fileName"          VARCHAR NOT NULL UNIQUE,
-    "file"              BYTEA,
-    "status"            BOOLEAN,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
@@ -1508,7 +1476,6 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScan"
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
 (
     "id"                VARCHAR NOT NULL,
-    "uboID"             VARCHAR NOT NULL,
     "scanID"            INT NOT NULL,
     "resultID"          INT,
     "status"            BOOLEAN NOT NULL,
@@ -1524,7 +1491,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
 ALTER TABLE MEMBER_CHECK."MemberScanDecision"
     ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
 ALTER TABLE MEMBER_CHECK."MemberScanDecision"
-    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("uboID") REFERENCES MASTER."OrganizationUBO" ("id");
+    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("id") REFERENCES MASTER."OrganizationUBO" ("id");
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
 (
@@ -1542,8 +1509,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
 (
-    "id"                VARCHAR NOT NULL,
-    "organizationID"    VARCHAR NOT NULL UNIQUE,
+    "id"    VARCHAR NOT NULL,
     "scanID"            INT NOT NULL,
     "resultID"          INT,
     "status"            BOOLEAN NOT NULL,
@@ -1558,7 +1524,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
 ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
     ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
 ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
-    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
@@ -1577,8 +1543,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
 (
-    "id"                VARCHAR NOT NULL,
-    "assetID"           VARCHAR NOT NULL UNIQUE,
+    "id"           VARCHAR NOT NULL,
     "scanID"            INT NOT NULL,
     "resultID"          INT,
     "status"            BOOLEAN NOT NULL,
@@ -1593,7 +1558,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
 ALTER TABLE MEMBER_CHECK."VesselScanDecision"
     ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
 ALTER TABLE MEMBER_CHECK."VesselScanDecision"
-    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id");
+    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id");
 
 
 
@@ -1668,16 +1633,12 @@ ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."OrganizationBackgroundCheck"
-    ADD CONSTRAINT OrganizationBackgroundCheck_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."TraderBackgroundCheck"
-    ADD CONSTRAINT TraderBackgroundCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
     ADD CONSTRAINT TraderRelation_Trader_fromID FOREIGN KEY ("fromID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
@@ -1973,11 +1934,6 @@ CREATE TRIGGER ORGANIZATION_LOG
     ON MASTER."Organization"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ORGANIZATION_BACKGROUND_CHECK_LOG
-    BEFORE INSERT OR UPDATE
-    ON MASTER."OrganizationBackgroundCheck"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."OrganizationBankAccountDetail"
@@ -1996,11 +1952,6 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER TRADER_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."Trader"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER TRADER_BACKGROUND_CHECK_LOG
-    BEFORE INSERT OR UPDATE
-    ON MASTER."TraderBackgroundCheck"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER TRADER_RELATION_LOG
@@ -2391,12 +2342,10 @@ DROP TRIGGER IF EXISTS MOBILE_LOG ON MASTER."Mobile" CASCADE;
 DROP TRIGGER IF EXISTS NEGOTIATION_LOG ON MASTER."Negotiation" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_LOG ON MASTER."Order" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_LOG ON MASTER."Organization" CASCADE;
-DROP TRIGGER IF EXISTS ORGANIZATION_BACKGROUND_CHECK_LOG ON MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG ON MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_KYC_LOG ON MASTER."OrganizationKYC" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_UBO_LOG ON MASTER."OrganizationUBO" CASCADE;
 DROP TRIGGER IF EXISTS TRADER_LOG ON MASTER."Trader" CASCADE;
-DROP TRIGGER IF EXISTS TRADER_BACKGROUND_CHECK_LOG ON MASTER."TraderBackgroundCheck" CASCADE;
 DROP TRIGGER IF EXISTS TRADER_RELATION_LOG ON MASTER."TraderRelation" CASCADE;
 DROP TRIGGER IF EXISTS ZONE_LOG ON MASTER."Zone" CASCADE;
 DROP TRIGGER IF EXISTS ZONE_KYC_LOG ON MASTER."ZoneKYC" CASCADE;
@@ -2491,12 +2440,10 @@ DROP TABLE IF EXISTS MASTER."Negotiation_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationUBO" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;

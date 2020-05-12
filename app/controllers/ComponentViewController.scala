@@ -6,8 +6,8 @@ import javax.inject.{Inject, Singleton}
 import models.docusign
 import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
 import models.master.{Organization => _, Zone => _, _}
-import models.{blockchain, master, masterTransaction, westernUnion}
-import models.masterTransaction.SendFiatRequest
+import models.{blockchain, master, masterTransaction, memberCheck, westernUnion}
+import models.masterTransaction.{AssetFile, SendFiatRequest}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
@@ -42,6 +42,7 @@ class ComponentViewController @Inject()(
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
                                          masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
+                                         memberCheckVesselScanDecisions: memberCheck.VesselScanDecisions,
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
                                          westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,
@@ -1661,7 +1662,14 @@ class ComponentViewController @Inject()(
   //TODO: Whoever did this correct it
   def zoneViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.zoneViewTradeRoomChecks()))
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+      def billOfLading(assetID: String): Future[Option[AssetFile]] = masterTransactionAssetFiles.Service.get(assetID, constants.File.Asset.BILL_OF_LADING)
+      (for{
+        negotiation <- negotiation
+        billOfLading <- billOfLading(negotiation.assetID)
+      } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[models.common.Serializable.BillOfLading].vesselName))))).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+      }
   }
 
   //TODO: Whoever did this correct it

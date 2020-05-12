@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,13 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class VesselScanDecision(id: String, assetID: String, scanID: Int, resultID: Option[Int], status: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[VesselScanDecision] {
-
-  def createLog()(implicit node: Node): VesselScanDecision = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): VesselScanDecision = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class VesselScanDecision(id: String, scanID: Int, resultID: Option[Int], status: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class VesselScanDecisions @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -35,11 +28,9 @@ class VesselScanDecisions @Inject()(protected val databaseConfigProvider: Databa
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val vesselScanDecisionTable = TableQuery[VesselScanDecisionTable]
 
-  private def add(vesselScanDecision: VesselScanDecision): Future[String] = db.run((vesselScanDecisionTable returning vesselScanDecisionTable.map(_.id) += vesselScanDecision.createLog()).asTry).map {
+  private def add(vesselScanDecision: VesselScanDecision): Future[String] = db.run((vesselScanDecisionTable returning vesselScanDecisionTable.map(_.id) += vesselScanDecision).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -47,7 +38,7 @@ class VesselScanDecisions @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  private def upsert(vesselScanDecision: VesselScanDecision): Future[Int] = db.run(vesselScanDecisionTable.insertOrUpdate(vesselScanDecision.updateLog()).asTry).map {
+  private def upsert(vesselScanDecision: VesselScanDecision): Future[Int] = db.run(vesselScanDecisionTable.insertOrUpdate(vesselScanDecision).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -69,11 +60,9 @@ class VesselScanDecisions @Inject()(protected val databaseConfigProvider: Databa
 
   private[models] class VesselScanDecisionTable(tag: Tag) extends Table[VesselScanDecision](tag, "VesselScanDecision") {
 
-    def * = (id, assetID, scanID, resultID.?, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (VesselScanDecision.tupled, VesselScanDecision.unapply)
+    def * = (id, scanID, resultID.?, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (VesselScanDecision.tupled, VesselScanDecision.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
-
-    def assetID = column[String]("assetID", O.Unique)
 
     def scanID = column[Int]("scanID")
 
@@ -97,7 +86,9 @@ class VesselScanDecisions @Inject()(protected val databaseConfigProvider: Databa
 
   object Service {
 
-    def create(assetID: String, scanID: Int, resultID: Option[Int], status: Boolean): Future[String] = add(VesselScanDecision(utilities.IDGenerator.requestID(), assetID, scanID, resultID, status))
+    def create(assetID: String, scanID: Int, resultID: Option[Int], status: Boolean): Future[String] = add(VesselScanDecision(assetID, scanID, resultID, status))
+
+    def insertOrUpdate(assetID: String, scanID: Int, resultID: Option[Int], status: Boolean): Future[Int] = upsert(VesselScanDecision(assetID, scanID, resultID, status))
 
     def get(id: String): Future[Option[VesselScanDecision]] = findById(id)
   }

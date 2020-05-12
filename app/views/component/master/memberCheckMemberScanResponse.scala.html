@@ -2,7 +2,7 @@
 @import queries.responses.MemberCheckMemberScanResponse
 @import views.html.base._
 
-@(memberScanResponse: MemberCheckMemberScanResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(memberScanResponse: MemberCheckMemberScanResponse.Response, uboID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div>
     @commonIntInfo(constants.View.SCAN_ID, memberScanResponse.scanResult.scanId)
@@ -33,11 +33,11 @@
                 @commonTextInfo(constants.View.MONITORING_STATUS, entity.monitoringStatus.getOrElse(""))
             @commonJavascriptButton(constants.View.DETAILS, JavaScript(s"componentResource('scanDetailedResult', jsRoutes.controllers.BackgroundCheckController.memberScanResult(${entity.resultId}))"))
             @commonFormButton(constants.Form.MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION, 'parameters -> s"${entity.resultId}")
-            @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${"orgID_changeTHIS"}', ${memberScanResponse.scanResult.scanId}, ${entity.resultId}")
+            @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${uboID}', ${memberScanResponse.scanResult.scanId}, ${entity.resultId}")
             }
         }
         case None => {
-                    @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${"orgID_changeTHIS"}', ${memberScanResponse.scanResult.scanId}")
+                    @commonFormButton(constants.Form.ADD_UBO_MEMBER_CHECK, 'parameters -> s" '${uboID}', ${memberScanResponse.scanResult.scanId}")
         }
     }
     <div id="scanDetailedResult"></div>

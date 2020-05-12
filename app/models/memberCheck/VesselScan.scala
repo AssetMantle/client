@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,13 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class VesselScan(id: String, vesselName: String, scanID: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[VesselScan] {
-
-  def createLog()(implicit node: Node): VesselScan = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): VesselScan = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class VesselScan(id: String, vesselName: String, scanID: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class VesselScans @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -35,11 +28,9 @@ class VesselScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val vesselScanTable = TableQuery[VesselScanTable]
 
-  private def add(vesselScan: VesselScan): Future[String] = db.run((vesselScanTable returning vesselScanTable.map(_.id) += vesselScan.createLog()).asTry).map {
+  private def add(vesselScan: VesselScan): Future[String] = db.run((vesselScanTable returning vesselScanTable.map(_.id) += vesselScan).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -47,7 +38,7 @@ class VesselScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def upsert(vesselScan: VesselScan): Future[Int] = db.run(vesselScanTable.insertOrUpdate(vesselScan.updateLog()).asTry).map {
+  private def upsert(vesselScan: VesselScan): Future[Int] = db.run(vesselScanTable.insertOrUpdate(vesselScan).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

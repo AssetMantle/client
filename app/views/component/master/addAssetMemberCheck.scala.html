@@ -6,7 +6,7 @@
 @commonForm(constants.Form.ADD_ASSET_MEMBER_CHECK, addAssetBackgroundCheckForm) {
   @commonInputText(addAssetBackgroundCheckForm, constants.FormField.ASSET_ID, 'value -> assetID, 'readonly -> true)
   @commonInputInt(addAssetBackgroundCheckForm, constants.FormField.SCAN_ID, 'value -> scanID, 'readonly -> true)
-  @commonInputInt(addAssetBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true)
+  @commonInputInt(addAssetBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true, 'required -> false)
   @commonCheckbox(addAssetBackgroundCheckForm, constants.FormField.STATUS)
 
 }

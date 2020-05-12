@@ -6,7 +6,7 @@
 @commonForm(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, addOrganizationBackgroundCheckForm) {
   @commonInputText(addOrganizationBackgroundCheckForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID, 'readonly -> true)
   @commonInputInt(addOrganizationBackgroundCheckForm, constants.FormField.SCAN_ID, 'value -> scanID, 'readonly -> true)
-  @commonInputInt(addOrganizationBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true)
+  @commonInputInt(addOrganizationBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true, 'required -> false)
   @commonCheckbox(addOrganizationBackgroundCheckForm, constants.FormField.STATUS)
 
 }
