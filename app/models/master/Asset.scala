@@ -1,7 +1,10 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import models.common.Serializable.{AssetOtherDetails, ShippingDetails}
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -13,16 +16,16 @@ import slick.lifted.TableQuery
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, takerID: Option[String] = None, otherDetails: AssetOtherDetails, status: String)
+case class Asset(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, takerID: Option[String] = None, otherDetails: AssetOtherDetails, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  case class AssetSerializable(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String) {
-    def deserialize(): Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status)
-  }
+  def serialize(asset: Asset): AssetSerializable = AssetSerializable(id = asset.id, ownerID = asset.ownerID, pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity, quantityUnit = asset.quantityUnit, price = asset.price, moderated = asset.moderated, takerID = asset.takerID, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
 
-  def serialize(asset: Asset): AssetSerializable = AssetSerializable(id = asset.id, ownerID = asset.ownerID, pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity, quantityUnit = asset.quantityUnit, price = asset.price, moderated = asset.moderated, takerID = asset.takerID, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status)
+  case class AssetSerializable(id: String, ownerID: String, pegHash: Option[String], assetType: String, description: String, documentHash: String, quantity: Int, quantityUnit: String, price: Int, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -138,7 +141,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class AssetTable(tag: Tag) extends Table[AssetSerializable](tag, "Asset") {
 
-    def * = (id, ownerID, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, takerID.?, otherDetails, status) <> (AssetSerializable.tupled, AssetSerializable.unapply)
+    def * = (id, ownerID, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, takerID.?, otherDetails, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerializable.tupled, AssetSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -165,6 +168,18 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def otherDetails = column[String]("otherDetails")
 
     def status = column[String]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

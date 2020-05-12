@@ -1,11 +1,13 @@
 package models.blockchainTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.blockchain.Asset
-import models.master.{Asset => masterAsset, Order => masterOrder, Negotiation => masterNegotiation}
+import models.Trait.Logged
+import models.master.{Negotiation => masterNegotiation, Order => masterOrder}
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -20,7 +22,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendAsset] {
+case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendAsset] with Logged {
   def mutateTicketID(newTicketID: String): SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -68,14 +70,6 @@ class SendAssets @Inject()(
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendAsset: SendAsset): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += sendAsset).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(sendAsset: SendAsset): Future[Int] = db.run(sendAssetTable.insertOrUpdate(sendAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -161,7 +155,7 @@ class SendAssets @Inject()(
 
   private[models] class SendAssetTable(tag: Tag) extends Table[SendAsset](tag, "SendAsset") {
 
-    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendAsset.tupled, SendAsset.unapply)
+    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendAsset.tupled, SendAsset.unapply)
 
     def from = column[String]("from")
 
@@ -180,6 +174,18 @@ class SendAssets @Inject()(
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
