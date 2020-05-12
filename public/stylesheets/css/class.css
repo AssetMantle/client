@@ -649,7 +649,7 @@ form .formBody {
   padding: 20px 60px 60px 60px; }
 
 .modalInfoBlock {
-  min-width: 500px;
+  width: 620px;
   max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px; }
