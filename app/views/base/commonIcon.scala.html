@@ -1,8 +1,5 @@
-@(name: String, function: Option[JavaScript], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+@(name: String)(implicit messagesProvider: MessagesProvider)
 
-<span class='@Seq(arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")' onclick="@function.getOrElse(JavaScript(""))"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#"+name)"/></svg></span>
+<svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#"+name)"/></svg>
 
-@*Exmaple Useage- @commonIcon("icon-seen", Some(JavaScript(s"getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('${negotiation.assetID}','${assetFile.documentType}'))")), 'class ->"seenIcon")
-  Or In case of no Javascript function
-    @commonIcon("icon-seen", None, 'class ->"seenIcon")
-*@
+@*Exmaple Useage- @commonIcon("icon-seen")*@

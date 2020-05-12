@@ -13,11 +13,13 @@
         @negotiationFileList.find(_.documentType == constants.File.Negotiation.CONTRACT) match {
             case Some(negotiationFile) => {
                 <tr>
-                    <td>@commonIcon("icon-doc2", None, 'class ->"docIcon")
+                    <td><span class="docIcon">@commonIcon("icon-doc2")</span>
                         <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocument('@negotiation.id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
                     </td>
                     <td>
-                        @commonIcon("icon-seen", Some(JavaScript(s"getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('${negotiation.assetID}','${negotiationFile.documentType}'))")), 'class ->"seenIcon")
+                        <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocumentContent('@negotiation.id','@negotiationFile.documentType'))")>
+                            @commonIcon("icon-seen")
+                        </span>
                     </td>
                     <td>
                     @negotiationEnvelopeList.find(_.documentType == constants.File.Negotiation.CONTRACT) match {
@@ -54,14 +56,14 @@
                         <tr><td colspan="2">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
                         @assetFileList.filter(assetFile=> negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
                             <tr>
-                                <td>@commonIcon("icon-doc2", None, 'class ->"docIcon")
+                                <td><span class="docIcon"> @commonIcon("icon-doc2")</span>
                                     <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocument('@negotiation.id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
                                 </td>
                                 @assetFile.documentType match{
                                     case constants.File.Asset.BILL_OF_LADING=> {
-                                        <td>@commonIcon("icon-seen", Some(JavaScript(s"getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('${negotiation.assetID}','${assetFile.documentType}'))")), 'class ->"seenIcon")</td>
+                                        <td> <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiation.assetID','@assetFile.documentType'))")> @commonIcon("icon-seen")</span></td>
                                         <td>
-                                        @assetFile.status match {
+                                        @assetFile.status match{
                                             case Some(true)=>{@constants.View.APPROVED}
                                             case Some(false)=>{@constants.View.REJECTED}
                                             case None=>{
@@ -79,14 +81,14 @@
                         <tr><td colspan="2">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</td></tr>
                         @negotiationFileList.filter(negotiationFile=> negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile=>
                             <tr>
-                                <td>@commonIcon("icon-doc2", None, 'class ->"docIcon")
+                                <td><span class="docIcon"> @commonIcon("icon-doc2")</span>
                                     <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocument('@negotiation.id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
                                 </td>
                                 @negotiationFile.documentType match{
                                     case constants.File.Negotiation.INVOICE | constants.File.Negotiation.CONTRACT => {
                                         <td>
                                             <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocumentContent('@negotiation.id','@negotiationFile.documentType'))")>
-                                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-seen")"/></svg>
+                                                @commonIcon("icon-seen")
                                                 @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <span>@constants.View.SIGNED</span>}
                                             </span>
                                         </td>
