@@ -6,9 +6,8 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Node
-import models.master.{Order => masterOrder, Negotiation => masterNegotiation}
-import models.{blockchain, master, masterTransaction}
+import models.master.{Negotiation => masterNegotiation, Order => masterOrder}
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -19,13 +18,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[Order] {
-
-  def createLog()(implicit node: Node): Order = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): Order = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Orders @Inject()(
@@ -39,7 +32,8 @@ class Orders @Inject()(
                         blockchainFiats: Fiats,
                         getOrder: queries.GetOrder,
                         masterOrders: master.Orders,
-                      )(implicit executionContext: ExecutionContext, configuration: Configuration) {
+                        configuration: Configuration,
+                      )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -61,9 +55,7 @@ class Orders @Inject()(
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
-  private def add(order: Order): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order.createLog()).asTry).map {
+  private def add(order: Order): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -71,7 +63,7 @@ class Orders @Inject()(
     }
   }
 
-  private def updateByID(order: Order): Future[Int] = db.run(orderTable.filter(_.id === order.id).update(order.updateLog()).asTry).map {
+  private def updateByID(order: Order): Future[Int] = db.run(orderTable.filter(_.id === order.id).update(order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

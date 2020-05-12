@@ -5,24 +5,19 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.{Document, Logged}
-import models.common.Node
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderBackgroundCheck] with Logged[TraderBackgroundCheck] {
+case class TraderBackgroundCheck(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = Option(true), createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[TraderBackgroundCheck] with Logged {
 
   def updateFileName(newFileName: String): TraderBackgroundCheck = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): TraderBackgroundCheck = copy(file = newFile)
-
-  def createLog()(implicit node: Node): TraderBackgroundCheck = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): TraderBackgroundCheck = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -37,13 +32,11 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
 
   val db = databaseConfig.db
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   import databaseConfig.profile.api._
 
   private[models] val traderBackgroundCheckTable = TableQuery[TraderBackgroundCheckTable]
 
-  private def add(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = db.run((traderBackgroundCheckTable returning traderBackgroundCheckTable.map(_.id) += traderBackgroundCheck.createLog()).asTry).map {
+  private def add(traderBackgroundCheck: TraderBackgroundCheck): Future[String] = db.run((traderBackgroundCheckTable returning traderBackgroundCheckTable.map(_.id) += traderBackgroundCheck).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -51,7 +44,7 @@ class TraderBackgroundChecks @Inject()(protected val databaseConfigProvider: Dat
     }
   }
 
-  private def update(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === traderBackgroundCheck.id).filter(_.documentType === traderBackgroundCheck.documentType).update(traderBackgroundCheck.updateLog()).asTry).map {
+  private def update(traderBackgroundCheck: TraderBackgroundCheck): Future[Int] = db.run(traderBackgroundCheckTable.filter(_.id === traderBackgroundCheck.id).filter(_.documentType === traderBackgroundCheck.documentType).update(traderBackgroundCheck).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
