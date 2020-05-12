@@ -8,7 +8,7 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>@title</title>
+        <title>@title | @Messages(constants.View.COMDEX)</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/Favicon.png")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/fonts.css")">
@@ -27,10 +27,10 @@
         <script src="@routes.Assets.versioned("javascripts/replaceDocument.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/submitFormOnEnter.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/submitForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/rippleEffect.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/validateForm.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
-
     </head>
     <body class="comdex">
         <div class="bodyContainer">
@@ -53,27 +53,27 @@
                         @loginState match {
                             case null => {}
                             case default => {
-                                <li><a href="@controllers.routes.ViewController.dashboard()"><span class="dashboardIcon">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-dashboard")"/></svg>
+                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                                    @commonIcon("dashboard")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.trades()"><span class="traderIcon">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-trader")"/></svg>
+                                <li><a href="@controllers.routes.ViewController.trades()" class="navItemRippleEffect"><span class="traderIcon">
+                                    @commonIcon("trader")
                                 </span>
                                     @Messages(constants.View.TRADES)
                                 </a>
                                 </li>
                                 <li>
-                                    <a href="@controllers.routes.ViewController.transactions()"><span class="transactionIcon">
-                                        <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-transaction")"/></svg>
+                                    <a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionIcon">
+                                        @commonIcon("transaction")
                                     </span>
                                         @Messages(constants.View.TRANSACTIONS)
                                     </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.account()"><span class="accountIcon">
-                                    <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-account")"/></svg>
+                                <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect"><span class="accountIcon">
+                                    @commonIcon("account")
                                 </span>
                                     @Messages(constants.View.ACCOUNT)
                                 </a>
@@ -100,10 +100,10 @@
                             case default => {
                                 @loginState.userType match {
                                     case constants.User.ZONE => {
-                                        <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                        <li><a href="@controllers.routes.ViewController.zoneRequest()" class="navItemRippleEffect">@Messages(constants.View.REQUEST)</a></li>
                                     }
                                     case constants.User.GENESIS => {
-                                        <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.View.REQUEST)</a></li>
+                                        <li><a href="@controllers.routes.ViewController.genesisRequest()" class="navItemRippleEffect">@Messages(constants.View.REQUEST)</a></li>
                                     }
                                     case _ => {}
                                 }
@@ -114,15 +114,15 @@
                                     </script>
                                 <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
-                                <li>
-                                    <a href="@controllers.routes.ViewController.profile()">
+                                <li class="login-nav-item">
+                                    <a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
                                         @loginState.username
                                     <span cmuk-icon="user" class="loginIcon"></span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                        <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-logout")"/></svg>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
+                                        <span class="logoutIcon">@commonIcon("logout")</span>
                                     </a>
                                 </li>
 
@@ -136,14 +136,14 @@
             @* End of Header *@
 
             @* Main Container *@
-        <div class="mainSection">
+        <div class="mainContainer">
             @* Data container *@
         <div class="dataContainer">
             <div class="cmuk-text-center">
                 @for(failure <- failures) {
                     <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="failureIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-fail")"/></svg></span>
+                        <p><span class="failureIcon">@commonIcon("fail")</span>
                             <span class="alertName">@Messages(constants.View.FAILURE):</span>
                             @Messages(failure.message)</p>
                     </div>
@@ -151,7 +151,7 @@
                 @for(warning <- warnings) {
                     <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="warningIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-warning")"/></svg></span>
+                        <p><span class="warningIcon">@commonIcon("warning")</span>
                             <span class="alertName">@Messages(constants.View.WARNING):</span>
                             @Messages(warning.message)</p>
                     </div>
@@ -159,14 +159,14 @@
                 @for(success <- successes) {
                     <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="successIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-success")"/></svg></span>
+                        <p><span class="successIcon">@commonIcon("success")</span>
                             @Messages(success.message)</p>
                     </div>
                 }
                 @for(info <- infos) {
                     <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
-                        <p><span class="infoIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-info")"/></svg></span>
+                        <p><span class="infoIcon">@commonIcon("info")</span>
                             <span class="alertName">@Messages(constants.View.INFORMATION):</span>
                             @Messages(info.message)</p>
                     </div>
@@ -177,7 +177,7 @@
             <div class="pageContainer">
             @loginState match {
                 case null => {
-                    <div class="bannerContainer cmuk-container">
+                    <div class="banner cmuk-container">
                         <div class="bannerText">
                             <h3>@Messages(constants.View.INDEX_1)</h3>
                             <p>@Messages(constants.View.INDEX_2)</p>
@@ -216,8 +216,7 @@
                 <div class="modalContent">
                     <button class="cmuk-modal-close-default" id="modalClose" type="button" cmuk-close></button>
                     <div class="modalBody" id="commonModalContent">
-
-                            </div>
+                    </div>
                 </div>
             </div>
 
@@ -245,7 +244,7 @@
                         <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
                     </div>
                 </div>
-                <div class="copyright">
+                <div class="copyRight">
                             &copy;
                     <script>document.write(new Date().getFullYear())</script>
                     <a href="" target="_blank">@Messages(constants.View.FOOTER_TEXT)</a>

@@ -4,9 +4,11 @@
 @import views.html.base.commonModalButton
 @import views.html.base.commonFormButton
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-
-<div class="centerText">
-    <h4>@Messages(constants.View.ORGANIZATION_KYC_FILES)</h4>
+<legend class="cmuk-legend">
+    @Messages(constants.View.ORGANIZATION_KYC_FILES)
+</legend>
+<hr>
+<div class="modalInfoBlock centerText">
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
@@ -22,8 +24,8 @@
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
-</div>
 @commonModalButton(constants.View.BACK, constants.Form.ADD_ORGANIZATION.get)
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
     @commonFormButton(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST,'id -> "getOrganizationKYCReviewForm")
 }
+</div>

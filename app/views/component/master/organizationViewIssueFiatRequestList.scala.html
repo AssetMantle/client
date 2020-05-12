@@ -9,23 +9,23 @@
     } {
         @fiatRequestList.map { fiatRequest =>
             @commonVerticalInfoBox() {
-                @commonTextInfo(constants.View.REQUEST_ID, fiatRequest.id)
+                @commonVerticalTextInfo(constants.View.REQUEST_ID, fiatRequest.id)
 
                 @traderList.find(_.id == fiatRequest.traderID) match {
                     case Some(trader) => {
-                        @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+                        @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
                     }
                     case None => {}
                 }
 
-                @commonIntInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.transactionAmount)
+                @commonVerticalIntInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.transactionAmount)
                 @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED) {
-                    @commonTextInfo(constants.View.STATUS, fiatRequest.status)
+                    @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
                 } else {
                     @rtcbList.find(_.externalReference == fiatRequest.id) match {
                         case Some(rtcb) => {
-                            @commonTextInfo(constants.View.STATUS, fiatRequest.status)
-                            @commonIntInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
+                            @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
+                            @commonVerticalIntInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
                         }
                         case None => {}
 

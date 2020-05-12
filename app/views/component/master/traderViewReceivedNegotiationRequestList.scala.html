@@ -7,10 +7,10 @@
 @import models.master.Organization
 @(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
- <div class="SalesQuoteCard">
+ <div class="salesQuoteCard">
     @receivedNegotiationRequestList.map { receivedNegotiationRequest =>
         @commonVerticalInfoBox(){
-            <div class="firstPart salesChild">
+            <div class="salesQuoteCardLeft salesChild">
                 <div class="salesQuoteCategory buy">
                     <span>@Messages(constants.View.BUY)</span>
                 </div>
@@ -20,7 +20,7 @@
                         <div class="assetIcon">
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
-                        <div class="assetIntialData">
+                        <div class="assetInitialData">
                             <p class="assetTitle">@asset.assetType</p>
                             <p class="assetQuantity">@Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@receivedNegotiationRequest.price</p>
@@ -30,7 +30,7 @@
                 }
                 </div>
             </div>
-            <div class="secondPart salesChild">
+            <div class="salesQuoteCardMiddle salesChild">
                 @counterPartyTraderList.find(_.id == receivedNegotiationRequest.sellerTraderID) match {
                     case Some(trader) => {
                         @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -45,11 +45,11 @@
                 }
                 <p><span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span>
                     <span class="lines">---</span>
-                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
                     <span class="lines">---</span>
                     <span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
-            <div class="thirdPart salesChild">
+            <div class="salesQuoteCardRight salesChild">
             @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
                 @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
             </div>
