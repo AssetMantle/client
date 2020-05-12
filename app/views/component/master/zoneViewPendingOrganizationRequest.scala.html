@@ -10,9 +10,8 @@
     @Messages(constants.View.ORGANIZATION_REQUEST): @organization.id
 </legend>
 <hr>
-<div class="infoBlock infoBlockHeight">
-    <div class="sideLeft infoBlockItem">
-<div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_DETAILS) </div>
+<div class="modalInfoBlock">
+    <div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_DETAILS) </div>
     @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
     @commonTextInfo(constants.View.ZONE_ID, organization.zoneID)
     @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
@@ -20,13 +19,10 @@
     @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
     @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
     @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
-<div class="title cmuk-text-left">@Messages(constants.FormField.REGISTERED_ADDRESS.name)</div>
-@streetAddress(organization.registeredAddress)
-<div class="title cmuk-text-left">@Messages(constants.FormField.POSTAL_ADDRESS.name) </div>
-@streetAddress(organization.postalAddress)
-    </div>
-    <div class="sideRight infoBlockItem">
-        <div class="infoBlockItemRight">
+    <div class="title cmuk-text-left">@Messages(constants.FormField.REGISTERED_ADDRESS.name)</div>
+    @streetAddress(organization.registeredAddress)
+    <div class="title cmuk-text-left">@Messages(constants.FormField.POSTAL_ADDRESS.name) </div>
+    @streetAddress(organization.postalAddress)
         <div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_UBO_DETAIL) </div>
         @for(ubo <- organization.ubos.data) {
             @commonTextInfo(constants.View.PERSON_NAME, ubo.personName)
@@ -48,6 +44,4 @@
         <p class="cmuk-text-left">@Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</p>
             @commonModalButton(constants.View.APPROVE, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'class -> "cmuk-button-success cmuk-button-small", 'parameters -> s"'${organization.id}'")
             @commonFormButton(constants.Form.REJECT_ORGANIZATION_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${organization.id}'")
-        </div>
-    </div>
 </div>

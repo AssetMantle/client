@@ -822,12 +822,6 @@ html, body{
           .modalInfoBlock{
             padding: 0;
           }
-          .infoBlock{
-            padding: 0;
-            .cmuk-card-body{
-              padding: 0;
-            }
-          }
         }
       }
       .documentItem{
@@ -848,36 +842,11 @@ form{
   }
 }
 
-
-.infoBlockHeight{
-  max-height: 600px;
-}
 .modalInfoBlock{
   min-width: 500px;
-  padding: 20px 60px 60px 60px;
-}
-
-.infoBlock{
-  width: 900px;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  border-radius: 2px;
+  max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px;
-  .infoBlockItem:first-child{
-    padding-right: 70px;
-  }
-  .infoBlockItem{
-    flex:1;
-    .infoBlockItemRight{
-      border-left: 1px solid rgba(5, 60, 117, 0.12);
-      padding-left: 70px;
-    }
-  }
-  .infoRow{
-    line-height: 2.4;
-  }
 }
 
 .loginForm {
@@ -1446,6 +1415,7 @@ form{
                 height: 22px;
                 width: 22px;
                 border:1px solid #5EB55C;
+                margin-top: 0;
               }
               .cmuk-checkbox:focus, .cmuk-radio:focus{
                 border-color: #5EB55C;
@@ -2357,7 +2327,7 @@ header:before,
 }
 
 .contactDetails {
-  .contact-info-item{
+  .contactInfoItem{
     display: flex;
     justify-content: space-between;
     .cmuk-card{
@@ -2382,7 +2352,7 @@ header:before,
       width: auto;
       margin-right: 5px;
     }
-    .contact-info-item-status{
+    .contactInfoItemStatus{
       display: flex;
       align-items: center;
     }

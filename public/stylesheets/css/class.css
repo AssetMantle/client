@@ -640,10 +640,6 @@ html, body {
           margin-top: 10px; }
         .modal .modalContent .modalBody form .formBody .modalInfoBlock {
           padding: 0; }
-        .modal .modalContent .modalBody form .formBody .infoBlock {
-          padding: 0; }
-          .modal .modalContent .modalBody form .formBody .infoBlock .cmuk-card-body {
-            padding: 0; }
       .modal .modalContent .modalBody .documentItem form {
         width: auto; }
       .modal .modalContent .modalBody .documentItem .infoRowLabel {
@@ -652,30 +648,11 @@ html, body {
 form .formBody {
   padding: 20px 60px 60px 60px; }
 
-.infoBlockHeight {
-  max-height: 600px; }
-
 .modalInfoBlock {
   min-width: 500px;
-  padding: 20px 60px 60px 60px; }
-
-.infoBlock {
-  width: 900px;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  border-radius: 2px;
+  max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px; }
-  .infoBlock .infoBlockItem:first-child {
-    padding-right: 70px; }
-  .infoBlock .infoBlockItem {
-    flex: 1; }
-    .infoBlock .infoBlockItem .infoBlockItemRight {
-      border-left: 1px solid rgba(5, 60, 117, 0.12);
-      padding-left: 70px; }
-  .infoBlock .infoRow {
-    line-height: 2.4; }
 
 .loginForm .formBody .inputField {
   position: relative;
@@ -1095,7 +1072,8 @@ form .formBody {
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox {
         height: 22px;
         width: 22px;
-        border: 1px solid #5EB55C; }
+        border: 1px solid #5EB55C;
+        margin-top: 0; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:focus, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:focus {
         border-color: #5EB55C; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:checked, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox:indeterminate, .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-radio:checked {
@@ -1755,26 +1733,26 @@ header:before,
   margin-right: 5px;
   margin-bottom: 2px; }
 
-.contactDetails .contact-info-item {
+.contactDetails .contactInfoItem {
   display: flex;
   justify-content: space-between; }
-  .contactDetails .contact-info-item .cmuk-card {
+  .contactDetails .contactInfoItem .cmuk-card {
     flex: 1; }
-    .contactDetails .contact-info-item .cmuk-card .infoRow {
+    .contactDetails .contactInfoItem .cmuk-card .infoRow {
       flex-direction: column; }
-  .contactDetails .contact-info-item .contactUpdateButton {
+  .contactDetails .contactInfoItem .contactUpdateButton {
     width: 60px;
     display: flex;
     flex-direction: row-reverse;
     text-align: right; }
-    .contactDetails .contact-info-item .contactUpdateButton button {
+    .contactDetails .contactInfoItem .contactUpdateButton button {
       font-weight: normal; }
 .contactDetails .infoRowBox {
   justify-content: space-between; }
   .contactDetails .infoRowBox .infoRowLabel {
     width: auto;
     margin-right: 5px; }
-  .contactDetails .infoRowBox .contact-info-item-status {
+  .contactDetails .infoRowBox .contactInfoItemStatus {
     display: flex;
     align-items: center; }
 .contactDetails .cmuk-badge {

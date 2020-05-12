@@ -4,7 +4,6 @@
 
 @(updatePaymentTerms: Form[PaymentTerms.Data] = PaymentTerms.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.UPDATE_PAYMENT_TERMS, updatePaymentTerms) {
-    <div class="modalInfoBlock">
     @commonInputText(updatePaymentTerms, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
     @Messages(constants.View.ADVANCE_PAYMENT)
     @commonInputDouble(updatePaymentTerms, constants.FormField.ADVANCE_PERCENTAGE, 'id -> "advancePercentage", 'oninput -> "advancePercentageInput()")
@@ -14,6 +13,5 @@
         @commonInputInt(updatePaymentTerms, constants.FormField.TENURE, 'required -> false, 'id -> "tenure", 'oninput -> "tenureInput()")
         @commonSelect(updatePaymentTerms, constants.FormField.REFERENCE, 'required -> false, 'id -> "reference")
     }
-    </div>
 }
 <script src="@routes.Assets.versioned("javascripts/paymentTerms.js")" type="text/javascript"></script>

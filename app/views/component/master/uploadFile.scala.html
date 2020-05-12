@@ -6,27 +6,25 @@
 <div class="uploadForm">
 @CSRF.formField
     <div class="modalInfoBlock">
-<div id="uploadSelector"  class="centerText uploadBox">
-    <span class="uploadIcon" cmuk-icon="cloud-upload"></span>
-    <div class="dropBox">
-        <p class="centerText"><small>@Messages(constants.View.DROP_FILE)</small></p>
-    </div>
-    <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
-    <button type="button" class="cmuk-button cmuk-button-primary" id="browseUploadButton">@Messages(constants.View.BROWSE)</button>
-</div>
-
-<div id="uploader" class="hidden centerText">
-    <a id="fileName" class="fileName"></a>
-    <br>
-    <div id="uploadControls">
-        <div class="progressContainer">
-            <div class="progressBar" id="fileUploadProgressBar"></div>
+    <div id="uploadSelector"  class="centerText uploadBox">
+        <span class="uploadIcon" cmuk-icon="cloud-upload"></span>
+        <div class="dropBox">
+            <p class="centerText"><small>@Messages(constants.View.DROP_FILE)</small></p>
         </div>
-        <button type="button" class="cmuk-button cmuk-button-primary" id="uploadButton" >@Messages(constants.View.UPLOAD)</button>
+        <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
+        <button type="button" class="cmuk-button cmuk-button-primary" id="browseUploadButton">@Messages(constants.View.BROWSE)</button>
     </div>
-</div>
-
-<div id="uploadCompletionMessage" class="hidden"></div>
+    <div id="uploader" class="hidden centerText">
+        <a id="fileName" class="fileName"></a>
+        <br>
+        <div id="uploadControls">
+            <div class="progressContainer">
+                <div class="progressBar" id="fileUploadProgressBar"></div>
+            </div>
+            <button type="button" class="cmuk-button cmuk-button-primary" id="uploadButton" >@Messages(constants.View.UPLOAD)</button>
+        </div>
+    </div>
+    <div id="uploadCompletionMessage" class="hidden"></div>
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>

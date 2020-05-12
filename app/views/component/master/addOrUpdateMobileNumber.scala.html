@@ -4,7 +4,6 @@
 
 @(addOrUpdateMobileNumber: Form[AddOrUpdateMobileNumber.Data] = AddOrUpdateMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER, addOrUpdateMobileNumber) {
-    <div class="modalInfoBlock">
     <div class="mobileNumberUpdate cmuk-flex">
         <div class="countryCode hiddenLabel">
             @commonSelect(addOrUpdateMobileNumber, constants.FormField.COUNTRY_CODE)
@@ -12,6 +11,5 @@
         <div class="mobileNumber">
         @commonInputText(addOrUpdateMobileNumber, constants.FormField.MOBILE_NUMBER)
         </div>
-    </div>
     </div>
 }

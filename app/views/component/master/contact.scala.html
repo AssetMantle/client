@@ -7,14 +7,14 @@
 
 @commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#contactDetails") {
    } {
-    <div class="contact-info-item">
+    <div class="contactInfoItem">
         @mobileNumber match {
             case Some(mobile) => {
                 @commonInfoBox() {
                     <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
                         @commonTextInfo(constants.View.MOBILE_NUMBER, mobile.mobileNumber)
                         @if(mobile.status) {
-                            <div class="contact-info-item-status">
+                            <div class="contactInfoItemStatus">
                             <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                             </div>
                         } else {
@@ -33,14 +33,14 @@
         @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm, 'class -> "cmuk-button-link")}
         </div>
     </div>
-    <div class="contact-info-item">
+    <div class="contactInfoItem">
     @emailAddress match {
         case Some(email) => {
             @commonInfoBox() {
                 <div class="cmuk-flex cmuk-flex-wrap infoRowBox">
                     @commonTextInfo(constants.View.EMAIL_ADDRESS, email.emailAddress)
                     @if(email.status) {
-                        <div class="contact-info-item-status">
+                        <div class="contactInfoItemStatus">
                         <span class="cmuk-badge verified">@Messages(constants.View.VERIFIED)</span>
                         </div>
                     } else {

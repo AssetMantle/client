@@ -5,8 +5,6 @@
 
 @(confirmAllNegotiationTermsForm: Form[ConfirmAllNegotiationTerms.Data] = ConfirmAllNegotiationTerms.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_ALL_NEGOTIATION_TERMS, confirmAllNegotiationTermsForm) {
-    <div class="modalInfoBlock">
     @commonInputText(confirmAllNegotiationTermsForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(confirmAllNegotiationTermsForm, constants.FormField.CONFIRM)
-    </div>
 }

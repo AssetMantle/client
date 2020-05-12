@@ -3,10 +3,8 @@
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data] = BuyerExecuteOrder.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.BUYER_EXECUTE_ORDER, buyerExecuteOrderForm) {
-    <div class="modalInfoBlock">
     @commonInputText(buyerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(buyerExecuteOrderForm, constants.FormField.FIAT_PROOF)
     @commonInputInt(buyerExecuteOrderForm, constants.FormField.GAS)
     @commonInputPassword(buyerExecuteOrderForm, constants.FormField.PASSWORD)
-    </div>
 }

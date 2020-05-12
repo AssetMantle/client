@@ -7,9 +7,7 @@
 
 @(userReviewAddOrganizationRequestForm: Form[UserReviewAddOrganizationRequest.Data] = UserReviewAddOrganizationRequest.form, organization: Organization, zone: Zone, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST, userReviewAddOrganizationRequestForm) {
-    <div class="infoBlock">
     @userViewOrganization(organizationZone = zone, organization = organization, organizationKYCs = organizationKYCs)
-    </div>
     @commonCheckbox(userReviewAddOrganizationRequestForm, constants.FormField.COMPLETION)
     @commonModalButton(constants.View.BACK,routes.javascript.AddOrganizationController.userUploadOrUpdateOrganizationKYCView)
 }

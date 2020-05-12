@@ -4,10 +4,8 @@
 
 @(sendFiatForm: Form[SendFiat.Data] = SendFiat.form, negotiationID: String, amount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_FIAT, sendFiatForm) {
-    <div class="modalInfoBlock">
     @commonInputText(sendFiatForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID)
     @commonInputInt(sendFiatForm, constants.FormField.AMOUNT, 'value -> amount.toString)
     @commonInputInt(sendFiatForm, constants.FormField.GAS)
     @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD)
-    </div>
 }

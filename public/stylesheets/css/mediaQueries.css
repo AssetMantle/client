@@ -67,7 +67,7 @@
     flex-wrap: wrap; } }
 @media (min-width: 640px) {
   .modalBody form {
-    width: auto;
+    width: 600px;
     text-align: center; }
 
   form hr {
@@ -137,6 +137,8 @@
     top: 10%;
     max-height: 530px; }
     .modal .modalContent .modalBody form .formBody {
+      max-height: 409px; }
+    .modal .modalContent .modalBody .modalInfoBlock {
       max-height: 409px; }
     .modal .modalContent .modalBody .infoBlockHeight {
       max-height: 399px; }

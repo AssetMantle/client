@@ -4,7 +4,5 @@
 
 @(issueFiatRequestForm: Form[IssueFiatRequest.Data] = IssueFiatRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ISSUE_FIAT_REQUEST, issueFiatRequestForm) {
-    <div class="modalInfoBlock">
     @commonInputInt(issueFiatRequestForm, constants.FormField.TRANSACTION_AMOUNT)
-    </div>
 }

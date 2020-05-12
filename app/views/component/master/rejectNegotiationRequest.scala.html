@@ -5,9 +5,7 @@
 
 @(rejectNegotiationRequestForm: Form[RejectNegotiationRequest.Data] = RejectNegotiationRequest.form, negotiation: Negotiation, sellerName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_NEGOTIATION_REQUEST, rejectNegotiationRequestForm) {
-  <div class="modalInfoBlock">
   @commonTextInfo(constants.View.SELLER, sellerName)
   @commonInputText(rejectNegotiationRequestForm, constants.FormField.ID, 'value -> negotiation.id, 'readonly -> true, 'containerDivClass -> "hidden")
   @commonInputText(rejectNegotiationRequestForm, constants.FormField.COMMENT, 'required -> false)
-  </div>
 }

@@ -7,8 +7,6 @@
 
 @(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_NEGOTIATION_REQUEST, traderReviewNegotiationRequest) {
-    <div class="infoBlock">
-        <div class="infoBlockItem">
     <div class="cmuk-text-left title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
     @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
     @commonTextInfo(constants.View.ACCOUNT_ID, counterPartyTrader.accountID)
@@ -22,9 +20,6 @@
     @commonIntInfo(constants.View.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
     @commonTextInfo(constants.View.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
     @commonTextInfo(constants.View.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
-    </div>
-        <div class="infoBlockItem">
-            <div class="infoBlockItemRight">
             <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS)</div>
             @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
             @negotiation.paymentTerms.credit match {
@@ -46,9 +41,6 @@
             @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
                 <p  class="cmuk-text-left cmuk-margin-remove"><span class="cmuk-text-left">@Messages(negotiationDocument)</span></p>
             }
-        </div>
-    </div>
-    </div>
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'parameters -> s"'${negotiation.id}'")
 }

@@ -86,7 +86,7 @@
 @media (min-width: 640px) {
   .modalBody{
     form{
-      width:auto;
+      width:600px;
       text-align: center;
     }
   }
@@ -198,6 +198,9 @@
     max-height: 530px;
     .modalBody {
       form .formBody {
+        max-height: 409px;
+      }
+      .modalInfoBlock{
         max-height: 409px;
       }
       .infoBlockHeight{

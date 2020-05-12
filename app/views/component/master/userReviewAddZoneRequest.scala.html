@@ -7,16 +7,11 @@
 @import views.html.component.master.streetAddress
 @(zoneCompletionForm: Form[ReviewAddZoneRequest.Data] = ReviewAddZoneRequest.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
-    <div class="infoBlock">
-        <div class="infoBlockItem">
             <div class="cmuk-text-left title">@Messages(constants.View.ZONE_DETAILS):</div>
             @commonTextInfo(constants.View.NAME, zone.name)
             @commonTextInfo(constants.View.CURRENCY, zone.currency)
             <div class="cmuk-text-left title">@Messages(constants.View.ADDRESS)</div>
             @streetAddress(zone.address)
-        </div>
-        <div class="infoBlockItem">
-            <div class="infoBlockItemRight">
             <div id="zoneKYCs">
                 <div class="cmuk-text-left title">@Messages(constants.View.ZONE_KYC_FILES)</div>
                 @for(zoneKYC <- zoneKYCs) {
@@ -30,8 +25,5 @@
                 }
             </div>
             @commonCheckbox(zoneCompletionForm, constants.FormField.COMPLETION)
-        </div>
-        </div>
-    </div>
     @commonModalButton(constants.View.BACK,routes.javascript.AddZoneController.userUploadOrUpdateZoneKYCView)
 }

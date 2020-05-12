@@ -4,11 +4,9 @@
 
 @(updateNegotiationAssetTermsForm: Form[UpdateNegotiationAssetTerms.Data] = UpdateNegotiationAssetTerms.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.UPDATE_ASSET_TERMS, updateNegotiationAssetTermsForm) {
-    <div class="modalInfoBlock">
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.ASSET_DESCRIPTION)
     @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.ASSET_PRICE)
     @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.QUANTITY_UNIT)
-    </div>
 }

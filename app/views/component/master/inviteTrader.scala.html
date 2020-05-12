@@ -3,8 +3,6 @@
 
 @(inviteTraderForm: Form[InviteTrader.Data] = InviteTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.INVITE_TRADER, inviteTraderForm) {
-    <div class="modalInfoBlock">
     @commonInputText(inviteTraderForm, constants.FormField.NAME)
     @commonInputText(inviteTraderForm, constants.FormField.EMAIL_ADDRESS)
-    </div>
 }

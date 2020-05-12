@@ -5,8 +5,6 @@
 
 @(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String, trader: Trader)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
-    <div class="infoBlock">
-        <div class="infoBlockItem">
         @commonTextInfo(constants.View.NAME, trader.name)
         @commonInputText(modifyTraderForm, constants.FormField.ACCOUNT_ID, 'value -> accountID, 'readonly -> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_ASSET, 'checked-> true)
@@ -18,9 +16,6 @@
         @commonCheckbox(modifyTraderForm, constants.FormField.SELLER_EXECUTE_ORDER, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked-> true)
-        </div>
-        <div class="infoBlockItem">
-            <div class="infoBlockItemRight">
         @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_BUYER_BID, 'checked-> true)
         @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked-> true)
@@ -28,8 +23,5 @@
         @commonCheckbox(modifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked-> true)
         @commonInputInt(modifyTraderForm, constants.FormField.GAS)
         @commonInputPassword(modifyTraderForm, constants.FormField.PASSWORD)
-        </div>
-        </div>
-    </div>
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'parameters -> s"'${trader.id}'")
 }

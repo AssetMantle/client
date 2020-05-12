@@ -5,8 +5,6 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
-    <div class="infoBlock">
-        <div class="infoBlockItem">
             <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ZONE)</div>
             <div class="cmuk-panel cmuk-panel-scrollable">
             <ul class="cmuk-list">
@@ -30,9 +28,6 @@
             @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
             @commonInputText(addOrganizationForm, constants.FormField.PHONE)
             }
-        </div>
-        <div class="infoBlockItem">
-            <div class="infoBlockItemRight">
             <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name):</div>
             @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
             @defining(Option(constants.FormField.POSTAL_ADDRESS)) { implicit nestedFormField =>
@@ -44,8 +39,5 @@
             @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
             @commonInputText(addOrganizationForm, constants.FormField.PHONE)
             }
-            </div>
-        </div>
-    </div>
 }
 <script src="@routes.Assets.versioned("javascripts/addOrganization.js")" type="text/javascript"></script>

@@ -5,7 +5,6 @@
 @(loginForm: Form[Login.Data] = Login.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div class="loginForm cmuk-text-center">
 @commonForm(constants.Form.LOGIN, loginForm) {
-    <div class="modalInfoBlock">
     <div class="inputField">
         <div class="inputFieldBody">
         @commonInputText(loginForm, constants.FormField.USERNAME)
@@ -20,7 +19,6 @@
     </div>
     <div class="pushNotification hiddenLabel">
     @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'containerDivClass -> "hidden", 'readonly -> true)
-    </div>
     </div>
 }
 </div>

@@ -4,7 +4,5 @@
 
 @(addOrUpdateEmailAddress: Form[AddOrUpdateEmailAddress.Data] = AddOrUpdateEmailAddress.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_OR_UPDATE_EMAIL_ADDRESS, addOrUpdateEmailAddress) {
-    <div class="modalInfoBlock">
     @commonInputText(addOrUpdateEmailAddress, constants.FormField.EMAIL_ADDRESS)
-    </div>
 }
