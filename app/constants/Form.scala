@@ -46,7 +46,7 @@ object Form {
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
   val SEND_ASSET = new Form("SEND_ASSET", routes.AssetController.send(), routes.javascript.AssetController.sendForm)
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.AssetController.redeem(), routes.javascript.AssetController.redeemForm)
-  val UPDATE_ASSET_DOCUMENT_STATUS = new Form("UPDATE_ASSET_DOCUMENT_STATUS", routes.AssetController.updateAssetDocumentStatus(), routes.javascript.AssetController.updateAssetDocumentStatusForm)
+  val ACCEPT_OR_REJECT_ASSET_DOCUMENT = new Form("ACCEPT_OR_REJECT_ASSET_DOCUMENT", routes.AssetController.acceptOrRejectAssetDocument(), routes.javascript.AssetController.acceptOrRejectAssetDocumentForm)
 
   //AddZoneController
   val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)

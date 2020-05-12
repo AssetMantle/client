@@ -464,7 +464,7 @@ class AssetController @Inject()(
       )
   }
 
-  def updateAssetDocumentStatusForm(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def acceptOrRejectAssetDocumentForm(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -473,15 +473,15 @@ class AssetController @Inject()(
       (for {
         negotiation <- negotiation
         assetFile <- getAssetFile(negotiation.assetID)
-      } yield Ok(views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiationID, assetFile = assetFile))
+      } yield Ok(views.html.component.master.acceptOrRejectAssetDocument(negotiationID = negotiationID, assetFile = assetFile))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
-  def updateAssetDocumentStatus(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def acceptOrRejectAssetDocument(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
+      views.companion.master.AcceptOrRejectAssetDocument.form.bindFromRequest().fold(
         formWithErrors => {
           val negotiation = masterNegotiations.Service.tryGet(formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))
 
@@ -490,7 +490,7 @@ class AssetController @Inject()(
           (for {
             negotiation <- negotiation
             assetFile <- getAssetFile(negotiation.assetID)
-          } yield BadRequest(views.html.component.master.updateAssetDocumentStatus(formWithErrors, negotiation.id, assetFile))
+          } yield BadRequest(views.html.component.master.acceptOrRejectAssetDocument(formWithErrors, negotiation.id, assetFile))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
@@ -522,7 +522,7 @@ class AssetController @Inject()(
             negotiation <- negotiation
             _ <- verifyOrRejectAndSendNotification(negotiation)
             assetFile <- getAssetFile(negotiation.assetID)
-            result <- withUsernameToken.PartialContent(views.html.component.master.updateAssetDocumentStatus(negotiationID = negotiation.id, assetFile = assetFile))
+            result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectAssetDocument(negotiationID = negotiation.id, assetFile = assetFile))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -530,5 +530,4 @@ class AssetController @Inject()(
         }
       )
   }
-
 }
