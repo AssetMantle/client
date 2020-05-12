@@ -514,6 +514,7 @@ SMS.VERIFY_PHONE.SUBJECT=Verify Phone
 SMS.VERIFY_PHONE.MESSAGE=OTP for registering your Comdex account is {0}. Do not share this number with anyone. Comdex will never call you for this code.
 SMS.PHONE_VERIFIED.MESSAGE=Phone Number is verified {0}
 SMS.EMAIL_VERIFIED.MESSAGE="Your email address has been registered with Comdex successfully
+NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP={0} {1} {2} @ {3} \n Shipping from {4} to {5} in period {6}.
 ISSUE_ASSET_PENDING=Issue Asset Pending, Request will not go if issue asset fails.
 PUSH_NOTIFICATION.NEGOTIATION_REQUEST_ACCEPTED.TITLE=Negotiation Request Accepted
 PUSH_NOTIFICATION.NEGOTIATION_REQUEST_ACCEPTED.MESSAGE=Ticket ID for the acceptance is {0}.

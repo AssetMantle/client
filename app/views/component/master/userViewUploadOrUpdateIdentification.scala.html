@@ -2,7 +2,7 @@
 @import models.master.AccountKYC
 @import views.html.base._
 
-@(accountKYC: Option[AccountKYC], documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
     @Messages(constants.View.PROVIDE_ID_PROOF)
@@ -20,7 +20,7 @@
                 @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
                 <script>hideElement('@Seq(constants.View.UPLOAD, file.documentType).mkString("_")')</script>
             }
-            @commonModalButton(constants.View.BACK, constants.Form.ADD_IDENTIFICATION.get)
+            @commonModalButton(constants.View.BACK, constants.Form. ADD_IDENTIFICATION.get)
             @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION)
         }
         case None => {}
