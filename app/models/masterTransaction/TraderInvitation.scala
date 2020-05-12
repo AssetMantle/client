@@ -1,17 +1,19 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import java.sql.Date
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderInvitation(id: String, organizationID: String, inviteeEmailAddress: String, status: String)
+case class TraderInvitation(id: String, organizationID: String, inviteeEmailAddress: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class TraderInvitations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -56,7 +58,7 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class TraderInvitationTable(tag: Tag) extends Table[TraderInvitation](tag, "TraderInvitation") {
 
-    def * = (id, organizationID, inviteeEmailAddress, status) <> (TraderInvitation.tupled, TraderInvitation.unapply)
+    def * = (id, organizationID, inviteeEmailAddress, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TraderInvitation.tupled, TraderInvitation.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -65,6 +67,18 @@ class TraderInvitations @Inject()(protected val databaseConfigProvider: Database
     def inviteeEmailAddress = column[String]("inviteeEmailAddress")
 
     def status = column[String]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

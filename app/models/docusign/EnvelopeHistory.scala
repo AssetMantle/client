@@ -2,13 +2,12 @@ package models.docusign
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class EnvelopeHistory(id: String, envelopeID: String, documentType: String, status: String)
 

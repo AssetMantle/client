@@ -645,8 +645,8 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             buyerAccountID <- getAccountID(negotiation.buyerTraderID)
             _ <- updateAssetOtherDetails(traderID = traderID, negotiation = negotiation)
-            _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
+            _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_OTHER_DETAILS_UPDATED, negotiation.id)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_OTHER_DETAILS_UPDATED, negotiation.id)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateAssetOtherDetailsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield {
             actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(negotiation.id)))
