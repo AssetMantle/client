@@ -1,0 +1,5 @@
+@(name: String, function: Option[JavaScript], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<span class='@Seq(arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")' onclick="@function.getOrElse(JavaScript(""))"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#"+name)"/></svg></span>
+
+@* Example Usage: @commonJavascriptButton(constants.View.IDENTIFICATION_DETAILS, JavaScript("""componentResource('identificationDetails', jsRoutes.controllers.ComponentViewController.identificationDetails('Abhinav', 1996))""")) *@
