@@ -19,7 +19,7 @@
             }
             </ul>
         }
-        @commonJavascriptButton(formTemplate.submit, JavaScript("submitForm(this)"), 'id -> formTemplate.submit.replace(".", "_"))
+        @commonJavascriptButton(formTemplate.submit, JavaScript("""submitForm(this)"""))
         </div>
     </fieldset>
 }

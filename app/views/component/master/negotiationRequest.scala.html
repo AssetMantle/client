@@ -1,54 +1,38 @@
-@import models.master.{Asset, Organization, Trader}
+@import controllers.actions.LoginState
 @import views.companion.master.NegotiationRequest
 @import views.html.base._
+@import models.master.Asset
+@import models.master.Trader
+@import models.master.Organization
 
-@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
-    <div id="selectAsset">
-        <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
-        <div class="cmuk-panel cmuk-panel-scrollable">
-            <ul class="cmuk-list">
-            @tradableAssetList.map { asset =>
-                <li onclick="selectAsset('@asset.id', '@asset.description', '@asset.assetType', '@asset.price.toString', '@Seq(asset.quantity.toString, asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
-                    @asset.description | @Messages(constants.View.STATUS): @Messages(asset.status)
-                </li>
-            }
-            </ul>
-        </div>
-        @commonFormButton(constants.Form.ISSUE_ASSET)
-        @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'containerDivClass -> "hidden", 'readonly -> true)
-        @commonTextInfo(constants.View.DESCRIPTION, "", 'id -> "selectedAssetDescription")
-        @commonTextInfo(constants.View.ASSET_TYPE, "", 'id -> "selectedAssetType")
-        @commonTextInfo(constants.View.PRICE, "", 'id -> "selectedAssetPrice")
-        @commonTextInfo(constants.View.QUANTITY, "", 'id -> "selectedAssetQuantity")
-        @Messages(constants.View.SHIPPING_DETAILS):
-        @commonTextInfo(constants.View.SHIPMENT_PERIOD, "", 'id -> "selectedAssetShipmentPeriod")
-        @commonTextInfo(constants.View.PORT_OF_LOADING, "", 'id -> "selectedAssetPortOfLoading")
-        @commonTextInfo(constants.View.PORT_OF_DISCHARGE, "", 'id -> "selectedAssetPortOfDischarge")
+    <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
+    <div class="cmuk-panel cmuk-panel-scrollable">
+        <ul class="cmuk-list">
+        @tradableAssetList.map { asset =>
+            <li cmuk-tooltip="@Messages(constants.View.NEGOTIATION_REQUEST_ASSET_DETAILS_TOOLTIP, asset.quantity, asset.quantityUnit, asset.assetType, asset.price, asset.otherDetails.shippingDetails.shippingPeriod, asset.otherDetails.shippingDetails.portOfDischarge, asset.otherDetails.shippingDetails.shippingPeriod)" onclick="fillAssetPegHashField('@asset.id')">
+                @asset.id | @asset.description | @Messages(asset.status)</li>
+        }
+        </ul>
     </div>
-    <div id="selectCounterParty" class="hidden">
-        <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_COUNTER_PARTY)</div>
-        <div class="cmuk-panel cmuk-panel-scrollable">
-            <ul class="cmuk-list">
-            @counterPartyTraderList.map { trader =>
-                @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
-                    case Some(organization) => {
-                        <li onclick="selectCounterParty('@trader.id', '@trader.name', '@trader.accountID', '@organization.name')">@trader.accountID
-                            | @trader.name | @organization.name</li>
-                    }
-                    case None => {}
-                }
+    @commonFormButton(constants.Form.ISSUE_ASSET)
+    @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'readonly -> true)
+    <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_COUNTER_PARTY)</div>
+    <div class="cmuk-panel cmuk-panel-scrollable">
+        <ul class="cmuk-list">
+        @counterPartyTraderList.map { trader =>
+                @counterPartyOrganizationList.find(_.id== trader.organizationID) match {
+                    case Some(organization)=> {
+                        <li onclick="fillCounterPartyField('@trader.id')">@trader.accountID | @trader.name | @constants.View.ORGANIZATION: @organization.name</li>
+                        }
+                    case None=>{}
             }
-            </ul>
-        </div>
-        @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
-        @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
-        @commonTextInfo(constants.View.NAME, "", 'id -> "selectedCounterPartyName")
-        @commonTextInfo(constants.View.ACCOUNT_ID, "", 'id -> "selectedCounterPartyAccountID")
-        @commonTextInfo(constants.View.ORGANIZATION_NAME, "", 'id -> "selectedCounterPartyOrganizationName")
+        }
+        </ul>
     </div>
-    @commonJavascriptButton(constants.View.BACK, JavaScript("showSelectAsset()"), 'id -> "showSelectAssetButton")
-    @commonJavascriptButton(constants.View.NEXT, JavaScript("showSelectCounterParty()"), 'id -> "showSelectCounterPartyButton")
-    <script src="@routes.Assets.versioned("javascripts/negotiationRequest.js")" type="text/javascript"></script>
+    @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
+    @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'readonly -> true)
 }
+<script src="@routes.Assets.versioned("javascripts/negotiationRequest.js")" type="text/javascript"></script>
