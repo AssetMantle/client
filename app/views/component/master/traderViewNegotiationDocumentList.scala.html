@@ -65,6 +65,17 @@
                                             @commonIcon("seen")
                                             </span>
                                         </td>
+                                        <td>
+                                        @assetFile.status match{
+                                            case Some(true)=>{@constants.View.APPROVED}
+                                            case Some(false)=>{@constants.View.REJECTED}
+                                            case None=>{
+                                                @if(traderID == negotiation.buyerTraderID) {
+                                                    @views.html.component.master.acceptOrRejectAssetDocument(negotiationID = negotiation.id, assetFile = assetFile)
+                                                }
+                                            }
+                                        }
+                                        </td>
                                     }
                                     case _=>{}
                                 }

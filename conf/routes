@@ -75,6 +75,9 @@ POST        /asset/release                                                      
 GET         /asset/redeem                                                                         controllers.AssetController.redeemForm(assetID: String)
 POST        /asset/redeem                                                                         controllers.AssetController.redeem
 
+GET         /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocumentForm(negotiationID: String, documentType: String)
+POST        /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocument
+
 GET         /contact                                                                              controllers.ContactController.contact
 
 GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm

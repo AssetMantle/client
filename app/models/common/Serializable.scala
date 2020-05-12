@@ -71,7 +71,7 @@ object Serializable {
 
   implicit val tradeActivityTemplateWrites: OWrites[TradeActivityTemplate] = Json.writes[TradeActivityTemplate]
 
-  case class BillOfLading(id: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends AssetDocumentContent
+  case class BillOfLading(id: String, vesselName: String, portOfLoading: String,  shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, assetDescription: String, weightOfConsignment: Int, declaredAssetValue: Int) extends AssetDocumentContent
 
   implicit val assetDocumentContentWrites: Writes[AssetDocumentContent] = {
     case billOfLading: BillOfLading => Json.toJson(billOfLading)(Json.writes[BillOfLading])
