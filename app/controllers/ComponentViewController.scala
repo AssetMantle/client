@@ -5,6 +5,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models._
 import models.master._
+import models.masterTransaction._
 import models.masterTransaction.SendFiatRequest
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
