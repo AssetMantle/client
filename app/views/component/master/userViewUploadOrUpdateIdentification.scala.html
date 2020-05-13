@@ -9,9 +9,7 @@
 </legend>
 <hr>
 <div class="modalInfoBlock centerText">
-    <div id="@Seq(constants.View.UPLOAD, documentType).mkString("_")">
-    @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "),routes.javascript.FileController.uploadAccountKYCForm,'parameters -> s"'${documentType}'")
-    </div>
+    @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "), routes.javascript.FileController.uploadAccountKYCForm, 'parameters -> s"'${documentType}'", 'id -> Seq(constants.View.UPLOAD, documentType).mkString("_"))
     @accountKYC match {
         case Some(file) => {
             @component.master.commonDocumentViewer(file) {
