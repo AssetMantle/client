@@ -5,7 +5,7 @@
 @(addZoneForm: Form[AddZone.Data] = AddZone.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ZONE, addZoneForm) {
     @commonInputText(addZoneForm, constants.FormField.NAME)
-    @commonInputText(addZoneForm, constants.FormField.CURRENCY)
+    @commonSelect(addZoneForm, constants.FormField.CURRENCY)
     @defining(Option(constants.FormField.ADDRESS)) { implicit nestedFormField =>
         @commonInputText(addZoneForm, constants.FormField.ADDRESS_LINE_1)
         @commonInputText(addZoneForm, constants.FormField.ADDRESS_LINE_2)
