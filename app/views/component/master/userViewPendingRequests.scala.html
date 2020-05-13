@@ -66,37 +66,34 @@
                 case None => {}
             }
         } else {
-            @if(trader.isDefined) {
-                @trader match {
-                    case Some(trader) => {
-                        @traderOrganization match {
-                            case Some(traderOrganization) => {
-                                @commonHorizontalSwitcher(
-                                    ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderRequest(trader, traderOrganization))
-                                )
-                            }
-                            case None => {}
+            @trader match {
+                case Some(trader) => {
+                    @traderOrganization match {
+                        case Some(traderOrganization) => {
+                            @commonHorizontalSwitcher(
+                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderRequest(trader, traderOrganization))
+                            )
                         }
+                        case None => {}
                     }
-                    case None => {}
                 }
+                case None => {}
             }
-            @if(organization.isDefined) {
-                @organization match {
-                    case Some(organization) => {
-                        @organizationZone match {
-                            case Some(organizationZone) => {
-                                @commonHorizontalSwitcher(
-                                    ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationRequest(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
-                                )
-                            }
-                            case None => {}
+            @organization match {
+                case Some(organization) => {
+                    @organizationZone match {
+                        case Some(organizationZone) => {
+                            @commonHorizontalSwitcher(
+                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationRequest(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
+                            )
                         }
+                        case None => {}
+                    }
 
-                    }
-                    case None => {}
                 }
+                case None => {}
             }
+
         }
 
     }
