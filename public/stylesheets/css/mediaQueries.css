@@ -220,6 +220,7 @@
     height: 40px; }
 
   .signUpForm .usernameAvailability .checkIcon,
+  .signUpForm .usernameAvailability .failureIcon,
   .signUpForm .showPassword {
     top: 45px; }
 
@@ -253,7 +254,14 @@
     font-size: 16px; }
 
   .showPassword, .checkIcon {
-    top: 37px; } }
+    top: 37px; }
+
+  .modal .modalContent .modalBody .modalInfoBlock .infoRowLabel, .modal .modalContent .modalBody form .formBody .infoRowLabel {
+    width: 300px; }
+  .modal .modalContent .modalBody .modalInfoBlock .infoRowValue, .modal .modalContent .modalBody form .formBody .infoRowValue {
+    text-align: left; }
+  .modal .modalContent .modalBody .modalInfoBlock .documentItem .infoRowLabel, .modal .modalContent .modalBody form .formBody .documentItem .infoRowLabel {
+    width: auto; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

@@ -25,7 +25,7 @@
         @commonTextInfo(constants.View.ASSET_TYPE, "", 'id -> "selectedAssetType")
         @commonTextInfo(constants.View.PRICE, "", 'id -> "selectedAssetPrice")
         @commonTextInfo(constants.View.QUANTITY, "", 'id -> "selectedAssetQuantity")
-        @Messages(constants.View.SHIPPING_DETAILS):
+        <div class="cmuk-text-left title">@Messages(constants.View.SHIPPING_DETAILS):</div>
         @commonTextInfo(constants.View.SHIPMENT_PERIOD, "", 'id -> "selectedAssetShipmentPeriod")
         @commonTextInfo(constants.View.PORT_OF_LOADING, "", 'id -> "selectedAssetPortOfLoading")
         @commonTextInfo(constants.View.PORT_OF_DISCHARGE, "", 'id -> "selectedAssetPortOfDischarge")
@@ -37,8 +37,8 @@
             @counterPartyTraderList.map { trader =>
                 @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
                     case Some(organization) => {
-                        <li onclick="selectCounterParty('@trader.id', '@trader.name', '@trader.accountID', '@organization.name')">@trader.accountID
-                            | @trader.name | @organization.name</li>
+                        <li onclick="selectCounterParty('@trader.id', '@trader.accountID', '@organization.name')">@trader.accountID
+                            | @organization.name</li>
                     }
                     case None => {}
                 }
@@ -47,7 +47,6 @@
         </div>
         @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
         @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'containerDivClass -> "hidden", 'readonly -> true)
-        @commonTextInfo(constants.View.NAME, "", 'id -> "selectedCounterPartyName")
         @commonTextInfo(constants.View.ACCOUNT_ID, "", 'id -> "selectedCounterPartyAccountID")
         @commonTextInfo(constants.View.ORGANIZATION_NAME, "", 'id -> "selectedCounterPartyOrganizationName")
     </div>

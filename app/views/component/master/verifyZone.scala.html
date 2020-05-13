@@ -5,6 +5,6 @@
 @(verifyZoneForm: Form[VerifyZone.Data] = VerifyZone.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.VERIFY_ZONE, verifyZoneForm) {
     @commonInputText(verifyZoneForm, constants.FormField.ZONE_ID, 'value -> zoneID)
-    @commonInputInt(verifyZoneForm, constants.FormField.GAS)
+    @commonInputInt(verifyZoneForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(verifyZoneForm, constants.FormField.PASSWORD)
 }

@@ -7,6 +7,7 @@
 @commonForm(constants.Form.ADD_INVOICE, addInvoiceForm) {
     @commonInputText(addInvoiceForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
     @commonInputText(addInvoiceForm, constants.FormField.INVOICE_NUMBER)
+    @commonInputInt(addInvoiceForm, constants.FormField.INVOICE_AMOUNT)
     @commonInputDate(addInvoiceForm, constants.FormField.INVOICE_DATE)
 }
 

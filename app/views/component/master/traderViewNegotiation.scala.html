@@ -6,69 +6,64 @@
 @import models.master.Organization
 @(negotiation: Negotiation, asset: Asset, counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@Messages(constants.View.NEGOTIATION_ID): @negotiation.id
+<legend class="cmuk-legend">
+    @Messages(constants.View.NEGOTIATION_ID): @negotiation.id
+</legend>
+<hr>
+<div class="modalInfoBlock">
 
-@Messages(constants.View.ASSET_DETAILS):
-<div class="traderCommodity">
+<div class="cmuk-text-left title"> @Messages(constants.View.ASSET_DETAILS):</div>
+<div class="traderCommodity cmuk-text-left">
     <span class="commodityImage">@commonImage("icons/"+asset.assetType+".svg")</span><span class="tradeName">@asset.assetType</span>
 </div>
 
-@commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-@commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-@commonIntInfo(constants.View.PRICE, negotiation.price)
-
-@Messages(constants.View.SHIPPING_DETAILS):
+    @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
+    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
+    @commonIntInfo(constants.View.PRICE, negotiation.price)
+    @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.accountID)
+    @commonTextInfo(constants.View.ORGANIZATION, counterPartyOrganization.name)
+<div class="cmuk-text-left title">@Messages(constants.View.SHIPPING_DETAILS):</div>
 
 @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
 @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
 @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
 
-@Messages(constants.View.PAYMENT_TERMS):
-<div>
-    <div class="cmuk-flex">
-        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
-    </div>
-    <div class="subTerms">
+    <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS):</div>
+    @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+    <div class="cmuk-text-left">
     @negotiation.paymentTerms.credit match {
         case Some(credit) => {
             @credit.tentativeDate match {
                 case Some(date) => {
-                    <p>@Messages(constants.View.TENTATIVE_DATE)
-                        - <span class="cmuk-text-bold">@date</span></p>
+                    @commonDateInfo(constants.View.TENTATIVE_DATE, date)
                 }
                 case None => {
-                    <p>@Messages(constants.View.TENURE)
-                        - <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
-                    <p>@Messages(constants.View.REFERENCE)
-                        - <span class="cmuk-text-bold">@credit.reference.getOrElse("")</span>
-                    </p>
+                    @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
+                    @commonTextInfo(constants.View.REFERENCE, credit.reference.getOrElse(""))
                 }
             }
         }
         case None => {}
     }
     </div>
-</div>
-
-
-<div>
-    <span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span>
+    <div class="cmuk-text-left">
+    <span class="title">@Messages(constants.View.ASSET_DOCUMENTS):</span>
     @negotiation.documentList.assetDocuments.map { assetDocument =>
-        <div>
+        <li>
             @Messages(assetDocument)
-        </div>
+        </li>
     }
-    <span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
+    </div>
+    <div class="cmuk-text-left">
+        <span class="title">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
     @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-        <div>
+        <li>
             @Messages(negotiationDocument)
-        </div>
+        </li>
     }
+    </div>
+
 </div>
-
-@commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
-@commonTextInfo(constants.View.ORGANIZATION, counterPartyOrganization.name)
-
 
 
 

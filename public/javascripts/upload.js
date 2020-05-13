@@ -27,7 +27,6 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
 
     rFile.on('fileAdded', function (file) {
         $("#uploader").show();
-        $("#uploadSelector").hide();
         $("#fileName").html(file.fileName);
     });
 
@@ -84,7 +83,6 @@ function updateFile(uploadRoute, updateRoute, documentType, id) {
 
     rFile.on('fileAdded', function (file) {
         $("#updater").show();
-        $("#updateSelector").hide();
         $("#fileName").html(file.fileName);
     });
 

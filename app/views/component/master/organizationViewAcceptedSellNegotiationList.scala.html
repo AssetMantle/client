@@ -10,6 +10,9 @@
     @sellNegotiationList.map { sellNegotiation =>
         @commonVerticalInfoBox() {
             <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == sellNegotiation.assetID) match {
                     case Some(asset) => {
@@ -35,14 +38,14 @@
                             }
                             case None => {}
                         }
-                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER)"> @trader.name</span>
+                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER)"> @trader.accountID</span>
                             <span class="lines">---</span>>
                     }
                     case None => {}
                 }
                 @traderList.find(_.id == sellNegotiation.sellerTraderID) match {
                     case Some(trader) => {
-                        <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.name</span></p>
+                        <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.accountID</span></p>
                             }
                     case None => {
                         <span>@sellNegotiation.buyerTraderID</span></p>

@@ -1,15 +1,20 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.Negotiation
-@(totalAmount: Int, amountPaid: Int, amountPending: Int, traderID: String, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(walletBalance: Int, amountPaid: Int, amountPending: Int, traderID: String, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
  <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
                 <span class="walletIcon">@commonIcon("wallet")</span>
                 <div>
-                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.TOTAL_AMOUNT)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @totalAmount</p>
+                    <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance</p>
                 </div>
+            </div>
+            <div>
+                @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST,'class -> "addBalanceButton")
+                <br>
+                @commonFormButton(constants.Form.REDEEM_FIAT,'class -> "addBalanceButton")
             </div>
         </li>
         <li class="cmuk-flex">
@@ -32,6 +37,3 @@
 
         </li>
     </ul>
-@commonFormButton(constants.Form.ISSUE_FIAT_REQUEST,'class -> "addBalanceButton")
-@commonFormButton(constants.Form.REDEEM_FIAT,'class -> "addBalanceButton")
-@commonFormButton(constants.Form.SEND_FIAT,'parameters -> s"'${negotiation.id}'", 'class -> "addBalanceButton")

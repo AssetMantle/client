@@ -30,6 +30,7 @@ function submitChat(source, target = '#chatMessages') {
             url: form.attr('action'),
             data: form.serialize(),
             async: true,
+            global: false,
             statusCode: {
                 400: function (data) {
 

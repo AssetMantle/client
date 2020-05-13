@@ -2,13 +2,52 @@
 @import views.html.base._
 @import models.master.{Asset, Negotiation}
 @import views.html.component.master.buyerViewNegotiationTerm
+@import models.master.Order
 
-@(traderID: String, negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderID: String, negotiation: Negotiation, order:Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity">
             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType</span>
+
+                    @traderID match {
+                        case negotiation.buyerTraderID => {
+                            @negotiation.status match {
+                                case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING=> { @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")}
+                                case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
+                                    @order match {
+                                        case Some(order)=> {
+                                            @order.status match {
+                                                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING=>{@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
+                                                case constants.Status.Order.COMPLETED=>{@commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")}
+                                                case _=>{}
+                                            }
+                                        }
+                                        case None=> {@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
+                                    }
+                                }
+                                case _=>{}
+                            }
+                        }
+                        case negotiation.sellerTraderID => {
+                            @negotiation.status match {
+                                case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING=> { @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")}
+                                case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
+                                    @order match {
+                                        case Some(order)=>{
+                                            @order.status match {
+                                                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=>{@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
+                                                case _=>{}
+                                            }
+                                        }
+                                        case None=> {@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
+                                    }
+                                }
+                                case _=>{}
+                            }
+                        }
+                     }
         </div>
 
         <div class="terms">
@@ -47,13 +86,10 @@
                         case Some(credit) => {
                             @credit.tentativeDate match {
                                 case Some(date) => {
-                                    <p>@Messages(constants.View.TENTATIVE_DATE)
-                                        - <span class="cmuk-text-bold"> @date</span></p>
+                                    @commonDateInfo(constants.View.TENTATIVE_DATE, date)
                                 }
                                 case None => {
-                                    <p>@Messages(constants.View.TENURE)
-                                        - <span class="cmuk-text-bold"> @credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span>
-                                    </p>
+                                    @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
                                     @commonTextInfo(constants.View.REFERENCE, credit.reference.getOrElse(""))
                                 }
                             }
@@ -174,15 +210,11 @@
                             case Some(credit) => {
                                 @credit.tentativeDate match {
                                     case Some(date) => {
-                                        <p>@Messages(constants.View.TENTATIVE_DATE)
-                                            - <span class="cmuk-text-bold">@date</span></p>
+                                        @commonDateInfo(constants.View.TENTATIVE_DATE, date)
                                     }
                                     case None => {
-                                        <p>@Messages(constants.View.TENURE)
-                                            - <span class="cmuk-text-bold">@credit.tenure.getOrElse(0) @Messages(constants.View.DAYS)</span></p>
-                                        <p>@Messages(constants.View.REFERENCE)
-                                            - <span class="cmuk-text-bold">@credit.reference.getOrElse("")</span>
-                                        </p>
+                                        @commonTextInfo(constants.View.TENURE, Seq(credit.tenure.getOrElse(0).toString, Messages(constants.View.DAYS)).mkString(" "))
+                                        @commonTextInfo(constants.View.REFERENCE, credit.reference.getOrElse(""))
                                     }
                                 }
                             }
@@ -232,16 +264,7 @@
                 }
                 </div>
             </div>
-            @traderID match {
-                case negotiation.buyerTraderID => {
-                    @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
-                    @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
-                }
-                case negotiation.sellerTraderID => {
-                    @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
-                    @commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")
-                }
-            }
+
         }
         </div>
     </div>

@@ -38,7 +38,7 @@
                             }
                             case None => {}
                         }
-                        <span cmuk-tooltip="@Messages(constants.View.TRADER)">@trader.name</span>
+                        <span cmuk-tooltip="@Messages(constants.View.TRADER)">@trader.accountID</span>
                     }
                     case None => {}
                 }
@@ -49,9 +49,9 @@
                     <span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
             <div class="salesQuoteCardRight salesChild">
-            @Messages(sentNegotiationRequest.status)
+                @Messages(sentNegotiationRequest.status)
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${sentNegotiationRequest.id}'")
             </div>
-        @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${sentNegotiationRequest.id}'")
     }
 }
 </div>

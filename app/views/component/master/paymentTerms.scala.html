@@ -10,6 +10,7 @@
     <div class="cmuk-text-left title"> @Messages(constants.View.CREDIT_TERMS)</div>
     @defining(Option(constants.FormField.CREDIT)) { implicit nestedFormField =>
         @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'id -> "tentativeDate", 'oninput -> "tentativeDateInput()")
+        <span> @Messages(constants.View.OR)</span>
         @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'id -> "tenure", 'oninput -> "tenureInput()")
         @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'id -> "reference")
     }

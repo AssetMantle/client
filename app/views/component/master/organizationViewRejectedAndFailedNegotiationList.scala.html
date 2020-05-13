@@ -1,10 +1,6 @@
 @import controllers.actions.LoginState
+@import models.master.{Asset, Negotiation, Organization, Trader}
 @import views.html.base._
-@import models.master.Negotiation
-@import models.master.Asset
-@import models.master.Trader
-
-@import models.master.Organization
 @(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)</div>
@@ -12,6 +8,9 @@
 @rejectedReceivedNegotiationList.map { rejectedReceivedNegotiation =>
     @commonVerticalInfoBox() {
         <div class="salesQuoteCardLeft salesChild">
+            <div class="salesQuoteCategory buy">
+                <span>@Messages(constants.View.BUY)</span>
+            </div>
             <div class="content">
             @assetList.find(_.id == rejectedReceivedNegotiation.assetID) match {
                 case Some(asset) => {
@@ -37,17 +36,18 @@
                         }
                         case None => {}
                     }
-                    <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)"> @trader.name</span>
+                    <p><span cmuk-tooltip="@Messages(constants.View.BUYER)"> @trader.accountID</span>
                         <span class="lines">---</span>
-                }
+                        }
                 case None => {}
             }
             @traderList.find(_.id == rejectedReceivedNegotiation.buyerTraderID) match {
                 case Some(trader) => {
-                    <span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)">@trader.name</span></p>
-                        }
+                    <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.accountID</span></p>
+                }
                 case None => {
-                    <span>@rejectedReceivedNegotiation.buyerTraderID</span></p>
+                    <span>@rejectedReceivedNegotiation.buyerTraderID</span>
+                    </p>
                 }
             }
             <p><span>@rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
@@ -58,73 +58,77 @@
             </p>
         </div>
         <div class="salesQuoteCardRight salesChild">
-            <span>@rejectedReceivedNegotiation.comment.getOrElse("")</span>
+            <span>@Messages(rejectedReceivedNegotiation.comment.getOrElse(""))</span>
+            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
         </div>
-        @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
     }
     }
 </div>
 
-    <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
-    <div class="salesQuoteCard">
-    @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
-        @commonVerticalInfoBox() {
-            <div class="salesQuoteCardLeft salesChild">
-                <div class="content">
-                @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
-                    case Some(asset) => {
-                        <div class="assetIcon">
-                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
-                        </div>
-                        <div class="assetInitialData">
-                            <p class="assetTitle">@asset.assetType</p>
-                            <p class="assetQuantity">@Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@rejectedSentNegotiation.price</p>
-                        </div>
-                    }
-                    case None => {}
-                }
-                </div>
+<div class="cmuk-text-left title">@Messages(constants.View.REJECTED_SENT_NEGOTIATION_LIST)</div>
+<div class="salesQuoteCard">
+@rejectedSentNegotiationList.map { rejectedSentNegotiation =>
+    @commonVerticalInfoBox() {
+        <div class="salesQuoteCardLeft salesChild">
+            <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
             </div>
-            <div class="salesQuoteCardMiddle salesChild">
-                @counterPartyTraderList.find(_.id == rejectedSentNegotiation.buyerTraderID) match {
-                    case Some(trader) => {
-                        @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
-                            case Some(organization) => {
-                                <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
-                            }
-                            case None => {}
-                        }
-                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)"> @trader.name</span>
-                            <span class="lines">---</span>
-                    }
-                    case None => {}
+            <div class="content">
+            @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
+                case Some(asset) => {
+                    <div class="assetIcon">
+                        <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                    </div>
+                    <div class="assetInitialData">
+                        <p class="assetTitle">@asset.assetType</p>
+                        <p class="assetQuantity">@Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
+                        <p class="assetPrice">@rejectedSentNegotiation.price</p>
+                    </div>
                 }
-                @traderList.find(_.id == rejectedSentNegotiation.sellerTraderID) match {
+                case None => {}
+            }
+            </div>
+        </div>
+        <div class="salesQuoteCardMiddle salesChild">
+            @counterPartyTraderList.find(_.id == rejectedSentNegotiation.buyerTraderID) match {
                 case Some(trader) => {
-                    <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)">@trader.name</span></p>
+                    @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
+                        case Some(organization) => {
+                            <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
                         }
-                case None => {
-                    <span>@rejectedSentNegotiation.buyerTraderID</span></p>
+                        case None => {}
                     }
+                    <p><span cmuk-tooltip="@Messages(constants.View.BUYER)"> @trader.accountID</span>
+                        <span class="lines">---</span>
+                        }
+                case None => {}
+            }
+            @traderList.find(_.id == rejectedSentNegotiation.sellerTraderID) match {
+                case Some(trader) => {
+                    <span cmuk-tooltip="@Messages(constants.View.SELLER)">@trader.accountID</span></p>
                 }
-                <p><span>@rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
-                    <span class="lines">---</span>
-                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                    <span class="lines">---</span>
-                    <span>@rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
-                </p>
-            </div>
-            <div class="salesQuoteCardRight salesChild">
-                <span>@rejectedSentNegotiation.comment.getOrElse("")</span>
-            </div>
+                case None => {
+                    <span>@rejectedSentNegotiation.buyerTraderID</span>
+                    </p>
+                }
+            }
+            <p><span>@rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
+                <span class="lines">---</span>
+                <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
+                <span class="lines">---</span>
+                <span>@rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
+            </p>
+        </div>
+        <div class="salesQuoteCardRight salesChild">
+            <span>@Messages(rejectedSentNegotiation.comment.getOrElse(""))</span>
             @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedSentNegotiation.id}'")
-        }
-        }
-    </div>
+        </div>
+    }
+    }
+</div>
 
-    <div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
-    <div class="salesQuoteCard">
+<div class="cmuk-text-left title">@Messages(constants.View.FAILED_NEGOTIATION_LIST)</div>
+<div class="salesQuoteCard">
     @failedNegotiationList.map { failedNegotiation =>
         @commonVerticalInfoBox() {
             <div class="salesQuoteCardLeft salesChild">
@@ -153,18 +157,19 @@
                             }
                             case None => {}
                         }
-                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)"> @trader.name</span>
+                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.accountID</span>
                             <span class="lines">---</span>
-                    }
+                            }
                     case None => {}
                 }
 
                 @traderList.find(_.id == failedNegotiation.sellerTraderID) match {
                     case Some(trader) => {
-                        <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)">@trader.name</span></p>
-                            }
+                        <span cmuk-tooltip="@Messages(constants.View.SELLER)">@trader.accountID</span></p>
+                    }
                     case None => {
-                        <span>@failedNegotiation.buyerTraderID</span></p>
+                        <span>@failedNegotiation.buyerTraderID</span>
+                        </p>
                     }
                 }
                 <p><span>@failedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
@@ -175,9 +180,9 @@
                 </p>
             </div>
             <div class="salesQuoteCardRight salesChild">
-            <span>@failedNegotiation.status</span>
+                <span>@Messages(failedNegotiation.status)</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
         }
-        }
-    </div>
+    }
+</div>
