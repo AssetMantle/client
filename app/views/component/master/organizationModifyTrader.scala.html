@@ -20,7 +20,7 @@
     @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked -> true)
     @commonCheckbox(modifyTraderForm, constants.FormField.NEGOTIATION, 'checked -> true)
     @commonCheckbox(modifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> true)
-    @commonInputInt(modifyTraderForm, constants.FormField.GAS)
+    @commonInputInt(modifyTraderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(modifyTraderForm, constants.FormField.PASSWORD)
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'parameters -> s"'${trader.id}'")
 }

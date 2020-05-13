@@ -30,8 +30,8 @@
     <div class="cmuk-container cmuk-margin-bottom">
     @loginState.userType match {
         case constants.User.ZONE => {
-            <div>
-                <div id="zoneTradeStatistics" class="cmuk-margin-bottom"></div>
+            <div class="tradeList cmuk-margin-bottom">
+                <div id="zoneViewAcceptedNegotiationList"></div>
             </div>
 
             <div>
@@ -42,14 +42,14 @@
                 <div id="zoneViewAcceptedNegotiationList"></div>
             </div>
             <script>
-                    componentResource('zoneTradeStatistics', jsRoutes.controllers.ComponentViewController.zoneTradeStatistics());
+                    componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
                     componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
                     componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
             </script>
         }
         case constants.User.ORGANIZATION => {
-            <div>
-                <div id="organizationTradeStatistics" class="cmuk-margin-bottom"></div>
+            <div class="tradeList switcherCard">
+                <div id="organizationViewAcceptedNegotiationList"></div>
             </div>
             <div>
                 <div id="organizationViewAcceptedNegotiationList" class="switcherCard"></div>
@@ -64,11 +64,11 @@
             </script>
         }
         case constants.User.TRADER => {
-            <div>
-                <div id="traderTradeStatistics"></div>
+            <div class="tradeList switcherCard">
+                <div id="traderViewAcceptedNegotiationList"></div>
             </div>
             <script>
-                    componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
+                    componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
             </script>
         }
         case constants.User.USER => {}
