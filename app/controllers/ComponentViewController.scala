@@ -1,13 +1,12 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.docusign
-import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
-import models.master.{Organization => _, Zone => _, _}
-import models.{blockchain, master, masterTransaction, memberCheck, westernUnion}
-import models.masterTransaction.{AssetFile, SendFiatRequest}
+import models._
+import models.master._
+import models.masterTransaction._
+import models.masterTransaction.SendFiatRequest
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
@@ -853,6 +852,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val organization = masterOrganizations.Service.tryGet(organizationID)
+
       def ubos(organizationID: String) = masterOrganizationUBOs.Service.getUBOs(organizationID)
 
       def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
@@ -904,7 +904,7 @@ class ComponentViewController @Inject()(
 
       def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) masterOrganizationKYCs.Service.getAllDocuments(organization.get.id) else Future(Seq[OrganizationKYC]())
 
-      def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getOrNoneByAccountID(accountID)
+      def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getByAccountID(accountID)
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
@@ -1015,12 +1015,12 @@ class ComponentViewController @Inject()(
             case fromTrader.accountID => {
               for {
                 organizationName <- getOrganizationName(toTrader.organizationID)
-              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))
+              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, organizationName = organizationName))
             }
             case toTrader.accountID => {
               for {
                 organizationName <- getOrganizationName(fromTrader.organizationID)
-              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = fromTrader.accountID, traderName = fromTrader.name, organizationName = organizationName))
+              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = fromTrader.accountID, organizationName = organizationName))
             }
             case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
           }
@@ -1045,7 +1045,7 @@ class ComponentViewController @Inject()(
         (for {
           trader <- trader
           organizationName <- getOrganizationName(trader.organizationID)
-        } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, traderName = trader.name, organizationName = organizationName))).recover {
+        } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, organizationName = organizationName))).recover {
           case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
   }
@@ -1065,7 +1065,7 @@ class ComponentViewController @Inject()(
           toTrader <- toTrader
           traderRelation <- traderRelation(fromId = fromTrader.id, toId = toTrader.id)
           organizationName <- getOrganizationName(fromTrader.organizationID)
-        } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, traderName = toTrader.name, organizationName = organizationName))).recover {
+        } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, organizationName = organizationName))).recover {
           case baseException: BaseException => ServiceUnavailable(Html(baseException.failure.message))
         }
   }
@@ -1124,14 +1124,16 @@ class ComponentViewController @Inject()(
   def userViewOrganizationUBOs(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organization = masterOrganizations.Service.getByAccountID(loginState.username)
+
       def ubos(organization: Option[Organization]) = organization match {
-        case Some(organization) =>  masterOrganizationUBOs.Service.getUBOs(organization.id)
+        case Some(organization) => masterOrganizationUBOs.Service.getUBOs(organization.id)
         case None => Future(Seq())
       }
+
       (for {
         organization <- organization
         ubos <- ubos(organization)
-      } yield Ok(views.html.component.master.userViewOrganizationUBOs(organization ,ubos))
+      } yield Ok(views.html.component.master.userViewOrganizationUBOs(organization, ubos))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
@@ -1140,7 +1142,9 @@ class ComponentViewController @Inject()(
   def viewOrganizationUBOs(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
       def ubos(organizationID: String) = masterOrganizationUBOs.Service.getUBOs(organizationID)
+
       (for {
         organizationID <- organizationID
         ubos <- ubos(organizationID)
@@ -1674,8 +1678,10 @@ class ComponentViewController @Inject()(
   def zoneViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
       def billOfLading(assetID: String): Future[Option[AssetFile]] = masterTransactionAssetFiles.Service.get(assetID, constants.File.Asset.BILL_OF_LADING)
-      (for{
+
+      (for {
         negotiation <- negotiation
         billOfLading <- billOfLading(negotiation.assetID)
       } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[models.common.Serializable.BillOfLading].vesselName))))).recover {

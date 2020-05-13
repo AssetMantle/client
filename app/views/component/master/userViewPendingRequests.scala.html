@@ -1,89 +1,99 @@
 @import controllers.actions.LoginState
-@import play.twirl.api.Html
-@import views.html.component.master._
-@import models.master.{Organization, OrganizationKYC, Trader, Zone}
+@import models.master.{Identification, Organization, OrganizationKYC, Trader, Zone}
 @import views.html.base._
-@import models.master.Identification
+@import views.html.component.master._
 
 @import scala.collection.immutable.ListMap
+
 @(identification: Option[Identification], contactStatus: Seq[String], organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.ORGANIZATION_DETAILS) {
-    @identification match {
-        case Some(identification) => {
-            @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED)) && (identification.verificationStatus.getOrElse(false) && (organization.isDefined || trader.isDefined))) {
-                @commonFormButton(constants.Form.ADD_TRADER)
-            }
-        }
-        case _ => {}
+@commonCard(constants.View.REQUEST) {
+    @if(organization.isEmpty && trader.isDefined) {
+        @commonFormButton(constants.Form.ADD_ORGANIZATION)
+    }
+    @if(trader.isEmpty && organization.isDefined) {
+        @commonFormButton(constants.Form.ADD_TRADER)
     }
 } {
-    @identification match {
-        case Some(identification) => {
-            @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
-                @identification.verificationStatus match {
-                    case Some(status) => {
-                        @if(status) {
-                            @defining[ListMap[String, Html]](
-                                organization match {
-                                    case Some(organization) => {
-                                        trader match {
-                                            case Some(trader) => {
-                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganization(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs),
-                                                    constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get))
-                                            }
-                                            case _ => {
-                                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganization(organizationZone = organizationZone.get, organization = organization, organizationKYCs = organizationKYCs))
-                                            }
-                                        }
-                                    }
-                                    case _ => {
-                                        trader match {
-                                            case Some(trader) => {
-                                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTrader(trader, traderOrganization.get))
-                                            }
-                                            case _ => {
-                                                ListMap()
-                                            }
-                                        }
-                                    }
-                                }) { items =>
-                                @commonHorizontalSwitcher(items)
-                            }
-                            @if(organization.isEmpty && trader.isEmpty) {
-                                <div class="cmuk-position-center">
-                                    @commonFormButton(constants.Form.ADD_TRADER)
-                                </div>
-                            }
+    @if(trader.isEmpty && organization.isEmpty) {
+        <div class="cmuk-position-center">
+        @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
+            @commonFormButton(constants.Form.ADD_TRADER)
+            <br>
+                @identification match {
+                    case Some(identification) => {
+                        @if(identification.verificationStatus.getOrElse(false)) {
+                            @commonFormButton(constants.Form.ADD_ORGANIZATION)
                         } else {
-                            <div class="cmuk-position-center">
-                            @Messages(constants.View.IDENTIFICATION_REJECTED)
-                            </div>
+                            @Messages(constants.View.COMPLETE_ACCOUNT_KYC_NOTE)
                         }
                     }
                     case None => {
-                        <div class="cmuk-position-center">
-                        @Messages(constants.View.PENDING_IDENTIFICATION_VERIFICATION)
-                        </div>
+                        @Messages(constants.View.ORGANIZATION_COMPLETE_ACCOUNT_KYC_NOTE)
                     }
                 }
+
             } else {
-                <div class="cmuk-position-center">
-                @contactStatus.map { status =>
-                    @Messages(status)
-                    <br>
+            @Messages(constants.View.UPDATE_AND_VERIFY_CONTACT_NOTE)
+        }
+        </div>
+    } else {
+        @if(trader.isDefined && organization.isDefined) {
+            @trader match {
+                case Some(trader) => {
+                    @traderOrganization match {
+                        case Some(traderOrganization) => {
+                            @organization match {
+                                case Some(organization) => {
+                                    @organizationZone match {
+                                        case Some(organizationZone) => {
+                                            @commonHorizontalSwitcher(
+                                                ListMap(
+                                                    constants.View.PENDING_ORGANIZATION_REQUEST -> userViewOrganizationRequest(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs),
+                                                    constants.View.PENDING_TRADER_REQUEST -> userViewTraderRequest(trader, traderOrganization)
+                                                )
+                                            )
+                                        }
+                                        case None => {}
+                                    }
+                                }
+                                case None => {}
+                            }
+                        }
+                        case None => {}
+                    }
                 }
-                </div>
+                case None => {}
+            }
+        } else {
+            @trader match {
+                case Some(trader) => {
+                    @traderOrganization match {
+                        case Some(traderOrganization) => {
+                            @commonHorizontalSwitcher(
+                                ListMap(constants.View.PENDING_TRADER_REQUESTS -> userViewTraderRequest(trader, traderOrganization))
+                            )
+                        }
+                        case None => {}
+                    }
+                }
+                case None => {}
+            }
+            @organization match {
+                case Some(organization) => {
+                    @organizationZone match {
+                        case Some(organizationZone) => {
+                            @commonHorizontalSwitcher(
+                                ListMap(constants.View.PENDING_VERIFY_ORGANIZATION_REQUESTS -> userViewOrganizationRequest(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
+                            )
+                        }
+                        case None => {}
+                    }
+
+                }
+                case None => {}
             }
         }
-        case _ => {
-            <div class="cmuk-position-center">
-                @contactStatus.map { status =>
-                    @Messages(status)
-                    <br>
-                }
-                @Messages(constants.View.UPLOAD_IDENTIFICATION)
-            </div>
-        }
+
     }
 }

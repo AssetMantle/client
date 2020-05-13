@@ -24,9 +24,8 @@ function showSelectCounterParty() {
     }
 }
 
-function selectCounterParty(traderID, traderName, traderAccountID, trderOrganizationName) {
+function selectCounterParty(traderID, traderAccountID, trderOrganizationName) {
     $('#negotiationRequestCounterParty').val(traderID);
-    $('#selectedCounterPartyName').html(traderName);
     $('#selectedCounterPartyAccountID').html(traderAccountID);
     $('#selectedCounterPartyOrganizationName').html(trderOrganizationName);
     $('#FORM_NEGOTIATION_REQUEST_SUBMIT').show();

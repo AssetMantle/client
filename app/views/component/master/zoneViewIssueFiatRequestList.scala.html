@@ -1,45 +1,38 @@
 @import controllers.actions.LoginState
+@import models.master.{Organization, Trader}
+@import models.westernUnion.{FiatRequest, RTCB}
 @import views.html.base._
-@import models.master.Trader
-@import models.master.Organization
-@import models.westernUnion.FiatRequest
-@import models.westernUnion.RTCB
 @(traderList: Seq[Trader], organizationList: Seq[Organization], fiatRequestList: Seq[FiatRequest], rtcbList: Seq[RTCB])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-    @commonCard(constants.View.FIAT_TRANSACTIONS) {
-    } {
-        @fiatRequestList.map { fiatRequest =>
-            @commonVerticalInfoBox() {
-                @commonVerticalTextInfo(constants.View.REQUEST_ID, fiatRequest.id)
-
-                @traderList.find(_.id == fiatRequest.traderID) match {
-                    case Some(trader) => {
-                        @commonVerticalTextInfo(constants.View.TRADER_NAME, trader.name)
-                        @organizationList.find(_.id == trader.organizationID) match {
-                            case Some(organization) => {
-                                @commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
-                            }
-                            case None => {}
+@commonCard(constants.View.FIAT_TRANSACTIONS) {
+} {
+    @fiatRequestList.map { fiatRequest =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.REQUEST_ID, fiatRequest.id)
+            @traderList.find(_.id == fiatRequest.traderID) match {
+                case Some(trader) => {
+                    @commonVerticalTextInfo(constants.View.TRADER, trader.accountID)
+                    @organizationList.find(_.id == trader.organizationID) match {
+                        case Some(organization) => {
+                            @commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                         }
+                        case None => {}
+                    }
+                }
+                case None => {}
+            }
+            @commonVerticalIntInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.transactionAmount)
+            @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED) {
+                @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
+            } else {
+                @rtcbList.find(_.externalReference == fiatRequest.id) match {
+                    case Some(rtcb) => {
+                        @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
+                        @commonVerticalIntInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
                     }
                     case None => {}
                 }
-
-                @commonVerticalIntInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.transactionAmount)
-                @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED) {
-                    @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
-                } else {
-                    @rtcbList.find(_.externalReference == fiatRequest.id) match {
-                        case Some(rtcb) => {
-                            @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
-                            @commonVerticalIntInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
-                        }
-                        case None => {}
-
-                    }
-                }
             }
-
         }
     }
-
+    }

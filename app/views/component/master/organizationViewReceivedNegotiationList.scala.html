@@ -39,7 +39,7 @@
                             }
                             case None => {}
                         }
-                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)"> @trader.name</span>
+                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER)"> @trader.accountID</span>
                             <span class="lines">---</span>
                     }
                     case None => {}
@@ -47,7 +47,7 @@
                 @defining(traderList.find(_.id == receivedNegotiation.buyerTraderID)) { organizationTrader: Option[Trader] =>
                     @organizationTrader match {
                         case Some(trader) => {
-                            <span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)">@trader.name</span></p>
+                            <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.accountID</span></p>
                                 }
                         case None => {
                             <span>@receivedNegotiation.buyerTraderID</span></p>

@@ -1037,7 +1037,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "zoneID"            VARCHAR NOT NULL,
     "organizationID"    VARCHAR NOT NULL,
     "accountID"         VARCHAR NOT NULL UNIQUE,
-    "name"              VARCHAR NOT NULL,
     "status"            BOOLEAN,
     "comment"           VARCHAR,
     "createdBy"         VARCHAR,

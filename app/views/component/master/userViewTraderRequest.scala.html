@@ -1,17 +1,14 @@
 @import controllers.actions.LoginState
-@import views.html.base._
 @import models.master.{Organization, Trader}
-@import views.html.component.master.commonDocumentViewer
+@import views.html.base._
 
 @(trader: Trader, organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-<div>
-    <div class="cmuk-text-left title"> <span>@Messages(constants.View.TRADER_DETAILS)</span></div>
-    @commonTextInfo(constants.View.NAME, trader.name)
-    @commonTextInfo(constants.View.TRADER_ID, trader.id)
+@commonInfoBox() {
+    <div class="cmuk-text-left title"><span>@Messages(constants.View.TRADER_DETAILS)</span></div>
     @commonBooleanInfo(constants.View.VERIFIED_STATUS, trader.status)
-</div>
-<div>
+}
+@commonInfoBox() {
     <div class="cmuk-text-left title"><span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
     @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
     @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
@@ -20,4 +17,5 @@
     @commonTextInfo(constants.View.POSTAL_ADDRESS, Seq(organization.postalAddress.addressLine1, organization.postalAddress.addressLine2, organization.postalAddress.landmark.getOrElse(""), Seq(organization.postalAddress.city, organization.postalAddress.zipCode).mkString(" - "), organization.postalAddress.country).mkString(",\n"))
     @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
     @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
-</div>
+}
+@commonModalButton(constants.View.UPDATE_TRADER_REQUEST, constants.Form.ADD_TRADER.get)

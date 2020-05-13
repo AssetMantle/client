@@ -66,7 +66,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       val signerList = traderList.zipWithIndex.map { case (trader, index) =>
         val signer = new Signer()
         signer.setEmail(emailList.find(_.id == trader.accountID).map(_.emailAddress).getOrElse(""))
-        signer.setName(trader.name)
+        signer.setName(trader.accountID)
         signer.clientUserId(trader.id)
         signer.recipientId((index + 1).toString)
         signer
@@ -127,7 +127,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       viewRequest.setReturnUrl(comdexURL + routes.DocusignController.callBack(envelopeID, "").url.split("""&""")(0))
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
-      viewRequest.setUserName(trader.name)
+      viewRequest.setUserName(trader.accountID)
       viewRequest.setClientUserId(trader.id)
 
       envelopesApi.createRecipientView(accountID, envelopeID, viewRequest).getUrl

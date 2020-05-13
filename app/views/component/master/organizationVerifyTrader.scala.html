@@ -5,7 +5,6 @@
 
 @(verifyTraderForm: Form[VerifyTrader.Data] = VerifyTrader.form, trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ORGANIZATION_VERIFY_TRADER, verifyTraderForm) {
-    @commonTextInfo(constants.View.NAME, trader.name)
     @commonInputText(verifyTraderForm, constants.FormField.ACCOUNT_ID, 'readonly -> true, 'value -> trader.accountID)
     @commonInputText(verifyTraderForm, constants.FormField.ORGANIZATION_ID, 'readonly -> true, 'value -> trader.organizationID)
     @commonCheckbox(verifyTraderForm, constants.FormField.ISSUE_ASSET, 'checked -> true)

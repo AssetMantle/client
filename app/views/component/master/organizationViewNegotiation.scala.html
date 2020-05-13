@@ -21,13 +21,13 @@
     @commonIntInfo(constants.View.PRICE, negotiation.price)
     @trader match {
         case Some(trader) => {
-            @commonTextInfo(constants.View.TRADER_NAME, trader.name)
+            @commonTextInfo(constants.View.TRADER, trader.accountID)
         }
         case None => {}
     }
     @counterPartyTrader match {
         case Some(counterPartyTrader) => {
-            @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
+            @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.accountID)
         }
         case None => {}
     }

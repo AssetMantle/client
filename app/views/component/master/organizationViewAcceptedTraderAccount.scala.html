@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
-@import views.html.base._
 @import models.master.Trader
+@import views.html.base._
 
 @(trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -9,8 +9,7 @@
 </legend>
 <hr>
 <div class="modalInfoBlock">
-@commonTextInfo(constants.View.TRADER_ID, trader.id)
-@commonTextInfo(constants.View.NAME, trader.name)
-@commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-@commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
+    @commonTextInfo(constants.View.TRADER_ID, trader.id)
+    @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+    @commonFormButton(constants.Form.MODIFY_TRADER, 'parameters -> s"'${trader.accountID}'")
 </div>
