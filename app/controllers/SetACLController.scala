@@ -4,7 +4,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Identification, Organization, Trader}
+import models.master._
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -23,6 +23,7 @@ class SetACLController @Inject()(
                                   masterOrganizations: master.Organizations,
                                   masterIdentifications: master.Identifications,
                                   masterTraders: master.Traders,
+                                  masterMobiles: master.Mobiles,
                                   withZoneLoginAction: WithZoneLoginAction,
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
                                   withUserLoginAction: WithUserLoginAction,
@@ -125,12 +126,16 @@ class SetACLController @Inject()(
         },
         addTraderData => {
           val status = masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)
+          val email = masterEmails.Service.tryGet(loginState.username)
+          val mobile = masterMobiles.Service.tryGet(loginState.username)
 
           def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
             if (status) {
               val organization = masterOrganizations.Service.tryGet(addTraderData.organizationID)
 
-              def addTrader(zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username)
+              def addTrader(zoneID: String, email: Email, mobile: Mobile): Future[String] =
+                if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
+                else masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username)
 
               val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
@@ -142,7 +147,9 @@ class SetACLController @Inject()(
 
               for {
                 organization <- organization
-                _ <- addTrader(zoneID = organization.zoneID)
+                email <- email
+                mobile <- mobile
+                _ <- addTrader(zoneID = organization.zoneID, email = email, mobile = mobile)
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
