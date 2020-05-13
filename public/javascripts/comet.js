@@ -2,45 +2,32 @@ function cometMessageHandler(message){
     let parsedMessage = JSON.parse(JSON.stringify(message));
     switch (parsedMessage.messageType) {
         case 'ASSET' :
-            if ($('#assetList').length) {
-                comet('assetList', jsRoutes.controllers.ComponentViewController.assetList());
-            }
             break;
         case 'FIAT' :
             if ($('#totalFiat').length) {
                 $('#totalFiat').html(parsedMessage.messageContent.ping);
-            }
-            if ($('#fiatList').length) {
-                comet('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
             }
             if ($('#traderFinancials').length) {
                 comet('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
             }
             break;
         case 'ORDER':
-            if ($('#orderList').length) {
-                comet('orderList', jsRoutes.controllers.ComponentViewController.orderList());
-            }
             break;
         case 'NEGOTIATION' :
-            if ($('#buyNegotiationList').length) {
-                comet('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-            }
-            if ($('#sellNegotiationList').length) {
-                comet('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
-            }
-            if ($('#traderViewAcceptedNegotiation').length) {
-                comet('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation(parsedMessage.messageContent.id));
-            }
-            if ($('#organizationViewAcceptedNegotiation').length) {
-                comet('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation(parsedMessage.messageContent.id));
-            }
-            if ($('#traderViewAcceptedNegotiationDocumentList').length) {
-                comet('traderViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(parsedMessage.messageContent.id));
+            if ($('#' + parsedMessage.messageContent.id).length) {
+                if ($('#traderViewAcceptedNegotiation').length) {
+                    comet('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation(parsedMessage.messageContent.id));
+                }
+                if ($('#organizationViewAcceptedNegotiation').length) {
+                    comet('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation(parsedMessage.messageContent.id));
+                }
+                if ($('#traderViewAcceptedNegotiationDocumentList').length) {
+                    comet('traderViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(parsedMessage.messageContent.id));
+                }
             }
             break;
         case 'CHAT' :
-            if( $('#chatMessages').length ){
+            if ($('#chatMessages').length && $('#' + parsedMessage.messageContent.chatID).length) {
                 comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.chatID, 0));
             }
             break;

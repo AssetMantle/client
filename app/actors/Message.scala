@@ -31,7 +31,7 @@ object Message {
 
   implicit val orderWrites: OWrites[Order] = Json.writes[Order]
 
-  case class Negotiation(id: Option[String] = None)
+  case class Negotiation(id: String)
 
   implicit val negotiationWrites: OWrites[Negotiation] = Json.writes[Negotiation]
 
