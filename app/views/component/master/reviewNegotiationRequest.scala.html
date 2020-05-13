@@ -8,7 +8,6 @@
 @(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_NEGOTIATION_REQUEST, traderReviewNegotiationRequest) {
     <div class="cmuk-text-left title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
-    @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
     @commonTextInfo(constants.View.ACCOUNT_ID, counterPartyTrader.accountID)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET)</div>
     @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)

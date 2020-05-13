@@ -3,9 +3,9 @@
 @import views.companion.master.RejectNegotiationRequest
 @import models.master.Negotiation
 
-@(rejectNegotiationRequestForm: Form[RejectNegotiationRequest.Data] = RejectNegotiationRequest.form, negotiation: Negotiation, sellerName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(rejectNegotiationRequestForm: Form[RejectNegotiationRequest.Data] = RejectNegotiationRequest.form, negotiation: Negotiation, sellerAccountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_NEGOTIATION_REQUEST, rejectNegotiationRequestForm) {
-  @commonTextInfo(constants.View.SELLER, sellerName)
+  @commonTextInfo(constants.View.SELLER, sellerAccountID)
   @commonInputText(rejectNegotiationRequestForm, constants.FormField.ID, 'value -> negotiation.id, 'readonly -> true, 'containerDivClass -> "hidden")
   @commonInputText(rejectNegotiationRequestForm, constants.FormField.COMMENT, 'required -> false)
 }

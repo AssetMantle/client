@@ -35,9 +35,14 @@
             <div class="cmuk-width-1-2@@m">
                 <div id="contact" class="contactDetails"></div>
             </div>
-            <div class="cmuk-width-1-2@@m">
-                <div id="identification" class="identificationDetails switcherCard"></div>
-            </div>
+            @if(loginState.userType != constants.User.TRADER){
+                <div class="cmuk-width-1-2@@m">
+                    <div id="identification" class="identificationDetails switcherCard"></div>
+                </div>
+                <script>
+                        componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
+                </script>
+            }
 
             @loginState.userType match {
                 case constants.User.USER => {
@@ -99,7 +104,6 @@
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('contact', jsRoutes.controllers.ContactController.contact());
-            componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
     </script>
 }
 

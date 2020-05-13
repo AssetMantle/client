@@ -20,7 +20,7 @@
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
     @commonIntInfo(constants.View.PRICE, negotiation.price)
-    @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
+    @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.accountID)
     @commonTextInfo(constants.View.ORGANIZATION, counterPartyOrganization.name)
 <div class="cmuk-text-left title">@Messages(constants.View.SHIPPING_DETAILS):</div>
 

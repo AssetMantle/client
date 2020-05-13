@@ -270,8 +270,8 @@ class ChangeSellerBids @Inject()(
             _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)
             buyerOrganization <- getOrganization(buyer.organizationID)
             sellerOrganization <- getOrganization(seller.organizationID)
-            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, sellerOrganization.name)
-            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, buyerOrganization.name)
+            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, sellerOrganization.name)
+            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, buyerOrganization.name)
           } yield Unit
         } else {
           for {
