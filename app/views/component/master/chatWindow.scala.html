@@ -11,7 +11,7 @@
             <div onclick="markChatRead(jsRoutes.controllers.ChatController.markChatAsRead('@chatID'))" style="font-size: 12px;">
             }
     }
-
+<div id="@chatID"></div>
     <div id="chatMessages" class="chat chatMessagesContainer" title="You have chat with">
         <script>
             componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0))
