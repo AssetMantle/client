@@ -5,11 +5,13 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
+        <div class="cmuk-text-left panelHeader">@Messages(constants.View.REGISTER_AS_ORGANIZATION_NOTE)</div>
+        <br>
         <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ZONE)</div>
         <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @zones.map { zone =>
-            <li onclick="fillZoneIDField('@zone.id')">@zone.name | @zone.currency | @zone.id</li>
+            <li onclick="fillZoneIDField('@zone.id')">@zone.name | @zone.currency</li>
         }
         </ul>
         </div>

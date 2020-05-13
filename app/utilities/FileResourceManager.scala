@@ -27,11 +27,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadOrganizationKYCACRAPath = rootFilePath + configuration.get[String]("upload.organization.acraPath")
 
-  private val uploadOrganizationKYCIncorporationDocumentPath = rootFilePath + configuration.get[String]("upload.organization.incorporationDocument")
-
-  private val uploadOrganizationWorldCheck = rootFilePath + configuration.get[String]("upload.backgroundCheck.organizationWorldCheck")
-
-  private val uploadTraderWorldCheck = rootFilePath + configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
+  private val uploadOrganizationKYCBoardResolutionPath = rootFilePath + configuration.get[String]("upload.organization.boardResolutionPath")
 
   private val uploadAssetBillOfLadingPath: String = rootFilePath + configuration.get[String]("upload.asset.billOfLading")
 
@@ -57,14 +53,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def getBackgroundCheckFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.WorldCheck.TRADER_WORLD_CHECK => uploadTraderWorldCheck
-      case constants.File.WorldCheck.ORGANIZATION_WORLD_CHECK => uploadOrganizationWorldCheck
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
-    }
-  }
-
   def getZoneKYCFilePath(documentType: String): String = {
     documentType match {
       case constants.File.ZoneKYC.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
@@ -76,7 +64,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
   def getOrganizationKYCFilePath(documentType: String): String = {
     documentType match {
       case constants.File.OrganizationKYC.ACRA => uploadOrganizationKYCACRAPath
-      case constants.File.OrganizationKYC.INCORPORATION_DOCUMENT => uploadOrganizationKYCIncorporationDocumentPath
+      case constants.File.OrganizationKYC.BOARD_RESOLUTION => uploadOrganizationKYCBoardResolutionPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }

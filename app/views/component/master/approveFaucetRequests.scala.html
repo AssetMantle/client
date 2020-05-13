@@ -6,6 +6,6 @@
 @commonForm(constants.Form.APPROVE_FAUCET_REQUEST, approveFaucetRequestForm) {
     @commonInputText(approveFaucetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
     @commonInputText(approveFaucetRequestForm, constants.FormField.ACCOUNT_ID, 'value -> accountID)
-    @commonInputInt(approveFaucetRequestForm, constants.FormField.GAS)
+    @commonInputInt(approveFaucetRequestForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(approveFaucetRequestForm, constants.FormField.PASSWORD)
 }

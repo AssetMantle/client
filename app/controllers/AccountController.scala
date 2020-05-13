@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{LoginState, WithLoginAction}
+import controllers.actions.{LoginState, WithLoginAction, WithUserLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -21,6 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AccountController @Inject()(
                                    utilitiesNotification: utilities.Notification,
                                    withLoginAction: WithLoginAction,
+                                   withUserLoginAction: WithUserLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
                                    blockchainAclHashes: blockchain.ACLHashes,
@@ -368,7 +369,7 @@ class AccountController @Inject()(
     } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
-  def addIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addIdentificationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
 
@@ -386,7 +387,7 @@ class AccountController @Inject()(
       }
   }
 
-  def addIdentification(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addIdentification(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddIdentification.form.bindFromRequest().fold(
         formWithErrors => {

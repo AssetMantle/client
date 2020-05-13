@@ -7,7 +7,6 @@
 @commonForm(constants.Form.ACCEPT_ORGANIZATION_REQUEST, acceptOrganizationRequestForm) {
     @commonTextInfo(constants.View.NAME, organization.name)
     @commonInputText(acceptOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organization.id, 'readonly -> true)
-    @commonInputInt(acceptOrganizationRequestForm, constants.FormField.GAS)
+    @commonInputInt(acceptOrganizationRequestForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(acceptOrganizationRequestForm, constants.FormField.PASSWORD)
-    @commonModalButton(constants.View.BACK, routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile, 'parameters -> s"'${organization.id}'")
 }

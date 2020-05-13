@@ -6,9 +6,11 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
+import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
 import models.master.{AccountFile, AccountKYC, Negotiations}
 import models.{master, masterTransaction}
 import models.common.Serializable
+import models.common.Serializable.{BillOfLading, Contract, Invoice}
 import models.docusign
 import models.master.{AccountKYC, Negotiation, Negotiations, Trader}
 import models.masterTransaction.{AssetFile, NegotiationFile}
@@ -212,24 +214,48 @@ class FileController @Inject()(
         masterCreate = masterTransactionAssetFiles.Service.create
       )
 
-      def getResult(negotiation: Negotiation): Future[Result] = {
-        val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
-        val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+      def getResultByDocumentType(negotiation: Negotiation): Future[Result] = {
+        documentType match {
+          case constants.File.Asset.BILL_OF_LADING => {
+            val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-        for {
-          negotiationFileList <- negotiationFileList
-          negotiationEnvelopeList <- negotiationEnvelopeList
-          assetFileList <- assetFileList
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
-        } yield result
+            def getDocumentContent(assetID: String) = masterTransactionAssetFiles.Service.getDocumentContent(assetID, constants.File.Asset.BILL_OF_LADING)
 
+            def getResult(documentContent: Option[AssetDocumentContent]) = {
+              documentContent match {
+                case Some(content) => {
+                  val billOfLading = content.asInstanceOf[BillOfLading]
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+                }
+                case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
+              }
+            }
+
+            for {
+              negotiation <- negotiation
+              documentContent <- getDocumentContent(negotiation.assetID)
+              result <- getResult(documentContent)
+            } yield result
+          }
+          case _ => {
+            val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+            val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+            val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+
+            for {
+              negotiationFileList <- negotiationFileList
+              negotiationEnvelopeList <- negotiationEnvelopeList
+              assetFileList <- assetFileList
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
+            } yield result
+          }
+        }
       }
 
       (for {
         negotiation <- negotiation
         _ <- storeFile(negotiation.assetID)
-        result <- getResult(negotiation)
+        result <- getResultByDocumentType(negotiation)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -249,24 +275,49 @@ class FileController @Inject()(
         updateOldDocument = masterTransactionAssetFiles.Service.updateOldDocument
       )
 
-      def getResult(negotiation: Negotiation): Future[Result] = {
-        val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
-        val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+      def getResultByDocumentType(negotiation: Negotiation): Future[Result] = {
+        documentType match {
+          case constants.File.Asset.BILL_OF_LADING => {
+            val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-        for {
-          negotiationFileList <- negotiationFileList
-          negotiationEnvelopeList <- negotiationEnvelopeList
-          assetFileList <- assetFileList
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
-        } yield result
+            def getDocumentContent(assetID: String) = masterTransactionAssetFiles.Service.getDocumentContent(assetID, constants.File.Asset.BILL_OF_LADING)
+
+            def getResult(documentContent: Option[AssetDocumentContent]) = {
+              documentContent match {
+                case Some(content) => {
+                  val billOfLading = content.asInstanceOf[BillOfLading]
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+                }
+                case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
+              }
+            }
+
+            for {
+              negotiation <- negotiation
+              documentContent <- getDocumentContent(negotiation.assetID)
+              result <- getResult(documentContent)
+            } yield result
+          }
+          case _ => {
+            val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+            val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+            val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
+
+            for {
+              negotiationFileList <- negotiationFileList
+              negotiationEnvelopeList <- negotiationEnvelopeList
+              assetFileList <- assetFileList
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
+            } yield result
+          }
+        }
       }
 
       (for {
         negotiation <- negotiation
         oldDocument <- oldDocument(negotiation.assetID)
         _ <- updateFile(oldDocument, negotiation.assetID)
-        result <- getResult(negotiation)
+        result <- getResultByDocumentType(negotiation)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -310,25 +361,67 @@ class FileController @Inject()(
         masterCreate = masterTransactionNegotiationFiles.Service.create
       )
 
-      def getResult: Future[Result] = {
-        val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+      def getResultByDocumentType: Future[Result] = {
+        documentType match {
+          case constants.File.Negotiation.CONTRACT => {
+            val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.CONTRACT)
 
-        def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+            def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+              documentContent match {
+                case Some(content) => {
+                  val contract = content.asInstanceOf[Contract]
+                  withUsernameToken.PartialContent(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
+                }
+                case None => withUsernameToken.PartialContent(views.html.component.master.addContract(negotiationID = negotiationID))
+              }
+            }
 
-        for {
-          negotiationFileList <- negotiationFileList
-          negotiation <- negotiation
-          negotiationEnvelopeList <- negotiationEnvelopeList
-          assetFileList <- getAssetFileList(negotiation.assetID)
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
-        } yield result
+            for {
+              documentContent <- documentContent
+              result <- getResult(documentContent)
+            } yield result
+          }
+          case constants.File.Negotiation.INVOICE => {
+            val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
+
+            def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+              documentContent match {
+                case Some(content) => {
+                  val invoice = content.asInstanceOf[Invoice]
+                  withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
+                }
+                case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID))
+              }
+            }
+
+            for {
+              documentContent <- documentContent
+              result <- getResult(documentContent)
+            } yield result
+          }
+          case _ => {
+            val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+            val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+            val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+
+            def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+
+            for {
+              negotiationFileList <- negotiationFileList
+              negotiation <- negotiation
+              negotiationEnvelopeList <- negotiationEnvelopeList
+              assetFileList <- getAssetFileList(negotiation.assetID)
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
+            } yield result
+          }
+
+
+        }
       }
 
       (for {
         _ <- storeFile
-        result <- getResult
+        result <- getResultByDocumentType
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -346,26 +439,69 @@ class FileController @Inject()(
         updateOldDocument = masterTransactionNegotiationFiles.Service.updateOldDocument
       )
 
-      def getResult: Future[Result] = {
-        val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
-        val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-        val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+      def getResultByDocumentType: Future[Result] = {
+        documentType match {
+          case constants.File.Negotiation.CONTRACT => {
+            val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.CONTRACT)
 
-        def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+            def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+              documentContent match {
+                case Some(content) => {
+                  val contract = content.asInstanceOf[Contract]
+                  withUsernameToken.PartialContent(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
+                }
+                case None => withUsernameToken.PartialContent(views.html.component.master.addContract(negotiationID = negotiationID))
+              }
+            }
 
-        for {
-          negotiationFileList <- negotiationFileList
-          negotiation <- negotiation
-          negotiationEnvelopeList <- negotiationEnvelopeList
-          assetFileList <- getAssetFileList(negotiation.assetID)
-          result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
-        } yield result
+            for {
+              documentContent <- documentContent
+              result <- getResult(documentContent)
+            } yield result
+          }
+          case constants.File.Negotiation.INVOICE => {
+            val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
+
+            def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+              documentContent match {
+                case Some(content) => {
+                  val invoice = content.asInstanceOf[Invoice]
+                  withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
+                }
+                case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID))
+              }
+            }
+
+            for {
+              documentContent <- documentContent
+              result <- getResult(documentContent)
+            } yield result
+          }
+          case _ => {
+            val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
+            val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+            val negotiationEnvelopeList = masterTransactionDocusignEnvelopes.Service.getAll(negotiationID)
+
+            def getAssetFileList(assetID: String) = masterTransactionAssetFiles.Service.getAllDocuments(assetID)
+
+            for {
+              negotiationFileList <- negotiationFileList
+              negotiation <- negotiation
+              negotiationEnvelopeList <- negotiationEnvelopeList
+              assetFileList <- getAssetFileList(negotiation.assetID)
+              result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
+            } yield result
+          }
+
+
+        }
       }
+
 
       (for {
         oldDocument <- oldDocument
         _ <- updateFile(oldDocument)
-        result <- getResult
+        result <- getResultByDocumentType
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

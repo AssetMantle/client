@@ -5,6 +5,6 @@
 @(redeemFiatForm: Form[RedeemFiat.Data] = RedeemFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REDEEM_FIAT, redeemFiatForm) {
     @commonInputInt(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
-    @commonInputInt(redeemFiatForm, constants.FormField.GAS)
+    @commonInputInt(redeemFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(redeemFiatForm, constants.FormField.PASSWORD)
 }

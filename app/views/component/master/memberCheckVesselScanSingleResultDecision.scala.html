@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.MemberCheckVesselScanResultDecision
+
+@(memberCheckVesselScanResultDecisionForm: Form[MemberCheckVesselScanResultDecision.Data] = MemberCheckVesselScanResultDecision.form, resultID: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION, memberCheckVesselScanResultDecisionForm) {
+  @commonInputInt(memberCheckVesselScanResultDecisionForm, constants.FormField.RESULT_ID, 'value -> resultID, 'readonly -> true)
+  @commonSelect(memberCheckVesselScanResultDecisionForm, constants.FormField.MATCH_DECISION)
+  @commonSelect(memberCheckVesselScanResultDecisionForm, constants.FormField.ASSESSED_RISK)
+  @commonInputText(memberCheckVesselScanResultDecisionForm, constants.FormField.COMMENT)
+}
