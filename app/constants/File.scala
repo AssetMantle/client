@@ -44,7 +44,7 @@ object File {
 
   object OrganizationKYC {
     val ACRA = "ACRA"
-    val INCORPORATION_DOCUMENT = "INCORPORATION_DOCUMENT"
+    val BOARD_RESOLUTION = "BOARD_RESOLUTION"
   }
 
   object WorldCheck {
@@ -59,7 +59,7 @@ object File {
 
   //Seq
   val ZONE_KYC_DOCUMENT_TYPES: Seq[String] = Seq(ZoneKYC.IDENTIFICATION, ZoneKYC.BANK_ACCOUNT_DETAIL)
-  val ORGANIZATION_KYC_DOCUMENT_TYPES: Seq[String] = Seq(OrganizationKYC.ACRA, OrganizationKYC.INCORPORATION_DOCUMENT)
+  val ORGANIZATION_KYC_DOCUMENT_TYPES: Seq[String] = Seq(OrganizationKYC.ACRA, OrganizationKYC.BOARD_RESOLUTION)
   val TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES: Seq[String] = Seq(WorldCheck.TRADER_WORLD_CHECK)
   val ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES: Seq[String] = Seq(WorldCheck.ORGANIZATION_WORLD_CHECK)
   val ASSET_DOCUMENTS: Seq[String] = Seq(Asset.BILL_OF_LADING, Asset.COO, Asset.COA)
