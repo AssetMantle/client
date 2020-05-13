@@ -904,23 +904,19 @@ class ComponentViewController @Inject()(
 
       def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) masterOrganizationKYCs.Service.getAllDocuments(organization.get.id) else Future(Seq[OrganizationKYC]())
 
-      def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getByAccountID(accountID)
+      def getTraderByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getByAccountID(accountID)
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
       def getUserResult(identification: Option[Identification], contactStatus: Seq[String]): Future[Result] = {
         val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
-        if (identificationStatus && contactStatus.equals(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
-          for {
-            trader <- getTraderOrNoneByAccountID(loginState.username)
-            traderOrganization <- getTraderOrganization(trader)
-            organization <- getOrganizationOrNoneByAccountID(loginState.username)
-            organizationZone <- getOrganizationZone(organization)
-            organizationKYCs <- getOrganizationKYCsByOrganization(organization)
-          } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, contactStatus = contactStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader))
-        } else {
-          Future(Ok(views.html.component.master.userViewPendingRequests(identification = if (identification.isDefined) Option(identification.get) else None, contactStatus = contactStatus)))
-        }
+        for {
+          trader <- getTraderByAccountID(loginState.username)
+          traderOrganization <- getTraderOrganization(trader)
+          organization <- getOrganizationOrNoneByAccountID(loginState.username)
+          organizationZone <- getOrganizationZone(organization)
+          organizationKYCs <- getOrganizationKYCsByOrganization(organization)
+        } yield Ok(views.html.component.master.userViewPendingRequests(identification = identification, contactStatus = contactStatus, organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs, traderOrganization = traderOrganization, trader = trader))
       }
 
       (for {
