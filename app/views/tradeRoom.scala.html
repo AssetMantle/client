@@ -37,8 +37,9 @@
 }
 
 @center = {
+    <div id="@negotiationID"></div>
     <div class="mainTabs switcherCardSecond">
-        <div class="cmuk-card cmuk-card-default">
+        <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
             <div class="cmuk-card-body">
             @loginState.userType match {
                 case constants.User.TRADER => {
@@ -77,7 +78,7 @@
                 <div id="tradeActivities"></div>
             </div>
             <div id="chatRoom" class="chatRoom"></div>
-            <div id="orderActions"></div>
+            <div id="orderActions" class="orderInfoCard"></div>
         </div>
     </div>
     <script>

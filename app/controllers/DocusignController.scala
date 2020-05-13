@@ -116,8 +116,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       traders <- getTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
       _ <- updateStatus(envelope, traders.map(_.accountID))
     } yield {
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(envelope.id)))
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(Option(envelope.id)))
+      actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
+      actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
       Ok(views.html.component.master.docusignCallBackView(event))
     }).recover {
       case baseException: BaseException => InternalServerError(views.html.component.master.docusignCallBackView(constants.View.UNEXPECTED_EVENT))

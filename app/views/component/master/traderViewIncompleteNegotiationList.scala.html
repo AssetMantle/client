@@ -48,9 +48,9 @@
                     <span class="lines">---</span>
                     <span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${incompleteNegotiation.id}'")
             <div class="salesQuoteCardRight salesChild">
-            @commonFormButton(constants.Form.NEGOTIATION_PAYMENT_TERMS, 'parameters -> s"'${incompleteNegotiation.id}'")
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${incompleteNegotiation.id}'")
+                @commonFormButton(constants.Form.NEGOTIATION_PAYMENT_TERMS, 'parameters -> s"'${incompleteNegotiation.id}'")
             </div>
         }
     }

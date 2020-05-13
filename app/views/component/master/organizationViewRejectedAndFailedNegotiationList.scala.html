@@ -12,6 +12,9 @@
 @rejectedReceivedNegotiationList.map { rejectedReceivedNegotiation =>
     @commonVerticalInfoBox() {
         <div class="salesQuoteCardLeft salesChild">
+            <div class="salesQuoteCategory buy">
+                <span>@Messages(constants.View.BUY)</span>
+            </div>
             <div class="content">
             @assetList.find(_.id == rejectedReceivedNegotiation.assetID) match {
                 case Some(asset) => {
@@ -58,9 +61,9 @@
             </p>
         </div>
         <div class="salesQuoteCardRight salesChild">
-            <span>@rejectedReceivedNegotiation.comment.getOrElse("")</span>
+            <span>@Messages(rejectedReceivedNegotiation.comment.getOrElse(""))</span>
+            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
         </div>
-        @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
     }
     }
 </div>
@@ -70,6 +73,9 @@
     @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
         @commonVerticalInfoBox() {
             <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
                     case Some(asset) => {
@@ -116,9 +122,9 @@
                 </p>
             </div>
             <div class="salesQuoteCardRight salesChild">
-                <span>@rejectedSentNegotiation.comment.getOrElse("")</span>
+                <span>@Messages(rejectedSentNegotiation.comment.getOrElse(""))</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedSentNegotiation.id}'")
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${rejectedSentNegotiation.id}'")
         }
         }
     </div>
@@ -175,9 +181,9 @@
                 </p>
             </div>
             <div class="salesQuoteCardRight salesChild">
-            <span>@failedNegotiation.status</span>
+            <span>@Messages(failedNegotiation.status)</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
         }
         }
     </div>

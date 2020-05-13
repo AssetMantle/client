@@ -9,8 +9,8 @@
         <div class="inputFieldBody">
             <div class="usernameAvailability">
                 @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
-                <div id="checkUsernameAvailableResult" class="result">
-                    <span class="userNameNotAvailable error">@Messages(constants.View.USER_NAME_NOT_AVAILABLE)</span>
+                <div id="checkUsernameAvailableResult" class="result failureIcon">
+                    @commonIcon("failRounded")
                 </div>
                 <div class="checkIcon" id="checkIcon">
                     @commonIcon("success")

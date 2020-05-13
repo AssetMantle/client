@@ -4,7 +4,7 @@
 
 @(notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-<div class="timeline recentActivityBox">
+<div class="timeline recentActivityBox" cmuk-scrollspy="target: > div; cls: cmuk-animation-fade; delay: 100; repeat: true">
     @if(notifications.nonEmpty) {
         @notifications.map { notification =>
             <div class="timeline-item notification">

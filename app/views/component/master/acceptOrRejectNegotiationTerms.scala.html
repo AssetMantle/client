@@ -7,13 +7,12 @@
 
 @form(action = constants.Form.ACCEPT_OR_REJECT_NEGOTIATION_TERMS.route) {
     @CSRF.formField
-    <div class="modalInfoBlock">
     @commonInputText(updateNegotiationTermAcceptanceForm, constants.FormField.ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(updateNegotiationTermAcceptanceForm, constants.FormField.TERM_TYPE, 'value -> termType, 'containerDivClass -> "hidden", 'readonly -> true)
     @if(status) {
-        @commonCheckbox(updateNegotiationTermAcceptanceForm, constants.FormField.STATUS, 'onclick -> s"submitForm(this, '${Seq("#", negotiationID, termType).mkString("")}')", 'checked -> true)
+        @commonCheckbox(updateNegotiationTermAcceptanceForm, constants.FormField.STATUS, 'onclick -> s"submitForm(this, '${Seq(negotiationID, termType).mkString("")}')", 'checked -> true)
     } else {
-        @commonCheckbox(updateNegotiationTermAcceptanceForm, constants.FormField.STATUS, 'onclick -> s"submitForm(this, '${Seq("#", negotiationID, termType).mkString("")}')")
+        @commonCheckbox(updateNegotiationTermAcceptanceForm, constants.FormField.STATUS, 'onclick -> s"submitForm(this, '${Seq(negotiationID, termType).mkString("")}')")
     }
     @if(updateNegotiationTermAcceptanceForm.hasGlobalErrors) {
         <ul>
@@ -22,5 +21,4 @@
         }
         </ul>
     }
-    </div>
 }

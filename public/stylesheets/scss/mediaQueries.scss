@@ -334,6 +334,7 @@
     }
   }
   .signUpForm .usernameAvailability .checkIcon,
+  .signUpForm .usernameAvailability .failureIcon,
   .signUpForm .showPassword{
     top:45px
   }
@@ -387,6 +388,21 @@
   }
   .showPassword, .checkIcon{
     top:37px;
+  }
+  .modal .modalContent .modalBody {
+    .modalInfoBlock, form .formBody{
+      .infoRowLabel {
+        width: 300px;
+      }
+      .infoRowValue {
+        text-align: left;
+      }
+      .documentItem{
+        .infoRowLabel{
+          width: auto;
+        }
+      }
+    }
   }
 }
 

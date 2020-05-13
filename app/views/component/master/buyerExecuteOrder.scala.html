@@ -5,6 +5,6 @@
 @commonForm(constants.Form.BUYER_EXECUTE_ORDER, buyerExecuteOrderForm) {
     @commonInputText(buyerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(buyerExecuteOrderForm, constants.FormField.FIAT_PROOF)
-    @commonInputInt(buyerExecuteOrderForm, constants.FormField.GAS)
+    @commonInputInt(buyerExecuteOrderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(buyerExecuteOrderForm, constants.FormField.PASSWORD)
 }
