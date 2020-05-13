@@ -419,7 +419,7 @@ html, body{
 
 .commonCheckBox{
   dt{
-    width: 200px;
+    width:200px;
     word-break: break-word;
   }
 }
@@ -476,6 +476,9 @@ html, body{
       color: #272829;
       border: 1px solid  $colorPrimary;
     }
+  }
+  input[type=date] {
+    padding: 12px 15px;
   }
   .cmuk-input, .cmuk-select:not([multiple]):not([size]){
     height: 50px;
@@ -571,7 +574,7 @@ html, body{
   }
   .cmuk-legend{
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     padding: 20px 25px;
     color: #061728;
     font-size: $paragraphFontSizeLarge;
@@ -847,6 +850,11 @@ form{
   max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px;
+  .traderCommodity{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+  }
 }
 
 .loginForm {
@@ -904,7 +912,7 @@ form{
       top: 100px;
       right: 0;
     }
-    .checkIcon{
+    .failureIcon, .checkIcon{
       display: none;
       position: absolute;
       right: 15px;
@@ -912,9 +920,18 @@ form{
       width: 20px;
       height: 20px;
       .icon{
-        fill:#32d296;
         width: 20px;
         height: 20px;
+      }
+    }
+    .failureIcon{
+      .icon{
+        fill:#f0506e;
+      }
+    }
+    .checkIcon{
+      .icon{
+        fill:#32d296;
       }
     }
     .userNameNotAvailable,
@@ -945,16 +962,26 @@ form{
 .logoutContainer {
   form {
     .formBody {
-      padding: 40px 60px 60px 60px;
+      padding: 25px 60px 60px 60px;
+      p{
+        margin-bottom: 30px;
+        font-size: $headingFontSizeSmall;
+      }
       .commonCheckBox {
         justify-content: center;
         dl {
           flex-direction: row-reverse;
           border: 1px solid #e7eaf3;
-          padding: 10px 40px;
+          padding: 5px 15px;
+          dt{
+            width: auto;
+          }
+          label{
+            font-size: $paragraphFontSizeMedium;
+          }
           dd {
-            margin-top: 12px;
-            margin-right: 25px;
+            margin-top: 10px;
+            margin-right: 15px;
           }
         }
       }
@@ -1385,7 +1412,7 @@ form{
                 margin:0 0 5px 0;
               }
               .infoRowLabel{
-                width: auto;
+                width: 250px;
                 color: #061728;
                 font-size: $paragraphFontSizeSmall;
                 font-weight: normal;
@@ -1410,6 +1437,9 @@ form{
               }
               .commonCheckBox dl{
                 margin-bottom: 0;
+                dd{
+                  margin: 0;
+                }
               }
               .cmuk-checkbox{
                 height: 22px;
@@ -1460,7 +1490,7 @@ form{
           margin: 10px 0;
           align-items: center;
           .infoRowLabel{
-            width: auto;
+            width: 250px;;
             color: $colorPrimary;
             font-size: $paragraphFontSizeSmall;
             font-weight: bold;
@@ -1568,18 +1598,18 @@ form{
     }
     .financialCard.cardPaddingRemove {
       ul li {
-        padding: 10px 0;
+        padding: 20px 0;
         margin: 0 20px;
 
         &:first-child {
-          padding-top: 20px;
+          padding-top: 25px;
         }
       }
     }
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 15px 0;
+        padding: 20px 0;
         margin: 0 20px;
         &:first-child {
           padding-top: 25px;
@@ -1610,8 +1640,11 @@ form{
 
           .payableIcon {
             @extend %iconBackground;
-            background: #B004DB;
+            background: #A23BBB;
             box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
+            .icon{
+              left:3px;
+            }
           }
 
           .cmuk-comment-meta {
@@ -1624,8 +1657,11 @@ form{
 
           .receivableIcon {
             @extend %iconBackground;
-            background: #0CCB08;
+            background: #49A948;
             box-shadow: 0 0 0 3px rgba(83, 217, 81, 0.25);
+            .icon{
+              left:3px;
+            }
           }
 
           .cmuk-comment-meta {

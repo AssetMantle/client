@@ -379,6 +379,8 @@ html, body {
   .comdex .cmuk-input:focus {
     color: #272829;
     border: 1px solid #0862BE; }
+.comdex input[type=date] {
+  padding: 12px 15px; }
 .comdex .cmuk-input, .comdex .cmuk-select:not([multiple]):not([size]) {
   height: 50px; }
 .comdex .cmuk-input, .comdex .cmuk-select, .comdex .cmuk-textarea {
@@ -446,7 +448,7 @@ html, body {
   background-color: #0862BE; }
 .comdex .cmuk-legend {
   font-weight: bold;
-  text-align: left;
+  text-align: center;
   padding: 20px 25px;
   color: #061728;
   font-size: 1.125rem; }
@@ -653,6 +655,10 @@ form .formBody {
   max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px; }
+  .modalInfoBlock .traderCommodity {
+    display: flex;
+    align-items: center;
+    justify-content: start; }
 
 .loginForm .formBody .inputField {
   position: relative;
@@ -691,17 +697,20 @@ form .formBody {
     position: absolute;
     top: 100px;
     right: 0; }
-  .signUpForm .usernameAvailability .checkIcon {
+  .signUpForm .usernameAvailability .failureIcon, .signUpForm .usernameAvailability .checkIcon {
     display: none;
     position: absolute;
     right: 15px;
     top: 58px;
     width: 20px;
     height: 20px; }
-    .signUpForm .usernameAvailability .checkIcon .icon {
-      fill: #32d296;
+    .signUpForm .usernameAvailability .failureIcon .icon, .signUpForm .usernameAvailability .checkIcon .icon {
       width: 20px;
       height: 20px; }
+  .signUpForm .usernameAvailability .failureIcon .icon {
+    fill: #f0506e; }
+  .signUpForm .usernameAvailability .checkIcon .icon {
+    fill: #32d296; }
   .signUpForm .usernameAvailability .userNameNotAvailable,
   .signUpForm .usernameAvailability .passwordNotMatched {
     display: none; }
@@ -721,16 +730,23 @@ form .formBody {
     fill: #FE4350; }
 
 .logoutContainer form .formBody {
-  padding: 40px 60px 60px 60px; }
+  padding: 25px 60px 60px 60px; }
+  .logoutContainer form .formBody p {
+    margin-bottom: 30px;
+    font-size: 1.25rem; }
   .logoutContainer form .formBody .commonCheckBox {
     justify-content: center; }
     .logoutContainer form .formBody .commonCheckBox dl {
       flex-direction: row-reverse;
       border: 1px solid #e7eaf3;
-      padding: 10px 40px; }
+      padding: 5px 15px; }
+      .logoutContainer form .formBody .commonCheckBox dl dt {
+        width: auto; }
+      .logoutContainer form .formBody .commonCheckBox dl label {
+        font-size: 1rem; }
       .logoutContainer form .formBody .commonCheckBox dl dd {
-        margin-top: 12px;
-        margin-right: 25px; }
+        margin-top: 10px;
+        margin-right: 15px; }
   .logoutContainer form .formBody .buttonPrimary {
     width: 250px;
     margin-top: 20px;
@@ -1048,7 +1064,7 @@ form .formBody {
         font-weight: normal;
         margin: 0 0 5px 0; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms .infoRowLabel {
-        width: auto;
+        width: 250px;
         color: #061728;
         font-size: 0.875rem;
         font-weight: normal;
@@ -1069,6 +1085,8 @@ form .formBody {
         display: none; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dl {
         margin-bottom: 0; }
+        .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dl dd {
+          margin: 0; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .cmuk-checkbox {
         height: 22px;
         width: 22px;
@@ -1106,7 +1124,7 @@ form .formBody {
     margin: 10px 0;
     align-items: center; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
-      width: auto;
+      width: 250px;
       color: #0862BE;
       font-size: 0.875rem;
       font-weight: bold;
@@ -1179,13 +1197,13 @@ form .formBody {
     height: 300px;
     overflow: auto; }
 .leftContainer .financial .financialCard.cardPaddingRemove ul li {
-  padding: 10px 0;
+  padding: 20px 0;
   margin: 0 20px; }
   .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-    padding-top: 20px; }
+    padding-top: 25px; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 20px 0;
   margin: 0 20px; }
   .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
     padding-top: 25px; }
@@ -1203,13 +1221,17 @@ form .formBody {
   .leftContainer .financial .cmuk-switcher ul li .payable, .leftContainer .financial .financialCard ul li .payable {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon, .leftContainer .financial .financialCard ul li .payable .payableIcon {
-      background: #B004DB;
+      background: #A23BBB;
       box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25); }
+      .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon .icon, .leftContainer .financial .financialCard ul li .payable .payableIcon .icon {
+        left: 3px; }
   .leftContainer .financial .cmuk-switcher ul li .receivable, .leftContainer .financial .financialCard ul li .receivable {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .receivable .receivableIcon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon {
-      background: #0CCB08;
+      background: #49A948;
       box-shadow: 0 0 0 3px rgba(83, 217, 81, 0.25); }
+      .leftContainer .financial .cmuk-switcher ul li .receivable .receivableIcon .icon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon .icon {
+        left: 3px; }
   .leftContainer .financial .cmuk-switcher ul li .leftDays, .leftContainer .financial .financialCard ul li .leftDays {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .leftDays .leftDaysIcon, .leftContainer .financial .financialCard ul li .leftDays .leftDaysIcon {

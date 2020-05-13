@@ -53,8 +53,8 @@
             </div>
             <div class="salesQuoteCardRight salesChild">
                <span>@rejectedReceivedNegotiation.status</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${rejectedReceivedNegotiation.id}'")
             }
         }
     </div>
@@ -104,8 +104,8 @@
                     </div>
                     <div class="salesQuoteCardRight salesChild">
                         <span>@rejectedSentNegotiation.status</span>
+                        @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${rejectedSentNegotiation.id}'")
                     </div>
-                    @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${rejectedSentNegotiation.id}'")
                 }
                 }
             </div>
@@ -155,8 +155,8 @@
             </div>
             <div class="salesQuoteCardRight salesChild">
                 <span>@failedNegotiation.status</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${failedNegotiation.id}'")
         }
     }
 </div>

@@ -56,9 +56,9 @@
                     <span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
             <div class="salesQuoteCardRight salesChild">
-            <span>@sentNegotiationRequest.status</span>
+                <span>@Messages(sentNegotiationRequest.status)</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${sentNegotiationRequest.id}'")
             </div>
-            @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${sentNegotiationRequest.id}'")
 
         }
     }
