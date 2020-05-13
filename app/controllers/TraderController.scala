@@ -5,12 +5,11 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Organization, Trader, TraderRelation}
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.{Configuration, Logger}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
-import services.SFTPScheduler
+import play.api.mvc._
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,6 +25,7 @@ class TraderController @Inject()(
                                   withTraderLoginAction: WithTraderLoginAction,
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
                                   masterTraderRelations: master.TraderRelations,
+                                  masterAccounts: master.Accounts,
                                   masterTraders: master.Traders,
                                   transaction: utilities.Transaction,
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
@@ -258,42 +258,46 @@ class TraderController @Inject()(
           }
         },
         modifyTraderData => {
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = modifyTraderData.password)
           val trader = masterTraders.Service.tryGetByAccountID(modifyTraderData.accountID)
           val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-          def getResult(trader: Trader, organizationID: String): Future[Result] = {
-            if (trader.organizationID == organizationID) {
-              val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
-              val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-              val aclAddress = blockchainAccounts.Service.tryGetAddress(modifyTraderData.accountID)
-              val acl = blockchain.ACL(issueAsset = modifyTraderData.issueAsset, issueFiat = modifyTraderData.issueFiat, sendAsset = modifyTraderData.sendAsset, sendFiat = modifyTraderData.sendFiat, redeemAsset = modifyTraderData.redeemAsset, redeemFiat = modifyTraderData.redeemFiat, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder, changeBuyerBid = modifyTraderData.changeBuyerBid, changeSellerBid = modifyTraderData.changeSellerBid, confirmBuyerBid = modifyTraderData.confirmBuyerBid, confirmSellerBid = modifyTraderData.changeSellerBid, negotiation = modifyTraderData.negotiation, releaseAsset = modifyTraderData.releaseAsset)
-              val createACL = blockchainAclHashes.Service.create(acl)
+          def getResult(validateUsernamePassword: Boolean, trader: Trader, organizationID: String): Future[Result] = {
+            if (validateUsernamePassword) {
+              if (trader.organizationID == organizationID) {
+                val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
+                val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+                val aclAddress = blockchainAccounts.Service.tryGetAddress(modifyTraderData.accountID)
+                val acl = blockchain.ACL(issueAsset = modifyTraderData.issueAsset, issueFiat = modifyTraderData.issueFiat, sendAsset = modifyTraderData.sendAsset, sendFiat = modifyTraderData.sendFiat, redeemAsset = modifyTraderData.redeemAsset, redeemFiat = modifyTraderData.redeemFiat, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder, changeBuyerBid = modifyTraderData.changeBuyerBid, changeSellerBid = modifyTraderData.changeSellerBid, confirmBuyerBid = modifyTraderData.confirmBuyerBid, confirmSellerBid = modifyTraderData.changeSellerBid, negotiation = modifyTraderData.negotiation, releaseAsset = modifyTraderData.releaseAsset)
+                val createACL = blockchainAclHashes.Service.create(acl)
 
-              def transactionProcess(aclAddress: String, zoneID: String, organizationID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
-                entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = modifyTraderData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
-                request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = modifyTraderData.gas.toString), password = modifyTraderData.password, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, issueAsset = modifyTraderData.issueAsset.toString, issueFiat = modifyTraderData.issueFiat.toString, sendAsset = modifyTraderData.sendAsset.toString, sendFiat = modifyTraderData.sendFiat.toString, redeemAsset = modifyTraderData.redeemAsset.toString, redeemFiat = modifyTraderData.redeemFiat.toString, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = modifyTraderData.changeBuyerBid.toString, changeSellerBid = modifyTraderData.changeSellerBid.toString, confirmBuyerBid = modifyTraderData.confirmBuyerBid.toString, confirmSellerBid = modifyTraderData.confirmSellerBid.toString, negotiation = modifyTraderData.negotiation.toString, releaseAsset = modifyTraderData.releaseAsset.toString, mode = transactionMode),
-                action = transactionsSetACL.Service.post,
-                onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
-                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
-              )
+                def transactionProcess(aclAddress: String, zoneID: String, organizationID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                  entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = modifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                  request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = modifyTraderData.gas.toString), password = modifyTraderData.password, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, issueAsset = modifyTraderData.issueAsset.toString, issueFiat = modifyTraderData.issueFiat.toString, sendAsset = modifyTraderData.sendAsset.toString, sendFiat = modifyTraderData.sendFiat.toString, redeemAsset = modifyTraderData.redeemAsset.toString, redeemFiat = modifyTraderData.redeemFiat.toString, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = modifyTraderData.changeBuyerBid.toString, changeSellerBid = modifyTraderData.changeSellerBid.toString, confirmBuyerBid = modifyTraderData.confirmBuyerBid.toString, confirmSellerBid = modifyTraderData.confirmSellerBid.toString, negotiation = modifyTraderData.negotiation.toString, releaseAsset = modifyTraderData.releaseAsset.toString, mode = transactionMode),
+                  action = transactionsSetACL.Service.post,
+                  onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                  onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+                )
 
-              for {
-                aclAddress <- aclAddress
-                zoneID <- zoneID
-                organizationID <- organizationID
-                _ <- createACL
-                _ <- transactionProcess(aclAddress, zoneID, organizationID)
-                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
-              } yield result
-            } else throw new BaseException(constants.Response.UNAUTHORIZED)
+                for {
+                  aclAddress <- aclAddress
+                  zoneID <- zoneID
+                  organizationID <- organizationID
+                  _ <- createACL
+                  _ <- transactionProcess(aclAddress, zoneID, organizationID)
+                  result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
+                } yield result
+              } else throw new BaseException(constants.Response.UNAUTHORIZED)
+            } else Future(BadRequest(views.html.component.master.organizationModifyTrader(views.companion.master.ModifyTrader.form.fill(modifyTraderData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), accountID = modifyTraderData.accountID, trader = trader)))
           }
 
           (for {
             trader <- trader
+            validateUsernamePassword <- validateUsernamePassword
             organizationID <- organizationID
-            result <- getResult(trader, organizationID)
+            result <- getResult(validateUsernamePassword = validateUsernamePassword, trader = trader, organizationID = organizationID)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

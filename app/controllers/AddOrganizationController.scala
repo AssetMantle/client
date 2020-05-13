@@ -524,9 +524,7 @@ class AddOrganizationController @Inject()(
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_ACCEPTED)))
                 } yield result
               } else Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
-            } else {
-              Future(BadRequest(views.html.component.master.acceptOrganizationRequest(views.companion.master.AcceptOrganizationRequest.form.fill(acceptRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), organization = organization)))
-            }
+            } else Future(BadRequest(views.html.component.master.acceptOrganizationRequest(views.companion.master.AcceptOrganizationRequest.form.fill(acceptRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), organization = organization)))
           }
 
           (for {
