@@ -20,14 +20,13 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
-                            $("#checkUsernameAvailableResult span").hide();
+                            $("#checkUsernameAvailableResult").fadeOut();
                             $("#checkIcon").fadeIn();
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
-                            $("#checkUsernameAvailableResult span").hide();
                             $("#checkIcon").fadeOut();
-                            $("#checkUsernameAvailableResult .userNameNotAvailable").show();
+                            $("#checkUsernameAvailableResult").fadeIn();
                         },
                     }
                 });
