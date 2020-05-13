@@ -29,10 +29,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadOrganizationKYCIncorporationDocumentPath = rootFilePath + configuration.get[String]("upload.organization.incorporationDocument")
 
-  private val uploadOrganizationWorldCheck = rootFilePath + configuration.get[String]("upload.backgroundCheck.organizationWorldCheck")
-
-  private val uploadTraderWorldCheck = rootFilePath + configuration.get[String]("upload.backgroundCheck.traderWorldCheck")
-
   private val uploadAssetBillOfLadingPath: String = rootFilePath + configuration.get[String]("upload.asset.billOfLading")
 
   private val uploadAssetCOOPath: String = rootFilePath + configuration.get[String]("upload.asset.coo")
@@ -53,14 +49,6 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
   def getAccountKYCFilePath(documentType: String): String = {
     documentType match {
       case constants.File.AccountKYC.IDENTIFICATION => uploadAccountKYCIdentificationPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
-    }
-  }
-
-  def getBackgroundCheckFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.WorldCheck.TRADER_WORLD_CHECK => uploadTraderWorldCheck
-      case constants.File.WorldCheck.ORGANIZATION_WORLD_CHECK => uploadOrganizationWorldCheck
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }

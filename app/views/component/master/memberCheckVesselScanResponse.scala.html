@@ -1,0 +1,44 @@
+@import controllers.actions.LoginState
+@import queries.responses.MemberCheckCorporateScanResponse
+@import views.html.base._
+
+@(corporateScanResponse: MemberCheckCorporateScanResponse.Response, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div>
+    @commonIntInfo(constants.View.SCAN_ID, corporateScanResponse.scanResult.scanId)
+    @commonTextInfo(constants.View.RESULT_URL, corporateScanResponse.scanResult.resultUrl)
+    @commonIntInfo(constants.View.MATCHED_NUMBER, corporateScanResponse.scanResult.matchedNumber)
+
+    @corporateScanResponse.scanResult.matchedEntities match {
+        case Some(entities) => {
+            @entities.map { entity =>
+                @commonIntInfo(constants.View.RESULT_ID, entity.resultId)
+                @commonIntInfo(constants.View.UNIQUE_ID, entity.uniqueId.getOrElse(0))
+
+                @commonTextInfo(constants.View.NAME, entity.name)
+                @Messages(constants.View.DECISION_DETAIL)
+                @entity.decisionDetail match {
+                    case Some(detail) => {
+                        @commonTextInfo(constants.View.TEXT, detail.text)
+                        @commonTextInfo(constants.View.MATCH_DECISION, detail.matchDecision)
+                        @commonTextInfo(constants.View.ASSESSED_RISK, detail.assessedRisk)
+                        @commonTextInfo(constants.View.COMMENT, detail.comment)
+                    }
+                    case None => {
+                        @Messages(constants.View.NOT_RELEVANT)
+                    }
+                }
+                @commonTextInfo(constants.View.CATEGORY, entity.category.getOrElse(""))
+                @commonTextInfo(constants.View.PRIMARY_LOCATION, entity.primaryLocation.getOrElse(""))
+                @commonTextInfo(constants.View.MONITORING_STATUS, entity.monitoringStatus.getOrElse(""))
+            @commonJavascriptButton(constants.View.DETAILS, JavaScript(s"componentResource('scanDetailedResult', jsRoutes.controllers.BackgroundCheckController.corporateScanResult(${entity.resultId}))"))
+            @commonFormButton(constants.Form.MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION, 'parameters -> s"${entity.resultId}")
+            @commonFormButton(constants.Form.ADD_ASSET_MEMBER_CHECK, 'parameters -> s" '${assetID}', ${corporateScanResponse.scanResult.scanId}, ${entity.resultId}")
+            }
+        }
+        case None => {
+                    @commonFormButton(constants.Form.ADD_ASSET_MEMBER_CHECK, 'parameters -> s" '${assetID}', ${corporateScanResponse.scanResult.scanId}")
+        }
+    }
+    <div id="scanDetailedResult"></div>
+</div>

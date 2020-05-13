@@ -122,9 +122,9 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           val markSent = masterTransactionSendFiatRequests.Service.markSent(sendFiatData.id)
           (for {
             _ <- markSent
-          } yield Ok(views.html.transactions(successes = Seq(constants.Response.FIAT_SENT)))
+          } yield Ok(views.html.transactionsView(successes = Seq(constants.Response.FIAT_SENT)))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.transactionsView(failures = Seq(baseException.failure)))
           }
         })
   }

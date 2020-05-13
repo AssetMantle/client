@@ -8,8 +8,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
 import models.common.Serializable._
-import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
-import models.{blockchain, blockchainTransaction, master}
+import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, OrganizationUBO, Zone}
+import models.{blockchain, blockchainTransaction, master, memberCheck}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -26,6 +26,8 @@ class AddOrganizationController @Inject()(
                                            masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
                                            utilitiesNotification: utilities.Notification,
                                            masterOrganizationKYCs: master.OrganizationKYCs,
+                                           masterOrganizationUBOs: master.OrganizationUBOs,
+                                           memberCheckCorporateScanResultDecisions: memberCheck.CorporateScanDecisions,
                                            transactionsAddOrganization: transactions.AddOrganization,
                                            masterZones: master.Zones,
                                            blockchainAccounts: blockchain.Accounts,
@@ -34,7 +36,6 @@ class AddOrganizationController @Inject()(
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
-                                           masterOrganizationBackgroundChecks: master.OrganizationBackgroundChecks
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -82,7 +83,7 @@ class AddOrganizationController @Inject()(
 
           def insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus: Boolean): Future[Result] = {
             if (verificationStatus) {
-              val id = masterOrganizations.Service.insertOrUpdateWithoutUBOs(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
+              val id = masterOrganizations.Service.insertOrUpdate(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
 
               def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
@@ -107,51 +108,6 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userAddOrUpdateUBOsForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val id = masterOrganizations.Service.tryGetID(loginState.username)
-
-      def getUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
-
-      (for {
-        id <- id
-        ubos <- getUBOs(id)
-        result <- withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
-      } yield result
-        ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.userAddOrUpdateUBOs())
-      }
-  }
-
-  def userAddOrUpdateUBOs(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.AddOrUpdateUBOs.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.userAddOrUpdateUBOs(formWithErrors)))
-        },
-        updateUBOsData => {
-          val id = masterOrganizations.Service.tryGetID(loginState.username)
-
-          def updateUBOs(id: String): Future[Int] = {
-            if (updateUBOsData.ubos.flatten.map(uboData => uboData.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.flatten.map(uboData => UBO(personName = uboData.personName, sharePercentage = uboData.sharePercentage, relationship = uboData.relationship, title = uboData.title)))
-          }
-
-          def getUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
-
-          (for {
-            id <- id
-            _ <- updateUBOs(id)
-            ubos <- getUBOs(id)
-            result <- withUsernameToken.PartialContent(views.html.component.master.userAddOrUpdateUBOs(views.companion.master.AddOrUpdateUBOs.form.fill(views.companion.master.AddOrUpdateUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddOrUpdateUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
   def userAddUBOForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.userAddUBO())
   }
@@ -163,20 +119,19 @@ class AddOrganizationController @Inject()(
           Future(BadRequest(views.html.component.master.userAddUBO(formWithErrors)))
         },
         userAddUBOData => {
-          val id = masterOrganizations.Service.tryGetID(loginState.username)
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-          def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
+          def getOldUBOs(organizationID: String): Future[Seq[OrganizationUBO]] = masterOrganizationUBOs.Service.getUBOs(organizationID)
 
-          def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data :+ UBO(personName = userAddUBOData.personName, sharePercentage = userAddUBOData.sharePercentage, relationship = userAddUBOData.relationship, title = userAddUBOData.title)
-            if (newUBOs.map(_.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
+          def createUBO(organizationID: String, oldUBOs: Seq[OrganizationUBO]): Future[String] = {
+            if (oldUBOs.map(_.sharePercentage).sum + userAddUBOData.sharePercentage > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
+            masterOrganizationUBOs.Service.create(organizationID, userAddUBOData.personFirstName, userAddUBOData.personLastName, userAddUBOData.sharePercentage, userAddUBOData.relationship, userAddUBOData.title)
           }
 
           (for {
-            id <- id
-            oldUBOs <- getOldUBOs(id)
-            _ <- updateUBOs(id, oldUBOs)
+            organizationID <- organizationID
+            oldUBOs <- getOldUBOs(organizationID)
+            _ <- createUBO(organizationID, oldUBOs)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_ADDED)))
           } yield result
             ).recover {
@@ -197,20 +152,19 @@ class AddOrganizationController @Inject()(
           Future(BadRequest(views.html.component.master.addUBO(formWithErrors)))
         },
         addUBOData => {
-          val id = masterOrganizations.Service.tryGetID(loginState.username)
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-          def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
+          def getOldUBOs(organizationID: String): Future[Seq[OrganizationUBO]] = masterOrganizationUBOs.Service.getUBOs(organizationID)
 
-          def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data :+ UBO(personName = addUBOData.personName, sharePercentage = addUBOData.sharePercentage, relationship = addUBOData.relationship, title = addUBOData.title)
-            if (newUBOs.map(_.sharePercentage).sum > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
+          def createUBO(organizationID: String, oldUBOs: Seq[OrganizationUBO]): Future[String] = {
+            if (oldUBOs.map(_.sharePercentage).sum + addUBOData.sharePercentage > 100.0) throw new BaseException(constants.Response.UBO_TOTAL_SHARE_PERCENTAGE_EXCEEDS_MAXIMUM_VALUE)
+            masterOrganizationUBOs.Service.create(organizationID, addUBOData.personFirstName, addUBOData.personLastName, addUBOData.sharePercentage, addUBOData.relationship, addUBOData.title)
           }
 
           (for {
-            id <- id
-            oldUBOs <- getOldUBOs(id)
-            _ <- updateUBOs(id, oldUBOs)
+            organizationID <- organizationID
+            oldUBOs <- getOldUBOs(organizationID)
+            _ <- createUBO(organizationID, oldUBOs)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_ADDED)))
           } yield result
             ).recover {
@@ -220,8 +174,8 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userDeleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personName = personName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
+  def userDeleteUBOForm(id: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
   def userDeleteUBO(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -231,19 +185,13 @@ class AddOrganizationController @Inject()(
           Future(BadRequest(views.html.component.master.userDeleteUBO(formWithErrors)))
         },
         userDeleteUBOData => {
-          val id = masterOrganizations.Service.tryGetID(loginState.username)
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-          def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
-
-          def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == userDeleteUBOData.personName && ubo.sharePercentage == userDeleteUBOData.sharePercentage && ubo.relationship == userDeleteUBOData.relationship && ubo.title == userDeleteUBOData.title))
-            masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
-          }
+          def deleteUBO(organizationID: String): Future[Int] = masterOrganizationUBOs.Service.delete(id = userDeleteUBOData.id, organizationID)
 
           (for {
-            id <- id
-            oldUBOs <- getOldUBOs(id)
-            _ <- updateUBOs(id, oldUBOs)
+            organizationID <- organizationID
+            _ <- deleteUBO(organizationID)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_DELETED)))
           } yield result
             ).recover {
@@ -253,8 +201,8 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def deleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(personName = personName, sharePercentage = sharePercentage, relationship = relationship, title = title))))
+  def deleteUBOForm(id: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
   def deleteUBO(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -264,19 +212,13 @@ class AddOrganizationController @Inject()(
           Future(BadRequest(views.html.component.master.deleteUBO(formWithErrors)))
         },
         deleteUBOData => {
-          val id = masterOrganizations.Service.tryGetID(loginState.username)
+          val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-          def getOldUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
-
-          def updateUBOs(id: String, oldUBOs: UBOs): Future[Int] = {
-            val newUBOs = oldUBOs.data.filterNot(ubo => (ubo.personName == deleteUBOData.personName && ubo.sharePercentage == deleteUBOData.sharePercentage && ubo.relationship == deleteUBOData.relationship && ubo.title == deleteUBOData.title))
-            masterOrganizations.Service.updateUBOs(id = id, ubos = newUBOs)
-          }
+          def deleteUBO(organizationID: String): Future[Int] = masterOrganizationUBOs.Service.delete(id = deleteUBOData.id, organizationID)
 
           (for {
-            id <- id
-            oldUBOs <- getOldUBOs(id)
-            _ <- updateUBOs(id, oldUBOs)
+            organizationID <- organizationID
+            _ <- deleteUBO(organizationID)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.UBO_DELETED)))
           } yield result
             ).recover {
@@ -551,10 +493,11 @@ class AddOrganizationController @Inject()(
             masterOrganizationKYCs.Service.checkAllKYCFilesVerified(acceptRequestData.organizationID)
           }
 
-          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterOrganizationBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
+          def checkMemberCheckVerified(organizationID: String): Future[Boolean] = memberCheckCorporateScanResultDecisions.Service.checkOrganizationApproved(organizationID)
 
-          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkAllBackgroundFilesVerified: Boolean, zoneID: String): Future[Result] = {
-            if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_ORGANIZATION_BACKGROUND_CHECK_FILES_NOT_VERFIED)
+          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String): Future[Result] = {
+            if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERIFIED)
+
             if (checkAllKYCFilesVerified) {
               val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)
 
@@ -587,8 +530,8 @@ class AddOrganizationController @Inject()(
             zoneID <- zoneID
             organization <- organization
             checkAllKYCFilesVerified <- checkAllKYCFilesVerified(zoneID, organization)
-            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(organization.id)
-            result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, zoneID = zoneID)
+            checkMemberCheckVerified <- checkMemberCheckVerified(organization.id)
+            result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

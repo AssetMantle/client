@@ -12,7 +12,8 @@ CREATE SCHEMA IF NOT EXISTS WESTERN_UNION
     AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS DOCUSIGN
     AUTHORIZATION "commit";
-
+CREATE SCHEMA IF NOT EXISTS MEMBER_CHECK
+    AUTHORIZATION "commit";
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
 (
@@ -962,7 +963,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "email"              VARCHAR NOT NULL,
     "registeredAddress"  VARCHAR NOT NULL,
     "postalAddress"      VARCHAR NOT NULL,
-    "ubos"               VARCHAR,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     "comment"            VARCHAR,
@@ -972,6 +972,25 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "updatedBy"          VARCHAR,
     "updatedOn"          TIMESTAMP,
     "updatedOnTimeZone"  VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationUBO"
+(
+    "id"                VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "firstName"         VARCHAR NOT NULL,
+    "lastName"          VARCHAR NOT NULL,
+    "sharePercentage"   DOUBLE PRECISION NOT NULL,
+    "relationship"      VARCHAR NOT NULL,
+    "title"             VARCHAR NOT NULL,
+    "status"            VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -994,22 +1013,6 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
-(
-    "id"                VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "fileName"          VARCHAR NOT NULL UNIQUE,
-    "file"              BYTEA,
-    "status"            BOOLEAN,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
@@ -1044,22 +1047,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
-(
-    "id"                VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "fileName"          VARCHAR NOT NULL UNIQUE,
-    "file"              BYTEA,
-    "status"            BOOLEAN,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
@@ -1492,6 +1479,97 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."SFTPFileTransaction"
     PRIMARY KEY ("transactionReference")
 );
 
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "firstName"         VARCHAR NOT NULL,
+    "lastName"          VARCHAR NOT NULL,
+    "scanID"            INT NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id"),
+    UNIQUE ("firstName", "lastName")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "scanID"            INT NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "companyName"       VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
+(
+    "id"    VARCHAR NOT NULL,
+    "scanID"            INT NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "vesselName"        VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
+(
+    "id"           VARCHAR NOT NULL,
+    "scanID"            INT NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+
 ALTER TABLE BLOCKCHAIN."Account_BC"
     ADD CONSTRAINT Account_BC_Master_Account_username FOREIGN KEY ("username") REFERENCES MASTER."Account" ("id");
 ALTER TABLE BLOCKCHAIN."Asset_BC"
@@ -1563,16 +1641,14 @@ ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."OrganizationBackgroundCheck"
-    ADD CONSTRAINT OrganizationBackgroundCheck_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."OrganizationUBO"
+    ADD CONSTRAINT OrganizationUBO_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."TraderBackgroundCheck"
-    ADD CONSTRAINT TraderBackgroundCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
     ADD CONSTRAINT TraderRelation_Trader_fromID FOREIGN KEY ("fromID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
@@ -1622,6 +1698,19 @@ ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
     ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
     ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("id") REFERENCES MASTER."OrganizationUBO" ("id");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id");
 
 ALTER TABLE WESTERN_UNION."FiatRequest"
     ADD CONSTRAINT FiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
@@ -1868,11 +1957,6 @@ CREATE TRIGGER ORGANIZATION_LOG
     ON MASTER."Organization"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ORGANIZATION_BACKGROUND_CHECK_LOG
-    BEFORE INSERT OR UPDATE
-    ON MASTER."OrganizationBackgroundCheck"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."OrganizationBankAccountDetail"
@@ -1883,14 +1967,14 @@ CREATE TRIGGER ORGANIZATION_KYC_LOG
     ON MASTER."OrganizationKYC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORGANIZATION_UBO_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."OrganizationUBO"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER TRADER_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."Trader"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER TRADER_BACKGROUND_CHECK_LOG
-    BEFORE INSERT OR UPDATE
-    ON MASTER."TraderBackgroundCheck"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER TRADER_RELATION_LOG
@@ -1987,6 +2071,37 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ZONE_INVITATION_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER_TRANSACTION."ZoneInvitation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER MEMBER_SCAN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."MemberScan"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MEMBER_SCAN_DECISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."MemberScanDecision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CORPORATE_SCAN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."CorporateScan"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CORPORATE_SCAN_DECISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."CorporateScanDecision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER VESSEL_SCAN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."VesselScan"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER VESSEL_SCAN_DECISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."VesselScanDecision"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
@@ -2209,11 +2324,10 @@ DROP TRIGGER IF EXISTS MOBILE_LOG ON MASTER."Mobile" CASCADE;
 DROP TRIGGER IF EXISTS NEGOTIATION_LOG ON MASTER."Negotiation" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_LOG ON MASTER."Order" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_LOG ON MASTER."Organization" CASCADE;
-DROP TRIGGER IF EXISTS ORGANIZATION_BACKGROUND_CHECK_LOG ON MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG ON MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_KYC_LOG ON MASTER."OrganizationKYC" CASCADE;
+DROP TRIGGER IF EXISTS ORGANIZATION_UBO_LOG ON MASTER."OrganizationUBO" CASCADE;
 DROP TRIGGER IF EXISTS TRADER_LOG ON MASTER."Trader" CASCADE;
-DROP TRIGGER IF EXISTS TRADER_BACKGROUND_CHECK_LOG ON MASTER."TraderBackgroundCheck" CASCADE;
 DROP TRIGGER IF EXISTS TRADER_RELATION_LOG ON MASTER."TraderRelation" CASCADE;
 DROP TRIGGER IF EXISTS ZONE_LOG ON MASTER."Zone" CASCADE;
 DROP TRIGGER IF EXISTS ZONE_KYC_LOG ON MASTER."ZoneKYC" CASCADE;
@@ -2234,6 +2348,13 @@ DROP TRIGGER IF EXISTS SMS_OTP_LOG ON MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TRIGGER IF EXISTS TRADE_ACTIVITY_LOG ON MASTER_TRANSACTION."TradeActivity" CASCADE;
 DROP TRIGGER IF EXISTS TRADER_INVITATION_LOG ON MASTER_TRANSACTION."TraderInvitation" CASCADE;
 DROP TRIGGER IF EXISTS ZONE_INVITATION_LOG ON MASTER_TRANSACTION."ZoneInvitation" CASCADE;
+
+DROP TRIGGER IF EXISTS MEMBER_SCAN_LOG ON MEMBER_CHECK."MemberCheck" CASCADE;
+DROP TRIGGER IF EXISTS MEMBER_SCAN_DECISION_LOG ON MEMBER_CHECK."MemberCheckDecision" CASCADE;
+DROP TRIGGER IF EXISTS CORPORATE_SCAN_LOG ON MEMBER_CHECK."CorporateCheck" CASCADE;
+DROP TRIGGER IF EXISTS CORPORATE_SCAN_DECISION_LOG ON MEMBER_CHECK."CorporateCheckDecision" CASCADE;
+DROP TRIGGER IF EXISTS VESSEL_SCAN_LOG ON MEMBER_CHECK."VesselCheck" CASCADE;
+DROP TRIGGER IF EXISTS VESSEL_SCAN_DECISION_LOG ON MEMBER_CHECK."VesselCheckDecision" CASCADE;
 
 DROP TRIGGER IF EXISTS FIAT_REQUEST_LOG ON WESTERN_UNION."FiatRequest" CASCADE;
 DROP TRIGGER IF EXISTS RTCB_LOG ON WESTERN_UNION."RTCB" CASCADE;
@@ -2301,11 +2422,10 @@ DROP TABLE IF EXISTS MASTER."Negotiation_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationUBO" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
@@ -2335,9 +2455,17 @@ DROP TABLE IF EXISTS WESTERN_UNION."FiatRequest" CASCADE;
 DROP TABLE IF EXISTS WESTERN_UNION."RTCB" CASCADE;
 DROP TABLE IF EXISTS WESTERN_UNION."SFTPFileTransaction" CASCADE;
 
+DROP TABLE IF EXISTS MEMBER_CHECK."MemberScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."MemberScanDecision" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."CorporateScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."CorporateScanDecision" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."VesselScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."VesselScanDecision" CASCADE;
+
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS DOCUSIGN CASCADE;
 DROP SCHEMA IF EXISTS MASTER CASCADE;
 DROP SCHEMA IF EXISTS MASTER_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS WESTERN_UNION CASCADE;
+DROP SCHEMA IF EXISTS MEMBER_CHECK CASCADE;
