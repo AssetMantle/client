@@ -11,11 +11,12 @@ object AddInvoice {
     mapping(
       constants.FormField.NEGOTIATION_ID.name -> constants.FormField.NEGOTIATION_ID.field,
       constants.FormField.INVOICE_NUMBER.name -> constants.FormField.INVOICE_NUMBER.field,
+      constants.FormField.INVOICE_AMOUNT.name -> constants.FormField.INVOICE_AMOUNT.field,
       constants.FormField.INVOICE_DATE.name -> constants.FormField.INVOICE_DATE.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, invoiceNumber: String, invoiceDate: Date)
+  case class Data(negotiationID: String, invoiceNumber: String, invoiceAmount: Int, invoiceDate: Date)
 
 }
 
