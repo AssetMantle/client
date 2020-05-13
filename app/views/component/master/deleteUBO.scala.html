@@ -4,7 +4,8 @@
 
 @(deleteUBOForm: Form[DeleteUBO.Data] = DeleteUBO.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.DELETE_UBO, deleteUBOForm) {
-    @commonInputText(deleteUBOForm, constants.FormField.PERSON_NAME, 'readonly -> true)
+    @commonInputText(deleteUBOForm, constants.FormField.PERSON_FIRST_NAME, 'readonly -> true)
+    @commonInputText(deleteUBOForm, constants.FormField.PERSON_LAST_NAME, 'readonly -> true)
     @commonInputDouble(deleteUBOForm, constants.FormField.SHARE_PERCENTAGE, 'readonly -> true)
     @commonInputText(deleteUBOForm, constants.FormField.RELATIONSHIP, 'readonly -> true)
     @commonInputText(deleteUBOForm, constants.FormField.TITLE, 'readonly -> true)

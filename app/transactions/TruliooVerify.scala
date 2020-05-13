@@ -8,7 +8,7 @@ import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-
+import responses.TruliooVerifyResponse.Response
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -30,7 +30,7 @@ class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Config
 
   private val url = baseURL + endpoint
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).withHttpHeaders(headers).post(Json.toJson(request))
+  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withHttpHeaders(headers).post(Json.toJson(request)))
 
   private implicit val locationWrites: OWrites[Location] = Json.writes[Location]
 
@@ -50,7 +50,7 @@ class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Config
 
   object Service {
 
-    def post(request: Request): Future[WSResponse] = action(request).recover {
+    def post(request: Request): Future[Response] = action(request).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

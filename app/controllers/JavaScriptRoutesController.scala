@@ -25,7 +25,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddKeyController.blockchainAddKeyForm,
 
         routes.javascript.AddOrganizationController.addOrganizationForm,
-        routes.javascript.AddOrganizationController.userAddOrUpdateUBOsForm,
         routes.javascript.AddOrganizationController.userDeleteUBOForm,
         routes.javascript.AddOrganizationController.userAddUBOForm,
         routes.javascript.AddOrganizationController.addUBOForm,
@@ -360,18 +359,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.trades,
         routes.javascript.ViewController.tradeRoom,
 
-        routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFileForm,
-        routes.javascript.BackgroundCheckController.uploadTraderBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.storeTraderBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.updateTraderBackgroundCheckFileForm,
-        routes.javascript.BackgroundCheckController.updateTraderBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm,
-        routes.javascript.BackgroundCheckController.uploadOrganizationBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.storeOrganizationBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm,
-        routes.javascript.BackgroundCheckController.updateOrganizationBackgroundCheckFile,
-        routes.javascript.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile,
+        routes.javascript.BackgroundCheckController.memberScanForm,
+        routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
+        routes.javascript.BackgroundCheckController.addUBOMemberCheckForm,
+        routes.javascript.BackgroundCheckController.memberScanResult,
+        routes.javascript.BackgroundCheckController.corporateScanForm,
+        routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm,
+        routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm,
+        routes.javascript.BackgroundCheckController.corporateScanResult,
+        routes.javascript.BackgroundCheckController.vesselScanForm,
+        routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm,
+        routes.javascript.BackgroundCheckController.addAssetMemberCheckForm,
+        routes.javascript.BackgroundCheckController.vesselScanResult,
 
       )
     ).as("text/javascript")

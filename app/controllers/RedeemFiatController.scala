@@ -96,9 +96,9 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           val markRedeemed = masterTransactionRedeemFiatRequests.Service.markRedeemed(redeemFiatData.id)
           (for {
             _ <- markRedeemed
-          } yield Ok(views.html.transactions(successes = Seq(constants.Response.FIAT_REDEEMED)))
+          } yield Ok(views.html.transactionsView(successes = Seq(constants.Response.FIAT_REDEEMED)))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.transactionsView(failures = Seq(baseException.failure)))
           }
         })
   }
