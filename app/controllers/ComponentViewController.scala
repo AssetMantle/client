@@ -1160,9 +1160,11 @@ class ComponentViewController @Inject()(
       def getResult(traderID: String, negotiation: Negotiation) = {
         if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
           val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val order = masterOrders.Service.get(negotiationID)
           for {
             asset <- asset
-          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, asset = asset))
+            order <- order
+          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, negotiation = negotiation, order = order, asset = asset))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1636,10 +1638,19 @@ class ComponentViewController @Inject()(
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
       val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def getTraderIDList(zoneID: String) = masterTraders.Service.getVerifiedTraderIDsByZoneID(zoneID)
+
+      def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
+
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(negotiation.price, 0, negotiation.price - fiatsInOrder))
+        zoneID <- zoneID
+        traderIDList <- getTraderIDList(zoneID)
+        fiatPegWallet <- getFiatPegWallet(traderIDList)
+      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -1661,10 +1672,19 @@ class ComponentViewController @Inject()(
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
       val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getTraderIDList(organizationID: String) = masterTraders.Service.getVerifiedTraderIDsByOrganizationID(organizationID)
+
+      def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
+
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(negotiation.price, 0, negotiation.price - fiatsInOrder))
+        organizationID <- organizationID
+        traderIDList <- getTraderIDList(organizationID)
+        fiatPegWallet <- getFiatPegWallet(traderIDList)
+      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -1687,11 +1707,15 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
       val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
+
+      def getFiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
+
       (for {
         traderID <- traderID
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(negotiation.price, 0, negotiation.price - fiatsInOrder, traderID, negotiation))
+        fiatPegWallet <- getFiatPegWallet(traderID)
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder, traderID, negotiation))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -1713,9 +1737,11 @@ class ComponentViewController @Inject()(
       def getResult(zoneID: String, traderList: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (traderList.map(_.zoneID) contains zoneID) {
           val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val order = masterOrders.Service.get(negotiationID)
           for {
             asset <- asset
-          } yield Ok(views.html.component.master.zoneViewOrderActions(zoneID, traderList, negotiation, asset))
+            order <- order
+          } yield Ok(views.html.component.master.zoneViewOrderActions(negotiation, asset, order))
         } else {
           Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
         }

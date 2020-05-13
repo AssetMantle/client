@@ -11,6 +11,7 @@ object AddBillOfLading {
     mapping(
       constants.FormField.NEGOTIATION_ID.name -> constants.FormField.NEGOTIATION_ID.field,
       constants.FormField.BILL_OF_LADING_NUMBER.name -> constants.FormField.BILL_OF_LADING_NUMBER.field,
+      constants.FormField.CONSIGNEE_TO.name -> constants.FormField.CONSIGNEE_TO.field,
       constants.FormField.VESSEL_NAME.name -> constants.FormField.VESSEL_NAME.field,
       constants.FormField.PORT_OF_LOADING.name -> constants.FormField.PORT_OF_LOADING.field,
       constants.FormField.SHIPPER_NAME.name -> constants.FormField.SHIPPER_NAME.field,
@@ -25,6 +26,6 @@ object AddBillOfLading {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, billOfLadingNumber: String, vesselName: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Int, assetPrice: Int)
+  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Int, assetPrice: Int)
 
 }
