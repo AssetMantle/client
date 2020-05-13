@@ -7,6 +7,6 @@
 @commonForm(constants.Form.ACCEPT_NEGOTIATION_REQUEST, acceptNegotiationRequestForm) {
     @commonTextInfo(constants.View.SELLER, sellerName)
     @commonInputText(acceptNegotiationRequestForm, constants.FormField.ID, 'value -> negotiation.id, 'readonly -> true, 'containerDivClass -> "hidden")
-    @commonInputInt(acceptNegotiationRequestForm, constants.FormField.GAS)
+    @commonInputInt(acceptNegotiationRequestForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(acceptNegotiationRequestForm, constants.FormField.PASSWORD)
 }

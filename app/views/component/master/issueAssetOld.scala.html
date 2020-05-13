@@ -11,7 +11,7 @@
     @commonInputInt(issueAssetForm, constants.FormField.ASSET_PRICE)
     @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
     @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
-    @commonInputInt(issueAssetForm, constants.FormField.GAS)
+    @commonInputInt(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS, 'required -> false)
     @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD)
 }

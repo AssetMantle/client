@@ -10,6 +10,6 @@
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
     @commonIntInfo(constants.View.PRICE, negotiation.price)
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(""))
-    @commonInputInt(sellerConfirmNegotiationForm, constants.FormField.GAS)
+    @commonInputInt(sellerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sellerConfirmNegotiationForm, constants.FormField.PASSWORD)
 }

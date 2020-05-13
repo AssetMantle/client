@@ -1,9 +1,9 @@
-@import views.html.base._
 @import views.companion.master.ModeratedBuyerExecuteOrder
+@import views.html.base._
 
 @(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-    @commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
-        @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
-        @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS)
-        @commonInputPassword(moderatedBuyerExecuteOrderForm, constants.FormField.PASSWORD)
-    }
+@commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputPassword(moderatedBuyerExecuteOrderForm, constants.FormField.PASSWORD)
+}
