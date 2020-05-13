@@ -77,14 +77,14 @@
                                         }
                                         </td>
                                     }
-                                    case _=>{}
+                                    case _=>{<td colspan="2"></td>}
                                 }
                             </tr>
                         }
                         <tr><td colspan="3">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</td></tr>
                         @negotiationFileList.filter(negotiationFile=> negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile=>
                             <tr>
-                                <td><span class="docIcon">@commonIcon("doc2")</span>
+                                <td colspan="2"><span class="docIcon">@commonIcon("doc2")</span>
                                     <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocument('@negotiation.id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
                                 </td>
                                 @negotiationFile.documentType match{
@@ -96,7 +96,7 @@
                                         </td>
                                         @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <td><span>@constants.View.SIGNED</span></td>}
                                     }
-                                    case _=>{<td></td>}
+                                    case _=>{<td colspan="3"></td>}
                                 }
                             </tr>
                         }

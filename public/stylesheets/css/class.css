@@ -642,6 +642,8 @@ html, body {
           margin-top: 10px; }
         .modal .modalContent .modalBody form .formBody .modalInfoBlock {
           padding: 0; }
+        .modal .modalContent .modalBody form .formBody .cmuk-card .cmuk-card-body {
+          padding: 0; }
       .modal .modalContent .modalBody .documentItem form {
         width: auto; }
       .modal .modalContent .modalBody .documentItem .infoRowLabel {
@@ -1203,7 +1205,7 @@ form .formBody {
     padding-top: 25px; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
-  padding: 20px 0;
+  padding: 15px 0;
   margin: 0 20px; }
   .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
     padding-top: 25px; }
@@ -1363,6 +1365,8 @@ form .formBody {
   .rightContainer .chatRoom .cmuk-card-body .chatMoveTop {
     position: relative;
     bottom: 50px; }
+.rightContainer .orderInfoCard button {
+  margin: 5px; }
 
 .documentItem {
   display: flex;

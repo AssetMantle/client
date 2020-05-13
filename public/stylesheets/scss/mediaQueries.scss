@@ -397,6 +397,11 @@
       .infoRowValue {
         text-align: left;
       }
+      .documentItem{
+        .infoRowLabel{
+          width: auto;
+        }
+      }
     }
   }
 }

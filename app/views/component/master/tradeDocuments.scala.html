@@ -9,6 +9,10 @@
 
 @negotiation.status match {
     case constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS => {
+        <legend class="cmuk-legend">
+        @Messages(constants.View.UPLOAD_CONTRACT_LEGEND)
+        </legend>
+        <hr>
         <div class="modalInfoBlock">
         <div id='@Seq("UPLOAD", "NEGOTIATION", constants.File.Negotiation.CONTRACT).mkString("_")'>
         @commonModalButton(Seq("UPLOAD", constants.File.Negotiation.CONTRACT).mkString("_"), routes.javascript.FileController.uploadNegotiationForm,  'parameters -> s"'${constants.File.Negotiation.CONTRACT}','${negotiation.id}'")
@@ -31,17 +35,21 @@
                         }
                     }
                 <script>hideElement('@Seq("UPLOAD", "NEGOTIATION", constants.File.Negotiation.CONTRACT).mkString("_")')</script>
-                <td><li><a href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.View.SUBMIT)</a></li></td>
+                <td><a class="cmuk-button buttonPrimary"  href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.View.SUBMIT)</a></td>
             }
             case None=> {}
                 }
             </div>
           }
     case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED=>{
+        <legend class="cmuk-legend">
+        @Messages(constants.View.UPLOAD_ASSET_DOCUMENTS)
+        </legend>
+        <hr>
         <div class="modalInfoBlock">
             <div class="cmuk-text-left title"> @Messages(constants.View.ASSET_DOCUMENTS)</div>
             @negotiation.documentList.assetDocuments.map { assetDocuemntType =>
-                <div id='@Seq("UPLOAD", "ASSET", assetDocuemntType).mkString("_")'>
+                <div id='@Seq("UPLOAD", "ASSET", assetDocuemntType).mkString("_")' class="cmuk-text-left">
                 @commonModalButton(Seq("UPLOAD", assetDocuemntType).mkString("_"), routes.javascript.FileController.uploadAssetForm, 'parameters -> s"'${assetDocuemntType}','${negotiation.id}'")
                 </div>
             }
@@ -63,7 +71,7 @@
             }
             <div class="cmuk-text-left title">@Messages(constants.View.NEGOTIATION_DOCUMENTS)</div>
             @negotiation.documentList.negotiationDocuments.filter(negotiationDocumentType => constants.File.NEGOTIATION_DOCUMENTS.contains(negotiationDocumentType)).map { negotiationDocumentType =>
-                <div id='@Seq("UPLOAD_NEGOTIATION", negotiationDocumentType).mkString("_")'>
+                <div id='@Seq("UPLOAD_NEGOTIATION", negotiationDocumentType).mkString("_")' class="cmuk-text-left">
                 @commonModalButton(Seq("UPLOAD", negotiationDocumentType).mkString("_"), routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${negotiationDocumentType}','${negotiation.id}'")
                 </div>
             }
@@ -84,8 +92,7 @@
                     <script>hideElement('UPLOAD_NEGOTIATION_@negotiationFile.documentType')</script>
                 }
             }
-            <td>
-                <li><a href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.View.SUBMIT)</a></li></td>
+            <td><a class="cmuk-button buttonPrimary" href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.View.SUBMIT)</a></td>
         </div>
     }
     case _=>{}

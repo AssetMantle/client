@@ -825,6 +825,9 @@ html, body{
           .modalInfoBlock{
             padding: 0;
           }
+          .cmuk-card .cmuk-card-body{
+            padding: 0;
+          }
         }
       }
       .documentItem{
@@ -1609,7 +1612,7 @@ form{
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 20px 0;
+        padding: 15px 0;
         margin: 0 20px;
         &:first-child {
           padding-top: 25px;
@@ -1852,6 +1855,11 @@ form{
     .chatMoveTop{
       position: relative;
       bottom: 50px;
+    }
+  }
+  .orderInfoCard{
+    button{
+      margin: 5px;
     }
   }
 }
