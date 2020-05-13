@@ -667,6 +667,20 @@ html, body{
   }
 }
 
+.formNote{
+  font-size: 1.15rem;
+}
+.infoIcon{
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 200px;
+  top: 95px;
+  .icon{
+    width: 20px;
+    height: 20px;
+  }
+}
 .header{
   background: $colorSecondary;
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
@@ -860,9 +874,6 @@ form{
     align-items: center;
     justify-content: start;
   }
-  .formNote{
-    font-size: 1.15rem;
-  }
 }
 
 .loginForm {
@@ -1051,12 +1062,13 @@ form{
   .mnemonicNote{
     font-size: $paragraphFontSizeSmall;
     text-align: justify;
+    word-break: break-word;
     letter-spacing: 0.01em;
     color: #FFFFFF;
     font-weight: bold;
     padding: 15px;
     margin: 20px 0;
-    background: url("../../images/note.svg") 103%/contain no-repeat #FF2938;
+    background: url("../../images/note.svg") 112%/contain no-repeat #FF2938;
     display: flex;
     align-items: center;
     .mnemonicNoteText{
@@ -2816,3 +2828,21 @@ figure.zoom {
   }
 }
 
+.identificationCheckbox{
+  display: flex;
+  padding: 10px 0px;
+  p{
+    margin:0;
+    word-break:break-word;
+  }
+  .commonCheckBox{
+    dl{
+      dt{
+        display: none;
+      }
+      dd{
+        margin: 0 5px 0 0;
+      }
+    }
+  }
+}

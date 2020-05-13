@@ -518,6 +518,19 @@ html, body {
     left: 160px;
     font-weight: bold; }
 
+.formNote {
+  font-size: 1.15rem; }
+
+.infoIcon {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 200px;
+  top: 95px; }
+  .infoIcon .icon {
+    width: 20px;
+    height: 20px; }
+
 .header {
   background: #053C75; }
   .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
@@ -664,8 +677,6 @@ form .formBody {
     display: flex;
     align-items: center;
     justify-content: start; }
-  .modalInfoBlock .formNote {
-    font-size: 1.15rem; }
 
 .loginForm .formBody .inputField {
   position: relative;
@@ -791,12 +802,13 @@ form .formBody {
 .MnemonicQuiz .mnemonicNote {
   font-size: 0.875rem;
   text-align: justify;
+  word-break: break-word;
   letter-spacing: 0.01em;
   color: #FFFFFF;
   font-weight: bold;
   padding: 15px;
   margin: 20px 0;
-  background: url("../../images/note.svg") 103%/contain no-repeat #FF2938;
+  background: url("../../images/note.svg") 112%/contain no-repeat #FF2938;
   display: flex;
   align-items: center; }
   .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
@@ -2087,5 +2099,15 @@ figure.zoom {
   to {
     transform: scale(100);
     opacity: 0; } }
+.identificationCheckbox {
+  display: flex;
+  padding: 10px 0px; }
+  .identificationCheckbox p {
+    margin: 0;
+    word-break: break-word; }
+  .identificationCheckbox .commonCheckBox dl dt {
+    display: none; }
+  .identificationCheckbox .commonCheckBox dl dd {
+    margin: 0 5px 0 0; }
 
 /*# sourceMappingURL=class.css.map */
