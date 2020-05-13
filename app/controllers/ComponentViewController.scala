@@ -29,6 +29,7 @@ class ComponentViewController @Inject()(
                                          masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
                                          masterOrganizationKYCs: master.OrganizationKYCs,
                                          masterOrganizations: master.Organizations,
+                                         masterOrganizationUBOs: master.OrganizationUBOs,
                                          masterTraders: master.Traders,
                                          masterTraderRelations: master.TraderRelations,
                                          masterZones: master.Zones,
@@ -39,6 +40,7 @@ class ComponentViewController @Inject()(
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                          masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
                                          masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
+                                         memberCheckVesselScanDecisions: memberCheck.VesselScanDecisions,
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
                                          westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,
@@ -772,6 +774,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val organization = masterOrganizations.Service.tryGet(organizationID)
+      val ubos = masterOrganizationUBOs.Service.getUBOs(organizationID)
 
       def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
         masterOrganizationKYCs.Service.getAllDocuments(organization.id)
@@ -782,8 +785,9 @@ class ComponentViewController @Inject()(
       (for {
         zoneID <- zoneID
         organization <- organization
+        ubos <- ubos
         organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
-      } yield Ok(views.html.component.master.zoneViewAcceptedOrganizationAccount(organization = organization, organizationKYCs = organizationKYCs))
+      } yield Ok(views.html.component.master.zoneViewAcceptedOrganizationAccount(organization = organization, organizationKYCs = organizationKYCs, ubos = ubos))
         ).recover {
         case _: BaseException => InternalServerError(views.html.account())
       }
@@ -808,6 +812,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val organization = masterOrganizations.Service.tryGet(organizationID)
+      val ubos = masterOrganizationUBOs.Service.getUBOs(organizationID)
 
       def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
         masterOrganizationKYCs.Service.getAllDocuments(organization.id)
@@ -818,8 +823,9 @@ class ComponentViewController @Inject()(
       (for {
         zoneID <- zoneID
         organization <- organization
+        ubos <- ubos
         organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
-      } yield Ok(views.html.component.master.zoneViewPendingOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs))
+      } yield Ok(views.html.component.master.zoneViewPendingOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs, ubos = ubos))
         ).recover {
         case _: BaseException => InternalServerError(views.html.account())
       }
@@ -845,6 +851,8 @@ class ComponentViewController @Inject()(
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val organization = masterOrganizations.Service.tryGet(organizationID)
 
+      def ubos(organizationID: String) = masterOrganizationUBOs.Service.getUBOs(organizationID)
+
       def getOrganizationKYCs(zoneID: String, organization: Organization): Future[Seq[OrganizationKYC]] = if (organization.zoneID == zoneID) {
         masterOrganizationKYCs.Service.getAllDocuments(organization.id)
       } else {
@@ -855,7 +863,8 @@ class ComponentViewController @Inject()(
         zoneID <- zoneID
         organization <- organization
         organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
-      } yield Ok(views.html.component.master.zoneViewRejectedOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs))
+        ubos <- ubos(organization.id)
+      } yield Ok(views.html.component.master.zoneViewRejectedOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs, ubos = ubos))
         ).recover {
         case _: BaseException => InternalServerError(views.html.account())
       }
@@ -1114,9 +1123,15 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organization = masterOrganizations.Service.getByAccountID(loginState.username)
 
+      def ubos(organization: Option[Organization]) = organization match {
+        case Some(organization) => masterOrganizationUBOs.Service.getUBOs(organization.id)
+        case None => Future(Seq())
+      }
+
       (for {
         organization <- organization
-      } yield Ok(views.html.component.master.userViewOrganizationUBOs(organization))
+        ubos <- ubos(organization)
+      } yield Ok(views.html.component.master.userViewOrganizationUBOs(organization, ubos))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
@@ -1124,11 +1139,14 @@ class ComponentViewController @Inject()(
 
   def viewOrganizationUBOs(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def ubos(organizationID: String) = masterOrganizationUBOs.Service.getUBOs(organizationID)
 
       (for {
-        organization <- organization
-      } yield Ok(views.html.component.master.viewOrganizationUBOs(organization))
+        organizationID <- organizationID
+        ubos <- ubos(organizationID)
+      } yield Ok(views.html.component.master.viewOrganizationUBOs(ubos))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
@@ -1646,7 +1664,16 @@ class ComponentViewController @Inject()(
   //TODO: Whoever did this correct it
   def zoneViewTradeRoomChecks(negotiationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.zoneViewTradeRoomChecks()))
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
+      def billOfLading(assetID: String): Future[Option[AssetFile]] = masterTransactionAssetFiles.Service.get(assetID, constants.File.Asset.BILL_OF_LADING)
+
+      (for {
+        negotiation <- negotiation
+        billOfLading <- billOfLading(negotiation.assetID)
+      } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[models.common.Serializable.BillOfLading].vesselName))))).recover {
+        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+      }
   }
 
   //TODO: Whoever did this correct it

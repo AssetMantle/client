@@ -33,9 +33,7 @@ class SetACLController @Inject()(
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
                                   blockchainAclHashes: blockchain.ACLHashes,
                                   utilitiesNotification: utilities.Notification,
-                                  withUsernameToken: WithUsernameToken,
-                                  masterTraderBackgroundChecks: master.TraderBackgroundChecks
-                                )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                  withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -208,10 +206,7 @@ class SetACLController @Inject()(
           val zoneID = masterZones.Service.tryGetID(loginState.username)
           val trader = masterTraders.Service.tryGetByAccountID(verifyTraderData.accountID)
 
-          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterTraderBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
-
-          def processTransactionAndGetResult(trader: Trader, organizationVerificationStatus: Boolean, checkAllBackgroundFilesVerified: Boolean, zoneID: String): Future[Result] = {
-            if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
+          def processTransactionAndGetResult(trader: Trader, organizationVerificationStatus: Boolean, zoneID: String): Future[Result] = {
             if (trader.zoneID != zoneID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (trader.organizationID != verifyTraderData.organizationID) throw new BaseException(constants.Response.ORGANIZATION_ID_MISMATCH)
             if (organizationVerificationStatus) {
@@ -244,8 +239,7 @@ class SetACLController @Inject()(
             organizationVerificationStatus <- organizationVerificationStatus
             zoneID <- zoneID
             trader <- trader
-            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(trader.id)
-            result <- processTransactionAndGetResult(trader = trader, organizationVerificationStatus = organizationVerificationStatus, checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, zoneID = zoneID)
+            result <- processTransactionAndGetResult(trader = trader, organizationVerificationStatus = organizationVerificationStatus, zoneID = zoneID)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -293,12 +287,9 @@ class SetACLController @Inject()(
           val traderOrganization = masterOrganizations.Service.tryGet(verifyTraderData.organizationID)
           val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
-          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterTraderBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
-
-          def getResult(checkAllBackgroundFilesVerified: Boolean, trader: Trader, traderOrganization: Organization, organization: Organization): Future[Result] = {
+          def getResult(trader: Trader, traderOrganization: Organization, organization: Organization): Future[Result] = {
             if (trader.organizationID != verifyTraderData.organizationID || traderOrganization.id != organization.id) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_MISMATCH)
-            if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
             val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
             val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
 
@@ -326,8 +317,7 @@ class SetACLController @Inject()(
             trader <- trader
             traderOrganization <- traderOrganization
             organization <- organization
-            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(trader.id)
-            result <- getResult(checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, trader = trader, traderOrganization = traderOrganization, organization = organization)
+            result <- getResult(trader = trader, traderOrganization = traderOrganization, organization = organization)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

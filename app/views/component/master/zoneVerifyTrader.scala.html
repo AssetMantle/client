@@ -23,5 +23,5 @@
     @commonCheckbox(verifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> true)
     @commonInputInt(verifyTraderForm, constants.FormField.GAS)
     @commonInputPassword(verifyTraderForm, constants.FormField.PASSWORD)
-    @commonModalButton(constants.View.BACK, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'")
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
 }

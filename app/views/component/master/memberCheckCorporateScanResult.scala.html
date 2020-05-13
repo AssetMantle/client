@@ -1,0 +1,77 @@
+@import controllers.actions.LoginState
+@import queries.responses.MemberCheckCorporateScanResultResponse
+@import base._
+@(response: MemberCheckCorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<div>
+    @commonIntInfo(constants.View.ID, response.id)
+    @commonIntInfo(constants.View.UNIQUE_ID, response.entity.uniqueId)
+    @commonTextInfo(constants.View.CATEGORIES, response.entity.categories)
+    @commonTextInfo(constants.View.SUBCATEGORY, response.entity.subcategory.getOrElse(""))
+    @commonTextInfo(constants.View.PRIMARY_NAME, response.entity.primaryName)
+    @commonTextInfo(constants.View.PRIMARY_LOCATION, response.entity.primaryLocation.getOrElse(""))
+    @Messages(constants.View.GENERAL_INFO) : @response.entity.generalInfo
+    @commonTextInfo(constants.View.FURTHER_INFORMATION, response.entity.furtherInformation.getOrElse(""))
+    @Messages(constants.View.XML_FURTHER_INFORMATION) : @response.entity.xmlFurtherInformation
+    @commonTextInfo(constants.View.ENTER_DATE, response.entity.enterDate.getOrElse(""))
+    @commonTextInfo(constants.View.LAST_REVIEWED, response.entity.lastReviewed.getOrElse(""))
+    @Messages(constants.View.DESCRIPTIONS)
+    @response.entity.descriptions.map {description =>
+        @commonTextInfo(constants.View.DESCRIPTION_1, description.description1)
+        @commonTextInfo(constants.View.DESCRIPTION_2, description.description2)
+        @commonTextInfo(constants.View.DESCRIPTION_3, description.description3)
+    }
+    @Messages(constants.View.NAME_DETAILS)
+    @response.entity.nameDetails.map {nameDetail =>
+        @commonTextInfo(constants.View.NAME_TYPE, nameDetail.nameType)
+        @commonTextInfo(constants.View.ENTITY_NAME, nameDetail.entityName)
+    }
+    @Messages(constants.View.ORIGINAL_SCRIPT_NAMES) : @response.entity.originalScriptNames
+    @Messages(constants.View.LOCATIONS)
+    @response.entity.locations.map {location =>
+        @commonTextInfo(constants.View.COUNTRY, location.country)
+        @commonTextInfo(constants.View.CITY, location.city.getOrElse(""))
+        @commonTextInfo(constants.View.ADDRESS, location.address)
+    }
+    @Messages(constants.View.COUNTRIES)
+    @response.entity.countries.map {country =>
+        @commonTextInfo(constants.View.COUNTRY_TYPE, country.countryType)
+        @commonTextInfo(constants.View.COUNTRY_VALUE, country.countryValue)
+    }
+    @Messages(constants.View.OFFICIAL_LISTS)
+    @response.entity.officialLists.map {officialList =>
+        @commonTextInfo(constants.View.KEYWORD, officialList.keyword)
+        @commonTextInfo(constants.View.CATEGORY, officialList.category)
+        @commonTextInfo(constants.View.DESCRIPTION, officialList.description)
+        @commonTextInfo(constants.View.COUNTRY, officialList.country)
+        @commonBooleanInfo(constants.View.IS_CURRENT, Some(officialList.isCurrent))
+    }
+    @Messages(constants.View.ID_NUMBERS)
+    @response.entity.idNumbers.map {idNumber =>
+        @commonTextInfo(constants.View.TYPE, idNumber.`type`)
+        @commonTextInfo(constants.View.ID_NOTES, idNumber.idNotes)
+        @commonTextInfo(constants.View.NUMBER, idNumber.number)
+    }
+    @Messages(constants.View.SOURCES)
+    @response.entity.sources.map {source =>
+        @commonTextInfo(constants.View.URL, source.url)
+        @commonTextInfo(constants.View.CATEGORIES, source.categories)
+        @commonTextInfo(constants.View.DATES, source.dates)
+    }
+    @Messages(constants.View.LINKED_INDIVIDUALS)
+    @response.entity.linkedIndividuals.map {linkedIndividual =>
+        @commonTextInfo(constants.View.FIRST_NAME, linkedIndividual.firstName)
+        @commonTextInfo(constants.View.MIDDLE_NAME, linkedIndividual.middleName.getOrElse(""))
+        @commonTextInfo(constants.View.LAST_NAME, linkedIndividual.lastName)
+        @commonTextInfo(constants.View.OTHER_CATEGORIES, linkedIndividual.otherCategories)
+        @commonTextInfo(constants.View.SUB_CATEGORIES, linkedIndividual.subcategories.getOrElse(""))
+        @commonTextInfo(constants.View.DESCRIPTIONS, linkedIndividual.description.getOrElse(""))
+    }
+
+    @Messages(constants.View.LINKED_COMPANIES)
+    @response.entity.linkedCompanies.map {linkedCompany =>
+        @commonTextInfo(constants.View.NAME, linkedCompany.name)
+        @commonTextInfo(constants.View.CATEGORIES, linkedCompany.categories)
+        @commonTextInfo(constants.View.SUB_CATEGORIES, linkedCompany.subcategories.getOrElse(""))
+        @commonTextInfo(constants.View.DESCRIPTIONS, linkedCompany.description.getOrElse(""))
+    }
+</div>
