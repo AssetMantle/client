@@ -31,6 +31,7 @@
     <div class="cmuk-container cmuk-margin-bottom">
         <div id="sendFiatRequests" class="switcherCard"></div>
         <div id="redeemFiatRequests" class="switcherCard"></div>
+        <div id="receiveFiats" class="switcherCard"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
             <div id="traderViewIssueFiatRequestList"></div>
@@ -38,6 +39,7 @@
                     componentResource('traderViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.traderViewIssueFiatRequestList());
                     componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewSendFiatRequests());
                     componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewRedeemFiatRequests());
+                    componentResource('receiveFiats', jsRoutes.controllers.ComponentViewController.traderViewReceiveFiatList());
                 </script>
             }
             case constants.User.ORGANIZATION => {
@@ -46,6 +48,7 @@
                     componentResource('organizationViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.organizationViewIssueFiatRequestList());
                     componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewSendFiatRequests());
                     componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewRedeemFiatRequests());
+                    componentResource('receiveFiats', jsRoutes.controllers.ComponentViewController.organizationViewReceiveFiatList());
                 </script>
             }
             case constants.User.ZONE => {
@@ -54,6 +57,7 @@
                     componentResource('zoneViewIssueFiatRequestList', jsRoutes.controllers.ComponentViewController.zoneViewIssueFiatRequestList());
                     componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequests());
                     componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequests());
+                    componentResource('receiveFiats', jsRoutes.controllers.ComponentViewController.zoneViewReceiveFiatList());
                 </script>
             }
             case constants.User.GENESIS => {}
@@ -61,24 +65,6 @@
         }
 
     </div>
-    <script>
-        @loginState.userType match {
-            case constants.User.TRADER => {
-                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewSendFiatRequests());
-                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.traderViewRedeemFiatRequests());
-            }
-            case constants.User.ORGANIZATION => {
-                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewSendFiatRequests());
-                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.organizationViewRedeemFiatRequests());
-            }
-            case constants.User.ZONE => {
-                 componentResource('sendFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewSendFiatRequests());
-                 componentResource('redeemFiatRequests', jsRoutes.controllers.ComponentViewController.zoneViewRedeemFiatRequests());
-            }
-            case constants.User.GENESIS => {}
-            case _ => {}
-        }
-    </script>
 }
 
 @right = {

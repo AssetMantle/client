@@ -308,6 +308,7 @@ GET         /component/zoneViewRedeemFiatRequests                               
 GET         /component/zoneViewPendingRedeemFiatRequestList                                       controllers.ComponentViewController.zoneViewPendingRedeemFiatRequestList()
 GET         /component/zoneViewCompleteRedeemFiatRequestList                                      controllers.ComponentViewController.zoneViewCompleteRedeemFiatRequestList()
 GET         /component/zoneViewFailedRedeemFiatRequestList                                        controllers.ComponentViewController.zoneViewFailedRedeemFiatRequestList()
+GET         /component/zoneViewReceiveFiatList                                                    controllers.ComponentViewController.zoneViewReceiveFiatList()
 GET         /component/organizationViewSendFiatRequests                                           controllers.ComponentViewController.organizationViewSendFiatRequests()
 GET         /component/organizationViewPendingSendFiatRequestList                                 controllers.ComponentViewController.organizationViewPendingSendFiatRequestList()
 GET         /component/organizationViewCompleteSendFiatRequestList                                controllers.ComponentViewController.organizationViewCompleteSendFiatRequestList()
@@ -316,6 +317,7 @@ GET         /component/organizationViewRedeemFiatRequests                       
 GET         /component/organizationViewPendingRedeemFiatRequestList                               controllers.ComponentViewController.organizationViewPendingRedeemFiatRequestList()
 GET         /component/organizationViewCompleteRedeemFiatRequestList                              controllers.ComponentViewController.organizationViewCompleteRedeemFiatRequestList()
 GET         /component/organizationViewFailedRedeemFiatRequestList                                controllers.ComponentViewController.organizationViewFailedRedeemFiatRequestList()
+GET         /component/organizationViewReceiveFiatList                                            controllers.ComponentViewController.organizationViewReceiveFiatList()
 GET         /component/traderViewSendFiatRequests                                                 controllers.ComponentViewController.traderViewSendFiatRequests()
 GET         /component/traderViewPendingSendFiatRequestList                                       controllers.ComponentViewController.traderViewPendingSendFiatRequestList()
 GET         /component/traderViewCompleteSendFiatRequestList                                      controllers.ComponentViewController.traderViewCompleteSendFiatRequestList()
@@ -324,6 +326,7 @@ GET         /component/traderViewRedeemFiatRequests                             
 GET         /component/traderViewPendingRedeemFiatRequestList                                     controllers.ComponentViewController.traderViewPendingRedeemFiatRequestList()
 GET         /component/traderViewCompleteRedeemFiatRequestList                                    controllers.ComponentViewController.traderViewCompleteRedeemFiatRequestList()
 GET         /component/traderViewFailedRedeemFiatRequestList                                      controllers.ComponentViewController.traderViewFailedRedeemFiatRequestList()
+GET         /component/traderViewReceiveFiatList                                                  controllers.ComponentViewController.traderViewReceiveFiatList()
 
 GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)

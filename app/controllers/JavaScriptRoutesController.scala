@@ -148,6 +148,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.zoneViewPendingRedeemFiatRequestList,
         routes.javascript.ComponentViewController.zoneViewCompleteRedeemFiatRequestList,
         routes.javascript.ComponentViewController.zoneViewFailedRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.zoneViewReceiveFiatList,
         routes.javascript.ComponentViewController.organizationViewSendFiatRequests,
         routes.javascript.ComponentViewController.organizationViewPendingSendFiatRequestList,
         routes.javascript.ComponentViewController.organizationViewCompleteSendFiatRequestList,
@@ -156,6 +157,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewPendingRedeemFiatRequestList,
         routes.javascript.ComponentViewController.organizationViewCompleteRedeemFiatRequestList,
         routes.javascript.ComponentViewController.organizationViewFailedRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.organizationViewReceiveFiatList,
         routes.javascript.ComponentViewController.traderViewSendFiatRequests,
         routes.javascript.ComponentViewController.traderViewPendingSendFiatRequestList,
         routes.javascript.ComponentViewController.traderViewCompleteSendFiatRequestList,
@@ -164,6 +166,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewPendingRedeemFiatRequestList,
         routes.javascript.ComponentViewController.traderViewCompleteRedeemFiatRequestList,
         routes.javascript.ComponentViewController.traderViewFailedRedeemFiatRequestList,
+        routes.javascript.ComponentViewController.traderViewReceiveFiatList,
 
         routes.javascript.ComponentViewController.organizationSubscription,
         routes.javascript.ComponentViewController.traderSubscription,

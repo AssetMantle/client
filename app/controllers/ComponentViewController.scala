@@ -39,6 +39,7 @@ class ComponentViewController @Inject()(
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          docusignEnvelopes: docusign.Envelopes,
                                          masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                         masterTransactionReceiveFiats: masterTransaction.ReceiveFiats,
                                          masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
                                          masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
@@ -1981,6 +1982,23 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def zoneViewReceiveFiatList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
+
+      def receiveFiatList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderIDs)
+
+      (for {
+        zoneID <- zoneID
+        traderIDs <- traderIDs(zoneID)
+        receiveFiatList <- receiveFiatList(traderIDs)
+      } yield Ok(views.html.component.master.receiveFiatList(receiveFiatList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
   //Transactions organization
   def organizationViewSendFiatRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -2094,6 +2112,24 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def organizationViewReceiveFiatList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(organizationID)
+
+      def receiveFiatList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderIDs)
+
+      (for {
+        organizationID <- organizationID
+        traderIDs <- traderIDs(organizationID)
+        receiveFiatList <- receiveFiatList(traderIDs)
+      } yield Ok(views.html.component.master.receiveFiatList(receiveFiatList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  //Transactions Trader
   def traderViewSendFiatRequests: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.traderViewSendFiatRequests()))
@@ -2184,6 +2220,20 @@ class ComponentViewController @Inject()(
         traderID <- traderID
         redeemFiatRequestList <- redeemFiatRequestList(traderID)
       } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderViewReceiveFiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def receiveFiatList(traderID: String): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderID)
+
+      (for {
+        traderID <- traderID
+        receiveFiatList <- receiveFiatList(traderID)
+      } yield Ok(views.html.component.master.traderViewReceiveFiatList(receiveFiatList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
