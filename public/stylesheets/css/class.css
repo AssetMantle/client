@@ -354,6 +354,9 @@ html, body {
   -webkit-box-orient: vertical;
   overflow: hidden; }
 
+.forgotPasswordNote {
+  font-size: 1.25rem; }
+
 .comdex .cmuk-sticky-fixed {
   width: 100% !important; }
 .comdex .buttonPrimary {
@@ -661,6 +664,8 @@ form .formBody {
     display: flex;
     align-items: center;
     justify-content: start; }
+  .modalInfoBlock .formNote {
+    font-size: 1.15rem; }
 
 .loginForm .formBody .inputField {
   position: relative;

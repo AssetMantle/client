@@ -11,6 +11,9 @@
     @receivedNegotiationList.map { receivedNegotiation =>
         @commonVerticalInfoBox(){
             <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory buy">
+                    <span>@Messages(constants.View.BUY)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == receivedNegotiation.assetID) match {
                     case Some(asset) => {

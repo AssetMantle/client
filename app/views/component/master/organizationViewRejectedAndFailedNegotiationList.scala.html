@@ -12,6 +12,9 @@
 @rejectedReceivedNegotiationList.map { rejectedReceivedNegotiation =>
     @commonVerticalInfoBox() {
         <div class="salesQuoteCardLeft salesChild">
+            <div class="salesQuoteCategory buy">
+                <span>@Messages(constants.View.BUY)</span>
+            </div>
             <div class="content">
             @assetList.find(_.id == rejectedReceivedNegotiation.assetID) match {
                 case Some(asset) => {
@@ -70,6 +73,9 @@
     @rejectedSentNegotiationList.map { rejectedSentNegotiation =>
         @commonVerticalInfoBox() {
             <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
                     case Some(asset) => {

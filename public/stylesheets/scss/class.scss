@@ -443,7 +443,9 @@ html, body{
   overflow: hidden;
 }
 
-
+.forgotPasswordNote{
+  font-size: $headingFontSizeSmall;
+}
 
 .comdex {
   .cmuk-sticky-fixed{
@@ -857,6 +859,9 @@ form{
     display: flex;
     align-items: center;
     justify-content: start;
+  }
+  .formNote{
+    font-size: 1.15rem;
   }
 }
 

@@ -10,6 +10,9 @@
     @incompleteNegotiationList.map { incompleteNegotiation =>
         @commonVerticalInfoBox(){
             <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == incompleteNegotiation.assetID) match {
                     case Some(asset) => {
