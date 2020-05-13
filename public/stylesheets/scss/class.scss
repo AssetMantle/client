@@ -1068,7 +1068,7 @@ form{
     font-weight: bold;
     padding: 15px;
     margin: 20px 0;
-    background: url("../../images/note.svg") 112%/contain no-repeat #FF2938;
+    background: url("../../images/note.svg") 112%/125px no-repeat #FF2938;
     display: flex;
     align-items: center;
     .mnemonicNoteText{
@@ -1549,7 +1549,7 @@ form{
             .infoRowLabel{
               color: #061728;
               font-weight: normal;
-              width: auto;
+              width: 250px;
               margin:2px 0 3px 0;
             }
             .infoRowValue{
