@@ -1,12 +1,10 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.docusign
-import models.master.{Asset, Identification, Negotiation, Organization, OrganizationBankAccountDetail, OrganizationKYC, Trader, TraderRelation, Zone}
-import models.master.{Organization => _, Zone => _, _}
-import models.{blockchain, master, masterTransaction, westernUnion}
+import models._
+import models.master._
 import models.masterTransaction.SendFiatRequest
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -895,7 +893,7 @@ class ComponentViewController @Inject()(
 
       def getOrganizationKYCsByOrganization(organization: Option[Organization]): Future[Seq[OrganizationKYC]] = if (organization.isDefined) masterOrganizationKYCs.Service.getAllDocuments(organization.get.id) else Future(Seq[OrganizationKYC]())
 
-      def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getOrNoneByAccountID(accountID)
+      def getTraderOrNoneByAccountID(accountID: String): Future[Option[Trader]] = masterTraders.Service.getByAccountID(accountID)
 
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
@@ -1006,12 +1004,12 @@ class ComponentViewController @Inject()(
             case fromTrader.accountID => {
               for {
                 organizationName <- getOrganizationName(toTrader.organizationID)
-              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, traderName = toTrader.name, organizationName = organizationName))
+              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = toTrader.accountID, organizationName = organizationName))
             }
             case toTrader.accountID => {
               for {
                 organizationName <- getOrganizationName(fromTrader.organizationID)
-              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = fromTrader.accountID, traderName = fromTrader.name, organizationName = organizationName))
+              } yield Ok(views.html.component.master.acceptedTraderRelation(accountID = fromTrader.accountID, organizationName = organizationName))
             }
             case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
           }
@@ -1036,7 +1034,7 @@ class ComponentViewController @Inject()(
         (for {
           trader <- trader
           organizationName <- getOrganizationName(trader.organizationID)
-        } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, traderName = trader.name, organizationName = organizationName))).recover {
+        } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, organizationName = organizationName))).recover {
           case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
         }
   }
@@ -1056,7 +1054,7 @@ class ComponentViewController @Inject()(
           toTrader <- toTrader
           traderRelation <- traderRelation(fromId = fromTrader.id, toId = toTrader.id)
           organizationName <- getOrganizationName(fromTrader.organizationID)
-        } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, traderName = toTrader.name, organizationName = organizationName))).recover {
+        } yield Ok(views.html.component.master.pendingReceivedTraderRelation(traderRelation = traderRelation, organizationName = organizationName))).recover {
           case baseException: BaseException => ServiceUnavailable(Html(baseException.failure.message))
         }
   }

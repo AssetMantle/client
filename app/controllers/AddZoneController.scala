@@ -7,7 +7,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
-import models.master.ZoneKYC
+import models.master.{Email, Mobile, ZoneKYC}
 import models.masterTransaction.ZoneInvitation
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -29,6 +29,8 @@ class AddZoneController @Inject()(
                                    blockchainTransactionAddZones: blockchainTransaction.AddZones,
                                    blockchainAccounts: blockchain.Accounts,
                                    masterZones: master.Zones,
+                                   masterEmails: master.Emails,
+                                   masterMobiles: master.Mobiles,
                                    withUserLoginAction: WithUserLoginAction,
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    withUsernameToken: WithUsernameToken,
@@ -115,12 +117,19 @@ class AddZoneController @Inject()(
           Future(BadRequest(views.html.component.master.addZone(formWithErrors)))
         },
         addZoneData => {
-          val id = masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+          val email = masterEmails.Service.tryGet(loginState.username)
+          val mobile = masterMobiles.Service.tryGet(loginState.username)
+
+          def insertOrUpdate(email: Email, mobile: Mobile) =
+            if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
+            else masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
 
           def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
-            id <- id
+            email <- email
+            mobile <- mobile
+            id <- insertOrUpdate(email, mobile)
             zoneKYCs <- zoneKYCs(id)
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result

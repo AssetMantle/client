@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
-@import models.master.Trader
+@import models.master.{Organization, Trader}
 @import views.html.base._
-@import models.master.Organization
 
 @(trader: Trader, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -10,16 +9,13 @@
 </legend>
 <hr>
 <div class="modalInfoBlock">
-@commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
-@commonTextInfo(constants.View.NAME, trader.name)
-<div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_DETAILS)</div>
-@commonTextInfo(constants.View.NAME, organization.name)
-@commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
-@commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
-@commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
-@commonBooleanInfo(constants.View.STATUS, organization.verificationStatus)
-
-<p class="cmuk-text-left">* @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</p>
-@commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")
-@commonModalButton(constants.View.NEXT, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'", 'class-> "cmuk-button-small buttonPrimary")
+    @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+    <div class="cmuk-text-left title">@Messages(constants.View.ORGANIZATION_DETAILS)</div>
+    @commonTextInfo(constants.View.NAME, organization.name)
+    @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+    @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
+    @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
+    @commonBooleanInfo(constants.View.STATUS, organization.verificationStatus)
+    @commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")
+    @commonModalButton(constants.View.NEXT, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'", 'class -> "cmuk-button-small buttonPrimary")
 </div>

@@ -1,8 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 
-@(accountID: String, traderName: String, organizationName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-    @commonVerticalTextInfo(constants.View.ACCOUNT_ID, accountID)
-    @commonVerticalTextInfo(constants.View.TRADER_NAME, traderName)
-    @commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organizationName)
+@(accountID: String, organizationName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonVerticalTextInfo(constants.View.ACCOUNT_ID, accountID)
+@commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organizationName)

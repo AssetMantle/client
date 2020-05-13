@@ -8,7 +8,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
 import models.common.Serializable._
-import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
+import models.master.{Email, Identification, Mobile, Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
@@ -28,6 +28,9 @@ class AddOrganizationController @Inject()(
                                            masterOrganizationKYCs: master.OrganizationKYCs,
                                            transactionsAddOrganization: transactions.AddOrganization,
                                            masterZones: master.Zones,
+                                           masterIdentifications: master.Identifications,
+                                           masterEmails: master.Emails,
+                                           masterMobiles: master.Mobiles,
                                            blockchainAccounts: blockchain.Accounts,
                                            blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations,
                                            masterOrganizations: master.Organizations,
@@ -79,9 +82,15 @@ class AddOrganizationController @Inject()(
         },
         addOrganizationData => {
           val verificationStatus = masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)
+          val identification = masterIdentifications.Service.tryGet(loginState.username)
+          val email = masterEmails.Service.tryGet(loginState.username)
+          val mobile = masterMobiles.Service.tryGet(loginState.username)
 
-          def insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus: Boolean): Future[Result] = {
-            if (verificationStatus) {
+          def insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus: Boolean, identification: Identification, email: Email, mobile: Mobile): Future[Result] = {
+            if (!verificationStatus) throw new BaseException(constants.Response.UNVERIFIED_ZONE)
+            else if (!identification.verificationStatus.getOrElse(false)) throw new BaseException(constants.Response.ACCOUNT_KYC_PENDING)
+            else if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
+            else {
               val id = masterOrganizations.Service.insertOrUpdateWithoutUBOs(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
 
               def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
@@ -92,14 +101,14 @@ class AddOrganizationController @Inject()(
                 result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
               } yield result
             }
-            else {
-              Future(Unauthorized(views.html.profile(failures = Seq(constants.Response.UNVERIFIED_ZONE))))
-            }
           }
 
           (for {
             verificationStatus <- verificationStatus
-            result <- insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus)
+            identification <- identification
+            email <- email
+            mobile <- mobile
+            result <- insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus, identification, email, mobile)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }

@@ -25,7 +25,7 @@
         @counterPartyTraderList.map { trader =>
                 @counterPartyOrganizationList.find(_.id== trader.organizationID) match {
                     case Some(organization)=> {
-                        <li onclick="fillCounterPartyField('@trader.id')">@trader.accountID | @trader.name | @constants.View.ORGANIZATION: @organization.name</li>
+                        <li onclick="fillCounterPartyField('@trader.id')">@trader.accountID | @constants.View.ORGANIZATION: @organization.name</li>
                         }
                     case None=>{}
             }

@@ -6,9 +6,10 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Identification, Organization, Trader}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -100,12 +101,19 @@ class SetACLController @Inject()(
 
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+      val trader = masterTraders.Service.getByAccountID(loginState.username)
+
+      def getResult(trader: Option[Trader]) = if (trader.isDefined) {
+        Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(organizationID = trader.get.organizationID))))
+      } else {
+        Ok(views.html.component.master.addTrader())
+      }
+
       (for {
         trader <- trader
-      } yield Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(organizationID = trader.organizationID))))
+      } yield getResult(trader)
         ).recover {
-        case _: BaseException => Ok(views.html.component.master.addTrader())
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -120,10 +128,9 @@ class SetACLController @Inject()(
 
           def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
             if (status) {
-              val name = masterIdentifications.Service.tryGetName(loginState.username)
               val organization = masterOrganizations.Service.tryGet(addTraderData.organizationID)
 
-              def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
+              def addTrader(zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username)
 
               val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
@@ -134,9 +141,8 @@ class SetACLController @Inject()(
               }
 
               for {
-                name <- name
                 organization <- organization
-                _ <- addTrader(name = name, zoneID = organization.zoneID)
+                _ <- addTrader(zoneID = organization.zoneID)
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
