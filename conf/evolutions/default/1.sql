@@ -977,13 +977,13 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
 
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationUBO"
 (
-    "id"                VARCHAR NOT NULL,
-    "organizationID"    VARCHAR NOT NULL,
-    "firstName"         VARCHAR NOT NULL,
-    "lastName"          VARCHAR NOT NULL,
+    "id"                VARCHAR          NOT NULL,
+    "organizationID"    VARCHAR          NOT NULL,
+    "firstName"         VARCHAR          NOT NULL,
+    "lastName"          VARCHAR          NOT NULL,
     "sharePercentage"   DOUBLE PRECISION NOT NULL,
-    "relationship"      VARCHAR NOT NULL,
-    "title"             VARCHAR NOT NULL,
+    "relationship"      VARCHAR          NOT NULL,
+    "title"             VARCHAR          NOT NULL,
     "status"            VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1291,11 +1291,11 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ReceiveFiat"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ReceiveFiat_History"
 (
-    "id"                VARCHAR NOT NULL,
-    "traderID"          VARCHAR NOT NULL,
-    "orderID"           VARCHAR NOT NULL,
-    "amount"            INT     NOT NULL,
-    "status"            VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "traderID"          VARCHAR   NOT NULL,
+    "orderID"           VARCHAR   NOT NULL,
+    "amount"            INT       NOT NULL,
+    "status"            VARCHAR   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1518,7 +1518,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScan"
     "id"                VARCHAR NOT NULL,
     "firstName"         VARCHAR NOT NULL,
     "lastName"          VARCHAR NOT NULL,
-    "scanID"            INT NOT NULL UNIQUE,
+    "scanID"            INT     NOT NULL UNIQUE,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1532,7 +1532,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScan"
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
 (
     "id"                VARCHAR NOT NULL,
-    "scanID"            INT NOT NULL,
+    "scanID"            INT     NOT NULL,
     "resultID"          INT,
     "status"            BOOLEAN NOT NULL,
     "createdBy"         VARCHAR,
@@ -1549,7 +1549,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
 (
     "id"                VARCHAR NOT NULL,
     "companyName"       VARCHAR NOT NULL UNIQUE,
-    "scanID"            INT NOT NULL UNIQUE,
+    "scanID"            INT     NOT NULL UNIQUE,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1561,8 +1561,8 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
 (
-    "id"    VARCHAR NOT NULL,
-    "scanID"            INT NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "scanID"            INT     NOT NULL,
     "resultID"          INT,
     "status"            BOOLEAN NOT NULL,
     "createdBy"         VARCHAR,
@@ -1578,7 +1578,7 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
 (
     "id"                VARCHAR NOT NULL,
     "vesselName"        VARCHAR NOT NULL UNIQUE,
-    "scanID"            INT NOT NULL UNIQUE,
+    "scanID"            INT     NOT NULL UNIQUE,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1590,8 +1590,8 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
 (
-    "id"           VARCHAR NOT NULL,
-    "scanID"            INT NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "scanID"            INT     NOT NULL,
     "resultID"          INT,
     "status"            BOOLEAN NOT NULL,
     "createdBy"         VARCHAR,
