@@ -1463,6 +1463,16 @@ header:before,
   .timeline .notification > div {
     padding: 0; }
 
+.documentView.switcherCardSecond .cmuk-subnav-pill > .cmuk-active > a {
+  border-bottom: none; }
+.documentView.switcherCardSecond .cmuk-subnav li:first-child {
+  border: none; }
+.documentView.switcherCardSecond .cmuk-subnav li a {
+  text-align: left;
+  padding: 15px 20px; }
+.documentView.switcherCardSecond .cmuk-subnav li:last-child {
+  display: none; }
+
 .documentView .cmuk-card-header, .documentView .cmuk-card-body, .documentView .documentList {
   padding: 0; }
 .documentView .documentList {

@@ -1978,6 +1978,25 @@ header:before,
   }
 }
 
+.documentView.switcherCardSecond {
+  .cmuk-subnav-pill > .cmuk-active > a {
+    border-bottom: none;
+  }
+  .cmuk-subnav {
+    li {
+      &:first-child {
+        border: none;
+      }
+      a {
+        text-align: left;
+        padding: 15px 20px;
+      }
+      &:last-child {
+        display: none;
+      }
+    }
+  }
+}
 .documentView{
   .cmuk-card-header, .cmuk-card-body, .documentList{
     padding:0;
