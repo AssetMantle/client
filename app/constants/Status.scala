@@ -54,6 +54,11 @@ object Status {
     val SENT = "SENT"
   }
 
+  object ReceiveFiat {
+    val ORDER_COMPLETION_FIAT = "ORDER_COMPLETION_FIAT"
+    val ORDER_REVERSED_FIAT = "ORDER_REVERSED_FIAT"
+  }
+
   object Negotiation {
     val FORM_INCOMPLETE = "FORM_INCOMPLETE"
     val ISSUE_ASSET_PENDING = "ISSUE_ASSET_PENDING"
