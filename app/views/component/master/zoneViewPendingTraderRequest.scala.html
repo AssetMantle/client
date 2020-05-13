@@ -18,8 +18,6 @@
 @commonTextInfo(constants.View.ACCOUNT_ID, organization.accountID)
 @commonTextInfo(constants.View.EMAIL_ADDRESS, organization.email)
 @commonBooleanInfo(constants.View.STATUS, organization.verificationStatus)
-
-<p class="cmuk-text-left">* @Messages(constants.View.PLEASE_APPROVE_ALL_KYC_DOCUMENTS)</p>
 @commonFormButton(constants.Form.ZONE_REJECT_TRADER_REQUEST, 'class -> "cmuk-button-danger cmuk-button-small", 'parameters -> s"'${trader.id}'")
 @commonModalButton(constants.View.NEXT, routes.javascript.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile, 'parameters -> s"'${trader.id}'", 'class-> "cmuk-button-small buttonPrimary")
 </div>
