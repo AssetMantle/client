@@ -2,7 +2,10 @@
 @import queries.responses.MemberCheckCorporateScanResultResponse
 @import base._
 @(response: MemberCheckCorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-<div>
+<legend class="cmuk-legend">
+    @Messages(constants.View.MEMBER_CHECK_CORPORATE_SCAN_RESULT)
+</legend>
+<hr>
     @commonIntInfo(constants.View.ID, response.id)
     @commonIntInfo(constants.View.UNIQUE_ID, response.entity.uniqueId)
     @commonTextInfo(constants.View.CATEGORIES, response.entity.categories)

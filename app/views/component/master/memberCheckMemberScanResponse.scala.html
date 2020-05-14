@@ -3,8 +3,11 @@
 @import views.html.base._
 
 @(memberScanResponse: MemberCheckMemberScanResponse.Response, uboID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-<div>
+<legend class="cmuk-legend">
+    @Messages(constants.View.MEMBER_CHECK_SCAN_RESPONSE)
+</legend>
+<hr>
+<div class="modalInfoBlock">
     @commonIntInfo(constants.View.SCAN_ID, memberScanResponse.scanResult.scanId)
     @commonTextInfo(constants.View.RESULT_URL, memberScanResponse.scanResult.resultUrl)
     @commonIntInfo(constants.View.MATCHED_NUMBER, memberScanResponse.scanResult.matchedNumber)

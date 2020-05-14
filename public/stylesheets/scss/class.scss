@@ -629,7 +629,7 @@ html, body{
     padding: 0;
   }
   .panelHeader{
-    font-size: $paragraphFontSizeMedium;
+    font-size: $paragraphFontSizeLarge;
     font-weight: normal;
     color: #272829;
     line-height: 2;
@@ -667,6 +667,29 @@ html, body{
   }
 }
 
+.formNote{
+  font-size: 1.15rem;
+}
+.infoText {
+  position: relative;
+
+  .infoIcon.organizationInfoIcon {
+    left:360px;
+    top: 0;
+  }
+}
+  .infoIcon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 195px;
+    top: 116px;
+
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+}
 .header{
   background: $colorSecondary;
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
@@ -860,9 +883,6 @@ form{
     align-items: center;
     justify-content: start;
   }
-  .formNote{
-    font-size: 1.15rem;
-  }
 }
 
 .loginForm {
@@ -1051,12 +1071,13 @@ form{
   .mnemonicNote{
     font-size: $paragraphFontSizeSmall;
     text-align: justify;
+    word-break: break-word;
     letter-spacing: 0.01em;
     color: #FFFFFF;
     font-weight: bold;
     padding: 15px;
     margin: 20px 0;
-    background: url("../../images/note.svg") 103%/contain no-repeat #FF2938;
+    background: url("../../images/note.svg") 112%/125px no-repeat #FF2938;
     display: flex;
     align-items: center;
     .mnemonicNoteText{
@@ -1537,7 +1558,7 @@ form{
             .infoRowLabel{
               color: #061728;
               font-weight: normal;
-              width: auto;
+              width: 250px;
               margin:2px 0 3px 0;
             }
             .infoRowValue{
@@ -1817,6 +1838,7 @@ form{
         outline: none;
         border-color: #e5e5e5;
         height: 40px;
+        padding-right: 30px;
         &::placeholder{
           font-size: $paragraphFontSizeSmall;
         }
@@ -2816,3 +2838,21 @@ figure.zoom {
   }
 }
 
+.identificationCheckbox{
+  display: flex;
+  padding: 10px 0px;
+  p{
+    margin:0;
+    word-break:break-word;
+  }
+  .commonCheckBox{
+    dl{
+      dt{
+        display: none;
+      }
+      dd{
+        margin: 0 5px 0 0;
+      }
+    }
+  }
+}

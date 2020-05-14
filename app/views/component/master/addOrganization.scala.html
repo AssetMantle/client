@@ -5,7 +5,7 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
-        <div class="cmuk-text-left panelHeader">@Messages(constants.View.REGISTER_AS_ORGANIZATION_NOTE)</div>
+        <p class="cmuk-margin-remove panelHeader infoText">@Messages(constants.View.REGISTER_AS_ORGANIZATION)<span class="infoIcon organizationInfoIcon" cmuk-tooltip="title:@Messages(constants.View.REGISTER_AS_ORGANIZATION_NOTE);pos:bottom"> @commonIcon("info")</span></p>
         <br>
         <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ZONE)</div>
         <div class="cmuk-panel cmuk-panel-scrollable">
@@ -26,7 +26,7 @@
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)
         @commonInputText(addOrganizationForm, constants.FormField.LANDMARK, 'required -> false)
         @commonInputText(addOrganizationForm, constants.FormField.CITY)
-        @commonInputText(addOrganizationForm, constants.FormField.COUNTRY)
+        @commonSelect(addOrganizationForm, constants.FormField.COUNTRY)
         @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
         @commonInputText(addOrganizationForm, constants.FormField.PHONE)
         }
@@ -37,7 +37,7 @@
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)
         @commonInputText(addOrganizationForm, constants.FormField.LANDMARK, 'required -> false)
         @commonInputText(addOrganizationForm, constants.FormField.CITY)
-        @commonInputText(addOrganizationForm, constants.FormField.COUNTRY)
+        @commonSelect(addOrganizationForm, constants.FormField.COUNTRY)
         @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
         @commonInputText(addOrganizationForm, constants.FormField.PHONE)
         }
