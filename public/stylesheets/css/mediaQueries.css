@@ -248,7 +248,15 @@
     border: none; }
 
   .mobileNumberUpdate .countryCode {
-    margin-top: 38px; } }
+    margin-top: 38px; }
+
+  .infoIcon {
+    left: 175px;
+    top: 109px; }
+
+  .infoText .infoIcon.organizationInfoIcon {
+    left: 340px;
+    top: 0; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }

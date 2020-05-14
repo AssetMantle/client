@@ -3,7 +3,11 @@
 @import base._
 
 @(response: MemberCheckMemberScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-<div>
+<legend class="cmuk-legend">
+    @Messages(constants.View.MEMBER_CHECK_SCAN_RESULT)
+</legend>
+<hr>
+<div class="modalInfoBlock">
     @commonIntInfo(constants.View.ID, response.id)
     @commonIntInfo(constants.View.UNIQUE_ID, response.person.uniqueId)
     @commonTextInfo(constants.View.CATEGORIES, response.person.categories)

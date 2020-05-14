@@ -489,7 +489,7 @@ html, body {
   max-height: 100px;
   padding: 0; }
 .comdex .panelHeader {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: normal;
   color: #272829;
   line-height: 2; }
@@ -517,6 +517,25 @@ html, body {
     top: 13px;
     left: 160px;
     font-weight: bold; }
+
+.formNote {
+  font-size: 1.15rem; }
+
+.infoText {
+  position: relative; }
+  .infoText .infoIcon.organizationInfoIcon {
+    left: 360px;
+    top: 0; }
+
+.infoIcon {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 195px;
+  top: 116px; }
+  .infoIcon .icon {
+    width: 20px;
+    height: 20px; }
 
 .header {
   background: #053C75; }
@@ -664,8 +683,6 @@ form .formBody {
     display: flex;
     align-items: center;
     justify-content: start; }
-  .modalInfoBlock .formNote {
-    font-size: 1.15rem; }
 
 .loginForm .formBody .inputField {
   position: relative;
@@ -791,12 +808,13 @@ form .formBody {
 .MnemonicQuiz .mnemonicNote {
   font-size: 0.875rem;
   text-align: justify;
+  word-break: break-word;
   letter-spacing: 0.01em;
   color: #FFFFFF;
   font-weight: bold;
   padding: 15px;
   margin: 20px 0;
-  background: url("../../images/note.svg") 103%/contain no-repeat #FF2938;
+  background: url("../../images/note.svg") 112%/125px no-repeat #FF2938;
   display: flex;
   align-items: center; }
   .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
@@ -1163,7 +1181,7 @@ form .formBody {
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowLabel {
         color: #061728;
         font-weight: normal;
-        width: auto;
+        width: 250px;
         margin: 2px 0 3px 0; }
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowValue {
         color: #061728;
@@ -1334,7 +1352,8 @@ form .formBody {
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input {
     outline: none;
     border-color: #e5e5e5;
-    height: 40px; }
+    height: 40px;
+    padding-right: 30px; }
     .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input::placeholder {
       font-size: 0.875rem; }
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendIconButton {
@@ -2087,5 +2106,15 @@ figure.zoom {
   to {
     transform: scale(100);
     opacity: 0; } }
+.identificationCheckbox {
+  display: flex;
+  padding: 10px 0px; }
+  .identificationCheckbox p {
+    margin: 0;
+    word-break: break-word; }
+  .identificationCheckbox .commonCheckBox dl dt {
+    display: none; }
+  .identificationCheckbox .commonCheckBox dl dd {
+    margin: 0 5px 0 0; }
 
 /*# sourceMappingURL=class.css.map */

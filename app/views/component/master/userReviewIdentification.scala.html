@@ -26,7 +26,9 @@
         } {
 
         }
-        <p>@Messages(constants.View.REVIEW_FORM_DECLARATION)</p>
+        <div class="identificationCheckbox">
         @commonCheckbox(userReviewIdentificationForm, constants.FormField.COMPLETION)
+        <p>@Messages(constants.View.REVIEW_FORM_DECLARATION)</p>
+        </div>
         @commonModalButton(constants.View.BACK,routes.javascript.AccountController.userViewUploadOrUpdateIdentification)
 }
