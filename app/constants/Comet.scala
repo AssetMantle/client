@@ -13,5 +13,5 @@ object Comet {
   val ORDER = "ORDER"
   val NEGOTIATION = "NEGOTIATION"
   val CHAT = "CHAT"
-
+  val KEEP_ALIVE = "KEEP_ALIVE"
 }
