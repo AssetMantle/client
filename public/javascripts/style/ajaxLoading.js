@@ -5,8 +5,8 @@ $(document).ajaxStart(function () {
     $('#loading').fadeOut(100);
 });
 
-const hideSpinnerList = ['chat', 'checkUsernameAvailable', 'comet', 'getForm','recentActivity', 'switcher'];
+const hideSpinnerEventList = ['chat', 'checkUsernameAvailable', 'comet', 'getForm','recentActivity', 'switcher'];
 
 function showSpinner(event = '') {
-    return !hideSpinnerList.includes(event);
+    return !hideSpinnerEventList.includes(event);
 }
