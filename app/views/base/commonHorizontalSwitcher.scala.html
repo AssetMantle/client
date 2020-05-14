@@ -13,7 +13,7 @@
                 }
                 case route: JavaScriptReverseRoute => {
                     @defining(utilities.String.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
-                        <li><a id="switcherHeader@itemHeader" href="#" onclick="componentResource('switcherContent@itemHeader', @jsRoute)">@Messages(itemHeader)</a></li>
+                        <li><a id="switcherHeader@itemHeader" href="#" onclick="componentResource('switcherContent@itemHeader', @jsRoute, 'switcher')">@Messages(itemHeader)</a></li>
                     }
                 }
                 case _ => {

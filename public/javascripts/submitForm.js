@@ -9,6 +9,7 @@ function submitForm(source, targetID = 'commonModalContent') {
             url: form.attr('action'),
             data: form.serialize(),
             async: true,
+            global: showSpinner('submitForm'),
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);

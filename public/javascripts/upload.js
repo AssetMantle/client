@@ -43,6 +43,7 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,
+            global: showSpinner('fileUpload'),
             statusCode: {
                 200: function (data) {
                     $("#uploadCompletionMessage").show();
@@ -97,6 +98,7 @@ function updateFile(uploadRoute, updateRoute, documentType, id) {
         $.ajax({
             url: updateDbRoute.url,
             type: updateDbRoute.type,
+            global: showSpinner('fileUpload'),
             statusCode: {
                 200: function (data) {
                     $("#updateCompletionMessage").show();

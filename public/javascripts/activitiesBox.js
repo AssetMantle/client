@@ -9,6 +9,7 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('recentActivity'),
         statusCode: {
             200: function (data) {
                 const loadMore = $(".recentActivityBox .notification:last");
@@ -26,6 +27,7 @@ $('#notificationBadge').ready(function () {
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('recentActivity'),
         statusCode: {
             200: function (data) {
                 notificationBadge.html(data);
@@ -44,6 +46,7 @@ function markNotificationRead(target, accountID) {
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('recentActivity'),
         statusCode: {
             200: function (data) {
                 $(target).addClass("read");

@@ -45,6 +45,7 @@ function comet(source, route){
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('comet'),
         statusCode: {
             200: function (data) {
                 div.html(data)

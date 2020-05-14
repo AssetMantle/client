@@ -1,9 +1,10 @@
-function componentResource(source, route){
+function componentResource(source, route, event = ''){
     const div = $('#'+ source);
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner(event),
         statusCode: {
             200: function (data) {
                 div.html(data);

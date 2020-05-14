@@ -8,15 +8,14 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
         timer = setTimeout(function () {
             timeoutFlag = true;
             const username = $(source).val();
-            const result = $(resultID);
             const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
-            let userNameNotAvailable = "";
             if (username.length > 0) {
                 $.ajax({
                     url: route.url,
                     type: route.type,
                     async: true,
+                    global: showSpinner('checkUsernameAvailable'),
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;

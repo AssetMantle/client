@@ -4,6 +4,7 @@ function loadMoreChats(chatID) {
         url: route.url,
         type: route.type,                                       
         async: true,
+        global: showSpinner('chat'),
         statusCode: {
             200: function (data) {
                 const loadMore = $(".chatMessages .chatMessage:first");
@@ -30,7 +31,7 @@ function submitChat(source, target = '#chatMessages') {
             url: form.attr('action'),
             data: form.serialize(),
             async: true,
-            global: false,
+            global: showSpinner('chat'),
             statusCode: {
                 400: function (data) {
 
@@ -70,14 +71,13 @@ function markChatRead(route) {
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('chat'),
         statusCode: {
             200: function (data) {
                $('.unRead').fadeOut();
             },
             401: function (data) {
-
                 replaceDocument(data.responseText);
-
             },
             500: function (data) {
                 replaceDocument(data.responseText);
@@ -91,6 +91,7 @@ function replyMessage(route, messageID) {
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('chat'),
         statusCode: {
             200: function (data) {
                 $('#' + data.id + messageID).html(data.text);
@@ -115,7 +116,7 @@ function scrollToTop() {
 }
 
 function unReadBar(count) {
-    if ($('#unRead').length == 0) {
+    if ($('#unRead').length === 0) {
         let c=count+2;
         const loadMore = $(".chatMessages .chatMessage:nth-last-child("+c+")");
         loadMore.after('<div id="unRead" class="unRead">un read message</div>');

@@ -3,6 +3,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('getForm'),
         statusCode: {
             200: function (data) {
                 $(modal).fadeIn(200);

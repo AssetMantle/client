@@ -8,6 +8,7 @@ function getConfiguration(configuration) {
             url: route.url,
             type: route.type,
             async: false,
+            global: showSpinner('configuration'),
             statusCode: {
                 200: function (data) {
                     setCookie(configuration, data, 1)
@@ -28,6 +29,7 @@ function getConfigurationAsynchronously(configuration) {
             url: route.url,
             type: route.type,
             async: true,
+            global: showSpinner('configuration'),
             statusCode: {
                 200: function (data) {
                     setCookie(configuration, data, 1);
