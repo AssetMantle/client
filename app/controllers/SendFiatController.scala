@@ -4,21 +4,20 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction}
+import models.master.Negotiation
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
-import models.masterTransaction
-import models.master
-import models.master.Negotiation
 
 @Singleton
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                    blockchainAccounts: blockchain.Accounts,
                                    blockchainTransactionSendFiats: blockchainTransaction.SendFiats,
                                    masterAssets: master.Assets,
+                                   masterAccounts: master.Accounts,
                                    masterTraders: master.Traders,
                                    masterNegotiations: master.Negotiations,
                                    masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
@@ -56,6 +55,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         sendFiatData => {
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
           val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(sendFiatData.negotiationID)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendFiatData.password)
 
           def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
@@ -63,42 +63,50 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
           def assetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
-          def sendTransaction(sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[String] = {
-            if (!loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendFiat) throw new BaseException(constants.Response.UNAUTHORIZED)
-            else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
-            else transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
-              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.amount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-              request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = pegHash, mode = transactionMode),
-              action = transactionsSendFiat.Service.post,
-              onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
-              onFailure = blockchainTransactionSendFiats.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
-            )
-          }
-
           def createFiatRequest(traderID: String, ticketID: String, negotiationID: String): Future[String] = masterTransactionSendFiatRequests.Service.create(traderID, ticketID, negotiationID, sendFiatData.amount)
 
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[Result] = {
+            if (!loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendFiat) throw new BaseException(constants.Response.UNAUTHORIZED)
+            else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
+            else {
+              if (validateUsernamePassword) {
+                val ticketID = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+                  entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.amount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
+                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = pegHash, mode = transactionMode),
+                  action = transactionsSendFiat.Service.post,
+                  onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
+                  onFailure = blockchainTransactionSendFiats.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
+                )
 
-          def getResult(fiatsInOrder: Int, negotiation: master.Negotiation): Future[Result] = {
+                for {
+                  ticketID <- ticketID
+                  _ <- createFiatRequest(negotiation.buyerTraderID, ticketID, negotiation.id)
+                  result <- withUsernameToken.Ok(views.html.tradeRoom(sendFiatData.negotiationID, successes = Seq(constants.Response.FIAT_SENT)))
+                } yield result
+              } else Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiationID = sendFiatData.negotiationID, amount = sendFiatData.amount)))
+            }
+          }
+
+          def getResult(fiatsInOrder: Int, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
             if (fiatsInOrder + sendFiatData.amount <= negotiation.price) {
               for {
                 sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
                 sellerAddress <- getAddress(sellerAccountID)
                 assetPegHash <- assetPegHash(negotiation.assetID)
-                ticketID <- sendTransaction(sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
-                _ <- createFiatRequest(negotiation.buyerTraderID, ticketID, negotiation.id)
-                result <- withUsernameToken.Ok(views.html.tradeRoom(sendFiatData.negotiationID, successes = Seq(constants.Response.FIAT_SENT)))
+                result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(value = views.companion.master.SendFiat.Data(negotiationID = sendFiatData.negotiationID, amount = sendFiatData.amount, gas = sendFiatData.gas, password = sendFiatData.password)).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price - fiatsInOrder), sendFiatData.negotiationID, sendFiatData.amount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price - fiatsInOrder), sendFiatData.negotiationID, sendFiatData.amount)))
             }
           }
 
           (for {
+            validateUsernamePassword <- validateUsernamePassword
             negotiation <- negotiation
             fiatsInOrder <- fiatsInOrder
-            result <- getResult(fiatsInOrder, negotiation)
+            result <- getResult(fiatsInOrder, negotiation, validateUsernamePassword)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

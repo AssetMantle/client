@@ -8,7 +8,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
 import models.common.Serializable._
-import models.master.{Email, Identification, Mobile, Organization, OrganizationBankAccountDetail, OrganizationKYC, OrganizationUBO, Zone}
+import models.master._
 import models.{blockchain, blockchainTransaction, master, memberCheck}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
@@ -20,6 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AddOrganizationController @Inject()(
                                            messagesControllerComponents: MessagesControllerComponents,
+                                           masterAccounts: master.Accounts,
                                            withOrganizationLoginAction: WithOrganizationLoginAction,
                                            fileResourceManager: utilities.FileResourceManager,
                                            transaction: utilities.Transaction,
@@ -494,6 +495,7 @@ class AddOrganizationController @Inject()(
           }
         },
         acceptRequestData => {
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = acceptRequestData.password)
           val zoneID = masterZones.Service.tryGetID(loginState.username)
           val organization = masterOrganizations.Service.tryGet(acceptRequestData.organizationID)
 
@@ -504,43 +506,43 @@ class AddOrganizationController @Inject()(
 
           def checkMemberCheckVerified(organizationID: String): Future[Boolean] = memberCheckCorporateScanResultDecisions.Service.checkOrganizationApproved(organizationID)
 
-          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String): Future[Result] = {
-            if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERIFIED)
+          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String, validateUsernamePassword: Boolean, organization: Organization): Future[Result] = {
+            if (validateUsernamePassword) {
+              if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERIFIED)
+              else if (checkAllKYCFilesVerified) {
+                val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)
 
-            if (checkAllKYCFilesVerified) {
-              val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)
+                def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
-              def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
+                def getTicketID(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
+                  entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
+                  request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, password = acceptRequestData.password, mode = transactionMode),
+                  action = transactionsAddOrganization.Service.post,
+                  onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
+                  onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
+                )
 
-              def getTicketID(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
-                entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-                request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, password = acceptRequestData.password, mode = transactionMode),
-                action = transactionsAddOrganization.Service.post,
-                onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
-                onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
-              )
-
-              for {
-                organizationAccountID <- organizationAccountID
-                organizationAccountAddress <- getOrganizationAccountAddress(organizationAccountID)
-                ticketID <- getTicketID(organizationAccountAddress)
-                _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
-                _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
-                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_ACCEPTED)))
-              } yield result
-            } else {
-              Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
-            }
+                for {
+                  organizationAccountID <- organizationAccountID
+                  organizationAccountAddress <- getOrganizationAccountAddress(organizationAccountID)
+                  ticketID <- getTicketID(organizationAccountAddress)
+                  _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
+                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
+                  result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_ACCEPTED)))
+                } yield result
+              } else Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+            } else Future(BadRequest(views.html.component.master.acceptOrganizationRequest(views.companion.master.AcceptOrganizationRequest.form.fill(acceptRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), organization = organization)))
           }
 
           (for {
+            validateUsernamePassword <- validateUsernamePassword
             zoneID <- zoneID
             organization <- organization
             checkAllKYCFilesVerified <- checkAllKYCFilesVerified(zoneID, organization)
             checkMemberCheckVerified <- checkMemberCheckVerified(organization.id)
-            result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID)
+            result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID, validateUsernamePassword = validateUsernamePassword, organization = organization)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
