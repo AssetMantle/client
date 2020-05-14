@@ -59,9 +59,10 @@ class ComponentViewController @Inject()(
 
   private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
 
+  private val keepAliveDuration = configuration.get[Int]("comet.keepAliveDuration").seconds
+
   def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val keepAliveDuration = configuration.get[Int]("comet.keepAliveDuration").seconds
       Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username, keepAliveDuration) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
   }
 
