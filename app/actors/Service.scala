@@ -8,7 +8,9 @@ import akka.stream.{CompletionStrategy, Materializer, OverflowStrategy}
 import com.typesafe.config.ConfigFactory
 import exceptions.BaseException
 import play.api.Logger
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
+
+import scala.concurrent.duration._
 
 object Service {
 
@@ -42,7 +44,7 @@ object Service {
       cometActor ! ShutdownCometUserActor(username)
       val (systemUserActor, source) = Source.actorRef[JsValue](cometCompletionMatcher, cometFailureMatcher, 0, OverflowStrategy.dropHead).preMaterialize()
       cometActor ! UpdateUsernameActorRef(username, systemUserActor)
-      source
+      source.keepAlive(60.seconds, () => Json.toJson("TICK"))
     }
 
     def shutdownUserActor(username: String): Unit = cometActor ! ShutdownCometUserActor(username)
