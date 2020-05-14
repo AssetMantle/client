@@ -382,7 +382,13 @@
   }
   .infoIcon {
     left: 175px;
-    top: 88px;
+    top: 109px;
+  }
+  .infoText {
+    .infoIcon.organizationInfoIcon {
+      left: 340px;
+      top: 0;
+    }
   }
 }
 

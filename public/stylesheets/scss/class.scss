@@ -629,7 +629,7 @@ html, body{
     padding: 0;
   }
   .panelHeader{
-    font-size: $paragraphFontSizeMedium;
+    font-size: $paragraphFontSizeLarge;
     font-weight: normal;
     color: #272829;
     line-height: 2;
@@ -670,16 +670,25 @@ html, body{
 .formNote{
   font-size: 1.15rem;
 }
-.infoIcon{
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  left: 200px;
-  top: 95px;
-  .icon{
+.infoText {
+  position: relative;
+
+  .infoIcon.organizationInfoIcon {
+    left:360px;
+    top: 0;
+  }
+}
+  .infoIcon {
     width: 20px;
     height: 20px;
-  }
+    position: absolute;
+    left: 195px;
+    top: 116px;
+
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
 }
 .header{
   background: $colorSecondary;
@@ -1829,6 +1838,7 @@ form{
         outline: none;
         border-color: #e5e5e5;
         height: 40px;
+        padding-right: 30px;
         &::placeholder{
           font-size: $paragraphFontSizeSmall;
         }

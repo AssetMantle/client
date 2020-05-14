@@ -252,7 +252,11 @@
 
   .infoIcon {
     left: 175px;
-    top: 88px; } }
+    top: 109px; }
+
+  .infoText .infoIcon.organizationInfoIcon {
+    left: 340px;
+    top: 0; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }

@@ -489,7 +489,7 @@ html, body {
   max-height: 100px;
   padding: 0; }
 .comdex .panelHeader {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: normal;
   color: #272829;
   line-height: 2; }
@@ -521,12 +521,18 @@ html, body {
 .formNote {
   font-size: 1.15rem; }
 
+.infoText {
+  position: relative; }
+  .infoText .infoIcon.organizationInfoIcon {
+    left: 360px;
+    top: 0; }
+
 .infoIcon {
   width: 20px;
   height: 20px;
   position: absolute;
-  left: 200px;
-  top: 95px; }
+  left: 195px;
+  top: 116px; }
   .infoIcon .icon {
     width: 20px;
     height: 20px; }
@@ -1346,7 +1352,8 @@ form .formBody {
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input {
     outline: none;
     border-color: #e5e5e5;
-    height: 40px; }
+    height: 40px;
+    padding-right: 30px; }
     .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input::placeholder {
       font-size: 0.875rem; }
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendIconButton {
