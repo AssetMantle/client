@@ -13,6 +13,7 @@ import play.api.libs.Comet
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import play.twirl.api.Html
+import scala.concurrent.duration._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,6 +58,12 @@ class ComponentViewController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 
   private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
+
+  def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val keepAliveDuration = configuration.get[Int]("comet.keepAliveDuration").seconds
+      Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username, keepAliveDuration) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
+  }
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -541,11 +548,6 @@ class ComponentViewController @Inject()(
   def tradeActivities(negotiationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.tradeActivities(negotiationID)))
-  }
-
-  def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

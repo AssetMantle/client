@@ -37,6 +37,10 @@ object Message {
 
   //For CHAT/ MESSAGE -> Takes message directly from masterTransaction.Message.scala
 
+  case class KeepAlive(ping: String = constants.Comet.PING)
+
+  implicit val keepAliveWrites: OWrites[KeepAlive] = Json.writes[KeepAlive]
+
   case class UpdateUsernameActorRef(username: String, actorRef: ActorRef)
 
   case class ShutdownCometUserActor(username: String)
