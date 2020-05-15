@@ -1,12 +1,20 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.masterTransaction.SendFiatRequest
+@import models.master.Trader
+@import models.master.Organization
 
-@(sendFiatRequests: Seq[SendFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(sendFiatRequests: Seq[SendFiatRequest], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @sendFiatRequests.map { sendFiatRequest =>
     @commonVerticalInfoBox() {
         @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
+        @traders.find(_.id == sendFiatRequest.traderID) match {
+            case Some(trader) => {
+                @commonVerticalTextInfo(constants.View.TRADER, trader.accountID)
+            }
+            case None => {}
+        }
         @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
         @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
         @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)

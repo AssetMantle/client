@@ -89,5 +89,10 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
 
   }
 
+  object Utility {
+    def convertToSendFiatRequest(sendFiatRequestHistory: SendFiatRequestHistory) = SendFiatRequest(sendFiatRequestHistory.id, sendFiatRequestHistory.traderID,
+      sendFiatRequestHistory.ticketID, sendFiatRequestHistory.negotiationID, sendFiatRequestHistory.amount, sendFiatRequestHistory.status, sendFiatRequestHistory.createdBy, sendFiatRequestHistory.createdOn, sendFiatRequestHistory.createdOnTimeZone,
+      sendFiatRequestHistory.updatedBy, sendFiatRequestHistory.updatedOn, sendFiatRequestHistory.updatedOnTimeZone)
+  }
 }
 
