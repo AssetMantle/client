@@ -6,7 +6,7 @@
 @views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftSideContainer">
+    <div class="leftContainer">
         <div id="financials" class="financial"></div>
     </div>
     <script>
@@ -35,9 +35,14 @@
             <div class="cmuk-width-1-2@@m">
                 <div id="contact" class="contactDetails"></div>
             </div>
-            <div class="cmuk-width-1-2@@m">
-                <div id="identification" class="identificationDetails switcherCard"></div>
-            </div>
+            @if(loginState.userType != constants.User.TRADER){
+                <div class="cmuk-width-1-2@@m">
+                    <div id="identification" class="identificationDetails switcherCard"></div>
+                </div>
+                <script>
+                        componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
+                </script>
+            }
 
             @loginState.userType match {
                 case constants.User.USER => {
@@ -99,12 +104,11 @@
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('contact', jsRoutes.controllers.ContactController.contact());
-            componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
     </script>
 }
 
 @right = {
-    <div class="rightSideContainer">
+    <div class="rightContainer">
     <div class="recentActivityContainer">
         <div id="recentActivities"></div>
     </div>

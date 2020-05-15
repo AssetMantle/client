@@ -8,7 +8,6 @@
 @(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_NEGOTIATION_REQUEST, traderReviewNegotiationRequest) {
     <div class="cmuk-text-left title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
-    @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.name)
     @commonTextInfo(constants.View.ACCOUNT_ID, counterPartyTrader.accountID)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET)</div>
     @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
@@ -20,29 +19,27 @@
     @commonIntInfo(constants.View.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
     @commonTextInfo(constants.View.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
     @commonTextInfo(constants.View.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
-    <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS)</div>
-    @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
-    @negotiation.paymentTerms.credit match {
-        case Some(creditTerms) => {
-            @creditTerms.tentativeDate match {
-                case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
-                case None => {
-                    @commonIntInfo(constants.View.TENURE, creditTerms.tenure.getOrElse(0))
+            <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS)</div>
+            @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+            @negotiation.paymentTerms.credit match {
+                case Some(creditTerms) => {
+                    @creditTerms.tentativeDate match {
+                        case Some(date) => {@commonDateInfo(constants.View.TENTATIVE_DATE, date)}
+                        case None => {@commonIntInfo(constants.View.TENURE, creditTerms.tenure.getOrElse(0))
                     @commonTextInfo(constants.View.REFERENCE, creditTerms.reference.getOrElse(""))
                 }
             }
-        }
-        case None => {}
-    }
-    @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit.isDefined))
-    <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
-    @negotiation.documentList.assetDocuments.map { assetDocument =>
-        <p  class="cmuk-text-left cmuk-margin-remove"><span>@Messages(assetDocument)</span></p>
-    }
-    @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-        <p  class="cmuk-text-left cmuk-margin-remove"><span class="cmuk-text-left">@Messages(negotiationDocument)</span></p>
-    }
-
+                }
+                case None => {}
+            }
+            @commonBooleanInfo(constants.View.CREDIT, Option(negotiation.paymentTerms.credit.isDefined))
+            <div class="cmuk-text-left title">@Messages(constants.View.DOCUMENT_LIST)</div>
+            @negotiation.documentList.assetDocuments.map { assetDocument =>
+                <p  class="cmuk-text-left cmuk-margin-remove"><span>@Messages(assetDocument)</span></p>
+            }
+            @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
+                <p  class="cmuk-text-left cmuk-margin-remove"><span class="cmuk-text-left">@Messages(negotiationDocument)</span></p>
+            }
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'parameters -> s"'${negotiation.id}'")
 }

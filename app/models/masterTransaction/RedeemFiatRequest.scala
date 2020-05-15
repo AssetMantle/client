@@ -1,7 +1,7 @@
 package models.masterTransaction
 
 import java.sql.Timestamp
-import models.common.Node
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
@@ -13,13 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[RedeemFiatRequest] {
-
-  def createLog()(implicit node: Node): RedeemFiatRequest = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): RedeemFiatRequest = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
-
-}
+case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -34,11 +28,9 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private[models] val redeemFiatRequestTable = TableQuery[RedeemFiatRequestTable]
 
-  private def add(redeemFiatRequest: RedeemFiatRequest): Future[String] = db.run((redeemFiatRequestTable returning redeemFiatRequestTable.map(_.id) += redeemFiatRequest.createLog()).asTry).map {
+  private def add(redeemFiatRequest: RedeemFiatRequest): Future[String] = db.run((redeemFiatRequestTable returning redeemFiatRequestTable.map(_.id) += redeemFiatRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -58,7 +50,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequest]] = db.run(redeemFiatRequestTable.filter(_.traderID === traderID).filter(_.status === status).result)
 
-  private def update(redeemFiatRequest: RedeemFiatRequest): Future[Int] = db.run(redeemFiatRequestTable.update(redeemFiatRequest.updateLog()).asTry).map {
+  private def update(redeemFiatRequest: RedeemFiatRequest): Future[Int] = db.run(redeemFiatRequestTable.update(redeemFiatRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

@@ -1,9 +1,12 @@
 package models.blockchainTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.Trait.Logged
 import models.blockchain.ACL
 import models.master.{Organization, Trader}
 import models.{blockchain, master}
@@ -19,7 +22,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SetACL] {
+case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SetACL] with Logged {
   def mutateTicketID(newTicketID: String): SetACL = SetACL(from = from, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = aclHash, status = status, gas = gas, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -55,14 +58,6 @@ class SetACLs @Inject()(
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(setACL: SetACL): Future[String] = db.run((setACLTable returning setACLTable.map(_.ticketID) += setACL).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(setACL: SetACL): Future[Int] = db.run(setACLTable.insertOrUpdate(setACL).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -148,7 +143,7 @@ class SetACLs @Inject()(
 
   private[models] class SetACLTable(tag: Tag) extends Table[SetACL](tag, "SetACL") {
 
-    def * = (from, aclAddress, organizationID, zoneID, aclHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SetACL.tupled, SetACL.unapply)
+    def * = (from, aclAddress, organizationID, zoneID, aclHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SetACL.tupled, SetACL.unapply)
 
     def from = column[String]("from")
 
@@ -171,6 +166,18 @@ class SetACLs @Inject()(
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
@@ -232,8 +239,8 @@ class SetACLs @Inject()(
         fromAccountID <- getAccountID(setACL.from)
         organization <- getTraderOrganization(trader.organizationID)
         _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash)
-        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash, trader.name)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.accountID, trader.name, organization.name)
+        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash, trader.accountID)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.accountID, trader.accountID, organization.name)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -267,8 +274,8 @@ class SetACLs @Inject()(
         trader <- getTrader(traderAccountID)
         organization <- getTraderOrganization(trader.organizationID)
         _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_FAILED, message)
-        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_FAILED, message, trader.name)
-        _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED, message, trader.accountID, trader.name, organization.name)
+        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_FAILED, message, trader.accountID)
+        _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED, message, trader.accountID, trader.accountID, organization.name)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

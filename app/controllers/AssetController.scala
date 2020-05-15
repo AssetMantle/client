@@ -1,17 +1,16 @@
 package controllers
 
-import controllers.actions.{LoginState, WithLoginAction, WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
+import models._
 import models.blockchain.ACL
 import models.common.Serializable._
-import models.docusign
 import models.master.{Asset, Negotiation, Trader, Zone}
 import models.masterTransaction.AssetFile
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 
@@ -179,10 +178,7 @@ class AssetController @Inject()(
                         counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
                         result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                       } yield result
-                    }
-                    else {
-                      Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
-                    }
+                    } else Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
 
                     for {
                       validateUsernamePassword <- validateUsernamePassword
@@ -219,7 +215,7 @@ class AssetController @Inject()(
         documentContent match {
           case Some(content) => {
             val billOfLading = content.asInstanceOf[BillOfLading]
-            withUsernameToken.Ok(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
           }
           case None => withUsernameToken.Ok(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
         }
@@ -247,7 +243,7 @@ class AssetController @Inject()(
 
           def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
             if (traderID == negotiation.sellerTraderID) {
-              val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.portOfLoading, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetQuantity, billOfLadingContentData.assetPrice))
+              val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.consigneeTo, billOfLadingContentData.vesselName, billOfLadingContentData.portOfLoading, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetDescription, billOfLadingContentData.assetQuantity, billOfLadingContentData.assetPrice))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(billOfLadingContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)
@@ -294,6 +290,7 @@ class AssetController @Inject()(
           val zoneID = masterZones.Service.tryGetID(loginState.username)
           val asset = masterAssets.Service.tryGet(releaseData.assetID)
           val billOfLading = masterTransactionAssetFiles.Service.tryGet(id = releaseData.assetID, documentType = constants.File.Asset.BILL_OF_LADING)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = releaseData.password)
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
@@ -309,22 +306,30 @@ class AssetController @Inject()(
 
           def getLockedStatus(pegHash: Option[String]): Future[Boolean] = if (pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
 
-          def sendTransaction(seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean, acl: ACL): Future[String] = {
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, seller: Trader, zoneID: String, sellerAddress: String, billOfLading: AssetFile, asset: Asset, lockedStatus: Boolean, acl: ACL): Future[Result] = {
             if (seller.zoneID != zoneID || asset.ownerID != seller.id || !acl.releaseAsset) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (!lockedStatus) throw new BaseException(constants.Response.ASSET_ALREADY_UNLOCKED)
             else if (billOfLading.status.isEmpty) throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
             else if (billOfLading.status.contains(false)) throw new BaseException(constants.Response.BILL_OF_LADING_REJECTED)
             else asset.pegHash match {
               case Some(pegHash) =>
-                transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
-                  entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = pegHash, gas = releaseData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-                  request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = pegHash, mode = transactionMode),
-                  action = transactionsReleaseAsset.Service.post,
-                  onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
-                  onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
-                )
+                if (validateUsernamePassword) {
+                  val ticketID = transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
+                    entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = pegHash, gas = releaseData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
+                    request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = pegHash, mode = transactionMode),
+                    action = transactionsReleaseAsset.Service.post,
+                    onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
+                    onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
+                  )
+                  for {
+                    ticketID <- ticketID
+                    _ <- utilitiesNotification.send(loginState.username, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
+                    _ <- utilitiesNotification.send(seller.accountID, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
+                    result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ZONE_RELEASED_ASSET)))
+                  } yield result
+                } else Future(BadRequest(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form.fill(releaseData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), assetID = asset.id)))
               case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
           }
@@ -332,15 +337,13 @@ class AssetController @Inject()(
           (for {
             zoneID <- zoneID
             asset <- asset
+            validateUsernamePassword <- validateUsernamePassword
             seller <- getTrader(asset.ownerID)
             sellerAddress <- getAddress(seller.accountID)
             acl <- getACL(sellerAddress)
             lockedStatus <- getLockedStatus(asset.pegHash)
             billOfLading <- billOfLading
-            ticketID <- sendTransaction(seller = seller, zoneID = zoneID, sellerAddress = sellerAddress, billOfLading = billOfLading, asset = asset, lockedStatus = lockedStatus, acl = acl)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
-            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.ZONE_RELEASED_ASSET, ticketID)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ZONE_RELEASED_ASSET)))
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, seller = seller, zoneID = zoneID, sellerAddress = sellerAddress, billOfLading = billOfLading, asset = asset, lockedStatus = lockedStatus, acl = acl)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
@@ -360,6 +363,7 @@ class AssetController @Inject()(
         },
         sendAssetData => {
           val negotiation = masterNegotiations.Service.tryGet(sendAssetData.orderID)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendAssetData.password)
 
           def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
@@ -369,37 +373,44 @@ class AssetController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String, negotiation: Negotiation): Future[String] = {
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyer: Trader, buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String, negotiation: Negotiation): Future[Result] = {
             if (asset.ownerID != sellerTraderID || !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendAsset) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
             else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
             else asset.pegHash match {
-              case Some(pegHash) => if (asset.status == constants.Status.Asset.ISSUED) {
-                transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
-                  entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
-                  request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sellerAddress, gas = sendAssetData.gas.toString), to = buyerAddress, password = sendAssetData.password, pegHash = pegHash, mode = transactionMode),
-                  action = transactionsSendAsset.Service.post,
-                  onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
-                  onFailure = blockchainTransactionSendAssets.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
-                )
-              } else throw new BaseException(constants.Response.UNAUTHORIZED)
+              case Some(pegHash) =>
+                if (validateUsernamePassword) {
+                  if (asset.status == constants.Status.Asset.ISSUED) {
+                    val ticketID = transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
+                      entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
+                      blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
+                      request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sellerAddress, gas = sendAssetData.gas.toString), to = buyerAddress, password = sendAssetData.password, pegHash = pegHash, mode = transactionMode),
+                      action = transactionsSendAsset.Service.post,
+                      onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
+                      onFailure = blockchainTransactionSendAssets.Utility.onFailure,
+                      updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
+                    )
+                    for {
+                      ticketID <- ticketID
+                      _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
+                      _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
+                      result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.orderID, successes = Seq(constants.Response.ASSET_SENT)))
+                    } yield result
+                  } else throw new BaseException(constants.Response.UNAUTHORIZED)
+                } else Future(BadRequest(views.html.component.master.sendAsset(views.companion.master.SendAsset.form.fill(sendAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), orderID = negotiation.id)))
               case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
 
           }
 
           (for {
+            validateUsernamePassword <- validateUsernamePassword
             negotiation <- negotiation
             asset <- getAsset(negotiation.assetID)
             assetLocked <- getLockedStatus(asset.pegHash)
             buyer <- getTrader(negotiation.buyerTraderID)
             buyerAddress <- getAddress(buyer.accountID)
-            ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked, sellerTraderID = negotiation.sellerTraderID, negotiation = negotiation)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
-            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
-            result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.orderID, successes = Seq(constants.Response.ASSET_SENT)))
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAddress = buyerAddress, buyer = buyer, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked, sellerTraderID = negotiation.sellerTraderID, negotiation = negotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sendAssetData.orderID, failures = Seq(baseException.failure)))
@@ -421,6 +432,7 @@ class AssetController @Inject()(
         redeemAssetData => {
           val asset = masterAssets.Service.tryGet(redeemAssetData.assetID)
           val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = redeemAssetData.password)
 
           def getLockedStatus(asset: Asset): Future[Boolean] = if (asset.pegHash.isDefined) blockchainAssets.Service.tryGetLockedStatus(asset.pegHash.get) else throw new BaseException(constants.Response.ASSET_NOT_FOUND)
 
@@ -428,20 +440,28 @@ class AssetController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransaction(ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[String] = {
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, zoneAccountID: String, ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[Result] = {
             if (asset.ownerID != trader.id || !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemAsset) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
             else asset.pegHash match {
               case Some(pegHash) =>
-                transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
-                  entity = blockchainTransaction.RedeemAsset(from = ownerAddress, to = zoneAddress, pegHash = pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
-                  request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = ownerAddress, gas = redeemAssetData.gas.toString), to = zoneAddress, password = redeemAssetData.password, pegHash = pegHash, mode = transactionMode),
-                  action = transactionsRedeemAsset.Service.post,
-                  onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
-                  onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
-                )
+                if (validateUsernamePassword) {
+                  val ticketID = transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
+                    entity = blockchainTransaction.RedeemAsset(from = ownerAddress, to = zoneAddress, pegHash = pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
+                    request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = ownerAddress, gas = redeemAssetData.gas.toString), to = zoneAddress, password = redeemAssetData.password, pegHash = pegHash, mode = transactionMode),
+                    action = transactionsRedeemAsset.Service.post,
+                    onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
+                    onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
+                  )
+                  for {
+                    ticketID <- ticketID
+                    _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT, ticketID)
+                    _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT, ticketID)
+                    result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ASSET_REDEEMED)))
+                  } yield result
+                } else Future(BadRequest(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form.fill(redeemAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), assetID = asset.id)))
               case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
 
@@ -449,14 +469,12 @@ class AssetController @Inject()(
 
           (for {
             asset <- asset
+            validateUsernamePassword <- validateUsernamePassword
             trader <- trader
             assetLocked <- getLockedStatus(asset)
             zoneAccountID <- getZoneAccountID(trader.zoneID)
             zoneAddress <- getAddress(zoneAccountID)
-            ticketID <- sendTransaction(ownerAddress = loginState.address, zoneAddress = zoneAddress, asset = asset, assetLocked = assetLocked, trader = trader)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT, ticketID)
-            _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET_SENT, ticketID)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.ASSET_REDEEMED)))
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, zoneAccountID = zoneAccountID, ownerAddress = loginState.address, zoneAddress = zoneAddress, asset = asset, assetLocked = assetLocked, trader = trader)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -465,4 +483,70 @@ class AssetController @Inject()(
       )
   }
 
+  def acceptOrRejectAssetDocumentForm(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+
+      def getAssetFile(assetID: String) = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = documentType)
+
+      (for {
+        negotiation <- negotiation
+        assetFile <- getAssetFile(negotiation.assetID)
+      } yield Ok(views.html.component.master.acceptOrRejectAssetDocument(negotiationID = negotiationID, assetFile = assetFile))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def acceptOrRejectAssetDocument(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.AcceptOrRejectAssetDocument.form.bindFromRequest().fold(
+        formWithErrors => {
+          val negotiation = masterNegotiations.Service.tryGet(formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))
+
+          def getAssetFile(assetID: String) = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+
+          (for {
+            negotiation <- negotiation
+            assetFile <- getAssetFile(negotiation.assetID)
+          } yield BadRequest(views.html.component.master.acceptOrRejectAssetDocument(formWithErrors, negotiation.id, assetFile))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
+        },
+        updateAssetDocumentStatusData => {
+          val negotiation = masterNegotiations.Service.tryGet(updateAssetDocumentStatusData.negotiationID)
+
+          def verifyOrRejectAndSendNotification(negotiation: Negotiation) = if (updateAssetDocumentStatusData.status) {
+            val verify = masterTransactionAssetFiles.Service.accept(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
+            val sellerAccountID = masterTraders.Service.tryGetAccountId(negotiation.sellerTraderID)
+            for {
+              _ <- verify
+              sellerAccountID <- sellerAccountID
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            } yield {}
+          } else {
+            val reject = masterTransactionAssetFiles.Service.reject(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
+            val sellerAccountID = masterTraders.Service.tryGetAccountId(negotiation.sellerTraderID)
+            for {
+              _ <- reject
+              sellerAccountID <- sellerAccountID
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+            } yield {}
+          }
+
+          def getAssetFile(assetID: String): Future[AssetFile] = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = updateAssetDocumentStatusData.documentType)
+
+          (for {
+            negotiation <- negotiation
+            _ <- verifyOrRejectAndSendNotification(negotiation)
+            assetFile <- getAssetFile(negotiation.assetID)
+            result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectAssetDocument(negotiationID = negotiation.id, assetFile = assetFile))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
 }

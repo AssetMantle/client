@@ -4,9 +4,10 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.master.Trader
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +17,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
                                      blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats,
                                      blockchainAccounts: blockchain.Accounts,
                                      masterZones: master.Zones,
+                                     masterAccounts: master.Accounts,
                                      masterTraders: master.Traders,
                                      masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
                                      transactionsRedeemFiat: transactions.RedeemFiat,
@@ -45,34 +47,41 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
         },
         redeemFiatData => {
           val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = redeemFiatData.password)
 
           def zoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
 
           def zoneAddress(zoneAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
-          def sendTransaction(toAddress: String): Future[String] = {
-            if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
-              transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
-                entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
-                request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
-                action = transactionsRedeemFiat.Service.post,
-                onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
-                onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
-              )
-            } else throw new BaseException(constants.Response.UNAUTHORIZED)
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, toAddress: String, trader: Trader): Future[Result] = {
+            if (validateUsernamePassword) {
+              if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
+                val ticketID = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
+                  entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
+                  request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
+                  action = transactionsRedeemFiat.Service.post,
+                  onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
+                  onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
+                )
+                for {
+                  ticketID <- ticketID
+                  _ <- createRedeemFiatRequests(trader.id, ticketID)
+                  result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
+                } yield result
+              } else throw new BaseException(constants.Response.UNAUTHORIZED)
+            } else Future(BadRequest(views.html.component.master.redeemFiat(views.companion.master.RedeemFiat.form.fill(redeemFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
           }
 
           def createRedeemFiatRequests(traderID: String, ticketID: String): Future[String] = masterTransactionRedeemFiatRequests.Service.create(traderID, ticketID, redeemFiatData.redeemAmount)
 
           (for {
             trader <- trader
+            validateUsernamePassword <- validateUsernamePassword
             zoneAccountID <- zoneAccountID(trader.zoneID)
             zoneAddress <- zoneAddress(zoneAccountID)
-            ticketID <- sendTransaction(zoneAddress)
-            _ <- createRedeemFiatRequests(trader.id, ticketID)
-            result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
+            result <- sendTransactionAndGetResult(validateUsernamePassword, zoneAddress, trader)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -96,9 +105,9 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           val markRedeemed = masterTransactionRedeemFiatRequests.Service.markRedeemed(redeemFiatData.id)
           (for {
             _ <- markRedeemed
-          } yield Ok(views.html.transactions(successes = Seq(constants.Response.FIAT_REDEEMED)))
+          } yield Ok(views.html.transactionsView(successes = Seq(constants.Response.FIAT_REDEEMED)))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.transactionsView(failures = Seq(baseException.failure)))
           }
         })
   }

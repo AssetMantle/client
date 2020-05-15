@@ -2,26 +2,20 @@ package models.masterTransaction
 
 import java.sql.Timestamp
 
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Logged
-import models.common.Node
+import models.Trait.HistoryLogged
 import models.common.Serializable.TradeActivityTemplate
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class TradeActivityHistory(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged[TradeActivityHistory] {
+case class TradeActivityHistory(id: String, negotiationID: String, tradeActivityTemplate: TradeActivityTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged {
   val title: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.TITLE_SUFFIX).mkString(".")
 
   val template: String = Seq(constants.TradeActivity.PREFIX, tradeActivityTemplate.template, constants.TradeActivity.MESSAGE_SUFFIX).mkString(".")
-
-  def createLog()(implicit node: Node): TradeActivityHistory = copy(createdBy = Option(node.id), createdOn = Option(new Timestamp(System.currentTimeMillis())), createdOnTimeZone = Option(node.timeZone))
-
-  def updateLog()(implicit node: Node): TradeActivityHistory = copy(updatedBy = Option(node.id), updatedOn = Option(new Timestamp(System.currentTimeMillis())), updatedOnTimeZone = Option(node.timeZone))
 
 }
 
@@ -38,15 +32,13 @@ class TradeActivityHistories @Inject()(protected val databaseConfigProvider: Dat
 
   import databaseConfig.profile.api._
 
-  private implicit val node: Node = Node(id = configuration.get[String]("node.id"), timeZone = configuration.get[String]("node.timeZone"))
-
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
-  case class TradeActivityHistorySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): TradeActivityHistory = TradeActivityHistory(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class TradeActivityHistorySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
+    def deserialize(): TradeActivityHistory = TradeActivityHistory(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
   }
 
-  def serialize(tradeActivityHistory: TradeActivityHistory): TradeActivityHistorySerializable = TradeActivityHistorySerializable(id = tradeActivityHistory.id, negotiationID = tradeActivityHistory.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivityHistory.tradeActivityTemplate).toString, read = tradeActivityHistory.read, createdBy = tradeActivityHistory.createdBy, createdOn = tradeActivityHistory.createdOn, createdOnTimeZone = tradeActivityHistory.createdOnTimeZone, updatedBy = tradeActivityHistory.updatedBy, updatedOn = tradeActivityHistory.updatedOn, updatedOnTimeZone = tradeActivityHistory.updatedOnTimeZone)
+  def serialize(tradeActivityHistory: TradeActivityHistory): TradeActivityHistorySerializable = TradeActivityHistorySerializable(id = tradeActivityHistory.id, negotiationID = tradeActivityHistory.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivityHistory.tradeActivityTemplate).toString, read = tradeActivityHistory.read, createdBy = tradeActivityHistory.createdBy, createdOn = tradeActivityHistory.createdOn, createdOnTimeZone = tradeActivityHistory.createdOnTimeZone, updatedBy = tradeActivityHistory.updatedBy, updatedOn = tradeActivityHistory.updatedOn, updatedOnTimeZone = tradeActivityHistory.updatedOnTimeZone, deletedBy = tradeActivityHistory.deletedBy, deletedOn = tradeActivityHistory.deletedOn, deletedOnTimeZone = tradeActivityHistory.deletedOnTimeZone)
 
   private[models] val tradeActivityHistoryTable = TableQuery[TradeActivityHistoryTable]
 
@@ -56,7 +48,7 @@ class TradeActivityHistories @Inject()(protected val databaseConfigProvider: Dat
 
   private[models] class TradeActivityHistoryTable(tag: Tag) extends Table[TradeActivityHistorySerializable](tag, "TradeActivity_History") {
 
-    def * = (id, negotiationID, tradeActivityTemplateJson, read, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TradeActivityHistorySerializable.tupled, TradeActivityHistorySerializable.unapply)
+    def * = (id, negotiationID, tradeActivityTemplateJson, read, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (TradeActivityHistorySerializable.tupled, TradeActivityHistorySerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -77,6 +69,12 @@ class TradeActivityHistories @Inject()(protected val databaseConfigProvider: Dat
     def updatedOn = column[Timestamp]("updatedOn")
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+
+    def deletedBy = column[String]("deletedBy")
+
+    def deletedOn = column[Timestamp]("deletedOn")
+
+    def deletedOnTimeZone = column[String]("deletedOnTimeZone")
 
   }
 

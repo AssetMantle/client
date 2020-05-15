@@ -8,6 +8,7 @@
     @Messages(constants.View.TRADER): @trader.id
 </legend>
 <hr>
-@commonTextInfo(constants.View.TRADER_ID, trader.id)
-@commonTextInfo(constants.View.NAME, trader.name)
-@commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+<div class="modalInfoBlock">
+    @commonTextInfo(constants.View.TRADER_ID, trader.id)
+    @commonTextInfo(constants.View.ACCOUNT_ID, trader.accountID)
+</div>

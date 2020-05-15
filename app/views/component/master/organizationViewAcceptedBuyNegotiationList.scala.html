@@ -7,17 +7,20 @@
 @import models.master.Organization
 @(buyNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-<div class="SalesQuoteCard">
+<div class="salesQuoteCard">
     @buyNegotiationList.map { buyNegotiation =>
         @commonVerticalInfoBox() {
-            <div class="firstPart salesChild">
+            <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory buy">
+                    <span>@Messages(constants.View.BUY)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == buyNegotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetIcon">
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
-                        <div class="assetIntialData">
+                        <div class="assetInitialData">
                             <p class="assetTitle">@asset.assetType</p>
                             <p class="assetQuantity">@Seq(buyNegotiation.quantity.toString, buyNegotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@buyNegotiation.price</p>
@@ -27,7 +30,7 @@
                 }
                 </div>
             </div>
-            <div class="secondPart salesChild">
+            <div class="salesQuoteCardMiddle salesChild">
 
                 @counterPartyTraderList.find(_.id == buyNegotiation.sellerTraderID) match {
                     case Some(trader) => {
@@ -37,7 +40,7 @@
                             }
                             case None => {}
                         }
-                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER)"> @trader.name</span>
+                        <p><span cmuk-tooltip="@Messages(constants.View.SELLER)"> @trader.accountID</span>
                             <span class="lines">---</span>
                     }
                     case None => {}
@@ -45,7 +48,7 @@
 
                 @traderList.find(_.id == buyNegotiation.buyerTraderID) match {
                     case Some(trader) => {
-                        <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.name</span></>
+                        <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.accountID</span></>
                     }
                     case None => {
                         <span>@buyNegotiation.buyerTraderID</span></p>
@@ -53,12 +56,12 @@
                 }
                 <p><span>@buyNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
                     <span class="lines">---</span>
-                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
                     <span class="lines">---</span>
                     <span>@buyNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
-            <div class="thirdPart salesChild">
-            @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(buyNegotiation.id), 'class -> "secondaryFont")
+            <div class="salesQuoteCardRight salesChild">
+            @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(buyNegotiation.id), 'class -> "cmuk-button buttonPrimary")
             </div>
 
         }

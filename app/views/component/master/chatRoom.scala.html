@@ -4,7 +4,6 @@
 
 @(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-
 @commonInfoBox() {
     <div class="chatList">
     @commonComponentButton("chatWindow", chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1), routes.javascript.ChatController.chatWindow, 'parameters -> s"'${chatID}', 0")

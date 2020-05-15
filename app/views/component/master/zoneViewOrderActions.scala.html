@@ -4,20 +4,33 @@
 @import models.master.Asset
 @import models.master.Trader
 
-@(zoneID: String, traders: Seq[Trader], negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.Order
+@(negotiation: Negotiation, asset: Asset, order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.ORDER_ACTIONS){
 }{
-    @traders.map { trader =>
-        @if(trader.zoneID == zoneID && trader.id == negotiation.buyerTraderID){
-            @commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-        }
-        @if(trader.zoneID == zoneID && trader.id == negotiation.sellerTraderID){
-            @commonFormButton(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-            @if(asset.moderated){
-                @commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")
+    @if(asset.moderated){
+        @negotiation.status match {
+            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED  => {
+                @order match {
+                    case Some(order)=> {
+                        @order.status match {
+                        case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=> {@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
+                        case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING=>{
+                            @commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
+                            @commonFormButton(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
+                        }
+                        case constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING=> {@commonFormButton(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")}
+                        case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING=> {@commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")}
+                        case _=>{}
+                        }
+                    }
+                    case None=>{@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
+                }
             }
+            case _=>{@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
         }
     }
+
 
 }

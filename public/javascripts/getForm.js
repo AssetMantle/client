@@ -7,6 +7,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
             200: function (data) {
                 $(modal).fadeIn(200);
                 $(modalContent).html(data);
+                $('.modalContent').addClass('fadeInEffect');
             },
             500: function (data) {
                 replaceDocument(data.responseText);

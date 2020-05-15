@@ -7,7 +7,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
-import models.master.ZoneKYC
+import models.master.{Email, Mobile, ZoneKYC}
 import models.masterTransaction.ZoneInvitation
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -29,6 +29,8 @@ class AddZoneController @Inject()(
                                    blockchainTransactionAddZones: blockchainTransaction.AddZones,
                                    blockchainAccounts: blockchain.Accounts,
                                    masterZones: master.Zones,
+                                   masterEmails: master.Emails,
+                                   masterMobiles: master.Mobiles,
                                    withUserLoginAction: WithUserLoginAction,
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    withUsernameToken: WithUsernameToken,
@@ -61,7 +63,7 @@ class AddZoneController @Inject()(
           def sendEmailNotificationsAndGetResult(token: String): Future[Result] = {
             utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteZoneData.emailAddress, email = constants.Notification.ZONE_INVITATION, comdexURL, token)
             utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.ZONE_INVITATION_SENT)
-            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+            withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_INVITATION_EMAIL_SENT)))
           }
 
           (for {
@@ -115,12 +117,19 @@ class AddZoneController @Inject()(
           Future(BadRequest(views.html.component.master.addZone(formWithErrors)))
         },
         addZoneData => {
-          val id = masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+          val email = masterEmails.Service.tryGet(loginState.username)
+          val mobile = masterMobiles.Service.tryGet(loginState.username)
+
+          def insertOrUpdate(email: Email, mobile: Mobile) =
+            if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
+            else masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
 
           def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
-            id <- id
+            email <- email
+            mobile <- mobile
+            id <- insertOrUpdate(email, mobile)
             zoneKYCs <- zoneKYCs(id)
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result
@@ -389,7 +398,7 @@ class AddZoneController @Inject()(
     implicit request =>
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          val zoneKYC = masterZoneKYCs.Service.tryGet(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
+          val zoneKYC = masterZoneKYCs.Service.tryGet(id = formWithErrors.data(constants.FormField.ZONE_ID.name), documentType = formWithErrors.data(constants.FormField.DOCUMENT_TYPE.name))
           (for {
             zoneKYC <- zoneKYC
           } yield BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors, zoneKYC))
@@ -400,19 +409,19 @@ class AddZoneController @Inject()(
         updateZoneKYCDocumentStatusData => {
           val verifyOrRejectAndSendNotification = if (updateZoneKYCDocumentStatusData.status) {
             val verify = masterZoneKYCs.Service.verify(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneAccountID = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- verify
-              zoneId <- zoneId
-              _ <- utilitiesNotification.send(zoneId, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              zoneAccountID <- zoneAccountID
+              _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
             } yield {}
           } else {
             val reject = masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
-            val zoneId = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
+            val zoneAccountID = masterZones.Service.tryGetAccountID(updateZoneKYCDocumentStatusData.zoneID)
             for {
               _ <- reject
-              zoneId <- zoneId
-              _ <- utilitiesNotification.send(zoneId, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              zoneAccountID <- zoneAccountID
+              _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             } yield {}
           }
 

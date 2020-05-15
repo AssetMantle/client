@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import models.Trait.Document
+@import views.html.base._
 
 @(document: Document[_])(documentLink: Html = Html(""))(documentContentTop: Html = Html(""))(documentContentBottom: Html = Html(""))(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="centerText documentItem">
@@ -13,9 +14,8 @@
                     case _ => {
                         <a href="@documentLink" target="_blank">
                             <span class="documentIcon">
-                                <svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-doc2")"/></svg>
+                                @commonIcon("doc2")
                             </span>
-                            @Messages(constants.View.TRADES)
                         </a>
                     }
                 }

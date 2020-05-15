@@ -1,16 +1,19 @@
 package models.docusign
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
-case class Envelope(id: String, envelopeID: String, documentType: String, status: String)
+case class Envelope(id: String, envelopeID: String, documentType: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -89,7 +92,7 @@ class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private[models] class EnvelopeTable(tag: Tag) extends Table[Envelope](tag, "Envelope") {
 
-    def * = (id, envelopeID, documentType, status) <> (Envelope.tupled, Envelope.unapply)
+    def * = (id, envelopeID, documentType, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Envelope.tupled, Envelope.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -98,6 +101,18 @@ class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     def documentType = column[String]("documentType")
 
     def status = column[String]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

@@ -5,7 +5,8 @@
 
 @(userAddUBOForm: Form[AddUBO.Data] = AddUBO.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.USER_ADD_UBO, userAddUBOForm) {
-    @commonInputText(userAddUBOForm, constants.FormField.PERSON_NAME)
+    @commonInputText(userAddUBOForm, constants.FormField.PERSON_FIRST_NAME)
+    @commonInputText(userAddUBOForm, constants.FormField.PERSON_LAST_NAME)
     @commonInputDouble(userAddUBOForm, constants.FormField.SHARE_PERCENTAGE)
     @commonInputText(userAddUBOForm, constants.FormField.RELATIONSHIP)
     @commonInputText(userAddUBOForm, constants.FormField.TITLE)

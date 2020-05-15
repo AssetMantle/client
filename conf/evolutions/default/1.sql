@@ -12,7 +12,8 @@ CREATE SCHEMA IF NOT EXISTS WESTERN_UNION
     AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS DOCUSIGN
     AUTHORIZATION "commit";
-
+CREATE SCHEMA IF NOT EXISTS MEMBER_CHECK
+    AUTHORIZATION "commit";
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
 (
@@ -655,16 +656,19 @@ CREATE TABLE IF NOT EXISTS DOCUSIGN."Envelope"
 
 CREATE TABLE IF NOT EXISTS DOCUSIGN."Envelope_History"
 (
-    "id"                VARCHAR NOT NULL,
-    "envelopeID"        VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "status"            VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "envelopeID"        VARCHAR   NOT NULL,
+    "documentType"      VARCHAR   NOT NULL,
+    "status"            VARCHAR   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
+    "deletedBy"         VARCHAR   NOT NULL,
+    "deletedOn"         TIMESTAMP NOT NULL,
+    "deletedOnTimeZone" VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -756,25 +760,28 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
 
 CREATE TABLE IF NOT EXISTS MASTER."Asset_History"
 (
-    "id"                VARCHAR NOT NULL,
-    "ownerID"           VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "ownerID"           VARCHAR   NOT NULL,
     "pegHash"           VARCHAR,
-    "assetType"         VARCHAR NOT NULL,
-    "description"       VARCHAR NOT NULL,
-    "documentHash"      VARCHAR NOT NULL,
-    "quantity"          INT     NOT NULL,
-    "quantityUnit"      VARCHAR NOT NULL,
-    "price"             INT     NOT NULL,
-    "moderated"         BOOLEAN NOT NULL,
+    "assetType"         VARCHAR   NOT NULL,
+    "description"       VARCHAR   NOT NULL,
+    "documentHash"      VARCHAR   NOT NULL,
+    "quantity"          INT       NOT NULL,
+    "quantityUnit"      VARCHAR   NOT NULL,
+    "price"             INT       NOT NULL,
+    "moderated"         BOOLEAN   NOT NULL,
     "takerID"           VARCHAR,
-    "otherDetails"      VARCHAR NOT NULL,
-    "status"            VARCHAR NOT NULL,
+    "otherDetails"      VARCHAR   NOT NULL,
+    "status"            VARCHAR   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
+    "deletedBy"         VARCHAR   NOT NULL,
+    "deletedOn"         TIMESTAMP NOT NULL,
+    "deletedOnTimeZone" VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -879,28 +886,28 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
 
 CREATE TABLE IF NOT EXISTS MASTER."Negotiation_History"
 (
-    "id"                             VARCHAR NOT NULL,
+    "id"                             VARCHAR   NOT NULL,
     "negotiationID"                  VARCHAR,
-    "buyerTraderID"                  VARCHAR NOT NULL,
-    "sellerTraderID"                 VARCHAR NOT NULL,
-    "assetID"                        VARCHAR NOT NULL,
-    "assetDescription"               VARCHAR NOT NULL,
-    "price"                          INT     NOT NULL,
-    "quantity"                       INT     NOT NULL,
-    "quantityUnit"                   VARCHAR NOT NULL,
-    "buyerAcceptedAssetDescription"  BOOLEAN NOT NULL,
-    "buyerAcceptedPrice"             BOOLEAN NOT NULL,
-    "buyerAcceptedQuantity"          BOOLEAN NOT NULL,
-    "assetOtherDetails"              VARCHAR NOT NULL,
-    "buyerAcceptedAssetOtherDetails" BOOLEAN NOT NULL,
+    "buyerTraderID"                  VARCHAR   NOT NULL,
+    "sellerTraderID"                 VARCHAR   NOT NULL,
+    "assetID"                        VARCHAR   NOT NULL,
+    "assetDescription"               VARCHAR   NOT NULL,
+    "price"                          INT       NOT NULL,
+    "quantity"                       INT       NOT NULL,
+    "quantityUnit"                   VARCHAR   NOT NULL,
+    "buyerAcceptedAssetDescription"  BOOLEAN   NOT NULL,
+    "buyerAcceptedPrice"             BOOLEAN   NOT NULL,
+    "buyerAcceptedQuantity"          BOOLEAN   NOT NULL,
+    "assetOtherDetails"              VARCHAR   NOT NULL,
+    "buyerAcceptedAssetOtherDetails" BOOLEAN   NOT NULL,
     "time"                           INT,
-    "paymentTerms"                   VARCHAR NOT NULL,
-    "buyerAcceptedPaymentTerms"      BOOLEAN NOT NULL,
-    "documentList"                   VARCHAR NOT NULL,
-    "buyerAcceptedDocumentList"      BOOLEAN NOT NULL,
+    "paymentTerms"                   VARCHAR   NOT NULL,
+    "buyerAcceptedPaymentTerms"      BOOLEAN   NOT NULL,
+    "documentList"                   VARCHAR   NOT NULL,
+    "buyerAcceptedDocumentList"      BOOLEAN   NOT NULL,
     "physicalDocumentsHandledVia"    VARCHAR,
     "chatID"                         VARCHAR,
-    "status"                         VARCHAR NOT NULL,
+    "status"                         VARCHAR   NOT NULL,
     "comment"                        VARCHAR,
     "createdBy"                      VARCHAR,
     "createdOn"                      TIMESTAMP,
@@ -908,6 +915,9 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation_History"
     "updatedBy"                      VARCHAR,
     "updatedOn"                      TIMESTAMP,
     "updatedOnTimeZone"              VARCHAR,
+    "deletedBy"                      VARCHAR   NOT NULL,
+    "deletedOn"                      TIMESTAMP NOT NULL,
+    "deletedOnTimeZone"              VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -927,15 +937,18 @@ CREATE TABLE IF NOT EXISTS MASTER."Order"
 
 CREATE TABLE IF NOT EXISTS MASTER."Order_History"
 (
-    "id"                VARCHAR NOT NULL,
-    "orderID"           VARCHAR NOT NULL,
-    "status"            VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "orderID"           VARCHAR   NOT NULL,
+    "status"            VARCHAR   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
+    "deletedBy"         VARCHAR   NOT NULL,
+    "deletedOn"         TIMESTAMP NOT NULL,
+    "deletedOnTimeZone" VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -950,7 +963,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "email"              VARCHAR NOT NULL,
     "registeredAddress"  VARCHAR NOT NULL,
     "postalAddress"      VARCHAR NOT NULL,
-    "ubos"               VARCHAR,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     "comment"            VARCHAR,
@@ -960,6 +972,25 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "updatedBy"          VARCHAR,
     "updatedOn"          TIMESTAMP,
     "updatedOnTimeZone"  VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationUBO"
+(
+    "id"                VARCHAR          NOT NULL,
+    "organizationID"    VARCHAR          NOT NULL,
+    "firstName"         VARCHAR          NOT NULL,
+    "lastName"          VARCHAR          NOT NULL,
+    "sharePercentage"   DOUBLE PRECISION NOT NULL,
+    "relationship"      VARCHAR          NOT NULL,
+    "title"             VARCHAR          NOT NULL,
+    "status"            VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
 
@@ -984,22 +1015,6 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationBackgroundCheck"
-(
-    "id"                VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "fileName"          VARCHAR NOT NULL UNIQUE,
-    "file"              BYTEA,
-    "status"            BOOLEAN,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "documentType")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
     "id"                VARCHAR NOT NULL,
@@ -1022,7 +1037,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "zoneID"            VARCHAR NOT NULL,
     "organizationID"    VARCHAR NOT NULL,
     "accountID"         VARCHAR NOT NULL UNIQUE,
-    "name"              VARCHAR NOT NULL,
     "status"            BOOLEAN,
     "comment"           VARCHAR,
     "createdBy"         VARCHAR,
@@ -1032,22 +1046,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS MASTER."TraderBackgroundCheck"
-(
-    "id"                VARCHAR NOT NULL,
-    "documentType"      VARCHAR NOT NULL,
-    "fileName"          VARCHAR NOT NULL UNIQUE,
-    "file"              BYTEA,
-    "status"            BOOLEAN,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
@@ -1118,9 +1116,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile_History"
 (
-    "id"                  VARCHAR NOT NULL,
-    "documentType"        VARCHAR NOT NULL,
-    "fileName"            VARCHAR NOT NULL,
+    "id"                  VARCHAR   NOT NULL,
+    "documentType"        VARCHAR   NOT NULL,
+    "fileName"            VARCHAR   NOT NULL,
     "file"                BYTEA,
     "documentContentJson" VARCHAR,
     "status"              BOOLEAN,
@@ -1130,6 +1128,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile_History"
     "updatedBy"           VARCHAR,
     "updatedOn"           TIMESTAMP,
     "updatedOnTimeZone"   VARCHAR,
+    "deletedBy"           VARCHAR   NOT NULL,
+    "deletedOn"           TIMESTAMP NOT NULL,
+    "deletedOnTimeZone"   VARCHAR   NOT NULL,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -1197,7 +1198,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MessageRead"
 (
     "messageID"         VARCHAR NOT NULL,
     "accountID"         VARCHAR NOT NULL,
-    "readAt"            TIMESTAMP,
+    "read"              BOOLEAN NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1226,9 +1227,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile_History"
 (
-    "id"                  VARCHAR NOT NULL,
-    "documentType"        VARCHAR NOT NULL,
-    "fileName"            VARCHAR NOT NULL,
+    "id"                  VARCHAR   NOT NULL,
+    "documentType"        VARCHAR   NOT NULL,
+    "fileName"            VARCHAR   NOT NULL,
     "file"                BYTEA,
     "documentContentJson" VARCHAR,
     "status"              BOOLEAN,
@@ -1238,6 +1239,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile_History"
     "updatedBy"           VARCHAR,
     "updatedOn"           TIMESTAMP,
     "updatedOnTimeZone"   VARCHAR,
+    "deletedBy"           VARCHAR   NOT NULL,
+    "deletedOn"           TIMESTAMP NOT NULL,
+    "deletedOnTimeZone"   VARCHAR   NOT NULL,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -1266,6 +1270,41 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ReceiveFiat"
+(
+    "id"                VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
+    "orderID"           VARCHAR NOT NULL UNIQUE,
+    "amount"            INT     NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ReceiveFiat_History"
+(
+    "id"                VARCHAR   NOT NULL,
+    "traderID"          VARCHAR   NOT NULL,
+    "orderID"           VARCHAR   NOT NULL,
+    "amount"            INT       NOT NULL,
+    "status"            VARCHAR   NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    "deletedBy"         VARCHAR   NOT NULL,
+    "deletedOn"         TIMESTAMP NOT NULL,
+    "deletedOnTimeZone" VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -1304,18 +1343,21 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendFiatRequest_History"
 (
-    "id"                VARCHAR NOT NULL,
-    "traderID"          VARCHAR NOT NULL,
-    "negotiationID"     VARCHAR NOT NULL,
-    "ticketID"          VARCHAR NOT NULL,
-    "amount"            INT     NOT NULL,
-    "status"            VARCHAR NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "traderID"          VARCHAR   NOT NULL,
+    "negotiationID"     VARCHAR   NOT NULL,
+    "ticketID"          VARCHAR   NOT NULL,
+    "amount"            INT       NOT NULL,
+    "status"            VARCHAR   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
+    "deletedBy"         VARCHAR   NOT NULL,
+    "deletedOn"         TIMESTAMP NOT NULL,
+    "deletedOnTimeZone" VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -1363,16 +1405,19 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity_History"
 (
-    "id"                        VARCHAR NOT NULL,
-    "negotiationID"             VARCHAR NOT NULL,
-    "tradeActivityTemplateJson" VARCHAR NOT NULL,
-    "read"                      BOOLEAN NOT NULL,
+    "id"                        VARCHAR   NOT NULL,
+    "negotiationID"             VARCHAR   NOT NULL,
+    "tradeActivityTemplateJson" VARCHAR   NOT NULL,
+    "read"                      BOOLEAN   NOT NULL,
     "createdBy"                 VARCHAR,
     "createdOn"                 TIMESTAMP,
     "createdOnTimeZone"         VARCHAR,
     "updatedBy"                 VARCHAR,
     "updatedOn"                 TIMESTAMP,
     "updatedOnTimeZone"         VARCHAR,
+    "deletedBy"                 VARCHAR   NOT NULL,
+    "deletedOn"                 TIMESTAMP NOT NULL,
+    "deletedOnTimeZone"         VARCHAR   NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -1422,7 +1467,6 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
     PRIMARY KEY ("id")
 );
 
-
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."RTCB"
 (
     "id"                VARCHAR   NOT NULL,
@@ -1468,6 +1512,97 @@ CREATE TABLE IF NOT EXISTS WESTERN_UNION."SFTPFileTransaction"
     "updatedOnTimeZone"    VARCHAR,
     PRIMARY KEY ("transactionReference")
 );
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "firstName"         VARCHAR NOT NULL,
+    "lastName"          VARCHAR NOT NULL,
+    "scanID"            INT     NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id"),
+    UNIQUE ("firstName", "lastName")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."MemberScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "scanID"            INT     NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "companyName"       VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT     NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."CorporateScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "scanID"            INT     NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScan"
+(
+    "id"                VARCHAR NOT NULL,
+    "vesselName"        VARCHAR NOT NULL UNIQUE,
+    "scanID"            INT     NOT NULL UNIQUE,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
+(
+    "id"                VARCHAR NOT NULL,
+    "scanID"            INT     NOT NULL,
+    "resultID"          INT,
+    "status"            BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
 
 ALTER TABLE BLOCKCHAIN."Account_BC"
     ADD CONSTRAINT Account_BC_Master_Account_username FOREIGN KEY ("username") REFERENCES MASTER."Account" ("id");
@@ -1540,16 +1675,14 @@ ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."OrganizationBackgroundCheck"
-    ADD CONSTRAINT OrganizationBackgroundCheck_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."OrganizationUBO"
+    ADD CONSTRAINT OrganizationUBO_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."TraderBackgroundCheck"
-    ADD CONSTRAINT TraderBackgroundCheck_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
     ADD CONSTRAINT TraderRelation_Trader_fromID FOREIGN KEY ("fromID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."TraderRelation"
@@ -1579,6 +1712,10 @@ ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
     ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."ReceiveFiat"
+    ADD CONSTRAINT ReceiveFiat_Trader_id FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
+ALTER TABLE MASTER_TRANSACTION."ReceiveFiat"
+    ADD CONSTRAINT ReceiveFiat_Order_id FOREIGN KEY ("orderID") REFERENCES MASTER."Order" ("id") ON DELETE CASCADE;
 ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
     ADD CONSTRAINT RedeemFiatRequest_RedeemFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."RedeemFiat" ("ticketID");
 ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
@@ -1600,6 +1737,19 @@ ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
 ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
     ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."MemberScanDecision"
+    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("id") REFERENCES MASTER."OrganizationUBO" ("id");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
+    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
+ALTER TABLE MEMBER_CHECK."VesselScanDecision"
+    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id");
+
 ALTER TABLE WESTERN_UNION."FiatRequest"
     ADD CONSTRAINT FiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE WESTERN_UNION."RTCB"
@@ -1607,15 +1757,420 @@ ALTER TABLE WESTERN_UNION."RTCB"
 
 /*Triggers*/
 
+CREATE OR REPLACE FUNCTION PUBLIC.INSERT_OR_UPDATE_LOG() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        new."createdOn" = CURRENT_TIMESTAMP;;
+        new."createdOnTimeZone" = CURRENT_SETTING('TIMEZONE');;
+        new."createdBy" = CURRENT_USER;;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+--         values of created needs to be set here otherwise insertOrUpdate of slick will omit created details
+        new."createdOn" = old."createdOn";;
+        new."createdOnTimeZone" = old."createdOnTimeZone";;
+        new."createdBy" = old."createdBy";;
+        new."updatedOn" = CURRENT_TIMESTAMP;;
+        new."updatedOnTimeZone" = CURRENT_SETTING('TIMEZONE');;
+        new."updatedBy" = CURRENT_USER;;
+    END IF;;
+    RETURN NEW;;
+END;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER ACCOUNT_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Account_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ACL_ACCOUNT_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."ACLAccount_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ACL_HASH_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."ACLHash_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ASSET_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Asset_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER FIAT_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Fiat_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER NEGOTIATION_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Negotiation_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORDER_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Order_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORGANIZATION_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Organization_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRADER_FEEDBACK_HISTORY_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."TraderFeedbackHistory_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRANSACTION_FEEDBACK_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."TransactionFeedBack_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ZONE_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Zone_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER ADD_ORGANIZATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."AddOrganization"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ADD_ZONE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."AddZone"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER BUYER_EXECUTE_ORDER_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CHANGE_BUYER_BID_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CHANGE_SELLER_BID_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CONFIRM_BUYER_BID_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CONFIRM_SELLER_BID_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ISSUE_ASSET_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IssueAsset"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ISSUE_FIAT_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IssueFiat"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER REDEEM_ASSET_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."RedeemAsset"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER REDEEM_FIAT_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."RedeemFiat"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER RELEASE_ASSET_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."ReleaseAsset"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SELLER_EXECUTE_ORDER_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SEND_ASSET_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SendAsset"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SEND_COIN_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SendCoin"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SEND_FIAT_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SendFiat"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SET_ACL_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SetACL"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SET_BUYER_FEEDBACK_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SetBuyerFeedback"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SET_SELLER_FEEDBACK_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER ENVELOPE_LOG
+    BEFORE INSERT OR UPDATE
+    ON DOCUSIGN."Envelope"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER OAUTH_TOKEN_LOG
+    BEFORE INSERT OR UPDATE
+    ON DOCUSIGN."OAuthToken"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER ACCOUNT_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Account"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ACCOUNT_FILE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."AccountFile"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ACCOUNT_KYC_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."AccountKYC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ASSET_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Asset"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER EMAIL_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Email"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER FIAT_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Fiat"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTIFICATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Identification"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MOBILE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Mobile"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER NEGOTIATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Negotiation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORDER_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Order"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORGANIZATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Organization"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."OrganizationBankAccountDetail"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORGANIZATION_KYC_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."OrganizationKYC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORGANIZATION_UBO_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."OrganizationUBO"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRADER_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Trader"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRADER_RELATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."TraderRelation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ZONE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Zone"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ZONE_KYC_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."ZoneKYC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER ASSET_FILE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."AssetFile"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CHAT_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."Chat"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER EMAIL_OTP_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."EmailOTP"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER FAUCET_REQUEST_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."FaucetRequest"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MESSAGE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."Message"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MESSAGE_READ_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."MessageRead"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER NEGOTIATION_FILE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."NegotiationFile"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER NOTIFICATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."Notification"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER PUSH_NOTIFICATION_TOKEN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."PushNotificationToken"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER RECEIVE_FIAT_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."ReceiveFiat"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER REDEEM_FIAT_REQUEST_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."RedeemFiatRequest"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SEND_FIAT_REQUEST_TOKEN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."SendFiatRequest"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SESSION_TOKEN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."SessionToken"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SMS_OTP_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."SMSOTP"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRADE_ACTIVITY_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."TradeActivity"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRADER_INVITATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."TraderInvitation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ZONE_INVITATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."ZoneInvitation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER MEMBER_SCAN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."MemberScan"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MEMBER_SCAN_DECISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."MemberScanDecision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CORPORATE_SCAN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."CorporateScan"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CORPORATE_SCAN_DECISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."CorporateScanDecision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER VESSEL_SCAN_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."VesselScan"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER VESSEL_SCAN_DECISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MEMBER_CHECK."VesselScanDecision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER FIAT_REQUEST_LOG
+    BEFORE INSERT OR UPDATE
+    ON WESTERN_UNION."FiatRequest"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER RTCB_LOG
+    BEFORE INSERT OR UPDATE
+    ON WESTERN_UNION."RTCB"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SFTP_FILE_TRANSACTION_LOG
+    BEFORE INSERT OR UPDATE
+    ON WESTERN_UNION."SFTPFileTransaction"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
 CREATE OR REPLACE FUNCTION DOCUSIGN.CREATE_ENVELOPE_HISTORY()
     RETURNS trigger
 AS
 $$
 BEGIN
-    INSERT INTO DOCUSIGN."Envelope_History" ( "id", "envelopeID", "documentType", "status", "createdBy", "createdOn"
-                                            , "createdOnTimeZone", "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."envelopeID", old."documentType", old.status, old."createdBy", old."createdOn",
-            old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO DOCUSIGN."Envelope_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1631,14 +2186,7 @@ CREATE OR REPLACE FUNCTION MASTER.CREATE_ASSET_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER."Asset_History" ( "id", "ownerID", "pegHash", "assetType", "description", "documentHash"
-                                       , "quantity", "quantityUnit", "price", "moderated", "takerID", "otherDetails"
-                                       , "status", "createdBy", "createdOn", "createdOnTimeZone", "updatedBy"
-                                       , "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."ownerID", old."pegHash", old."assetType", old.description, old."documentHash", old."quantity",
-            old."quantityUnit", old.price, old.moderated, old."takerID", old."otherDetails", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER."Asset_History" VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1654,22 +2202,8 @@ CREATE OR REPLACE FUNCTION MASTER.CREATE_NEGOTIATION_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER."Negotiation_History" ( "id", "negotiationID", "buyerTraderID", "sellerTraderID", "assetID"
-                                             , "assetDescription", price, quantity, "quantityUnit"
-                                             , "buyerAcceptedAssetDescription", "buyerAcceptedPrice"
-                                             , "buyerAcceptedQuantity", "assetOtherDetails"
-                                             , "buyerAcceptedAssetOtherDetails", "time", "paymentTerms"
-                                             , "buyerAcceptedPaymentTerms", "documentList", "buyerAcceptedDocumentList"
-                                             , "physicalDocumentsHandledVia", "chatID", "status", "comment"
-                                             , "createdBy", "createdOn", "createdOnTimeZone", "updatedBy", "updatedOn"
-                                             , "updatedOnTimeZone")
-    VALUES (old.id, old."negotiationID", old."buyerTraderID", old."sellerTraderID", old."assetID",
-            old."assetDescription", old.price, old."quantity", old."quantityUnit", old."buyerAcceptedAssetDescription",
-            old."buyerAcceptedPrice", old."buyerAcceptedQuantity", old."assetOtherDetails",
-            old."buyerAcceptedAssetOtherDetails", old.time, old."paymentTerms", old."buyerAcceptedPaymentTerms",
-            old."documentList", old."buyerAcceptedDocumentList", old."physicalDocumentsHandledVia", old."chatID",
-            old."status", old."comment", old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER,
-            CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER."Negotiation_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1685,10 +2219,8 @@ CREATE OR REPLACE FUNCTION MASTER.CREATE_ORDER_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER."Order_History" ("id", "orderID", "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                        "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."orderID", old."status", old."createdBy", old."createdOn", old."createdOnTimeZone",
-            CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER."Order_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1704,12 +2236,8 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_ASSET_FILE_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."AssetFile_History" ("id", "documentType", "fileName", "file", "documentContentJson",
-                                                        "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                                        "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."AssetFile_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1725,13 +2253,8 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."NegotiationFile_History" ("id", "documentType", "fileName", "file",
-                                                              "documentContentJson", "status", "createdBy", "createdOn",
-                                                              "createdOnTimeZone", "updatedBy", "updatedOn",
-                                                              "updatedOnTimeZone")
-    VALUES (old.id, old."documentType", old."fileName", old."file", old."documentContentJson", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."NegotiationFile_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1742,17 +2265,30 @@ CREATE TRIGGER DELETE_NEGOTIATION_FILE
     FOR EACH ROW
 EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_NEGOTIATION_FILE_HISTORY();
 
+CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_RECEIVE_FIAT_HISTORY()
+    RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO MASTER_TRANSACTION."ReceiveFiat_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    RETURN old;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER DELETE_RECEIVE_FIAT
+    BEFORE DELETE
+    ON MASTER_TRANSACTION."ReceiveFiat"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_RECEIVE_FIAT_HISTORY();
+
 CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_SEND_FIAT_REQUEST_HISTORY()
     RETURNS trigger
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."SendFiatRequest_History" ("id", "traderID", "negotiationID", "ticketID", "amount",
-                                                              "status", "createdBy", "createdOn", "createdOnTimeZone",
-                                                              "updatedBy", "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."traderID", old."negotiationID", old."ticketID", old."amount", old.status,
-            old."createdBy", old."createdOn", old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP,
-            CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."SendFiatRequest_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1768,11 +2304,8 @@ CREATE OR REPLACE FUNCTION MASTER_TRANSACTION.CREATE_TRADE_ACTIVITY_HISTORY()
 AS
 $$
 BEGIN
-    INSERT INTO MASTER_TRANSACTION."TradeActivity_History" ("id", "negotiationID", "tradeActivityTemplateJson", "read",
-                                                            "createdBy", "createdOn", "createdOnTimeZone", "updatedBy",
-                                                            "updatedOn", "updatedOnTimeZone")
-    VALUES (old.id, old."negotiationID", old."tradeActivityTemplateJson", old."read", old."createdBy", old."createdOn",
-            old."createdOnTimeZone", CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
+    INSERT INTO MASTER_TRANSACTION."TradeActivity_History"
+    VALUES (old.*, CURRENT_USER, CURRENT_TIMESTAMP, CURRENT_SETTING('TIMEZONE'));;
     RETURN old;;
 END ;;
 $$ LANGUAGE PLPGSQL;
@@ -1785,32 +2318,110 @@ EXECUTE PROCEDURE MASTER_TRANSACTION.CREATE_TRADE_ACTIVITY_HISTORY();
 
 /*Initial State*/
 
-INSERT INTO MASTER."Account" ("id", "secretHash", "partialMnemonic", "language", "userType", "createdBy", "createdOn",
-                              "createdOnTimeZone")
+INSERT INTO MASTER."Account" ("id", "secretHash", "partialMnemonic", "language", "userType")
 VALUES ('main',
         '711213004',
         '["fluid","cereal","trash","miracle","casino","menu","true","method","exhaust","pen","fiber","rural","grape","purchase","rather","table","omit","youth","gain","cage","erase"]',
         'en',
-        'GENESIS',
-        CURRENT_USER,
-        CURRENT_TIMESTAMP,
-        CURRENT_SETTING('TIMEZONE'));
+        'GENESIS');
 
-INSERT INTO BLOCKCHAIN."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
-                                     "dirtyBit", "createdBy", "createdOn", "createdOnTimeZone")
+INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
+                                     "dirtyBit")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
-        true,
-        CURRENT_USER,
-        CURRENT_TIMESTAMP,
-        CURRENT_SETTING('TIMEZONE'));
+        true);
 
 # --- !Downs
 
+/*Log Triggers*/
+DROP TRIGGER IF EXISTS ACCOUNT_BC_LOG ON BLOCKCHAIN."Account_BC" CASCADE;
+DROP TRIGGER IF EXISTS ACL_ACCOUNT_BC_LOG ON BLOCKCHAIN."ACLAccount_BC" CASCADE;
+DROP TRIGGER IF EXISTS ACL_HASH_BC_LOG ON BLOCKCHAIN."ACLHash_BC" CASCADE;
+DROP TRIGGER IF EXISTS ASSET_BC_LOG ON BLOCKCHAIN."Asset_BC" CASCADE;
+DROP TRIGGER IF EXISTS FIAT_BC_LOG ON BLOCKCHAIN."Fiat_BC" CASCADE;
+DROP TRIGGER IF EXISTS NEGOTIATION_BC_LOG ON BLOCKCHAIN."Negotiation_BC" CASCADE;
+DROP TRIGGER IF EXISTS ORDER_BC_LOG ON BLOCKCHAIN."Order_BC" CASCADE;
+DROP TRIGGER IF EXISTS ORGANIZATION_BC_LOG ON BLOCKCHAIN."Organization_BC" CASCADE;
+DROP TRIGGER IF EXISTS TRADER_FEEDBACK_HISTORY_BC_LOG ON BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;
+DROP TRIGGER IF EXISTS TRANSACTION_FEEDBACK_BC_LOG ON BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
+DROP TRIGGER IF EXISTS ZONE_BC_LOG ON BLOCKCHAIN."Zone_BC" CASCADE;
+
+DROP TRIGGER IF EXISTS ADD_ORGANIZATION_LOG ON BLOCKCHAIN_TRANSACTION."AddOrganization" CASCADE;
+DROP TRIGGER IF EXISTS ADD_ZONE_LOG ON BLOCKCHAIN_TRANSACTION."AddZone" CASCADE;
+DROP TRIGGER IF EXISTS BUYER_EXECUTE_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder" CASCADE;
+DROP TRIGGER IF EXISTS CHANGE_BUYER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ChangeBuyerBid" CASCADE;
+DROP TRIGGER IF EXISTS CHANGE_SELLER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ChangeSellerBid" CASCADE;
+DROP TRIGGER IF EXISTS CONFIRM_BUYER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid" CASCADE;
+DROP TRIGGER IF EXISTS CONFIRM_SELLER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ConfirmSellerBid" CASCADE;
+DROP TRIGGER IF EXISTS ISSUE_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."IssueAsset" CASCADE;
+DROP TRIGGER IF EXISTS ISSUE_FIAT_LOG ON BLOCKCHAIN_TRANSACTION."IssueFiat" CASCADE;
+DROP TRIGGER IF EXISTS REDEEM_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."RedeemAsset" CASCADE;
+DROP TRIGGER IF EXISTS REDEEM_FIAT_LOG ON BLOCKCHAIN_TRANSACTION."RedeemFiat" CASCADE;
+DROP TRIGGER IF EXISTS RELEASE_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."ReleaseAsset" CASCADE;
+DROP TRIGGER IF EXISTS SELLER_EXECUTE_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."SellerExecuteOrder" CASCADE;
+DROP TRIGGER IF EXISTS SEND_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."SendAsset" CASCADE;
+DROP TRIGGER IF EXISTS SEND_COIN_LOG ON BLOCKCHAIN_TRANSACTION."SendCoin" CASCADE;
+DROP TRIGGER IF EXISTS SEND_FIAT_LOG ON BLOCKCHAIN_TRANSACTION."SendFiat" CASCADE;
+DROP TRIGGER IF EXISTS SET_ACL_LOG ON BLOCKCHAIN_TRANSACTION."SetACL" CASCADE;
+DROP TRIGGER IF EXISTS SET_BUYER_FEEDBACK_LOG ON BLOCKCHAIN_TRANSACTION."SetBuyerFeedback" CASCADE;
+DROP TRIGGER IF EXISTS SET_SELLER_FEEDBACK_LOG ON BLOCKCHAIN_TRANSACTION."SetSellerFeedback" CASCADE;
+
+DROP TRIGGER IF EXISTS ENVELOPE_LOG ON DOCUSIGN."Envelope" CASCADE;
+DROP TRIGGER IF EXISTS OAUTH_TOKEN_LOG ON DOCUSIGN."OAuthToken" CASCADE;
+
+DROP TRIGGER IF EXISTS ACCOUNT_LOG ON MASTER."Account" CASCADE;
+DROP TRIGGER IF EXISTS ACCOUNT_FILE_LOG ON MASTER."AccountFile" CASCADE;
+DROP TRIGGER IF EXISTS ACCOUNT_KYC_LOG ON MASTER."AccountKYC" CASCADE;
+DROP TRIGGER IF EXISTS ASSET_LOG ON MASTER."Asset" CASCADE;
+DROP TRIGGER IF EXISTS EMAIL_LOG ON MASTER."Email" CASCADE;
+DROP TRIGGER IF EXISTS FIAT_LOG ON MASTER."Fiat" CASCADE;
+DROP TRIGGER IF EXISTS IDENTIFICATION_LOG ON MASTER."Identification" CASCADE;
+DROP TRIGGER IF EXISTS MOBILE_LOG ON MASTER."Mobile" CASCADE;
+DROP TRIGGER IF EXISTS NEGOTIATION_LOG ON MASTER."Negotiation" CASCADE;
+DROP TRIGGER IF EXISTS ORDER_LOG ON MASTER."Order" CASCADE;
+DROP TRIGGER IF EXISTS ORGANIZATION_LOG ON MASTER."Organization" CASCADE;
+DROP TRIGGER IF EXISTS ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG ON MASTER."OrganizationBankAccountDetail" CASCADE;
+DROP TRIGGER IF EXISTS ORGANIZATION_KYC_LOG ON MASTER."OrganizationKYC" CASCADE;
+DROP TRIGGER IF EXISTS ORGANIZATION_UBO_LOG ON MASTER."OrganizationUBO" CASCADE;
+DROP TRIGGER IF EXISTS TRADER_LOG ON MASTER."Trader" CASCADE;
+DROP TRIGGER IF EXISTS TRADER_RELATION_LOG ON MASTER."TraderRelation" CASCADE;
+DROP TRIGGER IF EXISTS ZONE_LOG ON MASTER."Zone" CASCADE;
+DROP TRIGGER IF EXISTS ZONE_KYC_LOG ON MASTER."ZoneKYC" CASCADE;
+
+DROP TRIGGER IF EXISTS ASSET_FILE_LOG ON MASTER_TRANSACTION."AssetFile" CASCADE;
+DROP TRIGGER IF EXISTS CHAT_LOG ON MASTER_TRANSACTION."Chat" CASCADE;
+DROP TRIGGER IF EXISTS EMAIL_OTP_LOG ON MASTER_TRANSACTION."EmailOTP" CASCADE;
+DROP TRIGGER IF EXISTS FAUCET_REQUEST_LOG ON MASTER_TRANSACTION."FaucetRequest" CASCADE;
+DROP TRIGGER IF EXISTS MESSAGE_LOG ON MASTER_TRANSACTION."Message" CASCADE;
+DROP TRIGGER IF EXISTS MESSAGE_READ_LOG ON MASTER_TRANSACTION."MessageRead" CASCADE;
+DROP TRIGGER IF EXISTS NEGOTIATION_FILE_LOG ON MASTER_TRANSACTION."NegotiationFile" CASCADE;
+DROP TRIGGER IF EXISTS NOTIFICATION_LOG ON MASTER_TRANSACTION."Notification" CASCADE;
+DROP TRIGGER IF EXISTS PUSH_NOTIFICATION_TOKEN_LOG ON MASTER_TRANSACTION."PushNotificationToken" CASCADE;
+DROP TRIGGER IF EXISTS RECEIVE_FIAT_LOG ON MASTER_TRANSACTION."ReceiveFiat" CASCADE;
+DROP TRIGGER IF EXISTS REDEEM_FIAT_REQUEST_LOG ON MASTER_TRANSACTION."RedeemFiatRequest" CASCADE;
+DROP TRIGGER IF EXISTS SEND_FIAT_REQUEST_TOKEN_LOG ON MASTER_TRANSACTION."SendFiatRequest" CASCADE;
+DROP TRIGGER IF EXISTS SESSION_TOKEN_LOG ON MASTER_TRANSACTION."SessionToken" CASCADE;
+DROP TRIGGER IF EXISTS SMS_OTP_LOG ON MASTER_TRANSACTION."SMSOTP" CASCADE;
+DROP TRIGGER IF EXISTS TRADE_ACTIVITY_LOG ON MASTER_TRANSACTION."TradeActivity" CASCADE;
+DROP TRIGGER IF EXISTS TRADER_INVITATION_LOG ON MASTER_TRANSACTION."TraderInvitation" CASCADE;
+DROP TRIGGER IF EXISTS ZONE_INVITATION_LOG ON MASTER_TRANSACTION."ZoneInvitation" CASCADE;
+
+DROP TRIGGER IF EXISTS MEMBER_SCAN_LOG ON MEMBER_CHECK."MemberCheck" CASCADE;
+DROP TRIGGER IF EXISTS MEMBER_SCAN_DECISION_LOG ON MEMBER_CHECK."MemberCheckDecision" CASCADE;
+DROP TRIGGER IF EXISTS CORPORATE_SCAN_LOG ON MEMBER_CHECK."CorporateCheck" CASCADE;
+DROP TRIGGER IF EXISTS CORPORATE_SCAN_DECISION_LOG ON MEMBER_CHECK."CorporateCheckDecision" CASCADE;
+DROP TRIGGER IF EXISTS VESSEL_SCAN_LOG ON MEMBER_CHECK."VesselCheck" CASCADE;
+DROP TRIGGER IF EXISTS VESSEL_SCAN_DECISION_LOG ON MEMBER_CHECK."VesselCheckDecision" CASCADE;
+
+DROP TRIGGER IF EXISTS FIAT_REQUEST_LOG ON WESTERN_UNION."FiatRequest" CASCADE;
+DROP TRIGGER IF EXISTS RTCB_LOG ON WESTERN_UNION."RTCB" CASCADE;
+DROP TRIGGER IF EXISTS SFTP_FILE_TRANSACTION_LOG ON WESTERN_UNION."SFTPFileTransaction" CASCADE;
+
+/*Delete Triggers*/
 DROP TRIGGER IF EXISTS DELETE_ENVELOPE ON DOCUSIGN."Envelope" CASCADE;
 
 DROP TRIGGER IF EXISTS DELETE_ASSET ON MASTER."Asset" CASCADE;
@@ -1819,6 +2430,7 @@ DROP TRIGGER IF EXISTS DELETE_ORDER ON MASTER."Order" CASCADE;
 
 DROP TRIGGER IF EXISTS DELETE_ASSET_FILE ON MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TRIGGER IF EXISTS DELETE_NEGOTIATION_FILE ON MASTER_TRANSACTION."NegotiationFile" CASCADE;
+DROP TRIGGER IF EXISTS DELETE_RECEIVE_FIAT ON MASTER_TRANSACTION."ReceiveFiat" CASCADE;
 DROP TRIGGER IF EXISTS DELETE_SEND_FIAT_REQUEST ON MASTER_TRANSACTION."SendFiatRequest" CASCADE;
 DROP TRIGGER IF EXISTS DELETE_TRADE_ACTIVITY ON MASTER_TRANSACTION."TradeActivity" CASCADE;
 
@@ -1828,6 +2440,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."ACLHash_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Fiat_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Organization_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
@@ -1871,14 +2484,13 @@ DROP TABLE IF EXISTS MASTER."Negotiation_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order" CASCADE;
 DROP TABLE IF EXISTS MASTER."Order_History" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationUBO" CASCADE;
 DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderBackgroundCheck" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
-DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
+DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile_History" CASCADE;
@@ -1891,6 +2503,8 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."PushNotificationToken" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."ReceiveFiat" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."ReceiveFiat_History" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."RedeemFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SendFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SendFiatRequest_History" CASCADE;
@@ -1905,9 +2519,17 @@ DROP TABLE IF EXISTS WESTERN_UNION."FiatRequest" CASCADE;
 DROP TABLE IF EXISTS WESTERN_UNION."RTCB" CASCADE;
 DROP TABLE IF EXISTS WESTERN_UNION."SFTPFileTransaction" CASCADE;
 
+DROP TABLE IF EXISTS MEMBER_CHECK."MemberScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."MemberScanDecision" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."CorporateScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."CorporateScanDecision" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."VesselScan" CASCADE;
+DROP TABLE IF EXISTS MEMBER_CHECK."VesselScanDecision" CASCADE;
+
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
 DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS DOCUSIGN CASCADE;
 DROP SCHEMA IF EXISTS MASTER CASCADE;
 DROP SCHEMA IF EXISTS MASTER_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS WESTERN_UNION CASCADE;
+DROP SCHEMA IF EXISTS MEMBER_CHECK CASCADE;

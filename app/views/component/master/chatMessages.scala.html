@@ -6,7 +6,7 @@
 
 @(messages: Seq[Message], readMessages: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-<div class="chatMessages">
+<div class="chatMessages" cmuk-scrollspy="target: > li; cls: cmuk-animation-fade; delay: 100; repeat: true">
     <div class="chatMessage"></div>
     @if(messages.nonEmpty) {
         @for(message <- messages.reverse) {

@@ -1,9 +1,10 @@
 package models.master
 
-import java.sql.Date
+import java.sql.{Date, Timestamp}
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import models.common.Serializable.Address
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -11,18 +12,22 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
-import scala.concurrent.{Await, ExecutionContext, Future}
+
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Identification(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: Address, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
+case class Identification(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: Address, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Identifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private[models] val identificationTable = TableQuery[IdentificationTable]
 
-  private def serialize(identification: Identification): IdentificationSerialized = IdentificationSerialized(accountID = identification.accountID, firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = identification.dateOfBirth, idNumber = identification.idNumber, idType = identification.idType, address = Json.toJson(identification.address).toString, completionStatus = identification.completionStatus, verificationStatus = identification.verificationStatus)
+  private def serialize(identification: Identification): IdentificationSerialized = IdentificationSerialized(accountID = identification.accountID, firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = identification.dateOfBirth, idNumber = identification.idNumber, idType = identification.idType, address = Json.toJson(identification.address).toString, completionStatus = identification.completionStatus, verificationStatus = identification.verificationStatus, createdBy = identification.createdBy, createdOn = identification.createdOn, createdOnTimeZone = identification.createdOnTimeZone, updatedBy = identification.updatedBy, updatedOn = identification.updatedOn, updatedOnTimeZone = identification.updatedOnTimeZone)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -88,15 +93,15 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  case class IdentificationSerialized(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
+  case class IdentificationSerialized(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
 
-    def deserialize: Identification = Identification(accountID = accountID, firstName = firstName, lastName = lastName, dateOfBirth = dateOfBirth, idNumber = idNumber, idType = idType, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus)
+    def deserialize: Identification = Identification(accountID = accountID, firstName = firstName, lastName = lastName, dateOfBirth = dateOfBirth, idNumber = idNumber, idType = idType, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
 
   }
 
   private[models] class IdentificationTable(tag: Tag) extends Table[IdentificationSerialized](tag, "Identification") {
 
-    def * = (accountID, firstName, lastName, dateOfBirth, idNumber, idType, address, completionStatus, verificationStatus.?) <> (IdentificationSerialized.tupled, IdentificationSerialized.unapply)
+    def * = (accountID, firstName, lastName, dateOfBirth, idNumber, idType, address, completionStatus, verificationStatus.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentificationSerialized.tupled, IdentificationSerialized.unapply)
 
     def accountID = column[String]("accountID", O.PrimaryKey)
 
@@ -115,6 +120,18 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     def completionStatus = column[Boolean]("completionStatus")
 
     def verificationStatus = column[Boolean]("verificationStatus")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

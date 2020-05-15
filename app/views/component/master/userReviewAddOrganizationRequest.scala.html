@@ -3,12 +3,46 @@
 @import models.master.{Organization, OrganizationKYC, Zone}
 @import play.api.Logger
 @import views.companion.master.UserReviewAddOrganizationRequest
-@import views.html.component.master.userViewOrganization
+@import views.html.component.master.commonDocumentViewer
+
+@import views.html.component.master.streetAddress
 
 @(userReviewAddOrganizationRequestForm: Form[UserReviewAddOrganizationRequest.Data] = UserReviewAddOrganizationRequest.form, organization: Organization, zone: Zone, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST, userReviewAddOrganizationRequestForm) {
-    @userViewOrganization(organizationZone = zone, organization = organization, organizationKYCs = organizationKYCs)
-    <br>
+    @commonInfoBox() {
+        <div class="title cmuk-text-left"> <span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
+        @commonTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
+        @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
+        @commonTextInfo(constants.View.ORGANIZATION_ID, organization.id)
+        @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
+        @commonBooleanInfo(constants.View.REQUEST_COMPLETED, Option(organization.completionStatus))
+        @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
+    }
+    @commonInfoBox() {
+        <div class="title cmuk-text-left"> <span>@Messages(constants.View.ZONE_DETAILS)</span></div>
+        @commonTextInfo(constants.View.ZONE_NAME, zone.name)
+        @commonTextInfo(constants.View.CURRENCY, zone.currency)
+    }
+    @commonInfoBox() {
+        <div class="title cmuk-text-left">@Messages(constants.View.REGISTERED_ADDRESS)</div>
+        @streetAddress(organization.registeredAddress)
+    }
+    @commonInfoBox() {
+        <div class="title cmuk-text-left">@Messages(constants.View.POSTAL_ADDRESS)</div>
+        @streetAddress(organization.postalAddress)
+    }
+    @commonInfoBox() {
+        <div class="title cmuk-text-left">@Messages(constants.View.ORGANIZATION_DOCUMENTS)</div>
+        @for(organizationKYC <- organizationKYCs) {
+            @commonDocumentViewer(organizationKYC) {
+                @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+            } {
+                <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+            } {
+                @commonBooleanInfo(constants.View.STATUS, organizationKYC.status)
+            }
+        }
+    }
     @commonCheckbox(userReviewAddOrganizationRequestForm, constants.FormField.COMPLETION)
     @commonModalButton(constants.View.BACK,routes.javascript.AddOrganizationController.userUploadOrUpdateOrganizationKYCView)
 }

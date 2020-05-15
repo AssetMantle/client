@@ -1,9 +1,13 @@
 package models.blockchainTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.Trait.Logged
+import models.blockchain.Negotiation
 import models.master.{Organization, Trader, Negotiation => masterNegotiation}
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
@@ -14,15 +18,12 @@ import queries.responses.NegotiationResponse
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import java.net.ConnectException
-
-import models.blockchain.Negotiation
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] {
+case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] with Logged {
   def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -47,8 +48,11 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -56,20 +60,14 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
   private[models] val changeBuyerBidTable = TableQuery[ChangeBuyerBidTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(changeBuyerBid: ChangeBuyerBid): Future[String] = db.run((changeBuyerBidTable returning changeBuyerBidTable.map(_.ticketID) += changeBuyerBid).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(changeBuyerBid: ChangeBuyerBid): Future[Int] = db.run(changeBuyerBidTable.insertOrUpdate(changeBuyerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -155,7 +153,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
   private[models] class ChangeBuyerBidTable(tag: Tag) extends Table[ChangeBuyerBid](tag, "ChangeBuyerBid") {
 
-    def * = (from, to, bid, time, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (ChangeBuyerBid.tupled, ChangeBuyerBid.unapply)
+    def * = (from, to, bid, time, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ChangeBuyerBid.tupled, ChangeBuyerBid.unapply)
 
     def from = column[String]("from")
 
@@ -178,6 +176,18 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
@@ -261,8 +271,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
             _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)
             buyerOrganization <- getOrganization(buyer.organizationID)
             sellerOrganization <- getOrganization(seller.organizationID)
-            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, sellerOrganization.name)
-            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.name, buyer.name, buyerOrganization.name)
+            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, sellerOrganization.name)
+            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, buyerOrganization.name)
           } yield ()
         } else {
           for {

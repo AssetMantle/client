@@ -1,16 +1,15 @@
 package controllers
 
-import java.nio.file.Files
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Identification, Organization, Trader}
+import models.master._
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -24,6 +23,7 @@ class SetACLController @Inject()(
                                   masterOrganizations: master.Organizations,
                                   masterIdentifications: master.Identifications,
                                   masterTraders: master.Traders,
+                                  masterMobiles: master.Mobiles,
                                   withZoneLoginAction: WithZoneLoginAction,
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
                                   withUserLoginAction: WithUserLoginAction,
@@ -33,9 +33,7 @@ class SetACLController @Inject()(
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
                                   blockchainAclHashes: blockchain.ACLHashes,
                                   utilitiesNotification: utilities.Notification,
-                                  withUsernameToken: WithUsernameToken,
-                                  masterTraderBackgroundChecks: master.TraderBackgroundChecks
-                                )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                  withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -57,7 +55,6 @@ class SetACLController @Inject()(
           Future(BadRequest(views.html.component.master.inviteTrader(formWithErrors)))
         },
         inviteTraderData => {
-
           val emailAddressAccount: Future[Option[String]] = masterEmails.Service.getEmailAddressAccount(inviteTraderData.emailAddress)
 
           def inviteeUserType(emailAddressAccount: Option[String]): Future[String] = emailAddressAccount match {
@@ -69,21 +66,22 @@ class SetACLController @Inject()(
             if (inviteeUserType != constants.User.USER) {
               Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_TAKEN))))
             } else {
-
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
+              val identification = masterIdentifications.Service.tryGet(loginState.username)
 
               def createInvitation(organization: Organization): Future[String] = masterTransactionTraderInvitations.Service.create(organizationID = organization.id, inviteeEmailAddress = inviteTraderData.emailAddress)
 
-              def sendEmailAndGetResult(organization: Organization): Future[Result] = {
-                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, organization.name, organization.id, comdexURL)
-                withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
+              def sendEmailAndGetResult(organization: Organization, identification: Identification): Future[Result] = {
+                utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = inviteTraderData.emailAddress, email = constants.Notification.TRADER_INVITATION, inviteTraderData.name, Seq(identification.firstName, identification.lastName).mkString(" "), organization.name, comdexURL, organization.id)
+                withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_INVITATION_EMAIL_SENT)))
               }
 
               for {
                 organization <- organization
+                identification <- identification
                 _ <- createInvitation(organization)
                 _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
-                result <- sendEmailAndGetResult(organization)
+                result <- sendEmailAndGetResult(organization, identification)
               } yield result
             }
 
@@ -102,12 +100,19 @@ class SetACLController @Inject()(
 
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+      val trader = masterTraders.Service.getByAccountID(loginState.username)
+
+      def getResult(trader: Option[Trader]) = if (trader.isDefined) {
+        Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(organizationID = trader.get.organizationID))))
+      } else {
+        Ok(views.html.component.master.addTrader())
+      }
+
       (for {
         trader <- trader
-      } yield Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(organizationID = trader.organizationID))))
+      } yield getResult(trader)
         ).recover {
-        case _: BaseException => Ok(views.html.component.master.addTrader())
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -119,13 +124,16 @@ class SetACLController @Inject()(
         },
         addTraderData => {
           val status = masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)
+          val email = masterEmails.Service.tryGet(loginState.username)
+          val mobile = masterMobiles.Service.tryGet(loginState.username)
 
           def insertOrUpdateAndGetResult(status: Boolean): Future[Result] = {
             if (status) {
-              val name = masterIdentifications.Service.tryGetName(loginState.username)
               val organization = masterOrganizations.Service.tryGet(addTraderData.organizationID)
 
-              def addTrader(name: String, zoneID: String): Future[String] = masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username, name)
+              def addTrader(zoneID: String, email: Email, mobile: Mobile): Future[String] =
+                if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
+                else masterTraders.Service.insertOrUpdate(zoneID, addTraderData.organizationID, loginState.username)
 
               val emailAddress: Future[Option[String]] = masterEmails.Service.getVerifiedEmailAddress(loginState.username)
 
@@ -136,9 +144,10 @@ class SetACLController @Inject()(
               }
 
               for {
-                name <- name
                 organization <- organization
-                _ <- addTrader(name = name, zoneID = organization.zoneID)
+                email <- email
+                mobile <- mobile
+                _ <- addTrader(zoneID = organization.zoneID, email = email, mobile = mobile)
                 emailAddress <- emailAddress
                 _ <- updateInvitationStatus(emailAddress)
                 result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
@@ -196,34 +205,34 @@ class SetACLController @Inject()(
           val organizationVerificationStatus = masterOrganizations.Service.tryGetVerificationStatus(verifyTraderData.organizationID)
           val zoneID = masterZones.Service.tryGetID(loginState.username)
           val trader = masterTraders.Service.tryGetByAccountID(verifyTraderData.accountID)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = verifyTraderData.password)
 
-          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterTraderBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
-
-          def processTransactionAndGetResult(trader: Trader, organizationVerificationStatus: Boolean, checkAllBackgroundFilesVerified: Boolean, zoneID: String): Future[Result] = {
-            if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, trader: Trader, organizationVerificationStatus: Boolean, zoneID: String): Future[Result] = {
             if (trader.zoneID != zoneID) throw new BaseException(constants.Response.UNAUTHORIZED)
             if (trader.organizationID != verifyTraderData.organizationID) throw new BaseException(constants.Response.ORGANIZATION_ID_MISMATCH)
             if (organizationVerificationStatus) {
-              val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
-              val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
-              val createACL = blockchainAclHashes.Service.create(acl)
+              if (validateUsernamePassword) {
+                val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
+                val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
+                val createACL = blockchainAclHashes.Service.create(acl)
 
-              def transactionProcess(aclAddress: String, zoneID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
-                entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
-                request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), password = verifyTraderData.password, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
-                action = transactionsSetACL.Service.post,
-                onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
-                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
-              )
+                def sendTransaction(aclAddress: String, zoneID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                  entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                  request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), password = verifyTraderData.password, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
+                  action = transactionsSetACL.Service.post,
+                  onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                  onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+                )
 
-              for {
-                aclAddress <- aclAddress
-                _ <- createACL
-                _ <- transactionProcess(aclAddress = aclAddress, zoneID = trader.zoneID)
-                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
-              } yield result
+                for {
+                  aclAddress <- aclAddress
+                  _ <- createACL
+                  ticketID <- sendTransaction(aclAddress = aclAddress, zoneID = trader.zoneID)
+                  result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
+                } yield result
+              } else Future(BadRequest(views.html.component.master.zoneVerifyTrader(views.companion.master.VerifyTrader.form.fill(verifyTraderData), trader)))
             } else {
               Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ORGANIZATION_NOT_VERIFIED))))
             }
@@ -233,8 +242,8 @@ class SetACLController @Inject()(
             organizationVerificationStatus <- organizationVerificationStatus
             zoneID <- zoneID
             trader <- trader
-            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(trader.id)
-            result <- processTransactionAndGetResult(trader = trader, organizationVerificationStatus = organizationVerificationStatus, checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, zoneID = zoneID)
+            validateUsernamePassword <- validateUsernamePassword
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, trader = trader, organizationVerificationStatus = organizationVerificationStatus, zoneID = zoneID)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -281,42 +290,44 @@ class SetACLController @Inject()(
           val trader = masterTraders.Service.tryGetByAccountID(verifyTraderData.accountID)
           val traderOrganization = masterOrganizations.Service.tryGet(verifyTraderData.organizationID)
           val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = verifyTraderData.password)
 
-          def checkAllBackgroundFilesVerified(id: String): Future[Boolean] = masterTraderBackgroundChecks.Service.checkAllBackgroundFilesVerified(id)
-
-          def getResult(checkAllBackgroundFilesVerified: Boolean, trader: Trader, traderOrganization: Organization, organization: Organization): Future[Result] = {
+          def getResult(validateUsernamePassword: Boolean, trader: Trader, traderOrganization: Organization, organization: Organization): Future[Result] = {
             if (trader.organizationID != verifyTraderData.organizationID || traderOrganization.id != organization.id) throw new BaseException(constants.Response.UNAUTHORIZED)
-            if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_MISMATCH)
-            if (!checkAllBackgroundFilesVerified) throw new BaseException(constants.Response.ALL_TRADER_BACKGROUND_CHECK_FILES_NOT_VERFIED)
-            val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
-            val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
+            else if (trader.zoneID != traderOrganization.zoneID) throw new BaseException(constants.Response.ZONE_ID_MISMATCH)
+            else {
+              if (validateUsernamePassword) {
+                val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
+                val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
 
-            def createACL: Future[String] = blockchainAclHashes.Service.create(acl)
+                def createACL: Future[String] = blockchainAclHashes.Service.create(acl)
 
-            def transactionProcess(aclAddress: String, zoneID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
-              entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
-              request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), password = verifyTraderData.password, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
-              action = transactionsSetACL.Service.post,
-              onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
-              onFailure = blockchainTransactionSetACLs.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
-            )
+                def transactionProcess(aclAddress: String, zoneID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                  entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                  request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), password = verifyTraderData.password, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
+                  action = transactionsSetACL.Service.post,
+                  onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                  onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+                )
 
-            for {
-              aclAddress <- aclAddress
-              _ <- createACL
-              _ <- transactionProcess(aclAddress, trader.zoneID)
-              result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
-            } yield result
+                for {
+                  aclAddress <- aclAddress
+                  _ <- createACL
+                  _ <- transactionProcess(aclAddress, trader.zoneID)
+                  result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
+                } yield result
+              } else Future(BadRequest(views.html.component.master.organizationVerifyTrader(views.companion.master.VerifyTrader.form.fill(verifyTraderData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), trader = trader)))
+            }
           }
 
           (for {
+            validateUsernamePassword <- validateUsernamePassword
             trader <- trader
             traderOrganization <- traderOrganization
             organization <- organization
-            checkAllBackgroundFilesVerified <- checkAllBackgroundFilesVerified(trader.id)
-            result <- getResult(checkAllBackgroundFilesVerified = checkAllBackgroundFilesVerified, trader = trader, traderOrganization = traderOrganization, organization = organization)
+            result <- getResult(validateUsernamePassword = validateUsernamePassword, trader = trader, traderOrganization = traderOrganization, organization = organization)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

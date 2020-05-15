@@ -4,5 +4,6 @@
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data] = VerifyMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.VERIFY_MOBILE_NUMBER, verifyMobileNumberForm) {
+    <p class="formNote">@Messages(constants.View.MOBILE_OTP_NOTE)</p>
     @commonInputText(verifyMobileNumberForm, constants.FormField.OTP)
 }

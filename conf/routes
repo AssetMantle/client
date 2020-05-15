@@ -75,6 +75,9 @@ POST        /asset/release                                                      
 GET         /asset/redeem                                                                         controllers.AssetController.redeemForm(assetID: String)
 POST        /asset/redeem                                                                         controllers.AssetController.redeem
 
+GET         /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocumentForm(negotiationID: String, documentType: String)
+POST        /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocument
+
 GET         /contact                                                                              controllers.ContactController.contact
 
 GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
@@ -305,6 +308,7 @@ GET         /component/zoneViewRedeemFiatRequests                               
 GET         /component/zoneViewPendingRedeemFiatRequestList                                       controllers.ComponentViewController.zoneViewPendingRedeemFiatRequestList()
 GET         /component/zoneViewCompleteRedeemFiatRequestList                                      controllers.ComponentViewController.zoneViewCompleteRedeemFiatRequestList()
 GET         /component/zoneViewFailedRedeemFiatRequestList                                        controllers.ComponentViewController.zoneViewFailedRedeemFiatRequestList()
+GET         /component/zoneViewReceiveFiatList                                                    controllers.ComponentViewController.zoneViewReceiveFiatList()
 GET         /component/organizationViewSendFiatRequests                                           controllers.ComponentViewController.organizationViewSendFiatRequests()
 GET         /component/organizationViewPendingSendFiatRequestList                                 controllers.ComponentViewController.organizationViewPendingSendFiatRequestList()
 GET         /component/organizationViewCompleteSendFiatRequestList                                controllers.ComponentViewController.organizationViewCompleteSendFiatRequestList()
@@ -313,6 +317,7 @@ GET         /component/organizationViewRedeemFiatRequests                       
 GET         /component/organizationViewPendingRedeemFiatRequestList                               controllers.ComponentViewController.organizationViewPendingRedeemFiatRequestList()
 GET         /component/organizationViewCompleteRedeemFiatRequestList                              controllers.ComponentViewController.organizationViewCompleteRedeemFiatRequestList()
 GET         /component/organizationViewFailedRedeemFiatRequestList                                controllers.ComponentViewController.organizationViewFailedRedeemFiatRequestList()
+GET         /component/organizationViewReceiveFiatList                                            controllers.ComponentViewController.organizationViewReceiveFiatList()
 GET         /component/traderViewSendFiatRequests                                                 controllers.ComponentViewController.traderViewSendFiatRequests()
 GET         /component/traderViewPendingSendFiatRequestList                                       controllers.ComponentViewController.traderViewPendingSendFiatRequestList()
 GET         /component/traderViewCompleteSendFiatRequestList                                      controllers.ComponentViewController.traderViewCompleteSendFiatRequestList()
@@ -321,6 +326,7 @@ GET         /component/traderViewRedeemFiatRequests                             
 GET         /component/traderViewPendingRedeemFiatRequestList                                     controllers.ComponentViewController.traderViewPendingRedeemFiatRequestList()
 GET         /component/traderViewCompleteRedeemFiatRequestList                                    controllers.ComponentViewController.traderViewCompleteRedeemFiatRequestList()
 GET         /component/traderViewFailedRedeemFiatRequestList                                      controllers.ComponentViewController.traderViewFailedRedeemFiatRequestList()
+GET         /component/traderViewReceiveFiatList                                                  controllers.ComponentViewController.traderViewReceiveFiatList()
 
 GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
@@ -329,6 +335,9 @@ GET         /component/organizationViewTradeRoomChecks                          
 GET         /component/traderViewTradeRoomFinancialAndChecks                                      controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
+
+GET         /component/traderViewNegotiation                                                      controllers.ComponentViewController.traderViewNegotiation(negotiationID: String)
+GET         /component/organizationViewNegotiation                                                controllers.ComponentViewController.organizationViewNegotiation(negotiationID: String)
 
 GET         /component/traderViewIssueFiatRequestList                                             controllers.ComponentViewController.traderViewIssueFiatRequestList
 GET         /component/organizationViewIssueFiatRequestList                                       controllers.ComponentViewController.organizationViewIssueFiatRequestList
@@ -406,35 +415,38 @@ POST        /master/zoneVerifyTrader                                            
 GET         /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organizationVerifyTrader                                                      controllers.SetACLController.organizationVerifyTrader
 
-GET         /worldCheck/traderBackgroundCheckUpload                                               controllers.BackgroundCheckController.uploadTraderBackgroundCheckFileForm(documentType: String, traderID :String)
-POST        /worldCheck/traderBackgroundCheckUpload/file                                          controllers.BackgroundCheckController.uploadTraderBackgroundCheckFile(documentType: String)
-GET         /worldCheck/traderBackgroundCheckUpload/storeFile                                     controllers.BackgroundCheckController.storeTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
-GET         /worldCheck/traderBackgroundCheckUpdate                                               controllers.BackgroundCheckController.updateTraderBackgroundCheckFileForm(documentType: String, traderID :String)
-GET         /worldCheck/traderBackgroundCheckUpdate/updateFile                                    controllers.BackgroundCheckController.updateTraderBackgroundCheckFile(name: String, documentType: String, traderID: String)
-GET         /worldCheck/uploadOrUpdateTraderBackgroundCheck                                       controllers.BackgroundCheckController.uploadOrUpdateTraderBackgroundCheckFile(traderID: String)
-
-GET         /worldCheck/organizationBackgroundCheckUpload                                         controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
-POST        /worldCheck/organizationBackgroundCheckUpload/file                                    controllers.BackgroundCheckController.uploadOrganizationBackgroundCheckFile(documentType: String)
-GET         /worldCheck/organizationBackgroundCheckUpload/storeFile                               controllers.BackgroundCheckController.storeOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
-GET         /worldCheck/organizationBackgroundCheckUpdate                                         controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFileForm(documentType: String, organizationID :String)
-GET         /worldCheck/organizationBackgroundCheckUpdate/updateFile                              controllers.BackgroundCheckController.updateOrganizationBackgroundCheckFile(name: String, documentType: String, organizationID :String)
-GET         /worldCheck/uploadOrUpdateOrganizationBackgroundCheck                                 controllers.BackgroundCheckController.uploadOrUpdateOrganizationBackgroundCheckFile(organizationID: String)
-
-GET         /worldCheck/zoneAccessedTraderBackgroundCheckFile                                     controllers.BackgroundCheckController.zoneAccessedTraderBackgroundCheckFile(traderID: String, fileName: String, documentType: String)
-GET         /worldCheck/zoneAccessedOrganizationBackgroundCheckFile                               controllers.BackgroundCheckController.zoneAccessedOrganizationBackgroundCheckFile(organizationID: String, fileName: String, documentType: String)
+GET         /background/memberScan                                                                controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
+POST        /background/memberScan                                                                controllers.BackgroundCheckController.memberScan
+GET         /background/memberScanResult                                                          controllers.BackgroundCheckController.memberScanResult(resultID: Int)
+GET         /background/memberScanResultDecision                                                  controllers.BackgroundCheckController.memberScanResultDecisionForm(resultID: Int)
+POST        /background/memberScanResultDecision                                                  controllers.BackgroundCheckController.memberScanResultDecision
+GET         /background/addUBO                                                                    controllers.BackgroundCheckController.addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addUBO                                                                    controllers.BackgroundCheckController.addUBOMemberCheck
+GET         /background/corporateScan                                                             controllers.BackgroundCheckController.corporateScanForm(organizationID: String, companyName: String)
+POST        /background/corporateScan                                                             controllers.BackgroundCheckController.corporateScan
+GET         /background/corporateScanResult                                                       controllers.BackgroundCheckController.corporateScanResult(resultID: Int)
+GET         /background/corporateScanResultDecision                                               controllers.BackgroundCheckController.corporateScanResultDecisionForm(resultID: Int)
+POST        /background/corporateScanResultDecision                                               controllers.BackgroundCheckController.corporateScanResultDecision
+GET         /background/addOrganization                                                           controllers.BackgroundCheckController.addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addOrganization                                                           controllers.BackgroundCheckController.addOrganizationMemberCheck
+GET         /background/vesselScan                                                                controllers.BackgroundCheckController.vesselScanForm(assetID: String, vesselName: String)
+POST        /background/vesselScan                                                                controllers.BackgroundCheckController.vesselScan
+GET         /background/vesselScanResult                                                          controllers.BackgroundCheckController.vesselScanResult(resultID: Int)
+GET         /background/vesselScanResultDecision                                                  controllers.BackgroundCheckController.vesselScanResultDecisionForm(resultID: Int)
+POST        /background/vesselScanResultDecision                                                  controllers.BackgroundCheckController.vesselScanResultDecision
+GET         /background/addAsset                                                                  controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addAsset                                                                  controllers.BackgroundCheckController.addAssetMemberCheck
 
 GET         /master/addOrganization                                                               controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                                               controllers.AddOrganizationController.addOrganization
 
-GET         /master/userAddOrUpdateUBOs                                                           controllers.AddOrganizationController.userAddOrUpdateUBOsForm
-POST        /master/userAddOrUpdateUBOs                                                           controllers.AddOrganizationController.userAddOrUpdateUBOs
 GET         /master/userAddUBO                                                                    controllers.AddOrganizationController.userAddUBOForm
 POST        /master/userAddUBO                                                                    controllers.AddOrganizationController.userAddUBO
 GET         /master/addUBO                                                                        controllers.AddOrganizationController.addUBOForm
 POST        /master/addUBO                                                                        controllers.AddOrganizationController.addUBO
-GET         /master/userDeleteUBO                                                                 controllers.AddOrganizationController.userDeleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String)
+GET         /master/userDeleteUBO                                                                 controllers.AddOrganizationController.userDeleteUBOForm(id: String)
 POST        /master/userDeleteUBO                                                                 controllers.AddOrganizationController.userDeleteUBO
-GET         /master/deleteUBO                                                                     controllers.AddOrganizationController.deleteUBOForm(personName: String, sharePercentage: Double, relationship: String, title: String)
+GET         /master/deleteUBO                                                                     controllers.AddOrganizationController.deleteUBOForm(id: String)
 POST        /master/deleteUBO                                                                     controllers.AddOrganizationController.deleteUBO
 
 GET         /master/addOrUpdateOrganizationBankAccount                                            controllers.AddOrganizationController.addOrUpdateOrganizationBankAccountForm

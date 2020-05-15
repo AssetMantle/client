@@ -28,7 +28,6 @@ object Form {
 
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization(), routes.javascript.AddOrganizationController.addOrganizationForm)
-  val USER_ADD_OR_UPDATE_UBOS = new Form("USER_ADD_OR_UPDATE_UBOS", routes.AddOrganizationController.userAddOrUpdateUBOs(), routes.javascript.AddOrganizationController.userAddOrUpdateUBOsForm)
   val DELETE_UBO = new Form("DELETE_UBO", routes.AddOrganizationController.deleteUBO(), routes.javascript.AddOrganizationController.deleteUBOForm)
   val USER_DELETE_UBO = new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO(), routes.javascript.AddOrganizationController.userDeleteUBOForm)
   val ADD_UBO = new Form("ADD_UBO", routes.AddOrganizationController.addUBO(), routes.javascript.AddOrganizationController.addUBOForm)
@@ -46,6 +45,7 @@ object Form {
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.AssetController.release(), routes.javascript.AssetController.releaseForm)
   val SEND_ASSET = new Form("SEND_ASSET", routes.AssetController.send(), routes.javascript.AssetController.sendForm)
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.AssetController.redeem(), routes.javascript.AssetController.redeemForm)
+  val ACCEPT_OR_REJECT_ASSET_DOCUMENT = new Form("ACCEPT_OR_REJECT_ASSET_DOCUMENT", routes.AssetController.acceptOrRejectAssetDocument(), routes.javascript.AssetController.acceptOrRejectAssetDocumentForm)
 
   //AddZoneController
   val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)
@@ -55,6 +55,18 @@ object Form {
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest(), routes.javascript.AddZoneController.rejectVerifyZoneRequestForm)
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
+
+  //BackgroundCheckController
+  val MEMBER_CHECK_MEMBER_SCAN = new Form("MEMBER_CHECK_MEMBER_SCAN", routes.BackgroundCheckController.memberScan(), routes.javascript.BackgroundCheckController.memberScanForm)
+  val MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION", routes.BackgroundCheckController.memberScanResultDecision(), routes.javascript.BackgroundCheckController.memberScanResultDecisionForm)
+  val ADD_UBO_MEMBER_CHECK = new Form("ADD_UBO_MEMBER_CHECK", routes.BackgroundCheckController.addUBOMemberCheck(), routes.javascript.BackgroundCheckController.addUBOMemberCheckForm)
+  val MEMBER_CHECK_CORPORATE_SCAN = new Form("MEMBER_CHECK_CORPORATE_SCAN", routes.BackgroundCheckController.corporateScan(), routes.javascript.BackgroundCheckController.corporateScanForm)
+  val MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION", routes.BackgroundCheckController.corporateScanResultDecision(), routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm)
+  val ADD_ORGANIZATION_MEMBER_CHECK = new Form("ADD_ORGANIZATION_MEMBER_CHECK", routes.BackgroundCheckController.addOrganizationMemberCheck(), routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm)
+  val MEMBER_CHECK_VESSEL_SCAN = new Form("MEMBER_CHECK_VESSEL_SCAN", routes.BackgroundCheckController.vesselScan(), routes.javascript.BackgroundCheckController.vesselScanForm)
+  val MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION", routes.BackgroundCheckController.vesselScanResultDecision(), routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm)
+  val ADD_ASSET_MEMBER_CHECK = new Form("ADD_ASSET_MEMBER_CHECK", routes.BackgroundCheckController.addAssetMemberCheck(), routes.javascript.BackgroundCheckController.addAssetMemberCheckForm)
+
 
   //ChangeBuyerBidController
   val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid(), routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm)

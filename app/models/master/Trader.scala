@@ -1,17 +1,19 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, status: Option[Boolean] = None, comment: Option[String] = None)
+case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, status: Option[Boolean] = None, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -106,15 +108,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getTraderNameByID(id: String): Future[String] = db.run(traderTable.filter(_.id === id).map(_.name).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getByAccountID(accountID: String): Future[Option[Trader]] = db.run(traderTable.filter(_.accountID === accountID).result.headOption)
+  private def getTraderByAccountID(accountID: String): Future[Option[Trader]] = db.run(traderTable.filter(_.accountID === accountID).result.headOption)
 
   private def tryGetStatusById(id: String): Future[Option[Boolean]] = db.run(traderTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
@@ -166,7 +160,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private[models] class TraderTable(tag: Tag) extends Table[Trader](tag, "Trader") {
 
-    def * = (id, zoneID, organizationID, accountID, name, status.?, comment.?) <> (Trader.tupled, Trader.unapply)
+    def * = (id, zoneID, organizationID, accountID, status.?, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Trader.tupled, Trader.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -176,22 +170,32 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def accountID = column[String]("accountID")
 
-    def name = column[String]("name")
-
     def status = column[Boolean]("status")
 
     def comment = column[String]("comment")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 
   object Service {
 
-    def create(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name))
+    def create(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID))
 
-    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = {
+    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String): Future[String] = {
       val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
 
-      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
+      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID))
 
       for {
         id <- id
@@ -214,8 +218,6 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def tryGetOrganizationIDs(ids: Seq[String]): Future[Seq[String]] = getOrganizationIDsByIDs(ids)
 
     def tryGetOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
-
-    def tryGetTraderName(id: String): Future[String] = getTraderNameByID(id)
 
     def tryGetZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
@@ -247,7 +249,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
 
-    def getOrNoneByAccountID(accountID: String): Future[Option[Trader]] = getByAccountID(accountID)
+    def getByAccountID(accountID: String): Future[Option[Trader]] = getTraderByAccountID(accountID)
 
     def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = getTradersByTraderIDs(traderIDs)
 

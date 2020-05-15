@@ -1,7 +1,10 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class SMSOTP(id: String, secretHash: String)
+case class SMSOTP(id: String, secretHash: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -18,6 +21,7 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_SMS_OTP
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -62,11 +66,23 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private[models] class SMSOTPTable(tag: Tag) extends Table[SMSOTP](tag, "SMSOTP") {
 
-    def * = (id, secretHash) <> (SMSOTP.tupled, SMSOTP.unapply)
+    def * = (id, secretHash, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SMSOTP.tupled, SMSOTP.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {

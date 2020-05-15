@@ -1,11 +1,14 @@
 package models.blockchainTransaction
 
+import java.sql.Timestamp
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.master.{Asset => masterAsset, Negotiation, Organization, Trader}
-import models.{blockchain, master, masterTransaction}
+import models.Trait.Logged
+import models.master.{Negotiation, Organization, Trader, Asset => masterAsset}
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -16,10 +19,10 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, gas: Int, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueAsset] {
+case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, gas: Int, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueAsset] with Logged {
   def mutateTicketID(newTicketID: String): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, gas = gas, takerAddress = takerAddress, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -64,14 +67,6 @@ class IssueAssets @Inject()(
   private def add(issueAsset: IssueAsset): Future[String] = db.run((issueAssetTable returning issueAssetTable.map(_.ticketID) += issueAsset).asTry).map {
     case Success(result) =>
       result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def upsert(issueAsset: IssueAsset): Future[Int] = db.run(issueAssetTable.insertOrUpdate(issueAsset).asTry).map {
-    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -156,7 +151,7 @@ class IssueAssets @Inject()(
 
   private[models] class IssueAssetTable(tag: Tag) extends Table[IssueAsset](tag, "IssueAsset") {
 
-    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, gas, takerAddress.?, status.?, txHash.?, ticketID, mode, code.?) <> (IssueAsset.tupled, IssueAsset.unapply)
+    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, gas, takerAddress.?, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IssueAsset.tupled, IssueAsset.unapply)
 
     def from = column[String]("from")
 
@@ -187,6 +182,18 @@ class IssueAssets @Inject()(
     def mode = column[String]("mode")
 
     def code = column[String]("code")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {
@@ -272,8 +279,8 @@ class IssueAssets @Inject()(
         fromAccountID <- getAccountIDByAddress(issueAsset.from)
         traderOrganization <- getOrganization(seller.organizationID)
         _ <- utilitiesNotification.send(ownerAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ASSET_ISSUED, blockResponse.txhash, seller.name, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-        _ <- if (fromAccountID != ownerAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ASSET_ISSUED, blockResponse.txhash, traderOrganization.name, seller.name, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString) else Future(None)
+        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ASSET_ISSUED, blockResponse.txhash, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+        _ <- if (fromAccountID != ownerAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ASSET_ISSUED, blockResponse.txhash, traderOrganization.name, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString) else Future(None)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -331,7 +338,7 @@ class IssueAssets @Inject()(
         fromAccountID <- getAccountIDByAddress(issueAsset.from)
         traderOrganization <- getOrganization(seller.organizationID)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.ISSUE_ASSET_REQUEST_FAILED, message, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
-        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, seller.name, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
         _ <- if (fromAccountID != toAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ISSUE_ASSET_REQUEST_FAILED, message, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString) else Future(None)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

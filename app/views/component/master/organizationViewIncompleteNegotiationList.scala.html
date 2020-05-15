@@ -6,17 +6,20 @@
 
 @import models.master.Organization
 @(incompleteNegotiationList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
- <div class="SalesQuoteCard">
+ <div class="salesQuoteCard">
     @incompleteNegotiationList.map { incompleteNegotiation =>
         @commonVerticalInfoBox(){
-            <div class="firstPart salesChild">
+            <div class="salesQuoteCardLeft salesChild">
+                <div class="salesQuoteCategory sell">
+                    <span>@Messages(constants.View.SELL)</span>
+                </div>
                 <div class="content">
                 @assetList.find(_.id == incompleteNegotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetIcon">
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
-                        <div class="assetIntialData">
+                        <div class="assetInitialData">
                             <p class="assetTitle">@asset.assetType</p>
                             <p class="assetQuantity">@Seq(incompleteNegotiation.quantity.toString, incompleteNegotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@incompleteNegotiation.price</p>
@@ -26,7 +29,7 @@
                 }
                 </div>
             </div>
-            <div class="secondPart salesChild">
+            <div class="salesQuoteCardMiddle salesChild">
                 @counterPartyTraderList.find(_.id == incompleteNegotiation.buyerTraderID) match {
                     case Some(trader) => {
                         @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -35,7 +38,7 @@
                             }
                             case None => {}
                         }
-                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_NAME)"> @trader.name</span>
+                        <p><span cmuk-tooltip="@Messages(constants.View.BUYER)"> @trader.accountID</span>
                             <span class="lines">---</span>
                     }
                     case None => {}
@@ -43,7 +46,7 @@
 
                 @traderList.find(_.id == incompleteNegotiation.sellerTraderID) match {
                     case Some(trader) => {
-                        <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_NAME)">@trader.name</span> </p>
+                        <span cmuk-tooltip="@Messages(constants.View.SELLER)">@trader.accountID</span> </p>
                     }
                     case None => {
                         <span>@incompleteNegotiation.buyerTraderID</span></p>
@@ -51,12 +54,13 @@
                 }
                 <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
                     <span class="lines">---</span>
-                    <span class="arrowIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-rounded-right-arrow")"/></svg></span>
+                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
                     <span class="lines">---</span>
                     <span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
-            <div class="thirdPart salesChild">
-                <span>@incompleteNegotiation.status</span>
+            <div class="salesQuoteCardRight salesChild">
+                <span>@Messages(incompleteNegotiation.status)</span>
+                @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${incompleteNegotiation.id}'")
             </div>
 
         }

@@ -1,7 +1,10 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class EmailOTP(id: String, secretHash: String)
+case class EmailOTP(id: String, secretHash: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -63,11 +66,23 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private[models] class EmailOTPTable(tag: Tag) extends Table[EmailOTP](tag, "EmailOTP") {
 
-    def * = (id, secretHash) <> (EmailOTP.tupled, EmailOTP.unapply)
+    def * = (id, secretHash, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (EmailOTP.tupled, EmailOTP.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 

@@ -27,13 +27,13 @@
         <div class="hiddenLabel sendFormField">
         @commonInputText(sendMessageForm, constants.FormField.TEXT)
             <button type="button" class="cmuk-button sendIconButton" onclick="submitChat(this)">
-                <span class="sendChatIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#icon-telegram")"/></svg></span>
+                <span class="sendChatIcon">@commonIcon("telegram")</span>
             </button>
         </div>
         @commonInputText(sendMessageForm, constants.FormField.REPLY_TO_MESSAGE,'containerDivClass -> "hidden", 'required -> false)
         </div>
         @if(sendMessageForm.hasGlobalErrors) {
-            <ul class="signupErrorList">
+            <ul class="signUpErrorList">
             @for(error <- sendMessageForm.globalErrors) {
                 <li class="error">@error.format</li>
             }

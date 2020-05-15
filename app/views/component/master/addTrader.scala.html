@@ -4,6 +4,6 @@
 
 @(addTraderForm: Form[AddTrader.Data] = AddTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_TRADER, addTraderForm) {
+    <p><span class="infoIcon" cmuk-tooltip="title:@Messages(constants.View.REGISTER_TO_ORGANIZATION_NOTE);pos:bottom"> @commonIcon("info")</span></p>
     @commonInputText(addTraderForm, constants.FormField.ORGANIZATION_ID)
-    @commonFormButton(constants.Form.ADD_ORGANIZATION)
 }

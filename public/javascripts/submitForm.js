@@ -1,4 +1,5 @@
-function submitForm(source, target = '#commonModalContent') {
+function submitForm(source, targetID = 'commonModalContent') {
+    const target = '#'+targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);

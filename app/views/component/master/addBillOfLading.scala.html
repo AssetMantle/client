@@ -6,6 +6,8 @@
 @commonForm(constants.Form.ADD_BILL_OF_LADING, addBillOfLadingForm) {
     @commonInputText(addBillOfLadingForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden")
     @commonInputText(addBillOfLadingForm, constants.FormField.BILL_OF_LADING_NUMBER)
+    @commonInputText(addBillOfLadingForm, constants.FormField.CONSIGNEE_TO)
+    @commonInputText(addBillOfLadingForm, constants.FormField.VESSEL_NAME)
     @commonInputText(addBillOfLadingForm, constants.FormField.PORT_OF_LOADING)
     @commonInputText(addBillOfLadingForm, constants.FormField.SHIPPER_NAME)
     @commonInputText(addBillOfLadingForm, constants.FormField.SHIPPER_ADDRESS)
@@ -13,6 +15,7 @@
     @commonInputText(addBillOfLadingForm, constants.FormField.NOTIFY_PARTY_ADDRESS)
     @commonInputDate(addBillOfLadingForm, constants.FormField.SHIPMENT_DATE)
     @commonSelect(addBillOfLadingForm, constants.FormField.DELIVERY_TERM)
+    @commonInputText(addBillOfLadingForm, constants.FormField.ASSET_DESCRIPTION)
     @commonInputInt(addBillOfLadingForm, constants.FormField.ASSET_QUANTITY)
     @commonInputInt(addBillOfLadingForm, constants.FormField.ASSET_PRICE)
 }

@@ -1,7 +1,10 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Mobile(id: String, mobileNumber: String, status: Boolean = false)
+case class Mobile(id: String, mobileNumber: String, status: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -105,13 +108,25 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private[models] class MobileTable(tag: Tag) extends Table[Mobile](tag, "Mobile") {
 
-    def * = (id, mobileNumber, status) <> (Mobile.tupled, Mobile.unapply)
+    def * = (id, mobileNumber, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Mobile.tupled, Mobile.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def mobileNumber = column[String]("mobileNumber")
 
     def status = column[Boolean]("status")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
   }
 
@@ -126,12 +141,13 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def unVerifyOldMobileNumbers(mobileNumber: String): Future[Int] = updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber, status = false)
 
     def verifyMobileNumber(id: String): Future[Int] = {
-      def updateNumber = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
-      for{
+      def updateNumber(): Future[Int] = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
+
+      for {
         mobile <- tryGet(id)
         _ <- unVerifyOldMobileNumbers(mobile.mobileNumber)
-        updateNumber <- updateNumber
-      } yield  updateNumber
+        updateNumber <- updateNumber()
+      } yield updateNumber
     }
 
     def tryGetVerifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = true)

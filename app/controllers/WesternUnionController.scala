@@ -119,7 +119,6 @@ class WesternUnionController @Inject()(
         issueFiatRequestData => {
           val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
           val traderDetails = masterTraders.Service.tryGetByAccountID(loginState.username)
-          val identification = masterIdentifications.Service.tryGet(loginState.username)
 
           def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
@@ -129,12 +128,11 @@ class WesternUnionController @Inject()(
           (for {
             emailAddress <- emailAddress
             traderDetails <- traderDetails
-            identification <- identification
             transactionID <- create(traderDetails.id)
             organizationDetails <- organizationDetails(traderDetails.organizationID)
           } yield {
             val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(transactionID),
-              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(identification.firstName), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(identification.lastName),
+              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id),
               Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
               Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),

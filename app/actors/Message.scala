@@ -31,11 +31,15 @@ object Message {
 
   implicit val orderWrites: OWrites[Order] = Json.writes[Order]
 
-  case class Negotiation(id: Option[String] = None)
+  case class Negotiation(id: String)
 
   implicit val negotiationWrites: OWrites[Negotiation] = Json.writes[Negotiation]
 
   //For CHAT/ MESSAGE -> Takes message directly from masterTransaction.Message.scala
+
+  case class KeepAlive(ping: String = constants.Comet.PING)
+
+  implicit val keepAliveWrites: OWrites[KeepAlive] = Json.writes[KeepAlive]
 
   case class UpdateUsernameActorRef(username: String, actorRef: ActorRef)
 

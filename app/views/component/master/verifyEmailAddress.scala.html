@@ -4,5 +4,6 @@
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data] = VerifyEmailAddress.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.VERIFY_EMAIL_ADDRESS, verifyEmailAddressForm) {
+    <p class="formNote">@Messages(constants.View.EMAIL_OTP_NOTE)</p>
     @commonInputText(verifyEmailAddressForm, constants.FormField.OTP)
 }
