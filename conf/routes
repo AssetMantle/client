@@ -28,6 +28,7 @@ GET         /trades                                                             
 GET         /transactions                                                                         controllers.ViewController.transactions
 GET         /dashboard                                                                            controllers.ViewController.dashboard
 GET         /tradeRoom                                                                            controllers.ViewController.tradeRoom(id: String)
+GET         /tradeRoomCompleted                                                                   controllers.ViewController.tradeRoomCompleted(id: String)
 
 GET         /profilePicture                                                                       controllers.ComponentViewController.profilePicture
 
@@ -141,6 +142,7 @@ GET         /negotiation/sellerConfirm                                          
 POST        /negotiation/sellerConfirm                                                            controllers.NegotiationController.sellerConfirm
 
 GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
+GET         /negotiation/completedTradeActivityMessages                                           controllers.NegotiationController.completedTradeActivityMessages(negotiationID: String, pageNumber: Int)
 
 GET         /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
 POST        /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSigned
@@ -189,6 +191,7 @@ GET         /master/queryConfigurationVariable:query                            
 GET         /component/traderViewAcceptedNegotiationList                                          controllers.ComponentViewController.traderViewAcceptedNegotiationList
 GET         /component/traderViewAcceptedBuyNegotiationList                                       controllers.ComponentViewController.traderViewAcceptedBuyNegotiationList
 GET         /component/traderViewAcceptedSellNegotiationList                                      controllers.ComponentViewController.traderViewAcceptedSellNegotiationList
+GET         /component/traderViewCompletedNegotiationList                                         controllers.ComponentViewController.traderViewCompletedNegotiationList
 
 GET         /component/traderViewSentReceivedIncompleteRejectedFailedNegotiationList              controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList
 GET         /component/traderViewSentNegotiationRequestList                                       controllers.ComponentViewController.traderViewSentNegotiationRequestList
@@ -200,6 +203,7 @@ GET         /component/identification                                           
 GET         /component/organizationViewAcceptedNegotiationList                                    controllers.ComponentViewController.organizationViewAcceptedNegotiationList
 GET         /component/organizationViewAcceptedBuyNegotiationList                                 controllers.ComponentViewController.organizationViewAcceptedBuyNegotiationList
 GET         /component/organizationViewAcceptedSellNegotiationList                                controllers.ComponentViewController.organizationViewAcceptedSellNegotiationList
+GET         /component/organizationViewCompletedNegotiationList                                   controllers.ComponentViewController.organizationViewCompletedNegotiationList
 
 GET         /component/organizationViewSentReceivedIncompleteRejectedFailedNegotiationList        controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList
 GET         /component/organizationViewSentNegotiationRequestList                                 controllers.ComponentViewController.organizationViewSentNegotiationRequestList
@@ -242,27 +246,42 @@ GET         /component/zonwFinancial                                            
 
 GET         /component/traderViewNegotiationDocumentList                                          controllers.ComponentViewController.traderViewNegotiationDocumentList(id:String)
 GET         /component/traderViewNegotiationDocument                                              controllers.ComponentViewController.traderViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/traderViewCompletedNegotiationDocument                                              controllers.ComponentViewController.traderViewCompletedNegotiationDocument(id:String, documentType: Option[String])
 GET         /component/traderViewAcceptedNegotiationDocumentList                                  controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(id:String)
+GET         /component/traderViewCompletedNegotiationDocumentList                                 controllers.ComponentViewController.traderViewCompletedNegotiationDocumentList(id:String)
 
 GET         /component/organizationViewNegotiationDocumentList                                    controllers.ComponentViewController.organizationViewNegotiationDocumentList(id:String)
 GET         /component/organizationViewNegotiationDocument                                        controllers.ComponentViewController.organizationViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/organizationViewCompletedNegotiationDocument                               controllers.ComponentViewController.organizationViewCompletedNegotiationDocument(id:String, documentType: Option[String])
 GET         /component/organizationViewAcceptedNegotiationDocumentList                            controllers.ComponentViewController.organizationViewAcceptedNegotiationDocumentList(id:String)
+GET         /component/organizationViewCompletedNegotiationDocumentList                            controllers.ComponentViewController.organizationViewCompletedNegotiationDocumentList(id:String)
 
 GET         /component/zoneViewNegotiationDocumentList                                            controllers.ComponentViewController.zoneViewNegotiationDocumentList(id:String)
 GET         /component/zoneViewNegotiationDocument                                                controllers.ComponentViewController.zoneViewNegotiationDocument(id:String, documentType: Option[String])
+GET         /component/zoneViewCompletedNegotiationDocument                                                controllers.ComponentViewController.zoneViewCompletedNegotiationDocument(id:String, documentType: Option[String])
 GET         /component/zoneViewAcceptedNegotiationDocumentList                                    controllers.ComponentViewController.zoneViewAcceptedNegotiationDocumentList(id:String)
+GET         /component/zoneViewCompletedNegotiationDocumentList                                    controllers.ComponentViewController.zoneViewCompletedNegotiationDocumentList(id:String)
+
+GET         /component/traderViewCompletedNegotiationTerms                                        controllers.ComponentViewController.traderViewCompletedNegotiationTerms(id: String)
+GET         /component/traderViewCompletedNegotiation                                             controllers.ComponentViewController.traderViewCompletedNegotiation(id: String)
 
 GET         /component/traderViewAcceptedNegotiationTerms                                         controllers.ComponentViewController.traderViewAcceptedNegotiationTerms(id: String)
 GET         /component/traderViewAcceptedNegotiation                                              controllers.ComponentViewController.traderViewAcceptedNegotiation(id: String)
 GET         /component/tradeDocuments                                                             controllers.ComponentViewController.tradeDocuments(id:String)
 GET         /component/tradeActivities                                                            controllers.ComponentViewController.tradeActivities(id:String)
+GET         /component/completedTradeActivities                                                   controllers.ComponentViewController.completedTradeActivities(id:String)
 
 GET         /component/organizationViewAcceptedNegotiationTerms                                   controllers.ComponentViewController.organizationViewAcceptedNegotiationTerms(id: String)
 GET         /component/organizationViewAcceptedNegotiation                                        controllers.ComponentViewController.organizationViewAcceptedNegotiation(id: String)
 
+GET         /component/organizationViewCompletedNegotiationTerms                                  controllers.ComponentViewController.organizationViewCompletedNegotiationTerms(id: String)
+GET         /component/organizationViewCompletedNegotiation                                       controllers.ComponentViewController.organizationViewCompletedNegotiation(id: String)
+
 GET         /component/zoneViewAcceptedNegotiationTerms                                           controllers.ComponentViewController.zoneViewAcceptedNegotiationTerms(id: String)
 GET         /component/zoneViewAcceptedNegotiation                                                controllers.ComponentViewController.zoneViewAcceptedNegotiation(id: String)
 
+GET         /component/zoneViewCompletedNegotiationTerms                                           controllers.ComponentViewController.zoneViewCompletedNegotiationTerms(id: String)
+GET         /component/zoneViewCompletedNegotiation                                                controllers.ComponentViewController.zoneViewCompletedNegotiation(id: String)
 
 GET         /component/organizationViewTraderAccountList                                          controllers.ComponentViewController.organizationViewTraderAccountList
 GET         /component/organizationViewAcceptedTraderAccountList                                  controllers.ComponentViewController.organizationViewAcceptedTraderAccountList
@@ -289,11 +308,16 @@ GET         /component/zoneViewRejectedOrganizationRequestList                  
 GET         /component/zoneViewRejectedOrganizationRequest                                        controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
 
 GET         /component/zoneViewAcceptedNegotiationList                                            controllers.ComponentViewController.zoneViewAcceptedNegotiationList
+GET         /component/zoneViewActiveNegotiationList                                              controllers.ComponentViewController.zoneViewActiveNegotiationList
+GET         /component/zoneViewCompletedNegotiationList                                            controllers.ComponentViewController.zoneViewCompletedNegotiationList
 GET         /component/zoneViewAcceptedNegotiation                                                controllers.ComponentViewController.zoneViewAcceptedNegotiation(negotiationID: String)
 GET         /component/zoneTradeStatistics                                                        controllers.ComponentViewController.zoneTradeStatistics
 GET         /component/zoneViewTradeRoomFinancialAndChecks                                        controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/zoneViewTradeRoomFinancial                                                 controllers.ComponentViewController.zoneViewTradeRoomFinancial(negotiationID: String)
 GET         /component/zoneViewTradeRoomChecks                                                    controllers.ComponentViewController.zoneViewTradeRoomChecks(negotiationID: String)
+GET         /component/zoneViewCompletedTradeRoomFinancialAndChecks                               controllers.ComponentViewController.zoneViewCompletedTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/zoneViewCompletedTradeRoomFinancial                                        controllers.ComponentViewController.zoneViewCompletedTradeRoomFinancial(negotiationID: String)
+GET         /component/zoneViewCompletedTradeRoomChecks                                           controllers.ComponentViewController.zoneViewCompletedTradeRoomChecks(negotiationID: String)
 GET         /component/zoneOrderActions                                                           controllers.ComponentViewController.zoneOrderActions(negotiationID: String)
 
 GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
@@ -328,13 +352,17 @@ GET         /component/traderViewCompleteRedeemFiatRequestList                  
 GET         /component/traderViewFailedRedeemFiatRequestList                                      controllers.ComponentViewController.traderViewFailedRedeemFiatRequestList()
 GET         /component/traderViewReceiveFiatList                                                  controllers.ComponentViewController.traderViewReceiveFiatList()
 
-GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
-GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
-GET         /component/organizationViewTradeRoomChecks                                            controllers.ComponentViewController.organizationViewTradeRoomChecks(negotiationID: String)
+GET         /component/organizationViewCompletedTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewCompletedTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/organizationViewCompletedTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewCompletedTradeRoomFinancial(negotiationID: String)
+GET         /component/organizationViewCompletedTradeRoomChecks                                            controllers.ComponentViewController.organizationViewCompletedTradeRoomChecks(negotiationID: String)
 
 GET         /component/traderViewTradeRoomFinancialAndChecks                                      controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
 GET         /component/traderViewTradeRoomChecks                                                  controllers.ComponentViewController.traderViewTradeRoomChecks(negotiationID: String)
+
+GET         /component/traderViewCompletedTradeRoomFinancialAndChecks                             controllers.ComponentViewController.traderViewCompletedTradeRoomFinancialAndChecks(negotiationID: String)
+GET         /component/traderViewCompletedTradeRoomFinancial                                      controllers.ComponentViewController.traderViewCompletedTradeRoomFinancial(negotiationID: String)
+GET         /component/traderViewCompletedTradeRoomChecks                                         controllers.ComponentViewController.traderViewCompletedTradeRoomChecks(negotiationID: String)
 
 GET         /component/traderViewNegotiation                                                      controllers.ComponentViewController.traderViewNegotiation(negotiationID: String)
 GET         /component/organizationViewNegotiation                                                controllers.ComponentViewController.organizationViewNegotiation(negotiationID: String)

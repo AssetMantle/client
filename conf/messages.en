@@ -993,3 +993,4 @@ MEMBER_CHECK_SCAN_RESPONSE=Member Check Scan Response
 MEMBER_CHECK_SCAN_RESULT=Member Check Scan Result
 MEMBER_CHECK_VESSEL_SCAN_RESPONSE=Member Check Vessel Scan Response
 MEMBER_CHECK_VESSEL_SCAN_RESULT=Member Check Vessel Scan Result
+COMPLETED_NEGOTIATION_LIST = Completed Trade Rooms
