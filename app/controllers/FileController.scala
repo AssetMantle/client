@@ -32,6 +32,7 @@ class FileController @Inject()(
                                 masterZoneKYCs: master.ZoneKYCs,
                                 masterOrganizationKYCs: master.OrganizationKYCs,
                                 masterNegotiations: master.Negotiations,
+                                masterNegotiationHistories: master.NegotiationHistories,
                                 masterZones: master.Zones,
                                 masterOrganizations: master.Organizations,
                                 masterTraders: master.Traders,
@@ -675,7 +676,25 @@ class FileController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-      def checkTraderNegotiationExists(traderID: String) = masterNegotiations.Service.checkTraderNegotiationExists(id = id, traderID = traderID)
+      def checkTraderNegotiationExists(traderID: String) = {
+        val negotiation = masterNegotiations.Service.get(id)
+
+        def checkTraderPartOfNegotiation(negotiation: Option[Negotiation]) = {
+          negotiation match {
+            case Some(negotiation) => {
+              Future(traderID == negotiation.sellerTraderID || traderID == negotiation.buyerTraderID)
+            }
+            case None => {
+              masterNegotiationHistories.Service.tryGet(id: String).map(negotiationHistory => negotiationHistory.sellerTraderID == traderID || negotiationHistory.buyerTraderID == traderID)
+            }
+          }
+        }
+
+        for {
+          negotiation <- negotiation
+          traderPartOfNegotiation <- checkTraderPartOfNegotiation(negotiation)
+        } yield traderPartOfNegotiation
+      }
 
       (for {
         traderID <- traderID
@@ -699,14 +718,37 @@ class FileController @Inject()(
   def organizationAccessedTradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
-      val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def traderOrganizationIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetOrganizationIDs(traderIDs)
+      def traderOrganizationIDs = {
+        val negotiation = masterNegotiations.Service.get(id)
+
+        def getTraderOrganizationIDs(negotiation: Option[Negotiation]) = {
+          negotiation match {
+            case Some(negotiation) => {
+              masterTraders.Service.tryGetOrganizationIDs(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+            }
+            case None => {
+              val negotiationHistory = masterNegotiationHistories.Service.tryGet(id)
+
+              def traderOrganizationIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetOrganizationIDs(traderIDs)
+
+              for {
+                negotiationHistory <- negotiationHistory
+                traderOrganizationIDs <- traderOrganizationIDs(Seq(negotiationHistory.sellerTraderID, negotiationHistory.buyerTraderID))
+              } yield traderOrganizationIDs
+            }
+          }
+        }
+
+        for {
+          negotiation <- negotiation
+          traderOrganizationIDs <- getTraderOrganizationIDs(negotiation)
+        } yield traderOrganizationIDs
+      }
 
       (for {
         organizationID <- organizationID
-        negotiation <- negotiation
-        traderOrganizationIDs <- traderOrganizationIDs(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        traderOrganizationIDs <- traderOrganizationIDs
       } yield {
         if (traderOrganizationIDs contains organizationID) {
           val path = documentType match {
@@ -726,14 +768,38 @@ class FileController @Inject()(
   def zoneAccessedTradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
-      val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def traderZoneIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetZoneIDs(traderIDs)
+      def traderZoneIDs = {
+        val negotiation = masterNegotiations.Service.get(id)
+
+        def getTraderZoneIDs(negotiation: Option[Negotiation]) = {
+          negotiation match {
+            case Some(negotiation) => {
+              masterTraders.Service.tryGetZoneIDs(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+            }
+            case None => {
+              val negotiationHistory = masterNegotiationHistories.Service.tryGet(id)
+
+              def traderZoneIDs(traderIDs: Seq[String]) = masterTraders.Service.tryGetZoneIDs(traderIDs)
+
+              for {
+                negotiationHistory <- negotiationHistory
+                traderZoneIDs <- traderZoneIDs(Seq(negotiationHistory.sellerTraderID, negotiationHistory.buyerTraderID))
+              } yield traderZoneIDs
+            }
+          }
+        }
+
+        for {
+          negotiation <- negotiation
+          traderZoneIDs <- getTraderZoneIDs(negotiation)
+        } yield traderZoneIDs
+      }
+
 
       (for {
         zoneID <- zoneID
-        negotiation <- negotiation
-        traderZoneIDs <- traderZoneIDs(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        traderZoneIDs <- traderZoneIDs
       } yield {
         if (traderZoneIDs contains zoneID) {
           val path = documentType match {

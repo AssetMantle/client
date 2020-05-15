@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.NegotiationHistory
+@import models.masterTransaction.NegotiationFile
+@import scala.collection.immutable.ListMap
+
+@(negotiationHistory: NegotiationHistory)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.traderViewCompletedNegotiationTerms,
+        constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.traderViewCompletedNegotiationDocument,
+    ),
+        'VIEW_TERMS_PARAMETERS -> s"'${negotiationHistory.id}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiationHistory.id}'")
+<br>
+</div>
