@@ -6,7 +6,7 @@
     @component.master.commonDocumentViewer(zoneKYC) {
         @routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)
     } {
-        <a href="@routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)">@Messages(zoneKYC.documentType)</a>
+        <a href="@routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)" target="_blank">@Messages(zoneKYC.documentType)</a>
     } {
         <div>
             @views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC)

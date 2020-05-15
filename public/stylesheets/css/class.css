@@ -258,6 +258,9 @@ html, body {
       text-decoration: none;
       color: #053C75; }
 
+.iframeModal {
+  padding: 50px; }
+
 .copyIcon {
   cursor: pointer; }
 

@@ -23,7 +23,7 @@
                 @component.master.commonDocumentViewer(document) {
                     @routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)
                 } {
-                    <a href="@routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)">@Messages(document.documentType)</a>
+                    <a href="@routes.FileController.tradingFile(negotiation.id, document.fileName, document.documentType)" target="_blank">@Messages(document.documentType)</a>
                 } {
                     @negotiationEnvelopeList.find(_.documentType == document.documentType) match {
                         case Some(docusignEnvelope)=> {
@@ -59,7 +59,7 @@
                 @component.master.commonDocumentViewer(assetFile) {
                     @routes.FileController.tradingFile(negotiation.id, assetFile.fileName, assetFile.documentType)
                 } {
-                    <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)">@Messages(assetFile.documentType)</a>
+                    <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)" target="_blank">@Messages(assetFile.documentType)</a>
                 } {
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAssetForm('@assetFile.documentType', '@negotiation.id'))">@Messages(constants.View.UPDATE)@Messages(assetFile.documentType)</button>
                     @assetFile.documentType match {
@@ -82,7 +82,7 @@
                 @component.master.commonDocumentViewer(negotiationFile) {
                     @routes.FileController.tradingFile(negotiation.id, negotiationFile.fileName, negotiationFile.documentType)
                 } {
-                    <a href="@routes.FileController.tradingFile(negotiation.id, negotiationFile.fileName, negotiationFile.documentType)">@Messages(negotiationFile.documentType)</a>
+                    <a href="@routes.FileController.tradingFile(negotiation.id, negotiationFile.fileName, negotiationFile.documentType)" target="_blank">@Messages(negotiationFile.documentType)</a>
                 } {
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateNegotiationForm('@negotiationFile.documentType', '@negotiation.id'))">@Messages(constants.View.UPDATE) @Messages(negotiationFile.documentType)</button>
                     @negotiationFile.documentType match {
