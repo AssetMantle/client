@@ -39,11 +39,21 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
+  private def upsert(ftraderRelation: TraderRelation): Future[Int] = db.run(traderRelationTable.insertOrUpdate(ftraderRelation).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
   private def updateStatusByID(id: String, status: Option[Boolean]): Future[Int] = db.run(traderRelationTable.filter(_.id === id).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -57,7 +67,9 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def findByID(id: String): Future[TraderRelation] = db.run(traderRelationTable.filter(_.id === id).result.head.asTry).map {
+  private def getByID(id: String): Future[Option[TraderRelation]] = db.run(traderRelationTable.filter(_.id === id).result.headOption)
+
+  private def tryGetByID(id: String): Future[TraderRelation] = db.run(traderRelationTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -103,10 +115,10 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(fromID: String, toID: String): Future[String] = if (fromID == toID) {
+    def insertOrUpdate(fromID: String, toID: String): Future[Int] = if (fromID == toID) {
       throw new BaseException(constants.Response.COUNTERPARTY_CANNOT_BE_SELF)
     } else {
-      add(TraderRelation(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID), fromID = fromID, toID = toID))
+      upsert(TraderRelation(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID), fromID = fromID, toID = toID))
     }
 
     def markAccepted(fromID: String, toID: String): Future[Int] = updateStatusByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID), status = Option(true))
@@ -117,9 +129,11 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def getAllSentPendingTraderRelation(fromID: String): Future[Seq[TraderRelation]] = findAllByFromIDAndStatus(fromID = fromID, status = null)
 
-    def get(fromID: String, toID: String): Future[TraderRelation] = findByID(getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
+    def tryGet(fromID: String, toID: String): Future[TraderRelation] = tryGetByID(getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
 
-    def markRejected(fromID: String, toID: String): Future[Int] = deleteByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
+    def get(fromID: String, toID: String): Future[Option[TraderRelation]] = getByID(getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID))
+
+    def markRejected(fromID: String, toID: String): Future[Int] = updateStatusByID(id = getTraderRelationIDByFromIDAndToID(fromID = fromID, toID = toID), status = Option(false))
 
     def getAllCounterParties(id: String): Future[Seq[String]] = findAllByFromIDOrToIDAndStatus(id = id, status = Option(true)).map(_.map(tradeRelation => if (tradeRelation.fromID == id) tradeRelation.toID else tradeRelation.fromID))
 
