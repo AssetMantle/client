@@ -1055,7 +1055,7 @@ class ComponentViewController @Inject()(
         val fromTrader = masterTraders.Service.tryGet(fromID)
         val toTrader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
-        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.get(fromID = fromId, toID = toId)
+        def traderRelation(fromId: String, toId: String): Future[TraderRelation] = masterTraderRelations.Service.tryGet(fromID = fromId, toID = toId)
 
         def getOrganizationName(organizationID: String): Future[String] = masterOrganizations.Service.getNameByID(organizationID)
 
