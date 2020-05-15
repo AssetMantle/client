@@ -5,11 +5,11 @@
 @(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
 @commonCard(constants.View.CHAT) {
-    @commonComponentButton("chatWindow", constants.View.REFRESH, routes.javascript.ChatController.chatWindow, 'parameters -> s"'${chatID}', 0")
+    @commonComponentButton("chatWindow", constants.View.REFRESH, routes.javascript.ChatController.chatWindow, "CHAT_LOADING", "chat", 'parameters -> s"'${chatID}', 0")
 }{
     <div id="chatWindow"></div>
     <script>
-            componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))
+            componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0), 'CHAT_LOADING', 'chat')
     </script>
 }
 <script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>

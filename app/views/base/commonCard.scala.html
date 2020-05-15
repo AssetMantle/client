@@ -9,13 +9,16 @@
             @if(arguments.toMap.get('cardIconPath).map(_.toString).isDefined) {
                 <svg class="icon"><use xlink:href='@routes.Assets.versioned(Asset(arguments.toMap.get('cardIconPath).map(_.toString).getOrElse("")))'/></svg>
             }
-            <span class="headerFontSize">@Messages(title)</span>
+        <span class="headerFontSize">@Messages(title)</span>
+        <div class="hidden" id="@Seq(title, "LOADING").mkString("_")">
+            <div class="cmuk-position-center" cmuk-spinner></div>
+        </div>
         </div>
         @headerContent
     </div>
     <div class="scroller">
-    <div class="cmuk-card-body cmuk-height-medium cmuk-overflow-auto">
-        @content
-    </div>
+        <div class="cmuk-card-body cmuk-height-medium cmuk-overflow-auto">
+            @content
+        </div>
     </div>
 </div>

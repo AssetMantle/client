@@ -12,7 +12,7 @@
 <div id="@chatID"></div>
 <div id="chatMessages" class="chat chatMessagesContainer" title="You have chat with">
     <script>
-            componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0))
+            componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0), 'CHAT_LOADING', 'chat')
     </script>
 </div>
 

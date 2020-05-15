@@ -1,10 +1,22 @@
 function loadMoreChats(chatID) {
     const route = jsRoutes.controllers.ChatController.loadMoreChats(chatID, ($(".chatMessages").length));
+    let loadingSpinner = $('#CHAT_LOADING');
     $.ajax({
         url: route.url,
         type: route.type,                                       
         async: true,
         global: showSpinner('chat'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            setTimeout(
+                function()
+                {
+                    loadingSpinner.hide();
+                }, 2000);
+
+        },
         statusCode: {
             200: function (data) {
                 const loadMore = $(".chatMessages .chatMessage:first");
@@ -23,6 +35,7 @@ function submitChatOnEnter(event, source) {
 
 function submitChat(source, target = '#chatMessages') {
     const form = $(source).closest("form");
+    let loadingSpinner = $('#CHAT_LOADING');
     if (validateForm(form)) {
         const result = $(target);
         $.ajax({
@@ -32,6 +45,17 @@ function submitChat(source, target = '#chatMessages') {
             data: form.serialize(),
             async: true,
             global: showSpinner('chat'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                setTimeout(
+                    function()
+                    {
+                        loadingSpinner.hide();
+                    }, 2000);
+
+            },
             statusCode: {
                 400: function (data) {
 
@@ -67,11 +91,23 @@ function replyButton(replyToMessageID, replyMessage, fromAccount) {
 }
 
 function markChatRead(route) {
+    let loadingSpinner = $('#CHAT_LOADING');
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         global: showSpinner('chat'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            setTimeout(
+                function()
+                {
+                    loadingSpinner.hide();
+                }, 2000);
+
+        },
         statusCode: {
             200: function (data) {
                $('.unRead').fadeOut();
@@ -87,11 +123,23 @@ function markChatRead(route) {
 }
 
 function replyMessage(route, messageID) {
+    let loadingSpinner = $('#CHAT_LOADING');
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         global: showSpinner('chat'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            setTimeout(
+                function()
+                {
+                    loadingSpinner.hide();
+                }, 2000);
+
+        },
         statusCode: {
             200: function (data) {
                 $('#' + data.id + messageID).html(data.text);

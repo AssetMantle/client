@@ -1,0 +1,4 @@
+@(id: String, spinnerClass: String = "cmuk-position-center", ratio: Double = 1.0)
+<div class="@Seq("hidden", spinnerClass).mkString(" ")" id="@id" >
+    <div cmuk-spinner="ratio: @ratio"></div>
+</div>

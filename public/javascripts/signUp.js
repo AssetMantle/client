@@ -11,11 +11,23 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
             const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
             if (username.length > 0) {
+                let loadingSpinner = $('#usernameAvailable');
                 $.ajax({
                     url: route.url,
                     type: route.type,
                     async: true,
                     global: showSpinner('checkUsernameAvailable'),
+                    beforeSend: function () {
+                        loadingSpinner.show();
+                    },
+                    complete: function () {
+                        setTimeout(
+                            function()
+                            {
+                                loadingSpinner.hide();
+                            }, 2000);
+
+                    },
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
@@ -39,9 +51,6 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
 function checkPasswords() {
     let confirmPassword = $('#signUpConfirmPassword').val();
     let password = $('#signUpPassword').val();
-    let matchPasswordsResult = $('#matchPasswordsResult');
-    let matchConfirmPasswordsResult = $('#matchConfirmPasswordsResult');
-    let passwordNotMatch = "Passwords Do Not Match"
     if (confirmPassword !== password) {
         $('#matchConfirmPasswordsResult span').hide();
         $(".passwordNotMatched").show();
