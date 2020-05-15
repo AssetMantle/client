@@ -44,6 +44,8 @@ class ComponentViewController @Inject()(
                                          masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
                                          masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
                                          memberCheckVesselScanDecisions: memberCheck.VesselScanDecisions,
+                                         masterTransactionReceiveFiatHistories: masterTransaction.ReceiveFiatHistories,
+                                         masterTransactionSendFiatRequestHistories: masterTransaction.SendFiatRequestHistories,
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
                                          westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,
@@ -1931,12 +1933,14 @@ class ComponentViewController @Inject()(
       def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderIDs)
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         zoneID <- zoneID
         traderIDs <- traderIDs(zoneID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
-      } yield Ok(views.html.component.master.zoneViewPendingSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.zoneViewPendingSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -1948,12 +1952,14 @@ class ComponentViewController @Inject()(
       def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderIDs)
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         zoneID <- zoneID
         traderIDs <- traderIDs(zoneID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
-      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -1965,12 +1971,14 @@ class ComponentViewController @Inject()(
       def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderIDs)
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         zoneID <- zoneID
         traderIDs <- traderIDs(zoneID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
-      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2040,12 +2048,14 @@ class ComponentViewController @Inject()(
       def traderIDs(zoneID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(zoneID)
 
       def receiveFiatList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderIDs)
+      def receiveFiatHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderIDs).map(_.map(masterTransactionReceiveFiatHistories.Utility.convertToReceiveFiat(_)))
 
       (for {
         zoneID <- zoneID
         traderIDs <- traderIDs(zoneID)
         receiveFiatList <- receiveFiatList(traderIDs)
-      } yield Ok(views.html.component.master.receiveFiatList(receiveFiatList))).recover {
+        receiveFiatHistoryList <- receiveFiatHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.receiveFiatList(receiveFiatList ++ receiveFiatHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2063,12 +2073,14 @@ class ComponentViewController @Inject()(
       def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderIDs)
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         organizationID <- organizationID
         traderIDs <- traderIDs(organizationID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
-      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2080,12 +2092,14 @@ class ComponentViewController @Inject()(
       def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderIDs)
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         organizationID <- organizationID
         traderIDs <- traderIDs(organizationID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
-      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2097,12 +2111,14 @@ class ComponentViewController @Inject()(
       def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByOrganizationID(organizationID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderIDs)
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         organizationID <- organizationID
         traderIDs <- traderIDs(organizationID)
         sendFiatRequestList <- sendFiatRequestList(traderIDs)
-      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.viewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2170,12 +2186,14 @@ class ComponentViewController @Inject()(
       def traderIDs(organizationID: String): Future[Seq[String]] = masterTraders.Service.getTraderIDsByZoneID(organizationID)
 
       def receiveFiatList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderIDs)
+      def receiveFiatHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderIDs).map(_.map(masterTransactionReceiveFiatHistories.Utility.convertToReceiveFiat(_)))
 
       (for {
         organizationID <- organizationID
         traderIDs <- traderIDs(organizationID)
         receiveFiatList <- receiveFiatList(traderIDs)
-      } yield Ok(views.html.component.master.receiveFiatList(receiveFiatList))).recover {
+        receiveFiatHistoryList <- receiveFiatHistoryList(traderIDs)
+      } yield Ok(views.html.component.master.receiveFiatList(receiveFiatList ++ receiveFiatHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2191,11 +2209,13 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderID)
+      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderID).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         traderID <- traderID
         sendFiatRequestList <- sendFiatRequestList(traderID)
-      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderID)
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2205,11 +2225,13 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderID)
+      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderID).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         traderID <- traderID
         sendFiatRequestList <- sendFiatRequestList(traderID)
-      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderID)
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2219,11 +2241,13 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderID)
+      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderID).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
 
       (for {
         traderID <- traderID
         sendFiatRequestList <- sendFiatRequestList(traderID)
-      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList))).recover {
+        sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traderID)
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2280,11 +2304,13 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def receiveFiatList(traderID: String): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderID)
+      def receiveFiatHistoryList(traderID: String): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderID).map(_.map(masterTransactionReceiveFiatHistories.Utility.convertToReceiveFiat(_)))
 
       (for {
         traderID <- traderID
         receiveFiatList <- receiveFiatList(traderID)
-      } yield Ok(views.html.component.master.traderViewReceiveFiatList(receiveFiatList))).recover {
+        receiveFiatHistoryList <- receiveFiatHistoryList(traderID)
+      } yield Ok(views.html.component.master.traderViewReceiveFiatList(receiveFiatList ++ receiveFiatHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
