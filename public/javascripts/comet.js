@@ -31,8 +31,10 @@ function cometMessageHandler(message){
                 comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.chatID, 0));
             }
             break;
+        case 'KEEP_ALIVE' :
+            break;
         default :
-            console.log("Unhandled Comet message", parsedMessage);
+            console.log("Unhandled Comet message");
             break;
 
 
