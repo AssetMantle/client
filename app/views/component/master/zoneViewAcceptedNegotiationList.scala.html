@@ -1,65 +1,13 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.master.Negotiation
-@import models.master.Asset
-@import models.master.Trader
+@import scala.collection.immutable.ListMap
 
-@(negotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.TRADE_ROOMS) {
 } {
-    <div class="salesQuoteCard">
-    @negotiationList.map { negotiation =>
-        @commonVerticalInfoBox() {
-            <div class="salesQuoteCardLeft salesChild">
-                <div class="content">
-                @assetList.find(_.id == negotiation.assetID) match {
-                    case Some(asset) => {
-                        <div class="assetIcon">
-                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
-                        </div>
-                        <div class="assetInitialData">
-                            <p class="assetTitle">@asset.assetType</p>
-                            <p class="assetQuantity">@Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@negotiation.price</p>
-                        </div>
-                    }
-                    case None => {}
-                }
-                </div>
-            </div>
-            <div class="salesQuoteCardMiddle salesChild">
-                <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_ID)">@negotiation.buyerTraderID</span>
-                    <span class="lines">---</span>
-                    <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_ID)">@negotiation.sellerTraderID</span>
-                </p>
-
-                @counterPartyTraderList.find(_.id == negotiation.buyerTraderID) match {
-                    case Some(trader) => {
-                        <p> <span cmuk-tooltip="@Messages(constants.View.BUYER_ORGANIZATION_ID)">@trader.organizationID</span>
-                            <span class="lines">---</span>
-                            }
-                    case None => {}
-                }
-                @counterPartyTraderList.find(_.id == negotiation.sellerTraderID) match {
-                    case Some(trader) => {
-                        <span cmuk-tooltip="@Messages(constants.View.SELLER_ORGANIZATION_ID)">@trader.organizationID</span></p>
-                    }
-                    case None => {}
-                }
-
-                <p><span>@negotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
-                    <span class="lines">---</span>
-                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                    <span class="lines">---</span>
-                    <span>@negotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
-                </p>
-            </div>
-            <div class="salesQuoteCardRight salesChild">
-            @commonLink(constants.View.GO_TO_TRADE_ROOM, routes.ViewController.tradeRoom(negotiation.id), 'class->"cmuk-button buttonPrimary")
-            </div>
-
-        }
-    }
-    </div>
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.ACTIVE_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.zoneViewActiveNegotiationList,
+        constants.View.COMPLETED_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.zoneViewCompletedNegotiationList,
+    ))
 }

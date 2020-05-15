@@ -136,6 +136,8 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
+  private def findAllNegotiationsByTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[NegotiationHistorySerializable]] = db.run((negotiationHistoryTable.filter(_.buyerTraderID === traderID) union negotiationHistoryTable.filter(_.sellerTraderID === traderID)).filter(_.status.inSet(statuses)).result)
+
   private def findAllNegotiationsByTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[NegotiationHistorySerializable]] = db.run((negotiationHistoryTable.filter(_.buyerTraderID inSet traderIDs) union negotiationHistoryTable.filter(_.sellerTraderID inSet traderIDs)).filter(_.status.inSet(statuses)).result)
 
   private def tryGetBuyerTraderIDByID(id: String): Future[String] = db.run(negotiationHistoryTable.filter(_.id === id).map(_.buyerTraderID).result.head.asTry).map {
@@ -283,6 +285,8 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
 
   object Service {
 
+    def tryGet(id: String): Future[NegotiationHistory] = tryGetByID(id).map(_.deserialize)
+
     def tryGetByBCNegotiationID(negotiationID: String): Future[NegotiationHistory] = tryGetByNegotiationID(negotiationID).map(_.deserialize)
 
     def tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[NegotiationHistory] = findByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID).map(_.deserialize)
@@ -298,6 +302,10 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
     def tryGetStatus(id: String): Future[String] = getStatusByID(id)
 
     def getAllByAssetID(assetID: String): Future[Seq[NegotiationHistory]] = findAllByAssetID(assetID).map(_.map(_.deserialize))
+
+    def getAllCompletedNegotiationListByTraderID(traderID: String): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED).map(_.map(_.deserialize))
+
+    def getAllCompletedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED).map(_.map(_.deserialize))
 
     def getAllAcceptedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.STARTED, constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS, constants.Status.Negotiation.CONTRACT_SIGNED, constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING, constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING, constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED).map(_.map(_.deserialize))
 

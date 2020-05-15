@@ -1,0 +1,4 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@(assetID: String, vesselName: Option[Option[String]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@commonFormButton(constants.Form.MEMBER_CHECK_VESSEL_SCAN, 'parameters -> s"'${assetID}', '${vesselName.getOrElse(None).getOrElse("")}'")

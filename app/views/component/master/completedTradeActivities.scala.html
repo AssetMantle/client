@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.Notification
+@import views.html.base._
+
+@(negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.TRADE_ACTIVITY,'cardIconPath -> "images/icons/icons.svg#recentActivity") {
+} {
+    <div class="scroller">
+        <div id="tradeActivityMessages" class="recentActivityMessages"></div>
+    </div>
+}
+<script>
+        loadMoreActivitiesOnScroll('@negotiationID');
+        componentResource('tradeActivityMessages', jsRoutes.controllers.NegotiationController.completedTradeActivityMessages('@negotiationID', 1));
+</script>
+
+
+

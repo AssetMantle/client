@@ -62,6 +62,8 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
+  private def findAllByIDs(ids: Seq[String]): Future[Seq[AssetHistorySerializable]] = db.run(assetHistoryTable.filter(_.id.inSet(ids)).result)
+
   private[models] class AssetHistoryTable(tag: Tag) extends Table[AssetHistorySerializable](tag, "Asset_History") {
 
     def * = (id, ownerID, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, takerID.?, otherDetails, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (AssetHistorySerializable.tupled, AssetHistorySerializable.unapply)
@@ -119,6 +121,8 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
     def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
 
     def tryGetPegHash(id: String): Future[String] = tryGetPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+
+    def getAllAssetsByID(ids: Seq[String]): Future[Seq[AssetHistory]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize()))
 
   }
 

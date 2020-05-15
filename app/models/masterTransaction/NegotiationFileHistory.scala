@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
-import models.Trait.HistoryLogged
+import models.Trait.{Document, HistoryLogged}
 import models.common.Serializable._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class NegotiationFileHistory(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[NegotiationDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged {
+case class NegotiationFileHistory(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[NegotiationDocumentContent] = None, status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends Document[NegotiationFileHistory] with HistoryLogged {
 
   def updateFileName(newFileName: String): NegotiationFileHistory = copy(fileName = newFileName)
 
