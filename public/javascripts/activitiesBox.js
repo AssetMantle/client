@@ -15,12 +15,7 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
@@ -45,12 +40,7 @@ $('#notificationBadge').ready(function () {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
@@ -76,12 +66,7 @@ function markNotificationRead(target, accountID) {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
@@ -98,10 +83,9 @@ function loadMoreActivitiesOnScroll(negotiationID) {
             if ($(this).scrollTop() +
                 $(this).innerHeight() >=
                 $(this)[0].scrollHeight) {
-                if(negotiationID){
+                if (negotiationID) {
                     loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, negotiationID)
-                }
-                else {
+                } else {
                     loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
                 }
             }

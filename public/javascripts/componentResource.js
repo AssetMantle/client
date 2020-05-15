@@ -8,15 +8,11 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
         async: true,
         global: showSpinner(event),
         beforeSend: function () {
+            console.log(loadingSpinnerID);
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {

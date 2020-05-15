@@ -8,14 +8,14 @@
     <div class="inputField">
         <div class="inputFieldBody">
             <div class="usernameAvailability">
-                @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
+                @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#USERNAME_AVAILABLE")""")
                 <div id="checkUsernameAvailableResult" class="result failureIcon">
                     @commonIcon("failRounded")
                 </div>
                 <div class="checkIcon" id="checkIcon">
                     @commonIcon("success")
                 </div>
-                @commonSpinner("usernameAvailable", "cmuk-position-right")
+                @commonSpinner("usernameAvailableLoading", "cmuk-position-right", 0.5)
             </div>
         </div>
     </div>

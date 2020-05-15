@@ -15,12 +15,7 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                 loadingSpinner.show();
             },
             complete: function () {
-                setTimeout(
-                    function()
-                    {
-                        loadingSpinner.hide();
-                    }, 2000);
-
+                loadingSpinner.hide();
             },
             statusCode: {
                 400: function (data) {

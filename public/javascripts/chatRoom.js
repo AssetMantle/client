@@ -3,19 +3,14 @@ function loadMoreChats(chatID) {
     let loadingSpinner = $('#CHAT_LOADING');
     $.ajax({
         url: route.url,
-        type: route.type,                                       
+        type: route.type,
         async: true,
         global: showSpinner('chat'),
         beforeSend: function () {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
@@ -49,12 +44,7 @@ function submitChat(source, target = '#chatMessages') {
                 loadingSpinner.show();
             },
             complete: function () {
-                setTimeout(
-                    function()
-                    {
-                        loadingSpinner.hide();
-                    }, 2000);
-
+                loadingSpinner.hide();
             },
             statusCode: {
                 400: function (data) {
@@ -101,16 +91,11 @@ function markChatRead(route) {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
-               $('.unRead').fadeOut();
+                $('.unRead').fadeOut();
             },
             401: function (data) {
                 replaceDocument(data.responseText);
@@ -133,12 +118,7 @@ function replyMessage(route, messageID) {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
@@ -165,8 +145,8 @@ function scrollToTop() {
 
 function unReadBar(count) {
     if ($('#unRead').length === 0) {
-        let c=count+2;
-        const loadMore = $(".chatMessages .chatMessage:nth-last-child("+c+")");
+        let c = count + 2;
+        const loadMore = $(".chatMessages .chatMessage:nth-last-child(" + c + ")");
         loadMore.after('<div id="unRead" class="unRead">un read message</div>');
     } else {
     }
@@ -180,7 +160,7 @@ function closeReply() {
 function loadMoreChatsOnScroll(chatID) {
     $('#chatMessages').on('scroll', function () {
         if (!$('#chatMessages .chatMessages > li').hasClass("noChats")) {
-            var scrollTop = $(this).scrollTop();
+            let scrollTop = $(this).scrollTop();
             if (scrollTop <= 0) {
                 setTimeout(function () {
                     loadMoreChats(chatID);

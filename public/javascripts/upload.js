@@ -49,12 +49,7 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
                 loadingSpinner.show();
             },
             complete: function () {
-                setTimeout(
-                    function()
-                    {
-                        loadingSpinner.hide();
-                    }, 2000);
-
+                loadingSpinner.hide();
             },
             statusCode: {
                 200: function (data) {
@@ -117,12 +112,7 @@ function updateFile(uploadRoute, updateRoute, documentType, id) {
                 loadingSpinner.show();
             },
             complete: function () {
-                setTimeout(
-                    function()
-                    {
-                        loadingSpinner.hide();
-                    }, 2000);
-
+                loadingSpinner.hide();
             },
             statusCode: {
                 200: function (data) {

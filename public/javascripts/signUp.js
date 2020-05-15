@@ -1,7 +1,7 @@
 let timer = 0;
 let timeoutFlag = true;
 
-function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
+function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
     if (timeoutFlag) {
         timeoutFlag = false;
         clearTimeout(timer);
@@ -10,8 +10,8 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
             const username = $(source).val();
             const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
+            let loadingSpinner = $('#usernameAvailableLoading');
             if (username.length > 0) {
-                let loadingSpinner = $('#usernameAvailable');
                 $.ajax({
                     url: route.url,
                     type: route.type,
@@ -21,12 +21,7 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                         loadingSpinner.show();
                     },
                     complete: function () {
-                        setTimeout(
-                            function()
-                            {
-                                loadingSpinner.hide();
-                            }, 2000);
-
+                        loadingSpinner.hide();
                     },
                     statusCode: {
                         200: function () {
@@ -62,12 +57,12 @@ function checkPasswords() {
 function showPassword() {
     $('#showPassword span').toggleClass('active');
     let password = $('#signUpPassword')[0];
-    let matchPassword =$('#signUpConfirmPassword')[0];
+    let matchPassword = $('#signUpConfirmPassword')[0];
     if (password.type && matchPassword.type === "password") {
         password.type = "text";
-        matchPassword.type="text"
+        matchPassword.type = "text"
     } else {
         password.type = "password";
-        matchPassword.type="password";
+        matchPassword.type = "password";
     }
 }

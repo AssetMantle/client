@@ -14,12 +14,7 @@ function getConfiguration(configuration) {
                 loadingSpinner.show();
             },
             complete: function () {
-                setTimeout(
-                    function()
-                    {
-                        loadingSpinner.hide();
-                    }, 2000);
-
+                loadingSpinner.hide();
             },
             statusCode: {
                 200: function (data) {
@@ -47,12 +42,7 @@ function getConfigurationAsynchronously(configuration) {
                 loadingSpinner.show();
             },
             complete: function () {
-                setTimeout(
-                    function()
-                    {
-                        loadingSpinner.hide();
-                    }, 2000);
-
+                loadingSpinner.hide();
             },
             statusCode: {
                 200: function (data) {

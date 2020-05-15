@@ -53,11 +53,7 @@ function comet(source, route, loadingSpinnerID = 'commonSpinner') {
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function () {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {

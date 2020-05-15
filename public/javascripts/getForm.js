@@ -9,12 +9,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
             loadingSpinner.show();
         },
         complete: function () {
-            setTimeout(
-                function()
-                {
-                    loadingSpinner.hide();
-                }, 2000);
-
+            loadingSpinner.hide();
         },
         statusCode: {
             200: function (data) {
