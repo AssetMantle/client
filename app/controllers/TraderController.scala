@@ -126,10 +126,29 @@ class TraderController @Inject()(
 
           def getOrganization(id: String): Future[Organization] = masterOrganizations.Service.tryGet(id)
 
-          def create(fromTrader: Trader, toTrader: Trader): Future[String] =
+          def create(fromTrader: Trader, toTrader: Trader): Future[Unit] = {
             if (fromTrader.organizationID == toTrader.organizationID) throw new BaseException(constants.Response.COUNTERPARTY_TRADER_FROM_SAME_ORGANIZATION)
-            else if (toTrader.status.getOrElse(false)) masterTraderRelations.Service.create(fromID = fromTrader.id, toID = toTrader.id)
-            else throw new BaseException(constants.Response.UNVERIFIED_TRADER)
+            else if (!toTrader.status.getOrElse(false)) throw new BaseException(constants.Response.UNVERIFIED_TRADER)
+            else {
+              val traderRelation = masterTraderRelations.Service.get(fromID = fromTrader.id, toID = toTrader.id)
+
+              def addOrUpdate(traderRelation: Option[TraderRelation]) = {
+                traderRelation match {
+                  case Some(relation) => {
+                    if (relation.status.isEmpty) throw new BaseException(constants.Response.TRADER_RELATION_REQUEST_ALREADY_EXISTS)
+                    else if (relation.status.contains(true)) throw new BaseException(constants.Response.COUNTERPARTY_ALREADY_EXISTS)
+                    else masterTraderRelations.Service.insertOrUpdate(fromID = fromTrader.id, toID = toTrader.id)
+                  }
+                  case None => masterTraderRelations.Service.insertOrUpdate(fromID = fromTrader.id, toID = toTrader.id)
+                }
+              }
+
+              for {
+                traderRelation <- traderRelation
+                _ <- addOrUpdate(traderRelation)
+              } yield ()
+            }
+          }
 
           (for {
             fromTrader <- getTrader(loginState.username)
@@ -151,7 +170,7 @@ class TraderController @Inject()(
 
   def acceptOrRejectTraderRelationForm(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderRelation = masterTraderRelations.Service.get(fromID = fromID, toID = toID)
+      val traderRelation = masterTraderRelations.Service.tryGet(fromID = fromID, toID = toID)
       (for {
         traderRelation <- traderRelation
       } yield Ok(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))).recover {
@@ -163,7 +182,7 @@ class TraderController @Inject()(
     implicit request =>
       views.companion.master.AcceptOrRejectTraderRelation.form.bindFromRequest().fold(
         formWithErrors => {
-          val traderRelation = masterTraderRelations.Service.get(fromID = formWithErrors(constants.FormField.FROM.name).value.get, toID = formWithErrors(constants.FormField.TO.name).value.get)
+          val traderRelation = masterTraderRelations.Service.tryGet(fromID = formWithErrors(constants.FormField.FROM.name).value.get, toID = formWithErrors(constants.FormField.TO.name).value.get)
           (for {
             traderRelation <- traderRelation
           } yield BadRequest(views.html.component.master.acceptOrRejectTraderRelation(formWithErrors, traderRelation = traderRelation))
@@ -178,7 +197,7 @@ class TraderController @Inject()(
             masterTraderRelations.Service.markRejected(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
           }
 
-          def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.get(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
+          def traderRelation: Future[TraderRelation] = masterTraderRelations.Service.tryGet(fromID = acceptOrRejectTraderRelationData.fromID, toID = acceptOrRejectTraderRelationData.toID)
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 

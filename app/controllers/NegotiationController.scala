@@ -8,7 +8,7 @@ import models.Abstract.NegotiationDocumentContent
 import models._
 import models.common.Serializable._
 import models.master.{Asset, Negotiation, Trader}
-import models.masterTransaction.{NegotiationFile, TradeActivity}
+import models.masterTransaction.{NegotiationFile, TradeActivity, TradeActivityHistory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -27,11 +27,13 @@ class NegotiationController @Inject()(
                                        masterTraders: master.Traders,
                                        masterZones: master.Zones,
                                        masterNegotiations: master.Negotiations,
+                                       masterNegotiationHistories: master.NegotiationHistories,
                                        masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                        masterTransactionChats: masterTransaction.Chats,
                                        masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                        masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                       masterTransactionTradeActivityHistories: masterTransaction.TradeActivityHistories,
                                        transaction: utilities.Transaction,
                                        utilitiesNotification: utilities.Notification,
                                        transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
@@ -1182,6 +1184,47 @@ class NegotiationController @Inject()(
         sellerZoneAccountID <- getZoneAccountID(sellerZoneID)
         tradeActivityMessages <- getTradeActivityMessages(buyerAccountID, buyerOrganizationAccountID, buyerZoneAccountID, sellerAccountID, sellerOrganizationAccountID, sellerZoneAccountID)
       } yield Ok(views.html.component.master.tradeActivityMessages(tradeActivities = tradeActivityMessages))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def completedTradeActivityMessages(negotiationID: String, pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val buyerTraderID = masterNegotiationHistories.Service.tryGetBuyerTraderID(negotiationID)
+      val sellerTraderID = masterNegotiationHistories.Service.tryGetSellerTraderID(negotiationID)
+
+      def getOrganizationID(traderID: String): Future[String] = masterTraders.Service.tryGetOrganizationID(traderID)
+
+      def getZoneID(traderID: String): Future[String] = masterTraders.Service.tryGetZoneID(traderID)
+
+      def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+
+      def getOrganizationAccountID(organizationID: String): Future[String] = masterOrganizations.Service.tryGetAccountID(organizationID)
+
+      def getZoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
+
+      def getCompletedTradeActivityMessages(accountIDs: String*): Future[Seq[TradeActivityHistory]] = {
+        if (!accountIDs.contains(loginState.username)) throw new BaseException(constants.Response.UNAUTHORIZED)
+        if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER)
+        masterTransactionTradeActivityHistories.Service.getAllTradeActivities(negotiationID = negotiationID, pageNumber = pageNumber)
+      }
+
+      (for {
+        buyerTraderID <- buyerTraderID
+        buyerOrganizationID <- getOrganizationID(buyerTraderID)
+        buyerZoneID <- getZoneID(buyerTraderID)
+        buyerAccountID <- getTraderAccountID(buyerTraderID)
+        buyerOrganizationAccountID <- getOrganizationAccountID(buyerOrganizationID)
+        buyerZoneAccountID <- getZoneAccountID(buyerZoneID)
+        sellerTraderID <- sellerTraderID
+        sellerOrganizationID <- getOrganizationID(sellerTraderID)
+        sellerZoneID <- getZoneID(sellerTraderID)
+        sellerAccountID <- getTraderAccountID(sellerTraderID)
+        sellerOrganizationAccountID <- getOrganizationAccountID(sellerOrganizationID)
+        sellerZoneAccountID <- getZoneAccountID(sellerZoneID)
+        completedTradeActivityMessages <- getCompletedTradeActivityMessages(buyerAccountID, buyerOrganizationAccountID, buyerZoneAccountID, sellerAccountID, sellerOrganizationAccountID, sellerZoneAccountID)
+      } yield Ok(views.html.component.master.completedTradeActivityMessages(completedTradeActivities = completedTradeActivityMessages))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

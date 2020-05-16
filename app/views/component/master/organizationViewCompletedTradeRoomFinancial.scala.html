@@ -1,0 +1,33 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@(walletBalance: Int, amountPaid: Int, amountPending: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+<ul class="">
+    <li class="cmuk-flex">
+        <div class="cmuk-flex wallet">
+            <span class="walletIcon">@commonIcon("wallet")</span>
+            <div>
+                <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance</p>
+            </div>
+        </div>
+    </li>
+    <li class="cmuk-flex">
+        <div class="cmuk-flex receivable">
+            <span class="receivableIcon">@commonIcon("receivable")</span>
+            <div>
+                <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid</p>
+            </div>
+        </div>
+    </li>
+    <li class="cmuk-flex">
+        <div class="cmuk-flex payable">
+            <span class="payableIcon">@commonIcon("payable")</span>
+            <div>
+                <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@amountPending</p>
+            </div>
+        </div>
+
+    </li>
+</ul>
