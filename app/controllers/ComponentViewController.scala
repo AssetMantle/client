@@ -1935,7 +1935,7 @@ class ComponentViewController @Inject()(
       def traders(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderIDs)
-      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderIDs).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         zoneID <- zoneID
@@ -1956,7 +1956,7 @@ class ComponentViewController @Inject()(
       def traders(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderIDs)
-      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderIDs).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         zoneID <- zoneID
@@ -1977,7 +1977,7 @@ class ComponentViewController @Inject()(
       def traders(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderIDs)
-      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderIDs).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         zoneID <- zoneID
@@ -2062,7 +2062,7 @@ class ComponentViewController @Inject()(
       def traders(zoneID: String): Future[Seq[Trader]] = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
 
       def receiveFiatList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderIDs)
-      def receiveFiatHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderIDs).map(_.map(masterTransactionReceiveFiatHistories.Utility.convertToReceiveFiat(_)))
+      def receiveFiatHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderIDs).map(_.map(_.convertToReceiveFiat))
 
       (for {
         zoneID <- zoneID
@@ -2088,7 +2088,7 @@ class ComponentViewController @Inject()(
       def traders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderIDs)
-      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderIDs).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         organizationID <- organizationID
@@ -2107,7 +2107,7 @@ class ComponentViewController @Inject()(
       def traders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderIDs)
-      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderIDs).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         organizationID <- organizationID
@@ -2126,7 +2126,7 @@ class ComponentViewController @Inject()(
       def traders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
 
       def sendFiatRequestList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderIDs)
-      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderIDs).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderIDs).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         organizationID <- organizationID
@@ -2201,7 +2201,7 @@ class ComponentViewController @Inject()(
       def traders(organizationID: String): Future[Seq[Trader]] = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
 
       def receiveFiatList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderIDs)
-      def receiveFiatHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderIDs).map(_.map(masterTransactionReceiveFiatHistories.Utility.convertToReceiveFiat(_)))
+      def receiveFiatHistoryList(traderIDs: Seq[String]): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderIDs).map(_.map(_.convertToReceiveFiat))
 
       (for {
         organizationID <- organizationID
@@ -2224,7 +2224,7 @@ class ComponentViewController @Inject()(
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getPendingSendFiatRequests(traderID)
-      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderID).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getPendingSendFiatRequests(traderID).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         trader <- trader
@@ -2240,7 +2240,7 @@ class ComponentViewController @Inject()(
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getCompleteSendFiatRequests(traderID)
-      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderID).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getCompleteSendFiatRequests(traderID).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         trader <- trader
@@ -2256,7 +2256,7 @@ class ComponentViewController @Inject()(
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def sendFiatRequestList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequests.Service.getFailedSendFiatRequests(traderID)
-      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderID).map(_.map(masterTransactionSendFiatRequestHistories.Utility.convertToSendFiatRequest(_)))
+      def sendFiatRequestHistoryList(traderID: String): Future[Seq[masterTransaction.SendFiatRequest]] = masterTransactionSendFiatRequestHistories.Service.getFailedSendFiatRequests(traderID).map(_.map(_.convertToSendFiatRequest))
 
       (for {
         trader <- trader
@@ -2319,7 +2319,7 @@ class ComponentViewController @Inject()(
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
 
       def receiveFiatList(traderID: String): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiats.Service.get(traderID)
-      def receiveFiatHistoryList(traderID: String): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderID).map(_.map(masterTransactionReceiveFiatHistories.Utility.convertToReceiveFiat(_)))
+      def receiveFiatHistoryList(traderID: String): Future[Seq[masterTransaction.ReceiveFiat]] = masterTransactionReceiveFiatHistories.Service.get(traderID).map(_.map(_.convertToReceiveFiat))
 
       (for {
         trader <- trader
