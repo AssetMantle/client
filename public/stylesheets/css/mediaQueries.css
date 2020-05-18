@@ -163,7 +163,7 @@
     border-radius: 103px;
     color: #0862BE;
     border: 0; }
-  .leftContainer .documentView .cmuk-card-header, .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
+  .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
     padding: 0px; }
   .leftContainer .documentView .documentList {
     height: 150px; }
@@ -256,7 +256,10 @@
 
   .infoText .infoIcon.organizationInfoIcon {
     left: 340px;
-    top: 0; } }
+    top: 0; }
+
+  .iframeModal {
+    height: 530px; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }

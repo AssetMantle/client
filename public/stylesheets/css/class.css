@@ -12,7 +12,7 @@ html, body {
   position: relative;
   background: #F0F0F0; }
 
-.scroller {
+html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin; }
 
@@ -259,6 +259,8 @@ html, body {
       color: #053C75; }
 
 .iframeModal {
+  height: 700px;
+  overflow: auto;
   padding: 50px; }
 
 .copyIcon {
@@ -1500,7 +1502,7 @@ header:before,
 .documentView.switcherCardSecond .cmuk-subnav li:last-child {
   display: none; }
 
-.documentView .cmuk-card-header, .documentView .cmuk-card-body, .documentView .documentList {
+.documentView .cmuk-card-body, .documentView .documentList {
   padding: 0; }
 .documentView .documentList {
   height: 250px;
@@ -1733,6 +1735,11 @@ header:before,
     .commonList .listItemChild button a, .commonList .listItemChild button a:hover {
       text-decoration: none;
       color: #fff; }
+    .commonList .listItemChild .cmuk-button {
+      line-height: 28px; }
+      .commonList .listItemChild .cmuk-button:hover {
+        color: #FFFFFF;
+        background: #0862BE; }
 
 .accountName {
   position: absolute;
@@ -2097,7 +2104,7 @@ figure.zoom {
       color: #FFFFFF;
       background: #0862BE; }
 
-.ripple-effect {
+.rippleEffect {
   position: absolute;
   border-radius: 50%;
   animation: ripple-animation 2s; }
@@ -2111,7 +2118,7 @@ figure.zoom {
     opacity: 0; } }
 .identificationCheckbox {
   display: flex;
-  padding: 10px 0px; }
+  padding: 10px 0; }
   .identificationCheckbox p {
     margin: 0;
     word-break: break-word; }

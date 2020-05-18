@@ -23,9 +23,11 @@
                     }
                     case None => {}
                 }
-                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
                 @commonVerticalIntInfo(constants.View.AMOUNT, receiveFiat.amount)
                 @commonVerticalTextInfo(constants.View.STATUS, receiveFiat.status)
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
+                </div>
             }
         }
     }

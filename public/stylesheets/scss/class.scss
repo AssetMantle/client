@@ -16,9 +16,10 @@ html, body{
   height: 100%;
   position: relative;
   background: #F0F0F0;
+  @extend %scroller;
 }
 
-.scroller{
+%scroller{
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin;
 }
@@ -323,7 +324,9 @@ html, body{
 }
 
 .iframeModal{
-padding: 50px;
+  height: 700px;
+  overflow: auto;
+  padding: 50px;
 }
 
 .copyIcon{
@@ -452,6 +455,9 @@ padding: 50px;
 }
 
 .comdex {
+  .cmuk-overflow-auto{
+    @extend %scroller;
+  }
   .cmuk-sticky-fixed{
     width: 100% !important;
   }
@@ -848,6 +854,7 @@ padding: 50px;
         .formBody{
           max-height:600px;
           overflow: auto;
+          @extend %scroller;
           .inputField{
             margin-top: 10px;
           }
@@ -882,6 +889,7 @@ form{
   max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px;
+  @extend %scroller;
   .traderCommodity{
     display: flex;
     align-items: center;
@@ -1599,6 +1607,7 @@ form{
   .cmuk-card-body{
     padding:0;
     overflow-y: auto;
+    @extend %scroller;
     ul{
       padding: 0;
       margin: 0;
@@ -1804,7 +1813,8 @@ form{
       .recentActivityMessages{
         height: 300px;
         padding: 0 15px;
-        overflow:auto
+        overflow:auto;
+        @extend %scroller;
       }
     }
   }
@@ -1833,6 +1843,7 @@ form{
     .chatMessagesContainer{
       height: 250px;
       overflow: auto;
+      @extend %scroller;
     }
     .chatForm{
       .sendFormField{
@@ -2028,13 +2039,15 @@ header:before,
     }
   }
 }
+
 .documentView{
-  .cmuk-card-header, .cmuk-card-body, .documentList{
+  .cmuk-card-body, .documentList{
     padding:0;
   }
   .documentList{
     height: 250px;
     overflow: auto;
+    @extend %scroller;
   }
 
   .documentList{
@@ -2320,6 +2333,13 @@ header:before,
       a, a:hover{
         text-decoration: none;
         color:#fff;
+      }
+    }
+    .cmuk-button{
+      line-height: 28px;
+      &:hover{
+        color: #FFFFFF;
+        background: $colorPrimary;
       }
     }
   }
@@ -2622,6 +2642,7 @@ dl .info {
     height: 256px;
     overflow: auto;
     padding: 20px;
+    @extend %scroller;
     .cmuk-button{
     @extend %buttonSmall;
     }
@@ -2825,7 +2846,7 @@ figure.zoom {
   }
 }
 
-.ripple-effect {
+.rippleEffect {
   position: absolute;
   border-radius: 50%;
   animation: ripple-animation 2s;
@@ -2844,7 +2865,7 @@ figure.zoom {
 
 .identificationCheckbox{
   display: flex;
-  padding: 10px 0px;
+  padding: 10px 0;
   p{
     margin:0;
     word-break:break-word;

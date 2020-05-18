@@ -240,7 +240,7 @@
       border: 0;
     }
     .documentView{
-      .cmuk-card-header, .cmuk-card-body, .documentList{
+      .cmuk-card-body, .documentList{
         padding:0px;
       }
       .documentList{
@@ -389,6 +389,9 @@
       left: 340px;
       top: 0;
     }
+  }
+  .iframeModal{
+    height: 530px;
   }
 }
 

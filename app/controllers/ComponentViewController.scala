@@ -51,7 +51,6 @@ class ComponentViewController @Inject()(
                                          masterTransactionSendFiatRequestHistories: masterTransaction.SendFiatRequestHistories,
                                          memberCheckVesselScanDecisions: memberCheck.VesselScanDecisions,
                                          masterTransactionReceiveFiatHistories: masterTransaction.ReceiveFiatHistories,
-                                         masterTransactionSendFiatRequestHistories: masterTransaction.SendFiatRequestHistories,
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
                                          westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,

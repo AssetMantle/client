@@ -12,7 +12,7 @@
             }
     }
 <div id="@chatID"></div>
-    <div id="chatMessages" class="chat chatMessagesContainer" title="You have chat with">
+    <div id="chatMessages" class="chat chatMessagesContainer">
         <script>
             componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0))
     </script>
@@ -32,4 +32,9 @@
   <script>
           loadMoreChatsOnScroll('@chatID');
   </script>
+@*<script>*@
+@*        $(document).ready(function(){*@
+@*            $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight - $('#chatMessages')[0].clientHeight)*@
+@*        });*@
+@*</script>*@
 
