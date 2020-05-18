@@ -4,6 +4,7 @@ function loadMoreChats(chatID) {
         url: route.url,
         type: route.type,                                       
         async: true,
+        global: false,
         statusCode: {
             200: function (data) {
                 const loadMore = $(".chatMessages .chatMessage:first");
@@ -70,6 +71,7 @@ function markChatRead(route) {
         url: route.url,
         type: route.type,
         async: true,
+        global: false,
         statusCode: {
             200: function (data) {
                $('.unRead').fadeOut();
@@ -91,6 +93,7 @@ function replyMessage(route, messageID) {
         url: route.url,
         type: route.type,
         async: true,
+        global: false,
         statusCode: {
             200: function (data) {
                 $('#' + data.id + messageID).html(data.text);
