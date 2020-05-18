@@ -1,4 +1,5 @@
 @import controllers.Assets.Asset
+@import views.html.base.commonSpinner
 
 @(title: String, arguments: (Symbol, Any)*)(headerContent: Html = Html(""))(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
 
@@ -10,9 +11,7 @@
                 <svg class="icon"><use xlink:href='@routes.Assets.versioned(Asset(arguments.toMap.get('cardIconPath).map(_.toString).getOrElse("")))'/></svg>
             }
         <span class="headerFontSize">@Messages(title)</span>
-        <div class="hidden" id="@Seq(title, "LOADING").mkString("_")">
-            <div class="cmuk-position-center" cmuk-spinner></div>
-        </div>
+            @commonSpinner(Seq(title, "LOADING").mkString("_"))
         </div>
         @headerContent
     </div>
