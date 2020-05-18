@@ -18,15 +18,15 @@ class WithActionLoggingFilter @Inject()(messagesControllerComponents: MessagesCo
   def next(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = Action { implicit request ⇒
     val startTime = System.currentTimeMillis()
     try {
-      logger.info(messagesApi(constants.Log.CONTROLLERS_REQUEST_LOG,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"))(Lang(language)))
+      logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"))(Lang(language)))
       val result = f(request)
       val endTime = System.currentTimeMillis()
-      logger.info(messagesApi(constants.Log.CONTROLLERS_RESPONSE_LOG,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),result.header.status,endTime - startTime)(Lang(language)))
+      logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),result.header.status,endTime - startTime)(Lang(language)))
       result
     } catch {
       case baseException: BaseException =>
         val endTime = System.currentTimeMillis()
-        logger.info(messagesApi(constants.Log.CONTROLLERS_RESPONSE_LOG,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),Results.InternalServerError.header.status,endTime - startTime)(Lang(language)))
+        logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),Results.InternalServerError.header.status,endTime - startTime)(Lang(language)))
         Results.InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
 

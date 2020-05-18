@@ -5,6 +5,6 @@
 
 @(updateContractSignedForm: Form[UpdateContractSigned.Data] = UpdateContractSigned.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.UPDATE_CONTRACT_SIGNED, updateContractSignedForm) {
-    @Messages(constants.View.UPDATE_CONTRACT_SIGNED_NOTE)
+    <p>@Messages(constants.View.UPDATE_CONTRACT_SIGNED_NOTE)</p>
     @commonInputText(updateContractSignedForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
 }

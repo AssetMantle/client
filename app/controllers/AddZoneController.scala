@@ -184,7 +184,7 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[ZoneKYC](
+      def storeFile(id: String): Future[Unit] = fileResourceManager.storeFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
@@ -493,7 +493,7 @@ class AddZoneController @Inject()(
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[ZoneKYC](
+      def storeFile(id: String): Future[Unit] = fileResourceManager.storeFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         document = ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),

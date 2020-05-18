@@ -70,5 +70,8 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
     def get(traderIDs: Seq[String]): Future[Seq[ReceiveFiatHistory]] = getByTraderIDsAndStatuses(traderIDs, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT))
   }
 
+  object Utility {
+    def convertToReceiveFiat(receiveFiatHistory: ReceiveFiatHistory) = ReceiveFiat(receiveFiatHistory.id, receiveFiatHistory.traderID, receiveFiatHistory.orderID, receiveFiatHistory.amount, receiveFiatHistory.status, receiveFiatHistory.createdBy,receiveFiatHistory.createdOn, receiveFiatHistory.createdOnTimeZone, receiveFiatHistory.updatedBy, receiveFiatHistory.updatedOn, receiveFiatHistory.updatedOnTimeZone)
+  }
 }
 

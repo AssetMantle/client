@@ -323,7 +323,7 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def storeFile(organizationID: String): Future[Boolean] = fileResourceManager.storeFile[OrganizationKYC](
+      def storeFile(organizationID: String): Future[Unit] = fileResourceManager.storeFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
@@ -697,7 +697,7 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[OrganizationKYC](
+      def storeFile(id: String): Future[Unit] = fileResourceManager.storeFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         document = OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),

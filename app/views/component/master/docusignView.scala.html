@@ -3,6 +3,6 @@
 @import models.masterTransaction.Chat
 
 @(url:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-
-<iframe src="@url" width="1000" height="1000"></iframe>
-
+<div class="iframeModal">
+<iframe src="@url" width="1000" height="700"></iframe>
+</div>

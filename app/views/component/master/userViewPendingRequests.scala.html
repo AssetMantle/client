@@ -18,7 +18,7 @@
     @if(trader.isEmpty && organization.isEmpty) {
         <div class="cmuk-position-center">
         @if(contactStatus.sameElements(Seq(constants.Status.Contact.MOBILE_NUMBER_VERIFIED, constants.Status.Contact.EMAIL_ADDRESS_VERIFIED))) {
-            @commonFormButton(constants.Form.ADD_TRADER)
+            @commonFormButton(constants.Form.ADD_TRADER, 'class -> "cmuk-margin-bottom buttonPrimary")
             <br>
                 @identification match {
                     case Some(identification) => {

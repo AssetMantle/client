@@ -9,7 +9,7 @@
         @receiveFiats.map { receiveFiat =>
             @commonVerticalInfoBox() {
                 @commonVerticalTextInfo(constants.View.ID, receiveFiat.id)
-                @commonVerticalTextInfo(constants.View.ORDER_ID, receiveFiat.orderID)
+                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
                 @commonVerticalIntInfo(constants.View.AMOUNT, receiveFiat.amount)
                 @commonVerticalTextInfo(constants.View.STATUS, receiveFiat.status)
             }

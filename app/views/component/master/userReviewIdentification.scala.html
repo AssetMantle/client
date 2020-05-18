@@ -22,7 +22,7 @@
         @component.master.commonDocumentViewer(accountKYC) {
             @routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)
         } {
-            <a href="@routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)">@Messages(accountKYC.documentType)</a>
+            <a href="@routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)" target="_blank">@Messages(accountKYC.documentType)</a>
         } {
 
         }

@@ -1,0 +1,25 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.ReceiveFiat
+@import models.master.Organization
+@import models.master.Trader
+
+@(receiveFiats: Seq[ReceiveFiat], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+    @commonCard(constants.View.RECEIVED_FIAT) {
+    } {
+        @receiveFiats.map { receiveFiat =>
+            @commonVerticalInfoBox() {
+                @commonVerticalTextInfo(constants.View.ID, receiveFiat.id)
+                @traders.find(_.id == receiveFiat.traderID) match {
+                    case Some(trader) => {
+                        @commonVerticalTextInfo(constants.View.TRADER, trader.accountID)
+                    }
+                    case None => {}
+                }
+                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
+                @commonVerticalIntInfo(constants.View.AMOUNT, receiveFiat.amount)
+                @commonVerticalTextInfo(constants.View.STATUS, receiveFiat.status)
+            }
+        }
+    }
