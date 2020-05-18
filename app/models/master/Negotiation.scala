@@ -87,6 +87,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def getByID(id: String): Future[Option[NegotiationSerializable]] = db.run(negotiationTable.filter(_.id === id).result.headOption)
 
   private def tryGetByID(id: String): Future[NegotiationSerializable] = db.run(negotiationTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
@@ -516,6 +517,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def update(negotiation: Negotiation): Future[Int] = updateByID(negotiation)
 
     def tryGet(id: String): Future[Negotiation] = tryGetByID(id).map(_.deserialize)
+
+    def get(id: String): Future[Option[Negotiation]] = getByID(id).map(_.map(_.deserialize))
 
     def tryGetByBCNegotiationID(negotiationID: String): Future[Negotiation] = tryGetByNegotiationID(negotiationID).map(_.deserialize)
 

@@ -1,0 +1,62 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.NegotiationHistory
+@import models.masterTransaction.AssetFileHistory
+@import models.masterTransaction.NegotiationFileHistory
+@(negotiationHistory: NegotiationHistory,assetFileHistoryList: Seq[AssetFileHistory], negotiationFileHistoryList: Seq[NegotiationFileHistory])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="documentView switcherCardSecond">
+    @commonInfoBox() {
+        @commonCard(constants.View.DOCUMENT_LIST){
+        }{
+            <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
+                <tbody>
+                    <tr><td colspan="3">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
+                    @assetFileHistoryList.filter(assetFile=> negotiationHistory.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
+                        <tr>
+                            <td colspan="2"><span class="docIcon">@commonIcon("doc2")</span>
+                                <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS', '1', jsRoutes.controllers.ComponentViewController.traderViewCompletedNegotiationDocument('@negotiationHistory.id', '@assetFile.documentType'))">@Messages(assetFile.documentType)</a>
+                            </td>
+                            @assetFile.documentType match{
+                                case constants.File.Asset.BILL_OF_LADING=> {
+                                    <td> <span class="seenIcon" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiationHistory.assetID', '@assetFile.documentType'))")>
+                                    @commonIcon("seen")
+                                    </span>
+                                    </td>
+                                    <td>
+                                    @assetFile.status match{
+                                        case Some(true)=>{@constants.View.APPROVED}
+                                        case Some(false)=>{@constants.View.REJECTED}
+                                        case None=>{}
+                                    }
+                                    </td>
+                                }
+                                case _=>{<td colspan="2"></td>}
+                            }
+                        </tr>
+                    }
+                    <tr><td colspan="3">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</td></tr>
+                    @negotiationFileHistoryList.filter(negotiationFile=> negotiationHistory.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile=>
+                        <tr>
+                            <td colspan="2"><span class="docIcon">@commonIcon("doc2")</span>
+                                <a onclick="switchTab('@constants.View.VIEW_DOCUMENTS','1', jsRoutes.controllers.ComponentViewController.traderViewCompletedNegotiationDocument('@negotiationHistory.id', '@negotiationFile.documentType'))">@Messages(negotiationFile.documentType)</a>
+                            </td>
+                            @negotiationFile.documentType match{
+                                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.CONTRACT => {
+                                    <td>
+                                        <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocumentContent('@negotiationHistory.id','@negotiationFile.documentType'))")>
+                                        @commonIcon("seen")
+                                        </span>
+                                    </td>
+                                    @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <td><span>@constants.View.SIGNED</span></td>}
+                                }
+                                case _=>{<td colspan="3"></td>}
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+</div>
+
+<script src="@routes.Assets.versioned("javascripts/switchTab.js")" type="text/javascript"></script>

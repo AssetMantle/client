@@ -1,0 +1,21 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.RedeemFiatRequest
+@import models.master.Organization
+@import models.master.Trader
+
+@(redeemFiatRequests: Seq[RedeemFiatRequest], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@redeemFiatRequests.map { redeemFiatRequest =>
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.ID, redeemFiatRequest.id)
+        @traders.find(_.id == redeemFiatRequest.traderID) match {
+            case Some(trader) => {
+                @commonVerticalTextInfo(constants.View.TRADER, trader.accountID)
+            }
+            case None => {}
+        }
+        @commonVerticalIntInfo(constants.View.AMOUNT, redeemFiatRequest.amount)
+        @commonVerticalTextInfo(constants.View.STATUS, redeemFiatRequest.status)
+    }
+}

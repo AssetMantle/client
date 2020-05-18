@@ -23,13 +23,5 @@
         }
         @commonVerticalIntInfo(constants.View.AMOUNT, redeemFiatRequest.amount)
         @commonVerticalTextInfo(constants.View.STATUS, redeemFiatRequest.status)
-        <div class="listItemChild">
-            <p class="listItemChildTitle">
-            @Messages(constants.View.ACTION)
-            </p>
-            <p class="listItemChildValue">
-                @commonModalButton(constants.View.VIEW, routes.javascript.RedeemFiatController.zoneRedeemFiatForm, 'parameters -> s"'${redeemFiatRequest.id}'")
-            </p>
-        </div>
     }
 }

@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Negotiation
+@import scala.collection.immutable.ListMap
+
+@(negotiationID:String)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.VIEW_TERMS -> routes.javascript.ComponentViewController.zoneViewCompletedNegotiationTerms,
+        constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.zoneViewCompletedNegotiationDocument,
+    ),
+        'VIEW_TERMS_PARAMETERS -> s"'${negotiationID}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiationID}'")
+</div>
