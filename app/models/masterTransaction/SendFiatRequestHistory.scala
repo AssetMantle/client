@@ -4,13 +4,14 @@ import java.sql.Timestamp
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.HistoryLogged
+import models.Trait
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged {
+case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends Trait.SendFiatRequest with HistoryLogged {
   def convertToSendFiatRequest = SendFiatRequest(this.id, this.traderID, this.ticketID, this.negotiationID, this.amount, this.status, this.createdBy, this.createdOn, this.createdOnTimeZone, this.updatedBy, this.updatedOn, this.updatedOnTimeZone)
 }
 

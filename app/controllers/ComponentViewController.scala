@@ -2551,7 +2551,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.zoneViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList, organizations, traders))).recover {
+      } yield Ok(views.html.component.master.zoneViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, organizations, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2572,7 +2572,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.zoneViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList, organizations, traders))).recover {
+      } yield Ok(views.html.component.master.zoneViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, organizations, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2657,7 +2657,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         receiveFiatList <- receiveFiatList(traders.map(_.id))
         receiveFiatHistoryList <- receiveFiatHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.zoneViewReceiveFiatList(receiveFiatList ++ receiveFiatHistoryList, organizations, traders))).recover {
+      } yield Ok(views.html.component.master.zoneViewReceiveFiatList(receiveFiatList, receiveFiatHistoryList, organizations, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2682,7 +2682,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList, traders))).recover {
+      } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2701,7 +2701,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList, traders))).recover {
+      } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2720,7 +2720,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList, traders))).recover {
+      } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2795,7 +2795,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         receiveFiatList <- receiveFiatList(traders.map(_.id))
         receiveFiatHistoryList <- receiveFiatHistoryList(traders.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewReceiveFiatList(receiveFiatList ++ receiveFiatHistoryList, traders))).recover {
+      } yield Ok(views.html.component.master.organizationViewReceiveFiatList(receiveFiatList, receiveFiatHistoryList, traders))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2817,7 +2817,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         sendFiatRequestList <- sendFiatRequestList(trader.id)
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(trader.id)
-      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2833,7 +2833,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         sendFiatRequestList <- sendFiatRequestList(trader.id)
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(trader.id)
-      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2849,7 +2849,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         sendFiatRequestList <- sendFiatRequestList(trader.id)
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(trader.id)
-      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList ++ sendFiatRequestHistoryList))).recover {
+      } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -2912,7 +2912,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         receiveFiatList <- receiveFiatList(trader.id)
         receiveFiatHistoryList <- receiveFiatHistoryList(trader.id)
-      } yield Ok(views.html.component.master.traderViewReceiveFiatList(receiveFiatList ++ receiveFiatHistoryList))).recover {
+      } yield Ok(views.html.component.master.traderViewReceiveFiatList(receiveFiatList, receiveFiatHistoryList))).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
