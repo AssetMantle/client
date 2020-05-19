@@ -3,8 +3,10 @@
 @import models.master.{Asset, Negotiation}
 @import views.html.component.master.buyerViewNegotiationTerm
 @import models.master.Order
+@import models.master.Trader
+@import models.master.Organization
 
-@(traderID: String, negotiation: Negotiation, order:Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderID: String, counterPartyTrader:Trader, counterPartyOrganization:Organization, negotiation: Negotiation, order:Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
@@ -48,6 +50,9 @@
                             }
                         }
                      }
+
+            @commonTextInfo(constants.View.COUNTER_PARTY_TRADER, counterPartyTrader.accountID)
+            @commonTextInfo(constants.View.COUNTER_PARTY_ORGANIZATION, counterPartyOrganization.name)
         </div>
 
         <div class="terms">
@@ -60,7 +65,7 @@
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "contractPrice") {
                 @Messages(constants.View.PRICE)
             } {
-                @negotiation.price
+                @Seq(negotiation.price, Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
             }
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "quantity") {
                 @Messages(constants.View.QUANTITY)
@@ -138,7 +143,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonIntInfo(constants.View.PRICE, negotiation.price)
+                    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @if(negotiation.buyerAcceptedPrice) {

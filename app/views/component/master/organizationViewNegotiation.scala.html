@@ -18,7 +18,7 @@
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-    @commonIntInfo(constants.View.PRICE, negotiation.price)
+    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
     @trader match {
         case Some(trader) => {
             @commonTextInfo(constants.View.TRADER, trader.accountID)

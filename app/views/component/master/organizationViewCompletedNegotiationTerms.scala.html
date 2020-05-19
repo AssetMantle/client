@@ -1,13 +1,26 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.{AssetHistory, NegotiationHistory}
+@import models.master.Trader
+@import models.master.Organization
 
-@(negotiationHistory: NegotiationHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traders: Seq[Trader], counterPartyOrganization: Organization, negotiationHistory: NegotiationHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiationHistory.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity">
             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetHistory.assetType + ".svg")"></span><span class="tradeName">@assetHistory.assetType</span>
+            @traders.find(_.organizationID != counterPartyOrganization.id) match {
+                case Some(trader)=>{@commonTextInfo(constants.View.TRADER,trader.accountID)}
+                case None=>{}
+            }
+            @traders.find(_.organizationID == counterPartyOrganization.id) match {
+                case Some(trader)=>{
+                    @commonTextInfo(constants.View.COUNTER_PARTY_TRADER, trader.accountID)
+                    @commonTextInfo(constants.View.COUNTER_PARTY_ORGANIZATION, counterPartyOrganization.name)
+                }
+                case None=>{}
+            }
         </div>
         <div class="terms">
             <div class="cmuk-flex cmuk-flex-between">
@@ -30,7 +43,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonIntInfo(constants.View.PRICE, negotiationHistory.price)
+                    @commonTextInfo(constants.View.PRICE, Seq(negotiationHistory.price, Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @if(negotiationHistory.buyerAcceptedPrice) {

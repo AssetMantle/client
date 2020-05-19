@@ -1,13 +1,36 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.{Asset, Negotiation}
+@import models.master.Trader
+@import models.master.Organization
 
-@(negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderList: Seq[Trader], organizationList: Seq[Organization], negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity">
             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType</span>
+
+         @traderList.map{ trader =>
+            @trader.id match {
+                case negotiation.sellerTraderID=>{
+                    @commonTextInfo(constants.View.SELLER, trader.accountID)
+                    @organizationList.find(_.id == trader.organizationID) match {
+                        case Some(organization)=>{@commonTextInfo(constants.View.SELLER_ORGANIZATION, organization.name)}
+                        case None=> {}
+                    }
+                }
+                case negotiation.buyerTraderID=>{
+                    @commonTextInfo(constants.View.BUYER, trader.accountID)
+                    @organizationList.find(_.id == trader.organizationID) match {
+                        case Some(organization)=>{@commonTextInfo(constants.View.BUYER_ORGANIZATION, organization.name)}
+                        case None=> {}
+                    }
+                }
+                case _=>{}
+            }
+         }
+
         </div>
         <div class="terms">
             <div class="cmuk-flex cmuk-flex-between">
@@ -25,7 +48,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonIntInfo(constants.View.PRICE, negotiation.price)
+                    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @negotiation.buyerAcceptedPrice
