@@ -4,9 +4,11 @@
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
   <appender name="AUDIT_FILE" class="ch.qos.logback.core.FileAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
-    </filter>
+    <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">
+      <Name>ACCESS_FILTER</Name>
+      <Marker>ACCESS</Marker>
+      <OnMatch>ACCEPT</OnMatch>
+    </turboFilter>
     <file>${application.home:-.}/logs/audit.log</file>
     <encoder>
       <pattern>%date [%level] from %logger in %thread  - %message%n%xException</pattern>
