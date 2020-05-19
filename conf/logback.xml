@@ -8,6 +8,7 @@
       <Name>ACCESS_FILTER</Name>
       <Marker>ACCESS</Marker>
       <OnMatch>ACCEPT</OnMatch>
+      <OnMismatch>DENY</OnMismatch>
     </turboFilter>
     <file>${application.home:-.}/logs/audit.log</file>
     <encoder>
