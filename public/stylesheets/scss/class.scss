@@ -565,7 +565,9 @@ html, body{
     color:#061728;
     padding: 15px 20px;
     .cmuk-button{
-    @extend %buttonSmall;
+      @extend %buttonSmall;
+      position: absolute;
+      right: 20px;
     }
   }
   .cmuk-button {
@@ -2449,14 +2451,20 @@ header:before,
       .infoRow{
         flex-direction: column;
       }
+      .cmuk-button{
+        line-height: 28px;
+        padding: 0 20px;
+      }
     }
     .contactUpdateButton{
-      width: 60px;
       display: flex;
       flex-direction: row-reverse;
+      align-items: center;
       text-align: right;
       button{
         font-weight: normal;
+        padding: 0 20px;
+        margin-left: 20px;
       }
     }
   }

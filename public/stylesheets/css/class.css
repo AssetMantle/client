@@ -442,6 +442,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-card-header {
   color: #061728;
   padding: 15px 20px; }
+  .comdex .cmuk-card-header .cmuk-button {
+    position: absolute;
+    right: 20px; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
@@ -1810,13 +1813,18 @@ header:before,
     flex: 1; }
     .contactDetails .contactInfoItem .cmuk-card .infoRow {
       flex-direction: column; }
+    .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
+      line-height: 28px;
+      padding: 0 20px; }
   .contactDetails .contactInfoItem .contactUpdateButton {
-    width: 60px;
     display: flex;
     flex-direction: row-reverse;
+    align-items: center;
     text-align: right; }
     .contactDetails .contactInfoItem .contactUpdateButton button {
-      font-weight: normal; }
+      font-weight: normal;
+      padding: 0 20px;
+      margin-left: 20px; }
 .contactDetails .infoRowBox {
   justify-content: space-between; }
   .contactDetails .infoRowBox .infoRowLabel {
