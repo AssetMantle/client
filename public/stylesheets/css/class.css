@@ -357,7 +357,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden; }
+  overflow: hidden;
+  word-break: break-word; }
 
 .forgotPasswordNote {
   font-size: 1.25rem; }
@@ -1665,6 +1666,7 @@ header:before,
         color: #0862BE;
         text-align: left; }
     .chat .partner p {
+      word-break: break-word;
       margin: 0; }
   .chat .you {
     word-break: break-all;
@@ -1697,6 +1699,7 @@ header:before,
         color: #6CA8E7;
         text-align: left; }
     .chat .you p {
+      word-break: break-word;
       margin: 0; }
   .chat .chatSubmit {
     width: 92%;
