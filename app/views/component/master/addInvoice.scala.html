@@ -5,7 +5,7 @@
 @import models.master.Organization
 @import models.master.Trader
 
-@(addInvoiceForm: Form[AddInvoice.Data] = AddInvoice.form, negotiationID:String,negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(addInvoiceForm: Form[AddInvoice.Data] = AddInvoice.form, negotiationID:String, negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.ADD_INVOICE, addInvoiceForm) {
     @traderList.map{ trader =>
