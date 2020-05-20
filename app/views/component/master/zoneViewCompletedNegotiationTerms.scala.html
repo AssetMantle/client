@@ -51,7 +51,8 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonTextInfo(constants.View.PRICE, Seq(negotiationHistory.price, Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE, Seq(negotiationHistory.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiationHistory.price * negotiationHistory.quantity).toString, Messages(constants.View.USD)).mkString(" "))
                 </div>
                 <div>
                 @if(negotiationHistory.buyerAcceptedPrice) {

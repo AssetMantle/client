@@ -1,13 +1,34 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import views.companion.master.AddInvoice
+@import models.master.Negotiation
+@import models.master.Organization
+@import models.master.Trader
 
-@(addInvoiceForm: Form[AddInvoice.Data] = AddInvoice.form, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(addInvoiceForm: Form[AddInvoice.Data] = AddInvoice.form, negotiationID:String,negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.ADD_INVOICE, addInvoiceForm) {
+    @traderList.map{ trader =>
+        @trader.id match {
+            case negotiation.sellerTraderID=>{
+                @organizationList.find(_.id == trader.organizationID) match {
+                    case Some(organization)=>{@commonTextInfo(constants.View.SELLER_ORGANIZATION, organization.name)}
+                    case None=> {}
+                }
+            }
+            case negotiation.buyerTraderID=>{
+                @organizationList.find(_.id == trader.organizationID) match {
+                    case Some(organization)=>{@commonTextInfo(constants.View.BUYER_ORGANIZATION, organization.name)}
+                    case None=> {}
+                }
+            }
+            case _=>{}
+        }
+    }
     @commonInputText(addInvoiceForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
     @commonInputText(addInvoiceForm, constants.FormField.INVOICE_NUMBER)
     @commonInputInt(addInvoiceForm, constants.FormField.INVOICE_AMOUNT)
     @commonInputDate(addInvoiceForm, constants.FormField.INVOICE_DATE)
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${negotiationID}'")
 }
 

@@ -7,12 +7,11 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
-import models.master.{AccountFile, AccountKYC, Negotiations}
+import models.master.{AccountFile, AccountKYC, Negotiation, Negotiations, Organization, Trader}
 import models.{master, masterTransaction}
 import models.common.Serializable
 import models.common.Serializable.{BillOfLading, Contract, Invoice}
 import models.docusign
-import models.master.{AccountKYC, Negotiation, Negotiations, Trader}
 import models.masterTransaction.{AssetFile, NegotiationFile}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -226,7 +225,7 @@ class FileController @Inject()(
               documentContent match {
                 case Some(content) => {
                   val billOfLading = content.asInstanceOf[BillOfLading]
-                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
               }
@@ -287,7 +286,7 @@ class FileController @Inject()(
               documentContent match {
                 case Some(content) => {
                   val billOfLading = content.asInstanceOf[BillOfLading]
-                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.weightOfConsignment, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
               }
@@ -384,20 +383,28 @@ class FileController @Inject()(
           }
           case constants.File.Negotiation.INVOICE => {
             val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
+            val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-            def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+            def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+            def getOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
+
+            def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
               documentContent match {
                 case Some(content) => {
                   val invoice = content.asInstanceOf[Invoice]
-                  withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
+                  withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
                 }
-                case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID))
+                case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
               }
             }
 
             for {
               documentContent <- documentContent
-              result <- getResult(documentContent)
+              negotiation <- negotiation
+              traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+              organizationList <- getOrganizationList(traderList.map(_.organizationID))
+              result <- getResult(documentContent, negotiation, traderList, organizationList)
             } yield result
           }
           case _ => {
@@ -462,20 +469,28 @@ class FileController @Inject()(
           }
           case constants.File.Negotiation.INVOICE => {
             val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
+            val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-            def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+            def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+            def getOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
+
+            def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
               documentContent match {
                 case Some(content) => {
                   val invoice = content.asInstanceOf[Invoice]
-                  withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
+                  withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
                 }
-                case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID))
+                case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
               }
             }
 
             for {
               documentContent <- documentContent
-              result <- getResult(documentContent)
+              negotiation <- negotiation
+              traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+              organizationList <- getOrganizationList(traderList.map(_.organizationID))
+              result <- getResult(documentContent, negotiation, traderList, organizationList)
             } yield result
           }
           case _ => {

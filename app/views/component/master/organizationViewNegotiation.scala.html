@@ -18,7 +18,8 @@
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiation.price * negotiation.quantity).toString, Messages(constants.View.USD)).mkString(" "))
     @trader match {
         case Some(trader) => {
             @commonTextInfo(constants.View.TRADER, trader.accountID)

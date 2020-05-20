@@ -23,10 +23,11 @@ object AddBillOfLading {
       constants.FormField.DELIVERY_TERM.name -> constants.FormField.DELIVERY_TERM.field,
       constants.FormField.ASSET_DESCRIPTION.name -> constants.FormField.ASSET_DESCRIPTION.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
+      constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Int, assetPrice: Int)
+  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Int, quantityUnit: String, assetPrice: Int)
 
 }

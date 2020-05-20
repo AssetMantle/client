@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
 import models._
 import models.common.Serializable._
-import models.master.{Asset, Negotiation, Trader}
+import models.master.{Asset, Negotiation, Organization, Trader}
 import models.masterTransaction.{NegotiationFile, TradeActivity, TradeActivityHistory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -845,20 +845,28 @@ class NegotiationController @Inject()(
   def addInvoiceForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.INVOICE)
+      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+      def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+      def getOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
+
+      def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
         documentContent match {
           case Some(content) => {
             val invoice = content.asInstanceOf[Invoice]
-            withUsernameToken.Ok(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.addInvoice(negotiationID = negotiationID))
+          case None => withUsernameToken.Ok(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
         }
       }
 
       (for {
         documentContent <- documentContent
-        result <- getResult(documentContent)
+        negotiation <- negotiation
+        traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        organizationList <- getOrganizationList(traderList.map(_.organizationID))
+        result <- getResult(documentContent, negotiation, traderList, organizationList)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
@@ -869,7 +877,17 @@ class NegotiationController @Inject()(
     implicit request =>
       views.companion.master.AddInvoice.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addInvoice(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
+          val negotiation = masterNegotiations.Service.tryGet(formWithErrors.data(constants.FormField.ID.name))
+
+          def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
+
+          def getOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
+
+          for {
+            negotiation <- negotiation
+            traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+            organizationList <- getOrganizationList(traderList.map(_.organizationID))
+          }yield BadRequest(views.html.component.master.addInvoice(formWithErrors, formWithErrors.data(constants.FormField.ID.name), negotiation, traderList, organizationList))
         },
         updateInvoiceContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)

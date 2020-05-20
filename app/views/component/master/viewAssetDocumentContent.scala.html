@@ -22,7 +22,8 @@
                     @commonDateInfo(constants.View.SHIPMENT_DATE, billOfLading.dateOfShipping)
                     @commonTextInfo(constants.View.DELIVERY_TERM, billOfLading.deliveryTerm)
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, billOfLading.assetDescription)
-                    @commonIntInfo(constants.View.ASSET_QUANTITY, billOfLading.weightOfConsignment)
+                    @commonIntInfo(constants.View.ASSET_QUANTITY, billOfLading.assetQuantity)
+                    @commonTextInfo(constants.View.QUANTITY_UNIT, billOfLading.quantityUnit)
                     @commonIntInfo(constants.View.ASSET_PRICE, billOfLading.declaredAssetValue)
                 }
             }
