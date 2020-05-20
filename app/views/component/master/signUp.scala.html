@@ -8,7 +8,7 @@
     <div class="inputField">
         <div class="inputFieldBody">
             <div class="usernameAvailability">
-                @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
+                @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#USERNAME_AVAILABLE")""")
                 <div id="checkUsernameAvailableResult" class="result failureIcon">
                     @commonIcon("failRounded")
                 </div>

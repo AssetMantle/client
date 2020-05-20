@@ -5,10 +5,18 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
     } else {
         route = notificationRoute(negotiationID, $(".recentActivityBox").length + 1);
     }
+    let loadingSpinner = $('#RECENT_ACTIVITY_LOADING');
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('recentActivity'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            loadingSpinner.hide();
+        },
         statusCode: {
             200: function (data) {
                 const loadMore = $(".recentActivityBox .notification:last");
@@ -22,10 +30,18 @@ $('#notificationBadge').ready(function () {
     const route = jsRoutes.controllers.NotificationController.unreadNotificationCount();
     const notificationBadge = $('#notificationBadge');
     notificationBadge.html('0');
+    let loadingSpinner = $('#RECENT_ACTIVITY_LOADING');
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('recentActivity'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            loadingSpinner.hide();
+        },
         statusCode: {
             200: function (data) {
                 notificationBadge.html(data);
@@ -40,10 +56,18 @@ $('#notificationBadge').ready(function () {
 
 function markNotificationRead(target, accountID) {
     let route = jsRoutes.controllers.NotificationController.markNotificationRead(accountID);
+    let loadingSpinner = $('#RECENT_ACTIVITY_LOADING');
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('recentActivity'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            loadingSpinner.hide();
+        },
         statusCode: {
             200: function (data) {
                 $(target).addClass("read");
@@ -59,10 +83,9 @@ function loadMoreActivitiesOnScroll(negotiationID) {
             if ($(this).scrollTop() +
                 $(this).innerHeight() >=
                 $(this)[0].scrollHeight) {
-                if(negotiationID){
+                if (negotiationID) {
                     loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, negotiationID)
-                }
-                else {
+                } else {
                     loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
                 }
             }
