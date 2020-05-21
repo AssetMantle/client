@@ -1795,7 +1795,7 @@ header:before,
   border: 1px solid rgba(5, 60, 117, 0.12); }
 .profileContainer .icon {
   width: 18px;
-  height: 18px;
+  height: 20px;
   margin-right: 5px;
   margin-bottom: 3px; }
 .profileContainer .plusIcon .icon {
