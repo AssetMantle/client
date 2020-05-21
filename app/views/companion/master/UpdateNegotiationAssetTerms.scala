@@ -11,9 +11,11 @@ object UpdateNegotiationAssetTerms {
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, description: String, price: Int, quantity: Int, quantityUnit: String)
+  case class Data(id: String, description: String, price: Int, quantity: Int, quantityUnit: String, gas: Int, password: String)
 
 }

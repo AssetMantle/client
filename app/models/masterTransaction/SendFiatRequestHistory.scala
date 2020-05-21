@@ -4,13 +4,16 @@ import java.sql.Timestamp
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.HistoryLogged
+import models.Trait
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
+case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends Trait.SendFiatRequest with HistoryLogged {
+  def convertToSendFiatRequest = SendFiatRequest(this.id, this.traderID, this.ticketID, this.negotiationID, this.amount, this.status, this.createdBy, this.createdOn, this.createdOnTimeZone, this.updatedBy, this.updatedOn, this.updatedOnTimeZone)
+}
 
 @Singleton
 class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -87,12 +90,6 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
 
     def getFailedSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.BLOCKCHAIN_FAILURE)
 
-  }
-
-  object Utility {
-    def convertToSendFiatRequest(sendFiatRequestHistory: SendFiatRequestHistory) = SendFiatRequest(sendFiatRequestHistory.id, sendFiatRequestHistory.traderID,
-      sendFiatRequestHistory.ticketID, sendFiatRequestHistory.negotiationID, sendFiatRequestHistory.amount, sendFiatRequestHistory.status, sendFiatRequestHistory.createdBy, sendFiatRequestHistory.createdOn, sendFiatRequestHistory.createdOnTimeZone,
-      sendFiatRequestHistory.updatedBy, sendFiatRequestHistory.updatedOn, sendFiatRequestHistory.updatedOnTimeZone)
   }
 }
 

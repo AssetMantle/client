@@ -1833,7 +1833,7 @@ form{
     padding: 0 13px;
   }
   .chatRoom .cmuk-card-body{
-    height: 360px;
+    height: 305px;
     .chatList{
       padding: 5px 0;
       button
@@ -1844,7 +1844,7 @@ form{
       }
     }
     .chatMessagesContainer{
-      height: 250px;
+      height: 205px;
       overflow: auto;
       @extend %scroller;
     }
@@ -2109,7 +2109,7 @@ header:before,
       padding: 0 12px;
     }
   }
-  .cmuk-card-default{
+  .cmuk-card{
     height: 360px;
   }
   .cmuk-card-body .cmuk-tab{

@@ -4,30 +4,39 @@
 @import models.master.Organization
 @import models.master.Trader
 
-@(receiveFiats: Seq[ReceiveFiat], organizations: Seq[Organization], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(receiveFiats: Seq[ReceiveFiat], receiveFiatHistories: Seq[ReceiveFiat], organizations: Seq[Organization], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-    @commonCard(constants.View.RECEIVED_FIAT) {
-    } {
-        @receiveFiats.map { receiveFiat =>
-            @commonVerticalInfoBox() {
-                @commonVerticalTextInfo(constants.View.ID, receiveFiat.id)
-                @traders.find(_.id == receiveFiat.traderID) match {
-                    case Some(trader) => {
-                        @commonVerticalTextInfo(constants.View.TRADER, trader.accountID)
-                        @organizations.find(_.id == trader.organizationID) match {
-                            case Some(organization) => {
-                                @commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
-                            }
-                            case None => {}
+@commonCard(constants.View.RECEIVED_FIAT) {
+} {
+    @recieveFiatData(receiveFiats, false)
+    @recieveFiatData(receiveFiatHistories, true)
+}
+
+@recieveFiatData(receiveFiatList: Seq[ReceiveFiat], history: Boolean) = {
+    @receiveFiatList.map { receiveFiat =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.ID, receiveFiat.id)
+            @traders.find(_.id == receiveFiat.traderID) match {
+                case Some(trader) => {
+                    @commonVerticalTextInfo(constants.View.TRADER, trader.accountID)
+                    @organizations.find(_.id == trader.organizationID) match {
+                        case Some(organization) => {
+                            @commonVerticalTextInfo(constants.View.ORGANIZATION_NAME, organization.name)
                         }
+                        case None => {}
                     }
-                    case None => {}
                 }
-                @commonVerticalIntInfo(constants.View.AMOUNT, receiveFiat.amount)
-                @commonVerticalTextInfo(constants.View.STATUS, receiveFiat.status)
-                <div class="listItemChild cmuk-flex cmuk-flex-middle">
-                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
-                </div>
+                case None => {}
             }
+            @commonVerticalIntInfo(constants.View.AMOUNT, receiveFiat.amount)
+            @commonVerticalTextInfo(constants.View.STATUS, receiveFiat.status)
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @if(history) {
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
+                } else {
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
+                }
+            </div>
         }
     }
+}

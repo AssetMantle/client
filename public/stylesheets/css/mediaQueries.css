@@ -169,6 +169,8 @@
     height: 150px; }
   .leftContainer .documentView .cmuk-card {
     height: 265px; }
+    .leftContainer .documentView .cmuk-card .cmuk-card-body {
+      height: 265px; }
   .leftContainer .zoneTradeFinancial .cmuk-card-body {
     height: auto; }
     .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
@@ -181,9 +183,9 @@
       .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
         height: 210px; }
   .rightContainer .chatRoom .cmuk-card-body {
-    height: 264px; }
+    height: 215px; }
     .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 160px; }
+      height: 120px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }

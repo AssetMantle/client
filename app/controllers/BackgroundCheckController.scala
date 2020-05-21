@@ -346,7 +346,7 @@ class BackgroundCheckController @Inject()(
           Future(BadRequest(views.html.component.master.addAssetMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ASSET_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt,  Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },
         addAssetBackgroundCheckData => {
-          val corporateScan = memberCheckCorporateScans.Service.tryGetByScanID(addAssetBackgroundCheckData.scanID)
+          val corporateScan = memberCheckVesselScans.Service.tryGetByScanID(addAssetBackgroundCheckData.scanID)
           def createMemberCheckVesselDecision = memberCheckVesselScanDecisions.Service.insertOrUpdate(addAssetBackgroundCheckData.assetID, addAssetBackgroundCheckData.scanID, addAssetBackgroundCheckData.resultID, addAssetBackgroundCheckData.status)
           (for {
             _ <- corporateScan

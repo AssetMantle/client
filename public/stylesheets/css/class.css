@@ -1346,7 +1346,7 @@ form .formBody {
 .rightContainer .cmuk-card-body {
   padding: 0 13px; }
 .rightContainer .chatRoom .cmuk-card-body {
-  height: 360px; }
+  height: 305px; }
   .rightContainer .chatRoom .cmuk-card-body .chatList {
     padding: 5px 0; }
     .rightContainer .chatRoom .cmuk-card-body .chatList button {
@@ -1354,7 +1354,7 @@ form .formBody {
       margin: 0 5px;
       line-height: 10px; }
   .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-    height: 250px;
+    height: 205px;
     overflow: auto; }
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField {
     position: relative; }
@@ -1553,7 +1553,7 @@ header:before,
 .documentView .documentList .cmuk-button {
   line-height: 28px;
   padding: 0 12px; }
-.documentView .cmuk-card-default {
+.documentView .cmuk-card {
   height: 360px; }
 .documentView .cmuk-card-body .cmuk-tab {
   width: 100%;

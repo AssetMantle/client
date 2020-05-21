@@ -248,6 +248,9 @@
       }
       .cmuk-card{
         height: 265px;
+        .cmuk-card-body{
+          height: 265px;
+        }
       }
     }
     .zoneTradeFinancial{
@@ -271,9 +274,9 @@
     }
     .chatRoom{
       .cmuk-card-body{
-        height: 264px;
+        height: 215px;
         .chatMessagesContainer {
-          height: 160px;
+          height: 120px;
         }
       }
     }
