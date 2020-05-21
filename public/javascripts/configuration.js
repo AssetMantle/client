@@ -4,10 +4,18 @@ function getConfiguration(configuration) {
         return configurationValue;
     } else {
         let route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
+        let loadingSpinner = $('#commonSpinner');
         $.ajax({
             url: route.url,
             type: route.type,
             async: false,
+            global: showSpinner('configuration'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 200: function (data) {
                     setCookie(configuration, data, 1)
@@ -24,10 +32,18 @@ function getConfigurationAsynchronously(configuration) {
         return configurationValue;
     } else {
         let route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
+        let loadingSpinner = $('#commonSpinner');
         $.ajax({
             url: route.url,
             type: route.type,
             async: true,
+            global: showSpinner('configuration'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 200: function (data) {
                     setCookie(configuration, data, 1);

@@ -7,11 +7,15 @@
     @if(message.fromAccountID == loginState.username) {
         <li class="sender chatMessage">
             @text("you")
+            <div>
             <span class="chatName">@message.fromAccountID.substring(0, 1)</span>
+            </div>
         </li>
     } else {
         <li class="chatMessage receiver">
+            <div>
             <span class="chatName">@message.fromAccountID.substring(0, 1)</span>
+            </div>
             @text("partner")
             @receiverScript
         </li>
