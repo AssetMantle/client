@@ -11,13 +11,15 @@
     @sendFiatRequestList.map { sendFiatRequest =>
         @commonVerticalInfoBox() {
             @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
-            @if(history){
-                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
-            } else {
-                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
-            }
             @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
             @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @if(history){
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
+                } else {
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
+                }
+            </div>
         }
     }
 }

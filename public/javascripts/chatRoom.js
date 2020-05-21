@@ -145,7 +145,7 @@ function scrollToTop() {
 
 function unReadBar(count) {
     if ($('#unRead').length === 0) {
-        let c = count + 2;
+        let c = count + 1;
         const loadMore = $(".chatMessages .chatMessage:nth-last-child(" + c + ")");
         loadMore.after('<div id="unRead" class="unRead">un read message</div>');
     } else {
