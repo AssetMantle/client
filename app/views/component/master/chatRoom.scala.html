@@ -4,7 +4,7 @@
 
 @(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-@commonCard(constants.View.CHAT) {
+@commonCard(constants.View.CHAT, 'cardIconPath -> "images/icons/icons.svg#chat") {
     @commonComponentButton("chatWindow", constants.View.REFRESH, routes.javascript.ChatController.chatWindow, "CHAT_LOADING", "chat", 'parameters -> s"'${chatID}', 0")
 }{
     <div id="chatWindow"></div>

@@ -1237,7 +1237,7 @@ form .formBody {
     padding-top: 25px; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 20px 0;
   margin: 0 20px; }
   .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
     padding-top: 25px; }
@@ -1345,6 +1345,9 @@ form .formBody {
   font-size: 1rem; }
 .rightContainer .cmuk-card-body {
   padding: 0 13px; }
+.rightContainer .chatRoom .cmuk-card-header .icon {
+  width: 18px;
+  height: 18px; }
 .rightContainer .chatRoom .cmuk-card-body {
   height: 305px; }
   .rightContainer .chatRoom .cmuk-card-body .chatList {

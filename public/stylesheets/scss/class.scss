@@ -1654,7 +1654,7 @@ form{
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 15px 0;
+        padding: 20px 0;
         margin: 0 20px;
         &:first-child {
           padding-top: 25px;
@@ -1832,74 +1832,93 @@ form{
   .cmuk-card-body{
     padding: 0 13px;
   }
-  .chatRoom .cmuk-card-body{
-    height: 305px;
-    .chatList{
-      padding: 5px 0;
-      button
-      {
-        padding: 5px 10px;
-        margin: 0 5px;
-        line-height: 10px;
+  .chatRoom {
+    .cmuk-card-header{
+      .icon{
+        width: 18px;
+        height: 18px;
       }
     }
-    .chatMessagesContainer{
-      height: 205px;
-      overflow: auto;
-      @extend %scroller;
-    }
-    .chatForm{
-      .sendFormField{
+    .cmuk-card-body {
+      height: 305px;
+
+      .chatList {
+        padding: 5px 0;
+
+        button {
+          padding: 5px 10px;
+          margin: 0 5px;
+          line-height: 10px;
+        }
+      }
+
+      .chatMessagesContainer {
+        height: 205px;
+        overflow: auto;
+        @extend %scroller;
+      }
+
+      .chatForm {
+        .sendFormField {
+          position: relative;
+        }
+
+        .sendFormField input {
+          outline: none;
+          border-color: #e5e5e5;
+          height: 40px;
+          padding-right: 30px;
+
+          &::placeholder {
+            font-size: $paragraphFontSizeSmall;
+          }
+        }
+
+        .sendIconButton {
+          background: none;
+          padding: 0 10px;
+          margin: 0;
+          position: absolute;
+          top: 0;
+          right: 0;
+
+          .icon {
+            width: 17px;
+            height: 17px;
+          }
+        }
+
+        .replyBox {
+          background-color: #FFffff;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: -65px;
+          padding: 10px 10px;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .replyAccount {
+          font-size: 12px;
+          font-weight: bold;
+          color: #3f7fc9;
+        }
+
+        .replyMessage {
+          width: 100px;
+          overflow: hidden;
+          display: inline-block;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 14px;
+        }
+      }
+
+      .chatMoveTop {
         position: relative;
+        bottom: 50px;
       }
-      .sendFormField input{
-        outline: none;
-        border-color: #e5e5e5;
-        height: 40px;
-        padding-right: 30px;
-        &::placeholder{
-          font-size: $paragraphFontSizeSmall;
-        }
-      }
-      .sendIconButton{
-        background: none;
-        padding: 0 10px;
-        margin: 0;
-        position: absolute;
-        top:0;
-        right:0;
-        .icon{
-          width: 17px;
-          height: 17px;
-        }
-      }
-      .replyBox{
-        background-color: #FFffff;
-        position: absolute;
-        left:0;
-        right:0;
-        top:-65px;
-        padding: 10px 10px;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .replyAccount{
-        font-size: 12px;
-        font-weight: bold;
-        color: #3f7fc9;
-      }
-      .replyMessage{
-        width: 100px;
-        overflow: hidden;
-        display: inline-block;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 14px;
-      }
-    }
-    .chatMoveTop{
-      position: relative;
-      bottom: 50px;
     }
   }
   .orderInfoCard{
