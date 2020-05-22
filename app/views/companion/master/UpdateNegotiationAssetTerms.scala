@@ -8,7 +8,7 @@ object UpdateNegotiationAssetTerms {
     mapping(
       constants.FormField.ID.name -> constants.FormField.ID.field,
       constants.FormField.ASSET_DESCRIPTION.name -> constants.FormField.ASSET_DESCRIPTION.field,
-      constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
+      constants.FormField.ASSET_PRICE_PER_UNIT.name -> constants.FormField.ASSET_PRICE_PER_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field,
@@ -16,6 +16,6 @@ object UpdateNegotiationAssetTerms {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, description: String, price: Int, quantity: Int, quantityUnit: String, gas: Int, password: String)
+  case class Data(id: String, description: String, pricePerUnit: Int, quantity: Int, quantityUnit: String, gas: Int, password: String)
 
 }

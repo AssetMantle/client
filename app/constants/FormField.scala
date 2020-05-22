@@ -138,6 +138,7 @@ object FormField {
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
+  val ASSET_PRICE_PER_UNIT = new IntFormField("ASSET_PRICE_PER_UNIT", 0, Int.MaxValue)
   val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
