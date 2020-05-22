@@ -14,7 +14,7 @@ class Log @Inject()(messagesApi: MessagesApi)
 
   private val language = configuration.get[String]("play.log.lang")
 
-  def infoLog(infoMessage: String, logParameters: Any*)(implicit logger: Logger = Logger(constants.Log.DEFAULT_INFO_LOGGER)) = {
+  def infoLog(infoMessage: String, logParameters: Any*)(implicit logger: Logger) = {
     logger.info(messagesApi(infoMessage, logParameters: _*)(Lang(language)))
   }
 }
