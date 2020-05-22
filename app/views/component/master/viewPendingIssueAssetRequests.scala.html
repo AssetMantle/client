@@ -15,7 +15,7 @@
                     @commonTextInfo(constants.View.ASSET_ID, assetRequest.id)
                     @commonTextInfo(constants.View.ASSET_TYPE, assetRequest.assetType)
                     @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetRequest.quantity, assetRequest.quantityUnit).mkString(" "))
-                    @commonIntInfo(constants.View.ASSET_PRICE, assetRequest.price)
+                    @commonTextInfo(constants.View.ASSET_PRICE, Seq(assetRequest.price, Messages(constants.View.USD), Messages(constants.View.PER), assetRequest.quantityUnit).mkString(" "))
                     @commonBooleanInfo(constants.View.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
                     @commonFormButton(constants.Form.ZONE_ISSUE_ASSET,'parameters -> s"'${assetRequest.id}'", 'class -> "cmuk-button-success cmuk-button-small")

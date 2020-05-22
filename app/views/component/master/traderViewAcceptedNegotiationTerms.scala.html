@@ -3,8 +3,10 @@
 @import models.master.{Asset, Negotiation}
 @import views.html.component.master.buyerViewNegotiationTerm
 @import models.master.Order
+@import models.master.Trader
+@import models.master.Organization
 
-@(traderID: String, negotiation: Negotiation, order:Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderID: String, counterPartyTrader:Trader, counterPartyOrganization:Organization, negotiation: Negotiation, order:Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
@@ -48,6 +50,9 @@
                             }
                         }
                      }
+
+            @commonTextInfo(constants.View.COUNTER_PARTY_TRADER, counterPartyTrader.accountID)
+            @commonTextInfo(constants.View.COUNTER_PARTY_ORGANIZATION, counterPartyOrganization.name)
         </div>
 
         <div class="terms">
@@ -60,7 +65,8 @@
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "contractPrice") {
                 @Messages(constants.View.PRICE)
             } {
-                @negotiation.price
+                @Seq(negotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
+                @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiation.price * negotiation.quantity).toString, Messages(constants.View.USD)).mkString(" "))
             }
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "quantity") {
                 @Messages(constants.View.QUANTITY)
@@ -117,7 +123,7 @@
         } else {
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
-                @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
+                @if((negotiation.status == constants.Status.Negotiation.STARTED || negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS || negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED) && negotiation.sellerTraderID == traderID) {
                     @commonFormButton(constants.Form.UPDATE_ASSET_TERMS, 'parameters -> s"'${negotiation.id}'")
                 }
             </div>
@@ -138,7 +144,8 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonIntInfo(constants.View.PRICE, negotiation.price)
+                    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiation.price * negotiation.quantity).toString, Messages(constants.View.USD)).mkString(" "))
                 </div>
                 <div>
                 @if(negotiation.buyerAcceptedPrice) {

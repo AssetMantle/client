@@ -14,11 +14,10 @@ class SignUpControllerTest extends Simulation {
 object signUpControllerTest {
 
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
-    .exec(http("Verify_Mnemonic")
-        .get(routes.AccountController.noteAndVerifyMnemonic().url)
-      .check(substring("Please Backup This Mnemonic").exists)
-      .check(css("[id=%s]".format("getMnemonic"), "onclick").saveAs(Form.MNEMONIC))
-      .check(regex("""onclick="getMnemonic([^#]*)""").saveAs(Test.TEST_BLOCKCHAIN_ADDRESS))
+    .exec(http("SignUp_GET")
+        .get(routes.AccountController.signUpForm().url)
+      .check(substring("Register").exists)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
     )
     .exec{session=>println(session)
     session}
