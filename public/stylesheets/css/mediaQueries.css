@@ -261,7 +261,17 @@
     top: 0; }
 
   .iframeModal {
-    height: 530px; } }
+    height: 530px; }
+
+  .leftContainer .financial .financialCard.cardPaddingRemove ul li {
+    padding: 15px 0px; }
+    .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
+      padding-top: 10px; }
+
+  .walletButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: center; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }

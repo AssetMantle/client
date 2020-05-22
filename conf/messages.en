@@ -1120,3 +1120,7 @@ FULLY_PAID=Fully Paid
 OVER_PAID=Over Paid
 CONTENT_NOT_FOUND=Content Not Found
 CHAT=Chat
+COUNTER_PARTY_TRADER=Counter Party Trader
+COUNTER_PARTY_ORGANIZATION=Counter Party Organization
+SELLER_ORGANIZATION=Seller Organization
+BUYER_ORGANIZATION=Buyer Organization
