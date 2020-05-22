@@ -9,11 +9,11 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileResourceManager @Inject()()(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val rootFilePath = configuration.get[String]("upload.rootFilePath")
 
@@ -96,7 +96,8 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def storeFile[T <: Document[T]](name: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
+  def storeFile[T <: Document[T]](name: String, path: String, document: T, masterCreate: T => Future[String]): Future[Unit] = {
+    utilitiesLog.infoLog(constants.Log.Info.STORE_FILE_ENTRY, name, document.documentType, path)
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -111,7 +112,10 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64
       _ <- updateAndCreateFile(fileName, encodedBase64)
-    } yield utilities.FileOperations.renameFile(path, name, fileName)
+    } yield {
+      utilities.FileOperations.renameFile(path, name, fileName)
+      utilitiesLog.infoLog(constants.Log.Info.STORE_FILE_EXIT, name, document.documentType, path)
+    }
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)

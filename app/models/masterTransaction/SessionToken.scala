@@ -10,6 +10,7 @@ import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import slick.ast.JoinType.Inner
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration._
@@ -31,7 +32,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
 
   private val sessionTokenTimeout: Long = configuration.get[Long]("play.http.session.token.timeout")
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 

@@ -20,7 +20,7 @@ object FileOperations {
 
   private val uploadedParts: ConcurrentMap[String, Set[FileUploadInfo]] = new ConcurrentHashMap(8, 0.9f, 1)
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   def savePartialFile(filePart: Array[Byte], fileInfo: FileUploadInfo, uploadPath: String) {
     try {

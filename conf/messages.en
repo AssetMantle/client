@@ -1126,3 +1126,13 @@ COUNTER_PARTY_TRADER=Counter Party Trader
 COUNTER_PARTY_ORGANIZATION=Counter Party Organization
 SELLER_ORGANIZATION=Seller Organization
 BUYER_ORGANIZATION=Buyer Organization
+
+
+#Logs
+CONTROLLERS_REQUEST=REQUEST  path-{0} {1}  by address-{2} username-{3}
+CONTROLLERS_RESPONSE=RESPONSE for-{0} {1}  by address-{2} username-{3}  returnedWithStatus-{4} in {5}ms
+
+LOG.NO_SUCH_ELEMENT_EXCEPTION_3=No Such Element Exception
+LOG.PSQL_EXCEPTION= Psql Exception
+STORE_FILE_ENTRY=storing {0} file as {1} in path {2}
+STORE_FILE_EXIT=stored {0} file as {1} in path {2}

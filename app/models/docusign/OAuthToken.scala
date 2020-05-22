@@ -36,7 +36,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private val docusignOAuthTokenInitialDelay = configuration.get[Int]("docusign.scheduler.initialDelay").seconds
   private val docusignOAuthTokenIntervalTime = configuration.get[Int]("docusign.scheduler.intervalTime").minutes
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
