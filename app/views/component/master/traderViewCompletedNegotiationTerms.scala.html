@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.{AssetHistory, NegotiationHistory, OrderHistory}
-@import views.html.component.master.buyerViewNegotiationTerm
-@import models.master.Order
+@import models.master.Organization
+@import models.master.Trader
 
-@(negotiationHistory: NegotiationHistory, orderHistory: OrderHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiationHistory: NegotiationHistory, orderHistory: OrderHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiationHistory.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
@@ -14,6 +14,22 @@
         </div>
 
         <div class="terms">
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
+            </div>
+            <div class="sellerTerm">
+                <div class="cmuk-flex">
+                    <span class="termIcon">@commonIcon("description")</span>
+                    @commonTextInfo(constants.View.COUNTER_PARTY_TRADER, counterPartyTrader.accountID)
+                </div>
+            </div>
+            <div class="sellerTerm">
+                <div class="cmuk-flex">
+                    <span class="termIcon">@commonIcon("description")</span>
+                    @commonTextInfo(constants.View.COUNTER_PARTY_ORGANIZATION, counterPartyOrganization.name)
+                </div>
+            </div>
+
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
             </div>
@@ -32,9 +48,15 @@
                 </div>
             </div>
             <div class="sellerTerm">
-                <div class="cmuk-flex">
-                    <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonIntInfo(constants.View.PRICE, negotiationHistory.price)
+                <div>
+                    <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("contractPrice")</span>
+                        @commonTextInfo(constants.View.PRICE, Seq(negotiationHistory.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                    </div>
+                    <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("contractPrice")</span>
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiationHistory.price * negotiationHistory.quantity).toString, Messages(constants.View.USD)).mkString(" "))
+                    </div>
                 </div>
                 <div>
                 @if(negotiationHistory.buyerAcceptedPrice) {

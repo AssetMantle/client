@@ -1,4 +1,4 @@
-function cometMessageHandler(message){
+function cometMessageHandler(message) {
     let parsedMessage = JSON.parse(JSON.stringify(message));
     switch (parsedMessage.messageType) {
         case 'ASSET' :
@@ -28,7 +28,7 @@ function cometMessageHandler(message){
             break;
         case 'CHAT' :
             if ($('#chatMessages').length && $('#' + parsedMessage.messageContent.chatID).length) {
-                comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.chatID, 0));
+                comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.chatID, 0), 'CHAT_LOADING');
             }
             break;
         case 'KEEP_ALIVE' :
@@ -41,12 +41,20 @@ function cometMessageHandler(message){
     }
 }
 
-function comet(source, route){
-    const div = $('#'+ source);
+function comet(source, route, loadingSpinnerID = 'commonSpinner') {
+    const div = $('#' + source);
+    let loadingSpinner = $('#' + loadingSpinnerID);
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
+        global: showSpinner('comet'),
+        beforeSend: function () {
+            loadingSpinner.show();
+        },
+        complete: function () {
+            loadingSpinner.hide();
+        },
         statusCode: {
             200: function (data) {
                 div.html(data)

@@ -6,7 +6,7 @@
                 btnOffset = $btn.offset(),
                 xPos = event.pageX - btnOffset.left,
                 yPos = event.pageY - btnOffset.top;
-            $div.addClass('ripple-effect');
+            $div.addClass('rippleEffect');
             $div
                 .css({
                     height: $btn.height(),

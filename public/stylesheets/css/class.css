@@ -12,7 +12,7 @@ html, body {
   position: relative;
   background: #F0F0F0; }
 
-.scroller {
+html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin; }
 
@@ -259,6 +259,8 @@ html, body {
       color: #053C75; }
 
 .iframeModal {
+  height: 700px;
+  overflow: auto;
   padding: 50px; }
 
 .copyIcon {
@@ -355,7 +357,8 @@ html, body {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden; }
+  overflow: hidden;
+  word-break: break-word; }
 
 .forgotPasswordNote {
   font-size: 1.25rem; }
@@ -440,6 +443,9 @@ html, body {
 .comdex .cmuk-card-header {
   color: #061728;
   padding: 15px 20px; }
+  .comdex .cmuk-card-header .cmuk-button {
+    position: absolute;
+    right: 20px; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
@@ -1231,7 +1237,7 @@ form .formBody {
     padding-top: 25px; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 20px 0;
   margin: 0 20px; }
   .leftContainer .financial .cmuk-switcher ul li:first-child, .leftContainer .financial .financialCard ul li:first-child {
     padding-top: 25px; }
@@ -1339,8 +1345,11 @@ form .formBody {
   font-size: 1rem; }
 .rightContainer .cmuk-card-body {
   padding: 0 13px; }
+.rightContainer .chatRoom .cmuk-card-header .icon {
+  width: 18px;
+  height: 18px; }
 .rightContainer .chatRoom .cmuk-card-body {
-  height: 360px; }
+  height: 305px; }
   .rightContainer .chatRoom .cmuk-card-body .chatList {
     padding: 5px 0; }
     .rightContainer .chatRoom .cmuk-card-body .chatList button {
@@ -1348,7 +1357,7 @@ form .formBody {
       margin: 0 5px;
       line-height: 10px; }
   .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-    height: 250px;
+    height: 205px;
     overflow: auto; }
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField {
     position: relative; }
@@ -1500,7 +1509,7 @@ header:before,
 .documentView.switcherCardSecond .cmuk-subnav li:last-child {
   display: none; }
 
-.documentView .cmuk-card-header, .documentView .cmuk-card-body, .documentView .documentList {
+.documentView .cmuk-card-body, .documentView .documentList {
   padding: 0; }
 .documentView .documentList {
   height: 250px;
@@ -1547,7 +1556,7 @@ header:before,
 .documentView .documentList .cmuk-button {
   line-height: 28px;
   padding: 0 12px; }
-.documentView .cmuk-card-default {
+.documentView .cmuk-card {
   height: 360px; }
 .documentView .cmuk-card-body .cmuk-tab {
   width: 100%;
@@ -1660,6 +1669,7 @@ header:before,
         color: #0862BE;
         text-align: left; }
     .chat .partner p {
+      word-break: break-word;
       margin: 0; }
   .chat .you {
     word-break: break-all;
@@ -1692,6 +1702,7 @@ header:before,
         color: #6CA8E7;
         text-align: left; }
     .chat .you p {
+      word-break: break-word;
       margin: 0; }
   .chat .chatSubmit {
     width: 92%;
@@ -1733,6 +1744,11 @@ header:before,
     .commonList .listItemChild button a, .commonList .listItemChild button a:hover {
       text-decoration: none;
       color: #fff; }
+    .commonList .listItemChild .cmuk-button {
+      line-height: 28px; }
+      .commonList .listItemChild .cmuk-button:hover {
+        color: #FFFFFF;
+        background: #0862BE; }
 
 .accountName {
   position: absolute;
@@ -1779,7 +1795,7 @@ header:before,
   border: 1px solid rgba(5, 60, 117, 0.12); }
 .profileContainer .icon {
   width: 18px;
-  height: 18px;
+  height: 20px;
   margin-right: 5px;
   margin-bottom: 3px; }
 .profileContainer .plusIcon .icon {
@@ -1803,13 +1819,18 @@ header:before,
     flex: 1; }
     .contactDetails .contactInfoItem .cmuk-card .infoRow {
       flex-direction: column; }
+    .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
+      line-height: 28px;
+      padding: 0 20px; }
   .contactDetails .contactInfoItem .contactUpdateButton {
-    width: 60px;
     display: flex;
     flex-direction: row-reverse;
+    align-items: center;
     text-align: right; }
     .contactDetails .contactInfoItem .contactUpdateButton button {
-      font-weight: normal; }
+      line-height: 28px;
+      padding: 0 20px;
+      margin-left: 20px; }
 .contactDetails .infoRowBox {
   justify-content: space-between; }
   .contactDetails .infoRowBox .infoRowLabel {
@@ -2097,7 +2118,7 @@ figure.zoom {
       color: #FFFFFF;
       background: #0862BE; }
 
-.ripple-effect {
+.rippleEffect {
   position: absolute;
   border-radius: 50%;
   animation: ripple-animation 2s; }
@@ -2111,7 +2132,7 @@ figure.zoom {
     opacity: 0; } }
 .identificationCheckbox {
   display: flex;
-  padding: 10px 0px; }
+  padding: 10px 0; }
   .identificationCheckbox p {
     margin: 0;
     word-break: break-word; }

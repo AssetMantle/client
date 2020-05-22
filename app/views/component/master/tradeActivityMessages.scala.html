@@ -13,7 +13,7 @@
                 </div>
                 <div class="timeline-content right">
                     <div>
-                        <div class="textLineOverflow activityContent" title="@tradeActivity.title"><span class="cmuk-text-bolder">@Messages(tradeActivity.title)</span>
+                        <div class="textLineOverflow activityContent" title="@Messages(tradeActivity.template, tradeActivity.tradeActivityTemplate.parameters: _*)"><span class="cmuk-text-bolder">@Messages(tradeActivity.title)</span>
                             @Messages(tradeActivity.template, tradeActivity.tradeActivityTemplate.parameters: _*)
                         </div>
                         <div class="notificationTime">@tradeActivity.createdOn @tradeActivity.createdOnTimeZone</div>

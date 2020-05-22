@@ -1,7 +1,7 @@
 package models.masterTransaction
 
 import java.sql.Timestamp
-
+import models.Trait
 import javax.inject.{Inject, Singleton}
 import models.Trait.HistoryLogged
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +10,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ReceiveFiatHistory(id: String, traderID: String, orderID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
+case class ReceiveFiatHistory(id: String, traderID: String, orderID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends Trait.ReceiveFiat with HistoryLogged {
+  def convertToReceiveFiat = ReceiveFiat(this.id, this.traderID, this.orderID, this.amount, this.status, this.createdBy,this.createdOn, this.createdOnTimeZone, this.updatedBy, this.updatedOn, this.updatedOnTimeZone)
+}
 
 @Singleton
 class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -68,10 +70,6 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
     def get(traderID: String): Future[Seq[ReceiveFiatHistory]] = getByTraderIDAndStatuses(traderID, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT))
 
     def get(traderIDs: Seq[String]): Future[Seq[ReceiveFiatHistory]] = getByTraderIDsAndStatuses(traderIDs, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT))
-  }
-
-  object Utility {
-    def convertToReceiveFiat(receiveFiatHistory: ReceiveFiatHistory) = ReceiveFiat(receiveFiatHistory.id, receiveFiatHistory.traderID, receiveFiatHistory.orderID, receiveFiatHistory.amount, receiveFiatHistory.status, receiveFiatHistory.createdBy,receiveFiatHistory.createdOn, receiveFiatHistory.createdOnTimeZone, receiveFiatHistory.updatedBy, receiveFiatHistory.updatedOn, receiveFiatHistory.updatedOnTimeZone)
   }
 }
 

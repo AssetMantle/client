@@ -9,4 +9,6 @@
     @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.ASSET_PRICE)
     @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.QUANTITY_UNIT)
+    @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputPassword(updateNegotiationAssetTermsForm, constants.FormField.PASSWORD)
 }

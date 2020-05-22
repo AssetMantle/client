@@ -5,9 +5,9 @@
 @import models.masterTransaction.NegotiationFileHistory
 @(negotiationHistory: NegotiationHistory,assetFileHistoryList: Seq[AssetFileHistory], negotiationFileHistoryList: Seq[NegotiationFileHistory])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="documentView switcherCardSecond">
-    @commonInfoBox() {
         @commonCard(constants.View.DOCUMENT_LIST){
         }{
+            <div class="documentList">
             <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
                 <tbody>
                     <tr><td colspan="3">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
@@ -55,7 +55,7 @@
                     }
                 </tbody>
             </table>
-        }
+            </div>
     }
 </div>
 
