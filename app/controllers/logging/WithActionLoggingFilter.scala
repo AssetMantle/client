@@ -17,21 +17,18 @@ class WithActionLoggingFilter @Inject()(messagesControllerComponents: MessagesCo
 
   private val language= configuration.get[String]("play.log.lang")
 
-  private val marker = MarkerFactory.getMarker("ACCESS")
-   private val markerContext = MarkerContext(marker)
-
   def next(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = Action { implicit request ⇒
     val startTime = System.currentTimeMillis()
     try {
-      logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"))(Lang(language)))(markerContext)
+      logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"))(Lang(language)))
       val result = f(request)
       val endTime = System.currentTimeMillis()
-      logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),result.header.status,endTime - startTime)(Lang(language)))(markerContext)
+      logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),result.header.status,endTime - startTime)(Lang(language)))
       result
     } catch {
       case baseException: BaseException =>
         val endTime = System.currentTimeMillis()
-        logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),Results.InternalServerError.header.status,endTime - startTime)(Lang(language)))(markerContext)
+        logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE,request.method,request.path,request.remoteAddress,request.session.get(constants.Security.USERNAME).getOrElse("None"),Results.InternalServerError.header.status,endTime - startTime)(Lang(language)))
         Results.InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
 

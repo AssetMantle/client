@@ -13,7 +13,7 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val rootFilePath = configuration.get[String]("upload.rootFilePath")
 

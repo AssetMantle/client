@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -34,7 +34,9 @@ class AddZoneController @Inject()(
                                    withUserLoginAction: WithUserLoginAction,
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    withUsernameToken: WithUsernameToken,
-                                   masterTransactionZoneInvitations: masterTransaction.ZoneInvitations
+                                   masterTransactionZoneInvitations: masterTransaction.ZoneInvitations,
+                                   withoutLoginAction: WithoutLoginAction,
+                                   withoutLoginActionAsync: WithoutLoginActionAsync
                                  )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -45,7 +47,7 @@ class AddZoneController @Inject()(
 
   private val comdexURL: String = configuration.get[String]("comdex.url")
 
-  def inviteZoneForm(): Action[AnyContent] = Action {
+  def inviteZoneForm(): Action[AnyContent] = withoutLoginAction {
     implicit request =>
       Ok(views.html.component.master.inviteZone())
   }
@@ -155,7 +157,7 @@ class AddZoneController @Inject()(
       }
   }
 
-  def userUploadZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def userUploadZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userStoreZoneKYC), documentType))
   }
 
@@ -204,7 +206,7 @@ class AddZoneController @Inject()(
       }
   }
 
-  def userUpdateZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def userUpdateZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUpdateZoneKYC), documentType))
   }
 
@@ -307,7 +309,7 @@ class AddZoneController @Inject()(
       )
   }
 
-  def verifyZoneForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
+  def verifyZoneForm(zoneID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.verifyZone(zoneID = zoneID))
   }
 
@@ -439,7 +441,7 @@ class AddZoneController @Inject()(
       )
   }
 
-  def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
+  def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.rejectVerifyZoneRequest(zoneID = zoneID))
   }
 
@@ -465,7 +467,7 @@ class AddZoneController @Inject()(
       )
   }
 
-  def uploadZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def uploadZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.storeZoneKYC), documentType))
   }
 
@@ -510,7 +512,7 @@ class AddZoneController @Inject()(
       }
   }
 
-  def updateZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def updateZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.updateZoneKYC), documentType))
   }
 
@@ -538,11 +540,11 @@ class AddZoneController @Inject()(
       }
   }
 
-  def blockchainAddZoneForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddZoneForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.addZone())
   }
 
-  def blockchainAddZone: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainAddZone: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.AddZone.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.addZone(formWithErrors)))

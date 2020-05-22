@@ -11,6 +11,7 @@ object Response {
   lazy val WARNING_PREFIX = "WARNING."
   lazy val SUCCESS_PREFIX = "SUCCESS."
   lazy val INFO_PREFIX = "INFO."
+  lazy val LOG_PREFIX = "LOG."
   val KEY_ASSET = "asset"
   val KEY_FIAT = "fiat"
   val KEY_NEGOTIATION_ID = "negotiation_id"
@@ -210,7 +211,7 @@ object Response {
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.String.getJsRouteString(actionController)
-    val logMessage: String = response
+    val logMessage: String = LOG_PREFIX + response
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

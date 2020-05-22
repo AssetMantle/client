@@ -41,44 +41,35 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.id) += serialize(account)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => utilitiesLog.errorLog(constants.Response.PSQL_EXCEPTION, psqlException, "add", module)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def findById(id: String): Future[AccountSerialized] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException =>
-        utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException, "findByID", module, id)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def tryGetLanguageById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.language).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException =>
-        utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException, "tryGetLanguageById", module, id)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def tryGetPartialMnemonicById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.partialMnemonic).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException =>
-        utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException, "tryGetPartialMnemonicById", module, id)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def getUserTypeById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException =>
-        utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException, "getUserTypeById", module, id)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -86,41 +77,31 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def updatePartialMnemonicById(id: String, partialMnemonic: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.partialMnemonic).update(partialMnemonic).asTry).map {
     case Success(result) => result match {
-      case 0 => utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION), "tryGetLanguageById", module, id, partialMnemonic)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException =>
-        utilitiesLog.errorLog(constants.Response.PSQL_EXCEPTION, psqlException, "updatePartialMnemonicById", module)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def updateUserTypeById(id: String, userType: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType).update(userType).asTry).map {
     case Success(result) => result match {
-      case 0 => utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION), "updateUserTypeById", module, id, userType)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException =>
-        utilitiesLog.errorLog(constants.Response.PSQL_EXCEPTION, psqlException, "updateUserTypeById", module)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def updatePasswordByID(id: String, secretHash: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.secretHash).update(secretHash).asTry).map {
     case Success(result) => result match {
-      case 0 =>
-        utilitiesLog.errorLog(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION), "updateUserTypeById", module, id, secretHash)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException =>
-        utilitiesLog.errorLog(constants.Response.PSQL_EXCEPTION, psqlException, "updatePasswordByID", module)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
@@ -129,10 +110,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 

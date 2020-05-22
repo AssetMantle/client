@@ -16,8 +16,6 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
-  //private val logger= Logger(this.getClass)
-
   def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
 

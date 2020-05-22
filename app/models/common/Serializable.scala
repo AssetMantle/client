@@ -5,11 +5,14 @@ import java.sql.Date
 
 import exceptions.BaseException
 import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
+import play.api.Logger
 import play.api.libs.json.{JsResult, JsValue, Json, OWrites, Reads, Writes}
 
 object Serializable {
 
   private implicit val module: String = constants.Module.SERIALIZABLE
+
+  private implicit val logger: Logger = Logger(this.getClass)
 
   case class Address(addressLine1: String, addressLine2: String, landmark: Option[String] = None, city: String, country: String, zipCode: String, phone: String)
 
