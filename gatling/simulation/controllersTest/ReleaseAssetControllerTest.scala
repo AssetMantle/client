@@ -21,7 +21,7 @@ object releaseAssetControllerTest {
     .exec(http("Release_Asset_Form_GET")
       .get(session=> routes.ReleaseAssetController.releaseAssetForm(session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.RELEASE_ASSET.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Release_Asset_POST")
       .post(routes.ReleaseAssetController.releaseAsset().url)
@@ -29,8 +29,8 @@ object releaseAssetControllerTest {
         Form.BLOCKCHAIN_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD ->  "${%s}".format(Test.TEST_ZONE_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD ->  "${%s}".format(Test.TEST_ZONE_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ASSET_RELEASED").exists)
     )
     .pause(3)
@@ -45,7 +45,7 @@ object releaseAssetControllerTest {
     .exec(http("BlockchainReleaseAsset_GET")
       .get(routes.ReleaseAssetController.blockchainReleaseAssetForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_RELEASE_ASSET.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainReleaseAsset_POST")
       .post(routes.ReleaseAssetController.blockchainReleaseAsset().url)
@@ -55,8 +55,8 @@ object releaseAssetControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ASSET_RELEASED").exists)
     )
 }

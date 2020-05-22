@@ -26,14 +26,14 @@ object blockchainTest {
     .feed(GenesisFeeder.genesisFeed)
     .exec(http("Login_GET")
       .get(routes.AccountController.loginForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
-        Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
-        Form.PUSH_NOTIFICATION_TOKEN -> "",
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Test.PUSH_NOTIFICATION_TOKEN -> "",
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
     .pause(5)
 
   val blockChainTestSendCoinFromMainTo4: ScenarioBuilder = scenario("blockChainTestSendCoinFromMainTo4")

@@ -23,14 +23,14 @@ object loginControllerTest {
     .exec(http("Login_GET")
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.LOGIN.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
-        Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.PUSH_NOTIFICATION_TOKEN -> "",
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PUSH_NOTIFICATION_TOKEN -> "",
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("${%s}".format(Test.TEST_USERNAME)).exists)
     )
     .pause(3)
@@ -40,15 +40,15 @@ object loginControllerTest {
     .exec(http("Login_GET")
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
-        Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.PUSH_NOTIFICATION_TOKEN -> "",
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PUSH_NOTIFICATION_TOKEN -> "",
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("${%s}".format(Test.TEST_USERNAME)).exists)
     )
     .pause(5)
@@ -58,14 +58,14 @@ object loginControllerTest {
     .exec(http("Login_Main_GET")
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .exec(http("Login_Main_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
-        Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
-        Form.PUSH_NOTIFICATION_TOKEN -> "",
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Test.PUSH_NOTIFICATION_TOKEN -> "",
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("${%s}".format(Test.TEST_MAIN_USERNAME)).exists)
     )
     .pause(5)

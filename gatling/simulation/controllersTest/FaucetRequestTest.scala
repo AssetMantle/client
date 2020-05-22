@@ -24,23 +24,23 @@ object requestFaucetTest {
     .exec(controllersTest.loginControllerTest.loginAfterSignUpScenario)
     .exec(http("RequestFaucet_GET")
       .get(routes.SendCoinController.faucetRequestForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("RequestFaucet_POST")
       .post(routes.SendCoinController.faucetRequest().url)
       .formParamMap(Map(
         Form.COUPON -> "",
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 
   val approveFaucetRequest: ScenarioBuilder = scenario("ApproveFaucetRequest")
     .exec(controllersTest.loginControllerTest.loginMain)
     .exec(http("RequestFaucet_GET")
       .get(routes.SendCoinController.approveFaucetRequestsForm("${%s}".format(Test.TEST_USERNAME),"").url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("RequestFaucet_POST")
       .post(routes.SendCoinController.faucetRequest().url)
-      .formParamMap(Map(Form.COUPON -> "", Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+      .formParamMap(Map(Form.COUPON -> "", Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 
 }
 

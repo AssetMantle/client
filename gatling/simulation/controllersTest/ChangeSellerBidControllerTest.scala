@@ -22,21 +22,21 @@ object changeSellerBidControllerTest {
     .feed(TimeFeeder.timeFeed)
     .exec(http("Change_Seller_Bid_GET")
       .get(session=>routes.ChangeSellerBidController.changeSellerBidForm(session(Test.TEST_BUYER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.REQUEST_ID), "value").saveAs(Form.REQUEST_ID))
     )
     .pause(2)
     .exec(http("Change_Seller_Bid_POST")
       .post(routes.ChangeSellerBidController.changeSellerBid().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.REQUEST_ID -> "${%s}".format(Form.REQUEST_ID),
         Form.BUYER_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
         Form.BID -> "${%s}".format(Test.TEST_SELLER_BID),
         Form.TIME -> "${%s}".format(Test.TEST_TIME),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_SELLER_PASSWORD)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_SELLER_PASSWORD)))
       .check(substring("SUCCESS SELLER_BID_CHANGED").exists)
     )
 
@@ -52,20 +52,20 @@ object changeSellerBidControllerTest {
     .exec(http("BlockchainChangeSellerBid_GET")
       .get(routes.ChangeSellerBidController.blockchainChangeSellerBidForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_CHANGE_SELLER_BID.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainChangeSellerBid_POST")
       .post(routes.ChangeSellerBidController.blockchainChangeSellerBid().url)
       .formParamMap(Map(
         Form.FROM -> "${%s}".format(Test.TEST_FROM),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.BID -> "${%s}".format(Test.TEST_SELLER_BID),
         Form.TIME -> "${%s}".format(Test.TEST_TIME),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS SELLER_BID_CHANGED").exists)
     )
 }

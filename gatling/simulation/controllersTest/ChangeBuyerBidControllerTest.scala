@@ -23,21 +23,21 @@ object changeBuyerBidControllerTest {
     .exec(http("ChangeBuyerBid_GET")
       .get(session=>routes.ChangeBuyerBidController.changeBuyerBidForm(session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.CHANGE_BUYER_BID.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.REQUEST_ID), "value").saveAs(Form.REQUEST_ID))
     )
     .pause(2)
     .exec(http("Change_Buyer_Bid_POST")
       .post(routes.ChangeBuyerBidController.changeBuyerBid().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.REQUEST_ID-> "${%s}".format(Form.REQUEST_ID),
         Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.BID -> "${%s}".format(Test.TEST_BUYER_BID),
         Form.TIME -> "${%s}".format(Test.TEST_TIME),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_BUYER_PASSWORD)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_BUYER_PASSWORD)))
         .check(substring("SUCCESS BUYER_BID_CHANGED").exists)
     )
     .pause(3)
@@ -54,7 +54,7 @@ object changeBuyerBidControllerTest {
     .exec(http("BlockchainChangeBuyerBid_GET")
       .get(routes.ChangeBuyerBidController.blockchainChangeBuyerBidForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_CHANGE_BUYER_BID.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
     .pause(2)
     .exec(http("BlockchainChangeBuyerBid_POST")
@@ -67,8 +67,8 @@ object changeBuyerBidControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS BUYER_BID_CHANGED").exists)
     )
 

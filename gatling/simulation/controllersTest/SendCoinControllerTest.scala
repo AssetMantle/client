@@ -24,7 +24,7 @@ object sendCoinControllerTest {
     .repeat(12){
       exec(http("SendCoinController_GET")
         .get(routes.SendCoinController.sendCoinForm().url)
-        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
         .pause(2)
       .exec(http("Send Coin")
           .post(routes.SendCoinController.sendCoin().url)
@@ -32,8 +32,8 @@ object sendCoinControllerTest {
             Form.TO -> "commit138wamrzhj2u8axgk9086zzu66hq9rmmnsv9yd2",
             Form.AMOUNT ->"10",
             Form.GAS -> "999999",
-            Form.PASSWORD -> "qwerty1234567890",
-            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))
+            Test.PASSWORD -> "qwerty1234567890",
+            Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))
           ))
 
     }
@@ -49,16 +49,16 @@ object sendCoinControllerTest {
     } //toFeed
     .exec(http("SendCoinController_GET")
     .get(routes.SendCoinController.sendCoinForm().url)
-    .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("SendCoinController_POST")
       .post(routes.SendCoinController.sendCoin().url)
       .formParamMap(Map(
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.AMOUNT -> "${%s}".format(Test.TEST_AMOUNT),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 
   val sendCoinMainScenario: ScenarioBuilder = scenario("SendCoinMain")
     .feed(AmountFeeder.amountFeed)
@@ -71,16 +71,16 @@ object sendCoinControllerTest {
     } //toFeed
     .exec(http("SendCoinMainController_GET")
     .get(routes.SendCoinController.sendCoinForm().url)
-    .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("SendCoinMainController_POST")
       .post(routes.SendCoinController.sendCoin().url)
       .formParamMap(Map(
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.AMOUNT -> "${%s}".format(Test.TEST_AMOUNT),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 
   val blockchainSendCoinScenario: ScenarioBuilder = scenario("BlockchainSendCoin")
     .feed(FromFeeder.fromFeed)
@@ -94,7 +94,7 @@ object sendCoinControllerTest {
     } //toFeed
     .exec(http("BlockchainSendCoinController_GET")
     .get(routes.SendCoinController.blockchainSendCoinForm().url)
-    .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainSendCoinController_POST")
       .post(routes.SendCoinController.blockchainSendCoin().url)
@@ -102,9 +102,9 @@ object sendCoinControllerTest {
         Form.FROM -> "${%s}".format(Test.TEST_FROM),
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.AMOUNT -> "${%s}".format(Test.TEST_AMOUNT),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 
   val blockchainSendCoinMainScenario: ScenarioBuilder = scenario("BlockchainSendCoinMain")
     .feed(FromFeeder.fromFeed)
@@ -120,7 +120,7 @@ object sendCoinControllerTest {
     .pause(5)
     .exec(http("BlockchainSendCoinMainController_GET")
       .get(routes.SendCoinController.blockchainSendCoinForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainSendCoinMainController_POST")
       .post(routes.SendCoinController.blockchainSendCoin().url)
@@ -128,22 +128,22 @@ object sendCoinControllerTest {
         Form.FROM -> "${%s}".format(Test.TEST_FROM),
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.AMOUNT -> "${%s}".format(Test.TEST_AMOUNT),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 
   val FaucetRequestScenario: ScenarioBuilder = scenario("FaucetRequest")
     .feed(CouponFeeder.couponFeed)
     .exec(http("FaucetRequest_GET")
       .get(routes.SendCoinController.faucetRequestForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.FAUCET_REQUEST.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Faucet_Request_POST")
       .post(routes.SendCoinController.faucetRequest().url)
       .formParamMap(Map(
         Form.COUPON -> "${%s}".format(Test.TEST_COUPON),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS COINS_REQUESTED").exists)
     )
     .pause(2)
@@ -152,13 +152,13 @@ object sendCoinControllerTest {
     .exec(http("RejectFaucetRequest_GET")
       .get(routes.SendCoinController.rejectFaucetRequestForm(Test.TEST_REQUEST_ID).url)
       .check(css("legend:contains(%s)".format(constants.Form.REJECT_FAUCET_REQUEST.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("RejectFaucetRequest_POST")
       .post(routes.SendCoinController.rejectFaucetRequest().url)
       .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS FAUCET_REQUEST_REJECTED").exists)
     )
     .pause(3)
@@ -176,16 +176,16 @@ object sendCoinControllerTest {
     .exec(http("Approve_Faucet_Request_GET")
       .get(session=>routes.SendCoinController.approveFaucetRequestsForm(session(Test.TEST_REQUEST_ID).as[String],session(Test.TEST_USERNAME).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.APPROVE_FAUCET_REQUEST.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Approve_Faucet_Request_POST")
       .post(routes.SendCoinController.approveFaucetRequests().url)
       .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
         Form.ACCOUNT_ID -> "${%s}".format(Test.TEST_USERNAME),
-        Form.PASSWORD ->  "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Test.PASSWORD ->  "${%s}".format(Test.TEST_MAIN_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS FAUCET_REQUEST_APPROVED").exists)
     )
     .pause(3)

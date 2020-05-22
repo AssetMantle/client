@@ -21,7 +21,7 @@ object redeemAssetControllerTest {
     .exec(http("Redeem_Asset_GET")
       .get(session=> routes.RedeemAssetController.redeemAssetForm(session(Test.TEST_BUYER_USERNAME).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.REDEEM_ASSET.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Redeem_Asset_POST")
       .post(routes.RedeemAssetController.redeemAsset().url)
@@ -29,8 +29,8 @@ object redeemAssetControllerTest {
         Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD ->"${%s}".format(Test.TEST_BUYER_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD ->"${%s}".format(Test.TEST_BUYER_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ASSET_REDEEMED").exists)
     )
     .pause(3)
@@ -46,7 +46,7 @@ object redeemAssetControllerTest {
     .exec(http("BlockchainRedeemAsset_GET")
       .get(routes.RedeemAssetController.blockchainRedeemAssetForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_REDEEM_ASSET.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainRedeemAsset_POST")
       .post(routes.RedeemAssetController.blockchainRedeemAsset().url)
@@ -56,8 +56,8 @@ object redeemAssetControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ASSET_REDEEMED").exists)
     )
 }

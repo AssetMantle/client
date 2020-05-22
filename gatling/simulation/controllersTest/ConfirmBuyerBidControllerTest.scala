@@ -22,7 +22,7 @@ object confirmBuyerBidControllerTest {
     .exec(http("Confirm_Buyer_Bid_Detail_GET")
       .get(session=>routes.ConfirmBuyerBidController.confirmBuyerBidDetailForm(session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String],950).url)
       .check(css("legend:contains(%s)".format(constants.Form.CONFIRM_BUYER_BID_DETAIL.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.REQUEST_ID), "value").saveAs(Test.TEST_REQUEST_ID))
     )
     .pause(2)
@@ -33,7 +33,7 @@ object confirmBuyerBidControllerTest {
         Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.BID -> "${%s}".format(Test.TEST_CONFIRM_BID),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("UPLOAD BUYER_CONTRACT").exists)
     )
     .pause(2)
@@ -41,13 +41,13 @@ object confirmBuyerBidControllerTest {
     .exec(http("Trader_Upload_BuyerContract_Negotiation_Form")
       .get(session=> routes.FileController.uploadTraderNegotiationForm("BUYER_CONTRACT",session(Test.TEST_REQUEST_ID).as[String]).url)
       .check(substring("BROWSE").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .exec(http("Trader_Upload_Buyer_Contract")
       .post(routes.FileController.uploadTraderNegotiation("BUYER_CONTRACT").url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
         Form.RESUMABLE_CHUNK_SIZE  -> "1048576",
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
@@ -62,17 +62,17 @@ object confirmBuyerBidControllerTest {
     .exec(http("Confirm_Buyer_Bid_Form_GET")
       .get(session=> routes.ConfirmBuyerBidController.confirmBuyerBidForm(session(Test.TEST_REQUEST_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.CONFIRM_BUYER_BID.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(1)
     .exec(http("Confirm_Buyer_Bid_POST")
         .post(routes.ConfirmBuyerBidController.confirmBuyerBid().url)
         .formParamMap(Map(
-          Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+          Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
           Form.REQUEST_ID-> "${%s}".format(Test.TEST_REQUEST_ID),
           Form.TIME -> "${%s}".format(Test.TEST_TIME),
           Form.GAS -> "${%s}".format(Test.TEST_GAS),
-          Form.PASSWORD ->"${%s}".format(Test.TEST_BUYER_PASSWORD)
+          Test.PASSWORD ->"${%s}".format(Test.TEST_BUYER_PASSWORD)
         ))
       .check(substring("SUCCESS BUYER_BID_CONFIRMED").exists)
     )
@@ -89,20 +89,20 @@ object confirmBuyerBidControllerTest {
     .exec(http("BlockchainConfirmBuyerBid_GET")
       .get(routes.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_CONFIRM_BUYER_BID.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainConfirmBuyerBid_POST")
       .post(routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid().url)
       .formParamMap(Map(
         Form.FROM -> "${%s}".format(Test.TEST_FROM),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.BID -> "${%s}".format(Test.TEST_BID),
         Form.TIME -> "${%s}".format(Test.TEST_TIME),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS BUYER_BID_CONFIRMED").exists)
     )
 

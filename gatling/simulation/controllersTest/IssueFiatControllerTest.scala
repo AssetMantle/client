@@ -22,14 +22,14 @@ object issueFiatControllerTest {
     .exec(http("Issue_Fiat_Request_GET")
       .get(routes.IssueFiatController.issueFiatRequestForm().url)
       .check(css("legend:contains(%s)".format("Issue Fiat Request")).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
    /* .exec(http("Issue_Fiat_Request_POST")
       .post(routes.IssueFiatController.issueFiatRequest().url)
       .formParamMap(Map(
         Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
         Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ISSUE_FIAT_REQUEST_SENT").exists)
     )*/
     .pause(3)
@@ -40,7 +40,7 @@ object issueFiatControllerTest {
     .exec(http("Issue_Fiat_GET")
       .get(session=> routes.IssueFiatController.issueFiatForm(session(Test.TEST_REQUEST_ID).as[String],session(Test.TEST_BUYER_USERNAME).as[String],session(Test.TEST_TRANSACTION_ID).as[String],session(Test.TEST_TRANSACTION_AMOUNT).as[Int]).url)
       .check(css("legend:contains(%s)".format(constants.Form.ISSUE_FIAT.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Issue_Fiat_POST")
       .post(routes.IssueFiatController.issueFiat().url)
@@ -49,9 +49,9 @@ object issueFiatControllerTest {
         Form.ACCOUNT_ID -> "${%s}".format(Test.TEST_BUYER_USERNAME),
         Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
         Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS FIAT_ISSUED").exists)
     )
     .pause(3)
@@ -60,13 +60,13 @@ object issueFiatControllerTest {
     .exec(http("RejectIssueFiat_GET")
       .get(routes.IssueFiatController.rejectIssueFiatRequestForm(Test.TEST_REQUEST_ID).url)
       .check(css("legend:contains(%s)".format(constants.Form.REJECT_ISSUE_FIAT_REQUEST.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     /*.exec(http("RejectIssueFiat_POST")
       .post(routes.IssueFiatController.issueFiatRequest().url)
       .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ISSUE_FIAT_REQUEST_REJECTED").exists)
     )*/
      .pause(2)
@@ -82,7 +82,7 @@ object issueFiatControllerTest {
     .exec(http("BlockchainIssueFiat_GET")
       .get(routes.IssueFiatController.blockchainIssueFiatForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_ISSUE_FIAT.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainIssueFiat_POST")
       .post(routes.IssueFiatController.blockchainIssueFiat().url)
@@ -91,10 +91,10 @@ object issueFiatControllerTest {
         Form.TO -> "${%s}".format(Test.TEST_TO),
         Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
         Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS FIAT_ISSUED").exists)
     )
 

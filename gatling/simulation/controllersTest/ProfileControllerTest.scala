@@ -19,7 +19,7 @@ object profileControllerTest {
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Detail_Form")
         .get(routes.AccountController.addIdentificationForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .feed(NameFeeder.nameFeed)
     .feed(IdentificationFeeder.identificationFeed)
@@ -28,7 +28,7 @@ object profileControllerTest {
     .exec(http("IdentificationDetail_Post")
       .post(routes.AccountController.addIdentification().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.FIRST_NAME -> "${%s}".format(Test.TEST_FIRST_NAME),
         Form.LAST_NAME -> "${%s}".format(Test.TEST_LAST_NAME),
         Form.DATE_OF_BIRTH -> "2019-11-11",
@@ -47,14 +47,14 @@ object profileControllerTest {
     .exec(http("AddIdentificationForm")
         .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
       .check(substring("BROWSE").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .feed(ImageFeeder.imageFeed)
     .exec(http("IdentificationUpload")
         .post(routes.FileController.uploadAccountKYC("IDENTIFICATION").url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
         Form.RESUMABLE_CHUNK_SIZE  -> "1048576",
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
@@ -69,13 +69,13 @@ object profileControllerTest {
     .pause(2)
     .exec(http("AddIdentificationForm")
       .get(routes.AccountController.userReviewIdentificationForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .exec(http("IdentificationDetail_Post")
       .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
     )

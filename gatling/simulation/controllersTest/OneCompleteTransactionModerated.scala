@@ -40,7 +40,6 @@ class OneCompleteTransactionModerated extends Simulation {
     oneCompleteModeratedScenario.inject(atOnceUsers(1))
   ).maxDuration(1300)
     .protocols(http.baseUrl(Test.BASE_URL))
-
 }
 
 object CreateZone {

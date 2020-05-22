@@ -26,7 +26,7 @@ object sellerExecuteOrderControllerTest {
     .exec(http("Zone_Upload_Negotiation_AWB_PROOF")
       .get(session=> routes.FileController.uploadZoneNegotiationForm("AWB_PROOF",session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(substring("BROWSE").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .feed(ImageFeeder4.imageFeed4)
@@ -34,7 +34,7 @@ object sellerExecuteOrderControllerTest {
     .exec(http("Zone_Upload_Negotiation_AWB_Proof")
         .post(routes.FileController.uploadZoneNegotiation("AWB_PROOF").url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
         Form.RESUMABLE_CHUNK_SIZE  -> "1048576",
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
@@ -51,20 +51,20 @@ object sellerExecuteOrderControllerTest {
     .exec(http("Moderated_Seller_Execute_Form_GET")
       .get(session=> routes.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.MODERATED_SELLER_EXECUTE_ORDER.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.AWB_PROOF_HASH), "value").saveAs(Form.AWB_PROOF_HASH))
     )
     .pause(2)
     .exec(http("Moderated_Seller_Execute_POST")
         .post(routes.SellerExecuteOrderController.moderatedSellerExecuteOrder().url)
         .formParamMap(Map(
-          Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+          Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
           Form.BUYER_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
           Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
           Form.AWB_PROOF_HASH -> "${%s}".format(Form.AWB_PROOF_HASH),
           Form.PEG_HASH ->  "${%s}".format(Test.TEST_PEG_HASH),
           Form.GAS -> "${%s}".format(Test.TEST_GAS),
-          Form.PASSWORD -> "${%s}".format(Test.TEST_ZONE_PASSWORD)
+          Test.PASSWORD -> "${%s}".format(Test.TEST_ZONE_PASSWORD)
         ))
       .check(substring("SUCCESS SELLER_ORDER_EXECUTED").exists)
     )
@@ -80,7 +80,7 @@ object sellerExecuteOrderControllerTest {
     .exec(http("Trader_Upload_Negotiation_AWB_PROOF")
       .get(session=> routes.FileController.uploadTraderNegotiationForm("AWB_PROOF",session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(substring("BROWSE").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .feed(ImageFeeder4.imageFeed4)
@@ -88,7 +88,7 @@ object sellerExecuteOrderControllerTest {
     .exec(http("Trader_Upload_Negotiation_AWB_Proof")
       .post(routes.FileController.uploadTraderNegotiation("AWB_PROOF").url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
         Form.RESUMABLE_CHUNK_SIZE  -> "1048576",
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
@@ -105,19 +105,19 @@ object sellerExecuteOrderControllerTest {
     .exec(http("Seller_Execute_Form_GET")
       .get(session=> routes.SellerExecuteOrderController.sellerExecuteOrderForm(session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.SELLER_EXECUTE_ORDER.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.AWB_PROOF_HASH), "value").saveAs(Form.AWB_PROOF_HASH))
     )
     .pause(2)
     .exec(http("Seller_Execute_POST")
       .post(routes.SellerExecuteOrderController.sellerExecuteOrder().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.BUYER_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
         Form.AWB_PROOF_HASH -> "${%s}".format(Form.AWB_PROOF_HASH),
         Form.PEG_HASH ->  "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_SELLER_PASSWORD)
+        Test.PASSWORD -> "${%s}".format(Test.TEST_SELLER_PASSWORD)
       ))
       .check(substring("SUCCESS SELLER_ORDER_EXECUTED").exists)
     )
@@ -136,7 +136,7 @@ object sellerExecuteOrderControllerTest {
     .exec(http("BlockchainSellerExecuteOrder_GET")
       .get(routes.SellerExecuteOrderController.blockchainSellerExecuteOrderForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_SELLER_EXECUTE_ORDER.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainSellerExecuteOrder_POST")
       .post(routes.SellerExecuteOrderController.blockchainSellerExecuteOrder().url)
@@ -148,8 +148,8 @@ object sellerExecuteOrderControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS SELLER_ORDER_EXECUTED").exists)
     )
 }

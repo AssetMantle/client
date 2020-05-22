@@ -19,11 +19,11 @@ object verifyEmailAddressControllerTest {
     .feed(OTPFeeder.otpFeed)
     .exec(http("VerifyEmailAddress_GET")
       .get(routes.VerifyEmailAddressController.verifyEmailAddressForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("VerifyEmailAddress_POST")
       .post(routes.VerifyEmailAddressController.verifyEmailAddress().url)
       .formParamMap(Map(
         Form.OTP -> "${%s}".format(Test.TEST_OTP),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 }

@@ -220,7 +220,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             otpVerified <- verifyOTP
             _ <- verifyMobileNumber(otpVerified)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.SUCCESS)))
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.MOBILE_NUMBER_VERIFIED)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.PHONE_VERIFIED, loginState.username)
           } yield {
             result

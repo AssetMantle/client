@@ -21,14 +21,14 @@ object addKeyControllerTest {
     .exec(http("AddKey_GET")
       .get(routes.AddKeyController.blockchainAddKeyForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_ADD_KEY.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("AddKey_POST")
       .post(routes.AddKeyController.blockchainAddKey().url)
       .formParamMap(Map(
         Form.NAME -> "${%s}".format(Test.TEST_NAME),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS KEY_ADDED").exists)
     )
 

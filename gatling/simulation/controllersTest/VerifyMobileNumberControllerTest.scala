@@ -20,11 +20,11 @@ object verifyMobileNumberControllerTest {
     .feed(OTPFeeder.otpFeed)
     .exec(http("VerifyMobileNumber_GET")
       .get(routes.VerifyMobileNumberController.verifyMobileNumberForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("VerifyMobileNumber_POST")
       .post(routes.VerifyMobileNumberController.verifyMobileNumber().url)
       .formParamMap(Map(
         Form.OTP -> "${%s}".format(Test.TEST_OTP),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
 }*/

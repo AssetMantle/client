@@ -23,7 +23,7 @@ object setSellerFeedbackControllerTest {
     .exec(http("Set_Seller_Feedback_Form_GET")
       .get(session=> routes.SetSellerFeedbackController.setSellerFeedbackForm(session(Test.TEST_BUYER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.SET_SELLER_FEEDBACK.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Set_Seller_Feedback_POST")
       .post(routes.SetSellerFeedbackController.setSellerFeedback().url)
@@ -32,8 +32,8 @@ object setSellerFeedbackControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.RATING -> "${%s}".format(Test.TEST_RATING),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD ->  "${%s}".format(Test.TEST_SELLER_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD ->  "${%s}".format(Test.TEST_SELLER_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS SELLER_FEEDBACK_SET").exists)
     )
     .pause(3)
@@ -48,7 +48,7 @@ object setSellerFeedbackControllerTest {
     .exec(http("BlockchainSetSellerFeedback_GET")
       .get(routes.SetSellerFeedbackController.blockchainSetSellerFeedbackForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_SET_SELLER_FEEDBACK.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainSetSellerFeedback_POST")
       .post(routes.SetSellerFeedbackController.blockchainSetSellerFeedback().url)
@@ -59,8 +59,8 @@ object setSellerFeedbackControllerTest {
         Form.RATING -> "${%s}".format(Test.TEST_RATING),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS SELLER_FEEDBACK_SET").exists)
     )
 }

@@ -26,14 +26,14 @@ object buyerExecuteOrderControllerTest {
     .exec(http("Zone_Upload_Negotiation_FIAT_PROOF_Form")
       .get(session=> routes.FileController.uploadZoneNegotiationForm("FIAT_PROOF",session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(substring("BROWSE").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .feed(ImageFeeder3.imageFeed3)
     .exec(http("Zone_Upload_Negotiation_FIAT_PROOF")
       .post(routes.FileController.uploadZoneNegotiation("FIAT_PROOF").url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
         Form.RESUMABLE_CHUNK_SIZE  -> "1048576",
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
@@ -50,20 +50,20 @@ object buyerExecuteOrderControllerTest {
     .exec(http("Moderated_Buyer_Execute_Form_Get")
       .get(session=> routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.MODERATED_BUYER_EXECUTE_ORDER.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.FIAT_PROOF_HASH), "value").saveAs(Form.FIAT_PROOF_HASH))
     )
     .pause(2)
     .exec(http("Moderated_Buyer_Execute_POST")
       .post(routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.BUYER_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
         Form.FIAT_PROOF_HASH -> "${%s}".format(Form.FIAT_PROOF_HASH),
         Form.PEG_HASH ->  "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD ->  "${%s}".format(Test.TEST_ZONE_PASSWORD)
+        Test.PASSWORD ->  "${%s}".format(Test.TEST_ZONE_PASSWORD)
       ))
       .check(substring("SUCCESS BUYER_ORDER_EXECUTED").exists)
     )
@@ -79,14 +79,14 @@ object buyerExecuteOrderControllerTest {
     .exec(http("Trader_Upload_Negotiation_FIAT_PROOF")
       .get(session=> routes.FileController.uploadTraderNegotiationForm("FIAT_PROOF",session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(substring("BROWSE").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .feed(ImageFeeder3.imageFeed3)
     .exec(http("Trader_Upload_Negotiation_FIAT_PROOF")
       .post(routes.FileController.uploadTraderNegotiation("FIAT_PROOF").url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
         Form.RESUMABLE_CHUNK_SIZE  -> "1048576",
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
@@ -103,19 +103,19 @@ object buyerExecuteOrderControllerTest {
     .exec(http("Buyer_Execute_Form_Get")
       .get(session=> routes.BuyerExecuteOrderController.buyerExecuteOrderForm(session(Test.TEST_NEGOTIATION_REQUEST_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.BUYER_EXECUTE_ORDER.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.FIAT_PROOF_HASH), "value").saveAs(Form.FIAT_PROOF_HASH))
     )
     .pause(2)
     .exec(http("Buyer_Execute_POST")
       .post(routes.BuyerExecuteOrderController.buyerExecuteOrder().url)
       .formParamMap(Map(
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.FIAT_PROOF_HASH -> "${%s}".format(Form.FIAT_PROOF_HASH),
         Form.PEG_HASH ->  "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.PASSWORD ->  "${%s}".format(Test.TEST_BUYER_PASSWORD)
+        Test.PASSWORD ->  "${%s}".format(Test.TEST_BUYER_PASSWORD)
       ))
       .check(substring("SUCCESS BUYER_ORDER_EXECUTED").exists)
     )
@@ -133,20 +133,20 @@ object buyerExecuteOrderControllerTest {
     .exec(http("BlockchainBuyerExecuteOrder_GET")
       .get(routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_BUYER_EXECUTE_ORDER.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainBuyerExecuteOrder_POST")
       .post(routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder().url)
       .formParamMap(Map(
         Form.FROM -> "${%s}".format(Test.TEST_FROM),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.BUYER_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
         Form.FIAT_PROOF_HASH -> "${%s}".format(Test.TEST_FIAT_PROOF_HASH),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       check(substring("SUCCESS BUYER_ORDER_EXECUTED").exists)
     )
 }

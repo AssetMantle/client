@@ -17,28 +17,36 @@ object signUpControllerTest {
     .exec(http("SignUp_GET")
         .get(routes.AccountController.signUpForm().url)
       .check(substring("Register").exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
-    )
-    .exec{session=>println(session)
-    session}
-    .pause(2)
-    .exec(http("SignUp_GET")
-      .get(session=>routes.AccountController.signUpForm(session(Test.TEST_BLOCKCHAIN_ADDRESS).as[String].replaceAll("[,(']","")).url)
-      .check(css("legend:contains(%s)".format("Sign Up")).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
-      .check(css("[name=%s]".format(Form.MNEMONIC), "value").saveAs(Form.MNEMONIC))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .exec(http("SignUp_POST")
       .post(routes.AccountController.signUp().url)
       .formParamMap(Map(
-        Form.USERNAME -> ("${%s}".format(Test.TEST_USERNAME)),
-        Form.USERNAME_AVAILABLE -> true,
-        Form.MNEMONIC->"${%s}".format(Form.MNEMONIC),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CONFIRM_PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
+        Test.USERNAME_AVAILABLE -> true,
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CONFIRM_PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Create Wallet").exists)
+    )
+    .pause(2)
+    .exec(http("CreateWallet_GET")
+      .get(session=>routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
+      .check(substring("Create Wallet").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.MNEMONICS), "value").saveAs(Test.MNEMONICS))
+    )
+    .pause(2)
+    .exec(http("CreateWallet_POST")
+      .post(routes.AccountController.createWallet().url)
+      .formParamMap(Map(
+        Test.USERNAME -> ("${%s}".format(Test.TEST_USERNAME)),
+        Test.MNEMONICS->"${%s}".format(Test.MNEMONICS),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Signed Up").exists)
     )
     .pause(5)
 }
+

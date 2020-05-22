@@ -21,17 +21,17 @@ object sendFiatControllerTest {
     .exec(http("Send_Fiat_Form_GET")
       .get(session=>routes.SendFiatController.sendFiatForm(session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String],session(Test.TEST_AMOUNT).as[Int]).url)
       .check(css("legend:contains(%s)".format(constants.Form.SEND_FIAT.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Send_Fiat_POST")
       .post(routes.SendFiatController.sendFiat().url)
       .formParamMap(Map(
-        Form.PASSWORD -> "${%s}".format(Test.TEST_BUYER_PASSWORD),
+        Test.PASSWORD -> "${%s}".format(Test.TEST_BUYER_PASSWORD),
         Form.SELLER_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
         Form.AMOUNT -> "${%s}".format(Test.TEST_AMOUNT),
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)
       ))
       .check(substring("SUCCESS FIAT_SENT").exists)
     )
@@ -47,7 +47,7 @@ object sendFiatControllerTest {
     .exec(http("BlockchainSendFiat_GET")
       .get(routes.SendFiatController.blockchainSendFiatForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_SEND_ASSET.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("BlockchainSendFiat_POST")
       .post(routes.SendFiatController.blockchainSendFiat().url)
@@ -58,8 +58,8 @@ object sendFiatControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.MODE ->"${%s}".format(Test.TEST_MODE),
-        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS FIAT_SENT").exists)
     )
 }
