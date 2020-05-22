@@ -16,9 +16,10 @@ html, body{
   height: 100%;
   position: relative;
   background: #F0F0F0;
+  @extend %scroller;
 }
 
-.scroller{
+%scroller{
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin;
 }
@@ -323,7 +324,9 @@ html, body{
 }
 
 .iframeModal{
-padding: 50px;
+  height: 700px;
+  overflow: auto;
+  padding: 50px;
 }
 
 .copyIcon{
@@ -445,6 +448,7 @@ padding: 50px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  word-break: break-word;
 }
 
 .forgotPasswordNote{
@@ -452,6 +456,9 @@ padding: 50px;
 }
 
 .comdex {
+  .cmuk-overflow-auto{
+    @extend %scroller;
+  }
   .cmuk-sticky-fixed{
     width: 100% !important;
   }
@@ -559,7 +566,9 @@ padding: 50px;
     color:#061728;
     padding: 15px 20px;
     .cmuk-button{
-    @extend %buttonSmall;
+      @extend %buttonSmall;
+      position: absolute;
+      right: 20px;
     }
   }
   .cmuk-button {
@@ -848,6 +857,7 @@ padding: 50px;
         .formBody{
           max-height:600px;
           overflow: auto;
+          @extend %scroller;
           .inputField{
             margin-top: 10px;
           }
@@ -882,6 +892,7 @@ form{
   max-height: 600px;
   overflow: auto;
   padding: 20px 60px 60px 60px;
+  @extend %scroller;
   .traderCommodity{
     display: flex;
     align-items: center;
@@ -1599,6 +1610,7 @@ form{
   .cmuk-card-body{
     padding:0;
     overflow-y: auto;
+    @extend %scroller;
     ul{
       padding: 0;
       margin: 0;
@@ -1642,7 +1654,7 @@ form{
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 15px 0;
+        padding: 20px 0;
         margin: 0 20px;
         &:first-child {
           padding-top: 25px;
@@ -1804,7 +1816,8 @@ form{
       .recentActivityMessages{
         height: 300px;
         padding: 0 15px;
-        overflow:auto
+        overflow:auto;
+        @extend %scroller;
       }
     }
   }
@@ -1819,73 +1832,93 @@ form{
   .cmuk-card-body{
     padding: 0 13px;
   }
-  .chatRoom .cmuk-card-body{
-    height: 360px;
-    .chatList{
-      padding: 5px 0;
-      button
-      {
-        padding: 5px 10px;
-        margin: 0 5px;
-        line-height: 10px;
+  .chatRoom {
+    .cmuk-card-header{
+      .icon{
+        width: 18px;
+        height: 18px;
       }
     }
-    .chatMessagesContainer{
-      height: 250px;
-      overflow: auto;
-    }
-    .chatForm{
-      .sendFormField{
+    .cmuk-card-body {
+      height: 305px;
+
+      .chatList {
+        padding: 5px 0;
+
+        button {
+          padding: 5px 10px;
+          margin: 0 5px;
+          line-height: 10px;
+        }
+      }
+
+      .chatMessagesContainer {
+        height: 205px;
+        overflow: auto;
+        @extend %scroller;
+      }
+
+      .chatForm {
+        .sendFormField {
+          position: relative;
+        }
+
+        .sendFormField input {
+          outline: none;
+          border-color: #e5e5e5;
+          height: 40px;
+          padding-right: 30px;
+
+          &::placeholder {
+            font-size: $paragraphFontSizeSmall;
+          }
+        }
+
+        .sendIconButton {
+          background: none;
+          padding: 0 10px;
+          margin: 0;
+          position: absolute;
+          top: 0;
+          right: 0;
+
+          .icon {
+            width: 17px;
+            height: 17px;
+          }
+        }
+
+        .replyBox {
+          background-color: #FFffff;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: -65px;
+          padding: 10px 10px;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .replyAccount {
+          font-size: 12px;
+          font-weight: bold;
+          color: #3f7fc9;
+        }
+
+        .replyMessage {
+          width: 100px;
+          overflow: hidden;
+          display: inline-block;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 14px;
+        }
+      }
+
+      .chatMoveTop {
         position: relative;
+        bottom: 50px;
       }
-      .sendFormField input{
-        outline: none;
-        border-color: #e5e5e5;
-        height: 40px;
-        padding-right: 30px;
-        &::placeholder{
-          font-size: $paragraphFontSizeSmall;
-        }
-      }
-      .sendIconButton{
-        background: none;
-        padding: 0 10px;
-        margin: 0;
-        position: absolute;
-        top:0;
-        right:0;
-        .icon{
-          width: 17px;
-          height: 17px;
-        }
-      }
-      .replyBox{
-        background-color: #FFffff;
-        position: absolute;
-        left:0;
-        right:0;
-        top:-65px;
-        padding: 10px 10px;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .replyAccount{
-        font-size: 12px;
-        font-weight: bold;
-        color: #3f7fc9;
-      }
-      .replyMessage{
-        width: 100px;
-        overflow: hidden;
-        display: inline-block;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 14px;
-      }
-    }
-    .chatMoveTop{
-      position: relative;
-      bottom: 50px;
     }
   }
   .orderInfoCard{
@@ -2028,13 +2061,15 @@ header:before,
     }
   }
 }
+
 .documentView{
-  .cmuk-card-header, .cmuk-card-body, .documentList{
+  .cmuk-card-body, .documentList{
     padding:0;
   }
   .documentList{
     height: 250px;
     overflow: auto;
+    @extend %scroller;
   }
 
   .documentList{
@@ -2093,7 +2128,7 @@ header:before,
       padding: 0 12px;
     }
   }
-  .cmuk-card-default{
+  .cmuk-card{
     height: 360px;
   }
   .cmuk-card-body .cmuk-tab{
@@ -2230,6 +2265,7 @@ header:before,
       }
     }
     p{
+      word-break: break-word;
       margin: 0;
     }
   }
@@ -2269,6 +2305,7 @@ header:before,
       }
     }
     p{
+      word-break: break-word;
       margin: 0;
     }
   }
@@ -2320,6 +2357,13 @@ header:before,
       a, a:hover{
         text-decoration: none;
         color:#fff;
+      }
+    }
+    .cmuk-button{
+      line-height: 28px;
+      &:hover{
+        color: #FFFFFF;
+        background: $colorPrimary;
       }
     }
   }
@@ -2392,7 +2436,7 @@ header:before,
   }
   .icon{
     width: 18px;
-    height: 18px;
+    height: 20px;
     margin-right: 5px;
     margin-bottom: 3px;
   }
@@ -2429,14 +2473,20 @@ header:before,
       .infoRow{
         flex-direction: column;
       }
+      .cmuk-button{
+        line-height: 28px;
+        padding: 0 20px;
+      }
     }
     .contactUpdateButton{
-      width: 60px;
       display: flex;
       flex-direction: row-reverse;
+      align-items: center;
       text-align: right;
       button{
-        font-weight: normal;
+        line-height: 28px;
+        padding: 0 20px;
+        margin-left: 20px;
       }
     }
   }
@@ -2622,6 +2672,7 @@ dl .info {
     height: 256px;
     overflow: auto;
     padding: 20px;
+    @extend %scroller;
     .cmuk-button{
     @extend %buttonSmall;
     }
@@ -2825,7 +2876,7 @@ figure.zoom {
   }
 }
 
-.ripple-effect {
+.rippleEffect {
   position: absolute;
   border-radius: 50%;
   animation: ripple-animation 2s;
@@ -2844,7 +2895,7 @@ figure.zoom {
 
 .identificationCheckbox{
   display: flex;
-  padding: 10px 0px;
+  padding: 10px 0;
   p{
     margin:0;
     word-break:break-word;

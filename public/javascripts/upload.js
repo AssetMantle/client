@@ -40,10 +40,17 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
         let storeDbRoute = storeRoute(file.fileName, documentType, id);
-
+        let loadingSpinner = $('#commonSpinner');
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,
+            global: showSpinner('fileUpload'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 200: function (data) {
                     $("#uploadCompletionMessage").show();
@@ -96,9 +103,17 @@ function updateFile(uploadRoute, updateRoute, documentType, id) {
     rFile.on('fileSuccess', function (file) {
         $("#updateControls").delay(1000).fadeOut(1000);
         let updateDbRoute = updateRoute(file.fileName, documentType, id);
+        let loadingSpinner = $('#commonSpinner');
         $.ajax({
             url: updateDbRoute.url,
             type: updateDbRoute.type,
+            global: showSpinner('fileUpload'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 200: function (data) {
                     $("#updateCompletionMessage").show();

@@ -4,13 +4,12 @@
 
 @(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 
-@commonInfoBox() {
-    <div class="chatList">
-    @commonComponentButton("chatWindow", chats.filter(_.id == chatID).filterNot(_.accountID == loginState.username).map(_.accountID).mkString.substring(0, 1), routes.javascript.ChatController.chatWindow, 'parameters -> s"'${chatID}', 0")
-    </div>
+@commonCard(constants.View.CHAT, 'cardIconPath -> "images/icons/icons.svg#chat") {
+    @commonComponentButton("chatWindow", constants.View.REFRESH, routes.javascript.ChatController.chatWindow, "CHAT_LOADING", "chat", 'parameters -> s"'${chatID}', 0")
+}{
     <div id="chatWindow"></div>
     <script>
-            componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0))
+            componentResource('chatWindow', jsRoutes.controllers.ChatController.chatWindow('@chatID', 0), 'CHAT_LOADING', 'chat')
     </script>
 }
 <script src="@routes.Assets.versioned("javascripts/chatRoom.js")" type="text/javascript"></script>

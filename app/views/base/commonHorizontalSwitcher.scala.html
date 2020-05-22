@@ -1,5 +1,6 @@
 @import play.api.routing.JavaScriptReverseRoute
 @import scala.collection.immutable.ListMap
+@import views.html.base._
 
 @(items: ListMap[String, Any], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
@@ -13,7 +14,7 @@
                 }
                 case route: JavaScriptReverseRoute => {
                     @defining(utilities.String.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
-                        <li><a id="switcherHeader@itemHeader" href="#" onclick="componentResource('switcherContent@itemHeader', @jsRoute)">@Messages(itemHeader)</a></li>
+                        <li><a id="switcherHeader@itemHeader" href="#" onclick="componentResource('switcherContent@itemHeader', @jsRoute, '@items.hashCode().toString', 'switcher')">@Messages(itemHeader)</a></li>
                     }
                 }
                 case _ => {
@@ -41,6 +42,7 @@
             }
         }
     </ul>
+    @commonSpinner(items.hashCode().toString)
 </div>
 
 @*Example Usage: @commonHorizontalSwitcher(

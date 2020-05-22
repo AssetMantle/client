@@ -2,13 +2,24 @@
 @import views.html.base._
 @import models.masterTransaction.SendFiatRequest
 
-@(sendFiatRequests: Seq[SendFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(sendFiatRequests: Seq[SendFiatRequest], sendFiatRequestHistories: Seq[SendFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@sendFiatRequests.map { sendFiatRequest =>
-    @commonVerticalInfoBox() {
-        @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
-        @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
-        @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
-        @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
+@sendFiatRequestData(sendFiatRequests, false)
+@sendFiatRequestData(sendFiatRequestHistories, true)
+
+@sendFiatRequestData(sendFiatRequestList: Seq[SendFiatRequest], history: Boolean) = {
+    @sendFiatRequestList.map { sendFiatRequest =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
+            @commonVerticalIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
+            @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @if(history){
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
+                } else {
+                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sendFiatRequest.negotiationID), 'class->"cmuk-button buttonPrimary")
+                }
+            </div>
+        }
     }
 }
