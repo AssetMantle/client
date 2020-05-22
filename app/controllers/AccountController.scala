@@ -68,7 +68,6 @@ class AccountController @Inject()(
           mnemonics <- mnemonics
           _ <- addLogin(mnemonics)
         } yield {
-          logger.info(mnemonics.toString)
           PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
         }
           ).recover {
