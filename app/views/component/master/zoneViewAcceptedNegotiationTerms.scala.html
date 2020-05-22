@@ -11,28 +11,55 @@
         <div class="traderCommodity">
             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType</span>
 
-         @traderList.map{ trader =>
-            @trader.id match {
-                case negotiation.sellerTraderID=>{
-                    @commonTextInfo(constants.View.SELLER, trader.accountID)
-                    @organizationList.find(_.id == trader.organizationID) match {
-                        case Some(organization)=>{@commonTextInfo(constants.View.SELLER_ORGANIZATION, organization.name)}
-                        case None=> {}
-                    }
-                }
-                case negotiation.buyerTraderID=>{
-                    @commonTextInfo(constants.View.BUYER, trader.accountID)
-                    @organizationList.find(_.id == trader.organizationID) match {
-                        case Some(organization)=>{@commonTextInfo(constants.View.BUYER_ORGANIZATION, organization.name)}
-                        case None=> {}
-                    }
-                }
-                case _=>{}
-            }
-         }
-
         </div>
         <div class="terms">
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
+            </div>
+            @traderList.map{ trader =>
+                @trader.id match {
+                    case negotiation.sellerTraderID=>{
+                        <div class="sellerTerm">
+                            <div class="cmuk-flex">
+                                <span class="termIcon">@commonIcon("description")</span>
+                                @commonTextInfo(constants.View.SELLER, trader.accountID)
+                            </div>
+                        </div>
+                        @organizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization)=>{
+                                <div class="sellerTerm">
+                                    <div class="cmuk-flex">
+                                        <span class="termIcon">@commonIcon("description")</span>
+                                        @commonTextInfo(constants.View.SELLER_ORGANIZATION, organization.name)
+                                    </div>
+                                </div>
+                            }
+                            case None=> {}
+                        }
+                    }
+                    case negotiation.buyerTraderID=>{
+                        <div class="sellerTerm">
+                            <div class="cmuk-flex">
+                                <span class="termIcon">@commonIcon("description")</span>
+                                @commonTextInfo(constants.View.BUYER, trader.accountID)
+                            </div>
+                        </div>
+                        @organizationList.find(_.id == trader.organizationID) match {
+                            case Some(organization)=>{
+                                <div class="sellerTerm">
+                                    <div class="cmuk-flex">
+                                        <span class="termIcon">@commonIcon("description")</span>
+                                        @commonTextInfo(constants.View.BUYER_ORGANIZATION, organization.name)
+                                    </div>
+                                </div>
+                            }
+                            case None=> {}
+                        }
+                    }
+                    case _=>{}
+                }
+                }
+
             <div class="cmuk-flex cmuk-flex-between">
                 <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
             </div>
@@ -46,10 +73,15 @@
                 </div>
             </div>
             <div class="sellerTerm">
+                <div>
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
                     @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                </div>
+                <div class="cmuk-flex">
+                    <span class="termIcon">@commonIcon("contractPrice")</span>
                     @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
+                </div>
                 </div>
                 <div>
                 @negotiation.buyerAcceptedPrice
