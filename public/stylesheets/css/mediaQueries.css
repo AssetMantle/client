@@ -163,12 +163,14 @@
     border-radius: 103px;
     color: #0862BE;
     border: 0; }
-  .leftContainer .documentView .cmuk-card-header, .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
+  .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
     padding: 0px; }
   .leftContainer .documentView .documentList {
     height: 150px; }
   .leftContainer .documentView .cmuk-card {
     height: 265px; }
+    .leftContainer .documentView .cmuk-card .cmuk-card-body {
+      height: 265px; }
   .leftContainer .zoneTradeFinancial .cmuk-card-body {
     height: auto; }
     .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
@@ -181,9 +183,9 @@
       .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
         height: 210px; }
   .rightContainer .chatRoom .cmuk-card-body {
-    height: 264px; }
+    height: 215px; }
     .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 160px; }
+      height: 120px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
@@ -256,7 +258,20 @@
 
   .infoText .infoIcon.organizationInfoIcon {
     left: 340px;
-    top: 0; } }
+    top: 0; }
+
+  .iframeModal {
+    height: 530px; }
+
+  .leftContainer .financial .financialCard.cardPaddingRemove ul li {
+    padding: 15px 0px; }
+    .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
+      padding-top: 10px; }
+
+  .walletButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: center; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }

@@ -4,7 +4,7 @@
 
 @(organizationBankAccountDetail: Option[OrganizationBankAccountDetail])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL) {
+@commonCard(constants.View.ORGANIZATION_BANK_ACCOUNT_DETAIL, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
 } {
     @organizationBankAccountDetail match {
         case Some(organizationBankAccountDetail) => {

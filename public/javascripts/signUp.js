@@ -1,22 +1,28 @@
 let timer = 0;
 let timeoutFlag = true;
 
-function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
+function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
     if (timeoutFlag) {
         timeoutFlag = false;
         clearTimeout(timer);
         timer = setTimeout(function () {
             timeoutFlag = true;
             const username = $(source).val();
-            const result = $(resultID);
             const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
-            let userNameNotAvailable = "";
+            let loadingSpinner = $('#usernameAvailableLoading');
             if (username.length > 0) {
                 $.ajax({
                     url: route.url,
                     type: route.type,
                     async: true,
+                    global: showSpinner('checkUsernameAvailable'),
+                    beforeSend: function () {
+                        loadingSpinner.show();
+                    },
+                    complete: function () {
+                        loadingSpinner.hide();
+                    },
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
@@ -40,9 +46,6 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
 function checkPasswords() {
     let confirmPassword = $('#signUpConfirmPassword').val();
     let password = $('#signUpPassword').val();
-    let matchPasswordsResult = $('#matchPasswordsResult');
-    let matchConfirmPasswordsResult = $('#matchConfirmPasswordsResult');
-    let passwordNotMatch = "Passwords Do Not Match"
     if (confirmPassword !== password) {
         $('#matchConfirmPasswordsResult span').hide();
         $(".passwordNotMatched").show();
@@ -54,12 +57,12 @@ function checkPasswords() {
 function showPassword() {
     $('#showPassword span').toggleClass('active');
     let password = $('#signUpPassword')[0];
-    let matchPassword =$('#signUpConfirmPassword')[0];
+    let matchPassword = $('#signUpConfirmPassword')[0];
     if (password.type && matchPassword.type === "password") {
         password.type = "text";
-        matchPassword.type="text"
+        matchPassword.type = "text"
     } else {
         password.type = "password";
-        matchPassword.type="password";
+        matchPassword.type = "password";
     }
 }

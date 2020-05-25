@@ -24,13 +24,16 @@
                 }
             }
             case None => {
-                <div class="cmuk-position-center">
-                @commonFormButton(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER)
-                </div>
+                @commonInfoBox() {
+                    <div class="cmuk-flex cmuk-flex-wrap infoRowBox cmuk-flex-middle">
+                    <p class="cmuk-margin-remove">@Messages(constants.View.MOBILE_NUMBER)</p>
+                    @commonFormButton(constants.Form.ADD_OR_UPDATE_MOBILE_NUMBER)
+                    </div>
+                }
             }
         }
         <div class="contactUpdateButton">
-        @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm, 'class -> "cmuk-button-link")}
+        @mobileNumber.map{mobile => @commonModalButton(constants.View.UPDATE_MOBILE_NUMBER, routes.javascript.ContactController.addOrUpdateMobileNumberForm)}
         </div>
     </div>
     <div class="contactInfoItem">
@@ -50,13 +53,16 @@
             }
         }
         case None => {
-            <div class="cmuk-position-center cmuk-margin-medium-top">
-            @commonFormButton(constants.Form.ADD_OR_UPDATE_EMAIL_ADDRESS)
-            </div>
+            @commonInfoBox() {
+                <div class="cmuk-flex cmuk-flex-wrap infoRowBox cmuk-flex-middle">
+                    <p class="cmuk-margin-remove">@Messages(constants.View.EMAIL_ADDRESS)</p>
+                    @commonFormButton(constants.Form.ADD_OR_UPDATE_EMAIL_ADDRESS)
+                </div>
+            }
         }
     }
         <div class="contactUpdateButton">
-        @emailAddress.map{email => @commonModalButton(constants.View.UPDATE_EMAIL_ADDRESS, routes.javascript.ContactController.addOrUpdateEmailAddressForm, 'class -> "cmuk-button-link")}
+        @emailAddress.map{email => @commonModalButton(constants.View.UPDATE_EMAIL_ADDRESS, routes.javascript.ContactController.addOrUpdateEmailAddressForm)}
         </div>
     </div>
 }

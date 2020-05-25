@@ -3,6 +3,7 @@ package controllers
 import java.nio.file.Files
 
 import controllers.actions._
+import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -40,6 +41,8 @@ class AddOrganizationController @Inject()(
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
+                                           withoutLoginAction: WithoutLoginAction,
+                                           withoutLoginActionAsync: WithoutLoginActionAsync,
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -118,7 +121,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userAddUBOForm(): Action[AnyContent] = Action { implicit request =>
+  def userAddUBOForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.userAddUBO())
   }
 
@@ -151,7 +154,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def addUBOForm(): Action[AnyContent] = Action { implicit request =>
+  def addUBOForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.addUBO())
   }
 
@@ -184,7 +187,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userDeleteUBOForm(id: String): Action[AnyContent] = Action { implicit request =>
+  def userDeleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
@@ -211,7 +214,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def deleteUBOForm(id: String): Action[AnyContent] = Action { implicit request =>
+  def deleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
@@ -292,7 +295,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKYC), documentType))
   }
 
@@ -320,7 +323,7 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def storeFile(organizationID: String): Future[Boolean] = fileResourceManager.storeFile[OrganizationKYC](
+      def storeFile(organizationID: String): Future[Unit] = fileResourceManager.storeFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         document = OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
@@ -340,7 +343,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
   }
 
@@ -635,7 +638,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def rejectRequestForm(organizationID: String): Action[AnyContent] = Action { implicit request =>
+  def rejectRequestForm(organizationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.rejectOrganizationRequest(organizationID = organizationID))
   }
 
@@ -662,11 +665,11 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKYC), documentType))
   }
 
-  def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKYC), documentType))
   }
 
@@ -694,7 +697,7 @@ class AddOrganizationController @Inject()(
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def storeFile(id: String): Future[Boolean] = fileResourceManager.storeFile[OrganizationKYC](
+      def storeFile(id: String): Future[Unit] = fileResourceManager.storeFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         document = OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
@@ -735,11 +738,11 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def blockchainAddOrganizationForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddOrganizationForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.addOrganization())
   }
 
-  def blockchainAddOrganization: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainAddOrganization: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.AddOrganization.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.addOrganization(formWithErrors)))

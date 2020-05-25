@@ -1,14 +1,22 @@
-function submitForm(source, targetID = 'commonModalContent') {
+function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 'commonSpinner') {
     const target = '#'+targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);
+        let loadingSpinner = $('#' + loadingSpinnerID);
         $.ajax({
             type: 'POST',
             contentType: 'application/x-www-form-urlencoded',
             url: form.attr('action'),
             data: form.serialize(),
             async: true,
+            global: showSpinner('submitForm'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);

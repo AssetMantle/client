@@ -10,7 +10,7 @@ object IssueAssetOld {
       constants.FormField.TRADER_ID.name -> constants.FormField.TRADER_ID.field,
       constants.FormField.DOCUMENT_HASH.name -> constants.FormField.DOCUMENT_HASH.field,
       constants.FormField.ASSET_TYPE.name -> constants.FormField.ASSET_TYPE.field,
-      constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
+      constants.FormField.ASSET_PRICE_PER_UNIT.name -> constants.FormField.ASSET_PRICE_PER_UNIT.field,
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.TAKER_ADDRESS.name -> optional(constants.FormField.TAKER_ADDRESS.field),
@@ -19,6 +19,6 @@ object IssueAssetOld {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, tarderID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], gas: Int, password: String)
+  case class Data(id: String, tarderID: String, documentHash: String, assetType: String, assetPricePerUnit: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], gas: Int, password: String)
 
 }

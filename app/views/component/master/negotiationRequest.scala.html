@@ -13,7 +13,7 @@
         <div class="cmuk-panel cmuk-panel-scrollable">
             <ul class="cmuk-list">
             @tradableAssetList.map { asset =>
-                <li onclick="selectAsset('@asset.id', '@asset.description', '@asset.assetType', '@Seq(asset.price, Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" ")', '@Seq(asset.quantity.toString, asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
+                <li onclick="selectAsset('@asset.id', '@asset.description', '@asset.assetType', '@Seq(asset.price/asset.quantity, Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" ")', '@Seq(asset.price, Messages(constants.View.USD)).mkString(" ")', '@Seq(asset.quantity.toString, asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
                     @asset.description | @Messages(constants.View.STATUS): @Messages(asset.status)
                 </li>
             }
@@ -23,7 +23,8 @@
         @commonInputText(negotiationRequestForm, constants.FormField.ASSET_ID, 'id -> "negotiationRequestAssetID", 'containerDivClass -> "hidden", 'readonly -> true)
         @commonTextInfo(constants.View.DESCRIPTION, "", 'id -> "selectedAssetDescription")
         @commonTextInfo(constants.View.ASSET_TYPE, "", 'id -> "selectedAssetType")
-        @commonTextInfo(constants.View.PRICE, "", 'id -> "selectedAssetPrice")
+        @commonTextInfo(constants.View.PRICE_PER_UNIT, "", 'id -> "selectedAssetPricePerUnit")
+        @commonTextInfo(constants.View.TOTAL_AMOUNT, "", 'id -> "selectedAssetTotalPrice")
         @commonTextInfo(constants.View.QUANTITY, "", 'id -> "selectedAssetQuantity")
         <div class="cmuk-text-left title">@Messages(constants.View.SHIPPING_DETAILS):</div>
         @commonTextInfo(constants.View.SHIPMENT_PERIOD, "", 'id -> "selectedAssetShipmentPeriod")

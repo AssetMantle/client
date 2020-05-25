@@ -50,12 +50,24 @@
                             }
                         }
                      }
-
-            @commonTextInfo(constants.View.COUNTER_PARTY_TRADER, counterPartyTrader.accountID)
-            @commonTextInfo(constants.View.COUNTER_PARTY_ORGANIZATION, counterPartyOrganization.name)
         </div>
 
         <div class="terms">
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
+            </div>
+            <div class="sellerTerm">
+                <div class="cmuk-flex">
+                    <span class="termIcon">@commonIcon("description")</span>
+                    @commonTextInfo(constants.View.COUNTER_PARTY_TRADER, counterPartyTrader.accountID)
+                </div>
+            </div>
+            <div class="sellerTerm">
+                <div class="cmuk-flex">
+                    <span class="termIcon">@commonIcon("description")</span>
+                    @commonTextInfo(constants.View.COUNTER_PARTY_ORGANIZATION, counterPartyOrganization.name)
+                </div>
+            </div>
         @if(traderID == negotiation.buyerTraderID && negotiation.status == constants.Status.Negotiation.STARTED) {
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "description") {
                 @Messages(constants.View.ASSET_DESCRIPTION)
@@ -64,9 +76,11 @@
             }
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "contractPrice") {
                 @Messages(constants.View.PRICE)
+                <div class="creditTerms">
+                @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
+                </div>
             } {
-                @Seq(negotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
-                @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiation.price * negotiation.quantity).toString, Messages(constants.View.USD)).mkString(" "))
+                @Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
             }
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "quantity") {
                 @Messages(constants.View.QUANTITY)
@@ -142,10 +156,15 @@
                 </div>
             </div>
             <div class="sellerTerm">
+                <div>
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiation.price * negotiation.quantity).toString, Messages(constants.View.USD)).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                </div>
+                    <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("contractPrice")</span>
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
+                    </div>
                 </div>
                 <div>
                 @if(negotiation.buyerAcceptedPrice) {
