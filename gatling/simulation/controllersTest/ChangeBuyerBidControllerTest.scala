@@ -10,14 +10,14 @@ import io.gatling.jdbc.Predef.jdbcFeeder
 
 class ChangeBuyerBidControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = changeBuyerBidControllerTest.blockchainChangeBuyerBidScenario
+  val scenarioBuilder: ScenarioBuilder = changeBuyerBidControllerTest.changeBuyerBidScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object changeBuyerBidControllerTest {
 
   val changeBuyerBidScenario: ScenarioBuilder = scenario("ChangeBuyerBid")
-    .feed(BuyerBidFeeder.buyerBidFeed)
+  /*  .feed(BuyerBidFeeder.buyerBidFeed)
     .feed(TimeFeeder.timeFeed)
     .feed(GasFeeder.gasFeed)
     .exec(http("ChangeBuyerBid_GET")
@@ -70,7 +70,7 @@ object changeBuyerBidControllerTest {
         Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS BUYER_BID_CHANGED").exists)
-    )
+    )*/
 
   def getAddressFromAccountID(accountID: String):String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",

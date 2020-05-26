@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -70,3 +71,4 @@ object loginControllerTest {
     )
     .pause(5)
 }
+*/

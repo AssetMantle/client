@@ -19,7 +19,7 @@ class SendCoinControllerTest extends Simulation {
 object sendCoinControllerTest {
 
   val sendCoin=scenario("sendCoin")
-    .exec(session=> session.set(Test.TEST_USERNAME,"testSendCoin123").set(Test.TEST_PASSWORD,"qwerty1234567890"))
+   /* .exec(session=> session.set(Test.TEST_USERNAME,"testSendCoin123").set(Test.TEST_PASSWORD,"qwerty1234567890"))
     .exec(loginControllerTest.loginScenario)
     .repeat(12){
       exec(http("SendCoinController_GET")
@@ -196,7 +196,7 @@ object sendCoinControllerTest {
         pause(1)
           .exec { session =>session.set(Test.USER_TYPE, getUserType(session(Test.TEST_USERNAME).as[String])) }
       }
-    }
+    }*/
 
 
   def getUserType(query: String):String={

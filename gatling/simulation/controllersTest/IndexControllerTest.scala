@@ -15,9 +15,9 @@ class IndexControllerTest extends Simulation {
 object indexControllerTest {
 
   val indexScenario: ScenarioBuilder = scenario("Index")
-    .exec(controllersTest.loginControllerTest.loginAfterSignUpScenario)
+   /* .exec(controllersTest.loginControllerTest.loginAfterSignUpScenario)
     .exec(http("Index_GET")
       .get(routes.IndexController.index().url))
     .pause(2)
-
+*/
 }

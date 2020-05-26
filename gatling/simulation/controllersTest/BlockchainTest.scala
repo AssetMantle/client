@@ -40,5 +40,5 @@ object blockchainTest {
     .pause(20)
     .feed(GenesisFeeder.genesisFeed)
     .feed(UsernameFeeder.usernameFeed)
-    .exec(controllersTest.sendCoinControllerTest.blockchainSendCoinMainScenario)
+    //.exec(controllersTest.sendCoinControllerTest.blockchainSendCoinMainScenario)
 }

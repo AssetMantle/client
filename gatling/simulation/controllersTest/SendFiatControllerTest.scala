@@ -17,7 +17,7 @@ class SendFiatControllerTest extends Simulation {
 object sendFiatControllerTest {
 
   val sendFiatScenario: ScenarioBuilder = scenario("SendFiat")
-    .feed(AmountFeeder.amountFeed)
+/*    .feed(AmountFeeder.amountFeed)
     .exec(http("Send_Fiat_Form_GET")
       .get(session=>routes.SendFiatController.sendFiatForm(session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String],session(Test.TEST_AMOUNT).as[Int]).url)
       .check(css("legend:contains(%s)".format(constants.Form.SEND_FIAT.legend)).exists)
@@ -61,5 +61,5 @@ object sendFiatControllerTest {
         Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS FIAT_SENT").exists)
-    )
+    )*/
 }

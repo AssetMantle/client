@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -64,3 +65,4 @@ object setBuyerFeedbackControllerTest {
       .check(substring("SUCCESS BUYER_FEEDBACK_SET").exists)
     )
 }
+*/

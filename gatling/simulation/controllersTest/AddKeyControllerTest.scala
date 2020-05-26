@@ -26,7 +26,7 @@ object addKeyControllerTest {
     .exec(http("AddKey_POST")
       .post(routes.AddKeyController.blockchainAddKey().url)
       .formParamMap(Map(
-        Form.NAME -> "${%s}".format(Test.TEST_NAME),
+        constants.FormField.NAME.name -> "${%s}".format(Test.TEST_NAME),
         Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS KEY_ADDED").exists)

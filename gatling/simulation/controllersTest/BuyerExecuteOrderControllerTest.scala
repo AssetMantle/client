@@ -10,14 +10,14 @@ import io.gatling.http.Predef._
 
 class BuyerExecuteOrderControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = buyerExecuteOrderControllerTest.blockchainBuyerExecuteOrderScenario
+  val scenarioBuilder: ScenarioBuilder = buyerExecuteOrderControllerTest.moderatedBuyerExecuteOrderScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object buyerExecuteOrderControllerTest {
 
   val moderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedBuyerExecuteOrder")
-    .exec(http("Moderated_Buyer_Execute_Order_Document_Upload_Form_GET")
+  /*  .exec(http("Moderated_Buyer_Execute_Order_Document_Upload_Form_GET")
       .get(session=>routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument(session(Test.TEST_BUYER_ADDRESS).as[String],session(Test.TEST_SELLER_ADDRESS).as[String],session(Test.TEST_PEG_HASH).as[String]).url)
     )
     .exec{session=> println(session)
@@ -148,5 +148,5 @@ object buyerExecuteOrderControllerTest {
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       check(substring("SUCCESS BUYER_ORDER_EXECUTED").exists)
-    )
+    )*/
 }

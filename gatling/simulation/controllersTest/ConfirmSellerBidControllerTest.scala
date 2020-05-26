@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -108,4 +109,4 @@ object confirmSellerBidControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS SELLER_BID_CONFIRMED").exists)
     )
-}
+}*/

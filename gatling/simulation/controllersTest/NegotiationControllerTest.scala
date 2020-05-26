@@ -12,7 +12,7 @@ import scala.util.Random
 
 class NegotiationControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = negotiationControllerTest.issueAssetRequestScenario
+  val scenarioBuilder: ScenarioBuilder = negotiationControllerTest.negotiationRequestScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -139,7 +139,7 @@ object negotiationControllerTest {
   val uploadContract: ScenarioBuilder = scenario("UploadContract")
     .feed(ImageFeeder.imageFeed)
     .exec(http("UploadContractForm" + "_GET")
-      .get(session => routes.FileController.uploadNegotiationForm(session(Test.TEST_NEGOTIATION_ID).as[String],constants.File.Negotiation.CONTRACT).url)
+      .get(session => routes.FileController.uploadNegotiationForm(session(Test.TEST_NEGOTIATION_ID).as[String], constants.File.Negotiation.CONTRACT).url)
       .check(substring("BROWSE").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -157,7 +157,7 @@ object negotiationControllerTest {
         .transferEncoding("binary")).asMultipartForm)
     .exec(
       http("Store_Contract")
-        .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], constants.File.Negotiation.CONTRACT,session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+        .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], constants.File.Negotiation.CONTRACT, session(Test.TEST_NEGOTIATION_ID).as[String]).url)
     )
     .pause(2)
 
@@ -175,34 +175,155 @@ object negotiationControllerTest {
     )
 
   val uploadAssetDocuments: ScenarioBuilder = scenario("UpdateContractSigned")
+    .foreach(constants.File.ASSET_DOCUMENTS, "documentType") {
+      feed(ImageFeeder.imageFeed)
+        .exec(http("Asset_Document_Upload_" + "${documentType}" + "_FORM")
+          .get(session => routes.FileController.uploadAssetForm(session("documentType").as[String], session(Test.TEST_ASSET_ID).as[String]).url)
+          .check(substring("BROWSE").exists)
+          .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+        )
+        .pause(2)
+        .exec(http("Asset_Document_Upload_" + "${documentType}")
+          .post(session => routes.FileController.uploadAsset(session("documentType").as[String]).url)
+          .formParamMap(Map(
+            Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+            Form.RESUMABLE_CHUNK_NUMBER -> "1",
+            Form.RESUMABLE_CHUNK_SIZE -> "1048576",
+            Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
+            Form.RESUMABLE_IDENTIFIER -> "document",
+            Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
+          .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
+            .transferEncoding("binary")).asMultipartForm)
+        .exec(
+          http("Store_Asset_Document_" + "${documentType}")
+            .get(session => routes.FileController.storeAsset(session(Test.TEST_FILE_NAME).as[String], session("documentType").as[String],session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+            .check(substring("Organization KYC Files").exists)
+        )
+        .pause(2)
+    }
 
-  val issueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
-    .feed(AssetTypeFeeder.assetTypeFeed)
-    .feed(AssetPriceFeeder.assetPriceFeed)
-    .feed(QuantityUnitFeeder.quantityUnitFeed)
-    .feed(AssetQuantityFeeder.assetQuantityFeed)
-    .feed(GasFeeder.gasFeed)
-    .feed(IssueAssetDetailFeeder.issueAssetDetailFeeder)
-    .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
-    .exec(http("IssueAssetDetailForm_GET")
-      .get(routes.AssetController.issueForm().url)
+  val addBillOfLading: ScenarioBuilder = scenario("AddBillOfLading")
+    .feed(IssueAssetOBLFeeder.issueAssetOBLFeeder)
+    .exec(http("AddBillOfLadingForm_GET")
+      .get(session => routes.AssetController.addBillOfLadingForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
-    .exec(http("IssueAssetRequest_POST")
-      .post(routes.AssetController.issue().url)
+    .exec(http("AddBillOfLading_POST")
+      .post(routes.AssetController.addBillOfLading().url)
       .formParamMap(Map(
-        constants.FormField.ASSET_TYPE.name -> "${%s}".format(Test.TEST_ASSET_TYPE),
-        constants.FormField.ASSET_QUANTITY.name -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
-        constants.FormField.QUANTITY_UNIT.name -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
-        constants.FormField.ASSET_PRICE.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
-        constants.FormField.SHIPPING_PERIOD.name -> "${%s}".format(Test.TEST_SHIPPING_PERIOD),
-        constants.FormField.PORT_OF_LOADING.name -> "${%s}".format(Test.TEST_PORT_OF_LOADING),
-        constants.FormField.PORT_OF_DISCHARGE.name -> "${%s}".format(Test.TEST_PORT_OF_DISCHARGE),
+        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("UPLOAD OBL").exists)
+      .check(substring("Document List").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(3)
+
+  val uploadNegotiationDocuments: ScenarioBuilder = scenario("uploadNegotiationDocuments")
+    .foreach(constants.File.NEGOTIATION_DOCUMENTS, "documentType") {
+      feed(ImageFeeder.imageFeed)
+        .exec(http("Negotiation_Document_Upload_" + "${documentType}" + "_FORM")
+          .get(session => routes.FileController.uploadAssetForm(session("documentType").as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+          .check(substring("BROWSE").exists)
+          .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+        )
+        .pause(2)
+        .exec(http("Negotiation_Document_Upload_" + "${documentType}")
+          .post(session => routes.FileController.uploadAsset(session("documentType").as[String]).url)
+          .formParamMap(Map(
+            Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+            Form.RESUMABLE_CHUNK_NUMBER -> "1",
+            Form.RESUMABLE_CHUNK_SIZE -> "1048576",
+            Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
+            Form.RESUMABLE_IDENTIFIER -> "document",
+            Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
+          .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
+            .transferEncoding("binary")).asMultipartForm)
+        .exec(
+          http("Store_Negotiation_Document_" + "${documentType}")
+            .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], session("documentType").as[String],session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+            .check(substring("Organization KYC Files").exists)
+        )
+        .pause(2)
+    }
+
+  val addInvoice: ScenarioBuilder = scenario("AddInvoice")
+    .feed(IssueAssetOBLFeeder.issueAssetOBLFeeder)
+    .exec(http("AddInvoiceForm_GET")
+      .get(session => routes.NegotiationController.addInvoiceForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("AddInvoice_POST")
+      .post(routes.NegotiationController.addInvoice().url)
+      .formParamMap(Map(
+        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Document List").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+
+  val addContract: ScenarioBuilder = scenario("AddContract")
+    .feed(IssueAssetOBLFeeder.issueAssetOBLFeeder)
+    .exec(http("AddContractForm_GET")
+      .get(session => routes.NegotiationController.addContractForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("AddContract_POST")
+      .post(routes.NegotiationController.addContract().url)
+      .formParamMap(Map(
+        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Document List").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+
+  val acceptBillOfLading: ScenarioBuilder = scenario("AcceptBillOfLading")
+    .exec(http("AcceptOrRejectAssetDocumentForm_GET")
+      .get(session => routes.AssetController.acceptOrRejectAssetDocumentForm(session(Test.TEST_NEGOTIATION_ID).as[String], constants.File.Asset.BILL_OF_LADING).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("AcceptOrRejectAssetDocument_POST")
+      .post(routes.AssetController.acceptOrRejectAssetDocument().url)
+      .formParamMap(Map(
+        constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.DOCUMENT_TYPE.name -> constants.File.Asset.BILL_OF_LADING,
+        constants.FormField.STATUS.name -> true,
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+    )
+
+  val buyerConfirmBid: ScenarioBuilder = scenario("BuyerConfirm")
+    .exec(http("BuyerConfirmForm_GET")
+      .get(session => routes.NegotiationController.buyerConfirmForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("BuyerConfirm_POST")
+      .post(routes.NegotiationController.buyerConfirm().url)
+      .formParamMap(Map(
+        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+    )
+
+  val sellerConfirmBid: ScenarioBuilder = scenario("SellerConfirm")
+    .exec(http("SellerConfirmForm_GET")
+      .get(session => routes.NegotiationController.sellerConfirmForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("SellerConfirm_POST")
+      .post(routes.NegotiationController.sellerConfirm().url)
+      .formParamMap(Map(
+        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+    )
 
 }

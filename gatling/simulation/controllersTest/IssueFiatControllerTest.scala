@@ -1,5 +1,7 @@
 package controllersTest
 
+import java.util.Base64
+
 import constants.{Form, Test}
 import controllers.routes
 import feeders._
@@ -10,35 +12,88 @@ import io.gatling.jdbc.Predef.jdbcFeeder
 
 class IssueFiatControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = issueFiatControllerTest.issueFiatScenario
+  val scenarioBuilder: ScenarioBuilder = issueFiatControllerTest.westernUnionRTCB
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object issueFiatControllerTest {
 
+  val rtcbSecretKey="D3M0r1c8KeyCoMd3X"
+  val id="10000123451"
+  val refrence="CSGSGPDEMO0123461"
+  val externalRefrence="RQWUFR1000036264829q45ZcBhH25p"
+  val invoiceNumber="INV123456"
+  val buyerBusinessID="STU123456"
+  val buyerFirstName="John"
+  val buyerLastName="Doe"
+  val createdDate="2019-04-01 06:00:00"
+  val lastUpdatedDate="2019-04-01 17:30:15"
+  val status="DEAL_POSTED"
+  val dealType="Sale"
+  val paymentTypeId="WIRE"
+  val paidOutAmount="550000"
+
   val issueFiatRequestScenario: ScenarioBuilder = scenario("IssueFiatRequest")
-    .feed(TransactionIDFeeder.transactionIDFeed)
     .feed(TransactionAmountFeeder.transactionAmountFeed)
     .exec(http("Issue_Fiat_Request_GET")
       .get(routes.IssueFiatController.issueFiatRequestForm().url)
       .check(css("legend:contains(%s)".format("Issue Fiat Request")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
-   /* .exec(http("Issue_Fiat_Request_POST")
-      .post(routes.IssueFiatController.issueFiatRequest().url)
+    .exec(http("Issue_Fiat_Request_POST")
+      .post(routes.IssueFiatController.issueFiat().url)
       .formParamMap(Map(
-        Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
-        Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
+        constants.FormField.TRANSACTION_AMOUNT.name -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS ISSUE_FIAT_REQUEST_SENT").exists)
-    )*/
+    )
     .pause(3)
 
-  val issueFiatScenario: ScenarioBuilder = scenario("IssueFiat")
+  val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
+    .exec(session=>
+    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+id+refrence+externalRefrence+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+status+dealType+paymentTypeId+paidOutAmount))
+    )
+    .exec(http("westernUnionRTCB")
+      .post(routes.WesternUnionController.westernUnionRTCB().url)
+      .body(StringBody(session=>s"""<request>
+                         |
+                         |<id>${id}</id>
+                         |
+                         |<reference>${refrence}</reference>
+                         |
+                         |<externalReference>${externalRefrence}</externalReference>
+                         |
+                         |<invoiceNumber>${invoiceNumber}</invoiceNumber>
+                         |
+                         |<buyerBusinessId>${buyerBusinessID}</buyerBusinessId>
+                         |
+                         |<buyerFirstName>${buyerFirstName}</buyerFirstName>
+                         |
+                         |<buyerLastName>${buyerLastName}</buyerLastName>
+                         |
+                         |<createdDate>${createdDate}</createdDate>
+                         |
+                         |<lastUpdatedDate>${lastUpdatedDate}</lastUpdatedDate>
+                         |
+                         |<status>${status}</status>
+                         |
+                         |<dealType>${dealType}</dealType>
+                         |
+                         |<paymentTypeId>${paymentTypeId}</paymentTypeId>
+                         |
+                         |<paidOutAmount>${paidOutAmount}</paidOutAmount>
+                         |
+                         |<requestSignature>"""+session("requestSignature").as[String]+"""</requestSignature>
+                         |
+                         |</request>""")).asXml
+      /*  .transferEncoding("binary")).asXml)*/
+    )
+
+ /* val issueFiatScenario: ScenarioBuilder = scenario("IssueFiat")
     .feed(GasFeeder.gasFeed)
-    .exec(session=> session.set(Test.TEST_REQUEST_ID,getRequestIDForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])).set(Test.TEST_TRANSACTION_ID,getTransactionIDForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])).set(Test.TEST_TRANSACTION_AMOUNT,getTransactionAmountForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])))
+    .exec(session => session.set(Test.TEST_REQUEST_ID, getRequestIDForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])).set(Test.TEST_TRANSACTION_ID, getTransactionIDForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])).set(Test.TEST_TRANSACTION_AMOUNT, getTransactionAmountForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])))
     .exec(http("Issue_Fiat_GET")
-      .get(session=> routes.IssueFiatController.issueFiatForm(session(Test.TEST_REQUEST_ID).as[String],session(Test.TEST_BUYER_USERNAME).as[String],session(Test.TEST_TRANSACTION_ID).as[String],session(Test.TEST_TRANSACTION_AMOUNT).as[Int]).url)
+      .get(session => routes.IssueFiatController.issueFiatForm(session(Test.TEST_REQUEST_ID).as[String], session(Test.TEST_BUYER_USERNAME).as[String], session(Test.TEST_TRANSACTION_ID).as[String], session(Test.TEST_TRANSACTION_AMOUNT).as[Int]).url)
       .check(css("legend:contains(%s)".format(constants.Form.ISSUE_FIAT.legend)).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
@@ -55,49 +110,7 @@ object issueFiatControllerTest {
       .check(substring("SUCCESS FIAT_ISSUED").exists)
     )
     .pause(3)
-
-   val rejectFiatRequestScenario: ScenarioBuilder = scenario("RejectFiatRequest")
-    .exec(http("RejectIssueFiat_GET")
-      .get(routes.IssueFiatController.rejectIssueFiatRequestForm(Test.TEST_REQUEST_ID).url)
-      .check(css("legend:contains(%s)".format(constants.Form.REJECT_ISSUE_FIAT_REQUEST.legend)).exists)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
-    /*.exec(http("RejectIssueFiat_POST")
-      .post(routes.IssueFiatController.issueFiatRequest().url)
-      .formParamMap(Map(
-        Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("SUCCESS ISSUE_FIAT_REQUEST_REJECTED").exists)
-    )*/
-     .pause(2)
-
-  val blockchainIssueFiatScenario: ScenarioBuilder = scenario("BlockchainIssueFiat")
-    .feed(FromFeeder.fromFeed)
-    .feed(ToFeeder.toFeed)
-    .feed(TransactionIDFeeder.transactionIDFeed)
-    .feed(TransactionAmountFeeder.transactionAmountFeed)
-    .feed(PasswordFeeder.passwordFeed)
-    .feed(ModeFeeder.modeFeed)
-    .feed(GasFeeder.gasFeed)
-    .exec(http("BlockchainIssueFiat_GET")
-      .get(routes.IssueFiatController.blockchainIssueFiatForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_ISSUE_FIAT.legend)).exists)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
-    .exec(http("BlockchainIssueFiat_POST")
-      .post(routes.IssueFiatController.blockchainIssueFiat().url)
-      .formParamMap(Map(
-        Form.FROM -> "${%s}".format(Test.TEST_FROM),
-        Form.TO -> "${%s}".format(Test.TEST_TO),
-        Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
-        Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
-        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.MODE ->"${%s}".format(Test.TEST_MODE),
-        Form.GAS -> "${%s}".format(Test.TEST_GAS),
-        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("SUCCESS FIAT_ISSUED").exists)
-    )
-
+  */
   def getRequestIDForIssueFiat(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master_transaction."IssueFiatRequest" WHERE "accountID" = '$query'),'0') AS "id";""")

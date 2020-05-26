@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -60,3 +61,4 @@ object releaseAssetControllerTest {
       .check(substring("SUCCESS ASSET_RELEASED").exists)
     )
 }
+*/

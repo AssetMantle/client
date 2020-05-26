@@ -9,29 +9,11 @@ import io.gatling.http.Predef._
 
 class ContactControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = updateContactControllerTest.updateContactScenario
+  val scenarioBuilder: ScenarioBuilder = updateContactControllerTest.addMobileNumberScenario
   setUp(scenarioBuilder.inject(atOnceUsers(Test.NUMBER_OF_USERS))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object updateContactControllerTest {
-
-  val updateContactScenario: ScenarioBuilder = scenario("UpdateContact")
-    .feed(EmailAddressFeeder.emailAddressFeed)
-    .feed(MobileNumberFeeder.mobileNumberFeed)
-    .feed(CountryCodeFeeder.countryCodeFeed)
-    .exec(http("UpdateContact_GET")
-      .get(routes.ContactController.updateContactForm().url)
-      .check(css("legend:contains(%s)".format("Update Contact")).exists)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
-    .exec(http("UpdateContact_POST")
-      .post(routes.ContactController.updateContact().url)
-      .formParamMap(Map(
-        Form.MOBILE_NUMBER -> "${%s}".format(Test.TEST_MOBILE_NUMBER),
-        Form.EMAIL_ADDRESS -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
-        Form.COUNTRY_CODE -> "${%s}".format(Test.TEST_COUNTRY_CODE),
-        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))))
-
 
   val addMobileNumberScenario: ScenarioBuilder = scenario("addMobileNumber")
     .feed(MobileNumberFeeder.mobileNumberFeed)
