@@ -198,7 +198,7 @@ object SelectFieldOptions {
     "Yemen",
     "Zambia",
     "Zimbabwe")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq("BANK", "TRUST")
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq("BANK", "TRUST", "COURIER")
   val PAYMENT_TERMS: Seq[String] = Seq(constants.View.ONLY_SUPPLIER, constants.View.ONLY_BUYER, constants.View.BOTH_PARTIES)
   val MODE: Seq[String] = Seq("async", "sync", "block")
   val REFERENCE_DATES: Seq[String] = Seq("INVOICE_DATE", "SHIPPING_DATE")

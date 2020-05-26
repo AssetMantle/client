@@ -512,7 +512,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(buyerTraderID: String, sellerTraderID: String, assetID: String, description: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: AssetOtherDetails): Future[String] = add(Negotiation(id = utilities.IDGenerator.requestID(), buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = description, price = price, quantity = quantity, quantityUnit = quantityUnit, assetOtherDetails = assetOtherDetails, paymentTerms = PaymentTerms(), documentList = DocumentList(Seq(), Seq()), status = constants.Status.Negotiation.FORM_INCOMPLETE))
+    def create(buyerTraderID: String, sellerTraderID: String, assetID: String, description: String, price: Int, quantity: Int, quantityUnit: String, assetOtherDetails: AssetOtherDetails): Future[String] = add(Negotiation(id = utilities.IDGenerator.requestID(), buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID, assetDescription = description, price = price, quantity = quantity, quantityUnit = quantityUnit, assetOtherDetails = assetOtherDetails, paymentTerms = PaymentTerms(), documentList = DocumentList(Seq(constants.File.Asset.BILL_OF_LADING), Seq(constants.File.Negotiation.INVOICE)), status = constants.Status.Negotiation.FORM_INCOMPLETE))
 
     def update(negotiation: Negotiation): Future[Int] = updateByID(negotiation)
 
