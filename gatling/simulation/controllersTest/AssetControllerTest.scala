@@ -47,11 +47,57 @@ object assetControllerTest {
     )
     .pause(3)
 
+  val sendAsset: ScenarioBuilder = scenario("SendAsset")
+    .exec(http("SendAssetForm_GET")
+      .get(session => routes.AssetController.sendForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("SendAsset_POST")
+      .post(routes.AssetController.send().url)
+      .formParamMap(Map(
+        constants.FormField.ORDER_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+    )
+
+  val releaseAsset: ScenarioBuilder = scenario("ReleaseAsset")
+    .exec(http("ReleaseAssetForm_GET")
+      .get(session => routes.AssetController.releaseForm(session(Test.TEST_ASSET_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("ReleaseAsset_POST")
+      .post(routes.AssetController.release().url)
+      .formParamMap(Map(
+        constants.FormField.ASSET_ID.name -> "${%s}".format(Test.TEST_ASSET_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+    )
+
+  val redeemAsset: ScenarioBuilder = scenario("RedeemAsset")
+    .exec(http("RedeemAssetForm_GET")
+      .get(session => routes.AssetController.redeemForm(session(Test.TEST_ASSET_ID).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("RedeemAsset_POST")
+      .post(routes.AssetController.redeem().url)
+      .formParamMap(Map(
+        constants.FormField.ASSET_ID.name -> "${%s}".format(Test.TEST_ASSET_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+    )
+
   def getRequestIDForIssueAsset(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
+
 
   def getDocumentHashForIssueAsset(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",

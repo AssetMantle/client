@@ -30,12 +30,12 @@ object signUpControllerTest {
         constants.FormField.SIGNUP_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Create Wallet").exists)
+      .check(substring("Blockchain Passphrase").exists)
     )
     .pause(2)
     .exec(http("CreateWallet_GET")
       .get(session=>routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
-      .check(substring("Create Wallet").exists)
+      .check(substring("Blockchain Passphrase").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.MNEMONICS), "value").saveAs(Test.MNEMONICS))
     )
@@ -47,7 +47,7 @@ object signUpControllerTest {
         constants.FormField.MNEMONICS.name->"${%s}".format(Test.MNEMONICS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Signed Up").exists)
+      .check(substring("Signed Up Successfully!").exists)
     )
     .pause(5)
 }
