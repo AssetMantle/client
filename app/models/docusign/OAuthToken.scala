@@ -52,8 +52,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private def updateByID(id: String, accessToken: String, expiresAt: Long, refreshToken: String): Future[Int] = db.run(oauthTokenTable.filter(_.id === id).map(x => (x.accessToken, x.expiresAt, x.refreshToken)).update((accessToken, expiresAt, refreshToken)).asTry).map {
     case Success(result) => result match {
-      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {

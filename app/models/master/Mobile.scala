@@ -70,8 +70,7 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(mobileTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
     case Success(result) => result match {
-      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {
@@ -88,8 +87,7 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def updateMobileNumberAndStatusByID(id: String, mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileTable.filter(_.id === id).map(x => (x.mobileNumber, x.status)).update((mobileNumber, status)).asTry).map {
     case Success(result) => result match {
-      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {

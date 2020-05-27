@@ -39,8 +39,7 @@ class Envelopes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private def updateStatusByEnvelopeID(envelopeID: String, status: String): Future[Int] = db.run(envelopeTable.filter(_.envelopeID === envelopeID).map(_.status).update(status).asTry).map {
     case Success(result) => result match {
-      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {

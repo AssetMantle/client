@@ -45,11 +45,12 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
   }
 
   private def updateStatusAndAccountIDByID(id: String, accountID: Option[String], status: Option[Boolean]): Future[Int] = db.run(zoneInvitationTable.filter(_.id === id).map(x => (x.accountID.?, x.status.?)).update((accountID, status)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.ZONE_INVITATION_NOT_FOUND)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.ZONE_INVITATION_NOT_FOUND.message, noSuchElementException)
-        throw new BaseException(constants.Response.ZONE_INVITATION_NOT_FOUND)
     }
   }
 
