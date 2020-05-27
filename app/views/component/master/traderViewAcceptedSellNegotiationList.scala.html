@@ -22,7 +22,7 @@
                         <div class="assetInitialData">
                             <p class="assetTitle">@asset.assetType</p>
                             <p class="assetQuantity">@Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(sellNegotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), sellNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq(sellNegotiation.price/sellNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), sellNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}

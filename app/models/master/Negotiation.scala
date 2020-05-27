@@ -569,9 +569,9 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def tryGetSellerTraderID(id: String): Future[String] = tryGetSellerTraderIDByID(id)
 
-    def updateAssetDescription(id: String, assetDescription: String): Future[Int] = updateAssetDescriptionByID(id = id, assetDescription = assetDescription, buyerAcceptedAssetDescription = false)
+    def updateAssetDescription(id: String, assetDescription: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = updateAssetDescriptionByID(id = id, assetDescription = assetDescription, buyerAcceptedAssetDescription)
 
-    def updateQuantity(id: String, quantity: Int, quantityUnit: String): Future[Int] = updateQuantityByID(id = id, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedQuantity = false)
+    def updateQuantity(id: String, quantity: Int, quantityUnit: String, buyerAcceptedQuantity: Boolean): Future[Int] = updateQuantityByID(id = id, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedQuantity)
 
     def updatePrice(id: String, price: Int): Future[Int] = updatePriceByID(id = id, price = price, buyerAcceptedPrice = false)
 

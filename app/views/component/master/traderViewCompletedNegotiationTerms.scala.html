@@ -51,11 +51,11 @@
                 <div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.PRICE, Seq(negotiationHistory.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiationHistory.price/negotiationHistory.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
                     </div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiationHistory.price * negotiationHistory.quantity).toString, Messages(constants.View.USD)).mkString(" "))
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price, Messages(constants.View.USD)).mkString(" "))
                     </div>
                 </div>
                 <div>
