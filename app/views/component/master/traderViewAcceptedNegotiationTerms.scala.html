@@ -22,6 +22,11 @@
                                         case Some(order)=> {
                                             @order.status match {
                                                 case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING=>{@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
+                                                case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
+                                                    @if(!asset.moderated){
+                                                        @commonFormButton(constants.Form.BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
+                                                    }
+                                                }
                                                 case constants.Status.Order.COMPLETED=>{@commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")}
                                                 case _=>{}
                                             }
@@ -40,6 +45,11 @@
                                         case Some(order)=>{
                                             @order.status match {
                                                 case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=>{@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
+                                                case constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
+                                                    @if(!asset.moderated) {
+                                                        @commonFormButton(constants.Form.SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
+                                                    }
+                                                }
                                                 case _=>{}
                                             }
                                         }
