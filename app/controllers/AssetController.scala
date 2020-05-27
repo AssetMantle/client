@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -48,6 +48,8 @@ class AssetController @Inject()(
                                  utilitiesNotification: utilities.Notification,
                                  utilitiesTransaction: utilities.Transaction,
                                  withZoneLoginAction: WithZoneLoginAction,
+                                 withoutLoginAction: WithoutLoginAction,
+                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                )
                                (implicit
                                 executionContext: ExecutionContext,
@@ -115,7 +117,7 @@ class AssetController @Inject()(
     }
   }
 
-  def issueForm(): Action[AnyContent] = Action { implicit request =>
+  def issueForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.issueAsset())
   }
 
@@ -276,7 +278,7 @@ class AssetController @Inject()(
       )
   }
 
-  def releaseForm(assetID: String): Action[AnyContent] = Action { implicit request =>
+  def releaseForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.releaseAsset(assetID = assetID))
   }
 
@@ -351,7 +353,7 @@ class AssetController @Inject()(
       )
   }
 
-  def sendForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+  def sendForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.sendAsset(orderID = orderID))
   }
 
@@ -419,7 +421,7 @@ class AssetController @Inject()(
       )
   }
 
-  def redeemForm(assetID: String): Action[AnyContent] = Action { implicit request =>
+  def redeemForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.redeemAsset(assetID = assetID))
   }
 

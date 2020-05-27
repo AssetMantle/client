@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -15,18 +15,17 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class IssueAssetController @Inject()(
                                       messagesControllerComponents: MessagesControllerComponents,
-                                      utilitiesNotification: utilities.Notification,
                                       masterTraders: master.Traders,
                                       transaction: utilities.Transaction,
                                       masterZones: master.Zones,
                                       blockchainAccounts: blockchain.Accounts,
                                       masterAssets: master.Assets,
-                                      masterTransactionAssetFiles: masterTransaction.AssetFiles,
-                                      withTraderLoginAction: WithTraderLoginAction,
                                       withZoneLoginAction: WithZoneLoginAction,
                                       transactionsIssueAsset: transactions.IssueAsset,
                                       blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
-                                      withUsernameToken: WithUsernameToken
+                                      withUsernameToken: WithUsernameToken,
+                                      withoutLoginAction: WithoutLoginAction,
+                                      withoutLoginActionAsync: WithoutLoginActionAsync
                                     )(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -111,11 +110,11 @@ class IssueAssetController @Inject()(
       )
   }
 
-  def blockchainIssueAssetForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainIssueAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.issueAsset())
   }
 
-  def blockchainIssueAsset: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainIssueAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.issueAsset(formWithErrors)))

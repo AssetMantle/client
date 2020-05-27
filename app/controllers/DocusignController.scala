@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithTraderLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{docusign, master, masterTransaction}
@@ -22,7 +22,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    masterTraders: master.Traders,
                                    masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                                   docusignEnvelopes: docusign.Envelopes)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                   docusignEnvelopes: docusign.Envelopes,
+                                   withoutLoginActionAsync: WithoutLoginActionAsync)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -73,7 +74,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def callBack(envelopeId: String, event: String): Action[AnyContent] = Action.async { implicit request =>
+  def callBack(envelopeId: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
 
     def getNegotiation(negotiationID: String): Future[Negotiation] = masterNegotiations.Service.tryGet(negotiationID)

@@ -58,6 +58,8 @@ class ComponentViewController @Inject()(
                                          withTraderLoginAction: WithTraderLoginAction,
                                          withUserLoginAction: WithUserLoginAction,
                                          withZoneLoginAction: WithZoneLoginAction,
+                                         withoutLoginAction: WithoutLoginAction,
+                                         withoutLoginActionAsync: WithoutLoginActionAsync,
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -195,7 +197,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewAcceptedNegotiationList: Action[AnyContent] = Action { implicit request =>
+  def traderViewAcceptedNegotiationList: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.traderViewAcceptedNegotiationList())
   }
 
@@ -271,7 +273,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewSentReceivedIncompleteRejectedFailedNegotiationList: Action[AnyContent] = Action { implicit request =>
+  def traderViewSentReceivedIncompleteRejectedFailedNegotiationList: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.traderViewSentReceivedIncompleteRejectedFailedNegotiationList())
   }
 
@@ -377,7 +379,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def organizationViewAcceptedNegotiationList: Action[AnyContent] = Action { implicit request =>
+  def organizationViewAcceptedNegotiationList: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.organizationViewAcceptedNegotiationList())
   }
 
@@ -471,7 +473,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def organizationViewSentReceivedIncompleteRejectedFailedNegotiationList: Action[AnyContent] = Action { implicit request =>
+  def organizationViewSentReceivedIncompleteRejectedFailedNegotiationList: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList())
   }
 
@@ -1032,7 +1034,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderRelationList(): Action[AnyContent] = Action { implicit request =>
+  def traderRelationList(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.traderRelationList())
   }
 
@@ -2003,7 +2005,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def zoneViewAcceptedNegotiationList: Action[AnyContent] = Action { implicit request =>
+  def zoneViewAcceptedNegotiationList: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.zoneViewAcceptedNegotiationList())
   }
 

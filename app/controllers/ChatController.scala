@@ -2,8 +2,8 @@ package controllers
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
-import controllers.actions.{WithLoginAction, WithTraderLoginAction}
+
+import controllers.actions.{WithLoginAction, WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -22,28 +22,14 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ChatController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
-                                transaction: utilities.Transaction,
-                                masterAccounts: master.Accounts,
-                                masterAssets: master.Assets,
-                                masterTradeRelations: master.TraderRelations,
                                 withTraderLoginAction: WithTraderLoginAction,
-                                withZoneLoginAction: WithZoneLoginAction,
-                                transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
-                                blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
-                                accounts: master.Accounts,
                                 masterTraders: master.Traders,
-                                blockchainACLAccounts: blockchain.ACLAccounts,
-                                blockchainZones: blockchain.Zones,
-                                blockchainNegotiations: blockchain.Negotiations,
                                 withUsernameToken: WithUsernameToken,
                                 masterNegotiations: master.Negotiations,
-                                blockchainAssets: blockchain.Assets,
-                                transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
-                                blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
-                                utilitiesNotification: utilities.Notification,
                                 masterTransactionChats: masterTransaction.Chats,
                                 masterTransactionMessages: masterTransaction.Messages,
                                 masterTransactionMessageReads: masterTransaction.MessageReads,
+                                withoutLoginAction: WithoutLoginAction,
                               )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -140,7 +126,7 @@ class ChatController @Inject()(
   }
 
   //send chat form
-  def sendMessageForm: Action[AnyContent] = Action { implicit request =>
+  def sendMessageForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.sendMessage())
   }
 
