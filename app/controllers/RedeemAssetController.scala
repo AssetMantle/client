@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.{WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -15,6 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class RedeemAssetController @Inject()(
                                        messagesControllerComponents: MessagesControllerComponents,
                                        transactionsRedeemAsset: transactions.RedeemAsset,
+                                       withoutLoginAction: WithoutLoginAction,
+                                       withoutLoginActionAsync: WithoutLoginActionAsync,
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -23,11 +25,11 @@ class RedeemAssetController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
 
-  def blockchainRedeemAssetForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainRedeemAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.redeemAsset())
   }
 
-  def blockchainRedeemAsset: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainRedeemAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.RedeemAsset
       .form.bindFromRequest().fold(
       formWithErrors => {

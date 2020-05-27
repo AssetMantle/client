@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.{WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withUsernameToken: WithUsernameToken,withoutLoginAction: WithoutLoginAction, withoutLoginActionAsync: WithoutLoginActionAsync)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -20,7 +20,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
 
   private implicit val module: String = constants.Module.CONTROLLERS_SET_BUYER_FEEDBACK
 
-  def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+  def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.setBuyerFeedback(sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
@@ -62,11 +62,11 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       }
   }
 
-  def blockchainSetBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSetBuyerFeedbackForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.setBuyerFeedback())
   }
 
-  def blockchainSetBuyerFeedback: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainSetBuyerFeedback: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.SetBuyerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors)))

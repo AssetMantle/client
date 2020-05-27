@@ -45,17 +45,19 @@ class FileController @Inject()(
                                 withZoneLoginAction: WithZoneLoginAction,
                                 withGenesisLoginAction: WithGenesisLoginAction,
                                 withUsernameToken: WithUsernameToken,
+                                withoutLoginAction: WithoutLoginAction,
+                                withoutLoginActionAsync: WithoutLoginActionAsync,
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
   }
 
-  def updateAccountKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountKYC), documentType))
   }
 
@@ -175,11 +177,11 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def uploadAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAsset), documentType, negotiationID))
   }
 
-  def updateAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def updateAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAsset), documentType, negotiationID))
   }
 
@@ -324,11 +326,11 @@ class FileController @Inject()(
       }
   }
 
-  def uploadNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def uploadNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeNegotiation), documentType, negotiationID))
   }
 
-  def updateNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def updateNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateNegotiation), documentType, negotiationID))
   }
 
@@ -581,11 +583,11 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
-  def updateAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 

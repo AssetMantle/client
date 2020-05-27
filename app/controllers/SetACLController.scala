@@ -28,6 +28,8 @@ class SetACLController @Inject()(
                                   withOrganizationLoginAction: WithOrganizationLoginAction,
                                   withUserLoginAction: WithUserLoginAction,
                                   withGenesisLoginAction: WithGenesisLoginAction,
+                                  withoutLoginAction: WithoutLoginAction,
+                                  withoutLoginActionAsync: WithoutLoginActionAsync,
                                   masterAccounts: master.Accounts,
                                   transactionsSetACL: transactions.SetACL,
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
@@ -43,7 +45,7 @@ class SetACLController @Inject()(
 
   private val comdexURL: String = configuration.get[String]("comdex.url")
 
-  def inviteTraderForm(): Action[AnyContent] = Action {
+  def inviteTraderForm(): Action[AnyContent] = withoutLoginAction {
     implicit request =>
       Ok(views.html.component.master.inviteTrader())
   }
@@ -336,11 +338,11 @@ class SetACLController @Inject()(
       )
   }
 
-  def blockchainSetACLForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSetACLForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.setACL())
   }
 
-  def blockchainSetACL: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainSetACL: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.SetACL.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.setACL(formWithErrors)))

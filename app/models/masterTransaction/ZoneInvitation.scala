@@ -33,26 +33,24 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
   private def add(zoneInvitation: ZoneInvitation): Future[String] = db.run((zoneInvitationTable returning zoneInvitationTable.map(_.id) += zoneInvitation).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def findByID(id: String): Future[ZoneInvitation] = db.run(zoneInvitationTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def updateStatusAndAccountIDByID(id: String, accountID: Option[String], status: Option[Boolean]): Future[Int] = db.run(zoneInvitationTable.filter(_.id === id).map(x => (x.accountID.?, x.status.?)).update((accountID, status)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.ZONE_INVITATION_NOT_FOUND)
+      case _ => result
+    }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.ZONE_INVITATION_NOT_FOUND.message, noSuchElementException)
-        throw new BaseException(constants.Response.ZONE_INVITATION_NOT_FOUND)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 

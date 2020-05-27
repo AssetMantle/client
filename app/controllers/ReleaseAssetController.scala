@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithZoneLoginAction
+import controllers.actions.{WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -14,17 +14,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                       transaction: utilities.Transaction,
-                                       blockchainAssets: blockchain.Assets,
-                                       blockchainACLAccounts: blockchain.ACLAccounts,
-                                       blockchainZones: blockchain.Zones,
-                                       masterAccounts: master.Accounts,
-                                       masterZones: master.Zones,
-                                       masterTraders: master.Traders,
-                                       masterAssets: master.Assets,
-                                       withZoneLoginAction: WithZoneLoginAction,
                                        transactionsReleaseAsset: transactions.ReleaseAsset,
-                                       blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets,
+                                       withoutLoginAction: WithoutLoginAction,
+                                       withoutLoginActionAsync: WithoutLoginActionAsync,
                                        withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -33,11 +25,11 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
 
-  def blockchainReleaseAssetForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainReleaseAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.releaseAsset())
   }
 
-  def blockchainReleaseAsset: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainReleaseAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.ReleaseAsset.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors)))
