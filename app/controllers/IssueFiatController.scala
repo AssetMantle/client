@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithZoneLoginAction
+import controllers.actions.{WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -22,6 +22,8 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                                     transactionsIssueFiat: transactions.IssueFiat,
                                     transaction: utilities.Transaction,
                                     withZoneLoginAction: WithZoneLoginAction,
+                                    withoutLoginAction: WithoutLoginAction,
+                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                     withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -30,11 +32,11 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_FIAT
 
-  def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
+  def issueFiatRequestForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.issueFiatRequest())
   }
 
-  def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = Action { implicit request =>
+  def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, gas = constants.FormField.GAS.minimumValue, password = ""))))
   }
 
@@ -92,11 +94,11 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       )
   }
 
-  def blockchainIssueFiatForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainIssueFiatForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.issueFiat())
   }
 
-  def blockchainIssueFiat: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainIssueFiat: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.IssueFiat.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.issueFiat(formWithErrors)))

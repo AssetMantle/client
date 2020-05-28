@@ -20,7 +20,6 @@ class WesternUnionController @Inject()(
                                         blockchainAccounts: blockchain.Accounts,
                                         messagesControllerComponents: MessagesControllerComponents,
                                         blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
-                                        sftpScheduler: SFTPScheduler,
                                         masterOrganizations: master.Organizations,
                                         masterTraders: master.Traders,
                                         masterZones: master.Zones,

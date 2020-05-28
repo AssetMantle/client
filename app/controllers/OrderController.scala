@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -39,7 +39,9 @@ class OrderController @Inject()(
                                  utilitiesNotification: utilities.Notification,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withZoneLoginAction: WithZoneLoginAction,
-                                 withUsernameToken: WithUsernameToken
+                                 withUsernameToken: WithUsernameToken,
+                                 withoutLoginAction: WithoutLoginAction,
+                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -48,7 +50,7 @@ class OrderController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ORDER
 
-  def moderatedBuyerExecuteForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+  def moderatedBuyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.moderatedBuyerExecuteOrder(orderID = orderID))
   }
 
@@ -124,7 +126,7 @@ class OrderController @Inject()(
       )
   }
 
-  def moderatedSellerExecuteForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+  def moderatedSellerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.moderatedSellerExecuteOrder(orderID = orderID))
   }
 
@@ -202,7 +204,7 @@ class OrderController @Inject()(
       )
   }
 
-  def buyerExecuteForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+  def buyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(orderID = orderID))
   }
 
@@ -222,9 +224,10 @@ class OrderController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order): Future[String] = {
+          def fiatProofHash: Future[String] = Future("fiatProofHash")
+
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String): Future[String] = {
             if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder) {
-              val fiatProofHash = utilities.String.sha256Sum(buyerExecuteData.fiatProof)
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
                   entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = buyerExecuteData.gas, ticketID = "", mode = transactionMode),
@@ -246,7 +249,8 @@ class OrderController @Inject()(
             asset <- getAsset(negotiation.assetID)
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             sellerAddress <- getAddress(sellerAccountID)
-            ticketID <- sendTransaction(buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order)
+            fiatProofHash <- fiatProofHash
+            ticketID <- sendTransaction(buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = fiatProofHash)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.BUYER_ORDER_EXECUTED, ticketID)
@@ -259,7 +263,7 @@ class OrderController @Inject()(
       )
   }
 
-  def sellerExecuteForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+  def sellerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.sellerExecuteOrder(orderID = orderID))
   }
 
@@ -320,11 +324,11 @@ class OrderController @Inject()(
       )
   }
 
-  def blockchainBuyerExecuteForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainBuyerExecuteForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.buyerExecuteOrder())
   }
 
-  def blockchainBuyerExecute: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainBuyerExecute: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.BuyerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.buyerExecuteOrder(formWithErrors)))
@@ -341,11 +345,11 @@ class OrderController @Inject()(
     )
   }
 
-  def blockchainSellerExecuteForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSellerExecuteForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.sellerExecuteOrder())
   }
 
-  def blockchainSellerExecute: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainSellerExecute: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.SellerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors)))

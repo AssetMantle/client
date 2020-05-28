@@ -1,11 +1,11 @@
 package controllers
 
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.{WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Negotiation, Negotiations}
-import models.masterTransaction.{NegotiationFile}
+import models.masterTransaction.NegotiationFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -15,17 +15,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                           transaction: utilities.Transaction,
-                                           blockchainAccounts: blockchain.Accounts,
-                                           masterAccounts: master.Accounts,
-                                           withTraderLoginAction: WithTraderLoginAction,
                                            transactionsConfirmSellerBid: transactions.ConfirmSellerBid,
-                                           masterNegotiations: Negotiations,
-                                           masterTraders: master.Traders,
-                                           masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                                           blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
-                                           withUsernameToken: WithUsernameToken,
-                                           masterAssets: master.Assets
+                                           withoutLoginAction: WithoutLoginAction,
+                                           withoutLoginActionAsync: WithoutLoginActionAsync
                                           )
                                           (implicit executionContext: ExecutionContext,
                                            configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -36,11 +28,11 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
 
   private implicit val module: String = constants.Module.CONTROLLERS_CONFIRM_SELLER_BID
 
-  def blockchainConfirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainConfirmSellerBidForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.changeSellerBid())
   }
 
-  def blockchainConfirmSellerBid: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainConfirmSellerBid: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.ConfirmSellerBid.form.bindFromRequest().fold(
       formWithErrors => (Future(BadRequest(views.html.component.blockchain.confirmSellerBid(formWithErrors)))),
       confirmSellerBidData => {

@@ -20,7 +20,6 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
                                   masterEmails: master.Emails,
                                   masterMobiles: master.Mobiles,
                                   withLoginAction: WithLoginAction,
-                                  masterAccounts: master.Accounts,
                                   masterTransactionEmailOTPs: masterTransaction.EmailOTPs,
                                   masterTransactionSMSOTPs: masterTransaction.SMSOTPs,
                                   withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {

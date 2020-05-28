@@ -1,8 +1,9 @@
 package controllers
 
+import controllers.actions.{WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -14,14 +15,18 @@ class BlockExplorerController @Inject()(messagesControllerComponents: MessagesCo
                                         queriesGetABCIInfo: queries.GetABCIInfo,
                                         queriesStakingValidators: queries.GetStakingValidators,
                                         queriesGetBlockDetails: queries.GetBlockDetails,
-                                        queriesGetTransactionHash: queries.GetTransactionHashResponse
+                                        queriesGetTransactionHash: queries.GetTransactionHashResponse,
+                                        withoutLoginAction: WithoutLoginAction,
+                                        withoutLoginActionAsync: WithoutLoginActionAsync,
                                        )
                                        (implicit
                                         exec: ExecutionContext,
                                         configuration: Configuration
                                        ) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def lastBlockHeight(): Action[AnyContent] = Action.async { implicit request =>
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  def lastBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val aBCIInfo = queriesGetABCIInfo.Service.get()
     (for {
       aBCIInfo <- aBCIInfo
@@ -31,7 +36,7 @@ class BlockExplorerController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def blockDetails(minimumHeight: Int, maximumHeight: Int): Action[AnyContent] = Action.async { implicit request =>
+  def blockDetails(minimumHeight: Int, maximumHeight: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val blockDetails = queriesGetBlockDetails.Service.get(minimumHeight = minimumHeight, maximumHeight = maximumHeight)
     (for {
       blockDetails <- blockDetails
@@ -41,7 +46,7 @@ class BlockExplorerController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def stakingValidators(): Action[AnyContent] = Action.async { implicit request =>
+  def stakingValidators(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val stakingValidators = queriesStakingValidators.Service.get()
     (for {
       stakingValidators <- stakingValidators
@@ -51,7 +56,7 @@ class BlockExplorerController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def transactionHash(txHash: String): Action[AnyContent] = Action.async { implicit request =>
+  def transactionHash(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val transactionHash = queriesGetTransactionHash.Service.get(txHash)
     (for {
       transactionHash <- transactionHash

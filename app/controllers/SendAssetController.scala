@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.{WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -13,14 +13,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                    transaction: utilities.Transaction,
-                                    blockchainAssets: blockchain.Assets,
-                                    blockchainOrders: blockchain.Orders,
-                                    blockchainAccounts: blockchain.Accounts,
-                                    withTraderLoginAction: WithTraderLoginAction,
                                     transactionsSendAsset: transactions.SendAsset,
-                                    blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
-                                    withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                    withoutLoginAction: WithoutLoginAction,
+                                    withoutLoginActionAsync: WithoutLoginActionAsync,
+                                   )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -29,11 +25,11 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_ASSET
 
 
-  def blockchainSendAssetForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.sendAsset())
   }
 
-  def blockchainSendAsset: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainSendAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.SendAsset.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sendAsset(formWithErrors)))
