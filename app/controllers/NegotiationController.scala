@@ -931,9 +931,9 @@ class NegotiationController @Inject()(
                 assetFileList <- assetFileList
                 negotiationEnvelopeList <- negotiationEnvelopeList
                 buyerAccountID <- buyerAccountID
-                _ <- buyerConfi utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
-                                                        _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
-                                                               result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
+                _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
+                result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
