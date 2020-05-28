@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -30,3 +31,4 @@ object logoutControllerTest {
     )
     .pause(2)
 }
+*/

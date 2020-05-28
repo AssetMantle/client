@@ -2,18 +2,18 @@ package controllersTest
 
 import constants.{Form, Test}
 import controllers.routes
-
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef.jdbcFeeder
 
 class AccountControllerTest extends Simulation {
-  val scenarioBuilder: ScenarioBuilder = signUpControllerTest.signUpScenario
+  val scenarioBuilder: ScenarioBuilder = accountControllerTest.signUpScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
-object signUpControllerTest {
+object accountControllerTest {
 
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
     .exec(http("SignUp_GET")
@@ -50,9 +50,6 @@ object signUpControllerTest {
       .check(substring("Signed Up").exists)
     )
     .pause(5)
-}
-
-object loginControllerTest{
 
   val loginScenario: ScenarioBuilder = scenario("Login Before SignUp")
     .exec(http("Login_GET")
@@ -93,9 +90,21 @@ object loginControllerTest{
       .check(substring("${%s}".format(Test.TEST_MAIN_USERNAME)).exists)
     )
     .pause(5)
-}
 
-object identificationControllerTest{
+  val logoutScenario: ScenarioBuilder = scenario("Logout")
+    .exec(http("Logout_Form_GET")
+      .get(routes.AccountController.logoutForm().url)
+      .check(css("legend:contains(%s)".format("Logout")).exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("Logout_POST")
+      .post(routes.AccountController.logout().url)
+      .formParamMap(Map(
+        Test.RECEIVE_NOTIFICATIONS -> false,
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Logged Out").exists)
+    )
+    .pause(2)
 
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Detail_Form")
@@ -162,4 +171,9 @@ object identificationControllerTest{
     )
     .pause(2)
 
+  def getUserType(query: String):String={
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+      s"""SELECT COALESCE((SELECT "userType" FROM master."Account" WHERE id = '$query'),'0') AS "userType";""")
+    sqlQueryFeeder.apply().next()("userType").toString
+  }
 }

@@ -109,11 +109,6 @@ object addZoneControllerTest {
     .pause(2)
 
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
-    .exec(http("Get_Pending_Verify_Zone_Request")
-      .get(routes.AddZoneController.viewPendingVerifyZoneRequests().url)
-      .check(substring("${%s}".format(Test.TEST_ZONE_ID)).exists)
-    )
-    .pause(1)
     .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, "documentType") {
       exec(http("ZoneKYCUpdateStatusForm_GET")
         .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String],session("${documentType}").as[String]).url)
@@ -165,30 +160,11 @@ object addZoneControllerTest {
     )
     .pause(5)
 
-  val blockchainAddZoneScenario: ScenarioBuilder = scenario("BlockchainAddZone")
-    .feed(FromFeeder.fromFeed)
-    .feed(ToFeeder.toFeed)
-    .feed(ZoneIDFeeder.zoneIDFeed)
-    .feed(PasswordFeeder.passwordFeed)
-    .feed(GasFeeder.gasFeed)
-    .feed(ModeFeeder.modeFeed)
-    .exec(http("BlockchainAddZone_GET")
-      .get(routes.AddZoneController.blockchainAddZoneForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_ADD_ZONE.legend)).exists)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
-    .exec(http("BlockchainAddZone_POST")
-      .post(routes.AddZoneController.blockchainAddZone().url)
-      .formParamMap(Map(
-        constants.FormField.FROM.name -> "${%s}".format(Test.TEST_FROM),
-        constants.FormField.TO.name -> "${%s}".format(Test.TEST_TO),
-        constants.FormField.ZONE_ID.name -> "${%s}".format(Test.TEST_ZONE_ID),
-        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
-        Form.MODE -> "${%s}".format(Test.TEST_MODE),
-        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      check (substring("SUCCESS ZONE_ADDED").exists)
-    )
+  def getZoneInvitationID(emailAddress: String)={
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+      s""" SELECT COALESCE((SELECT "id" FROM master_transaction."ZoneInvitation" WHERE "emailAddress" = '$emailAddress'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("id").toString
+  }
 
   def getZoneID(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",

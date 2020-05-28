@@ -9,11 +9,11 @@ import io.gatling.http.Predef._
 
 class ContactControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = updateContactControllerTest.addMobileNumberScenario
+  val scenarioBuilder: ScenarioBuilder = contactControllerTest.addMobileNumberScenario
   setUp(scenarioBuilder.inject(atOnceUsers(Test.NUMBER_OF_USERS))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
-object updateContactControllerTest {
+object contactControllerTest {
 
   val addMobileNumberScenario: ScenarioBuilder = scenario("addMobileNumber")
     .feed(MobileNumberFeeder.mobileNumberFeed)
