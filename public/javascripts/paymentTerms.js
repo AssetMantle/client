@@ -4,6 +4,12 @@ $(document).ready(function () {
         $('#tenure').val('').prop('disabled', true);
         $('#reference').val('').prop('disabled', true);
     }
+    if($('#tentativeDate').val()){
+        $('#tenure').val('').prop('disabled',true);
+        $('#reference').val('').prop('disabled',true);
+    }else if($('#tenure').val() || $('#refrence').val()){
+        $('#tentativeDate').prop('disabled',true);
+    }
 });
 
 function advancePercentageInput() {
