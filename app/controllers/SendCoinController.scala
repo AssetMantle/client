@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithUnknownLoginAction, WithUserLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithUnknownLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction, withUsernameToken: WithUsernameToken,withoutLoginAction: WithoutLoginAction, withoutLoginActionAsync: WithoutLoginActionAsync)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -24,7 +24,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
   private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
-  def sendCoinForm: Action[AnyContent] = Action { implicit request =>
+  def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.sendCoin())
   }
 
@@ -55,7 +55,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def faucetRequestForm: Action[AnyContent] = Action { implicit request =>
+  def faucetRequestForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.faucetRequest())
   }
 
@@ -89,7 +89,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def rejectFaucetRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
+  def rejectFaucetRequestForm(requestID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.rejectFaucetRequest(requestID = requestID))
   }
 
@@ -112,7 +112,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def approveFaucetRequestsForm(requestID: String, accountID: String): Action[AnyContent] = Action { implicit request =>
+  def approveFaucetRequestsForm(requestID: String, accountID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.approveFaucetRequests(requestID = requestID, accountID = accountID))
   }
 
@@ -163,11 +163,11 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendCoinForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.sendCoin())
   }
 
-  def blockchainSendCoin: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainSendCoin: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.SendCoin.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sendCoin(formWithErrors)))

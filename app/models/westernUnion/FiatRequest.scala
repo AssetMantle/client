@@ -33,16 +33,14 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
   private def add(fiatRequest: FiatRequest): Future[String] = db.run((fiatRequestTable returning fiatRequestTable.map(_.id) += fiatRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def findByID(id: String): Future[FiatRequest] = db.run(fiatRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -54,30 +52,25 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
     case Success(result) => if (result > 0) {
       result
     } else {
-      logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = " + id))
-      throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = " + id))
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def deleteByID(id: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def getStatusByID(id: String): Future[String] = db.run(fiatRequestTable.filter(_.id === id).map(_.status).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 

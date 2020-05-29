@@ -324,11 +324,11 @@ class AccountController @Inject()(
     )
   }
 
-  def forgotPasswordForm(username: String): Action[AnyContent] = Action { implicit request =>
+  def forgotPasswordForm(username: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.forgotPassword(username = username))
   }
 
-  def forgotPassword: Action[AnyContent] = Action.async { implicit request =>
+  def forgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.master.ForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.forgotPassword(formWithErrors, formWithErrors(constants.FormField.USERNAME.name).value.getOrElse(""))))
