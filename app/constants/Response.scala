@@ -207,6 +207,7 @@ object Response {
   val FILE_UPLOAD_ERROR = new Failure("FILE_UPLOAD_ERROR")
   val BLOCKCHAIN_ACCOUNT_NOT_FOUND = new Failure("BLOCKCHAIN_ACCOUNT_NOT_FOUND")
   val FIAT_PEG_NOT_FOUND = new Failure("FIAT_PEG_NOT_FOUND")
+  val ALL_TRADE_DOCUMENTS_NOT_UPLOADED = new Failure("ALL_TRADE_DOCUMENTS_NOT_UPLOADED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

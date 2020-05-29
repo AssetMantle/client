@@ -199,12 +199,6 @@ object sendCoinControllerTest {
     }*/
 
 
-  def getUserType(query: String):String={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "userType" FROM master."Account" WHERE id = '$query'),'0') AS "userType";""")
-       sqlQueryFeeder.apply().next()("userType").toString
-  }
-
   def getAddress(query: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE id = '$query'),'0') AS "accountAddress";""")

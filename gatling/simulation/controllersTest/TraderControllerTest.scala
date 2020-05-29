@@ -7,7 +7,7 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
 class TraderControllerTest extends Simulation {
-  val scenarioBuilder: ScenarioBuilder =  signUpControllerTest.signUpScenario
+  val scenarioBuilder: ScenarioBuilder =  traderControllerTest.traderRelationRequestScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -23,7 +23,7 @@ object traderControllerTest {
     .exec(http("TraderRelationRequest_POST")
       .post(routes.TraderController.traderRelationRequest().url)
       .formParamMap(Map(
-        constants.FormField.ACCOUNT_ID.name -> "${%s}".format(Test.TEST_USERNAME),
+        constants.FormField.ACCOUNT_ID.name -> "${%s}".format(Test.TEST_COUNTER_PARTY_USERNAME),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Create Wallet").exists)
     )
