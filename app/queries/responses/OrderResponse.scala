@@ -7,7 +7,7 @@ import transactions.Abstract.BaseResponse
 
 object OrderResponse {
 
-  case class Value(negotiationID: String, fiatProofHash: String, awbProofHash: String, fiatPegWallet: Option[Seq[Fiat]], assetPegWallet: Option[Seq[Asset]])
+  case class Value(negotiation_id: String, fiat_proof_hash: String, awb_proof_hash: String, fiat_peg_wallet: Option[Seq[Fiat]], asset_peg_wallet: Option[Seq[Asset]])
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

@@ -196,7 +196,7 @@ class Fiats @Inject()(
           val oldFiatPegWallet = Service.getFiatPegWallet(dirtyFiat.ownerAddress)
 
           def updateAndDelete(accountResponse: Response, oldFiatPegWallet: Seq[Fiat]): Future[String] = {
-            accountResponse.value.fiatPegWallet match {
+            accountResponse.value.fiat_peg_wallet match {
               case Some(updatedFiatPegWallet) =>
                 val deleteFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).diff(updatedFiatPegWallet.map(_.pegHash)))(pegHash => {
                   Service.deleteFiat(pegHash = pegHash, address = dirtyFiat.ownerAddress)
@@ -230,7 +230,7 @@ class Fiats @Inject()(
                   val traderID = masterTraders.Service.tryGetID(traderAccountID)
 
                   def upsert(traderID: String) =
-                    accountOwnerAddress.value.fiatPegWallet match {
+                    accountOwnerAddress.value.fiat_peg_wallet match {
                       case Some(updatedFiatPegWallet) => {
                         val updateTransactionAmountToZero = Future.traverse(oldFiatPegWallet.map(_.pegHash).diff(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => oldFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
                           masterFiats.Service.updateTransactionAmount(traderID, fiatPeg.transactionID, 0)

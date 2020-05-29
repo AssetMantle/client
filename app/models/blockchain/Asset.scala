@@ -194,7 +194,7 @@ class Assets @Inject()(
             val accountResponse = getAccount.Service.get(dirtyAsset.ownerAddress)
 
             def updateOrDelete(ownerAccount: Response): Future[Int] = {
-              ownerAccount.value.assetPegWallet match {
+              ownerAccount.value.asset_peg_wallet match {
                 case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
                   case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
                   case None => Service.deleteAsset(dirtyAsset.pegHash)

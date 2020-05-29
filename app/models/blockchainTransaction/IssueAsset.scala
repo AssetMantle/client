@@ -257,7 +257,7 @@ class IssueAssets @Inject()(
         ownerAccountID <- getAccountIDByAddress(issueAsset.to)
         seller <- getTrader(ownerAccountID)
         masterAsset <- getMasterAsset(traderID = seller.id, documentHash = issueAsset.documentHash)
-        pegHash <- create(bcAssets = accountResponse.value.assetPegWallet, ownerAddress = issueAsset.to, masterAsset = masterAsset)
+        pegHash <- create(bcAssets = accountResponse.value.asset_peg_wallet, ownerAddress = issueAsset.to, masterAsset = masterAsset)
         _ <- markAssetIssued(assetID = masterAsset.id, pegHash = pegHash)
         negotiations <- getNegotiations(masterAsset.id)
         _ <- updateNegotiationStatus(sellerAccountID = ownerAccountID, negotiations = negotiations, masterAsset = masterAsset)

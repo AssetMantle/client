@@ -170,7 +170,7 @@ class Orders @Inject()( actorSystem: ActorSystem,
 
             def completeOrReverseOrder(masterOrder: masterOrder, masterNegotiation: masterNegotiation, negotiation: Negotiation, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], orderResponse: OrderResponse.Response): Future[Unit] = {
               val fiatsInOrder = if (fiatPegWallet.nonEmpty) fiatPegWallet.map(_.transactionAmount.toInt).sum else 0
-              if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
+              if (orderResponse.value.awb_proof_hash != "" && orderResponse.value.fiat_proof_hash != "") {
                 if (assetPegWallet.isEmpty) throw new BaseException(constants.Response.ASSET_NOT_FOUND)
                 if (fiatPegWallet.isEmpty) throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
                 val updateAsset = blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.buyerAddress))
@@ -187,7 +187,7 @@ class Orders @Inject()( actorSystem: ActorSystem,
                   _ <- markMasterOrderStatusCompleted
                   _ <- createReceiveFiat
                 } yield ()
-              } else if (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "") {
+              } else if (orderResponse.value.awb_proof_hash == "" && orderResponse.value.fiat_proof_hash == "") {
                 val updateAsset = if (assetPegWallet.nonEmpty) blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.sellerAddress)) else Future(0)
                 val buyerMarkDirty = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.markDirty(negotiation.buyerAddress) else Future(0)
                 val deleteOrderFiats = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id) else Future(0)
@@ -202,7 +202,7 @@ class Orders @Inject()( actorSystem: ActorSystem,
                   _ <- markMasterOrderStatusReversed
                   _ <- createReceiveFiat
                 } yield ()
-              } else if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash == "") {
+              } else if (orderResponse.value.awb_proof_hash != "" && orderResponse.value.fiat_proof_hash == "") {
                 val markBuyerExecuteOrderPendingByBCOrderID = masterOrders.Service.markBuyerExecuteOrderPendingByBCOrderID(dirtyOrder.id)
                 for {
                   _ <- markBuyerExecuteOrderPendingByBCOrderID
@@ -215,7 +215,7 @@ class Orders @Inject()( actorSystem: ActorSystem,
               }
             }
 
-            def update(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.update(Order(id = dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false))
+            def update(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.update(Order(id = dirtyOrder.id, awbProofHash = if (orderResponse.value.awb_proof_hash == "") None else Option(orderResponse.value.awb_proof_hash), fiatProofHash = if (orderResponse.value.fiat_proof_hash == "") None else Option(orderResponse.value.fiat_proof_hash), dirtyBit = false))
 
             def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 

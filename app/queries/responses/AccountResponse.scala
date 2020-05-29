@@ -21,7 +21,7 @@ object AccountResponse {
 
   case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]])
 
-  case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[Asset]], fiatPegWallet: Option[Seq[Fiat]], account_number: String, sequence: String)
+  case class Value(address: String, coins: Option[Seq[Coins]], asset_peg_wallet: Option[Seq[Asset]], fiat_peg_wallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

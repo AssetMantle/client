@@ -189,7 +189,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       def getAccountResponse(issueFiat: IssueFiat): Future[AccountResponse.Response] = getAccount.Service.get(issueFiat.to)
 
       def create(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = {
-        val fiat = account.value.fiatPegWallet match {
+        val fiat = account.value.fiat_peg_wallet match {
           case Some(fiatPegWallet) => fiatPegWallet.find(_.transactionID == issueFiat.transactionID).getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
           case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
         }
