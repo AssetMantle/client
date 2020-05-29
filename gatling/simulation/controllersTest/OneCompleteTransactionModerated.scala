@@ -14,16 +14,14 @@ import scala.concurrent.duration.Duration
 
 class OneCompleteTransactionModerated extends Simulation {
 
-
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
     .exec(CreateZone.createZone)
-    .exec(CreateOrganization.createOrganization)
+    .exec(CreateSellerOrganization.createSellerOrganization)
+    .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
     .exec(CreateBuyer.createBuyer)
-    .exec(IssueAssetModerated.issueAsset)
+    .exec(IssueAssetModerated.issueAssetModerated)
     .exec(IssueFiat.issueFiat)
-    .exec(ChangeBuyerBid.changeBuyerBid)
-    .exec(ChangeSellerBid.changeSellerBid)
     .exec(ConfirmBuyerBid.confirmBuyerBid)
     .exec(ConfirmSellerBid.confirmSellerBid)
     .exec(SendFiat.sendFiat)
@@ -274,13 +272,10 @@ object IssueFiat {
 
   val issueFiat = scenario("IssueFiat")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
+    .exec(accountControllerTest.loginScenario)
     .exec(issueFiatControllerTest.issueFiatRequestScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(issueFiatControllerTest.issueFiatScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.logoutScenario)
+    .exec(issueFiatControllerTest.westernUnionRTCB)
 }
 
 object BuyerConfirmNegotiation {
@@ -292,9 +287,9 @@ object BuyerConfirmNegotiation {
     .exec(accountControllerTest.logoutScenario)
 }
 
-object ConfirmSellerBid {
+object SellerConfirmNegotiation {
 
-  val confirmSellerBid = scenario("ConfirmSellerBid")
+  val sellerConfirmNegotiation = scenario("SellerConfirmNegotiation")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.sellerConfirmNegotiation)
@@ -304,7 +299,6 @@ object ConfirmSellerBid {
 object ReleaseAsset {
 
   val releaseAsset = scenario("ReleaseAsset")
-
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.releaseAsset)
@@ -336,12 +330,11 @@ object SendAsset {
 object ModeratedBuyerAndSellerExecuteOrder {
 
   val moderatedBuyerAndSellerExecuteOrder = scenario("ModeratedBuyerAndSellerExecuteOrder")
-    .exec(session => session.set(Test.TEST_NEGOTIATION_REQUEST_ID, confirmBuyerBidControllerTest.getNegotiationRequestIDFromSellerAccountID(session(Test.TEST_SELLER_USERNAME).as[String])))
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(buyerExecuteOrderControllerTest.moderatedBuyerExecuteOrderScenario)
-    .exec(sellerExecuteOrderControllerTest.moderatedSellerExecuteOrder)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.loginScenario)
+    .exec(orderControllerTest.moderatedBuyerExecuteOrderScenario)
+    .exec(orderControllerTest.moderatedSellerExecuteOrderScenario)
+    .exec(accountControllerTest.logoutScenario)
 
 }
 
@@ -349,9 +342,9 @@ object RedeemAsset {
 
   val redeemAsset = scenario("RedeemAsset")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(redeemAssetControllerTest.redeemAssetScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.loginScenario)
+    .exec(assetControllerTest.redeemAsset)
+    .exec(accountControllerTest.logoutScenario)
 
 }
 

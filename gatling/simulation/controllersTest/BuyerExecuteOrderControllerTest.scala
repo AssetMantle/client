@@ -30,4 +30,5 @@ object buyerExecuteOrderControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(4)
 }

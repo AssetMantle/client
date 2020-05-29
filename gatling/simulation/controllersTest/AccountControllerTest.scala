@@ -51,8 +51,8 @@ object accountControllerTest {
     )
     .pause(5)
 
-  val loginScenario: ScenarioBuilder = scenario("Login Before SignUp")
-    .exec(http("Login_GET")
+  val loginScenario: ScenarioBuilder = scenario("Login")
+    .exec(http("LoginForm_GET")
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
@@ -102,12 +102,12 @@ object accountControllerTest {
       .formParamMap(Map(
         Test.RECEIVE_NOTIFICATIONS -> false,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Logged Out").exists)
+      .check(substring("Logged Out Successfully").exists)
     )
     .pause(2)
 
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
-    .exec(http("Add_Identification_Detail_Form")
+    .exec(http("Add_Identification_Form")
       .get(routes.AccountController.addIdentificationForm().url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -115,7 +115,7 @@ object accountControllerTest {
     .feed(IdentificationFeeder.identificationFeed)
     .feed(AddressDataFeeder.addressDataFeed)
     .pause(2)
-    .exec(http("IdentificationDetail_Post")
+    .exec(http("AddIdentification_Post")
       .post(routes.AccountController.addIdentification().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),

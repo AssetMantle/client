@@ -402,7 +402,6 @@ class AssetController @Inject()(
                 } else Future(BadRequest(views.html.component.master.sendAsset(views.companion.master.SendAsset.form.fill(sendAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiationID = negotiation.id)))
               case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
-
           }
 
           (for {

@@ -50,16 +50,17 @@ object issueFiatControllerTest {
     .pause(3)
 
   val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
+    .feed(wurtcbFeeder.wurtcbFeed)
     .exec(session=>
-    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+id+refrence+externalRefrence+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+status+dealType+paymentTypeId+paidOutAmount))
+    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+externalRefrence+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+status+dealType+paymentTypeId+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
     )
     .exec(http("westernUnionRTCB")
       .post(routes.WesternUnionController.westernUnionRTCB().url)
       .body(StringBody(session=>s"""<request>
                          |
-                         |<id>${id}</id>
+                         |<id>"""+session(Test.TEST_ID).as[String]+"""</id>
                          |
-                         |<reference>${refrence}</reference>
+                         |<reference>"""+session(Test.TEST_REFRENCE).as[String]+"""</reference>
                          |
                          |<externalReference>${externalRefrence}</externalReference>
                          |
