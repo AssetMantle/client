@@ -568,6 +568,9 @@ html, body{
     .cmuk-button{
       @extend %buttonSmall;
       margin-left: 15px;
+      position: absolute;
+      right: 20px;
+
     }
   }
   .cmuk-button {
