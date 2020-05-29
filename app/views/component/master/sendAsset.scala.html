@@ -2,9 +2,9 @@
 @import views.html.base._
 @import views.companion.master.SendAsset
 
-@(sendAssetForm: Form[SendAsset.Data] = SendAsset.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(sendAssetForm: Form[SendAsset.Data] = SendAsset.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_ASSET, sendAssetForm) {
-    @commonInputText(sendAssetForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(sendAssetForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputInt(sendAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sendAssetForm, constants.FormField.PASSWORD)
 }
