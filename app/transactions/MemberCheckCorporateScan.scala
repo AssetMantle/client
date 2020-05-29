@@ -2,6 +2,7 @@ package transactions
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
@@ -35,7 +36,7 @@ class MemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configurat
 
   private val endpoint = configuration.get[String]("memberCheck.endpoints.singleCorporateScan")
 
-  private val testURL = constants.Test.BASE_URL+"/loopBack/memberCheckCorporateScan"
+  private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.memberCheckCorporateScan
 
   //private val url = baseURL + endpoint
 

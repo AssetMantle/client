@@ -232,28 +232,4 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         }
       )
   }
-
-  def verifyEmailAddressLoopBack: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val testMode = configuration.get[Boolean]("mode.test")
-      val verifyEmailAddress = if (testMode) masterEmails.Service.verifyEmailAddress(loginState.username) else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
-      (for {
-        _ <- verifyEmailAddress
-      } yield Ok(constants.Response.EMAIL_ADDRESS_VERIFIED.message)
-        ).recover {
-        case _: Exception => InternalServerError(constants.Response.UNAUTHORIZED.message)
-      }
-  }
-
-  def verifyMobileNumberLoopBack: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val testMode = configuration.get[Boolean]("mode.test")
-      val verifyMobileNumber = if (testMode) masterMobiles.Service.verifyMobileNumber(loginState.username) else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
-      (for {
-        _ <- verifyMobileNumber
-      } yield Ok(constants.Response.MOBILE_NUMBER_VERIFIED.message)
-        ).recover {
-        case _: Exception => InternalServerError(constants.Response.UNAUTHORIZED.message)
-      }
-  }
 }
