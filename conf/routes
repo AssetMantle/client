@@ -67,7 +67,7 @@ POST        /asset/issue                                                        
 GET         /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLadingForm(negotiationID: String)
 POST        /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLading
 
-GET         /asset/send                                                                           controllers.AssetController.sendForm(orderID: String)
+GET         /asset/send                                                                           controllers.AssetController.sendForm(negotiationID: String)
 POST        /asset/send                                                                           controllers.AssetController.send
 
 GET         /asset/release                                                                        controllers.AssetController.releaseForm(assetID: String)

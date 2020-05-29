@@ -353,8 +353,8 @@ class AssetController @Inject()(
       )
   }
 
-  def sendForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.master.sendAsset(orderID = orderID))
+  def sendForm(negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.sendAsset(negotiationID = negotiationID))
   }
 
   def send: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -364,7 +364,7 @@ class AssetController @Inject()(
           Future(BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.ORDER_ID.name))))
         },
         sendAssetData => {
-          val negotiation = masterNegotiations.Service.tryGet(sendAssetData.orderID)
+          val negotiation = masterNegotiations.Service.tryGet(sendAssetData.negotiationID)
           val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendAssetData.password)
 
           def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
@@ -396,10 +396,10 @@ class AssetController @Inject()(
                       ticketID <- ticketID
                       _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
                       _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_SENT, ticketID)
-                      result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.orderID, successes = Seq(constants.Response.ASSET_SENT)))
+                      result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sendAssetData.negotiationID, successes = Seq(constants.Response.ASSET_SENT)))
                     } yield result
                   } else throw new BaseException(constants.Response.UNAUTHORIZED)
-                } else Future(BadRequest(views.html.component.master.sendAsset(views.companion.master.SendAsset.form.fill(sendAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), orderID = negotiation.id)))
+                } else Future(BadRequest(views.html.component.master.sendAsset(views.companion.master.SendAsset.form.fill(sendAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiationID = negotiation.id)))
               case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
 
@@ -415,7 +415,7 @@ class AssetController @Inject()(
             result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAddress = buyerAddress, buyer = buyer, sellerAddress = loginState.address, asset = asset, assetLocked = assetLocked, sellerTraderID = negotiation.sellerTraderID, negotiation = negotiation)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sendAssetData.orderID, failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sendAssetData.negotiationID, failures = Seq(baseException.failure)))
           }
         }
       )
