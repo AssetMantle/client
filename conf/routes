@@ -624,5 +624,5 @@ GET         /blockchain/setSellerFeedback                                       
 POST        /blockchain/setSellerFeedback                                                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
 
 #LoopBackControllers
-GET         /verifyEmailAddressLoopBack                                                           controllers.ContactController.verifyEmailAddressLoopBack
-GET         /verifyMobileNumberLoopBack                                                           controllers.ContactController.verifyMobileNumberLoopBack
+GET         /loopBack/memberCheckCorporateScan                                                    controllers.LoopBackController.memberCheckCorporateScanInfo(request:String)
+POST        /loopBack/memberCheckCorporateScan                                                    controllers.LoopBackController.memberCheckCorporateScan
