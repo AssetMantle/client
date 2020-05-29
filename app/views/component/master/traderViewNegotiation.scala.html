@@ -19,8 +19,8 @@
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.PRICE, Seq(negotiation.price, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq((negotiation.price * negotiation.quantity).toString, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
     @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.accountID)
     @commonTextInfo(constants.View.ORGANIZATION, counterPartyOrganization.name)
 <div class="cmuk-text-left title">@Messages(constants.View.SHIPPING_DETAILS):</div>

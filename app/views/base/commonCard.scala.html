@@ -4,8 +4,7 @@
 @(title: String, arguments: (Symbol, Any)*)(headerContent: Html = Html(""))(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
 
 <div class="cmuk-card cmuk-card-default commonCard cmuk-animation-fade">
-    <div class="cmuk-card-header cmuk-flex" style="align-items: center ;
-        justify-content: space-between;">
+    <div class="cmuk-card-header cmuk-flex">
         <div>
             @if(arguments.toMap.get('cardIconPath).map(_.toString).isDefined) {
                 <svg class="icon"><use xlink:href='@routes.Assets.versioned(Asset(arguments.toMap.get('cardIconPath).map(_.toString).getOrElse("")))'/></svg>

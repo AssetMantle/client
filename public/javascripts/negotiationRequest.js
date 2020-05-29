@@ -24,18 +24,19 @@ function showSelectCounterParty() {
     }
 }
 
-function selectCounterParty(traderID, traderAccountID, trderOrganizationName) {
+function selectCounterParty(traderID, traderAccountID, traderOrganizationName) {
     $('#negotiationRequestCounterParty').val(traderID);
     $('#selectedCounterPartyAccountID').html(traderAccountID);
-    $('#selectedCounterPartyOrganizationName').html(trderOrganizationName);
+    $('#selectedCounterPartyOrganizationName').html(traderOrganizationName);
     $('#FORM_NEGOTIATION_REQUEST_SUBMIT').show();
 }
 
-function selectAsset(assetID, assetDescription, assetType, price, quantity, shippingPeriod, portOfLoading, portOfDischarge) {
+function selectAsset(assetID, assetDescription, assetType, pricePerUnit, totalPrice, quantity, shippingPeriod, portOfLoading, portOfDischarge) {
     $('#negotiationRequestAssetID').val(assetID);
     $('#selectedAssetDescription').html(assetDescription);
     $('#selectedAssetType').html(assetType);
-    $('#selectedAssetPrice').html(price);
+    $('#selectedAssetPricePerUnit').html(pricePerUnit);
+    $('#selectedAssetTotalPrice').html(totalPrice);
     $('#selectedAssetQuantity').html(quantity);
     $('#selectedAssetShipmentPeriod').html(shippingPeriod);
     $('#selectedAssetPortOfLoading').html(portOfLoading);

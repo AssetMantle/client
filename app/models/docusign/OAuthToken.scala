@@ -36,7 +36,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private val docusignOAuthTokenInitialDelay = configuration.get[Int]("docusign.scheduler.initialDelay").seconds
   private val docusignOAuthTokenIntervalTime = configuration.get[Int]("docusign.scheduler.intervalTime").minutes
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -45,29 +45,25 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private def add(token: OAuthToken): Future[String] = db.run((oauthTokenTable returning oauthTokenTable.map(_.id) += token).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
 
   private def updateByID(id: String, accessToken: String, expiresAt: Long, refreshToken: String): Future[Int] = db.run(oauthTokenTable.filter(_.id === id).map(x => (x.accessToken, x.expiresAt, x.refreshToken)).update((accessToken, expiresAt, refreshToken)).asTry).map {
     case Success(result) => result match {
-      case 0 => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
   private def tryGetByID(id: String): Future[OAuthToken] = db.run(oauthTokenTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -76,10 +72,8 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private def deleteById(id: String): Future[Int] = db.run(oauthTokenTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 

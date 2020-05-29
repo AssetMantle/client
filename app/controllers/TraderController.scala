@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -32,6 +32,7 @@ class TraderController @Inject()(
                                   transactionsSetACL: transactions.SetACL,
                                   blockchainAclHashes: blockchain.ACLHashes,
                                   withZoneLoginAction: WithZoneLoginAction,
+                                  withoutLoginAction: WithoutLoginAction,
                                 )
                                 (implicit
                                  executionContext: ExecutionContext,
@@ -45,7 +46,7 @@ class TraderController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def organizationRejectRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
+  def organizationRejectRequestForm(traderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.organizationRejectTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
   }
 
@@ -77,7 +78,7 @@ class TraderController @Inject()(
       )
   }
 
-  def zoneRejectRequestForm(traderID: String): Action[AnyContent] = Action { implicit request =>
+  def zoneRejectRequestForm(traderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.zoneRejectTraderRequest(views.companion.master.RejectTraderRequest.form, traderID))
   }
 
@@ -109,7 +110,7 @@ class TraderController @Inject()(
       )
   }
 
-  def traderRelationRequestForm(): Action[AnyContent] = Action {
+  def traderRelationRequestForm(): Action[AnyContent] = withoutLoginAction {
     implicit request =>
       Ok(views.html.component.master.traderRelationRequest())
   }

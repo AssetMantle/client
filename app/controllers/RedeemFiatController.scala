@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -24,6 +24,8 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
                                      transaction: utilities.Transaction,
                                      withTraderLoginAction: WithTraderLoginAction,
                                      withZoneLoginAction: WithZoneLoginAction,
+                                     withoutLoginAction: WithoutLoginAction,
+                                     withoutLoginActionAsync: WithoutLoginActionAsync,
                                      withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -112,11 +114,11 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
         })
   }
 
-  def blockchainRedeemFiatForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainRedeemFiatForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.redeemFiat())
   }
 
-  def blockchainRedeemFiat: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainRedeemFiat: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors)))

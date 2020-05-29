@@ -45,17 +45,19 @@ class FileController @Inject()(
                                 withZoneLoginAction: WithZoneLoginAction,
                                 withGenesisLoginAction: WithGenesisLoginAction,
                                 withUsernameToken: WithUsernameToken,
+                                withoutLoginAction: WithoutLoginAction,
+                                withoutLoginActionAsync: WithoutLoginActionAsync,
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
   }
 
-  def updateAccountKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountKYC), documentType))
   }
 
@@ -175,11 +177,11 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def uploadAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAsset), documentType, negotiationID))
   }
 
-  def updateAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def updateAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAsset), documentType, negotiationID))
   }
 
@@ -225,7 +227,7 @@ class FileController @Inject()(
               documentContent match {
                 case Some(content) => {
                   val billOfLading = content.asInstanceOf[BillOfLading]
-                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = billOfLading.declaredAssetValue / billOfLading.assetQuantity)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
               }
@@ -286,7 +288,7 @@ class FileController @Inject()(
               documentContent match {
                 case Some(content) => {
                   val billOfLading = content.asInstanceOf[BillOfLading]
-                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPrice = billOfLading.declaredAssetValue)), negotiationID = negotiationID))
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = billOfLading.declaredAssetValue / billOfLading.assetQuantity)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
               }
@@ -324,11 +326,11 @@ class FileController @Inject()(
       }
   }
 
-  def uploadNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def uploadNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeNegotiation), documentType, negotiationID))
   }
 
-  def updateNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = Action { implicit request =>
+  def updateNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateNegotiation), documentType, negotiationID))
   }
 
@@ -581,11 +583,11 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
-  def updateAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+  def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 

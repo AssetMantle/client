@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.{WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -15,15 +15,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ChangeSellerBidController @Inject()(
                                            messagesControllerComponents: MessagesControllerComponents,
-                                           transaction: utilities.Transaction,
-                                           masterAccounts: master.Accounts,
-                                           masterNegotiations: Negotiations,
-                                           blockchainNegotiations: blockchain.Negotiations,
-                                           blockchainAccounts: blockchain.Accounts,
-                                           withTraderLoginAction: WithTraderLoginAction,
                                            transactionsChangeSellerBid: transactions.ChangeSellerBid,
-                                           blockchainTransactionChangeSellerBids: blockchainTransaction.ChangeSellerBids,
-                                           withUsernameToken: WithUsernameToken,
+                                           withoutLoginAction: WithoutLoginAction,
+                                           withoutLoginActionAsync: WithoutLoginActionAsync,
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -32,11 +26,11 @@ class ChangeSellerBidController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_CHANGE_SELLER_BID
 
-  def blockchainChangeSellerBidForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainChangeSellerBidForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.blockchain.changeSellerBid())
   }
 
-  def blockchainChangeSellerBid: Action[AnyContent] = Action.async { implicit request =>
+  def blockchainChangeSellerBid: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.blockchain.ChangeSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.changeSellerBid(formWithErrors)))

@@ -24,7 +24,7 @@ class MessageReads @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   val db = databaseConfig.db
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -33,8 +33,7 @@ class MessageReads @Inject()(protected val databaseConfigProvider: DatabaseConfi
   private def add(messageRead: MessageRead): Future[String] = db.run((messageReadTable returning messageReadTable.map(_.messageID) += messageRead).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
@@ -43,18 +42,15 @@ class MessageReads @Inject()(protected val databaseConfigProvider: DatabaseConfi
   private def updateReadByMessageIDsAndToAccountID(messageIDs: Seq[String], toAccountID: String, read: Boolean): Future[Int] = db.run(messageReadTable.filter(_.messageID inSet messageIDs).filter(_.accountID === toAccountID).map(_.read).update(read).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def findById(messageID: String): Future[Seq[MessageRead]] = db.run(messageReadTable.filter(_.messageID === messageID).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 

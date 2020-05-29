@@ -444,8 +444,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #061728;
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
-    position: absolute;
-    right: 20px; }
+    margin-left: 15px; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;

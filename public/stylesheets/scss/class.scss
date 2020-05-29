@@ -567,8 +567,7 @@ html, body{
     padding: 15px 20px;
     .cmuk-button{
       @extend %buttonSmall;
-      position: absolute;
-      right: 20px;
+      margin-left: 15px;
     }
   }
   .cmuk-button {

@@ -1,13 +1,17 @@
 package controllers
 
+import controllers.actions.{WithoutLoginAction, WithoutLoginActionAsync}
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.mvc._
 import play.api.routing._
 
 @Singleton
-class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
-  def javascriptRoutes = Action { implicit request =>
+class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents,withoutLoginAction: WithoutLoginAction)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
+
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  def javascriptRoutes = withoutLoginAction { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.AccountController.signUpForm,

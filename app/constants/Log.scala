@@ -1,0 +1,12 @@
+package constants
+
+object Log {
+
+  object Info {
+    val CONTROLLERS_REQUEST= "CONTROLLERS_REQUEST"
+    val CONTROLLERS_RESPONSE= "CONTROLLERS_RESPONSE"
+    val STORE_FILE_ENTRY = "STORE_FILE_ENTRY"
+    val STORE_FILE_EXIT = "STORE_FILE_EXIT"
+  }
+
+}

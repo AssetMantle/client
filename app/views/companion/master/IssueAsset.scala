@@ -10,7 +10,7 @@ object IssueAsset {
       constants.FormField.ASSET_DESCRIPTION.name -> constants.FormField.ASSET_DESCRIPTION.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
-      constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
+      constants.FormField.ASSET_PRICE_PER_UNIT.name -> constants.FormField.ASSET_PRICE_PER_UNIT.field,
       constants.FormField.SHIPPING_PERIOD.name -> constants.FormField.SHIPPING_PERIOD.field,
       constants.FormField.PORT_OF_LOADING.name -> constants.FormField.PORT_OF_LOADING.field,
       constants.FormField.PORT_OF_DISCHARGE.name -> constants.FormField.PORT_OF_DISCHARGE.field,
@@ -20,6 +20,6 @@ object IssueAsset {
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.issueAssetConstraint)
   )
 
-  case class Data(assetType: String, description: String, quantity: Int, quantityUnit: String, price: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, moderated: Boolean, gas: Option[Int], password: Option[String])
+  case class Data(assetType: String, description: String, quantity: Int, quantityUnit: String, pricePerUnit: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, moderated: Boolean, gas: Option[Int], password: Option[String])
 
 }
