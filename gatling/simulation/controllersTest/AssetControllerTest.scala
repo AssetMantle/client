@@ -12,19 +12,15 @@ import scala.util.Random
 
 class AssetControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = assetControllerTest.issueAssetRequestScenario
+  val scenarioBuilder: ScenarioBuilder = assetControllerTest.moderatedIssueAssetRequestScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object assetControllerTest {
 
-  val issueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
-    .feed(AssetTypeFeeder.assetTypeFeed)
-    .feed(AssetPriceFeeder.assetPriceFeed)
-    .feed(QuantityUnitFeeder.quantityUnitFeed)
-    .feed(AssetQuantityFeeder.assetQuantityFeed)
+  val moderatedIssueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
+    .feed(AssetDetailFeeder.assetDetailFeed)
     .feed(GasFeeder.gasFeed)
-    .feed(IssueAssetDetailFeeder.issueAssetDetailFeeder)
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
     .exec(http("IssueAssetDetailForm_GET")
       .get(routes.AssetController.issueForm().url)
@@ -34,16 +30,17 @@ object assetControllerTest {
       .post(routes.AssetController.issue().url)
       .formParamMap(Map(
         constants.FormField.ASSET_TYPE.name -> "${%s}".format(Test.TEST_ASSET_TYPE),
+        constants.FormField.ASSET_DESCRIPTION.name -> "${%s}".format(Test.TEST_ASSET_DESCRIPTION),
         constants.FormField.ASSET_QUANTITY.name -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
         constants.FormField.QUANTITY_UNIT.name -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
-        constants.FormField.ASSET_PRICE.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
+        constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
         constants.FormField.SHIPPING_PERIOD.name -> "${%s}".format(Test.TEST_SHIPPING_PERIOD),
         constants.FormField.PORT_OF_LOADING.name -> "${%s}".format(Test.TEST_PORT_OF_LOADING),
         constants.FormField.PORT_OF_DISCHARGE.name -> "${%s}".format(Test.TEST_PORT_OF_DISCHARGE),
+        constants.FormField.MODERATED.name -> true,
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("UPLOAD OBL").exists)
     )
     .pause(3)
 
@@ -91,6 +88,12 @@ object assetControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+
+  def getAssetID(query:String)={
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+      s"""SELECT COALESCE((SELECT "id" FROM master."Asset" WHERE "ownerID" = '$query'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("id").toString
+  }
 
   def getRequestIDForIssueAsset(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",

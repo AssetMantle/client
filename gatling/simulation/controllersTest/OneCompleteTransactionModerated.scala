@@ -132,8 +132,8 @@ object CreateBuyerOrganization {
     .exec(addOrganizationControllerTest.verifyOrganizationScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String])) }
-    .doIf(session => session(Test.USER_TYPE).as[String] != "ORGANIZATION") {
-      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != "ORGANIZATION", Duration.create(80, "seconds")) {
+    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION) {
+      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION, Duration.create(80, "seconds")) {
         pause(1)
           .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String])) }
       }
@@ -158,9 +158,10 @@ object CreateSeller {
     .exec(accountControllerTest.loginScenario)
     .exec(setACLControllerTest.organizationVerifyTrader)
     .exec(accountControllerTest.logoutScenario)
+    .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .doIf(session => session(Test.USER_TYPE).as[String] != "TRADER") {
-      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != "TRADER", Duration.create(80, "seconds")) {
+    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
+      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER, Duration.create(80, "seconds")) {
         pause(1)
           .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELLER_USERNAME).as[String])) }
       }
@@ -186,8 +187,8 @@ object CreateBuyer {
     .exec(setACLControllerTest.organizationVerifyTrader)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
-    .doIf(session => session(Test.USER_TYPE).as[String] != "TRADER") {
-      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != "TRADER", Duration.create(80, "seconds")) {
+    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
+      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER, Duration.create(80, "seconds")) {
         pause(1)
           .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
       }
@@ -195,7 +196,7 @@ object CreateBuyer {
 }
 
 object AddCounterParty {
-  val addCounterParty =  scenario("AddCounterParty")
+  val addCounterParty = scenario("AddCounterParty")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(session => session.set(Test.TEST_COUNTER_PARTY_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]))
@@ -212,12 +213,61 @@ object IssueAssetModerated {
   val issueAssetModerated = scenario("IssueAssetModerated")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
-    .exec(assetControllerTest.issueAssetRequestScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(issueAssetControllerTest.issueAssetScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(assetControllerTest.moderatedIssueAssetRequestScenario)
+    .exec(accountControllerTest.logoutScenario)
+    .exec { session => session.set(Test.TEST_ASSET_ID, assetControllerTest.getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String])) }
+}
+
+object CreateSalesQuote {
+  val createSalesQuote = scenario("CreateSalesQuote")
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
+    .exec(accountControllerTest.loginScenario)
+    .exec(negotiationControllerTest.negotiationRequestScenario)
+    .exec(accountControllerTest.logoutScenario)
+    .exec { session => session.set(Test.TEST_NEGOTIATION_ID, negotiationControllerTest.getNegotiationID(session(Test.TEST_SELLER_TRADER_ID).as[String])) }
+}
+
+object AcceptSalesQuoteAndAllTradeTerms {
+  val acceptSalesQuoteAndAllTradeTerms = scenario("AcceptSalesQuoteAndAllTradeTerms")
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+    .exec(accountControllerTest.loginScenario)
+    .exec(negotiationControllerTest.acceptNegotiationRequest)
+    .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+    .doIf(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED) {
+      asLongAsDuring(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED, Duration.create(80, "seconds")) {
+        pause(1)
+          .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+      }
+    }
+    .exec(negotiationControllerTest.acceptNegotiationTerms)
+    .exec(negotiationControllerTest.confirmAllNegotiationTerms)
+    .exec(accountControllerTest.logoutScenario)
+}
+
+object UploadContractAndOtherTradeDocuments {
+
+  val uploadContractAndOtherTradeDocuments = scenario("UploadContractAndOtherTradeDocuments")
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
+    .exec(accountControllerTest.loginScenario)
+    .exec(negotiationControllerTest.uploadContract)
+    .exec(negotiationControllerTest.updateContractSigned)
+    .exec(negotiationControllerTest.uploadAssetDocuments)
+    .exec(negotiationControllerTest.uploadNegotiationDocuments)
+    .exec(negotiationControllerTest.uploadAssetDocuments)
+    .exec(negotiationControllerTest.uploadNegotiationDocuments)
+    .exec(negotiationControllerTest.addBillOfLading)
+    .exec(negotiationControllerTest.addContract)
+    .exec(negotiationControllerTest.addInvoice)
+    .exec(accountControllerTest.logoutScenario)
+}
+
+object AcceptBillOfLading{
+
+   val acceptBillOfLading= scenario("AcceptBillOfLading")
+     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+     .exec(accountControllerTest.loginScenario)
+     .exec(negotiationControllerTest.acceptBillOfLading)
+     .exec(accountControllerTest.logoutScenario)
 }
 
 object IssueFiat {
@@ -231,51 +281,24 @@ object IssueFiat {
     .exec(loginControllerTest.loginScenario)
     .exec(issueFiatControllerTest.issueFiatScenario)
     .exec(logoutControllerTest.logoutScenario)
-
 }
 
-object ChangeBuyerBid {
+object BuyerConfirmNegotiation {
 
-  val changeBuyerBid = scenario("ChangeBuyerBid")
+  val buyerConfirmNegotiation = scenario("BuyerConfirmNegotiation")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(session => session.set(Test.TEST_SELLER_ADDRESS, getAddressFromAccountID(session(Test.TEST_SELLER_USERNAME).as[String])).set(Test.TEST_BUYER_ADDRESS, getAddressFromAccountID(session(Test.TEST_BUYER_USERNAME).as[String])))
-    .exec(session => session.set(Test.TEST_PEG_HASH, issueAssetControllerTest.getPegHashByOwnerAddress(session(Test.TEST_SELLER_USERNAME).as[String])))
-    .doIf(session => session(Test.TEST_PEG_HASH).as[String] == "0") {
-      asLongAsDuring(session => session(Test.TEST_PEG_HASH).as[String] == "0", Duration.create(30, "seconds")) {
-        pause(1)
-          .exec { session => session.set(Test.TEST_PEG_HASH, issueAssetControllerTest.getPegHashByOwnerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
-      }
-    }
-    .exec(changeBuyerBidControllerTest.changeBuyerBidScenario)
-    .exec(logoutControllerTest.logoutScenario)
-}
-
-object ChangeSellerBid {
-
-  val changeSellerBid = scenario("ChangeSellerBid")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(changeSellerBidControllerTest.changeSellerBidScenario)
-    .exec(logoutControllerTest.logoutScenario)
-}
-
-object ConfirmBuyerBid {
-
-  val confirmBuyerBid = scenario("ConfirmBuyerBid")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(confirmBuyerBidControllerTest.confirmBuyerBidScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.loginScenario)
+    .exec(negotiationControllerTest.buyerConfirmNegotiation)
+    .exec(accountControllerTest.logoutScenario)
 }
 
 object ConfirmSellerBid {
 
   val confirmSellerBid = scenario("ConfirmSellerBid")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(confirmSellerBidControllerTest.confirmSellerBidScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.loginScenario)
+    .exec(negotiationControllerTest.sellerConfirmNegotiation)
+    .exec(accountControllerTest.logoutScenario)
 }
 
 object ReleaseAsset {
@@ -283,35 +306,36 @@ object ReleaseAsset {
   val releaseAsset = scenario("ReleaseAsset")
 
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(releaseAssetControllerTest.releaseAssetScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.loginScenario)
+    .exec(assetControllerTest.releaseAsset)
+    .exec(accountControllerTest.logoutScenario)
 }
 
 object SendFiat {
 
   val sendFiat = scenario("SendFiat")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
+    .exec(accountControllerTest.loginScenario)
     .exec(sendFiatControllerTest.sendFiatScenario)
-    .exec(logoutControllerTest.logoutScenario)
+    .exec(accountControllerTest.logoutScenario)
 }
-
 
 object SendAsset {
 
   val sendAsset = scenario("SendAsset")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(sendAssetControllerTest.sendAssetScenario)
-    .exec(logoutControllerTest.logoutScenario)
-    .exec{session=> println(session)
-    session}
+    .exec(accountControllerTest.loginScenario)
+    .exec(assetControllerTest.sendAsset)
+    .exec(accountControllerTest.logoutScenario)
+    .exec { session =>
+      println(session)
+      session
+    }
 }
 
-object BuyerSellerExecuteOrder {
+object ModeratedBuyerAndSellerExecuteOrder {
 
-  val buyerSellerExecuteOrder = scenario("BuyerSellerExecuteOrder")
+  val moderatedBuyerAndSellerExecuteOrder = scenario("ModeratedBuyerAndSellerExecuteOrder")
     .exec(session => session.set(Test.TEST_NEGOTIATION_REQUEST_ID, confirmBuyerBidControllerTest.getNegotiationRequestIDFromSellerAccountID(session(Test.TEST_SELLER_USERNAME).as[String])))
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
     .exec(loginControllerTest.loginScenario)
@@ -319,24 +343,6 @@ object BuyerSellerExecuteOrder {
     .exec(sellerExecuteOrderControllerTest.moderatedSellerExecuteOrder)
     .exec(logoutControllerTest.logoutScenario)
 
-}
-
-object SetBuyerFeedback {
-
-  val setBuyerFeedback = scenario("SetBuyerFeedback")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(setBuyerFeedbackControllerTest.setBuyerFeedbackScenario)
-    .exec(logoutControllerTest.logoutScenario)
-}
-
-object SetSellerFeedback {
-
-  val setSellerFeedback = scenario("SetSellerFeedback")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(setSellerFeedbackControllerTest.setSellerFeedbackScenario)
-    .exec(logoutControllerTest.logoutScenario)
 }
 
 object RedeemAsset {
@@ -347,14 +353,6 @@ object RedeemAsset {
     .exec(redeemAssetControllerTest.redeemAssetScenario)
     .exec(logoutControllerTest.logoutScenario)
 
-}
-
-object RedeemFiat {
-  val redeemFiat = scenario("RedeemFiat")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(loginControllerTest.loginScenario)
-    .exec(redeemFiatControllerTest.redeemFiatScenario)
-    .exec(logoutControllerTest.logoutScenario)
 }
 
 

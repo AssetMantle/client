@@ -28,10 +28,9 @@ object negotiationControllerTest {
     .exec(http("NegotiationRequest_POST")
       .post(routes.NegotiationController.request().url)
       .formParamMap(Map(
-        constants.FormField.ASSET_ID.name -> "${%s}".format(Test.TEST_ASSET_TYPE),
-        constants.FormField.COUNTER_PARTY.name -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
+        constants.FormField.ASSET_ID.name -> "${%s}".format(Test.TEST_ASSET_ID),
+        constants.FormField.COUNTER_PARTY.name -> "${%s}".format(Test.TEST_COUNTER_PARTY_USERNAME),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("UPLOAD OBL").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.ID), "value").saveAs(Test.TEST_NEGOTIATION_ID))
     )
@@ -296,7 +295,7 @@ object negotiationControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
 
-  val buyerConfirmBid: ScenarioBuilder = scenario("BuyerConfirm")
+  val buyerConfirmNegotiation: ScenarioBuilder = scenario("BuyerConfirmNegotiation")
     .exec(http("BuyerConfirmForm_GET")
       .get(session => routes.NegotiationController.buyerConfirmForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
@@ -311,7 +310,7 @@ object negotiationControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
 
-  val sellerConfirmBid: ScenarioBuilder = scenario("SellerConfirm")
+  val sellerConfirmNegotiation: ScenarioBuilder = scenario("SellerConfirmNegotiation")
     .exec(http("SellerConfirmForm_GET")
       .get(session => routes.NegotiationController.sellerConfirmForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
@@ -326,4 +325,15 @@ object negotiationControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
 
+  def getNegotiationStatus(query:String)={
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+      s"""SELECT COALESCE((SELECT "id" FROM master."Negotiation" WHERE "id" = '$query'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("id").toString
+  }
+
+  def getNegotiationID(query:String)={
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+      s"""SELECT COALESCE((SELECT "id" FROM master."Negotiation" WHERE "sellerTraderID" = '$query'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("id").toString
+  }
 }
