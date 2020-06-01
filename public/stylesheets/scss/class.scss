@@ -567,8 +567,10 @@ html, body{
     padding: 15px 20px;
     .cmuk-button{
       @extend %buttonSmall;
+      margin-left: 15px;
       position: absolute;
       right: 20px;
+
     }
   }
   .cmuk-button {
@@ -1581,6 +1583,12 @@ form{
               font-weight: bold;
             }
           }
+          p{
+            font-size: 0.875rem;
+            color: #061728;
+            font-weight: normal;
+            margin: 0 0 5px 0;
+          }
         }
         button{
          @extend %buttonSmall;
@@ -1853,7 +1861,7 @@ form{
       }
 
       .chatMessagesContainer {
-        height: 205px;
+        height: 225px;
         overflow: auto;
         @extend %scroller;
       }
@@ -1861,9 +1869,10 @@ form{
       .chatForm {
         .sendFormField {
           position: relative;
-        }
-
-        .sendFormField input {
+          dl{
+            margin: 0;
+          }
+          input {
           outline: none;
           border-color: #e5e5e5;
           height: 40px;
@@ -1873,6 +1882,7 @@ form{
             font-size: $paragraphFontSizeSmall;
           }
         }
+      }
 
         .sendIconButton {
           background: none;
@@ -2472,10 +2482,14 @@ header:before,
       flex: 1;
       .infoRow{
         flex-direction: column;
+        .infoRowValue{
+          text-align: left;
+        }
       }
       .cmuk-button{
         line-height: 28px;
         padding: 0 20px;
+        word-break: inherit;
       }
     }
     .contactUpdateButton{

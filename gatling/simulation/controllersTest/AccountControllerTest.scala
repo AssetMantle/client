@@ -109,6 +109,7 @@ object accountControllerTest {
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Form")
       .get(routes.AccountController.addIdentificationForm().url)
+      .check(css("legend:contains(%s)".format("Provide your details below")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .feed(NameFeeder.nameFeed)
@@ -134,7 +135,7 @@ object accountControllerTest {
       ))
     )
     .pause(2)
-    .exec(http("AddIdentificationForm")
+    .exec(http("UploadIdentificationForm")
       .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
       .check(substring("BROWSE").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
@@ -157,17 +158,18 @@ object accountControllerTest {
         .get(session=>routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String],"IDENTIFICATION").url)
     )
     .pause(2)
-    .exec(http("AddIdentificationForm")
+    .exec(http("ReviewIdentificationForm")
       .get(routes.AccountController.userReviewIdentificationForm().url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
-    .exec(http("IdentificationDetail_Post")
+    .exec(http("ReviewIdentification_Post")
       .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
+      .check(substring("Identity Details updated successfully").exists)
     )
     .pause(2)
 

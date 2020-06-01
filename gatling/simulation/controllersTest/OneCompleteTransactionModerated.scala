@@ -63,8 +63,8 @@ object CreateZone {
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_ZONE_USERNAME).as[String])) }
-    .doIf(session => session(Test.USER_TYPE).as[String] != "ZONE") {
-      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != "ZONE", Duration.create(80, "seconds")) {
+    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE) {
+      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE, Duration.create(80, "seconds")) {
         pause(1)
           .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_ZONE_USERNAME).as[String])) }
       }
@@ -97,8 +97,8 @@ object CreateSellerOrganization {
     .exec(addOrganizationControllerTest.verifyOrganizationScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
-    .doIf(session => session(Test.USER_TYPE).as[String] != "ORGANIZATION") {
-      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != "ORGANIZATION", Duration.create(80, "seconds")) {
+    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION) {
+      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION, Duration.create(80, "seconds")) {
         pause(1)
           .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
       }

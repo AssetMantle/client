@@ -54,7 +54,7 @@ object FormField {
   val FROM = new StringFormField("FROM", 45, 45)
   val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 3, 100)
   val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 3, 100)
-  val BILL_OF_LADING_NUMBER = new StringFormField("BILL_OF_LADING_NUMBER", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val BILL_OF_LADING_NUMBER = new StringFormField("BILL_OF_LADING_NUMBER", 2, 500, RegularExpression.BILL_OF_LADING_NUMBER)
   val CONSIGNEE_TO = new StringFormField("CONSIGNEE_TO", 2, 100)
   val VESSEL_NAME = new StringFormField("VESSEL_NAME", 2, 100)
   val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)

@@ -35,14 +35,9 @@ object addZoneControllerTest {
     )
 
   val addZoneRequestScenario: ScenarioBuilder = scenario("AddZoneRequest")
-  exec(http("Accept_Zone_Invite")
-    .get(routes.AddZoneController.acceptInvitation("${%s}".format(Test.TOKEN)).url)
-    .check(css("legend:contains(%s)".format("Add Zone")).exists)
-  )
-    .pause(2)
     .exec(http("Add_Zone_Form_GET")
       .get(routes.AddZoneController.addZoneForm().url)
-      .check(css("legend:contains(%s)".format("Add Zone")).exists)
+      .check(css("legend:contains(%s)".format("Add Zone Details")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .feed(NameFeeder.nameFeed)
@@ -62,7 +57,7 @@ object addZoneControllerTest {
         Form.ADDRESS_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
-      .check(substring("Zone KYC Files").exists)
+      .check(substring("Zone KYC").exists)
     )
     .pause(2)
     .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, "documentType") {
@@ -87,14 +82,14 @@ object addZoneControllerTest {
         .exec(
           http("Store_ZoneKYC_" + "${documentType}")
             .get(session => routes.AddZoneController.userStoreZoneKYC(session(Test.TEST_FILE_NAME).as[String], session("documentType").as[String]).url)
-            .check(substring("Zone KYC Files").exists)
+            .check(substring("Zone KYC").exists)
         )
         .pause(2)
     }
     .pause(1)
     .exec(http("User_Review_Add_Zone_Request_Form")
       .get(routes.AddZoneController.userReviewAddZoneRequestForm().url)
-      .check(css("legend:contains(%s)".format("Review Add Zone On Completion")).exists)
+      .check(css("legend:contains(%s)".format("Review and Submit Zone details")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -104,7 +99,7 @@ object addZoneControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
-      .check(substring("Zone Added For Verification").exists)
+      .check(substring("Zone details submitted for review").exists)
     )
     .pause(2)
 
@@ -138,7 +133,7 @@ object addZoneControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         Test.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Zone Verified").exists)
+      .check(substring("Zone approved successfully").exists)
     )
     .pause(2)
 

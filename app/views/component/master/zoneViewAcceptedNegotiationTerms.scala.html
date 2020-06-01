@@ -156,20 +156,19 @@
             </div>
             <div class="sellerTerm">
                 <div>
-                @Messages(constants.View.ASSET_DOCUMENTS):
+                    <p><span class="cmuk-text-bold"> @Messages(constants.View.ASSET_DOCUMENTS):</span></p>
                 @negotiation.documentList.assetDocuments.map { document =>
-                    <div>
+                    <p>
                         <span class="termIcon">@commonIcon("document")</span>
                         @Messages(document)
-                    </div>
+                    </p>
                 }
-                <br>
-                @Messages(constants.View.NEGOTIATION_DOCUMENTS):
+                    <p><span class="cmuk-text-bold"> @Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
                 @negotiation.documentList.negotiationDocuments.map { document =>
-                    <div>
+                    <p>
                         <span class="termIcon">@commonIcon("document")</span>
                         @Messages(document)
-                    </div>
+                    </p>
                 }
                 </div>
                 <div>

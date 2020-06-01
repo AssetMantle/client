@@ -277,19 +277,19 @@
             </div>
             <div class="sellerTerm">
                 <div>
-                    <span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span>
+                    <p><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
                     @negotiation.documentList.assetDocuments.map { assetDocument =>
-                            <div>
+                            <p>
                              <span class="termIcon">@commonIcon("document")</span>
                             @Messages(assetDocument)
-                            </div>
+                            </p>
                          }
-                    <span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
+                    <p><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
                 @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-                    <div>
+                    <p>
                         <span class="termIcon">@commonIcon("document")</span>
                     @Messages(negotiationDocument)
-                    </div>
+                    </p>
                 }
                 </div>
                 <div>

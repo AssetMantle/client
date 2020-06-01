@@ -7,7 +7,7 @@ $(document).ready(function () {
     if($('#tentativeDate').val()){
         $('#tenure').val('').prop('disabled',true);
         $('#reference').val('').prop('disabled',true);
-    }else if($('#tenure').val() || $('#refrence').val()){
+    }else if($('#tenure').val() || $('#reference').val()){
         $('#tentativeDate').prop('disabled',true);
     }
 });
