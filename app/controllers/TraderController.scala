@@ -183,6 +183,7 @@ class TraderController @Inject()(
     implicit request =>
       views.companion.master.AcceptOrRejectTraderRelation.form.bindFromRequest().fold(
         formWithErrors => {
+          println("acceptOrRejectTraderRelation---"+formWithErrors.data)
           val traderRelation = masterTraderRelations.Service.tryGet(fromID = formWithErrors(constants.FormField.FROM.name).value.get, toID = formWithErrors(constants.FormField.TO.name).value.get)
           (for {
             traderRelation <- traderRelation

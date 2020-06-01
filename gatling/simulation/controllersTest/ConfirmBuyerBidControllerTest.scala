@@ -41,7 +41,7 @@ object confirmBuyerBidControllerTest {
   .feed(ImageFeeder.imageFeed)
     .exec(http("Trader_Upload_BuyerContract_Negotiation_Form")
       .get(session=> routes.FileController.uploadTraderNegotiationForm("BUYER_CONTRACT",session(Test.TEST_REQUEST_ID).as[String]).url)
-      .check(substring("BROWSE").exists)
+      .check(substring("Browse").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)

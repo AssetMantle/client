@@ -23,7 +23,7 @@ object addOrganizationControllerTest {
     .feed(AddressDataFeeder.addressDataFeed)
     .exec(http("Add_Organization_GET")
       .get(routes.AddOrganizationController.addOrganizationForm().url)
-      .check(css("legend:contains(%s)".format("Add Organization")).exists)
+      .check(css("legend:contains(%s)".format("Register Organization")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Add_Organization_POST")
@@ -50,14 +50,14 @@ object addOrganizationControllerTest {
         Test.POSTAL_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Test.POSTAL_PHONE -> "${%s}".format(Test.TEST_PHONE)
         ))
-      .check(substring("Organization KYC Files").exists)
+      .check(substring("Organization KYC").exists)
     )
     .pause(2)
     .foreach(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES,"documentType"){
       feed(ImageFeeder.imageFeed)
         .exec(http("Organization_KYC_Upload_"+"${documentType}"+"_FORM")
           .get(session=> routes.AddOrganizationController.userUploadOrganizationKYCForm(session("documentType").as[String]).url )
-          .check(substring("BROWSE").exists)
+          .check(substring("Browse").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(2)
@@ -75,13 +75,13 @@ object addOrganizationControllerTest {
         .exec(
           http("Store_Organization_KYC_"+"${documentType}")
             .get(session=>routes.AddOrganizationController.userStoreOrganizationKYC(session(Test.TEST_FILE_NAME).as[String],session("documentType").as[String]).url)
-            .check(substring("Organization KYC Files").exists)
+            .check(substring("Organization KYC").exists)
         )
         .pause(2)
     }
     .exec(http("User_Review_Add_Organization_Request_Form_GET")
       .get(routes.AddOrganizationController.userReviewAddOrganizationRequestForm().url)
-      .check(css("legend:contains(%s)".format("User Review Add Organization Request")).exists)
+      .check(css("legend:contains(%s)".format("Review & Submit Organization Details")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(1)
@@ -91,7 +91,7 @@ object addOrganizationControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
-      .check(substring("Organization Added For Verification").exists)
+      .check(substring("Organization details submitted for verification.").exists)
     )
     .pause(3)
 
@@ -103,7 +103,7 @@ object addOrganizationControllerTest {
     )
     .pause(2)
     .foreach(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES,"documentType"){
-      exec(http("Organization_KYC_Update_Status"+"${documentType}")
+      exec(http("Organization_KYC_Update_Status"+"${documentType}"+"_Form")
         .get(session=>routes.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(session(Test.TEST_ORGANIZATION_ID).as[String],session("documentType").as[String]).url)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
@@ -119,11 +119,40 @@ object addOrganizationControllerTest {
       )
         .pause(1)
     }
+    .exec(http("Member_Check_Corporate_Scan_Form_Get")
+        .get(session=>routes.BackgroundCheckController.corporateScanForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_NAME).as[String]).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("Member_Check_Corporate_Scan_POST")
+      .post(routes.BackgroundCheckController.corporateScan().url)
+      .formParamMap(Map(
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+        constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+        constants.FormField.COMPANY_NAME.name -> "${%s}".format(Test.TEST_NAME),
+      ))
+    )
+    .pause(2)
+    .exec { session => session.set(Test.TEST_SCAN_ID, getScanID(session(Test.TEST_NAME).as[String])) }
+    .exec(http("AddOrganizationMemberCheckForm_GET")
+      .get(session=>routes.BackgroundCheckController.addOrganizationMemberCheckForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_SCAN_ID).as[Int],None).url)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("AddOrganizationMemberCheck_POST")
+      .post(routes.BackgroundCheckController.addOrganizationMemberCheck().url)
+      .formParamMap(Map(
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+        constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+        constants.FormField.SCAN_ID.name -> "${%s}".format(Test.TEST_SCAN_ID),
+        constants.FormField.RESULT_ID.name -> "",
+        constants.FormField.STATUS.name -> true
+      ))
+      .check(substring("Decision Updated").exists)
+    )
     .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(http("Verify_Organization_Form_GET")
       .get(session=>routes.AddOrganizationController.acceptRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format("Verify Organization")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Verify_Organization_POST")
@@ -134,7 +163,7 @@ object addOrganizationControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_ZONE_PASSWORD),
       ))
-      .check(substring("Organization Verified").exists)
+      .check(substring("Organization Approved").exists)
     )
     .pause(3)
 
@@ -183,6 +212,12 @@ object addOrganizationControllerTest {
   def getOrganizationID(query: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master."Organization" WHERE "accountID" = '$query'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("id").toString
+  }
+
+  def getScanID(query: String) = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+      s"""SELECT COALESCE((SELECT "scanID" FROM member_check."CorporateScan" WHERE "companyName" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 }

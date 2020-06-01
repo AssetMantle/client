@@ -137,7 +137,7 @@ object accountControllerTest {
     .pause(2)
     .exec(http("UploadIdentificationForm")
       .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
-      .check(substring("BROWSE").exists)
+      .check(substring("Browse").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)

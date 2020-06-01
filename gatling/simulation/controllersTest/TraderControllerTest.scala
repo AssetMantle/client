@@ -25,7 +25,6 @@ object traderControllerTest {
       .formParamMap(Map(
         constants.FormField.ACCOUNT_ID.name -> "${%s}".format(Test.TEST_COUNTER_PARTY_USERNAME),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Create Wallet").exists)
     )
     .pause(2)
 
@@ -36,7 +35,7 @@ object traderControllerTest {
     )
     .pause(2)
     .exec(http("AcceptOrRejectTraderRelation_POST")
-      .post(routes.TraderController.traderRelationRequest().url)
+      .post(routes.TraderController.acceptOrRejectTraderRelation().url)
       .formParamMap(Map(
         constants.FormField.FROM_ID.name ->  "${%s}".format(Test.FROM_ID),
         constants.FormField.TO_ID.name ->  "${%s}".format(Test.TO_ID),

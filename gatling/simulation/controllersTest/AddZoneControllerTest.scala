@@ -12,7 +12,7 @@ import scala.util.Random
 
 class AddZoneControllerTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = addZoneControllerTest.blockchainAddZoneScenario
+  val scenarioBuilder: ScenarioBuilder = addZoneControllerTest.inviteZoneScenario
   setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -64,7 +64,7 @@ object addZoneControllerTest {
       feed(ImageFeeder.imageFeed)
         .exec(http("ZoneKYC_Upload_" + "${documentType}" + "_Form_GET")
           .get(session => routes.AddZoneController.userUploadZoneKYCForm(session("documentType").as[String]).url)
-          .check(substring("BROWSE").exists)
+          .check(substring("Browse").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(2)
@@ -105,8 +105,8 @@ object addZoneControllerTest {
 
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
     .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, "documentType") {
-      exec(http("ZoneKYCUpdateStatusForm_GET")
-        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String],session("${documentType}").as[String]).url)
+      exec(http("ZoneKYCUpdate"+"${documentType}"+"StatusForm_GET")
+        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String],session("documentType").as[String]).url)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
         .pause(2)
         .exec(http("Zone_KYC_update_Status_" + "${documentType}")

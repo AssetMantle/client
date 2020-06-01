@@ -37,7 +37,7 @@ object setACLControllerTest {
   val addTraderRequest=scenario("AddTraderRequest")
     .exec(http("Add_Trader_Form_GET")
       .get(routes.SetACLController.addTraderForm().url)
-      .check(css("legend:contains(%s)".format("Add Trader")).exists)
+      .check(css("legend:contains(%s)".format("Register Trader")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -53,13 +53,12 @@ object setACLControllerTest {
 
   val organizationVerifyTrader=scenario("organizationVerifyTrader")
     .exec(http("viewPendingTraderRequest")
-      .get(session=>routes.ComponentViewController.organizationViewPendingTraderRequest(session(Test.TEST_TRADER_USERNAME).as[String]).url)
+      .get(session=>routes.ComponentViewController.organizationViewPendingTraderRequest(session(Test.TEST_TRADER_ID).as[String]).url)
       .check(substring("${%s}".format(Test.TEST_TRADER_ID)).exists)
     )
     .pause(2)
     .exec(http("Organization_Verify_Trader_GET")
       .get(session=>routes.SetACLController.organizationVerifyTraderForm(session(Test.TEST_TRADER_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.ORGANIZATION_VERIFY_TRADER.legend)).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .feed(GasFeeder.gasFeed)
@@ -84,9 +83,8 @@ object setACLControllerTest {
         constants.FormField.NEGOTIATION.name -> setACLPrivileges.negotiation,
         constants.FormField.RELEASE_ASSET.name -> setACLPrivileges.releaseAsset,
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
-        Test.PASSWORD -> "${%s}".format(Test.TEST_ORGANIZATION_PASSWORD)
+        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD)
       ))
-      .check(substring("Acl Set").exists)
     )
     .pause(2)
 

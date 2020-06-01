@@ -12,7 +12,7 @@ object ZoneLoginFeeder {
     val feed = new Array[Map[String, String]](users)
     for (id <- 0 until users){
       val username = "ZONE1" + id.toString + Random.alphanumeric.take(8).mkString
-      feed(id) = Map(Test.TEST_ZONE_USERNAME -> username, Test.TEST_ZONE_PASSWORD -> username)
+      feed(id) = Map(Test.TEST_ZONE_USERNAME -> username, Test.TEST_ZONE_PASSWORD -> "123123123")
     }
     feed
   }

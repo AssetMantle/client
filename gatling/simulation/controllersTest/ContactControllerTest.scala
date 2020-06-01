@@ -23,7 +23,7 @@ object contactControllerTest {
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
-    .exec(http("UpdateContact_POST")
+    .exec(http("AddMobileNumber_POST")
       .post(routes.ContactController.addOrUpdateMobileNumber().url)
       .formParamMap(Map(
         constants.FormField.COUNTRY_CODE.name -> "${%s}".format(Test.TEST_COUNTRY_CODE),
@@ -37,7 +37,6 @@ object contactControllerTest {
     .feed(OTPFeeder.otpFeed)
     .exec(http("VerifyMobileNumberForm_GET")
       .get(routes.ContactController.verifyMobileNumberForm().url)
-      .check(css("legend:contains(%s)".format("Verify Mobile Number")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -81,6 +80,5 @@ object contactControllerTest {
         constants.FormField.OTP.name -> "${%s}".format(Test.TEST_OTP),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))
       )
-      .check(substring("Email Address Verified").exists)
     )
 }

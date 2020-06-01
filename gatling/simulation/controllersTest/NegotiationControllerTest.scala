@@ -21,7 +21,7 @@ object negotiationControllerTest {
   val negotiationTermList = Seq("ASSET_DESCRIPTION", "PRICE", "QUANTITY", "ASSET_OTHER_DETAILS", "PAYMENT_TERMS", "DOCUMENT_LIST")
 
   val negotiationRequestScenario: ScenarioBuilder = scenario("NegotiationRequest")
-    .exec(http("IssueAssetDetailForm_GET")
+    .exec(http("NegotiationRequestForm_GET")
       .get(routes.NegotiationController.requestForm().url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
@@ -29,22 +29,27 @@ object negotiationControllerTest {
       .post(routes.NegotiationController.request().url)
       .formParamMap(Map(
         constants.FormField.ASSET_ID.name -> "${%s}".format(Test.TEST_ASSET_ID),
-        constants.FormField.COUNTER_PARTY.name -> "${%s}".format(Test.TEST_COUNTER_PARTY_USERNAME),
+        constants.FormField.COUNTER_PARTY.name -> "${%s}".format(Test.TEST_COUNTER_PARTY),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+      .check(bodyString.saveAs("BODY"))
+     .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.ID), "value").saveAs(Test.TEST_NEGOTIATION_ID))
     )
+    .exec(session => {
+      val response = session("BODY").as[String]
+      println(s"Response body: \n$response")
+      session
+    })
     .pause(2)
     .exec(http("PaymentTerms_POST")
       .post(routes.NegotiationController.paymentTerms().url)
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         constants.FormField.ADVANCE_PERCENTAGE.name -> "${%s}".format(Test.TEST_ADVANCE_PERCENTAGE),
-        Test.CREDIT_TENTATIVE_DATE -> "${%s}".format(Test.TEST_TENTATIVE_DATE),
-        Test.CREDIT_TENURE -> "${%s}".format(Test.TEST_TENURE),
-        Test.CREDIT_REFRENCE -> "${%s}".format(Test.TEST_REFRENCE),
+        Test.CREDIT_TENTATIVE_DATE -> "2019-11-11",
+        Test.CREDIT_TENURE -> "",
+        Test.CREDIT_REFRENCE -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Document List").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -61,16 +66,14 @@ object negotiationControllerTest {
         constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> "Bank",
         constants.FormField.DOCUMENT_LIST_COMPLETED.name -> true,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Document List").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
-    .exec(http("DocumentList_POST")
+    .exec(http("ReviewNegotiationRequest_POST")
       .post(routes.NegotiationController.reviewRequest().url)
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Document List").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
 
@@ -86,8 +89,6 @@ object negotiationControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Document List").exists)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
 
   val rejectNegotiationRequest: ScenarioBuilder = scenario("RejectNegotiationRequest")
@@ -139,7 +140,7 @@ object negotiationControllerTest {
     .feed(ImageFeeder.imageFeed)
     .exec(http("UploadContractForm" + "_GET")
       .get(session => routes.FileController.uploadNegotiationForm(session(Test.TEST_NEGOTIATION_ID).as[String], constants.File.Negotiation.CONTRACT).url)
-      .check(substring("BROWSE").exists)
+      .check(substring("Browse").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -178,7 +179,7 @@ object negotiationControllerTest {
       feed(ImageFeeder.imageFeed)
         .exec(http("Asset_Document_Upload_" + "${documentType}" + "_FORM")
           .get(session => routes.FileController.uploadAssetForm(session("documentType").as[String], session(Test.TEST_ASSET_ID).as[String]).url)
-          .check(substring("BROWSE").exists)
+          .check(substring("Browse").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(2)
@@ -223,7 +224,7 @@ object negotiationControllerTest {
       feed(ImageFeeder.imageFeed)
         .exec(http("Negotiation_Document_Upload_" + "${documentType}" + "_FORM")
           .get(session => routes.FileController.uploadAssetForm(session("documentType").as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
-          .check(substring("BROWSE").exists)
+          .check(substring("Browse").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(2)
@@ -333,7 +334,7 @@ object negotiationControllerTest {
 
   def getNegotiationID(query:String)={
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Negotiation" WHERE "sellerTraderID" = '$query'),'0') AS "id";""")
+      s"""SELECT COALESCE((SELECT "id" FROM master."Negotiation" WHERE "assetID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 }

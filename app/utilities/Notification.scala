@@ -63,7 +63,8 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    //val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    val send=Future.successful("sent")
     (for {
       _ <- send
     } yield ()
@@ -113,8 +114,10 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     val language = masterAccounts.Service.tryGetLanguage(fromAccountID)
     (for {
       language <- language
-    } yield sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))
-      ).recover {
+    } yield {
+      //sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))}
+      "Sent"
+    }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }

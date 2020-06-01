@@ -393,6 +393,7 @@ class AccountController @Inject()(
     implicit request =>
       views.companion.master.AddIdentification.form.bindFromRequest().fold(
         formWithErrors => {
+          println(formWithErrors.data)
           Future(BadRequest(views.html.component.master.addIdentification(formWithErrors)))
         },
         addIdentificationData => {
