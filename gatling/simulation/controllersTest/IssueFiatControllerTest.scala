@@ -21,7 +21,6 @@ object issueFiatControllerTest {
   val rtcbSecretKey="D3M0r1c8KeyCoMd3X"
   val id="10000123451"
   val refrence="CSGSGPDEMO0123461"
-  val externalRefrence="RQWUFR1000036264829q45ZcBhH25p"
   val invoiceNumber="INV123456"
   val buyerBusinessID="STU123456"
   val buyerFirstName="John"
@@ -45,14 +44,14 @@ object issueFiatControllerTest {
       .formParamMap(Map(
         constants.FormField.TRANSACTION_AMOUNT.name -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("SUCCESS ISSUE_FIAT_REQUEST_SENT").exists)
     )
     .pause(3)
 
   val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
     .feed(wurtcbFeeder.wurtcbFeed)
+    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiat(session(Test.TEST_USERNAME).as[String])) }
     .exec(session=>
-    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+externalRefrence+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+status+dealType+paymentTypeId+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
+    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+status+dealType+paymentTypeId+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
     )
     .exec(http("westernUnionRTCB")
       .post(routes.WesternUnionController.westernUnionRTCB().url)

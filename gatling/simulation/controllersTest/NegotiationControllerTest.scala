@@ -45,7 +45,7 @@ object negotiationControllerTest {
       .post(routes.NegotiationController.paymentTerms().url)
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.ADVANCE_PERCENTAGE.name -> "${%s}".format(Test.TEST_ADVANCE_PERCENTAGE),
+        constants.FormField.ADVANCE_PERCENTAGE.name -> "50.0",
         Test.CREDIT_TENTATIVE_DATE -> "2019-11-11",
         Test.CREDIT_TENURE -> "",
         Test.CREDIT_REFRENCE -> "",
@@ -57,13 +57,12 @@ object negotiationControllerTest {
       .post(routes.NegotiationController.documentList().url)
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        "DOCUMENTLIST[0]" -> constants.File.Asset.BILL_OF_LADING,
-        "DOCUMENTLIST[1]" -> constants.File.Asset.COO,
-        "DOCUMENTLIST[2]" -> constants.File.Asset.COA,
-        "DOCUMENTLIST[3]" -> constants.File.Negotiation.BILL_OF_EXCHANGE,
-        "DOCUMENTLIST[4]" -> constants.File.Negotiation.INVOICE,
-        "DOCUMENTLIST[5]" -> None,
-        constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> "Bank",
+        "DOCUMENT_LIST[0]" -> constants.File.Asset.BILL_OF_LADING,
+        "DOCUMENT_LIST[1]" -> constants.File.Asset.COO,
+        "DOCUMENT_LIST[2]" -> constants.File.Asset.COA,
+        "DOCUMENT_LIST[3]" -> constants.File.Negotiation.BILL_OF_EXCHANGE,
+        "DOCUMENT_LIST[4]" -> constants.File.Negotiation.INVOICE,
+        constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> "BANK",
         constants.FormField.DOCUMENT_LIST_COMPLETED.name -> true,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
@@ -74,7 +73,6 @@ object negotiationControllerTest {
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
 
   val acceptNegotiationRequest: ScenarioBuilder = scenario("AcceptNegotiationRequest")
@@ -107,9 +105,9 @@ object negotiationControllerTest {
     )
 
   val acceptNegotiationTerms: ScenarioBuilder = scenario("AcceptNegotiationTerms")
-    .foreach(negotiationTermList, constants.Test.TERM_TYPE) {
+    .foreach(negotiationTermList, "termType") {
       exec(http("AcceptOrRejectNegotiationTermForm_GET")
-        .get(session => routes.NegotiationController.acceptOrRejectNegotiationTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String], session(constants.Test.TERM_TYPE).as[String]).url)
+        .get(session => routes.NegotiationController.acceptOrRejectNegotiationTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String], session("termType").as[String]).url)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
         .pause(2)
@@ -117,7 +115,7 @@ object negotiationControllerTest {
           .post(routes.NegotiationController.acceptOrRejectNegotiationTerms().url)
           .formParamMap(Map(
             constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-            constants.FormField.TERM_TYPE.name -> "${%s}".format(Test.TERM_TYPE),
+            constants.FormField.TERM_TYPE.name -> "${termType}",
             constants.FormField.STATUS.name -> true,
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
         )
@@ -132,7 +130,7 @@ object negotiationControllerTest {
     .exec(http("ConfirmAllNegotiationTerms_POST")
       .post(routes.NegotiationController.confirmAllNegotiationTerms().url)
       .formParamMap(Map(
-        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
 
@@ -170,7 +168,7 @@ object negotiationControllerTest {
     .exec(http("UpdateContractSigned_POST")
       .post(routes.NegotiationController.updateContractSigned().url)
       .formParamMap(Map(
-        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
 
@@ -197,7 +195,6 @@ object negotiationControllerTest {
         .exec(
           http("Store_Asset_Document_" + "${documentType}")
             .get(session => routes.FileController.storeAsset(session(Test.TEST_FILE_NAME).as[String], session("documentType").as[String],session(Test.TEST_NEGOTIATION_ID).as[String]).url)
-            .check(substring("Organization KYC Files").exists)
         )
         .pause(2)
     }
@@ -220,16 +217,16 @@ object negotiationControllerTest {
     )
 
   val uploadNegotiationDocuments: ScenarioBuilder = scenario("uploadNegotiationDocuments")
-    .foreach(constants.File.NEGOTIATION_DOCUMENTS, "documentType") {
+    .foreach(constants.File.NEGOTIATION_DOCUMENTS.filterNot(_ == constants.File.Negotiation.CONTRACT), "documentType") {
       feed(ImageFeeder.imageFeed)
         .exec(http("Negotiation_Document_Upload_" + "${documentType}" + "_FORM")
-          .get(session => routes.FileController.uploadAssetForm(session("documentType").as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+          .get(session => routes.FileController.uploadNegotiationForm(session("documentType").as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
           .check(substring("Browse").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(2)
         .exec(http("Negotiation_Document_Upload_" + "${documentType}")
-          .post(session => routes.FileController.uploadAsset(session("documentType").as[String]).url)
+          .post(session => routes.FileController.uploadNegotiation(session("documentType").as[String]).url)
           .formParamMap(Map(
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
             Form.RESUMABLE_CHUNK_NUMBER -> "1",
@@ -242,7 +239,6 @@ object negotiationControllerTest {
         .exec(
           http("Store_Negotiation_Document_" + "${documentType}")
             .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], session("documentType").as[String],session(Test.TEST_NEGOTIATION_ID).as[String]).url)
-            .check(substring("Organization KYC Files").exists)
         )
         .pause(2)
     }
