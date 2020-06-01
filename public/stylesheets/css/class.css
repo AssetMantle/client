@@ -444,8 +444,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #061728;
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
-    position: absolute;
-    right: 20px; }
+    margin-left: 15px; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
@@ -1195,6 +1194,11 @@ form .formBody {
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowValue {
         color: #061728;
         font-weight: bold; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm p {
+      font-size: 0.875rem;
+      color: #061728;
+      font-weight: normal;
+      margin: 0 0 5px 0; }
   .pageContainer .middle .mainTabs .tradeTerms button {
     font-size: 0.875rem; }
 
@@ -1357,17 +1361,19 @@ form .formBody {
       margin: 0 5px;
       line-height: 10px; }
   .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-    height: 205px;
+    height: 225px;
     overflow: auto; }
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField {
     position: relative; }
-  .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input {
-    outline: none;
-    border-color: #e5e5e5;
-    height: 40px;
-    padding-right: 30px; }
-    .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input::placeholder {
-      font-size: 0.875rem; }
+    .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField dl {
+      margin: 0; }
+    .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input {
+      outline: none;
+      border-color: #e5e5e5;
+      height: 40px;
+      padding-right: 30px; }
+      .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input::placeholder {
+        font-size: 0.875rem; }
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendIconButton {
     background: none;
     padding: 0 10px;
@@ -1819,9 +1825,12 @@ header:before,
     flex: 1; }
     .contactDetails .contactInfoItem .cmuk-card .infoRow {
       flex-direction: column; }
+      .contactDetails .contactInfoItem .cmuk-card .infoRow .infoRowValue {
+        text-align: left; }
     .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
       line-height: 28px;
-      padding: 0 20px; }
+      padding: 0 20px;
+      word-break: inherit; }
   .contactDetails .contactInfoItem .contactUpdateButton {
     display: flex;
     flex-direction: row-reverse;

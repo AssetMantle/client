@@ -30,7 +30,7 @@
                                 @commonModalButton(constants.View.E_SIGN, routes.javascript.DocusignController.sign, 'parameters -> s"'${negotiation.id}','${constants.File.Negotiation.CONTRACT}'")
                             }
                             @if(docusignEnvelope.status == constants.External.Docusign.Status.COMPLETED) {
-                                <span>@constants.View.SIGNED</span>
+                                <span class="cmuk-badge verified">@constants.View.SIGNED</span>
                             }
                             </div>
                         }
@@ -67,8 +67,8 @@
                                         </td>
                                         <td>
                                         @assetFile.status match{
-                                            case Some(true)=>{@constants.View.APPROVED}
-                                            case Some(false)=>{@constants.View.REJECTED}
+                                            case Some(true)=>{<span class="cmuk-badge verified">@constants.View.APPROVED</span>}
+                                            case Some(false)=>{<span class="cmuk-badge rejected">@constants.View.REJECTED</span>}
                                             case None=>{
                                                 @if(traderID == negotiation.buyerTraderID) {
                                                     @views.html.component.master.acceptOrRejectAssetDocument(negotiationID = negotiation.id, assetFile = assetFile)
@@ -94,7 +94,7 @@
                                                 @commonIcon("seen")
                                             </span>
                                         </td>
-                                        @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <td><span>@constants.View.SIGNED</span></td>}
+                                        @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <td><span class="cmuk-badge verified">@constants.View.SIGNED</span></td>}
                                     }
                                     case _=>{<td colspan="3"></td>}
                                 }
