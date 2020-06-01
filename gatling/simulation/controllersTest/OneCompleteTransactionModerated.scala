@@ -21,17 +21,18 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(CreateSeller.createSeller)
     .exec(CreateBuyer.createBuyer)
     .exec(IssueAssetModerated.issueAssetModerated)
+    .exec(CreateSalesQuote.createSalesQuote)
+    .exec(AcceptSalesQuoteAndAllTradeTerms.acceptSalesQuoteAndAllTradeTerms)
+    .exec(UploadContractAndOtherTradeDocuments.uploadContractAndOtherTradeDocuments)
+    .exec(AcceptBillOfLading.acceptBillOfLading)
     .exec(IssueFiat.issueFiat)
-    .exec(ConfirmBuyerBid.confirmBuyerBid)
-    .exec(ConfirmSellerBid.confirmSellerBid)
-    .exec(SendFiat.sendFiat)
+    .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
+    .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
     .exec(ReleaseAsset.releaseAsset)
+    .exec(SendFiat.sendFiat)
     .exec(SendAsset.sendAsset)
-    .exec(BuyerSellerExecuteOrder.buyerSellerExecuteOrder)
-    .exec(SetBuyerFeedback.setBuyerFeedback)
-    .exec(SetSellerFeedback.setSellerFeedback)
+    .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
     .exec(RedeemAsset.redeemAsset)
-    .exec(RedeemFiat.redeemFiat)
 
 
   setUp(
@@ -206,6 +207,23 @@ object AddCounterParty {
     .exec(accountControllerTest.logoutScenario)
 }
 
+object AcceptSalesQuoteAndAllTradeTerms {
+  val acceptSalesQuoteAndAllTradeTerms = scenario("AcceptSalesQuoteAndAllTradeTerms")
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+    .exec(accountControllerTest.loginScenario)
+    .exec(negotiationControllerTest.acceptNegotiationRequest)
+    .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+    .doIf(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED) {
+      asLongAsDuring(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED, Duration.create(80, "seconds")) {
+        pause(1)
+          .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+      }
+    }
+    .exec(negotiationControllerTest.acceptNegotiationTerms)
+    .exec(negotiationControllerTest.confirmAllNegotiationTerms)
+    .exec(accountControllerTest.logoutScenario)
+}
+
 object IssueAssetModerated {
 
   val issueAssetModerated = scenario("IssueAssetModerated")
@@ -223,23 +241,6 @@ object CreateSalesQuote {
     .exec(negotiationControllerTest.negotiationRequestScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.TEST_NEGOTIATION_ID, negotiationControllerTest.getNegotiationID(session(Test.TEST_SELLER_TRADER_ID).as[String])) }
-}
-
-object AcceptSalesQuoteAndAllTradeTerms {
-  val acceptSalesQuoteAndAllTradeTerms = scenario("AcceptSalesQuoteAndAllTradeTerms")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(accountControllerTest.loginScenario)
-    .exec(negotiationControllerTest.acceptNegotiationRequest)
-    .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
-    .doIf(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED) {
-      asLongAsDuring(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED, Duration.create(80, "seconds")) {
-        pause(1)
-          .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
-      }
-    }
-    .exec(negotiationControllerTest.acceptNegotiationTerms)
-    .exec(negotiationControllerTest.confirmAllNegotiationTerms)
-    .exec(accountControllerTest.logoutScenario)
 }
 
 object UploadContractAndOtherTradeDocuments {
