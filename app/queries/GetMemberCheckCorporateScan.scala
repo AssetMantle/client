@@ -2,6 +2,7 @@ package queries
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
@@ -33,9 +34,11 @@ class GetMemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configu
 
   private val endpoint = configuration.get[String]("memberCheck.endpoints.singleCorporateScan")
 
-  private val url = baseURL + endpoint + "/"
+  //private val url = baseURL + endpoint + "/"
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
+  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.memberCheckCorporateScanInfo("")
+
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
 
   object Service {
 

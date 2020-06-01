@@ -55,15 +55,17 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         addOrUpdateEmailAddressData => {
           val emailAddress = masterEmails.Service.get(loginState.username)
+
           def addEmail: Future[String] = masterEmails.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
+
           def updateEmail: Future[Int] = masterEmails.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
 
           def addOrUpdateEmailAddress(emailAddress: Option[Email]): Future[Unit] = {
             emailAddress match {
-              case Some(email) => if(email.emailAddress != addOrUpdateEmailAddressData.emailAddress) {
-                for{_ <- updateEmail} yield Unit
+              case Some(email) => if (email.emailAddress != addOrUpdateEmailAddressData.emailAddress) {
+                for {_ <- updateEmail} yield Unit
               } else Future(Unit)
-              case None => for{_ <- addEmail} yield Unit
+              case None => for {_ <- addEmail} yield Unit
             }
           }
 
@@ -111,10 +113,10 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
           def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
             mobileNumber match {
-              case Some(mobile) => if(mobile.mobileNumber != addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber) {
-                for{_ <- updateMobile} yield Unit
+              case Some(mobile) => if (mobile.mobileNumber != addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber) {
+                for {_ <- updateMobile} yield Unit
               } else Future(Unit)
-              case None => for{_ <- addMobile} yield Unit
+              case None => for {_ <- addMobile} yield Unit
             }
           }
 
@@ -214,6 +216,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         verifyMobileNumberData => {
           val verifyOTP = masterTransactionSMSOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
+
           def verifyMobileNumber(otpVerified: Boolean): Future[Int] = if (otpVerified) masterMobiles.Service.verifyMobileNumber(loginState.username) else throw new BaseException(constants.Response.INVALID_OTP)
 
           (for {

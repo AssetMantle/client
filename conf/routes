@@ -622,3 +622,7 @@ POST        /blockchain/setBuyerFeedback                                        
 
 GET         /blockchain/setSellerFeedback                                                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
+
+#LoopBackControllers
+GET         /loopBack/memberCheckCorporateScan                                                    controllers.LoopBackController.memberCheckCorporateScanInfo(request:String)
+POST        /loopBack/memberCheckCorporateScan                                                    controllers.LoopBackController.memberCheckCorporateScan
