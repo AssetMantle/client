@@ -22,7 +22,7 @@ object assetControllerTest {
     .feed(AssetDetailFeeder.assetDetailFeed)
     .feed(GasFeeder.gasFeed)
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
-    .exec(http("IssueAssetDetailForm_GET")
+    .exec(http("IssueAssetRequestForm_GET")
       .get(routes.AssetController.issueForm().url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
@@ -33,7 +33,7 @@ object assetControllerTest {
         constants.FormField.ASSET_DESCRIPTION.name -> "${%s}".format(Test.TEST_ASSET_DESCRIPTION),
         constants.FormField.ASSET_QUANTITY.name -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
         constants.FormField.QUANTITY_UNIT.name -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
-        constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
+        constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE_PER_UNIT),
         constants.FormField.SHIPPING_PERIOD.name -> "${%s}".format(Test.TEST_SHIPPING_PERIOD),
         constants.FormField.PORT_OF_LOADING.name -> "${%s}".format(Test.TEST_PORT_OF_LOADING),
         constants.FormField.PORT_OF_DISCHARGE.name -> "${%s}".format(Test.TEST_PORT_OF_DISCHARGE),
@@ -73,6 +73,7 @@ object assetControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(4)
 
   val redeemAsset: ScenarioBuilder = scenario("RedeemAsset")
     .exec(http("RedeemAssetForm_GET")

@@ -171,6 +171,7 @@ object negotiationControllerTest {
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(2)
 
   val uploadAssetDocuments: ScenarioBuilder = scenario("UpdateContractSigned")
     .foreach(constants.File.ASSET_DOCUMENTS, "documentType") {
@@ -201,6 +202,8 @@ object negotiationControllerTest {
 
   val addBillOfLading: ScenarioBuilder = scenario("AddBillOfLading")
     .feed(IssueAssetOBLFeeder.issueAssetOBLFeeder)
+    .feed(AssetDetailFeeder.assetDetailFeed)
+    .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
     .exec(http("AddBillOfLadingForm_GET")
       .get(session => routes.AssetController.addBillOfLadingForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
@@ -208,17 +211,29 @@ object negotiationControllerTest {
     .exec(http("AddBillOfLading_POST")
       .post(routes.AssetController.addBillOfLading().url)
       .formParamMap(Map(
-        constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
-        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.BILL_OF_LADING_NUMBER.name -> "${%s}".format(Test.TEST_BILL_OF_LADING_NUMBER),
+        constants.FormField.CONSIGNEE_TO.name -> "${%s}".format(Test.TEST_CONSIGNEE_TO),
+        constants.FormField.VESSEL_NAME.name -> "${%s}".format(Test.TEST_VESSEL_NAME),
+        constants.FormField.PORT_OF_LOADING.name -> "${%s}".format(Test.TEST_PORT_OF_LOADING),
+        constants.FormField.PORT_OF_DISCHARGE.name -> "${%s}".format(Test.TEST_PORT_OF_DISCHARGE),
+        constants.FormField.SHIPPER_NAME.name -> "${%s}".format(Test.TEST_SHIPPER_NAME),
+        constants.FormField.SHIPPER_ADDRESS.name -> "${%s}".format(Test.TEST_SHIPPER_ADDRESS),
+        constants.FormField.NOTIFY_PARTY_NAME.name -> "${%s}".format(Test.TEST_NOTIFY_PARTY_NAME),
+        constants.FormField.NOTIFY_PARTY_ADDRESS.name -> "${%s}".format(Test.TEST_NOTIFY_PARTY_ADDRESS),
+        constants.FormField.SHIPMENT_DATE.name -> "${%s}".format(Test.TEST_SHIPMENT_DATE),
+        constants.FormField.DELIVERY_TERM.name -> "${%s}".format(Test.TEST_DELIVERY_TERM),
+        constants.FormField.ASSET_DESCRIPTION.name -> "${%s}".format(Test.TEST_ASSET_DESCRIPTION),
+        constants.FormField.ASSET_QUANTITY.name -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
+        constants.FormField.QUANTITY_UNIT.name -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
+        constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE_PER_UNIT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Document List").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
 
   val uploadNegotiationDocuments: ScenarioBuilder = scenario("uploadNegotiationDocuments")
     .foreach(constants.File.NEGOTIATION_DOCUMENTS.filterNot(_ == constants.File.Negotiation.CONTRACT), "documentType") {
-      feed(ImageFeeder.imageFeed)
+      feed(ImageFeeder2.imageFeed2)
         .exec(http("Negotiation_Document_Upload_" + "${documentType}" + "_FORM")
           .get(session => routes.FileController.uploadNegotiationForm(session("documentType").as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
           .check(substring("Browse").exists)
@@ -259,6 +274,7 @@ object negotiationControllerTest {
       .check(substring("Document List").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
+    .pause(2)
 
   val addContract: ScenarioBuilder = scenario("AddContract")
     .feed(IssueAssetOBLFeeder.issueAssetOBLFeeder)
@@ -276,6 +292,7 @@ object negotiationControllerTest {
       .check(substring("Document List").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
+    .pause(2)
 
   val acceptBillOfLading: ScenarioBuilder = scenario("AcceptBillOfLading")
     .exec(http("AcceptOrRejectAssetDocumentForm_GET")
@@ -291,6 +308,7 @@ object negotiationControllerTest {
         constants.FormField.STATUS.name -> true,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(2)
 
   val buyerConfirmNegotiation: ScenarioBuilder = scenario("BuyerConfirmNegotiation")
     .exec(http("BuyerConfirmForm_GET")
@@ -306,6 +324,7 @@ object negotiationControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(5)
 
   val sellerConfirmNegotiation: ScenarioBuilder = scenario("SellerConfirmNegotiation")
     .exec(http("SellerConfirmForm_GET")
@@ -321,6 +340,7 @@ object negotiationControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(5)
 
   def getNegotiationStatus(query:String)={
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",

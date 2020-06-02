@@ -17,21 +17,18 @@ class SendFiatControllerTest extends Simulation {
 object sendFiatControllerTest {
 
   val sendFiatScenario: ScenarioBuilder = scenario("SendFiat")
-    .feed(AmountFeeder.amountFeed)
     .exec(http("Send_Fiat_Form_GET")
       .get(session=>routes.SendFiatController.sendFiatForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format("Send Fiat")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Send_Fiat_POST")
       .post(routes.SendFiatController.sendFiat().url)
       .formParamMap(Map(
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.AMOUNT.name -> "${%s}".format(Test.TEST_AMOUNT),
+        constants.FormField.AMOUNT.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)
       ))
-      .check(substring("SUCCESS FIAT_SENT").exists)
     )
 }

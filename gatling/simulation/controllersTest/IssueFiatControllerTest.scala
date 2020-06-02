@@ -27,31 +27,31 @@ object issueFiatControllerTest {
   val buyerLastName="Doe"
   val createdDate="2019-04-01 06:00:00"
   val lastUpdatedDate="2019-04-01 17:30:15"
-  val status="DEAL_POSTED"
+  val wu_status="DEAL_POSTED"
   val dealType="Sale"
   val paymentTypeId="WIRE"
   val paidOutAmount="550000"
 
   val issueFiatRequestScenario: ScenarioBuilder = scenario("IssueFiatRequest")
     .feed(TransactionAmountFeeder.transactionAmountFeed)
-    .exec(http("Issue_Fiat_Request_GET")
+    .exec(http("Issue_Fiat_Request_Form_GET")
       .get(routes.IssueFiatController.issueFiatRequestForm().url)
-      .check(css("legend:contains(%s)".format("Issue Fiat Request")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
-    .exec(http("Issue_Fiat_Request_POST")
-      .post(routes.IssueFiatController.issueFiat().url)
+    .exec(http("westernUnionPortalRedirect_POST")
+      .post(routes.WesternUnionController.westernUnionPortalRedirect().url)
       .formParamMap(Map(
         constants.FormField.TRANSACTION_AMOUNT.name -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(302))
     )
     .pause(3)
 
   val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
     .feed(wurtcbFeeder.wurtcbFeed)
-    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiat(session(Test.TEST_USERNAME).as[String])) }
+    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiatRequest(session(Test.TEST_TRADER_ID).as[String])) }
     .exec(session=>
-    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+status+dealType+paymentTypeId+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
+    session.set("requestSignature",utilities.String.sha256Sum(rtcbSecretKey+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+invoiceNumber+buyerBusinessID+buyerFirstName+buyerLastName+createdDate+lastUpdatedDate+wu_status+dealType+paymentTypeId+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
     )
     .exec(http("westernUnionRTCB")
       .post(routes.WesternUnionController.westernUnionRTCB().url)
@@ -61,27 +61,27 @@ object issueFiatControllerTest {
                          |
                          |<reference>"""+session(Test.TEST_REFRENCE).as[String]+"""</reference>
                          |
-                         |<externalReference>${externalRefrence}</externalReference>
+                         |<externalReference>"""+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+"""</externalReference>
                          |
-                         |<invoiceNumber>${invoiceNumber}</invoiceNumber>
+                         |<invoiceNumber>"""+invoiceNumber+"""</invoiceNumber>
                          |
-                         |<buyerBusinessId>${buyerBusinessID}</buyerBusinessId>
+                         |<buyerBusinessId>"""+buyerBusinessID+"""</buyerBusinessId>
                          |
-                         |<buyerFirstName>${buyerFirstName}</buyerFirstName>
+                         |<buyerFirstName>"""+buyerFirstName+"""</buyerFirstName>
                          |
-                         |<buyerLastName>${buyerLastName}</buyerLastName>
+                         |<buyerLastName>"""+buyerLastName+"""</buyerLastName>
                          |
-                         |<createdDate>${createdDate}</createdDate>
+                         |<createdDate>"""+createdDate+"""</createdDate>
                          |
-                         |<lastUpdatedDate>${lastUpdatedDate}</lastUpdatedDate>
+                         |<lastUpdatedDate>"""+lastUpdatedDate+"""</lastUpdatedDate>
                          |
-                         |<status>${status}</status>
+                         |<status>"""+wu_status+"""</status>
                          |
-                         |<dealType>${dealType}</dealType>
+                         |<dealType>"""+dealType+"""</dealType>
                          |
-                         |<paymentTypeId>${paymentTypeId}</paymentTypeId>
+                         |<paymentTypeId>"""+paymentTypeId+"""</paymentTypeId>
                          |
-                         |<paidOutAmount>${paidOutAmount}</paidOutAmount>
+                         |<paidOutAmount>"""+session(Test.TEST_TRANSACTION_AMOUNT).as[String]+"""</paidOutAmount>
                          |
                          |<requestSignature>"""+session("requestSignature").as[String]+"""</requestSignature>
                          |
@@ -111,9 +111,9 @@ object issueFiatControllerTest {
     )
     .pause(3)
   */
-  def getRequestIDForIssueFiat(query: String): String = {
+  def getRequestIDForIssueFiatRequest(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master_transaction."IssueFiatRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
+      s"""SELECT COALESCE((SELECT "id" FROM western_union."FiatRequest" WHERE "traderID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 

@@ -19,7 +19,7 @@ class BlockchainTest extends Simulation {
 object blockchainTest {
 
   val blockChainTestSignUp4: ScenarioBuilder = scenario("blockChainTestSignUp4")
-    .exec(controllersTest.signUpControllerTest.signUpScenario)
+
 
   val loginMain: ScenarioBuilder = scenario("loginMain")
     .pause(10)

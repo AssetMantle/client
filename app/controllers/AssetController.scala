@@ -125,6 +125,7 @@ class AssetController @Inject()(
     implicit request =>
       views.companion.master.IssueAsset.form.bindFromRequest().fold(
         formWithErrors => {
+          println(formWithErrors.data)
           Future(BadRequest(views.html.component.master.issueAsset(formWithErrors)))
         },
         issueAssetData => {

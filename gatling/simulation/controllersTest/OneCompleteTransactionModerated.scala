@@ -27,11 +27,11 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(UploadContractAndOtherTradeDocuments.uploadContractAndOtherTradeDocuments)
     .exec(AcceptBillOfLading.acceptBillOfLading)
     .exec(IssueFiat.issueFiat)
+    .exec(ReleaseAsset.releaseAsset)
     .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
     .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
-    .exec(ReleaseAsset.releaseAsset)
-    .exec(SendFiat.sendFiat)
     .exec(SendAsset.sendAsset)
+    .exec(SendFiat.sendFiat)
     .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
     .exec(RedeemAsset.redeemAsset)
 
@@ -266,6 +266,7 @@ object UploadContractAndOtherTradeDocuments {
     .exec(negotiationControllerTest.uploadContract)
     .exec(negotiationControllerTest.updateContractSigned)
     .exec(negotiationControllerTest.uploadAssetDocuments)
+    .exec(negotiationControllerTest.addBillOfLading)
     .exec(negotiationControllerTest.uploadNegotiationDocuments)
     .exec(accountControllerTest.logoutScenario)
 }
@@ -284,6 +285,7 @@ object IssueFiat {
   val issueFiat = scenario("IssueFiat")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
+    .exec { session => session.set(Test.TEST_TRADER_ID,session(Test.TEST_BUYER_TRADER_ID).as[String]) }
     .exec(issueFiatControllerTest.issueFiatRequestScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec(issueFiatControllerTest.westernUnionRTCB)
@@ -341,6 +343,13 @@ object SendAsset {
 object ModeratedBuyerAndSellerExecuteOrder {
 
   val moderatedBuyerAndSellerExecuteOrder = scenario("ModeratedBuyerAndSellerExecuteOrder")
+    .exec { session => session.set(Test.TEST_ORDER_STATUS, orderControllerTest.getOrderStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+    .doIf(session => session(Test.TEST_ORDER_STATUS).as[String] != constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING) {
+      asLongAsDuring(session => session(Test.TEST_ORDER_STATUS).as[String] != constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, Duration.create(80, "seconds")) {
+        pause(1)
+          .exec { session => session.set(Test.TEST_ORDER_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+      }
+    }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(orderControllerTest.moderatedBuyerExecuteOrderScenario)
