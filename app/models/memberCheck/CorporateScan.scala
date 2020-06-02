@@ -18,7 +18,7 @@ case class CorporateScan(id: String, companyName: String, scanID: Int, createdBy
 @Singleton
 class CorporateScans @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MEMBER_CHECK_MEMBER_SCAN
+  private implicit val module: String = constants.Module.MEMBER_CHECK_CORPORATE_SCAN
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
