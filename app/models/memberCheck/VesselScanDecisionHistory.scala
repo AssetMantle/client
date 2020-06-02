@@ -13,7 +13,7 @@ case class VesselScanDecisionHistory(id: String, scanID: Int, resultID: Option[I
 @Singleton
 class VesselScanDecisionHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MEMBER_CHECK_VESSEL_CHECK_DECISION_HISTORY
+  private implicit val module: String = constants.Module.MEMBER_CHECK_VESSEL_SCAN_DECISION_HISTORY
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
