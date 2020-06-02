@@ -88,7 +88,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.split("-")(0), countryCode = contact.mobileNumber.split("-")(1)))))
+          case Some(contact) => Ok(views.html.component.master.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.takeRight(10), countryCode = contact.mobileNumber.dropRight(10)))))
           case None => Ok(views.html.component.master.addOrUpdateMobileNumber())
         }
       }).recover {
@@ -103,17 +103,15 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           Future(BadRequest(views.html.component.master.addOrUpdateMobileNumber(formWithErrors)))
         },
         addOrUpdateMobileNumberData => {
-          val oldMobileNumber = masterMobiles.Service.get(loginState.username)
+          val mobileNumber = masterMobiles.Service.get(loginState.username)
 
-          val mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-")
+          def addMobile: Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString(""))
 
-          def addMobile: Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = mobileNumber)
+          def updateMobile: Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber)
 
-          def updateMobile: Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = mobileNumber)
-
-          def addOrUpdateMobileNumber(oldMobileNumber: Option[Mobile]): Future[Unit] = {
-            oldMobileNumber match {
-              case Some(mobile) => if(mobile.mobileNumber != mobileNumber) {
+          def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
+            mobileNumber match {
+              case Some(mobile) => if(mobile.mobileNumber != addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber) {
                 for{_ <- updateMobile} yield Unit
               } else Future(Unit)
               case None => for{_ <- addMobile} yield Unit
@@ -121,8 +119,8 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           }
 
           (for {
-            oldMobileNumber <- oldMobileNumber
-            _ <- addOrUpdateMobileNumber(oldMobileNumber)
+            mobileNumber <- mobileNumber
+            _ <- addOrUpdateMobileNumber(mobileNumber)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.MOBILE_NUMBER_UPDATED, loginState.username)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
           } yield result
