@@ -175,6 +175,7 @@ class Orders @Inject()( actorSystem: ActorSystem,
                 if (fiatPegWallet.isEmpty) throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
                 val updateAsset = blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.buyerAddress))
                 val sellerMarkDirty = blockchainFiats.Service.markDirty(negotiation.sellerAddress)
+                val buyerMarkDirty = blockchainFiats.Service.markDirty(negotiation.buyerAddress)
                 val deleteOrderFiats = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
                 val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash, masterNegotiation.buyerTraderID)
                 val markMasterOrderStatusCompleted = masterOrders.Service.markStatusCompletedByBCOrderID(dirtyOrder.id)
@@ -182,6 +183,7 @@ class Orders @Inject()( actorSystem: ActorSystem,
                 for {
                   _ <- updateAsset
                   _ <- sellerMarkDirty
+                  _ <- buyerMarkDirty
                   _ <- deleteOrderFiats
                   _ <- updateMasterAssetStatus
                   _ <- markMasterOrderStatusCompleted
