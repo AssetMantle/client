@@ -76,11 +76,11 @@ object accountControllerTest {
 
   val loginMain: ScenarioBuilder = scenario("LoginMain")
     .feed(GenesisFeeder.genesisFeed)
-    .exec(http("Login_Main_GET")
+    .exec(http("LoginForm_GET")
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .exec(http("Login_Main_POST")
+    .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
         constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_MAIN_USERNAME),

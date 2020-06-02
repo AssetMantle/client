@@ -37,7 +37,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(1))
+    oneCompleteModeratedScenario.inject(rampUsers(10) during (10))
   ).maxDuration(1300)
     .protocols(http.baseUrl(Test.BASE_URL))
 }
@@ -63,7 +63,6 @@ object CreateZone {
     }
     .exec(accountControllerTest.loginMain)
     .exec(addZoneControllerTest.verifyZoneScenario)
-    .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_ZONE_USERNAME).as[String])) }
     .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE) {
       asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE, Duration.create(80, "seconds")) {
