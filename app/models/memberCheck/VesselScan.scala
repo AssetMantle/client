@@ -18,7 +18,7 @@ case class VesselScan(id: String, vesselName: String, scanID: Int, createdBy: Op
 @Singleton
 class VesselScans @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MEMBER_CHECK_MEMBER_SCAN
+  private implicit val module: String = constants.Module.MEMBER_CHECK_VESSEL_CHECK
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

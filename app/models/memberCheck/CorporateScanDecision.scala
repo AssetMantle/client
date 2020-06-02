@@ -18,7 +18,7 @@ case class CorporateScanDecision(id: String, scanID: Int, resultID: Option[Int],
 @Singleton
 class CorporateScanDecisions @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MEMBER_CHECK_MEMBER_SCAN_DECISION
+  private implicit val module: String = constants.Module.MEMBER_CHECK_CORPORATE_SCAN_DECISION
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
