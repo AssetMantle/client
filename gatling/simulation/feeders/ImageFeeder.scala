@@ -19,13 +19,12 @@ import scala.util.Random
 
 object ImageFeeder {
 
-  val imageFeed=imageCreator(100)
+  val imageFeed=imageCreator(300)
 
   def imageCreator(users: Int)={
 
     val imageFeed= new Array[Map[String, String]](users)
     for (id <- 0 until users) {
-
       val height=Random.nextInt(500)+50
       val width=Random.nextInt(500)+50
 

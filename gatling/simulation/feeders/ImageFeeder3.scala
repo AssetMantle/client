@@ -12,13 +12,12 @@ import scala.util.Random
 
 object ImageFeeder3 {
 
-  val imageFeed3=imageCreator(10)
+  val imageFeed3=imageCreator(50)
 
   def imageCreator(users: Int)={
 
     val imageFeed= new Array[Map[String, String]](users)
     for (id <- 0 until users) {
-      println("creating images")
       val height=Random.nextInt(300)+50
       val width=Random.nextInt(300)+50
       val img = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB)

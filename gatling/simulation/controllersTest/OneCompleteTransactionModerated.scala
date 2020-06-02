@@ -30,14 +30,14 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(ReleaseAsset.releaseAsset)
     .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
     .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
-    .exec(SendAsset.sendAsset)
     .exec(SendFiat.sendFiat)
+    .exec(SendAsset.sendAsset)
     .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
     .exec(RedeemAsset.redeemAsset)
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(1))
+    oneCompleteModeratedScenario.inject(atOnceUsers(10))
   ).maxDuration(1300)
     .protocols(http.baseUrl(Test.BASE_URL))
 }
@@ -321,6 +321,13 @@ object ReleaseAsset {
 object SendFiat {
 
   val sendFiat = scenario("SendFiat")
+    .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+    .doIf(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) {
+      asLongAsDuring(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED, Duration.create(80, "seconds")) {
+        pause(1)
+          .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+      }
+    }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(sendFiatControllerTest.sendFiatScenario)
@@ -361,6 +368,13 @@ object ModeratedBuyerAndSellerExecuteOrder {
 object RedeemAsset {
 
   val redeemAsset = scenario("RedeemAsset")
+    .exec { session => session.set(Test.TEST_ORDER_STATUS, orderControllerTest.getOrderStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+    .doIf(session => session(Test.TEST_ORDER_STATUS).as[String] != constants.Status.Order.COMPLETED) {
+      asLongAsDuring(session => session(Test.TEST_ORDER_STATUS).as[String] != constants.Status.Order.COMPLETED, Duration.create(80, "seconds")) {
+        pause(1)
+          .exec { session => session.set(Test.TEST_ORDER_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
+      }
+    }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.redeemAsset)

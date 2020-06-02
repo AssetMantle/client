@@ -43,6 +43,7 @@ object issueFiatControllerTest {
       .formParamMap(Map(
         constants.FormField.TRANSACTION_AMOUNT.name -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .disableFollowRedirect
       .check(status.is(302))
     )
     .pause(3)

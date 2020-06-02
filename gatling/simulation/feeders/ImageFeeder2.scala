@@ -13,13 +13,12 @@ import scala.util.Random
 
 object ImageFeeder2 {
 
-  val imageFeed2=imageCreator(50)
+  val imageFeed2=imageCreator(200)
 
   def imageCreator(users: Int)={
 
     val imageFeed= new Array[Map[String, String]](users)
     for (id <- 0 until users) {
-      println("creating images")
       val height=Random.nextInt(500)+50
       val width=Random.nextInt(500)+50
 

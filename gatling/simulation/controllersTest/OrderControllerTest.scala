@@ -51,7 +51,7 @@ object orderControllerTest {
 
   def getOrderStatus(query:String)={
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Order" WHERE "id" = '$query'),'0') AS "id";""")
+      s"""SELECT COALESCE((SELECT "status" FROM master."Order" WHERE "id" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 }

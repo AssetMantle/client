@@ -228,7 +228,6 @@ object negotiationControllerTest {
         constants.FormField.QUANTITY_UNIT.name -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
         constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE_PER_UNIT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
 
   val uploadNegotiationDocuments: ScenarioBuilder = scenario("uploadNegotiationDocuments")
@@ -350,7 +349,7 @@ object negotiationControllerTest {
 
   def getNegotiationID(query:String)={
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Negotiation" WHERE "assetID" = '$query'),'0') AS "id";""")
+      s"""SELECT COALESCE((SELECT "status" FROM master."Negotiation" WHERE "assetID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 }
