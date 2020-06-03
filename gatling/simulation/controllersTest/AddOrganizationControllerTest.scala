@@ -119,36 +119,6 @@ object addOrganizationControllerTest {
       )
         .pause(1)
     }
-    .exec(http("Member_Check_Corporate_Scan_Form_Get")
-        .get(session=>routes.BackgroundCheckController.corporateScanForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_NAME).as[String]).url)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
-    .exec(http("Member_Check_Corporate_Scan_POST")
-      .post(routes.BackgroundCheckController.corporateScan().url)
-      .formParamMap(Map(
-        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
-        constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-        constants.FormField.COMPANY_NAME.name -> "${%s}".format(Test.TEST_NAME),
-      ))
-    )
-    .pause(2)
-    .exec { session => session.set(Test.TEST_SCAN_ID, getScanID(session(Test.TEST_NAME).as[String])) }
-    .exec(http("AddOrganizationMemberCheckForm_GET")
-      .get(session=>routes.BackgroundCheckController.addOrganizationMemberCheckForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_SCAN_ID).as[Int],None).url)
-      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
-    )
-    .pause(2)
-    .exec(http("AddOrganizationMemberCheck_POST")
-      .post(routes.BackgroundCheckController.addOrganizationMemberCheck().url)
-      .formParamMap(Map(
-        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
-        constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-        constants.FormField.SCAN_ID.name -> "${%s}".format(Test.TEST_SCAN_ID),
-        constants.FormField.RESULT_ID.name -> "",
-        constants.FormField.STATUS.name -> true
-      ))
-      .check(substring("Decision Updated").exists)
-    )
     .pause(2)
     .feed(GasFeeder.gasFeed)
     .exec(http("Verify_Organization_Form_GET")
@@ -215,9 +185,5 @@ object addOrganizationControllerTest {
     sqlQueryFeeder.apply().next()("id").toString
   }
 
-  def getScanID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "scanID" FROM member_check."CorporateScan" WHERE "companyName" = '$query'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
-  }
+
 }

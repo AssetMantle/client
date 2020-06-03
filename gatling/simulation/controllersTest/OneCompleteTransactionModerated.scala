@@ -27,7 +27,7 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(UploadContractAndOtherTradeDocuments.uploadContractAndOtherTradeDocuments)
     .exec(AcceptBillOfLading.acceptBillOfLading)
     .exec(IssueFiat.issueFiat)
-    .exec(ReleaseAsset.releaseAsset)
+    .exec(VesselCheckAndReleaseAsset.vesselCheckAndReleaseAsset)
     .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
     .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
     .exec(SendFiat.sendFiat)
@@ -37,7 +37,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(rampUsers(10) during (10))
+    oneCompleteModeratedScenario.inject(atOnceUsers(1))
   ).maxDuration(1300)
     .protocols(http.baseUrl(Test.BASE_URL))
 }
@@ -95,6 +95,7 @@ object CreateSellerOrganization {
           .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
       }
     }
+    .exec(backgroundCheckControllerTest.corporateScan)
     .exec(addOrganizationControllerTest.verifyOrganizationScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
@@ -159,6 +160,7 @@ object CreateBuyerOrganization {
           .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String])) }
       }
     }
+    .exec(backgroundCheckControllerTest.corporateScan)
     .exec(addOrganizationControllerTest.verifyOrganizationScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String])) }
@@ -308,11 +310,12 @@ object SellerConfirmNegotiation {
     .exec(accountControllerTest.logoutScenario)
 }
 
-object ReleaseAsset {
+object VesselCheckAndReleaseAsset {
 
-  val releaseAsset = scenario("ReleaseAsset")
+  val vesselCheckAndReleaseAsset = scenario("VesselCheckAndReleaseAsset")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
+    .exec(backgroundCheckControllerTest.vesselScan)
     .exec(assetControllerTest.releaseAsset)
     .exec(accountControllerTest.logoutScenario)
 }
