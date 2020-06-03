@@ -1542,6 +1542,10 @@ form{
             font-weight: bold;
             text-transform: uppercase;
             margin:2px 0 3px 0;
+            .creditTerms .infoRowValue{
+              position: absolute;
+              left: 328px;
+            }
           }
           .infoRowValue{
             color: #061728;
@@ -1588,6 +1592,34 @@ form{
             color: #061728;
             font-weight: normal;
             margin: 0 0 5px 0;
+          }
+          .termStatus{
+            display: flex;
+            align-items: center;
+            font-family: $fontFamilyPrimary;
+            color:#061728;
+            .commonCheckBox dt{
+              width: auto;
+              display: none;
+            }
+            .commonCheckBox dl{
+              margin-bottom: 0;
+              dd{
+                margin: 0;
+              }
+            }
+            .cmuk-checkbox{
+              height: 22px;
+              width: 22px;
+              border:1px solid #5EB55C;
+              margin-top: 0;
+            }
+            .cmuk-checkbox:focus, .cmuk-radio:focus{
+              border-color: #5EB55C;
+            }
+            .cmuk-checkbox:checked, .cmuk-checkbox:indeterminate, .cmuk-radio:checked{
+              background-color: #5EB55C;
+            }
           }
         }
         button{
