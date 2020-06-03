@@ -26,7 +26,9 @@ class AddZoneController @Inject()(
                                    utilitiesNotification: utilities.Notification,
                                    masterZoneKYCs: master.ZoneKYCs,
                                    transactionsAddZone: transactions.AddZone,
+                                   transactionsSendCoin: transactions.SendCoin,
                                    blockchainTransactionAddZones: blockchainTransaction.AddZones,
+                                   blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
                                    blockchainAccounts: blockchain.Accounts,
                                    masterZones: master.Zones,
                                    masterEmails: master.Emails,
@@ -44,6 +46,8 @@ class AddZoneController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
+
+  private val denom = configuration.get[String]("blockchain.denom")
 
   private val comdexURL: String = configuration.get[String]("comdex.url")
 
@@ -322,13 +326,23 @@ class AddZoneController @Inject()(
         verifyZoneData => {
           val allKYCFilesVerified = masterZoneKYCs.Service.checkAllKYCFilesVerified(verifyZoneData.zoneID)
 
-          def processTransactionAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
+          def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
               val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
 
               def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-              def transactionProcess(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+              def sendCoinTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount = constants.Blockchain.DefaultZoneFaucetToken, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetToken.toString)), password = verifyZoneData.password, mode = transactionMode),
+                action = transactionsSendCoin.Service.post,
+                onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+              )
+
+              def addZoneTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
                 entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
                 request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
@@ -341,7 +355,8 @@ class AddZoneController @Inject()(
               for {
                 accountID <- accountID
                 zoneAccountAddress <- zoneAccountAddress(accountID)
-                _ <- transactionProcess(zoneAccountAddress)
+                _ <- sendCoinTransaction(zoneAccountAddress)
+                _ <- addZoneTransaction(zoneAccountAddress)
                 result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
                 _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
               } yield {
@@ -352,7 +367,7 @@ class AddZoneController @Inject()(
 
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
-            result <- processTransactionAndGetResult(allKYCFilesVerified)
+            result <- sendTransactionsAndGetResult(allKYCFilesVerified)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
           } yield {
             result
