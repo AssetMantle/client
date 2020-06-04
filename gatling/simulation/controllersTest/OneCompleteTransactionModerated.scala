@@ -37,7 +37,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(rampUsers(10) during 50)
+    oneCompleteModeratedScenario.inject(rampUsers(10) during 100)
   ).maxDuration(1300)
     .protocols(http.baseUrl(Test.BASE_URL))
 }
@@ -57,10 +57,6 @@ object CreateZone {
     .exec(addZoneControllerTest.addZoneRequestScenario)
     .exec(accountControllerTest.logoutScenario)
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
-    .exec { session =>
-      println(session)
-      session
-    }
     .exec(accountControllerTest.loginMain)
     .exec(addZoneControllerTest.verifyZoneScenario)
     .pause(20)
@@ -216,7 +212,7 @@ object IssueAssetModerated {
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.moderatedIssueAssetRequestScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(15)
+    .pause(20)
     .exec { session => session.set(Test.TEST_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_SELLER_USERNAME).as[String]))}
     .exec { session => session.set(Test.TEST_ASSET_ID, assetControllerTest.getAssetID(session(Test.TEST_TRADER_ID).as[String])) }
 }

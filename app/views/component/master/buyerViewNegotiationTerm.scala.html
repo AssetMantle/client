@@ -1,18 +1,25 @@
-@import controllers.actions.LoginState
+    @import controllers.actions.LoginState
 @import views.html.base._
 @import views.companion.master.AcceptOrRejectNegotiationTerms
 
 @(updateNegotiationTermAcceptanceForm: Form[AcceptOrRejectNegotiationTerms.Data] = AcceptOrRejectNegotiationTerms.form, negotiationID: String, termType: String, status: Boolean, iconPath: String)(description: Html = Html(""))(value: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-<div class="term">
-    <div>
+<div class="sellerTerm">
+    <div class="cmuk-flex">
         <span class="termIcon">@commonIcon(iconPath)</span>
-        <span class="termName">@description</span>
+        <div class="cmuk-flex infoRow">
+            <div class="infoRowLabel">
+            @description
+            </div>
+            <div class="infoRowValue">
+            @value
+            </div>
+        </div>
     </div>
     <div class="termStatus">
-        <div>@value</div>
         <div id='@Seq(negotiationID, termType).mkString("")'>
         @views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiationID, termType = termType, status =  status)
         </div>
     </div>
 </div>
+

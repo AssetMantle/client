@@ -73,7 +73,7 @@ object changeBuyerBidControllerTest {
     )*/
 
   def getAddressFromAccountID(accountID: String):String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE "id" = '$accountID'),'0') AS "accountAddress";""")
     sqlQueryFeeder.apply().next()("accountAddress").toString
   }

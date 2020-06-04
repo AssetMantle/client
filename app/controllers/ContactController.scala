@@ -4,11 +4,11 @@ import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, masterTransaction}
 import models.master.{Email, Mobile}
+import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 import views.companion.master.{AddOrUpdateEmailAddress, AddOrUpdateMobileNumber}
 
@@ -90,7 +90,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.takeRight(10), countryCode = contact.mobileNumber.dropRight(10)))))
+          case Some(contact) => Ok(views.html.component.master.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.split("-")(1), countryCode = contact.mobileNumber.split("-")(0)))))
           case None => Ok(views.html.component.master.addOrUpdateMobileNumber())
         }
       }).recover {
@@ -107,13 +107,13 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         addOrUpdateMobileNumberData => {
           val mobileNumber = masterMobiles.Service.get(loginState.username)
 
-          def addMobile: Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString(""))
+          def addMobile: Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-"))
 
-          def updateMobile: Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber)
+          def updateMobile: Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-"))
 
           def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
             mobileNumber match {
-              case Some(mobile) => if (mobile.mobileNumber != addOrUpdateMobileNumberData.countryCode + addOrUpdateMobileNumberData.mobileNumber) {
+              case Some(mobile) => if (mobile.mobileNumber != Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-")) {
                 for {_ <- updateMobile} yield Unit
               } else Future(Unit)
               case None => for {_ <- addMobile} yield Unit

@@ -444,7 +444,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #061728;
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
-    margin-left: 15px; }
+    margin-left: 15px;
+    position: absolute;
+    right: 20px; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
@@ -1163,6 +1165,9 @@ form .formBody {
       font-weight: bold;
       text-transform: uppercase;
       margin: 2px 0 3px 0; }
+      .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel .creditTerms .infoRowValue {
+        position: absolute;
+        left: 328px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue {
       color: #061728;
       font-size: 0.875rem;
@@ -1199,6 +1204,27 @@ form .formBody {
       color: #061728;
       font-weight: normal;
       margin: 0 0 5px 0; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus {
+      display: flex;
+      align-items: center;
+      font-family: Rubik;
+      color: #061728; }
+      .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dt {
+        width: auto;
+        display: none; }
+      .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dl {
+        margin-bottom: 0; }
+        .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dl dd {
+          margin: 0; }
+      .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .cmuk-checkbox {
+        height: 22px;
+        width: 22px;
+        border: 1px solid #5EB55C;
+        margin-top: 0; }
+      .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .cmuk-checkbox:focus, .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .cmuk-radio:focus {
+        border-color: #5EB55C; }
+      .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .cmuk-checkbox:checked, .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .cmuk-checkbox:indeterminate, .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .cmuk-radio:checked {
+        background-color: #5EB55C; }
   .pageContainer .middle .mainTabs .tradeTerms button {
     font-size: 0.875rem; }
 

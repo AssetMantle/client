@@ -156,26 +156,26 @@ object addZoneControllerTest {
     .pause(5)
 
   def getZoneInvitationID(emailAddress: String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s""" SELECT COALESCE((SELECT "id" FROM master_transaction."ZoneInvitation" WHERE "emailAddress" = '$emailAddress'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getZoneID(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s""" SELECT COALESCE((SELECT "id" FROM master."Zone" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getZoneStatus(query: String): Boolean = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT "status" FROM master."Zone" WHERE "accountID" = '$query';""")
     if (sqlQueryFeeder.apply().next()("status") == true) true
     else false
   }
 
   def getUnverifiedZone() = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT "id" FROM master."Zone" WHERE "verificationStatus" = null;"""
     )
     sqlQueryFeeder.apply().next().toSeq

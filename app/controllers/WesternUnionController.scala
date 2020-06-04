@@ -133,7 +133,7 @@ class WesternUnionController @Inject()(
             organizationDetails <- organizationDetails(traderDetails.organizationID)
           } yield {
             val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(transactionID),
-              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id),
+              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(organizationDetails.name), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(organizationDetails.name),
               Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
               Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),

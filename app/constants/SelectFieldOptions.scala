@@ -1,7 +1,8 @@
 package constants
 
 object SelectFieldOptions {
-  val ASSET_TYPES: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat", "Other")
+  val ASSET_TYPES: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat", "Copper", "Corn", "Iron", "PalmOil", "Rice",
+    "Soya", "Steel", "Other")
   val DELIVERY_TERMS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val CURRENCIES: Seq[String] = Seq("USD")
   val COUNTRIES: Seq[String] = Seq("Afghanistan", "Albania", "Algeria",

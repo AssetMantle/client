@@ -113,19 +113,19 @@ object issueFiatControllerTest {
     .pause(3)
   */
   def getRequestIDForIssueFiatRequest(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM western_union."FiatRequest" WHERE "traderID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getTransactionIDForIssueFiat(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "transactionID" FROM master_transaction."IssueFiatRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getTransactionAmountForIssueFiat(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "transactionAmount" FROM master_transaction."IssueFiatRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
