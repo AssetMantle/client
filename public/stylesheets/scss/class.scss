@@ -1525,6 +1525,9 @@ form{
           hr{
             margin: 15px 0;
           }
+          .termIdent{
+            margin-left: 25px;
+          }
         }
         .sellerTerm{
           display: flex;
@@ -1533,6 +1536,7 @@ form{
           background: #F8F9FC;
           border: 1px solid #E2E4E6;
           border-radius:$buttonBorderRadius;
+          text-transform: uppercase;
           margin: 10px 0;
           align-items: center;
           .infoRowLabel{

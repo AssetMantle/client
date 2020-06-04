@@ -1149,6 +1149,8 @@ form .formBody {
         margin: 0; }
   .pageContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .termIdent {
+    margin-left: 25px; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
     display: flex;
     justify-content: space-between;
@@ -1156,6 +1158,7 @@ form .formBody {
     background: #F8F9FC;
     border: 1px solid #E2E4E6;
     border-radius: 3px;
+    text-transform: uppercase;
     margin: 10px 0;
     align-items: center; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
