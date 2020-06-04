@@ -90,9 +90,9 @@ object assetControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
 
-  def getAssetID(query:String)={
+  def getAssetID(traderID:String, assetType:String, assetDescription: String, quantityUnit:String, quantity:String, assetPrice:String)={
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Asset" WHERE "ownerID" = '$query'),'0') AS "id";""")
+      s"""SELECT COALESCE((SELECT "id" FROM master."Asset" WHERE "ownerID" = '$traderID' AND "assetType" = '$assetType' AND "description" = '$assetDescription' AND "quantity" = '$quantity' AND "quantityUnit" = '$quantityUnit' AND "price" = '$assetPrice'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
