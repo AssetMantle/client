@@ -79,6 +79,9 @@
                 </div>
             </div>
         @if(traderID == negotiation.buyerTraderID && negotiation.status == constants.Status.Negotiation.STARTED) {
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
+            </div>
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "description") {
                 @Messages(constants.View.ASSET_DESCRIPTION)
             } {
@@ -97,9 +100,10 @@
             } {
                 @Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")
             }
-
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
+            </div>
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "shipmentPeriod") {
-                @Messages(constants.View.ASSET_OTHER_DETAILS)
                 <div class="creditTerms">
                 @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
                 @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
@@ -107,7 +111,9 @@
                 </div>
             } {
             }
-            <hr>
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
+            </div>
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "advancePayment") {
                 @Messages(constants.View.PAYMENT_TERMS)
                 <div class="creditTerms">
@@ -129,7 +135,9 @@
                 </div>
             }{
             }
-            <hr>
+            <div class="cmuk-flex cmuk-flex-between">
+                <div class="title">@Messages(constants.View.DOCUMENT_LIST)</div>
+            </div>
             @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.buyerAcceptedDocumentList, iconPath = "document") {
                 @Messages(constants.View.DOCUMENT_LIST)
                 <div class="creditTerms">
