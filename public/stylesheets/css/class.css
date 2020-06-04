@@ -684,6 +684,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 form .formBody {
   padding: 20px 60px 60px 60px; }
 
+.termAccept {
+  margin: 0px 0px 30px 30px; }
+
 .modalInfoBlock {
   width: 620px;
   max-height: 600px;
@@ -1050,6 +1053,10 @@ form .formBody {
       color: #4B4B4B;
       font-weight: bold;
       font-size: 1rem; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .termIcon {
+    margin-bottom: 5px; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .documentTermName {
+    margin: auto; }
   .pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
     justify-content: space-between;
     border-bottom: 1px solid #E8E8E8;

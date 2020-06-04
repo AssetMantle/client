@@ -274,19 +274,20 @@
                     @commonFormButton(constants.Form.UPDATE_DOCUMENT_LIST, 'parameters -> s"'${negotiation.id}'")
                 }
             </div>
-            <div class="sellerTerm">
+            <div class="sellerTerm documentTerms">
                 <div>
-                    <p><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
+                    <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("document")</span>
+                        <p class="documentTermName"><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
+                    </div>
                     @negotiation.documentList.assetDocuments.map { assetDocument =>
-                            <p>
-                             <span class="termIcon">@commonIcon("document")</span>
+                            <p class="termIdent">
                             @Messages(assetDocument)
                             </p>
                          }
-                    <p><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
+                    <p class="termIdent"><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
                 @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-                    <p>
-                        <span class="termIcon">@commonIcon("document")</span>
+                    <p class="termIdent">
                     @Messages(negotiationDocument)
                     </p>
                 }

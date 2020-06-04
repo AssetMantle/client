@@ -889,6 +889,9 @@ form{
   }
 }
 
+.termAccept{
+  margin: 0px 0px 30px 30px;
+}
 .modalInfoBlock{
   width: 620px;
   max-height: 600px;
@@ -1398,6 +1401,14 @@ form{
             color: #4B4B4B;
             font-weight: bold;
             font-size: $paragraphFontSizeMedium;
+          }
+        }
+        .sellerTerm.documentTerms{
+          .termIcon{
+            margin-bottom: 5px;
+          }
+          .documentTermName{
+            margin: auto;
           }
         }
         .tradeTermsData{
