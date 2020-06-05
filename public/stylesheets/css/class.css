@@ -1834,7 +1834,8 @@ header:before,
 .profileContainer .cmuk-card-body .cmuk-card {
   box-shadow: none;
   background-color: #FFFFFF;
-  border: 1px solid rgba(5, 60, 117, 0.12); }
+  border: 1px solid rgba(5, 60, 117, 0.12);
+  margin-bottom: 5px; }
 .profileContainer .icon {
   width: 18px;
   height: 20px;
@@ -2038,9 +2039,6 @@ dl .info {
 
 .traderRelationList .cmuk-card-header {
   padding: 13px 20px; }
-
-.organizationDetails .cmuk-card-body .cmuk-card-default, .organizationUbos .cmuk-card-body .cmuk-card-default {
-  margin-bottom: 5px; }
 
 .cmuk-panel {
   padding: 0;
