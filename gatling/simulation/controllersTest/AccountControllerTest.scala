@@ -56,7 +56,7 @@ object accountControllerTest {
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(1)
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
@@ -71,7 +71,7 @@ object accountControllerTest {
       .check(substring("Account").exists)
 
     )
-    .pause(5)
+    .pause(2)
 
 
   val loginMain: ScenarioBuilder = scenario("LoginMain")

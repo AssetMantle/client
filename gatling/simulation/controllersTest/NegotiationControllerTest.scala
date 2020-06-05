@@ -13,7 +13,7 @@ import scala.util.Random
 class NegotiationControllerTest extends Simulation {
 
   val scenarioBuilder: ScenarioBuilder = negotiationControllerTest.negotiationRequestScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
+  setUp(scenarioBuilder.inject(atOnceUsers(10))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object negotiationControllerTest {
@@ -35,11 +35,6 @@ object negotiationControllerTest {
      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.ID), "value").saveAs(Test.TEST_NEGOTIATION_ID))
     )
-    .exec(session => {
-      val response = session("BODY").as[String]
-      println(s"Response body: \n$response")
-      session
-    })
     .pause(2)
     .exec(http("PaymentTerms_POST")
       .post(routes.NegotiationController.paymentTerms().url)
@@ -74,6 +69,7 @@ object negotiationControllerTest {
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(3)
 
   val acceptNegotiationRequest: ScenarioBuilder = scenario("AcceptNegotiationRequest")
     .exec(http("AcceptNegotiationRequestForm_GET")
@@ -88,6 +84,7 @@ object negotiationControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(2)
 
   val rejectNegotiationRequest: ScenarioBuilder = scenario("RejectNegotiationRequest")
     .exec(http("RejectNegotiationRequestForm_GET")
@@ -110,7 +107,7 @@ object negotiationControllerTest {
         .get(session => routes.NegotiationController.acceptOrRejectNegotiationTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String], session("termType").as[String]).url)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
-        .pause(2)
+        .pause(1)
         .exec(http("AcceptNegotiationTerm_POST")
           .post(routes.NegotiationController.acceptOrRejectNegotiationTerms().url)
           .formParamMap(Map(
@@ -119,6 +116,7 @@ object negotiationControllerTest {
             constants.FormField.STATUS.name -> true,
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
         )
+        .pause(1)
     }
 
   val confirmAllNegotiationTerms: ScenarioBuilder = scenario("ConfirmAllNegotiationTerms")
@@ -133,6 +131,7 @@ object negotiationControllerTest {
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(2)
 
   val uploadContract: ScenarioBuilder = scenario("UploadContract")
     .feed(ImageFeeder.imageFeed)
@@ -229,6 +228,7 @@ object negotiationControllerTest {
         constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE_PER_UNIT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
     )
+    .pause(2)
 
   val uploadNegotiationDocuments: ScenarioBuilder = scenario("uploadNegotiationDocuments")
     .foreach(constants.File.NEGOTIATION_DOCUMENTS.filterNot(_ == constants.File.Negotiation.CONTRACT), "documentType") {

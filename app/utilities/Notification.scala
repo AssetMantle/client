@@ -130,7 +130,10 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
     (for {
       emailAddress <- emailAddress
-    } yield sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
+    } yield {
+      //sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
+      "sent"
+    }
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
