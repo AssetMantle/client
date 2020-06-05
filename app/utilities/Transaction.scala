@@ -24,6 +24,8 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   private val responseErrorTransactionHashNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.transactionHashNotFound")
 
+  private val awaitingKafkaResponse: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.awaitingKafkaResponse")
+
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {
 
     val ticketID: Future[String] = if (kafkaEnabled) {
@@ -99,7 +101,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     def executeSuccessOrFailure(blockResponse: BlockResponse, ticketID: String): Future[Unit] = if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
 
-    def ticketsIterator(ticketIDsSeq: Seq[String]) =
+    def ticketsIterator(ticketIDsSeq: Seq[String]): Unit =
       ticketIDsSeq.foreach { ticketID =>
         val blockResponse = if (kafkaEnabled) {
           val mode = getMode(ticketID)
@@ -110,7 +112,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         } else {
           val transactionHash = getTransactionHash(ticketID)
 
-          def getBlockResponse(transactionHash: Option[String]): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))))
+          def getBlockResponse(transactionHash: Option[String]): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionHash.getOrElse(throw new BaseException(constants.Response.TRANSACTION_HASH_NOT_FOUND))))
 
           for {
             transactionHash <- transactionHash
@@ -122,7 +124,10 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
           _ <- executeSuccessOrFailure(blockResponse, ticketID)
         } yield Unit
           ).recover {
-          case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorTransactionHashNotFound)) onFailure(ticketID, baseException.failure.message) else logger.info(baseException.failure.message, baseException)
+          case baseException: BaseException =>
+            if (baseException.failure.message.matches(responseErrorTransactionHashNotFound) || baseException.failure.message.matches(awaitingKafkaResponse))
+              logger.info(baseException.failure.message, baseException)
+            else onFailure(ticketID, baseException.failure.message)
         }
         Await.result(forComplete, Duration.Inf)
       }

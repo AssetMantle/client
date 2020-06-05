@@ -518,9 +518,9 @@ class AddOrganizationController @Inject()(
                 def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
                 def sendCoinTransaction(organizationAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount = constants.Blockchain.DefaultOrganizationFaucetToken, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount = constants.Blockchain.DefaultOrganizationFaucetTokenAmount, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetToken.toString)), password = acceptRequestData.password, mode = transactionMode),
+                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetTokenAmount.toString)), password = acceptRequestData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
                   onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,

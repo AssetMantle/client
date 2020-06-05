@@ -223,9 +223,9 @@ class SetACLController @Inject()(
                 val createACL = blockchainAclHashes.Service.create(acl)
 
                 def sendCoinTransaction(aclAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = constants.Blockchain.DefaultTraderFaucetToken, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = constants.Blockchain.DefaultFaucetTokenAmount, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultTraderFaucetToken.toString)), password = verifyTraderData.password, mode = transactionMode),
+                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultFaucetTokenAmount.toString)), password = verifyTraderData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
                   onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,
@@ -319,9 +319,9 @@ class SetACLController @Inject()(
                 val createACL = blockchainAclHashes.Service.create(acl)
 
                 def sendCoinTransaction(aclAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = constants.Blockchain.DefaultTraderFaucetToken, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = constants.Blockchain.DefaultFaucetTokenAmount, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultTraderFaucetToken.toString)), password = verifyTraderData.password, mode = transactionMode),
+                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultFaucetTokenAmount.toString)), password = verifyTraderData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
                   onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,

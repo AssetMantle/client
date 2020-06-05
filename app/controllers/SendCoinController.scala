@@ -64,7 +64,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Future(BadRequest(views.html.component.master.faucetRequest(formWithErrors)))
         },
         faucetRequestFormData => {
-          val create = masterTransactionFaucetRequests.Service.create(loginState.username, constants.Blockchain.DefaultFaucetToken)
+          val create = masterTransactionFaucetRequests.Service.create(loginState.username, constants.Blockchain.DefaultFaucetTokenAmount)
           (for {
             _ <- create
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
@@ -128,9 +128,9 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               val toAddress = blockchainAccounts.Service.tryGetAddress(approveFaucetRequestFormData.accountID)
 
               def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = constants.Blockchain.DefaultFaucetToken, gas = approveFaucetRequestFormData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = constants.Blockchain.DefaultFaucetTokenAmount, gas = approveFaucetRequestFormData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = approveFaucetRequestFormData.gas.toString), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultFaucetToken.toString)), mode = transactionMode),
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = approveFaucetRequestFormData.gas.toString), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultFaucetTokenAmount.toString)), mode = transactionMode),
                 action = transactionsSendCoin.Service.post,
                 onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                 onFailure = blockchainTransactionSendCoins.Utility.onFailure,
