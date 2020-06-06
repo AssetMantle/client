@@ -31,12 +31,14 @@ class AddOrganizationController @Inject()(
                                            masterOrganizationUBOs: master.OrganizationUBOs,
                                            memberCheckCorporateScanResultDecisions: memberCheck.CorporateScanDecisions,
                                            transactionsAddOrganization: transactions.AddOrganization,
+                                           transactionsSendCoin: transactions.SendCoin,
                                            masterZones: master.Zones,
                                            masterIdentifications: master.Identifications,
                                            masterEmails: master.Emails,
                                            masterMobiles: master.Mobiles,
                                            blockchainAccounts: blockchain.Accounts,
                                            blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations,
+                                           blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
                                            masterOrganizations: master.Organizations,
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
@@ -46,6 +48,8 @@ class AddOrganizationController @Inject()(
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
+  private val denom = configuration.get[String]("blockchain.denom")
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ORGANIZATION
 
@@ -58,12 +62,8 @@ class AddOrganizationController @Inject()(
 
       def getResult(organization: Option[Organization], zones: Seq[Zone]): Future[Result] = {
         organization match {
-          case Some(organization) => {
-            withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.registeredAddress.addressLine1, addressLine2 = organization.registeredAddress.addressLine2, landmark = organization.registeredAddress.landmark, city = organization.registeredAddress.city, country = organization.registeredAddress.country, zipCode = organization.registeredAddress.zipCode, phone = organization.registeredAddress.phone), postalAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.postalAddress.addressLine1, addressLine2 = organization.postalAddress.addressLine2, landmark = organization.postalAddress.landmark, city = organization.postalAddress.city, country = organization.postalAddress.country, zipCode = organization.postalAddress.zipCode, phone = organization.postalAddress.phone))), zones = zones))
-          }
-          case None => {
-            withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = zones))
-          }
+          case Some(organization) => withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.registeredAddress.addressLine1, addressLine2 = organization.registeredAddress.addressLine2, landmark = organization.registeredAddress.landmark, city = organization.registeredAddress.city, country = organization.registeredAddress.country, zipCode = organization.registeredAddress.zipCode, phone = organization.registeredAddress.phone), postalAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.postalAddress.addressLine1, addressLine2 = organization.postalAddress.addressLine2, landmark = organization.postalAddress.landmark, city = organization.postalAddress.city, country = organization.postalAddress.country, zipCode = organization.postalAddress.zipCode, phone = organization.postalAddress.phone))), zones = zones))
+          case None => withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = zones))
         }
       }
 
@@ -509,7 +509,7 @@ class AddOrganizationController @Inject()(
 
           def checkMemberCheckVerified(organizationID: String): Future[Boolean] = memberCheckCorporateScanResultDecisions.Service.checkOrganizationApproved(organizationID)
 
-          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String, validateUsernamePassword: Boolean, organization: Organization): Future[Result] = {
+          def sendTransactionsAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String, validateUsernamePassword: Boolean, organization: Organization): Future[Result] = {
             if (validateUsernamePassword) {
               if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERIFIED)
               else if (checkAllKYCFilesVerified) {
@@ -517,7 +517,17 @@ class AddOrganizationController @Inject()(
 
                 def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
-                def getTicketID(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
+                def sendCoinTransaction(organizationAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount = constants.Blockchain.DefaultOrganizationFaucetTokenAmount, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetTokenAmount.toString)), password = acceptRequestData.password, mode = transactionMode),
+                  action = transactionsSendCoin.Service.post,
+                  onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                  onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+                )
+                
+                def sendAddOrganizationTransaction(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
                   entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
                   request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, password = acceptRequestData.password, mode = transactionMode),
@@ -530,7 +540,8 @@ class AddOrganizationController @Inject()(
                 for {
                   organizationAccountID <- organizationAccountID
                   organizationAccountAddress <- getOrganizationAccountAddress(organizationAccountID)
-                  ticketID <- getTicketID(organizationAccountAddress)
+                  _ <- sendCoinTransaction(organizationAccountAddress)
+                  ticketID <- sendAddOrganizationTransaction(organizationAccountAddress)
                   _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
                   _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_ACCEPTED)))
@@ -545,7 +556,7 @@ class AddOrganizationController @Inject()(
             organization <- organization
             checkAllKYCFilesVerified <- checkAllKYCFilesVerified(zoneID, organization)
             checkMemberCheckVerified <- checkMemberCheckVerified(organization.id)
-            result <- processTransactionAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID, validateUsernamePassword = validateUsernamePassword, organization = organization)
+            result <- sendTransactionsAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID, validateUsernamePassword = validateUsernamePassword, organization = organization)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
