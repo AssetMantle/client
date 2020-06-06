@@ -328,7 +328,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   margin-left: -77px; }
 
 .connectionError {
-  height: 100px;
+  height: 140px;
   position: relative;
   top: 25%;
   margin: auto;
@@ -336,7 +336,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 3px;
   font-size: 0.875rem;
   background: #e6e6e6;
-  width: 100px;
+  width: 220px;
   color: red; }
 
 .commonCheckBox dt {
