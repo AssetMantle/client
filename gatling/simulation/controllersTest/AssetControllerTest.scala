@@ -91,51 +91,51 @@ object assetControllerTest {
     )
 
   def getAssetID(traderID:String, assetType:String, assetDescription: String, quantityUnit:String, quantity:String, assetPrice:String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master."Asset" WHERE "ownerID" = '$traderID' AND "assetType" = '$assetType' AND "description" = '$assetDescription' AND "quantity" = '$quantity' AND "quantityUnit" = '$quantityUnit' AND "price" = '$assetPrice'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getRequestIDForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
 
   def getDocumentHashForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "documentHash" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getAssetTypeForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "assetType" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getAssetPriceForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "assetPrice" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getQuantityUnitForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "quantityUnit" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getAssetQuantityForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "assetQuantity" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getPegHashByOwnerAddress(accountID: String): String = {
     println(accountID)
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "pegHash" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$accountID'),'0') AS "pegHash";""")
     sqlQueryFeeder.apply().next()("pegHash").toString
   }

@@ -71,7 +71,29 @@ object accountControllerTest {
       .check(substring("Account").exists)
 
     )
-    .pause(2)
+    .pause(3)
+
+  val profile: ScenarioBuilder = scenario("LoginMain")
+    .exec(http("Profile_GET")
+        .get(routes.ViewController.profile().url)
+        .resources(
+          http("identification")
+        .get(routes.ComponentViewController.identification().url),
+          http("commonHome")
+            .get(routes.ComponentViewController.commonHome().url),
+          http("contact")
+            .get(routes.ContactController.contact().url),
+          http("recentActivities")
+            .get(routes.ComponentViewController.recentActivities().url),
+          http("unreadNotificationCount")
+            .get(routes.NotificationController.unreadNotificationCount().url),
+          http("profilePicture")
+            .get(routes.ComponentViewController.profilePicture().url),
+          http("recentActivityMessages")
+            .get(routes.NotificationController.recentActivityMessages(1).url)
+        )
+    )
+    .pause(1)
 
 
   val loginMain: ScenarioBuilder = scenario("LoginMain")
@@ -80,6 +102,7 @@ object accountControllerTest {
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(1)
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(

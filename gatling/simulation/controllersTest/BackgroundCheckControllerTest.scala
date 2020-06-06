@@ -85,13 +85,13 @@ object backgroundCheckControllerTest {
     .pause(2)
 
   def getVesselScanID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "scanID" FROM member_check."VesselScan" WHERE "vesselName" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getCorporateScanID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "scanID" FROM member_check."CorporateScan" WHERE "companyName" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }

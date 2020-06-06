@@ -19,20 +19,18 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(CreateBuyer.createBuyer)
     .exec(AddCounterParty.addCounterParty)
     .exec(IssueFiat.issueFiat)
-    .repeat(10) {
-      exec(IssueAssetModerated.issueAssetModerated)
-        .exec(CreateSalesQuote.createSalesQuote)
-        .exec(AcceptSalesQuoteAndAllTradeTerms.acceptSalesQuoteAndAllTradeTerms)
-        .exec(UploadContractAndOtherTradeDocuments.uploadContractAndOtherTradeDocuments)
-        .exec(AcceptBillOfLading.acceptBillOfLading)
-        .exec(VesselCheckAndReleaseAsset.vesselCheckAndReleaseAsset)
-        .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
-        .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
-        .exec(SendFiat.sendFiat)
-        .exec(SendAsset.sendAsset)
-        .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
-        .exec(RedeemAsset.redeemAsset)
-    }
+    .exec(IssueAssetModerated.issueAssetModerated)
+    .exec(CreateSalesQuote.createSalesQuote)
+    .exec(AcceptSalesQuoteAndAllTradeTerms.acceptSalesQuoteAndAllTradeTerms)
+    .exec(UploadContractAndOtherTradeDocuments.uploadContractAndOtherTradeDocuments)
+    .exec(AcceptBillOfLading.acceptBillOfLading)
+    .exec(VesselCheckAndReleaseAsset.vesselCheckAndReleaseAsset)
+    .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
+    .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
+    .exec(SendFiat.sendFiat)
+    .exec(SendAsset.sendAsset)
+    .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
+    .exec(RedeemAsset.redeemAsset)
 
 
   setUp(

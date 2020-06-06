@@ -200,13 +200,13 @@ object sendCoinControllerTest {
 
 
   def getAddress(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE id = '$query'),'0') AS "accountAddress";""")
     sqlQueryFeeder.apply().next()("accountAddress").toString
   }
 
   def getRequestIDForFaucetRequest(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master_transaction."FaucetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }

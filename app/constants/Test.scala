@@ -3,7 +3,7 @@ package constants
 object Test {
   val NUMBER_OF_USERS = 1500
 
-  val BASE_URL = "http://localhost:9000"
+  val BASE_URL = "http://18.136.170.155:9000"
 
   val IMAGE_FILE_FEED = "/home/prashant/testImages/"
   val TEST_NAME = "TEST_NAME"
