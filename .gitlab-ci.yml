@@ -1,5 +1,4 @@
 deploy:
-  image: ubuntu
   stage: deploy
   only:
     - comdexClient
