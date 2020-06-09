@@ -97,6 +97,9 @@
                 </div>
             </div>
             @if(traderID == negotiation.buyerTraderID && negotiation.status == constants.Status.Negotiation.STARTED) {
+                <div class="cmuk-flex cmuk-flex-between">
+                    <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
+                </div>
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_DESCRIPTION, status = negotiation.buyerAcceptedAssetDescription, iconPath = "description") {
                     @Messages(constants.View.ASSET_DESCRIPTION)
                 } {
@@ -115,9 +118,10 @@
                 } {
                     @Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")
                 }
-
+                <div class="cmuk-flex cmuk-flex-between">
+                    <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
+                </div>
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.ASSET_OTHER_DETAILS, status = negotiation.buyerAcceptedAssetOtherDetails, iconPath = "shipmentPeriod") {
-                    @Messages(constants.View.ASSET_OTHER_DETAILS)
                     <div class="creditTerms">
                         @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
                         @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
@@ -125,9 +129,11 @@
                     </div>
                 } {
                 }
-                <hr>
+                <div class="cmuk-flex cmuk-flex-between">
+                    <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
+                </div>
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PAYMENT_TERMS, status = negotiation.buyerAcceptedPaymentTerms, iconPath = "advancePayment") {
-                    @Messages(constants.View.PAYMENT_TERMS)
+
                     <div class="creditTerms">
                         @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                         @negotiation.paymentTerms.credit match {
@@ -147,9 +153,10 @@
                     </div>
                 } {
                 }
-                <hr>
+                <div class="cmuk-flex cmuk-flex-between">
+                    <div class="title">@Messages(constants.View.DOCUMENT_LIST)</div>
+                </div>
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.DOCUMENT_LIST, status = negotiation.buyerAcceptedDocumentList, iconPath = "document") {
-                    @Messages(constants.View.DOCUMENT_LIST)
                     <div class="creditTerms">
                         <p><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
                         @negotiation.documentList.assetDocuments.map { assetDocument =>
@@ -163,7 +170,7 @@
                 } {
                 }
             } else {
-                <div class="cmuk-flex cmuk-flex-between">
+                <div class="cmuk-flex cmuk-flex-between cmuk-flex-middle">
                     <div class="title">@Messages(constants.View.ASSET_DETAILS)</div>
                     @if((negotiation.status == constants.Status.Negotiation.STARTED || negotiation.status == constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS || negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED) && negotiation.sellerTraderID == traderID) {
                         @commonFormButton(constants.Form.UPDATE_ASSET_TERMS, 'parameters -> s"'${negotiation.id}'")
@@ -189,8 +196,7 @@
                             <span class="termIcon">@commonIcon("contractPrice")</span>
                             @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price / negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                         </div>
-                        <div class="cmuk-flex">
-                            <span class="termIcon">@commonIcon("contractPrice")</span>
+                        <div class="cmuk-flex termIdent">
                             @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
                         </div>
                     </div>
@@ -215,7 +221,7 @@
                     }
                     </div>
                 </div>
-                <div class="cmuk-flex cmuk-flex-between">
+                <div class="cmuk-flex cmuk-flex-between cmuk-flex-middle">
                     <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
                     @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                         @commonFormButton(constants.Form.UPDATE_ASSET_OTHER_DETAILS, 'parameters -> s"'${negotiation.id}'")
@@ -227,12 +233,10 @@
                             <span class="termIcon">@commonIcon("port")</span>
                             @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
                         </div>
-                        <div class="cmuk-flex">
-                            <span class="termIcon">@commonIcon("port")</span>
+                        <div class="cmuk-flex termIdent">
                             @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                         </div>
-                        <div class="cmuk-flex">
-                            <span class="termIcon">@commonIcon("shipmentPeriod")</span>
+                        <div class="cmuk-flex termIdent">
                             @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
                         </div>
                     </div>
@@ -245,9 +249,7 @@
                     </div>
                 </div>
 
-                <hr>
-
-                <div class="cmuk-flex cmuk-flex-between">
+                <div class="cmuk-flex cmuk-flex-between cmuk-flex-middle">
                     <div class="title">@Messages(constants.View.PAYMENT_TERMS)</div>
                     @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                         @commonFormButton(constants.Form.UPDATE_PAYMENT_TERMS, 'parameters -> s"'${negotiation.id}'")
@@ -259,7 +261,7 @@
                             <span class="termIcon">@commonIcon("advancePayment")</span>
                             @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                         </div>
-                        <div class="subTerms">
+                        <div class="termIdent">
                         @negotiation.paymentTerms.credit match {
                             case Some(credit) => {
                                 @credit.tentativeDate match {
@@ -285,27 +287,26 @@
                     </div>
                 </div>
 
-                <hr>
-
-                <div class="cmuk-flex cmuk-flex-between">
+                <div class="cmuk-flex cmuk-flex-between cmuk-flex-middle">
                     <div class="title"> @Messages(constants.View.DOCUMENT_LIST)</div>
                     @if(negotiation.status == constants.Status.Negotiation.STARTED && negotiation.sellerTraderID == traderID) {
                         @commonFormButton(constants.Form.UPDATE_DOCUMENT_LIST, 'parameters -> s"'${negotiation.id}'")
                     }
                 </div>
-                <div class="sellerTerm">
+                <div class="sellerTerm documentTerms">
                     <div>
-                        <p><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
+                        <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("document")</span>
+                        <p class="documentTermName"><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
+                    </div>
                         @negotiation.documentList.assetDocuments.map { assetDocument =>
-                            <p>
-                                <span class="termIcon">@commonIcon("document")</span>
+                            <p class="termIdent">
                                 @Messages(assetDocument)
                             </p>
                         }
-                        <p><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
+                        <p class="termIdent"><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
                         @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-                            <p>
-                                <span class="termIcon">@commonIcon("document")</span>
+                            <p class="termIdent">
                                 @Messages(negotiationDocument)
                             </p>
                         }
