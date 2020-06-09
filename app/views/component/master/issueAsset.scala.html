@@ -12,7 +12,7 @@
     @commonInputInt(issueAssetForm, constants.FormField.SHIPPING_PERIOD)
     @commonInputText(issueAssetForm, constants.FormField.PORT_OF_LOADING)
     @commonInputText(issueAssetForm, constants.FormField.PORT_OF_DISCHARGE)
-    <div class="checkboxModerate">
+    <div class="checkboxSection">
         <span class="warningIcon" cmuk-tooltip="title:@Messages(constants.View.MODERATED_WARNING);pos:bottom">@commonIcon("warning")</span>
         @commonCheckbox(issueAssetForm, constants.FormField.MODERATED, 'checked -> true, 'oninput -> """showHideGasAndPassword()""")
     </div>

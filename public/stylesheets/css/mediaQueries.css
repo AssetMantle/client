@@ -218,7 +218,7 @@
   :root {
     font-size: 13px; }
 
-  .checkboxModerate .warningIcon {
+  .checkboxSection .warningIcon {
     top: 45px;
     left: 50px; }
 
@@ -280,7 +280,7 @@
   :root {
     font-size: 16px; }
 
-  .checkboxModerate .commonCheckBox dt {
+  .checkboxSection .commonCheckBox dt {
     width: auto;
     margin-right: 40px; }
 

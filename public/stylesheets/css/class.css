@@ -318,13 +318,13 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #0862BE;
   margin-bottom: 5px; }
 
-.checkboxModerate {
+.checkboxSection {
   position: relative; }
-  .checkboxModerate .warningIcon {
+  .checkboxSection .warningIcon {
     position: absolute;
     top: 10px;
     left: 255px; }
-    .checkboxModerate .warningIcon .icon {
+    .checkboxSection .warningIcon .icon {
       width: 20px;
       height: 20px; }
 
