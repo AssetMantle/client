@@ -11,9 +11,9 @@
         constants.View.VIEW_DOCUMENTS -> routes.javascript.ComponentViewController.traderViewNegotiationDocument,
     ),
         'VIEW_TERMS_PARAMETERS -> s"'${negotiation.id}'", 'VIEW_DOCUMENTS_PARAMETERS -> s"'${negotiation.id}'")
-<br>
+    <div class="termAccept">
 @if(negotiation.buyerTraderID == traderID && negotiation.status == constants.Status.Negotiation.STARTED) {
     @commonFormButton(constants.Form.CONFIRM_ALL_NEGOTIATION_TERMS, 'parameters -> s"'${negotiation.id}'")
 }
-
+    </div>
 </div>
