@@ -10,56 +10,59 @@
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
-        <div class="traderCommodity">
-            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType &nbsp;</span>
-
-                    @traderID match {
-                        case negotiation.buyerTraderID => {
-                            @negotiation.status match {
-                                case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING=> { @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")}
-                                case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
-                                    @order match {
-                                        case Some(order)=> {
-                                            @order.status match {
-                                                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING=>{@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
-                                                case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
-                                                    @if(!asset.moderated){
-                                                        @commonFormButton(constants.Form.BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-                                                    }
-                                                }
-                                                case constants.Status.Order.COMPLETED=>{@commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")}
-                                                case _=>{}
+        <div class="traderCommodity commodityTitleSection">
+            <div class="cmuk-flex cmuk-flex-middle">
+                <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span><span class="tradeName">@asset.assetType &nbsp;</span>
+            </div>
+            <div>
+            @traderID match {
+                case negotiation.buyerTraderID => {
+                    @negotiation.status match {
+                        case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING=> { @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")}
+                        case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
+                            @order match {
+                                case Some(order)=> {
+                                    @order.status match {
+                                        case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING=>{@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
+                                        case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
+                                            @if(!asset.moderated){
+                                                @commonFormButton(constants.Form.BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
                                             }
                                         }
-                                        case None=> {@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
+                                        case constants.Status.Order.COMPLETED=>{@commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")}
+                                        case _=>{}
                                     }
                                 }
-                                case _=>{}
+                                case None=> {@commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")}
                             }
                         }
-                        case negotiation.sellerTraderID => {
-                            @negotiation.status match {
-                                case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING=> { @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")}
-                                case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
-                                    @order match {
-                                        case Some(order)=>{
-                                            @order.status match {
-                                                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=>{@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
-                                                case constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
-                                                    @if(!asset.moderated) {
-                                                        @commonFormButton(constants.Form.SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-                                                    }
-                                                }
-                                                case _=>{}
+                        case _=>{}
+                    }
+                }
+                case negotiation.sellerTraderID => {
+                    @negotiation.status match {
+                        case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING=> { @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")}
+                        case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
+                            @order match {
+                                case Some(order)=>{
+                                    @order.status match {
+                                        case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=>{@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
+                                        case constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
+                                            @if(!asset.moderated) {
+                                                @commonFormButton(constants.Form.SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
                                             }
                                         }
-                                        case None=> {@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
+                                        case _=>{}
                                     }
                                 }
-                                case _=>{}
+                                case None=> {@commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")}
                             }
                         }
-                     }
+                        case _=>{}
+                    }
+                }
+            }
+            </div>
         </div>
 
         <div class="terms">

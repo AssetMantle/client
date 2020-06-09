@@ -519,7 +519,10 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   stroke: #ffffff !important; }
 .comdex [class*=cmuk-modal-close-] {
   top: 20px;
-  right: 20px; }
+  right: 20px;
+  padding: 12px;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-radius: 50%; }
 .comdex .updateDocumentField {
   position: relative; }
   .comdex .updateDocumentField button {
@@ -659,7 +662,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
       .modal .modalContent .modalBody .infoRowValue {
         text-align: right; }
       .modal .modalContent .modalBody .title {
-        margin: 10px 0; }
+        margin: 10px 0 3px 0; }
       .modal .modalContent .modalBody hr {
         margin: 0; }
       .modal .modalContent .modalBody form .cmuk-card-default {
@@ -680,6 +683,14 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
         width: auto; }
       .modal .modalContent .modalBody .documentItem .infoRowLabel {
         width: auto; }
+    .modal .modalContent .closeButton:hover {
+      border-radius: 50%;
+      background: #e0e0e05c;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; }
+    .modal .modalContent .closeButton:active {
+      border-radius: 50%;
+      background: #e0e0e05c;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; }
 
 form .formBody {
   padding: 20px 60px 60px 60px; }
@@ -693,6 +704,7 @@ form .formBody {
   overflow: auto;
   padding: 20px 60px 60px 60px; }
   .modalInfoBlock .traderCommodity {
+    margin: 10px 0;
     display: flex;
     align-items: center;
     justify-content: start; }
@@ -1053,6 +1065,10 @@ form .formBody {
       color: #4B4B4B;
       font-weight: bold;
       font-size: 1rem; }
+  .pageContainer .middle .mainTabs .tradeTerms .commodityTitleSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .termIcon {
     margin-bottom: 5px; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .documentTermName {
@@ -1861,13 +1877,16 @@ header:before,
   .contactDetails .contactInfoItem .cmuk-card {
     flex: 1; }
     .contactDetails .contactInfoItem .cmuk-card .infoRow {
-      flex-direction: column; }
+      flex-direction: column;
+      flex: 1; }
       .contactDetails .contactInfoItem .cmuk-card .infoRow .infoRowValue {
         text-align: left; }
     .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
       line-height: 28px;
-      padding: 0 20px;
-      word-break: inherit; }
+      word-break: inherit;
+      position: absolute;
+      top: 5px;
+      right: 0; }
   .contactDetails .contactInfoItem .contactUpdateButton {
     display: flex;
     flex-direction: row-reverse;
@@ -1878,13 +1897,18 @@ header:before,
       padding: 0 20px;
       margin-left: 20px; }
 .contactDetails .infoRowBox {
+  position: relative;
   justify-content: space-between; }
   .contactDetails .infoRowBox .infoRowLabel {
     width: auto;
     margin-right: 5px; }
   .contactDetails .infoRowBox .contactInfoItemStatus {
     display: flex;
-    align-items: center; }
+    align-items: center;
+    width: 55px;
+    position: absolute;
+    top: 5px;
+    right: 0; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }
 .contactDetails .cmuk-card-body {
@@ -2077,7 +2101,7 @@ figure.zoom {
   flex-wrap: nowrap; }
 .salesQuoteCard .salesQuoteCardLeft {
   position: relative;
-  flex: 30%;
+  flex: 35%;
   display: flex; }
   .salesQuoteCard .salesQuoteCardLeft .content {
     display: flex;
@@ -2122,7 +2146,7 @@ figure.zoom {
 .salesQuoteCard .salesQuoteCardMiddle {
   border-radius: 2px;
   padding: 20px 10px 20px 0;
-  flex: 45%;
+  flex: 40%;
   justify-content: center;
   display: flex;
   flex-direction: column; }

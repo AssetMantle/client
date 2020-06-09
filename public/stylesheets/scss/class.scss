@@ -670,6 +670,9 @@ html, body{
   [class*=cmuk-modal-close-]{
     top:20px;
     right: 20px;
+    padding: 12px;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    border-radius: 50%;
   }
   .updateDocumentField{
     position: relative;
@@ -844,7 +847,7 @@ html, body{
         text-align: right;
       }
       .title{
-        margin: 10px 0;
+        margin: 10px 0 3px 0;
       }
       hr{
         margin:0;
@@ -879,6 +882,15 @@ html, body{
           width: auto;
         }
       }
+    }.closeButton:hover{
+      border-radius: 50%;
+      background: #e0e0e05c;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    }
+    .closeButton:active{
+      border-radius: 50%;
+      background: #e0e0e05c;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     }
   }
 }
@@ -899,6 +911,7 @@ form{
   padding: 20px 60px 60px 60px;
   @extend %scroller;
   .traderCommodity{
+    margin:10px 0;
     display: flex;
     align-items: center;
     justify-content: start;
@@ -1402,6 +1415,11 @@ form{
             font-weight: bold;
             font-size: $paragraphFontSizeMedium;
           }
+        }
+        .commodityTitleSection{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
         .sellerTerm.documentTerms{
           .termIcon{
@@ -2530,14 +2548,17 @@ header:before,
       flex: 1;
       .infoRow{
         flex-direction: column;
+        flex:1;
         .infoRowValue{
           text-align: left;
         }
       }
       .cmuk-button{
         line-height: 28px;
-        padding: 0 20px;
         word-break: inherit;
+        position: absolute;
+        top: 5px;
+        right: 0;
       }
     }
     .contactUpdateButton{
@@ -2553,6 +2574,7 @@ header:before,
     }
   }
   .infoRowBox{
+    position: relative;
     justify-content: space-between;
     .infoRowLabel{
       width: auto;
@@ -2561,6 +2583,10 @@ header:before,
     .contactInfoItemStatus{
       display: flex;
       align-items: center;
+      width: 55px;
+      position: absolute;
+      top: 5px;
+      right: 0;
     }
   }
   .cmuk-button-link{
@@ -2821,7 +2847,7 @@ figure.zoom {
   }
   .salesQuoteCardLeft{
     position: relative;
-    flex: 30%;
+    flex: 35%;
     display: flex;
     .content{
       display: flex;
@@ -2879,7 +2905,7 @@ figure.zoom {
   .salesQuoteCardMiddle{
     border-radius: 2px;
     padding:20px 10px 20px 0;
-    flex: 45%;
+    flex: 40%;
     justify-content: center;
     display: flex;
     flex-direction: column;

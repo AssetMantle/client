@@ -4,12 +4,15 @@
 @import models.common.Serializable
 @import models.Abstract.AssetDocumentContent
 @(documentType:String, documentContent: Option[AssetDocumentContent])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<legend class="cmuk-legend">
+    @Messages(constants.File.Asset.BILL_OF_LADING)
+</legend>
+<hr>
 <div class="modalInfoBlock">
 @documentContent match {
     case Some(content)=> {
         @documentType match {
             case constants.File.Asset.BILL_OF_LADING => {
-                @Messages(constants.File.Asset.BILL_OF_LADING) :
                 @defining(content.asInstanceOf[Serializable.BillOfLading]){billOfLading=>
                     @commonTextInfo(constants.View.BILL_OF_LADING_NUMBER, billOfLading.id)
                     @commonTextInfo(constants.View.VESSEL_NAME, billOfLading.vesselName)
