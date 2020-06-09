@@ -20,9 +20,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val defaultFaucetToken = configuration.get[Int]("blockchain.defaultFaucetToken")
-
-  private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
+  private val denom = configuration.get[String]("blockchain.denom")
 
   def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.sendCoin())
@@ -38,7 +36,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           val transactionProcess = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
             entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-            request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
+            request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denom, sendCoinData.amount.toString)), mode = transactionMode),
             action = transactionsSendCoin.Service.post,
             onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
             onFailure = blockchainTransactionSendCoins.Utility.onFailure,
@@ -66,7 +64,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Future(BadRequest(views.html.component.master.faucetRequest(formWithErrors)))
         },
         faucetRequestFormData => {
-          val create = masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
+          val create = masterTransactionFaucetRequests.Service.create(loginState.username, constants.Blockchain.DefaultFaucetTokenAmount)
           (for {
             _ <- create
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
@@ -130,9 +128,9 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               val toAddress = blockchainAccounts.Service.tryGetAddress(approveFaucetRequestFormData.accountID)
 
               def ticketID(toAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = constants.Blockchain.DefaultFaucetTokenAmount, gas = approveFaucetRequestFormData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = approveFaucetRequestFormData.gas.toString), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), mode = transactionMode),
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = approveFaucetRequestFormData.gas.toString), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultFaucetTokenAmount.toString)), mode = transactionMode),
                 action = transactionsSendCoin.Service.post,
                 onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                 onFailure = blockchainTransactionSendCoins.Utility.onFailure,
@@ -173,7 +171,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         Future(BadRequest(views.html.component.blockchain.sendCoin(formWithErrors)))
       },
       sendCoinData => {
-        val postRequest = transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = sendCoinData.mode))
+        val postRequest = transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denom, sendCoinData.amount.toString)), mode = sendCoinData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))

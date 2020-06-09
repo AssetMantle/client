@@ -208,6 +208,7 @@ object Response {
   val BLOCKCHAIN_ACCOUNT_NOT_FOUND = new Failure("BLOCKCHAIN_ACCOUNT_NOT_FOUND")
   val FIAT_PEG_NOT_FOUND = new Failure("FIAT_PEG_NOT_FOUND")
   val ALL_TRADE_DOCUMENTS_NOT_UPLOADED = new Failure("ALL_TRADE_DOCUMENTS_NOT_UPLOADED")
+  val TRANSACTION_HASH_NOT_FOUND = new Failure("TRANSACTION_HASH_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
