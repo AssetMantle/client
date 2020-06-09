@@ -197,7 +197,7 @@ object accountControllerTest {
     .pause(2)
 
   def getUserType(query: String):String={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "userType" FROM master."Account" WHERE id = '$query'),'0') AS "userType";""")
     sqlQueryFeeder.apply().next()("userType").toString
   }
