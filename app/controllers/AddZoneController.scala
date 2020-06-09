@@ -105,10 +105,9 @@ class AddZoneController @Inject()(
       val zone = masterZones.Service.getByAccountID(loginState.username)
       (for {
         zone <- zone
-        result <- withUsernameToken.Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
-      } yield result
+      } yield Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
         ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addZone())
+        case _: BaseException => Future(Ok(views.html.component.master.addZone()))
       }
   }
 
