@@ -397,6 +397,18 @@ html, body{
   margin-bottom: 5px;
 }
 
+.checkboxSection {
+  position: relative;
+  .warningIcon {
+    position: absolute;
+    top: 10px;
+    left: 255px;
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
 .mobileNumberUpdate {
   .countryCode {
     margin-top: 46px;
@@ -412,7 +424,7 @@ html, body{
 }
 
 .connectionError{
-  height: 100px;
+  height: 140px;
   position: relative;
   top:25%;
   margin: auto;
@@ -420,7 +432,7 @@ html, body{
   border-radius: $buttonBorderRadius;
   font-size: $paragraphFontSizeSmall;
   background: #e6e6e6;
-  width: 100px;
+  width: 220px;
   color: red;
 }
 
@@ -889,6 +901,9 @@ form{
   }
 }
 
+.termAccept{
+  margin: 0px 0px 30px 30px;
+}
 .modalInfoBlock{
   width: 620px;
   max-height: 600px;
@@ -1400,6 +1415,14 @@ form{
             font-size: $paragraphFontSizeMedium;
           }
         }
+        .sellerTerm.documentTerms{
+          .termIcon{
+            margin-bottom: 5px;
+          }
+          .documentTermName{
+            margin: auto;
+          }
+        }
         .tradeTermsData{
           justify-content: space-between;
           border-bottom: 1px solid #E8E8E8;
@@ -1525,6 +1548,9 @@ form{
           hr{
             margin: 15px 0;
           }
+          .termIdent{
+            margin-left: 25px;
+          }
         }
         .sellerTerm{
           display: flex;
@@ -1533,6 +1559,7 @@ form{
           background: #F8F9FC;
           border: 1px solid #E2E4E6;
           border-radius:$buttonBorderRadius;
+          text-transform: uppercase;
           margin: 10px 0;
           align-items: center;
           .infoRowLabel{
@@ -2474,6 +2501,7 @@ header:before,
       box-shadow: none;
       background-color: #FFFFFF;
       border: 1px solid rgba(5, 60, 117, 0.12);
+      margin-bottom: 5px
     }
   }
   .icon{
@@ -2755,13 +2783,6 @@ dl .info {
 .traderRelationList{
   .cmuk-card-header{
     padding: 13px 20px;
-  }
-}
-.organizationDetails, .organizationUbos{
-  .cmuk-card-body{
-    .cmuk-card-default{
-      margin-bottom: 5px;
-    }
   }
 }
 

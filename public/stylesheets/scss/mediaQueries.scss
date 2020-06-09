@@ -331,6 +331,12 @@
   :root {
     font-size: 13px;
   }
+  .checkboxSection {
+    .warningIcon {
+      top: 45px;
+      left: 50px;
+    }
+  }
   .comdex{
     .cmuk-input, .cmuk-select:not([multiple]):not([size]){
       height: 40px;
@@ -412,6 +418,12 @@
 @media (min-width: 1600px) {
   :root {
     font-size: 16px;
+  }
+  .checkboxSection {
+    .commonCheckBox dt{
+      width: auto;
+      margin-right: 40px;
+  }
   }
   .showPassword, .checkIcon{
     top:37px;

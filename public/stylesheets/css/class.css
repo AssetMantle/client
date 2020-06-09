@@ -318,6 +318,16 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #0862BE;
   margin-bottom: 5px; }
 
+.checkboxSection {
+  position: relative; }
+  .checkboxSection .warningIcon {
+    position: absolute;
+    top: 10px;
+    left: 255px; }
+    .checkboxSection .warningIcon .icon {
+      width: 20px;
+      height: 20px; }
+
 .mobileNumberUpdate .countryCode {
   margin-top: 46px;
   width: 80px;
@@ -328,7 +338,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   margin-left: -77px; }
 
 .connectionError {
-  height: 100px;
+  height: 140px;
   position: relative;
   top: 25%;
   margin: auto;
@@ -336,7 +346,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 3px;
   font-size: 0.875rem;
   background: #e6e6e6;
-  width: 100px;
+  width: 220px;
   color: red; }
 
 .commonCheckBox dt {
@@ -683,6 +693,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 form .formBody {
   padding: 20px 60px 60px 60px; }
+
+.termAccept {
+  margin: 0px 0px 30px 30px; }
 
 .modalInfoBlock {
   width: 620px;
@@ -1050,6 +1063,10 @@ form .formBody {
       color: #4B4B4B;
       font-weight: bold;
       font-size: 1rem; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .termIcon {
+    margin-bottom: 5px; }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .documentTermName {
+    margin: auto; }
   .pageContainer .middle .mainTabs .tradeTerms .tradeTermsData {
     justify-content: space-between;
     border-bottom: 1px solid #E8E8E8;
@@ -1149,6 +1166,8 @@ form .formBody {
         margin: 0; }
   .pageContainer .middle .mainTabs .tradeTerms .terms hr {
     margin: 15px 0; }
+  .pageContainer .middle .mainTabs .tradeTerms .terms .termIdent {
+    margin-left: 25px; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
     display: flex;
     justify-content: space-between;
@@ -1156,6 +1175,7 @@ form .formBody {
     background: #F8F9FC;
     border: 1px solid #E2E4E6;
     border-radius: 3px;
+    text-transform: uppercase;
     margin: 10px 0;
     align-items: center; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
@@ -1824,7 +1844,8 @@ header:before,
 .profileContainer .cmuk-card-body .cmuk-card {
   box-shadow: none;
   background-color: #FFFFFF;
-  border: 1px solid rgba(5, 60, 117, 0.12); }
+  border: 1px solid rgba(5, 60, 117, 0.12);
+  margin-bottom: 5px; }
 .profileContainer .icon {
   width: 18px;
   height: 20px;
@@ -2028,9 +2049,6 @@ dl .info {
 
 .traderRelationList .cmuk-card-header {
   padding: 13px 20px; }
-
-.organizationDetails .cmuk-card-body .cmuk-card-default, .organizationUbos .cmuk-card-body .cmuk-card-default {
-  margin-bottom: 5px; }
 
 .cmuk-panel {
   padding: 0;
