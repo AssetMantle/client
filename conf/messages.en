@@ -44,6 +44,7 @@ SET_BUYER_FEEDBACK=Set Buyer Feedback
 SET_SELLER_FEEDBACK=Set Seller Feedback
 MODERATED=Moderated
 LOCKED=Locked
+FIAT_PROOF=Fiat Proof
 MODERATED_BUYER_EXECUTE_ORDER=Moderated Buyer Execute Order
 MODERATED_SELLER_EXECUTE_ORDER=Moderated Seller Execute Order
 UPLOAD_BANK_DETAILS=Upload Bank Details
