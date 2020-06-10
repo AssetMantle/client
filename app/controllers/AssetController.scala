@@ -13,6 +13,7 @@ import models.masterTransaction.AssetFile
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import services.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,6 +51,7 @@ class AssetController @Inject()(
                                  withZoneLoginAction: WithZoneLoginAction,
                                  withoutLoginAction: WithoutLoginAction,
                                  withoutLoginActionAsync: WithoutLoginActionAsync,
+                                 keyStore: KeyStore
                                )
                                (implicit
                                 executionContext: ExecutionContext,
@@ -61,10 +63,6 @@ class AssetController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
-  private val zonePassword = configuration.get[String]("zone.password")
-
-  private val zoneGas = configuration.get[Int]("zone.gas")
 
   private def issueModeratedAsset(assetID: String): Future[Unit] = {
     val asset = masterAssets.Service.tryGet(assetID)
@@ -88,10 +86,12 @@ class AssetController @Inject()(
       }
     }
 
-    def sendTransaction(traderAddress: String, zoneAddress: String, takerAddress: String, asset: Asset): Future[String] = utilitiesTransaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-      entity = blockchainTransaction.IssueAsset(from = zoneAddress, to = traderAddress, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, gas = zoneGas, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
+    def getZonePassword(zoneID: String): Future[String] = Future(keyStore.getPassphrase(zoneID))
+
+    def sendTransaction(traderAddress: String, zoneAddress: String, takerAddress: String, asset: Asset, zonePassword: String): Future[String] = utilitiesTransaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+      entity = blockchainTransaction.IssueAsset(from = zoneAddress, to = traderAddress, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, gas = constants.Blockchain.ZoneIssueAssetGasAmount, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
       blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = zoneGas.toString), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity.toString, moderated = true, takerAddress = takerAddress, mode = transactionMode),
+      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = constants.Blockchain.ZoneIssueAssetGasAmount.toString), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity.toString, moderated = true, takerAddress = takerAddress, mode = transactionMode),
       action = transactionsIssueAsset.Service.post,
       onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
       onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -107,7 +107,8 @@ class AssetController @Inject()(
       traderAddress <- getAddress(trader.accountID)
       zoneAddress <- getAddress(zone.accountID)
       takerAddress <- getTakerAddress(asset.takerID)
-      ticketID <- sendTransaction(traderAddress = traderAddress, zoneAddress = zoneAddress, takerAddress = takerAddress, asset = asset)
+      zonePassword <- getZonePassword(zone.id)
+      ticketID <- sendTransaction(traderAddress = traderAddress, zoneAddress = zoneAddress, takerAddress = takerAddress, asset = asset, zonePassword = zonePassword)
       _ <- markAssetStatusAwaitingBlockchainResponse
       _ <- utilitiesNotification.send(zone.accountID, constants.Notification.ASSET_ISSUED, ticketID)
       _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ASSET_ISSUED, ticketID)

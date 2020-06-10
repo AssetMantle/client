@@ -13,6 +13,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import services.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 
@@ -40,8 +41,10 @@ class AccountController @Inject()(
                                    masterMobiles: master.Mobiles,
                                    masterIdentifications: master.Identifications,
                                    masterAccountKYCs: master.AccountKYCs,
+                                   masterZones: master.Zones,
                                    withoutLoginAction: WithoutLoginAction,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
+                                   keyStore: KeyStore
                                  )
                                  (implicit
                                   executionContext: ExecutionContext,
@@ -280,10 +283,22 @@ class AccountController @Inject()(
           def updateAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
             val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
 
+            def updateZoneKeyStore() = if (loginState.userType == constants.User.ZONE) {
+              val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+              def updateKeyStore(zoneID: String) = Future(keyStore.setPassphrase(alias = zoneID, aliasValue = changePasswordData.newPassword))
+
+              for {
+                zoneID <- zoneID
+                _ <- updateKeyStore(zoneID)
+              } yield ()
+            } else Future()
+
             def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
 
             for {
               _ <- postRequest
+              _ <- updateZoneKeyStore()
               _ <- updatePassword()
               result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
@@ -338,15 +353,28 @@ class AccountController @Inject()(
 
         def updateAndGetResult(validOTP: Boolean): Future[Result] = {
           if (validOTP) {
-            val partialMnemonic = masterAccounts.Service.tryGetPartialMnemonic(forgotPasswordData.username)
+            val account = masterAccounts.Service.tryGet(forgotPasswordData.username)
 
             def post(partialMnemonic: Seq[String]) = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = Seq(partialMnemonic.mkString(" "), forgotPasswordData.mnemonic).mkString(" "), newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
+
+            def updateZoneKeyStore(userType: String) = if (userType == constants.User.ZONE) {
+              val zoneID = masterZones.Service.tryGetID(forgotPasswordData.username)
+
+              def updateKeyStore(zoneID: String) = Future(keyStore.setPassphrase(alias = zoneID, aliasValue = forgotPasswordData.newPassword))
+
+              for {
+                zoneID <- zoneID
+
+                _ <- updateKeyStore(zoneID)
+              } yield ()
+            } else Future()
 
             def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
 
             for {
-              partialMnemonic <- partialMnemonic
-              _ <- post(partialMnemonic)
+              account <- account
+              _ <- post(account.partialMnemonic)
+              _ <- updateZoneKeyStore(account.userType)
               _ <- updatePassword()
             } yield Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
           } else {
