@@ -12,6 +12,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import services.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,7 +24,8 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
                              masterAccounts: master.Accounts,
-                             messagesApi: MessagesApi
+                             messagesApi: MessagesApi,
+                             keyStore: KeyStore
                             )
                             (implicit
                              executionContext: ExecutionContext,
@@ -44,10 +46,6 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private val smsAccountSID = configuration.get[String]("twilio.accountSID")
 
-  private val smsAuthToken = configuration.get[String]("twilio.authToken")
-
-  Twilio.init(smsAccountSID, smsAuthToken)
-
   private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
@@ -63,13 +61,22 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+
+    def getAuthTokenAndInitialize = {
+      val smsAuthToken = Future(keyStore.getPassphrase("twilioSMSAuthToken"))
+      for {
+        smsAuthToken <- smsAuthToken
+      } yield Twilio.init(smsAccountSID, smsAuthToken)
+    }
+
+    def send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+
     (for {
+      _ <- getAuthTokenAndInitialize
       _ <- send
     } yield ()
       ).recover {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
+      case baseException: BaseException => throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.SMS_SEND_FAILED)
       case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
