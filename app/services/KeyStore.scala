@@ -14,7 +14,7 @@ class KeyStore @Inject()(configuration: Configuration) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.UTILITIES_KEY_STORE
+  private implicit val module: String = constants.Module.SERVICES_KEY_STORE
 
   private val keyStoreLocation = configuration.get[String]("keyStore.filePath")
 
@@ -22,7 +22,7 @@ class KeyStore @Inject()(configuration: Configuration) {
 
   private val keyStoreType = "PKCS12"
 
-  private def getPassphraseFromKeystore(alias: String): String = try {
+  def getPassphrase(alias: String): String = try {
     val ks = KeyStore.getInstance(keyStoreType)
     val fis = new FileInputStream(keyStoreLocation)
     ks.load(fis, keyStorePassword.toCharArray)
@@ -42,7 +42,7 @@ class KeyStore @Inject()(configuration: Configuration) {
       throw new BaseException(constants.Response.KEY_STORE_ERROR)
   }
 
-  private def makeNewKeyStoreEntry(alias: String, aliasValue: String): Unit = try {
+  def setPassphrase(alias: String, aliasValue: String): Unit = try {
     val factory = SecretKeyFactory.getInstance("PBE")
     val generatedSecret = factory.generateSecret(new PBEKeySpec(aliasValue.toCharArray))
     val fis = try {
@@ -63,26 +63,5 @@ class KeyStore @Inject()(configuration: Configuration) {
     case exception: Exception => logger.error(exception.getMessage)
       throw new BaseException(constants.Response.KEY_STORE_ERROR)
   }
-
-  def getPassphrase(alias: String): String = try {
-    getPassphraseFromKeystore(alias)
-  } catch {
-    case baseException: BaseException => throw baseException
-  }
-
-  def setPassphrase(alias: String, aliasValue: String): Unit = try {
-    makeNewKeyStoreEntry(alias, aliasValue)
-  } catch {
-    case baseException: BaseException => throw baseException
-  }
-
-  //  val keyStoreValues = List(
-  //    "WESTERN_UNION_SFTP_PASSWORD",
-  //    "WESTERN_UNION_RTCB_SECRET_KEY"
-  //  )
-  //
-  //  def main(args: Array[String]): Unit = {
-  //    keyStoreValues.foreach(x => println(getPassphraseFromKeystore(x)))
-  //  }
 
 }

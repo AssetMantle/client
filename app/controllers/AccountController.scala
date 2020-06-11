@@ -364,7 +364,6 @@ class AccountController @Inject()(
 
               for {
                 zoneID <- zoneID
-
                 _ <- updateKeyStore(zoneID)
               } yield ()
             } else Future()

@@ -125,19 +125,22 @@ class AddZoneController @Inject()(
           Future(BadRequest(views.html.component.master.addZone(formWithErrors)))
         },
         addZoneData => {
+          val invitationStatus = masterTransactionZoneInvitations.Service.getStatus(loginState.username)
           val email = masterEmails.Service.tryGet(loginState.username)
           val mobile = masterMobiles.Service.tryGet(loginState.username)
 
-          def insertOrUpdate(email: Email, mobile: Mobile) =
+          def insertOrUpdate(invitationStatus: Option[Boolean], email: Email, mobile: Mobile) = if (invitationStatus.contains(true)) {
             if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
             else masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+          } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
+            invitationStatus <- invitationStatus
             email <- email
             mobile <- mobile
-            id <- insertOrUpdate(email, mobile)
+            id <- insertOrUpdate(invitationStatus, email, mobile)
             zoneKYCs <- zoneKYCs(id)
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result
