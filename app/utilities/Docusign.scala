@@ -1,6 +1,7 @@
 package utilities
 
 import java.util.Arrays
+
 import com.docusign.esign.api.EnvelopesApi
 import com.docusign.esign.client.ApiClient
 import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, Signer, Document => DocusignDocument, ReturnUrlRequest => CallBackURLRequest}
@@ -13,6 +14,7 @@ import models.master
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
 import java.io.{BufferedOutputStream, FileOutputStream}
+
 import models.docusign.{OAuthToken => DocusignOAuthToken}
 import com.docusign.esign.client.auth.OAuth.OAuthToken
 import com.sun.jersey.api.client.ClientHandlerException
@@ -20,6 +22,8 @@ import controllers.routes
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import models.docusign
+import services.KeyStore
+
 import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -27,7 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
                          masterAccounts: master.Accounts,
                          messagesApi: MessagesApi,
-                         docusignOAuthTokens: docusign.OAuthTokens
+                         docusignOAuthTokens: docusign.OAuthTokens,
+                         keyStore: KeyStore
                         )
                         (implicit
                          executionContext: ExecutionContext,
@@ -41,8 +46,6 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
   private val accountID = configuration.get[String]("docusign.accountID")
   private val authenticationMethod = configuration.get[String]("docusign.authenticationMethod")
   private val basePath = configuration.get[String]("docusign.basePath")
-  private val integrationKey = configuration.get[String]("docusign.integrationKey")
-  private val clientSecret = configuration.get[String]("docusign.clientSecret")
   private val comdexURL = configuration.get[String]("comdex.url")
   private val apiClient = new ApiClient(basePath)
   private val envelopesApi = new EnvelopesApi(apiClient)
@@ -145,14 +148,14 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   def updateSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentTypeList)
 
-  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String])= {
+  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]) = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
       documentTypeList.zipWithIndex.map { case (documentType, index) =>
-        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID,(index+1).toString)
+        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID, (index + 1).toString)
         val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileByteArray)).toString, constants.File.PDF).mkString(".")
         val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
         val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
@@ -180,8 +183,11 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
   }
 
   private def generateAndUpdateAccessToken(code: String): Future[Unit] = {
-    val response = Future(apiClient.generateAccessToken(integrationKey, clientSecret, code))
+    val docusignIntegrationKey = Future(keyStore.getPassphrase("docusignIntegrationKey"))
+    val docusignClientSecret = Future(keyStore.getPassphrase("docusignClientSecret"))
     val oauthToken = docusignOAuthTokens.Service.get(accountID)
+
+    def response(docusignIntegrationKey: String, docusignClientSecret: String) = Future(apiClient.generateAccessToken(docusignIntegrationKey, docusignClientSecret, code))
 
     def updateOauthToken(response: OAuthToken, oauthToken: Option[DocusignOAuthToken]) = oauthToken match {
       case Some(value) => docusignOAuthTokens.Service.update(accountID, response.getAccessToken, System.currentTimeMillis() + response.getExpiresIn * 1000, response.getRefreshToken)
@@ -189,7 +195,9 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     }
 
     (for {
-      response <- response
+      docusignIntegrationKey <- docusignIntegrationKey
+      docusignClientSecret <- docusignClientSecret
+      response <- response(docusignIntegrationKey, docusignClientSecret)
       oauthToken <- oauthToken
       _ <- updateOauthToken(response, oauthToken)
     } yield apiClient.setAccessToken(response.getAccessToken, response.getExpiresIn)
@@ -214,6 +222,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private def fetchAuthorizationURI: String = {
     try {
+      val integrationKey = keyStore.getPassphrase("docusignIntegrationKey")
       apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.External.Docusign.CODE).toString
     } catch {
       case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
