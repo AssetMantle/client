@@ -50,12 +50,11 @@ class SFTPScheduler @Inject()(
   private val sshPrivateKeyPath = configuration.get[String]("westernUnion.sshPrivateKeyPath")
   private val wuPGPPublicKeyFileLocation = configuration.get[String]("westernUnion.wuPGPPublicKeyPath")
   private val comdexPGPPrivateKeyFileLocation = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPath")
-  private val comdexPGPPrivateKeyPassword = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPassword")
   private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
   def scheduler: Unit = {
     try {
-      val wuSFTPPassword = keyStore.getPassphrase("WU_SFTP_PASSWORD")
+      val wuSFTPPassword = keyStore.getPassphrase("wuSFTPPassword")
       val sftpSettings = SftpSettings
         .create(InetAddress.getByName(sftpSite))
         .withPort(sftpPort)
@@ -77,15 +76,22 @@ class SFTPScheduler @Inject()(
           val writeEncryptedData = Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
 
           def decryptAndReadCSV: Future[BufferedSource] = {
-            PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
+            val comdexPGPPrivateKeyPassword = Future(keyStore.getPassphrase("comdexPGPPrivateKeyPassword"))
+
+            def decrypt(comdexPGPPrivateKeyPassword: String): Future[Unit] = Future(PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword))
+
             val csvFileContentBuffer = scala.io.Source.fromFile(storagePathSFTPFiles + tempFileName)
-            val csvFileContentProcessor = Future.sequence {
+
+            def csvFileContentProcessor = Future.sequence {
               csvFileContentBuffer.getLines.drop(1).map { line =>
                 val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
                 sFTPFileTransactions.Service.create(SFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
               }
             }
+
             for {
+              comdexPGPPrivateKeyPassword <- comdexPGPPrivateKeyPassword
+              _ <- decrypt(comdexPGPPrivateKeyPassword)
               _ <- csvFileContentProcessor
             } yield csvFileContentBuffer
           }

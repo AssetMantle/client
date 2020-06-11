@@ -49,7 +49,7 @@ class WesternUnionController @Inject()(
     request =>
 
       val requestBody = views.companion.master.WesternUnionRTCB.fromXml(request.body)
-      val hash = Future(keyStore.getPassphrase("WU_RTCB_SECRET_KEY") + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
+      val hash = Future(keyStore.getPassphrase("wuRTCBSecretKey") + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
         requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount)
 
