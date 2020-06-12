@@ -45,13 +45,7 @@ class KeyStore @Inject()(configuration: Configuration) {
   def setPassphrase(alias: String, aliasValue: String): Unit = try {
     val factory = SecretKeyFactory.getInstance("PBE")
     val generatedSecret = factory.generateSecret(new PBEKeySpec(aliasValue.toCharArray))
-    val fis = try {
-      new FileInputStream(keyStoreLocation)
-    } catch {
-      case _: FileNotFoundException => null
-      case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.KEY_STORE_ERROR)
-    }
+    val fis = new FileInputStream(keyStoreLocation)
     val ks = KeyStore.getInstance(keyStoreType)
     ks.load(fis, keyStorePassword.toCharArray)
     val keyStorePasswordProtection = new KeyStore.PasswordProtection(keyStorePassword.toCharArray)
