@@ -120,9 +120,8 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     val language = masterAccounts.Service.tryGetLanguage(fromAccountID)
     (for {
       language <- language
-    } yield {
-      sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))
-    }).recover {
+    } yield sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))
+    ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
@@ -134,9 +133,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
     (for {
       emailAddress <- emailAddress
-    } yield {
-      sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
-    }
+    } yield sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException

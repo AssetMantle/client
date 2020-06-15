@@ -36,11 +36,11 @@ class MemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configurat
 
   private val endpoint = configuration.get[String]("memberCheck.endpoints.singleCorporateScan")
 
-  private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.memberCheckCorporateScan
+  //private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.memberCheckCorporateScan
 
-  //private val url = baseURL + endpoint
+  private val url = baseURL + endpoint
 
-  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL).withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request)))
+  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
   case class Request(matchType: String = "Exact", whitelist: String = "Apply", companyName: String, idNumber: Option[String] = None, entityNumber: String, address: Option[String] = None, updateMonitoringList: Boolean = true) extends BaseRequest

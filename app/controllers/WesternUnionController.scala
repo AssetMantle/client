@@ -58,9 +58,6 @@ class WesternUnionController @Inject()(
     request =>
 
       val requestBody = views.companion.master.WesternUnionRTCB.fromXml(request.body)
-      println(requestBody.externalReference)
-      println(requestBody.buyerFirstName+"  "+requestBody.buyerLastName)
-      println("signature-------"+requestBody.requestSignature)
       val hash = rtcbSecretKey + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
         requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
         requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
@@ -107,8 +104,7 @@ class WesternUnionController @Inject()(
         }
       }
         ).recover {
-        case _: Exception =>
-          utilities.XMLRestResponse.COMDEX_VALIDATION_FAILURE.result
+        case _: Exception => utilities.XMLRestResponse.COMDEX_VALIDATION_FAILURE.result
       }
   }
 

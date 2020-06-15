@@ -19,7 +19,7 @@ import scala.util.Random
 
 object ImageFeeder {
 
-  val imageFeed=imageCreator(100)
+  val imageFeed=imageCreator(Test.NUMBER_OF_USERS)
 
   def imageCreator(users: Int)={
 

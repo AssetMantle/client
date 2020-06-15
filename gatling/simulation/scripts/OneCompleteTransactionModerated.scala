@@ -209,7 +209,6 @@ object AddCounterParty {
 object IssueAssetModerated {
 
   val issueAssetModerated = scenario("IssueAssetModerated")
-    //.feed(TempFeeder.timeFeed)
     .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
@@ -374,10 +373,6 @@ object RedeemAsset {
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.redeemAsset)
     .exec(accountControllerTest.logoutScenario)
-    .exec { session =>
-      println(session)
-      session
-    }
     .pause(10)
 }
 

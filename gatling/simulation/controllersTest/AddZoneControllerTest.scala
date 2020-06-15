@@ -157,12 +157,6 @@ object addZoneControllerTest {
     )
     .pause(5)
 
-  def getZoneInvitationID(emailAddress: String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s""" SELECT COALESCE((SELECT "id" FROM master_transaction."ZoneInvitation" WHERE "emailAddress" = '$emailAddress'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
-  }
-
   def getZoneID(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s""" SELECT COALESCE((SELECT "id" FROM master."Zone" WHERE "accountID" = '$query'),'0') AS "id";""")
@@ -176,10 +170,4 @@ object addZoneControllerTest {
     else false
   }
 
-  def getUnverifiedZone() = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s"""SELECT "id" FROM master."Zone" WHERE "verificationStatus" = null;"""
-    )
-    sqlQueryFeeder.apply().next().toSeq
-  }
 }

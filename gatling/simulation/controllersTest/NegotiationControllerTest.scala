@@ -27,13 +27,13 @@ object negotiationControllerTest {
         constants.FormField.COUNTER_PARTY.name -> "${%s}".format(Test.TEST_COUNTER_PARTY),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(css("legend:contains(Payment Terms)").exists)
-     .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.ID), "value").saveAs(Test.TEST_NEGOTIATION_ID))
     )
     .pause(1)
     .feed(DateFeeder.dateFeed)
     .exec(http("Payment_Terms_Form_GET")
-      .get(session=>routes.NegotiationController.paymentTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .get(session => routes.NegotiationController.paymentTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("legend:contains(Payment Terms)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(1)
@@ -51,7 +51,7 @@ object negotiationControllerTest {
     )
     .pause(1)
     .exec(http("Document_List_Form_GET")
-      .get(session=>routes.NegotiationController.documentListForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .get(session => routes.NegotiationController.documentListForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("legend:contains(Sales Quote Documents List)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(1)
@@ -72,7 +72,7 @@ object negotiationControllerTest {
     )
     .pause(1)
     .exec(http("Document_List_Form_GET")
-      .get(session=>routes.NegotiationController.reviewRequestForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .get(session => routes.NegotiationController.reviewRequestForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("legend:contains(Review Sales Quote)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(1)
@@ -217,13 +217,13 @@ object negotiationControllerTest {
             .transferEncoding("binary")).asMultipartForm)
         .exec(
           http("Store_Asset_Document_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
-            .get(session => routes.FileController.storeAsset(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String],session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+            .get(session => routes.FileController.storeAsset(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
         )
         .pause(2)
     }
 
   val addBillOfLading: ScenarioBuilder = scenario("AddBillOfLading")
-    .feed(IssueAssetOBLFeeder.issueAssetOBLFeeder)
+    .feed(OBLFeeder.oblFeed)
     .feed(AssetDetailFeeder.assetDetailFeed)
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
     .exec(http("AddBillOfLadingForm_GET")
@@ -279,7 +279,7 @@ object negotiationControllerTest {
             .transferEncoding("binary")).asMultipartForm)
         .exec(
           http("Store_Negotiation_Document_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
-            .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String],session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+            .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
         )
         .pause(2)
     }
@@ -340,9 +340,9 @@ object negotiationControllerTest {
     )
     .pause(5)
 
-  def getNegotiationStatus(query:String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Negotiation" WHERE "id" = '$query'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
+  def getNegotiationStatus(query: String) = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
+      s"""SELECT COALESCE((SELECT "status" FROM master."Negotiation" WHERE "id" = '$query'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("status").toString
   }
 }

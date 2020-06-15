@@ -12,7 +12,7 @@ object backgroundCheckControllerTest {
 
   val corporateScan: ScenarioBuilder = scenario("CorporateScan")
     .exec(http("Member_Check_Corporate_Scan_Form_Get")
-      .get(session=>routes.BackgroundCheckController.corporateScanForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_NAME).as[String]).url)
+      .get(session => routes.BackgroundCheckController.corporateScanForm(session(Test.TEST_ORGANIZATION_ID).as[String], session(Test.TEST_NAME).as[String]).url)
       .check(css("legend:contains(Member Check Corporate Scan)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
@@ -28,7 +28,7 @@ object backgroundCheckControllerTest {
     .pause(2)
     .exec { session => session.set(Test.TEST_SCAN_ID, getCorporateScanID(session(Test.TEST_NAME).as[String])) }
     .exec(http("Add_Organization_Member_Check_Form_GET")
-      .get(session=>routes.BackgroundCheckController.addOrganizationMemberCheckForm(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_SCAN_ID).as[Int],None).url)
+      .get(session => routes.BackgroundCheckController.addOrganizationMemberCheckForm(session(Test.TEST_ORGANIZATION_ID).as[String], session(Test.TEST_SCAN_ID).as[Int], None).url)
       .check(css("legend:contains(Add Organization Member Check)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -47,7 +47,7 @@ object backgroundCheckControllerTest {
 
   val vesselScan: ScenarioBuilder = scenario("VesselScan")
     .exec(http("Member_Check_Vessel_Scan_Form_Get")
-      .get(session=>routes.BackgroundCheckController.vesselScanForm(session(Test.TEST_ASSET_ID).as[String],session(Test.TEST_VESSEL_NAME).as[String]).url)
+      .get(session => routes.BackgroundCheckController.vesselScanForm(session(Test.TEST_ASSET_ID).as[String], session(Test.TEST_VESSEL_NAME).as[String]).url)
       .check(css("legend:contains(Member Check Vessel Scan)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
@@ -63,7 +63,7 @@ object backgroundCheckControllerTest {
     .pause(2)
     .exec { session => session.set(Test.TEST_SCAN_ID, getVesselScanID(session(Test.TEST_VESSEL_NAME).as[String])) }
     .exec(http("Add_Asset_Member_Check_Form_GET")
-      .get(session=>routes.BackgroundCheckController.addAssetMemberCheckForm(session(Test.TEST_ASSET_ID).as[String],session(Test.TEST_SCAN_ID).as[Int],None).url)
+      .get(session => routes.BackgroundCheckController.addAssetMemberCheckForm(session(Test.TEST_ASSET_ID).as[String], session(Test.TEST_SCAN_ID).as[Int], None).url)
       .check(css("legend:contains(Add Asset Member Check)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -82,13 +82,13 @@ object backgroundCheckControllerTest {
     .pause(2)
 
   def getVesselScanID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "scanID" FROM member_check."VesselScan" WHERE "vesselName" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getCorporateScanID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "scanID" FROM member_check."CorporateScan" WHERE "companyName" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }

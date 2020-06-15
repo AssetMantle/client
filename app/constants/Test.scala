@@ -3,7 +3,7 @@ package constants
 object Test {
   val NUMBER_OF_USERS = 1500
 
-  val TEST_IP = "localhost"
+  val TEST_IP = "18.136.170.155"
 
   val BASE_URL = "http://" + TEST_IP + ":9000"
 
@@ -240,8 +240,5 @@ object Test {
   val CREDIT_TENURE = "CREDIT.TENURE"
   val CREDIT_TENTATIVE_DATE = "CREDIT.TENTATIVE_DATE"
   val CREDIT_REFRENCE = "CREDIT.REFRENCE"
-
-  //termType
-  val NEGOTIATION_TERMS = Seq("")
 
 }
