@@ -13,7 +13,7 @@ import scala.util.Random
 
 object ImageFeeder2 {
 
-  val imageFeed2=imageCreator(500)
+  val imageFeed2=imageCreator(100)
 
   def imageCreator(users: Int)={
 

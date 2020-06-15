@@ -10,19 +10,13 @@ import io.gatling.jdbc.Predef.jdbcFeeder
 
 import scala.util.Random
 
-class AddZoneControllerTest extends Simulation {
-
-  val scenarioBuilder: ScenarioBuilder = addZoneControllerTest.inviteZoneScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
-}
-
 object addZoneControllerTest {
 
   val inviteZoneScenario: ScenarioBuilder = scenario("InviteZone")
     .feed(EmailAddressFeeder.emailAddressFeed)
     .exec(http("InviteZoneForm_GET")
       .get(routes.AddZoneController.inviteZoneForm().url)
-      .check(css("legend:contains(%s)".format("Add Zone")).exists)
+      .check(css("legend:contains(Invite Zone)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -32,7 +26,9 @@ object addZoneControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         constants.FormField.EMAIL_ADDRESS.name -> "${%s}".format(Test.TEST_EMAIL_ADDRESS)
       ))
+      .check(substring("Zone Invitation Sent").exists)
     )
+    .pause(1)
 
   val addZoneRequestScenario: ScenarioBuilder = scenario("AddZoneRequest")
     .exec(http("Add_Zone_Form_GET")
@@ -58,18 +54,20 @@ object addZoneControllerTest {
         Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
       .check(substring("Zone KYC").exists)
+      .check(css("button:contains(Upload Identification)").exists)
+      .check(css("button:contains(Upload Bank Account Detail)").exists)
     )
     .pause(2)
-    .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, "documentType") {
+    .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
       feed(ImageFeeder.imageFeed)
-        .exec(http("ZoneKYC_Upload_" + "${documentType}" + "_Form_GET")
-          .get(session => routes.AddZoneController.userUploadZoneKYCForm(session("documentType").as[String]).url)
-          .check(substring("Browse").exists)
+        .exec(http("ZoneKYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_Form_GET")
+          .get(session => routes.AddZoneController.userUploadZoneKYCForm(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+          .check(css("button:contains(Browse)").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(2)
-        .exec(http("ZoneKYC_Upload_" + "${documentType}")
-          .post(session => routes.AddZoneController.userUploadZoneKYC(session("documentType").as[String]).url)
+        .exec(http("ZoneKYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+          .post(session => routes.AddZoneController.userUploadZoneKYC(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
           .formParamMap(Map(
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
             Form.RESUMABLE_CHUNK_NUMBER -> "1",
@@ -80,8 +78,8 @@ object addZoneControllerTest {
           .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
             .transferEncoding("binary")).asMultipartForm)
         .exec(
-          http("Store_ZoneKYC_" + "${documentType}")
-            .get(session => routes.AddZoneController.userStoreZoneKYC(session(Test.TEST_FILE_NAME).as[String], session("documentType").as[String]).url)
+          http("Store_ZoneKYC_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+            .get(session => routes.AddZoneController.userStoreZoneKYC(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
             .check(substring("Zone KYC").exists)
         )
         .pause(2)
@@ -89,7 +87,7 @@ object addZoneControllerTest {
     .pause(1)
     .exec(http("User_Review_Add_Zone_Request_Form")
       .get(routes.AddZoneController.userReviewAddZoneRequestForm().url)
-      .check(css("legend:contains(%s)".format("Review and Submit Zone details")).exists)
+      .check(css("legend:contains(Review and Submit Zone details)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -104,25 +102,30 @@ object addZoneControllerTest {
     .pause(2)
 
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
-    .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, "documentType") {
-      exec(http("ZoneKYCUpdate"+"${documentType}"+"StatusForm_GET")
-        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String],session("documentType").as[String]).url)
+    .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
+      exec(http("ZoneKYCUpdate"+"${%s}".format(Test.TEST_DOCUMENT_TYPE)+"StatusForm_GET")
+        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String],session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+        .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
+        .check(css("button:contains(Approve)").exists)
+        .check(css("button:contains(Reject)").exists)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
         .pause(2)
-        .exec(http("Zone_KYC_update_Status_" + "${documentType}")
+        .exec(http("Zone_KYC_update_Status_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
           .post(routes.AddZoneController.updateZoneKYCDocumentStatus().url)
           .formParamMap(Map(
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
             constants.FormField.ZONE_ID.name -> "${%s}".format(Test.TEST_ZONE_ID),
-            constants.FormField.DOCUMENT_TYPE.name -> "${documentType}",
+            constants.FormField.DOCUMENT_TYPE.name -> "${%s}".format(Test.TEST_DOCUMENT_TYPE),
             constants.FormField.STATUS.name -> true
           ))
+          .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
+          .check(css("button:contains(Reject)").exists)
         )
         .pause(2)
     }
     .exec(http("Verify_Zone_GET")
       .get(session => routes.AddZoneController.verifyZoneForm(session(Test.TEST_ZONE_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format("Verify Zone")).exists)
+      .check(css("legend:contains(Verify Zone)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .feed(GasFeeder.gasFeed)
@@ -140,9 +143,8 @@ object addZoneControllerTest {
 
   val rejectVerifyZoneScenario: ScenarioBuilder = scenario("RejectVerifyZone")
     .exec(http("RejectVerifyZone_GET")
-      .get(routes.AddZoneController.rejectVerifyZoneRequestForm(Test.TEST_ZONE_ID).url)
+      .get(session => routes.AddZoneController.rejectVerifyZoneRequestForm(session(Test.TEST_ZONE_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.REJECT_VERIFY_ZONE_REQUEST.legend)).exists)
-      .check(css("[name=%s]".format(constants.FormField.ZONE_ID.name), "value").saveAs(Test.TEST_ZONE_ID))
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
 
     .pause(2)
@@ -156,26 +158,26 @@ object addZoneControllerTest {
     .pause(5)
 
   def getZoneInvitationID(emailAddress: String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s""" SELECT COALESCE((SELECT "id" FROM master_transaction."ZoneInvitation" WHERE "emailAddress" = '$emailAddress'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getZoneID(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s""" SELECT COALESCE((SELECT "id" FROM master."Zone" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getZoneStatus(query: String): Boolean = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s"""SELECT "status" FROM master."Zone" WHERE "accountID" = '$query';""")
     if (sqlQueryFeeder.apply().next()("status") == true) true
     else false
   }
 
   def getUnverifiedZone() = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s"""SELECT "id" FROM master."Zone" WHERE "verificationStatus" = null;"""
     )
     sqlQueryFeeder.apply().next().toSeq

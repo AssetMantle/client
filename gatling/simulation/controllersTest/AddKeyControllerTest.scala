@@ -8,11 +8,6 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
-class AddKeyControllerTest extends Simulation {
-  val scenarioBuilder: ScenarioBuilder = addKeyControllerTest.addKeyScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
-}
-
 object addKeyControllerTest {
 
   val addKeyScenario: ScenarioBuilder = scenario("AddKey")
@@ -27,7 +22,7 @@ object addKeyControllerTest {
       .post(routes.AddKeyController.blockchainAddKey().url)
       .formParamMap(Map(
         constants.FormField.NAME.name -> "${%s}".format(Test.TEST_NAME),
-        Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("SUCCESS KEY_ADDED").exists)
     )

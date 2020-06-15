@@ -19,7 +19,7 @@ import scala.util.Random
 
 object ImageFeeder {
 
-  val imageFeed=imageCreator(1000)
+  val imageFeed=imageCreator(100)
 
   def imageCreator(users: Int)={
 
@@ -31,7 +31,7 @@ object ImageFeeder {
      val img = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB)
         for(w <- 0 to width-1){
           for(h <- 0 to height-1){
-          img.setRGB(w, h, Random.nextInt(1000))
+          img.setRGB(w, h, Random.nextInt(100))
       }}
 
       val fileName="test"+Random.alphanumeric.take(6).mkString+".jpg"

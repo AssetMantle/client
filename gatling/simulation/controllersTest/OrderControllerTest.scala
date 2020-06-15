@@ -2,24 +2,18 @@ package controllersTest
 
 import constants.{Form, Test}
 import controllers.routes
-import controllersTest.changeBuyerBidControllerTest.getAddressFromAccountID
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef.jdbcFeeder
 
-class OrderControllerTest extends Simulation {
-
-  val scenarioBuilder: ScenarioBuilder = orderControllerTest.moderatedBuyerExecuteOrderScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
-}
-
 object orderControllerTest {
 
   val moderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedBuyerExecuteOrder")
     .exec(http("ModeratedBuyerExecuteOrderForm_GET")
       .get(session => routes.OrderController.moderatedBuyerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("legend:contains(Moderated Buyer Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -30,12 +24,14 @@ object orderControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Buyer Order Executed").exists)
     )
     .pause(4)
 
   val moderatedSellerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedSellerExecuteOrder")
     .exec(http("ModeratedSellerExecuteOrderForm_GET")
       .get(session => routes.OrderController.moderatedSellerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("legend:contains(Moderated Seller Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -46,11 +42,50 @@ object orderControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Seller Order Executed").exists)
+    )
+    .pause(4)
+
+  val unmoderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("UnmoderatedBuyerExecuteOrder")
+    .feed(FiatProofHashFeeder.fiatProofHashFeed)
+    .exec(http("UnmoderatedBuyerExecuteOrderForm_GET")
+      .get(session => routes.OrderController.buyerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("legend:contains(Execute Order)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("UnmoderatedBuyerExecuteOrder_POST")
+      .post(routes.OrderController.buyerExecute().url)
+      .formParamMap(Map(
+        constants.FormField.ORDER_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.FIAT_PROOF.name -> "${%s}".format(Test.TEST_FIAT_PROOF_HASH),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Buyer Order Executed").exists)
+    )
+    .pause(4)
+
+  val unmoderatedSellerExecuteOrderScenario: ScenarioBuilder = scenario("UnmoderatedSellerExecuteOrder")
+    .exec(http("UnmoderatedSellerExecuteOrderForm_GET")
+      .get(session => routes.OrderController.sellerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(css("legend:contains(Execute Order)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+    )
+    .pause(2)
+    .exec(http("UnmoderatedSellerExecuteOrder_POST")
+      .post(routes.OrderController.sellerExecute().url)
+      .formParamMap(Map(
+        constants.FormField.ORDER_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
+        constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Seller Order Executed").exists)
     )
     .pause(4)
 
   def getOrderStatus(query:String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "status" FROM master."Order" WHERE "id" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }

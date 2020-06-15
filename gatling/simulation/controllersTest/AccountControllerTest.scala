@@ -8,17 +8,12 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef.jdbcFeeder
 
-class AccountControllerTest extends Simulation {
-  val scenarioBuilder: ScenarioBuilder = accountControllerTest.signUpScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
-}
-
 object accountControllerTest {
 
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
     .exec(http("SignUp_GET")
       .get(routes.AccountController.signUpForm().url)
-      .check(substring("Register").exists)
+      .check(css("legend:contains(Register)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -30,12 +25,12 @@ object accountControllerTest {
         constants.FormField.SIGNUP_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Blockchain Passphrase").exists)
+      .check(css("legend:contains(Blockchain Passphrase)").exists)
     )
     .pause(2)
     .exec(http("CreateWallet_GET")
-      .get(session=>routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
-      .check(substring("Blockchain Passphrase").exists)
+      .get(session => routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
+      .check(css("legend:contains(Blockchain Passphrase)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.MNEMONICS), "value").saveAs(Test.MNEMONICS))
     )
@@ -43,7 +38,7 @@ object accountControllerTest {
     .exec(http("CreateWallet_POST")
       .post(routes.AccountController.createWallet().url)
       .formParamMap(Map(
-        constants.FormField.USERNAME.name -> ("${%s}".format(Test.TEST_USERNAME)),
+        constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
         constants.FormField.MNEMONICS.name->"${%s}".format(Test.MNEMONICS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
@@ -54,7 +49,7 @@ object accountControllerTest {
   val loginScenario: ScenarioBuilder = scenario("Login")
     .exec(http("LoginForm_GET")
       .get(routes.AccountController.loginForm().url)
-      .check(css("legend:contains(%s)".format("Login")).exists)
+      .check(css("legend:contains(Login)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(1)
     .exec(http("Login_POST")
@@ -69,32 +64,8 @@ object accountControllerTest {
       .check(substring("Trades").exists)
       .check(substring("Transactions").exists)
       .check(substring("Account").exists)
-
     )
     .pause(3)
-
-  val profile: ScenarioBuilder = scenario("LoginMain")
-    .exec(http("Profile_GET")
-        .get(routes.ViewController.profile().url)
-        .resources(
-          http("identification")
-        .get(routes.ComponentViewController.identification().url),
-          http("commonHome")
-            .get(routes.ComponentViewController.commonHome().url),
-          http("contact")
-            .get(routes.ContactController.contact().url),
-          http("recentActivities")
-            .get(routes.ComponentViewController.recentActivities().url),
-          http("unreadNotificationCount")
-            .get(routes.NotificationController.unreadNotificationCount().url),
-          http("profilePicture")
-            .get(routes.ComponentViewController.profilePicture().url),
-          http("recentActivityMessages")
-            .get(routes.NotificationController.recentActivityMessages(1).url)
-        )
-    )
-    .pause(1)
-
 
   val loginMain: ScenarioBuilder = scenario("LoginMain")
     .feed(GenesisFeeder.genesisFeed)
@@ -111,13 +82,17 @@ object accountControllerTest {
         constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("${%s}".format(Test.TEST_MAIN_USERNAME)).exists)
+      .check(substring("Dashboard").exists)
+      .check(substring("Trades").exists)
+      .check(substring("Transactions").exists)
+      .check(substring("Account").exists)
     )
     .pause(5)
 
   val logoutScenario: ScenarioBuilder = scenario("Logout")
     .exec(http("Logout_Form_GET")
       .get(routes.AccountController.logoutForm().url)
-      .check(css("legend:contains(%s)".format("Logout")).exists)
+      .check(css("legend:contains(Logout)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Logout_POST")
@@ -132,12 +107,13 @@ object accountControllerTest {
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Form")
       .get(routes.AccountController.addIdentificationForm().url)
-      .check(css("legend:contains(%s)".format("Provide your details below")).exists)
+      .check(css("legend:contains(Provide your details below)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .feed(NameFeeder.nameFeed)
     .feed(IdentificationFeeder.identificationFeed)
     .feed(AddressDataFeeder.addressDataFeed)
+    .feed(DateFeeder.dateFeed)
     .pause(2)
     .exec(http("AddIdentification_Post")
       .post(routes.AccountController.addIdentification().url)
@@ -145,7 +121,7 @@ object accountControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         constants.FormField.FIRST_NAME.name -> "${%s}".format(Test.TEST_FIRST_NAME),
         constants.FormField.LAST_NAME.name -> "${%s}".format(Test.TEST_LAST_NAME),
-        constants.FormField.DATE_OF_BIRTH.name -> "2019-11-11",
+        constants.FormField.DATE_OF_BIRTH.name -> "${%s}".format(Test.TEST_DATE),
         constants.FormField.ID_NUMBER.name -> "${%s}".format(Test.TEST_ID_NUMBER),
         constants.FormField.ID_TYPE.name -> "${%s}".format(Test.TEST_ID_TYPE),
         Form.ADDRESS_ADDRESS_LINE_1 -> "${%s}".format(Test.TEST_ADDRESS_LINE_1),
@@ -156,11 +132,13 @@ object accountControllerTest {
         Form.ADDRESS_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
+      .check(substring("Provide proof of identity").exists)
+      .check(css("button:contains(Upload Identification)").exists)
     )
     .pause(2)
     .exec(http("UploadIdentificationForm")
       .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
-      .check(substring("Browse").exists)
+      .check(css("button:contains(Browse)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
@@ -179,14 +157,17 @@ object accountControllerTest {
     .exec(
       http("Store_Identification")
         .get(session=>routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String],"IDENTIFICATION").url)
+        .check(substring("Provide proof of identity").exists)
+        .check(css("button:contains(Update Identification)").exists)
     )
     .pause(2)
-    .exec(http("ReviewIdentificationForm")
+    .exec(http("ReviewIdentificationForm_GET")
       .get(routes.AccountController.userReviewIdentificationForm().url)
+      .check(css("legend:contains(User Review Identification)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
-    .exec(http("ReviewIdentification_Post")
+    .exec(http("ReviewIdentification_POST")
       .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
@@ -197,7 +178,7 @@ object accountControllerTest {
     .pause(2)
 
   def getUserType(query: String):String={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "userType" FROM master."Account" WHERE id = '$query'),'0') AS "userType";""")
     sqlQueryFeeder.apply().next()("userType").toString
   }

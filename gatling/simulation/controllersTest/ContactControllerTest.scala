@@ -7,12 +7,6 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
-class ContactControllerTest extends Simulation {
-
-  val scenarioBuilder: ScenarioBuilder = contactControllerTest.addMobileNumberScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(Test.NUMBER_OF_USERS))).protocols(http.baseUrl(Test.BASE_URL))
-}
-
 object contactControllerTest {
 
   val addMobileNumberScenario: ScenarioBuilder = scenario("addMobileNumber")

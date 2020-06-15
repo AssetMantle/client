@@ -9,12 +9,6 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef.jdbcFeeder
 
-class SetACLControllerTest extends Simulation {
-
-  val scenarioBuilder: ScenarioBuilder = setACLControllerTest.addTraderRequest
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
-}
-
 object setACLPrivileges {
   val issueAsset = true
   val issueFiat = true
@@ -34,31 +28,27 @@ object setACLPrivileges {
 
 object setACLControllerTest {
 
-  val addTraderRequest=scenario("AddTraderRequest")
+  val addTraderRequest = scenario("AddTraderRequest")
     .exec(http("Add_Trader_Form_GET")
       .get(routes.SetACLController.addTraderForm().url)
-      .check(css("legend:contains(%s)".format("Register Trader")).exists)
+      .check(css("legend:contains(Register Trader)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)
     .exec(http("Add_Trader_POST")
-            .post(routes.SetACLController.addTrader().url)
-            .formParamMap(Map(
-              Test.CSRF_TOKEN-> "${%s}".format(Test.CSRF_TOKEN),
-              constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-            ))
+      .post(routes.SetACLController.addTrader().url)
+      .formParamMap(Map(
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+        constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+      ))
       .check(substring("Details submitted for organization approval").exists)
     )
     .pause(2)
 
-  val organizationVerifyTrader=scenario("organizationVerifyTrader")
-    .exec(http("viewPendingTraderRequest")
-      .get(session=>routes.ComponentViewController.organizationViewPendingTraderRequest(session(Test.TEST_TRADER_ID).as[String]).url)
-      .check(substring("${%s}".format(Test.TEST_TRADER_ID)).exists)
-    )
-    .pause(2)
+  val organizationVerifyTrader = scenario("organizationVerifyTrader")
     .exec(http("Organization_Verify_Trader_GET")
-      .get(session=>routes.SetACLController.organizationVerifyTraderForm(session(Test.TEST_TRADER_ID).as[String]).url)
+      .get(session => routes.SetACLController.organizationVerifyTraderForm(session(Test.TEST_TRADER_ID).as[String]).url)
+      .check(css("legend:contains(Set Trader Controls)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(2)
     .feed(GasFeeder.gasFeed)
@@ -66,7 +56,7 @@ object setACLControllerTest {
       .post(routes.SetACLController.organizationVerifyTrader().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
-        constants.FormField.ACCOUNT_ID.name-> "${%s}".format(Test.TEST_TRADER_USERNAME),
+        constants.FormField.ACCOUNT_ID.name -> "${%s}".format(Test.TEST_TRADER_USERNAME),
         constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
         constants.FormField.ISSUE_ASSET.name -> setACLPrivileges.issueAsset,
         constants.FormField.ISSUE_FIAT.name -> setACLPrivileges.issueFiat,
@@ -85,17 +75,12 @@ object setACLControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD)
       ))
+      .check(substring("Trader Controls set successfully").exists)
     )
     .pause(2)
 
-  def getAccountAddressByUsername(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE "id" = '$query'),'0') AS "accountAddress";""")
-    sqlQueryFeeder.apply().next()("accountAddress").toString
-  }
-
-  def getTraderID(query: String): String={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://18.136.170.155:5432/commit", "commit", "commit",
+  def getTraderID(query: String): String = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
       s"""SELECT COALESCE((SELECT "id" FROM master."Trader" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }

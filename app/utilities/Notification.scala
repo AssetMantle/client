@@ -4,6 +4,7 @@ import com.twilio.Twilio
 import com.twilio.`type`.PhoneNumber
 import com.twilio.exception.{ApiConnectionException, ApiException}
 import com.twilio.rest.api.v2010.account.Message
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -13,7 +14,8 @@ import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class Notification @Inject()(masterTransactionNotifications: masterTransaction.Notifications,
@@ -63,8 +65,9 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-    //val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
-    val send=Future.successful("sent")
+    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    //val send = wsClient.url(constants.Test.BASE_URL + routes.LoopBackController.sendSMS).get()
+
     (for {
       _ <- send
     } yield ()
@@ -72,9 +75,10 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
-        throw new BaseException(constants.Response.SMS_SEND_FAILED)
+        throw new BaseException(constants.Response.SMS_SEND_FAILED, apiException)
       case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
-        throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE)
+        throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE, apiConnectionException)
+      case e: Exception => logger.error(e.getMessage, e)
     }
   }
 
@@ -99,15 +103,17 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   }
 
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
-    mailerClient.send(Email(
-      subject = messagesApi(email.subject),
-      from = emailFromAddress,
-      to = Seq(emailAddress),
-      bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-      charset = Option(emailCharset),
-      replyTo = Seq(emailReplyTo),
-      bounceAddress = Option(emailBounceAddress),
-    ))
+      mailerClient.send(Email(
+        subject = messagesApi(email.subject),
+        from = emailFromAddress,
+        to = Seq(emailAddress),
+        bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
+        charset = Option(emailCharset),
+        replyTo = Seq(emailReplyTo),
+        bounceAddress = Option(emailBounceAddress),
+      ))
+
+   // Await.result(wsClient.url(constants.Test.BASE_URL + routes.LoopBackController.sendEmail).get().map(response => response.toString), Duration.Inf)
   }
 
   def sendEmailToEmailAddress(fromAccountID: String, emailAddress: String, email: constants.Notification.Email, messageParameters: String*): Future[String] = {
@@ -115,13 +121,11 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     (for {
       language <- language
     } yield {
-      //sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))}
-      "Sent"
+      sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
-
   }
 
   private def sendEmailByAccountID(accountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Future[String] = {
@@ -131,8 +135,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     (for {
       emailAddress <- emailAddress
     } yield {
-      //sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
-      "sent"
+      sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)
     }
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)

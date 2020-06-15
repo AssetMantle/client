@@ -37,4 +37,12 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(queries.responses.MemberCheckCorporateScanResponse.Response(scanParam, scanResult)).toString())
   }
 
+  def sendEmail=Action{
+    Ok
+  }
+
+  def sendSMS=Action{
+    Ok
+  }
+
 }
