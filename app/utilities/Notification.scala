@@ -72,13 +72,9 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       _ <- send
     } yield ()
       ).recover {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
-      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
-        throw new BaseException(constants.Response.SMS_SEND_FAILED, apiException)
-      case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
-        throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE, apiConnectionException)
-      case e: Exception => logger.error(e.getMessage, e)
+      case baseException: BaseException => throw baseException
+      case apiException: ApiException => throw new BaseException(constants.Response.SMS_SEND_FAILED, apiException)
+      case apiConnectionException: ApiConnectionException => throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE, apiConnectionException)
     }
   }
 
