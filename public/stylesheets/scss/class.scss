@@ -397,6 +397,18 @@ html, body{
   margin-bottom: 5px;
 }
 
+.checkboxSection {
+  position: relative;
+  .warningIcon {
+    position: absolute;
+    top: 10px;
+    left: 255px;
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
 .mobileNumberUpdate {
   .countryCode {
     margin-top: 46px;

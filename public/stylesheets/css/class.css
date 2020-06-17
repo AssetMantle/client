@@ -318,6 +318,16 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #0862BE;
   margin-bottom: 5px; }
 
+.checkboxSection {
+  position: relative; }
+  .checkboxSection .warningIcon {
+    position: absolute;
+    top: 10px;
+    left: 255px; }
+    .checkboxSection .warningIcon .icon {
+      width: 20px;
+      height: 20px; }
+
 .mobileNumberUpdate .countryCode {
   margin-top: 46px;
   width: 80px;
