@@ -6,6 +6,8 @@ import transactions.Abstract.BaseResponse
 object MnemonicResponse {
 
   class Response(response: WSResponse) extends BaseResponse {
+    println(response)
     val body: String = response.body
+    println("responseBody---"+response.body)
   }
 }

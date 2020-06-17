@@ -3,7 +3,7 @@ package constants
 object Test {
   val NUMBER_OF_USERS = 1500
 
-  val TEST_IP = "18.136.170.155"
+  val TEST_IP = "localhost"
 
   val BASE_URL = "http://" + TEST_IP + ":9000"
 

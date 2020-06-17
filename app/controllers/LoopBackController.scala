@@ -27,6 +27,8 @@ class LoopBackController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
+  private val mnemonicSampleElements=Seq("crush","spin","banana","cushion","danger","lunar","earn","unique","problem","crack","coral","mirror","battle","wreck","abandon","clarify","push","evil","embody","insane","gravity","gain","table","kangaroo","slim","regular","index","buddy","dad","recycle","suspect","pair","cram","fold","seven","host","palm","lawsuit","rocket","region","habit","produce","blossom","mosquito","daring","twin","isolate","surround","drip","health","stem","sure","coast","breeze","smart","husband","soup","memory","drill","giggle","ritual","mechanic","march","potato","until","short","animal","only","prison","token","illness","subway","pudding","balance","useless","aspect","view","vital","bamboo","have","release","recipe","subject","envelope","avoid","duck","host","category","mystery","chapter","card","model","diet","mail","unaware","mistake")
+
   def memberCheckCorporateScan = Action {
     Ok(Json.toJson(transactions.responses.MemberCheckCorporateScanResponse.Response(Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)).toString())
   }
@@ -45,4 +47,11 @@ class LoopBackController @Inject()(
     Ok
   }
 
+  def mnemonic=Action{
+    Ok(Random.shuffle(mnemonicSampleElements).take(24).mkString(" "))
+  }
+
+  def account(address:String)=Action{
+    Ok()
+  }
 }
