@@ -48,9 +48,13 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
+  private val smsAuthToken = keyStore.getPassphrase("twilioSMSAuthToken")
+
+  Twilio.init(smsAccountSID, smsAuthToken)
+
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
 
-  private val pushNotificationAuthorizationKey = configuration.get[String]("pushNotification.authorizationKey")
+  private val pushNotificationAuthorizationKey = keyStore.getPassphrase("pushNotificationAuthorizationKey")
 
   private case class Notification(title: String, body: String)
 
@@ -62,17 +66,9 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
 
-    def getAuthTokenAndInitialize = {
-      val smsAuthToken = Future(keyStore.getPassphrase("twilioSMSAuthToken"))
-      for {
-        smsAuthToken <- smsAuthToken
-      } yield Twilio.init(smsAccountSID, smsAuthToken)
-    }
-
-    def send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
 
     (for {
-      _ <- getAuthTokenAndInitialize
       _ <- send
     } yield ()
       ).recover {
@@ -90,7 +86,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
     val pushNotificationToken = masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
 
-    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
+    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> ("key=" + pushNotificationAuthorizationKey)).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
 
     (for {
       title <- title
