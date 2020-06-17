@@ -97,6 +97,8 @@ class SendFiats @Inject()(
     }
   }
 
+  private def findTransactionHashesByBuyerSellerPegHashAndStatus(buyerAddress: String, sellerAddress: String, pegHash: String, status: Option[Boolean]): Future[Seq[Option[String]]] = db.run(sendFiatTable.filter(_.from === buyerAddress).filter(_.to === sellerAddress).filter(_.pegHash === pegHash).filter(_.status.? === status).map(_.txHash.?).result)
+
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -193,6 +195,8 @@ class SendFiats @Inject()(
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
     def getMode(ticketID: String): Future[String] = findModeByTicketID(ticketID)
+
+    def getFiatProofs(buyerAddress: String, sellerAddress: String, pegHash: String): Future[Seq[String]] = findTransactionHashesByBuyerSellerPegHashAndStatus(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash, status = Option(true)).map(_.map(_.getOrElse(throw new BaseException(constants.Response.TRANSACTION_HASH_NOT_FOUND))).sorted)
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
