@@ -1,8 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.master.Negotiation
-@import models.master.NegotiationHistory
-@(walletBalance: Int, amountPaid: Int, amountPending: Int, traderID: String, negotiationHistory: NegotiationHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@(walletBalance: Int, amountPaid: Int, amountPending: Int, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <ul class="">
     <li class="cmuk-flex">
         <div class="cmuk-flex wallet">
@@ -22,7 +21,11 @@
             <span class="receivableIcon">@commonIcon("receivable")</span>
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
-                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
+                    @amountPaid
+                } else {
+                    0
+                }</p>
             </div>
         </div>
     </li>
