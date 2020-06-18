@@ -67,7 +67,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 5px;
   font-size: 10px; }
 
-.centerScreen, .MnemonicQuiz form .formBody .commonInputPassword, .banner, .salesQuoteCard .salesQuoteCardLeft .assetIcon, .salesQuoteCard .salesQuoteCardRight {
+.centerScreen, .mnemonicQuiz form .formBody .commonInputPassword, .banner, .salesQuoteCard .salesQuoteCardLeft .assetIcon, .salesQuoteCard .salesQuoteCardRight {
   display: flex;
   justify-content: center;
   align-items: center; }
@@ -109,7 +109,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   text-transform: uppercase;
   font-weight: bold; }
 
-.MnemonicQuiz .hidden,
+.mnemonicQuiz .hidden,
 .hidden {
   display: none; }
 
@@ -205,7 +205,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 3px;
   background-color: #ddd;
   height: 13px;
-  margin-bottom: 5px; }
+  margin: 10px 0; }
 
 .progressBar {
   width: 0;
@@ -320,12 +320,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .mobileNumberUpdate .countryCode {
   margin-top: 46px;
-  width: 80px;
+  width: 100px;
   margin-right: 10px; }
 .mobileNumberUpdate .mobileNumber {
   width: 100%; }
 .mobileNumberUpdate .mobileNumber label {
-  margin-left: -77px; }
+  margin-left: -90px; }
 
 .connectionError {
   height: 140px;
@@ -801,36 +801,36 @@ form .formBody {
     margin-top: 20px;
     padding: 5px 0; }
 
-.MnemonicQuiz form .formBody .commonInputPassword dd input {
+.mnemonicQuiz form .formBody .commonInputPassword dd input {
   width: 450px; }
-.MnemonicQuiz form .formBody .buttonPrimary {
+.mnemonicQuiz form .formBody .buttonPrimary {
   width: 450px;
   margin-top: 20px;
   padding: 5px 0; }
-.MnemonicQuiz .titleMnemonic {
+.mnemonicQuiz .titleMnemonic {
   font-weight: bold; }
-.MnemonicQuiz .errorMnemonicInput {
+.mnemonicQuiz .errorMnemonicInput {
   display: none;
   color: red;
   padding: 10px;
   font-size: 0.875rem; }
-.MnemonicQuiz .verifyMnemonic {
+.mnemonicQuiz .verifyMnemonic {
   flex-wrap: wrap;
   justify-content: center; }
-  .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
+  .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
     width: 114px;
     height: 38px;
     margin-right: 10px;
     margin-bottom: 10px;
     border-radius: 3px; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton input {
+    .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton input {
       color: #061728;
       text-align: center; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton .mnemonicField {
+    .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton .mnemonicField {
       background-color: #FFffff; }
-.MnemonicQuiz .buttonPrimary {
+.mnemonicQuiz .buttonPrimary {
   font-size: 0.875rem; }
-.MnemonicQuiz .mnemonicNote {
+.mnemonicQuiz .mnemonicNote {
   font-size: 0.875rem;
   text-align: justify;
   word-break: break-word;
@@ -842,23 +842,23 @@ form .formBody {
   background: url("../../images/note.svg") 112%/125px no-repeat #FF2938;
   display: flex;
   align-items: center; }
-  .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
+  .mnemonicQuiz .mnemonicNote .mnemonicNoteText {
     width: 73%; }
-  .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon {
+  .mnemonicQuiz .mnemonicNote .mnemonicInfoIcon {
     padding: 10px 20px 10px 10px;
     width: 20px;
     height: 20px; }
-    .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon .icon {
+    .mnemonicQuiz .mnemonicNote .mnemonicInfoIcon .icon {
       width: 20px;
       height: 20px; }
-.MnemonicQuiz .infoSuccess {
+.mnemonicQuiz .infoSuccess {
   padding: 10px 0; }
-  .MnemonicQuiz .infoSuccess .icon-success .icon {
+  .mnemonicQuiz .infoSuccess .icon-success .icon {
     width: 25px;
     height: 25px;
     fill: #0F9C0C;
     margin-bottom: 5px; }
-  .MnemonicQuiz .infoSuccess p {
+  .mnemonicQuiz .infoSuccess p {
     margin: 0;
     font-size: 1.25rem;
     color: #0F9C0C; }
@@ -2184,6 +2184,12 @@ figure.zoom {
     .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
       color: #FFFFFF;
       background: #0862BE; }
+  .salesQuoteCard .salesQuoteCardRight .cmuk-button-success:hover {
+    background-color: #5cb85c;
+    color: #fff; }
+  .salesQuoteCard .salesQuoteCardRight .cmuk-button-danger:hover {
+    background-color: #ec2147;
+    color: #fff; }
 
 .rippleEffect {
   position: absolute;

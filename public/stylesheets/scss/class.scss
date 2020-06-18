@@ -135,7 +135,7 @@ html, body{
   font-weight: bold;
 }
 
-.MnemonicQuiz .hidden,
+.mnemonicQuiz .hidden,
 .hidden{
   display: none;
 }
@@ -252,7 +252,7 @@ html, body{
   border-radius: $buttonBorderRadius;
   background-color: #ddd;
   height: 13px;
-  margin-bottom: 5px;
+  margin: 10px 0;
 }
 .progressBar {
   width: 0;
@@ -400,14 +400,14 @@ html, body{
 .mobileNumberUpdate {
   .countryCode {
     margin-top: 46px;
-    width: 80px;
+    width: 100px;
     margin-right: 10px;
   }
   .mobileNumber{
     width:100%;
   }
   .mobileNumber label{
-    margin-left: -77px;
+    margin-left: -90px;
   }
 }
 
@@ -1055,7 +1055,7 @@ form{
   }
 }
 
-.MnemonicQuiz {
+.mnemonicQuiz {
   form{
     .formBody{
       .commonInputPassword{
@@ -2952,6 +2952,18 @@ figure.zoom {
       &:hover{
         color: #FFFFFF;
         background: $colorPrimary;
+      }
+    }
+    .cmuk-button-success{
+      &:hover{
+        background-color: #5cb85c;
+        color: #fff;
+      }
+    }
+    .cmuk-button-danger{
+      &:hover{
+        background-color: #ec2147;
+        color: #fff;
       }
     }
   }
