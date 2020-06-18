@@ -14,7 +14,7 @@ class KeyStore @Inject()(configuration: Configuration) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.SERVICES_KEY_STORE
+  private implicit val module: String = constants.Module.UTILITIES_KEY_STORE
 
   private val keyStoreLocation = configuration.get[String]("keyStore.filePath")
 
