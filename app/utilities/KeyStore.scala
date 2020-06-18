@@ -32,8 +32,7 @@ class KeyStore @Inject()(configuration: Configuration) {
       try ks.getEntry(alias, keyStorePasswordProtection).asInstanceOf[KeyStore.SecretKeyEntry]
       finally keyStorePasswordProtection.destroy()
     }
-    val keySpec = SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm).getKeySpec(secretKeyEntry.getSecretKey, classOf[PBEKeySpec]).asInstanceOf[PBEKeySpec]
-    new String(keySpec.getPassword)
+    new String(SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm).getKeySpec(secretKeyEntry.getSecretKey, classOf[PBEKeySpec]).asInstanceOf[PBEKeySpec].getPassword)
   } catch {
     case exception: Exception => logger.error(exception.getMessage)
       throw new BaseException(constants.Response.KEY_STORE_ERROR)
