@@ -12,7 +12,6 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import services.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 

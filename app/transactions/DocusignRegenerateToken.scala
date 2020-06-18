@@ -10,7 +10,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import java.util.Base64
 
-import services.KeyStore
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 

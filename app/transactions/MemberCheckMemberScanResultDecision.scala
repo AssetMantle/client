@@ -7,9 +7,9 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import services.KeyStore
 import transactions.Abstract.BaseRequest
 import transactions.responses.MemberCheckMemberScanResponse.Response
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -13,7 +13,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import services.KeyStore
+import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{Login, Logout, SignUp}
 

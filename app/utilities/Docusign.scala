@@ -22,7 +22,6 @@ import controllers.routes
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import models.docusign
-import services.KeyStore
 
 import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}

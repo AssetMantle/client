@@ -9,7 +9,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooConsentsResponse.Response
-import services.KeyStore
+import utilities.KeyStore
 
 @Singleton
 class GetTruliooConsents @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {

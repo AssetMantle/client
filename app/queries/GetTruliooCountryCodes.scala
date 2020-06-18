@@ -9,7 +9,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooCountryCodesResponse.Response
-import services.KeyStore
+import utilities.KeyStore
 
 @Singleton
 class GetTruliooCountryCodes @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {

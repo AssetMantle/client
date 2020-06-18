@@ -9,7 +9,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooCountrySubdivisionsResponse.Response
-import services.KeyStore
+import utilities.KeyStore
 
 
 @Singleton

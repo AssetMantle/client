@@ -10,7 +10,8 @@ import models.{blockchain, blockchainTransaction, master, westernUnion}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import services.{KeyStore, SFTPScheduler}
+import services.SFTPScheduler
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq

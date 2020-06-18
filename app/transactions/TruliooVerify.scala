@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import responses.TruliooVerifyResponse.Response
-import services.KeyStore
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 

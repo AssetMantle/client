@@ -22,7 +22,7 @@ import models.westernUnion.{SFTPFileTransaction, SFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
-import utilities.PGP
+import utilities.{KeyStore, PGP}
 
 import scala.io.BufferedSource
 

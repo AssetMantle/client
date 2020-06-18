@@ -1,6 +1,6 @@
-package services
+package utilities
 
-import java.io.{FileInputStream, FileNotFoundException, FileOutputStream}
+import java.io.{FileInputStream, FileOutputStream}
 import java.security.KeyStore
 
 import exceptions.BaseException

@@ -10,7 +10,7 @@ import queries.responses.MemberCheckMemberScanResultResponse.ResponsePart1
 import queries.responses.MemberCheckMemberScanResultResponse.ResponsePart2
 import queries.responses.MemberCheckMemberScanResultResponse.Response
 import queries.responses.MemberCheckMemberScanResultResponse
-import services.KeyStore
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
