@@ -24,7 +24,11 @@ class GetMemberCheckCorporateScanResult @Inject()(wsClient: WSClient, keyStore: 
 
   private val apiKeyHeaderName = configuration.get[String]("memberCheck.apiKeyHeaderName")
 
+  private val apiHeaderValue = keyStore.getPassphrase(constants.KeyStore.MEMBER_CHECK_API_HEADER_VALUE)
+
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
+
+  private val apiKeyHeader = Tuple2(apiKeyHeaderName, apiHeaderValue)
 
   private val baseURL = configuration.get[String]("memberCheck.url")
 
@@ -32,21 +36,12 @@ class GetMemberCheckCorporateScanResult @Inject()(wsClient: WSClient, keyStore: 
 
   private val url = baseURL + endpoint
 
-  private def action(request: String, apiKeyHeader: (String, String)): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
 
   object Service {
-    def get(resultID: String): Future[Response] = {
-      val apiHeaderValue = Future(keyStore.getPassphrase("memberCheckAPIHeaderValue"))
-
-      (for {
-        apiHeaderValue <- apiHeaderValue
-        response <- action(resultID, Tuple2(apiKeyHeaderName, apiHeaderValue))
-      } yield response
-        ).recover {
-        case baseException: BaseException => throw baseException
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      }
+    def get(resultID: String): Future[Response] = action(resultID).recover {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

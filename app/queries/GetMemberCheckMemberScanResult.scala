@@ -27,7 +27,11 @@ class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient, keyStore: Key
 
   private val apiKeyHeaderName = configuration.get[String]("memberCheck.apiKeyHeaderName")
 
+  private val apiHeaderValue = keyStore.getPassphrase(constants.KeyStore.MEMBER_CHECK_API_HEADER_VALUE)
+
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
+
+  private val apiKeyHeader = Tuple2(apiKeyHeaderName, apiHeaderValue)
 
   private val baseURL = configuration.get[String]("memberCheck.url")
 
@@ -35,11 +39,11 @@ class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient, keyStore: Key
 
   private val url = baseURL + endpoint
 
-  private def action(request: String, apiKeyHeader: (String, String)): Future[Response] = {
+  private def action(request: String): Future[Response] = {
     val response = wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get
     val responsePart1 = utilities.JSON.getResponseFromJson[ResponsePart1](response)
     val responsePart2 = utilities.JSON.getResponseFromJson[ResponsePart2](response)
-    for{
+    for {
       responsePart1 <- responsePart1
       responsePart2 <- responsePart2
     } yield Response(responsePart1.id, MemberCheckMemberScanResultResponse.entity(responsePart1.person, responsePart2.person))
@@ -47,18 +51,9 @@ class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient, keyStore: Key
 
   object Service {
 
-    def get(resultID: String): Future[Response] = {
-      val apiHeaderValue = Future(keyStore.getPassphrase("memberCheckAPIHeaderValue"))
-
-      (for {
-        apiHeaderValue <- apiHeaderValue
-        response <- action(resultID, Tuple2(apiKeyHeaderName, apiHeaderValue))
-      } yield response
-        ).recover {
-        case baseException: BaseException => throw baseException
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      }
+    def get(resultID: String): Future[Response] = action(resultID).recover {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

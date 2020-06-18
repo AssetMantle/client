@@ -26,7 +26,11 @@ class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient, keyStore
 
   private val apiKeyHeaderName = configuration.get[String]("memberCheck.apiKeyHeaderName")
 
+  private val apiHeaderValue = keyStore.getPassphrase(constants.KeyStore.MEMBER_CHECK_API_HEADER_VALUE)
+
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
+
+  private val apiKeyHeader = Tuple2(apiKeyHeaderName, apiHeaderValue)
 
   private val baseURL = configuration.get[String]("memberCheck.url")
 
@@ -34,7 +38,7 @@ class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient, keyStore
 
   private val url = baseURL + endpoint
 
-  private def action(id: String, request: Request, apiKeyHeader: (String, String)): Future[WSResponse] = wsClient.url(url + id + "/decisions").withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request))
+  private def action(id: String, request: Request): Future[WSResponse] = wsClient.url(url + id + "/decisions").withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
@@ -42,18 +46,9 @@ class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient, keyStore
 
   object Service {
 
-    def post(id: String, request: Request): Future[WSResponse] = {
-      val apiHeaderValue = Future(keyStore.getPassphrase("memberCheckAPIHeaderValue"))
-
-      (for {
-        apiHeaderValue <- apiHeaderValue
-        response <- action(id, request, Tuple2(apiKeyHeaderName, apiHeaderValue))
-      } yield response
-        ).recover {
-        case baseException: BaseException => throw baseException
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      }
+    def post(id: String, request: Request): Future[WSResponse] = action(id, request).recover {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

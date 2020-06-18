@@ -1,7 +1,6 @@
 package utilities
 
 import java.util.Arrays
-
 import com.docusign.esign.api.EnvelopesApi
 import com.docusign.esign.client.ApiClient
 import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, Signer, Document => DocusignDocument, ReturnUrlRequest => CallBackURLRequest}
@@ -14,7 +13,6 @@ import models.master
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
 import java.io.{BufferedOutputStream, FileOutputStream}
-
 import models.docusign.{OAuthToken => DocusignOAuthToken}
 import com.docusign.esign.client.auth.OAuth.OAuthToken
 import com.sun.jersey.api.client.ClientHandlerException
@@ -22,14 +20,11 @@ import controllers.routes
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import models.docusign
-
 import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
-                         masterAccounts: master.Accounts,
-                         messagesApi: MessagesApi,
                          docusignOAuthTokens: docusign.OAuthTokens,
                          keyStore: KeyStore
                         )
@@ -42,9 +37,11 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val accountID = configuration.get[String]("docusign.accountID")
+  private val accountID = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_ACCOUNT_ID)
   private val authenticationMethod = configuration.get[String]("docusign.authenticationMethod")
   private val basePath = configuration.get[String]("docusign.basePath")
+  private val integrationKey = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_INTEGRATION_KEY)
+  private val clientSecret = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_CLIENT_SECRET)
   private val comdexURL = configuration.get[String]("comdex.url")
   private val apiClient = new ApiClient(basePath)
   private val envelopesApi = new EnvelopesApi(apiClient)
@@ -182,11 +179,8 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
   }
 
   private def generateAndUpdateAccessToken(code: String): Future[Unit] = {
-    val docusignIntegrationKey = Future(keyStore.getPassphrase("docusignIntegrationKey"))
-    val docusignClientSecret = Future(keyStore.getPassphrase("docusignClientSecret"))
+    val response = Future(apiClient.generateAccessToken(integrationKey, clientSecret, code))
     val oauthToken = docusignOAuthTokens.Service.get(accountID)
-
-    def response(docusignIntegrationKey: String, docusignClientSecret: String) = Future(apiClient.generateAccessToken(docusignIntegrationKey, docusignClientSecret, code))
 
     def updateOauthToken(response: OAuthToken, oauthToken: Option[DocusignOAuthToken]) = oauthToken match {
       case Some(value) => docusignOAuthTokens.Service.update(accountID, response.getAccessToken, System.currentTimeMillis() + response.getExpiresIn * 1000, response.getRefreshToken)
@@ -194,9 +188,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     }
 
     (for {
-      docusignIntegrationKey <- docusignIntegrationKey
-      docusignClientSecret <- docusignClientSecret
-      response <- response(docusignIntegrationKey, docusignClientSecret)
+      response <- response
       oauthToken <- oauthToken
       _ <- updateOauthToken(response, oauthToken)
     } yield apiClient.setAccessToken(response.getAccessToken, response.getExpiresIn)
@@ -221,7 +213,6 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private def fetchAuthorizationURI: String = {
     try {
-      val integrationKey = keyStore.getPassphrase("docusignIntegrationKey")
       apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.External.Docusign.CODE).toString
     } catch {
       case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)

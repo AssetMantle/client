@@ -1,20 +1,5 @@
-getConfigurationAsynchronously("pushNotification.apiKey");
-getConfigurationAsynchronously("pushNotification.authDomain");
-getConfigurationAsynchronously("pushNotification.databaseURL");
-getConfigurationAsynchronously("pushNotification.projectId");
-getConfigurationAsynchronously("pushNotification.storageBucket");
-getConfigurationAsynchronously("pushNotification.senderID");
-
 $(document).ready(function () {
-    let config = {
-        apiKey: getConfiguration("pushNotification.apiKey"),
-        authDomain: getConfiguration("pushNotification.authDomain"),
-        databaseURL: getConfiguration("pushNotification.databaseURL"),
-        projectId: getConfiguration("pushNotification.projectId"),
-        storageBucket: getConfiguration("pushNotification.storageBucket"),
-        messagingSenderId: getConfiguration("pushNotification.senderID")
-    };
-    firebase.initializeApp(config);
+    firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
     messaging
         .requestPermission()
@@ -26,7 +11,8 @@ $(document).ready(function () {
         })
         .catch(function (err) {
         });
+    //This delivers message in foreground, i.e., when web app is open in browser.
     messaging.onMessage(function (payload) {
-        alert(JSON.parse(JSON.stringify(payload)).notification.title + " + " + JSON.parse(JSON.stringify(payload)).notification.body);
+        // alert(JSON.parse(JSON.stringify(payload)).notification.title + " + " + JSON.parse(JSON.stringify(payload)).notification.body);
     });
 });

@@ -34,9 +34,11 @@ class WesternUnionController @Inject()(
                                         keyStore: KeyStore
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val wuClientID = configuration.get[String]("westernUnion.clientID")
+  private val rtcbSecretKey = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_RTCB_SECRET_KEY)
 
-  private val wuServiceID = configuration.get[String]("westernUnion.serviceID")
+  private val wuClientID = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_CLIENT_ID)
+
+  private val wuServiceID = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SERVICE_ID)
 
   private val wuURL = configuration.get[String]("westernUnion.url")
 
@@ -50,11 +52,11 @@ class WesternUnionController @Inject()(
     request =>
 
       val requestBody = views.companion.master.WesternUnionRTCB.fromXml(request.body)
-      val hash = Future(keyStore.getPassphrase("wuRTCBSecretKey") + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
+      val hash = rtcbSecretKey + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
         requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
-        requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount)
+        requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
 
-      def issueFiatAndGetResult(hash: String): Future[Result] = if (requestBody.requestSignature == utilities.String.sha256Sum(hash)) {
+      (if (requestBody.requestSignature == utilities.String.sha256Sum(hash)) {
         val createRTCB = westernUnionRTCBs.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
           requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
           utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
@@ -91,11 +93,6 @@ class WesternUnionController @Inject()(
           _ <- zoneAutomatedIssueFiat(traderAddress = traderAddress, zoneID = traderDetails.zoneID, zoneAddress = zoneAddress)
         } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else Future(utilities.XMLRestResponse.INVALID_REQUEST_SIGNATURE.result)
-
-      (for {
-        hash <- hash
-        result <- issueFiatAndGetResult(hash)
-      } yield result
         ).recover {
         case _: Exception => utilities.XMLRestResponse.COMDEX_VALIDATION_FAILURE.result
       }

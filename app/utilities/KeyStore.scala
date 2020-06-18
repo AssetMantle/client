@@ -22,6 +22,8 @@ class KeyStore @Inject()(configuration: Configuration) {
 
   private val keyStoreType = "PKCS12"
 
+  private val secretKeyFactoryAlgorithm = "PBE"
+
   def getPassphrase(alias: String): String = try {
     val ks = KeyStore.getInstance(keyStoreType)
     val fis = new FileInputStream(keyStoreLocation)
@@ -29,7 +31,7 @@ class KeyStore @Inject()(configuration: Configuration) {
     val keyStorePasswordProtection = new KeyStore.PasswordProtection(keyStorePassword.toCharArray)
     val fIn = new FileInputStream(keyStoreLocation)
     ks.load(fIn, keyStorePassword.toCharArray)
-    val factory = SecretKeyFactory.getInstance("PBE")
+    val factory = SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm)
     val secretKeyEntry = {
       try ks.getEntry(alias, keyStorePasswordProtection).asInstanceOf[KeyStore.SecretKeyEntry]
       finally keyStorePasswordProtection.destroy()
@@ -43,7 +45,7 @@ class KeyStore @Inject()(configuration: Configuration) {
   }
 
   def setPassphrase(alias: String, aliasValue: String): Unit = try {
-    val factory = SecretKeyFactory.getInstance("PBE")
+    val factory = SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm)
     val generatedSecret = factory.generateSecret(new PBEKeySpec(aliasValue.toCharArray))
     val fis = new FileInputStream(keyStoreLocation)
     val ks = KeyStore.getInstance(keyStoreType)

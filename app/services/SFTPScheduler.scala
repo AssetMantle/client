@@ -26,12 +26,9 @@ import utilities.{KeyStore, PGP}
 
 import scala.io.BufferedSource
 
+
 @Singleton
-class SFTPScheduler @Inject()(
-                               actorSystem: ActorSystem,
-                               sFTPFileTransactions: SFTPFileTransactions,
-                               keyStore: KeyStore
-                             )(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SFTPFileTransactions, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.SFTP_SCHEDULER
@@ -44,17 +41,18 @@ class SFTPScheduler @Inject()(
   private val basePathSFTPFiles = configuration.get[String]("westernUnion.sftpFileBasePath")
   private val storagePathSFTPFiles = configuration.get[String]("westernUnion.sftpFileStoragePath")
 
-  private val sftpSite = configuration.get[String]("westernUnion.sftpSite")
+  private val sftpSite = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SFTP_SITE)
   private val sftpPort = configuration.get[Int]("westernUnion.sftpPort")
-  private val wuSFTPUsername = configuration.get[String]("westernUnion.sftpUsername")
+  private val wuSFTPUsername = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SFTP_USERNAME)
+  private val wuSFTPPassword = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SFTP_PASSWORD)
   private val sshPrivateKeyPath = configuration.get[String]("westernUnion.sshPrivateKeyPath")
   private val wuPGPPublicKeyFileLocation = configuration.get[String]("westernUnion.wuPGPPublicKeyPath")
   private val comdexPGPPrivateKeyFileLocation = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPath")
+  private val comdexPGPPrivateKeyPassword = keyStore.getPassphrase(constants.KeyStore.COMDEX_PGP_PRIVATE_KEY_PASSWORD)
   private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
   def scheduler: Unit = {
     try {
-      val wuSFTPPassword = keyStore.getPassphrase("wuSFTPPassword")
       val sftpSettings = SftpSettings
         .create(InetAddress.getByName(sftpSite))
         .withPort(sftpPort)
@@ -76,22 +74,15 @@ class SFTPScheduler @Inject()(
           val writeEncryptedData = Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
 
           def decryptAndReadCSV: Future[BufferedSource] = {
-            val comdexPGPPrivateKeyPassword = Future(keyStore.getPassphrase("comdexPGPPrivateKeyPassword"))
-
-            def decrypt(comdexPGPPrivateKeyPassword: String): Future[Unit] = Future(PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword))
-
+            PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
             val csvFileContentBuffer = scala.io.Source.fromFile(storagePathSFTPFiles + tempFileName)
-
-            def csvFileContentProcessor = Future.sequence {
+            val csvFileContentProcessor = Future.sequence {
               csvFileContentBuffer.getLines.drop(1).map { line =>
                 val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
                 sFTPFileTransactions.Service.create(SFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
               }
             }
-
             for {
-              comdexPGPPrivateKeyPassword <- comdexPGPPrivateKeyPassword
-              _ <- decrypt(comdexPGPPrivateKeyPassword)
               _ <- csvFileContentProcessor
             } yield csvFileContentBuffer
           }
@@ -101,22 +92,22 @@ class SFTPScheduler @Inject()(
             Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
           }
 
-          val complete = for {
+          val complete=for {
             _ <- writeEncryptedData
             csvFileContentBuffer <- decryptAndReadCSV
             _ <- csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer)
           } yield {}
-          Await.result(complete, Duration.Inf)
+          Await.result(complete,Duration.Inf)
         }
 
       Await.result(sftpProcess, Duration.Inf)
     }
     catch {
-      case baseException: BaseException =>
+      case baseException: BaseException=>
         logger.error(baseException.failure.message, baseException)
         Done
       case e: Exception =>
-        logger.error(e.getMessage, e)
+        logger.error(e.getMessage,e)
         Done
     }
   }

@@ -43,17 +43,17 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private val emailCharset = configuration.get[String]("play.mailer.charset")
 
-  private val smsAccountSID = configuration.get[String]("twilio.accountSID")
+  private val smsAccountSID = keyStore.getPassphrase(constants.KeyStore.TWILIO_SMS_ACCOUNT_SID)
 
-  private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
+  private val smsFromNumber = new PhoneNumber(keyStore.getPassphrase(constants.KeyStore.TWILIO_SMS_FROM_NUMBER))
 
-  private val smsAuthToken = keyStore.getPassphrase("twilioSMSAuthToken")
+  private val smsAuthToken = keyStore.getPassphrase(constants.KeyStore.TWILIO_SMS_AUTH_TOKEN)
 
   Twilio.init(smsAccountSID, smsAuthToken)
 
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
 
-  private val pushNotificationAuthorizationKey = keyStore.getPassphrase("pushNotificationAuthorizationKey")
+  private val pushNotificationAuthorizationKey = keyStore.getPassphrase(constants.KeyStore.PUSH_NOTIFICATION_AUTHORIZATION_KEY)
 
   private case class Notification(title: String, body: String)
 
