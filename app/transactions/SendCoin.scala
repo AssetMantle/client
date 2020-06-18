@@ -4,7 +4,7 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OWrites, Reads}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
@@ -37,10 +37,13 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
   case class BaseReq(from: String, chain_id: String = chainID, gas: String)
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
+  implicit val baseRequestReads: Reads[BaseReq] = Json.reads[BaseReq]
 
   private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
+  implicit val amountReads: Reads[Amount] = Json.reads[Amount]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+  implicit val requestReads: Reads[Request] = Json.reads[Request]
 
   case class Request(base_req: BaseReq, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequest
 

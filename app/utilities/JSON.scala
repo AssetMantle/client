@@ -17,7 +17,10 @@ object JSON {
   def getResponseFromJson[T <: BaseResponse](response: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads: Reads[T]): Future[T] = {
     response.map { response =>
       Json.fromJson[T](response.json) match {
-        case JsSuccess(value: T, _: JsPath) => value
+        case JsSuccess(value: T, _: JsPath) =>
+          println(response.json)
+          println(response.json.toString())
+          value
         case _: JsError =>
           val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](response.json) match {
             case JsSuccess(value: ErrorResponse, _: JsPath) => value
@@ -37,6 +40,7 @@ object JSON {
 
   def convertJsonStringToObject[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {
+      println("convertJsonStringToObject----"+jsonString)
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
         case errors: JsError => logger.error(errors.toString)

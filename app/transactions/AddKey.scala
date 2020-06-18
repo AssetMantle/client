@@ -2,6 +2,7 @@ package transactions
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
@@ -26,13 +27,17 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).post(Json.toJson(request)))
+  private val testUrl = constants.Test.BASE_URL+routes.LoopBackController.addKey
+
+  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testUrl).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+  implicit val requestReads: Reads[Request] = Json.reads[Request]
 
   case class Request(name: String, password: String, seed:String)
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
+  implicit val responseWrites: OWrites[Response] = Json.writes[Response]
 
   case class Response(name: String, address: String, pubkey: String, mnemonic: String) extends BaseResponse
 

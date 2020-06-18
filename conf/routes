@@ -629,3 +629,4 @@ POST        /loopBack/memberCheckCorporateScan                                  
 GET         /loopBack/sendEmail                                                                   controllers.LoopBackController.sendEmail
 GET         /loopBack/sendSMS                                                                     controllers.LoopBackController.sendSMS
 GET         /loopback/keys/mnemonic                                                               controllers.LoopBackController.mnemonic
+POST        /loopback/addKey                                                                      controllers.LoopBackController.addKey
