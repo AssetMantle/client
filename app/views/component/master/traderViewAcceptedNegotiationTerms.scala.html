@@ -12,7 +12,7 @@
     <div class="tradeTerms">
         <div class="traderCommodity">
             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
-            <span class="tradeName">@asset.assetType &nbsp;</span>
+            <span class="tradeName">@Messages(asset.assetType) &nbsp;</span>
             @traderID match {
                 case negotiation.buyerTraderID => {
                     @negotiation.status match {
