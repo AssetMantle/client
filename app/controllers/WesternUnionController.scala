@@ -26,6 +26,7 @@ class WesternUnionController @Inject()(
                                         masterZones: master.Zones,
                                         masterEmails: master.Emails,
                                         masterFiats: master.Fiats,
+                                        sftpScheduler: SFTPScheduler,
                                         westernUnionFiatRequests: westernUnion.FiatRequests,
                                         westernUnionRTCBs: westernUnion.RTCBs,
                                         transactionsIssueFiat: transactions.IssueFiat,
