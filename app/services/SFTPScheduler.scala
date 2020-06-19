@@ -22,18 +22,18 @@ import models.westernUnion.{SFTPFileTransaction, SFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
-import utilities.PGP
+import utilities.{KeyStore, PGP}
 
 import scala.io.BufferedSource
 
 
 @Singleton
-class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SFTPFileTransactions, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.SFTP_SCHEDULER
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-  implicit val system = ActorSystem()
+  private val system: ActorSystem = ActorSystem()
   implicit val materializer: Materializer = Materializer(system)
 
   private val wuSFTPInitialDelay = configuration.get[Int]("westernUnion.scheduler.initialDelay").seconds
@@ -41,14 +41,14 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
   private val basePathSFTPFiles = configuration.get[String]("westernUnion.sftpFileBasePath")
   private val storagePathSFTPFiles = configuration.get[String]("westernUnion.sftpFileStoragePath")
 
-  private val sftpSite = configuration.get[String]("westernUnion.sftpSite")
+  private val sftpSite = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SFTP_SITE)
   private val sftpPort = configuration.get[Int]("westernUnion.sftpPort")
-  private val wuSFTPUsername = configuration.get[String]("westernUnion.sftpUsername")
-  private val wuSFTPPassword = configuration.get[String]("westernUnion.sftpPassword")
+  private val wuSFTPUsername = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SFTP_USERNAME)
+  private val wuSFTPPassword = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SFTP_PASSWORD)
   private val sshPrivateKeyPath = configuration.get[String]("westernUnion.sshPrivateKeyPath")
   private val wuPGPPublicKeyFileLocation = configuration.get[String]("westernUnion.wuPGPPublicKeyPath")
   private val comdexPGPPrivateKeyFileLocation = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPath")
-  private val comdexPGPPrivateKeyPassword = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPassword")
+  private val comdexPGPPrivateKeyPassword = keyStore.getPassphrase(constants.KeyStore.COMDEX_PGP_PRIVATE_KEY_PASSWORD)
   private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
   def scheduler: Unit = {

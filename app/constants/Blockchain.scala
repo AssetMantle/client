@@ -7,4 +7,6 @@ object Blockchain {
   val DefaultOrganizationFaucetTokenAmount = 1000
   val DefaultTraderFaucetTokenAmount = 1
   val DefaultFaucetTokenAmount = 1
+  val ZoneIssueFiatGasAmount = 1000000
+  val ZoneIssueAssetGasAmount = 1000000
 }

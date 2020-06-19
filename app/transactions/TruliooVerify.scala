@@ -9,10 +9,12 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import responses.TruliooVerifyResponse.Response
+import utilities.KeyStore
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class TruliooVerify @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_TRULIOO_VERIFY
 
@@ -20,9 +22,9 @@ class TruliooVerify @Inject()(wsClient: WSClient)(implicit configuration: Config
 
   private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
 
-  private val apiKeyValue = configuration.get[String]("trulioo.apiKeyValue")
+  private val apiKeyValue = keyStore.getPassphrase(constants.KeyStore.TRULIOO_API_KEY_VALUE)
 
-  private val headers = Tuple2(apiKeyName,apiKeyValue)
+  private val headers = Tuple2(apiKeyName, apiKeyValue)
 
   private val baseURL = configuration.get[String]("trulioo.url")
 

@@ -10,11 +10,12 @@ import queries.responses.MemberCheckMemberScanResultResponse.ResponsePart1
 import queries.responses.MemberCheckMemberScanResultResponse.ResponsePart2
 import queries.responses.MemberCheckMemberScanResultResponse.Response
 import queries.responses.MemberCheckMemberScanResultResponse
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.QUERIES_GET_MEMBER_CHECK_MEMBER_SCAN_RESULT
 
@@ -26,7 +27,7 @@ class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient)(implicit conf
 
   private val apiKeyHeaderName = configuration.get[String]("memberCheck.apiKeyHeaderName")
 
-  private val apiHeaderValue = configuration.get[String]("memberCheck.apiHeaderValue")
+  private val apiHeaderValue = keyStore.getPassphrase(constants.KeyStore.MEMBER_CHECK_API_HEADER_VALUE)
 
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
 
@@ -42,7 +43,7 @@ class GetMemberCheckMemberScanResult @Inject()(wsClient: WSClient)(implicit conf
     val response = wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get
     val responsePart1 = utilities.JSON.getResponseFromJson[ResponsePart1](response)
     val responsePart2 = utilities.JSON.getResponseFromJson[ResponsePart2](response)
-    for{
+    for {
       responsePart1 <- responsePart1
       responsePart2 <- responsePart2
     } yield Response(responsePart1.id, MemberCheckMemberScanResultResponse.entity(responsePart1.person, responsePart2.person))

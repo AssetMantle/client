@@ -25,9 +25,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
-                         masterAccounts: master.Accounts,
-                         messagesApi: MessagesApi,
-                         docusignOAuthTokens: docusign.OAuthTokens
+                         docusignOAuthTokens: docusign.OAuthTokens,
+                         keyStore: KeyStore
                         )
                         (implicit
                          executionContext: ExecutionContext,
@@ -38,11 +37,11 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val accountID = configuration.get[String]("docusign.accountID")
+  private val accountID = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_ACCOUNT_ID)
   private val authenticationMethod = configuration.get[String]("docusign.authenticationMethod")
   private val basePath = configuration.get[String]("docusign.basePath")
-  private val integrationKey = configuration.get[String]("docusign.integrationKey")
-  private val clientSecret = configuration.get[String]("docusign.clientSecret")
+  private val integrationKey = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_INTEGRATION_KEY)
+  private val clientSecret = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_CLIENT_SECRET)
   private val comdexURL = configuration.get[String]("comdex.url")
   private val apiClient = new ApiClient(basePath)
   private val envelopesApi = new EnvelopesApi(apiClient)
@@ -145,14 +144,14 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   def updateSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentTypeList)
 
-  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String])= {
+  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]) = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
       documentTypeList.zipWithIndex.map { case (documentType, index) =>
-        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID,(index+1).toString)
+        val fileByteArray = envelopesApi.getDocument(accountID, envelopeID, (index + 1).toString)
         val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileByteArray)).toString, constants.File.PDF).mkString(".")
         val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
         val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
