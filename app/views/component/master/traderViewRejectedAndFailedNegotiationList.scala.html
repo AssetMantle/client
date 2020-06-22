@@ -23,7 +23,7 @@
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(rejectedReceivedNegotiation.quantity.toString, rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@Seq(rejectedReceivedNegotiation.price/rejectedReceivedNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
@@ -74,7 +74,7 @@
                                     <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                                 </div>
                                 <div class="assetInitialData">
-                                    <p class="assetTitle">@asset.assetType</p>
+                                    <p class="assetTitle">@Messages(asset.assetType)</p>
                                     <p class="assetQuantity">@Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
                                     <p class="assetPrice">@Seq(rejectedSentNegotiation.price/rejectedSentNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
@@ -125,7 +125,7 @@
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(failedNegotiation.quantity.toString, failedNegotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@Seq(failedNegotiation.price/failedNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), failedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>

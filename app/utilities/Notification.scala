@@ -35,8 +35,6 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val emailFromAddress = configuration.get[String]("play.mailer.user")
-
   private val emailBounceAddress = configuration.get[String]("play.mailer.bounceAddress")
 
   private val emailReplyTo = configuration.get[String]("play.mailer.replyTo")
@@ -102,7 +100,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
     mailerClient.send(Email(
       subject = messagesApi(email.subject),
-      from = emailFromAddress,
+      from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
       to = Seq(emailAddress),
       bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
       charset = Option(emailCharset),
