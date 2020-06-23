@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{docusign, master, masterTransaction}
@@ -18,8 +18,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
                                    utilitiesNotification: utilities.Notification,
                                    masterEmails: master.Emails,
                                    masterNegotiations: master.Negotiations,
-                                   withTraderLoginAction: WithTraderLoginAction,
-                                   withGenesisLoginAction: WithGenesisLoginAction,
+                                   withLoginAction: WithLoginAction,
                                    masterTraders: master.Traders,
                                    masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                    docusignEnvelopes: docusign.Envelopes,
@@ -29,7 +28,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val module: String = constants.Module.CONTROLLERS_DOCUSIGN
 
-  def send(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def send(negotiationID: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
@@ -125,7 +124,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
     }
   }
 
-  def sign(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sign(negotiationID: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
@@ -148,14 +147,14 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def authorization: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def authorization: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
         case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
-  def authorizationCallBack(code: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def authorizationCallBack(code: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {

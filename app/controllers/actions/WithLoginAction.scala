@@ -35,27 +35,13 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         } yield (userType, address)
       }
 
-      def getLoginState(username: String, address: String, userType: String): Future[LoginState] = {
-        if (userType == constants.User.TRADER) {
-          val aclHash = blockchainACLAccounts.Service.tryGetACLHash(address)
-
-          def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
-
-          for {
-            aclHash <- aclHash
-            acl <- acl(aclHash)
-          } yield LoginState(username, userType, address, Option(acl))
-        } else Future(LoginState(username, userType, address, None))
-      }
-
       def result(loginState: LoginState): Future[Result] = f(loginState)(request)
 
       (for {
         username <- username
         sessionToken <- sessionToken
         (userType, address) <- verifySessionTokenAndUserType(username, sessionToken)
-        loginState <- getLoginState(username, address, userType)
-        result <- result(loginState)
+        result <- result(LoginState(username, userType, address))
       } yield {
         result
       }).recover {

@@ -185,8 +185,6 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         val markAccepted = masterOrganizations.Service.markAccepted(addOrganization.organizationID)
         val organizationAccountID = masterOrganizations.Service.tryGetAccountID(addOrganization.organizationID)
 
-        def markUserTypeOrganization(organizationAccountId: String): Future[Int] = masterAccounts.Service.markUserTypeOrganization(organizationAccountId)
-
         def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addOrganization.from)
 
         def getID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
@@ -195,7 +193,6 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
           _ <- create
           _ <- markAccepted
           organizationAccountID <- organizationAccountID
-          _ <- markUserTypeOrganization(organizationAccountID)
           _ <- markDirty
           fromAccountID <- getID(addOrganization.from)
           _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ADD_ORGANIZATION_SUCCESSFUL, blockResponse.txhash)

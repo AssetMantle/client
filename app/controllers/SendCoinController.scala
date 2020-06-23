@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithUnknownLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithLoginAction, WithUnknownLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -12,7 +12,18 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction, withUsernameToken: WithUsernameToken,withoutLoginAction: WithoutLoginAction, withoutLoginActionAsync: WithoutLoginActionAsync)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendCoinController @Inject()(
+                                    messagesControllerComponents: MessagesControllerComponents,
+                                    transaction: utilities.Transaction,
+                                    withLoginAction: WithLoginAction,
+                                    withUnknownLoginAction: WithUnknownLoginAction,
+                                    transactionsSendCoin: transactions.SendCoin,
+                                    blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
+                                    withUserLoginAction: WithUserLoginAction,
+                                    withUsernameToken: WithUsernameToken,
+                                    withoutLoginAction: WithoutLoginAction,
+                                    withoutLoginActionAsync: WithoutLoginActionAsync
+                                  )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 

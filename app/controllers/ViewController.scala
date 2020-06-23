@@ -17,10 +17,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ViewController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
                                 withLoginAction: WithLoginAction,
-                                withTraderLoginAction: WithTraderLoginAction,
-                                withZoneLoginAction: WithZoneLoginAction,
-                                withOrganizationLoginAction: WithOrganizationLoginAction,
-                                withGenesisLoginAction: WithGenesisLoginAction,
                                 withUsernameToken: WithUsernameToken
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 

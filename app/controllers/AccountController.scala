@@ -158,21 +158,8 @@ class AccountController @Inject()(
           } yield constants.User.USER
         } else Future(oldUserType)
 
-        def getLoginState(address: String, userType: String): Future[LoginState] = {
-          if (userType == constants.User.TRADER) {
-            val aclHash = blockchainAclAccounts.Service.tryGetACLHash(address)
-
-            def acl(aclHash: String): Future[ACL] = blockchainAclHashes.Service.tryGetACL(aclHash)
-
-            for {
-              aclHash <- aclHash
-              acl <- acl(aclHash)
-            } yield LoginState(username = loginData.username, userType = userType, address = address, acl = Option(acl))
-          } else Future(LoginState(username = loginData.username, userType = userType, address = address, acl = None))
-        }
-
-        def sendNotification(loginState: LoginState): Future[Unit] = {
-          val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = loginData.pushNotificationToken)
+        def sendNotification(username: String): Future[Unit] = {
+          val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = username, token = loginData.pushNotificationToken)
           for {
             _ <- pushNotificationTokenUpdate
             _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
@@ -202,10 +189,9 @@ class AccountController @Inject()(
                 account <- getAccount
                 address <- getAddress
                 userType <- firstLoginUserTypeUpdate(account.userType)
-                loginState <- getLoginState(address = address, userType = userType)
-                _ <- sendNotification(loginState)
+                _ <- sendNotification(loginData.username)
                 contactWarnings <- getContactWarnings
-                result <- getResult(contactWarnings)(loginState)
+                result <- getResult(contactWarnings)(LoginState(username = loginData.username, userType = userType, address = address))
               } yield result
             } else {
               val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
@@ -283,22 +269,10 @@ class AccountController @Inject()(
           def updateAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
             val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
 
-            def updateZoneKeyStore() = if (loginState.userType == constants.User.ZONE) {
-              val zoneID = masterZones.Service.tryGetID(loginState.username)
-
-              def updateKeyStore(zoneID: String) = Future(keyStore.setPassphrase(alias = zoneID, aliasValue = changePasswordData.newPassword))
-
-              for {
-                zoneID <- zoneID
-                _ <- updateKeyStore(zoneID)
-              } yield ()
-            } else Future()
-
             def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
 
             for {
               _ <- postRequest
-              _ <- updateZoneKeyStore()
               _ <- updatePassword()
               result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
@@ -357,23 +331,11 @@ class AccountController @Inject()(
 
             def post(partialMnemonic: Seq[String]) = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = Seq(partialMnemonic.mkString(" "), forgotPasswordData.mnemonic).mkString(" "), newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
 
-            def updateZoneKeyStore(userType: String) = if (userType == constants.User.ZONE) {
-              val zoneID = masterZones.Service.tryGetID(forgotPasswordData.username)
-
-              def updateKeyStore(zoneID: String) = Future(keyStore.setPassphrase(alias = zoneID, aliasValue = forgotPasswordData.newPassword))
-
-              for {
-                zoneID <- zoneID
-                _ <- updateKeyStore(zoneID)
-              } yield ()
-            } else Future()
-
             def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
 
             for {
               account <- account
               _ <- post(account.partialMnemonic)
-              _ <- updateZoneKeyStore(account.userType)
               _ <- updatePassword()
             } yield Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
           } else {

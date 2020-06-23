@@ -201,8 +201,6 @@ class SetACLs @Inject()(
 
       def aclAccountInsertOrUpdate(setACL: SetACL, acl: ACL): Future[Int] = blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, acl, dirtyBit = true)
 
-      def markUserTypeTrader(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeTrader(accountID)
-
       def markAccepted(traderID: String): Future[Int] = masterTraders.Service.markAccepted(traderID)
 
       def markDirty(fromAddress: String): Future[Int] = blockchainAccounts.Service.markDirty(fromAddress)
@@ -218,7 +216,6 @@ class SetACLs @Inject()(
         trader <- getTrader(traderAccountID)
         acl <- getAcl(setACL.aclHash)
         _ <- aclAccountInsertOrUpdate(setACL, acl)
-        _ <- markUserTypeTrader(traderAccountID)
         _ <- markAccepted(trader.id)
         _ <- markDirty(setACL.from)
         _ <- transactionFeedbacksInsertOrUpdate(setACL)

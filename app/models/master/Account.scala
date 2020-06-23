@@ -161,12 +161,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updatePartialMnemonic(id: String, partialMnemonic: Seq[String]): Future[Int] = updatePartialMnemonicById(id = id, partialMnemonic = Json.toJson(partialMnemonic).toString)
 
-    def markUserTypeTrader(id: String): Future[Int] = updateUserTypeById(id, constants.User.TRADER)
-
-    def markUserTypeZone(id: String): Future[Int] = updateUserTypeById(id, constants.User.ZONE)
-
-    def markUserTypeOrganization(id: String): Future[Int] = updateUserTypeById(id, constants.User.ORGANIZATION)
-
     def markUserTypeUser(id: String): Future[Int] = updateUserTypeById(id, constants.User.USER)
 
     def getUserType(id: String): Future[String] = getUserTypeById(id)

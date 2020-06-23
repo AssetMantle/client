@@ -53,10 +53,7 @@ class ComponentViewController @Inject()(
                                          westernUnionFiatRequests: westernUnion.FiatRequests,
                                          westernUnionRTCBs: westernUnion.RTCBs,
                                          withLoginAction: WithLoginAction,
-                                         withOrganizationLoginAction: WithOrganizationLoginAction,
-                                         withTraderLoginAction: WithTraderLoginAction,
                                          withUserLoginAction: WithUserLoginAction,
-                                         withZoneLoginAction: WithZoneLoginAction,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {

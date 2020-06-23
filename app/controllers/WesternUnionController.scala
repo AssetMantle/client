@@ -2,7 +2,7 @@ package controllers
 
 
 import constants.Form
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -31,7 +31,7 @@ class WesternUnionController @Inject()(
                                         westernUnionRTCBs: westernUnion.RTCBs,
                                         transactionsIssueFiat: transactions.IssueFiat,
                                         transaction: utilities.Transaction,
-                                        withTraderLoginAction: WithTraderLoginAction,
+                                        withLoginAction: WithLoginAction,
                                         keyStore: KeyStore
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -99,7 +99,7 @@ class WesternUnionController @Inject()(
       }
   }
 
-  def westernUnionPortalRedirect(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def westernUnionPortalRedirect(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
         formWithErrors => {

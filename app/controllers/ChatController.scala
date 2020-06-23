@@ -3,7 +3,7 @@ package controllers
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import controllers.actions.{WithLoginAction, WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithLoginAction, WithoutLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ChatController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
-                                withTraderLoginAction: WithTraderLoginAction,
+                                withLoginAction: WithLoginAction,
                                 masterTraders: master.Traders,
                                 withUsernameToken: WithUsernameToken,
                                 masterNegotiations: master.Negotiations,
@@ -45,7 +45,7 @@ class ChatController @Inject()(
 
 
   // gets all chatWindows in chatRoom, position - right bottom
-  def chatRoom(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def chatRoom(negotiationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
@@ -68,7 +68,7 @@ class ChatController @Inject()(
   }
 
   // populates chatWindow in chatroom
-  def chatWindow(chatID: String, pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def chatWindow(chatID: String, pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatID, accountID = loginState.username)
 
@@ -97,7 +97,7 @@ class ChatController @Inject()(
   }
 
   // populates chatWindow in chatroom
-  def loadMoreChats(chatID: String, pageNumber: Int = 0): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def loadMoreChats(chatID: String, pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatID, accountID = loginState.username)
 
@@ -130,7 +130,7 @@ class ChatController @Inject()(
     Ok(views.html.component.master.sendMessage())
   }
 
-  def sendMessage(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sendMessage(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SendMessage.form.bindFromRequest().fold(
         formWithErrors => {
@@ -180,7 +180,7 @@ class ChatController @Inject()(
   }
 
   // retrives a chat, that was part of a replied message
-  def replyToMessage(chatID: String, messageID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def replyToMessage(chatID: String, messageID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatID, accountID = loginState.username)
 
@@ -205,7 +205,7 @@ class ChatController @Inject()(
       }
   }
 
-  def markChatAsRead(chatWindowID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def markChatAsRead(chatWindowID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val userIsParticipant = masterTransactionChats.Service.checkUserInChat(id = chatWindowID, accountID = loginState.username)
 

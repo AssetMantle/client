@@ -21,10 +21,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class BackgroundCheckController @Inject()(
                                            messagesControllerComponents: MessagesControllerComponents,
-                                           masterZones: master.Zones,
-                                           masterOrganizations: master.Organizations,
                                            masterOrganizationUBOs: master.OrganizationUBOs,
-                                           masterTraders: master.Traders,
                                            memberCheckMemberScans: memberCheck.MemberScans,
                                            memberCheckMemberScanDecisions: memberCheck.MemberScanDecisions,
                                            memberCheckCorporateScans: memberCheck.CorporateScans,
@@ -39,8 +36,6 @@ class BackgroundCheckController @Inject()(
                                            getMemberCheckCorporateScanResult: GetMemberCheckCorporateScanResult,
                                            postMemberCheckCorporateScan: MemberCheckCorporateScan,
                                            postMemberCheckCorporateScanResultDecision: MemberCheckCorporateScanResultDecision,
-                                           fileResourceManager: utilities.FileResourceManager,
-                                           withZoneLoginAction: WithZoneLoginAction,
                                            withLoginAction: WithLoginAction,
                                            withUsernameToken: WithUsernameToken,
                                            withoutLoginAction: WithoutLoginAction,
@@ -56,7 +51,7 @@ class BackgroundCheckController @Inject()(
     Future(Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName)))
   }
 
-  def memberScan: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def memberScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckMemberScan.form.bindFromRequest().fold(
         formWithErrors => {
@@ -112,7 +107,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def memberScanResultDecision: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def memberScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckMemberScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -134,7 +129,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def addUBOMemberCheck: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def addUBOMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddUBOMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
@@ -161,7 +156,7 @@ class BackgroundCheckController @Inject()(
     Future(Ok(views.html.component.master.memberCheckCorporateScan(organizationID = organizationID, companyName = companyName)))
   }
 
-  def corporateScan: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def corporateScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckCorporateScan.form.bindFromRequest().fold(
         formWithErrors => {
@@ -217,7 +212,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def corporateScanResultDecision: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def corporateScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckCorporateScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -239,7 +234,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def addOrganizationMemberCheck: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def addOrganizationMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddOrganizationMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
@@ -263,7 +258,7 @@ class BackgroundCheckController @Inject()(
     Future(Ok(views.html.component.master.memberCheckVesselScan(assetID = assetID, vesselName = vesselName)))
   }
 
-  def vesselScan: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def vesselScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckVesselScan.form.bindFromRequest().fold(
         formWithErrors => {
@@ -319,7 +314,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def vesselScanResultDecision: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def vesselScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckVesselScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -341,7 +336,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def addAssetMemberCheck: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def addAssetMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddAssetMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {

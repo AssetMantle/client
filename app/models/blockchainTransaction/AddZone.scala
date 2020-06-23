@@ -185,15 +185,12 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
         def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
-        def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
-
         def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addZone.from)
 
         for {
           _ <- create
           _ <- verifyZone
           zoneAccountID <- getAccountID(addZone.to)
-          _ <- markUserTypeZone(zoneAccountID)
           _ <- markDirty
           fromAccountID <- getAccountID(addZone.from)
           _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
