@@ -15,12 +15,12 @@ import io.gatling.http.Predef._
 class OneCompleteTransactionModerated extends Simulation {
 
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
-   /* .exec(CreateZone.createZone)
+    .exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
     .exec(CreateBuyer.createBuyer)
-    .exec(AddCounterParty.addCounterParty)*/
+    .exec(AddCounterParty.addCounterParty)
     .exec(IssueFiat.issueFiat)
     .exec(IssueAssetModerated.issueAssetModerated)
     .exec(CreateSalesQuote.createSalesQuote)
@@ -58,7 +58,7 @@ object CreateZone {
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
     .exec(accountControllerTest.loginMain)
     .exec(addZoneControllerTest.verifyZoneScenario)
-    .pause(5)
+    .pause(40)
   /*.exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_ZONE_USERNAME).as[String])) }
   .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE) {
     asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE, Duration.create(80, "seconds")) {
@@ -89,7 +89,7 @@ object CreateSellerOrganization {
     .exec(backgroundCheckControllerTest.corporateScan)
     .exec(addOrganizationControllerTest.verifyOrganizationScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
   /* .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION) {
      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION, Duration.create(80, "seconds")) {
@@ -120,7 +120,7 @@ object CreateSeller {
     .exec(accountControllerTest.loginScenario)
     .exec(setACLControllerTest.organizationVerifyTrader)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
   /* .exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_SELLER_USERNAME).as[String])) }
    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
      asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER, Duration.create(80, "seconds")) {
@@ -152,7 +152,7 @@ object CreateBuyerOrganization {
     .exec(backgroundCheckControllerTest.corporateScan)
     .exec(addOrganizationControllerTest.verifyOrganizationScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
   /*.exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String])) }
   .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION) {
     asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION, Duration.create(80, "seconds")) {
@@ -184,7 +184,7 @@ object CreateBuyer {
     .exec(accountControllerTest.loginScenario)
     .exec(setACLControllerTest.organizationVerifyTrader)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
   /*.exec { session => session.set(Test.USER_TYPE, accountControllerTest.getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
   .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
     asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER, Duration.create(80, "seconds")) {
@@ -211,19 +211,19 @@ object AddCounterParty {
 object IssueFiat {
 
   val issueFiat = scenario("IssueFiat")
-    .exec(session => session.set(Test.TEST_ZONE_USERNAME, "ZONE10qr6Ecmuq").set(Test.TEST_ZONE_PASSWORD,"123123123"))
+   /* .exec(session => session.set(Test.TEST_ZONE_USERNAME, "ZONE10qr6Ecmuq").set(Test.TEST_ZONE_PASSWORD,"123123123"))
     .exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL103AfTmnz1").set(Test.TEST_SELLER_PASSWORD,"SELL103AfTmnz1"))
-    .exec(session => session.set(Test.TEST_BUYER_USERNAME, "SELL103AfTmnz1").set(Test.TEST_BUYER_PASSWORD, "SELL103AfTmnz1"))
+    .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10sYLgeDn4").set(Test.TEST_BUYER_PASSWORD, "BUY10sYLgeDn4"))
     .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+   */ .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec { session => session.set(Test.TEST_TRADER_ID, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
     .exec(issueFiatControllerTest.issueFiatRequestScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(3)
     .exec(issueFiatControllerTest.westernUnionRTCB)
-    .pause(5)
+    .pause(10)
 }
 
 object IssueAssetModerated {
@@ -233,7 +233,7 @@ object IssueAssetModerated {
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.moderatedIssueAssetRequestScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
     .exec { session => session.set(Test.TEST_ASSET_ID, assetControllerTest.getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_DESCRIPTION).as[String], session(Test.TEST_QUANTITY_UNIT).as[String], session(Test.TEST_ASSET_QUANTITY).as[String], session(Test.TEST_ASSET_PRICE).as[String])) }
 }
 
@@ -251,7 +251,7 @@ object AcceptSalesQuoteAndAllTradeTerms {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.acceptNegotiationRequest)
-    .pause(5)
+    .pause(40)
     /* .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
      .doIf(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED) {
        asLongAsDuring(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED, Duration.create(80, "seconds")) {
@@ -294,7 +294,7 @@ object BuyerConfirmNegotiation {
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.buyerConfirmNegotiation)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 }
 
 object SellerConfirmNegotiation {
@@ -304,7 +304,7 @@ object SellerConfirmNegotiation {
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.sellerConfirmNegotiation)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 }
 
 object VesselCheckAndReleaseAsset {
@@ -315,7 +315,7 @@ object VesselCheckAndReleaseAsset {
     .exec(backgroundCheckControllerTest.vesselScan)
     .exec(assetControllerTest.releaseAsset)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 }
 
 object SendFiat {
@@ -332,7 +332,7 @@ object SendFiat {
     .exec(accountControllerTest.loginScenario)
     .exec(sendFiatControllerTest.sendFiatScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 }
 
 object SendAsset {
@@ -342,7 +342,7 @@ object SendAsset {
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.sendAsset)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 }
 
 object ModeratedBuyerAndSellerExecuteOrder {
@@ -358,10 +358,10 @@ object ModeratedBuyerAndSellerExecuteOrder {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(orderControllerTest.moderatedBuyerExecuteOrderScenario)
-    .pause(5)
+    .pause(40)
     .exec(orderControllerTest.moderatedSellerExecuteOrderScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 
 }
 
@@ -379,7 +379,7 @@ object RedeemAsset {
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.redeemAsset)
     .exec(accountControllerTest.logoutScenario)
-    .pause(5)
+    .pause(40)
 }
 
 

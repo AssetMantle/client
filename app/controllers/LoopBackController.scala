@@ -302,6 +302,11 @@ class LoopBackController @Inject()(
   def releaseAsset = Action { implicit request =>
     implicit val requestReads = transactionsReleaseAsset.requestReads
 
+    println(assetList)
+    assetList.map { asset => println("Assset---------------------------------" + asset) }
+    println(assetList.toString())
+    println("assetListlength" + assetList.length)
+
     val releaseAsset = request.body.asJson.map { requestBody =>
       convertJsonStringToObject[transactionsReleaseAsset.Request](requestBody.toString())
     }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -309,6 +314,11 @@ class LoopBackController @Inject()(
     assetList.find(asset => asset.ownerAddress == releaseAsset.to && asset.pegHash == releaseAsset.pegHash).map { asset =>
       asset.locked = false
     }.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
+
+    println(assetList)
+    assetList.map { asset => println("Assset---------------------------------" + asset) }
+    println(assetList.toString())
+    println("assetListlength" + assetList.length)
 
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "ISFI" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
@@ -327,7 +337,7 @@ class LoopBackController @Inject()(
     val negotiation = negotiationList.find(negotiation => negotiation.buyerAddress == sendAsset.to && negotiation.sellerAddress == sendAsset.base_req.from && negotiation.assetPegHash == sendAsset.pegHash).getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND))
     orderList.find(_.id == negotiation.id) match {
       case Some(order) =>
-      case None => orderList :+ Order(negotiation.id, None, None)
+      case None => orderList=orderList :+ Order(negotiation.id, None, None)
     }
     assetList.find(_.pegHash == negotiation.assetPegHash).map { asset =>
       asset.ownerAddress = negotiation.id
@@ -347,23 +357,25 @@ class LoopBackController @Inject()(
       convertJsonStringToObject[transactionsSendFiat.Request](requestBody.toString())
     }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    fiatList.find(fiat => fiat.ownerAddress == sendFiat.base_req.from && fiat.transactionAmount == sendFiat.amount).map { fiat =>
-      fiatList
-
-      fiat.transactionAmount = (fiat.transactionAmount.toInt - sendFiat.amount.toInt).toString
-      fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, sendFiat.to, "", sendFiat.amount, "")
-    }.getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
+    println(sendFiat)
 
     val negotiation = negotiationList.find(negotiation => negotiation.buyerAddress == sendFiat.base_req.from && negotiation.sellerAddress == sendFiat.to && negotiation.assetPegHash == sendFiat.pegHash).getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND))
 
     fiatList.find(fiat => fiat.ownerAddress == sendFiat.base_req.from).map { fiat =>
+
+      fiat.transactionAmount = (fiat.transactionAmount.toInt - sendFiat.amount.toInt).toString
+      fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, negotiation.id, "", sendFiat.amount, "")
+    }.getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
+
+
+  /*  fiatList.find(fiat => fiat.ownerAddress == sendFiat.base_req.from).map { fiat =>
       fiat.transactionAmount = (fiat.transactionAmount.toInt - sendFiat.amount.toInt).toString
       fiatList = fiatList :+ Fiat(fiat.pegHash, negotiation.id, "", sendFiat.amount, "")
-    }
+    }*/
 
     orderList.find(_.id == negotiation.id) match {
       case Some(order) =>
-      case None => orderList :+ Order(negotiation.id, None, None)
+      case None => orderList=orderList :+ Order(negotiation.id, None, None)
     }
 
     if (kafkaEnabled) {
@@ -450,7 +462,7 @@ class LoopBackController @Inject()(
     val response = negotiationList.filter(_.id == negotiationID).map { negotiation =>
       queries.responses.NegotiationResponse.Response(queries.responses.NegotiationResponse.Value(negotiationID, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, negotiation.bid, negotiation.time, Some(negotiation.buyerSignature.getOrElse("")), Some(negotiation.sellerSignature.getOrElse("")), Some(negotiation.buyerBlockHeight.getOrElse("")), Some(negotiation.sellerBlockHeight.getOrElse("")), Some(negotiation.buyerContractHash.getOrElse("")), Some(negotiation.sellerContractHash.getOrElse(""))))
     }.headOption.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND))
-
+    println("getNegotiationResponse"+response)
     Ok(Json.toJson(response))
   }
 
@@ -459,17 +471,21 @@ class LoopBackController @Inject()(
     val negotiationID = negotiationList.filter(negotiation => negotiation.buyerAddress == buyerAddress && negotiation.sellerAddress == sellerAddress && negotiation.assetPegHash == pegHash).map {
       _.id
     }.headOption.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
+    println("getNegotiationIDResponse-----"+negotiationID)
     Ok(Json.toJson(queries.responses.NegotiationIdResponse.Response(negotiationID)))
   }
 
   def getOrder(orderID: String) = Action {
-    val assetPegWallet = assetList.filter(_.ownerAddress == orderID).map(asset => queries.responses.AccountResponse.Asset(asset.pegHash, asset.documentHash, asset.assetType, asset.assetQuantity, asset.assetPrice, asset.quantityUnit, asset.ownerAddress, false, asset.moderated, asset.takerAddress.getOrElse("")))
+    println("getOrder------------------"+orderID)
+    println(orderList.toString())
+
+    val assetPegWallet = assetList.filter(_.ownerAddress == orderID).map(asset => queries.responses.AccountResponse.Asset(asset.pegHash, asset.documentHash, asset.assetType, asset.assetQuantity, asset.assetPrice, asset.quantityUnit, asset.ownerAddress, asset.locked, asset.moderated, asset.takerAddress.getOrElse("")))
     val fiatPegWallet = fiatList.filter(_.ownerAddress == orderID).map(fiat => queries.responses.AccountResponse.Fiat(fiat.pegHash, fiat.transactionID, fiat.transactionAmount, fiat.redeemedAmount, None))
 
     val response = orderList.filter(_.id == orderID).map { order =>
       queries.responses.OrderResponse.Response(queries.responses.OrderResponse.Value(orderID, order.fiatProofHash.getOrElse(""), order.awbProofHash.getOrElse(""), Some(fiatPegWallet), Some(assetPegWallet)))
-    }
+    }.headOption.getOrElse(throw new BaseException(constants.Response.FAILURE))
+
     Ok(Json.toJson(response))
   }
 

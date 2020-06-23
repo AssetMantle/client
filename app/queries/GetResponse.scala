@@ -26,7 +26,10 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
   private val url = ip + ":" + port + "/" + path + "/"
   private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getResponse("")
 
-  private def action(request: String): Future[WSResponse] = wsClient.url(testURL + request).get
+  private def action(request: String): Future[WSResponse] = wsClient.url(testURL + request).get.map{response=>
+    println("getResponse------"+response)
+    response
+  }
 
   object Service {
 

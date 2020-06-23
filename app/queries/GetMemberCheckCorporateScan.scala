@@ -37,9 +37,9 @@ class GetMemberCheckCorporateScan @Inject()(wsClient: WSClient, keyStore: KeySto
 
   private val url = baseURL + endpoint + "/"
 
-  //private val testURL = constants.Test.BASE_URL+routes.LoopBackController.memberCheckCorporateScanInfo("")
+  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.memberCheckCorporateScanInfo("")
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).withHttpHeaders(organizationHeader, apiKeyHeader).get)
 
   object Service {
 

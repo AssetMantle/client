@@ -649,6 +649,7 @@ POST        /loopback/changeBuyerBid                                            
 POST        /loopback/changeSellerBid                                                             controllers.LoopBackController.changeSellerBid
 POST        /loopback/confirmBuyerBid                                                             controllers.LoopBackController.confirmBuyerBid
 POST        /loopback/confirmSellerBid                                                            controllers.LoopBackController.confirmSellerBid
+POST        /loopback/releaseAsset                                                                controllers.LoopBackController.releaseAsset
 POST        /loopback/sendAsset                                                                   controllers.LoopBackController.sendAsset
 POST        /loopback/sendFiat                                                                    controllers.LoopBackController.sendFiat
 POST        /loopback/buyerExecuteOrder                                                           controllers.LoopBackController.buyerExecuteOrder
