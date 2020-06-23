@@ -2,8 +2,8 @@ package controllers
 
 
 import constants.Form
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
-import controllers.results.WithUsernameToken
+import controllers.actions.WithTraderLoginAction
+import controllers.logging._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, westernUnion}
@@ -32,7 +32,8 @@ class WesternUnionController @Inject()(
                                         transactionsIssueFiat: transactions.IssueFiat,
                                         transaction: utilities.Transaction,
                                         withTraderLoginAction: WithTraderLoginAction,
-                                        keyStore: KeyStore
+                                        keyStore: KeyStore,
+                                        withXmlParseActionLoggingFilter: WithXmlParseActionLoggingFilter
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val rtcbSecretKey = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_RTCB_SECRET_KEY)
@@ -49,7 +50,7 @@ class WesternUnionController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def westernUnionRTCB: Action[NodeSeq] = Action.async(parse.xml) {
+  def westernUnionRTCB: Action[NodeSeq] = withXmlParseActionLoggingFilter.next {
     request =>
 
       val requestBody = views.companion.master.WesternUnionRTCB.fromXml(request.body)
