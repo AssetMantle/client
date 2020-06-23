@@ -63,7 +63,7 @@ class ChatController @Inject()(
           chats <- getChats(traderID, negotiation)
         } yield Ok(views.html.component.master.chatRoom(chatID = negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)), chats = chats))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError
       }
   }
 
@@ -83,7 +83,7 @@ class ChatController @Inject()(
             readChats <- readChats(chatsInWindow.map(_.id))
           } yield Ok(views.html.component.master.chatWindow(views.companion.master.SendMessage.form.fill(views.companion.master.SendMessage.Data(chatID, "", None)), chatsInWindow, readChats, chatID))
         } else {
-          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized)
         }
       }
 
@@ -92,7 +92,7 @@ class ChatController @Inject()(
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError
       }
   }
 
@@ -112,7 +112,7 @@ class ChatController @Inject()(
             readChats <- readChats(chatsInWindow.map(_.id))
           } yield Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatID))
         } else {
-          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized)
         }
       }
 
@@ -121,7 +121,7 @@ class ChatController @Inject()(
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError
       }
   }
 
@@ -164,7 +164,7 @@ class ChatController @Inject()(
                 result
               }
             } else {
-              Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
+              Future(Unauthorized)
             }
           }
 
@@ -191,7 +191,7 @@ class ChatController @Inject()(
             chat <- chat
           } yield Ok(Json.toJson(chat))
         } else {
-          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized)
         }
 
       }
@@ -220,7 +220,7 @@ class ChatController @Inject()(
             _ <- markRead(messageIDs)
           } yield Ok(constants.Response.MESSAGE_READ.message)
         } else {
-          Future(Unauthorized(views.html.trades(failures = Seq(constants.Response.UNAUTHORIZED))))
+          Future(Unauthorized)
         }
       }
 

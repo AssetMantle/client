@@ -70,7 +70,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         senderViewURL <- getSenderViewURL(envelope, traderID, negotiation)
       } yield Ok(views.html.component.master.docusignView(senderViewURL))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError
       }
   }
 
@@ -144,7 +144,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError
       }
   }
 

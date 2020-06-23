@@ -77,7 +77,7 @@ class WesternUnionController @Inject()(
 
         def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
-        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = requestBody.paidOutAmount.toInt)
+        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = Future("ISSUE_FIAT_TRANSACTION")
 
         def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, requestBody.paidOutAmount.toInt, 0)
 
@@ -134,29 +134,4 @@ class WesternUnionController @Inject()(
           }
         })
   }
-
-  private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: Int): Future[String] = {
-
-    val zonePassword = Future(keyStore.getPassphrase(zoneID))
-
-    def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
-      entity = blockchainTransaction.IssueFiat(from = zoneWalletAddress, to = traderAddress, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, gas = constants.Blockchain.ZoneIssueFiatGasAmount, ticketID = "", mode = transactionMode),
-      blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGasAmount.toString), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount.toString, mode = transactionMode),
-      action = transactionsIssueFiat.Service.post,
-      onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
-      onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
-      updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
-    )
-
-    (for {
-      zonePassword <- zonePassword
-      ticketID <- sendTransaction(zonePassword)
-    } yield ticketID
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
-
-  }
-
 }

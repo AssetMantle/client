@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import views.companion.master.ZoneSendFiat
-
-@(zoneSendFiatForm: Form[ZoneSendFiat.Data] = ZoneSendFiat.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@commonForm(constants.Form.ZONE_SEND_FIAT, zoneSendFiatForm) {
-    @commonInputText(zoneSendFiatForm, constants.FormField.ID, 'value -> id)
-}

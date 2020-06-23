@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import views.companion.master.FaucetRequest
-
-@(faucetRequestForm: Form[FaucetRequest.Data] = FaucetRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-    @commonForm(constants.Form.FAUCET_REQUEST, faucetRequestForm) {
-    @commonInputText(faucetRequestForm, constants.FormField.COUPON)
-}

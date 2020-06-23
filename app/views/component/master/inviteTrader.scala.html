@@ -1,8 +1,0 @@
-@import views.html.base._
-@import views.companion.master.InviteTrader
-
-@(inviteTraderForm: Form[InviteTrader.Data] = InviteTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@commonForm(constants.Form.INVITE_TRADER, inviteTraderForm) {
-    @commonInputText(inviteTraderForm, constants.FormField.NAME)
-    @commonInputText(inviteTraderForm, constants.FormField.EMAIL_ADDRESS)
-}

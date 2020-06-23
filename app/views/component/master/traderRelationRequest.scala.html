@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import views.companion.master.TraderRelationRequest
-
-@(sendRelationRequestForm: Form[TraderRelationRequest.Data] = TraderRelationRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@commonForm(constants.Form.TRADER_RELATION_REQUEST, sendRelationRequestForm) {
-  @commonInputText(sendRelationRequestForm, constants.FormField.ACCOUNT_ID)
-}

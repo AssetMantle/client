@@ -61,19 +61,6 @@
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.trades()" class="navItemRippleEffect"><span class="traderIcon">
-                                    @commonIcon("trader")
-                                </span>
-                                    @Messages(constants.View.TRADES)
-                                </a>
-                                </li>
-                                <li>
-                                    <a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionIcon">
-                                        @commonIcon("transaction")
-                                    </span>
-                                        @Messages(constants.View.TRANSACTIONS)
-                                    </a>
-                                </li>
                                 <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect"><span class="accountIcon">
                                     @commonIcon("account")
                                 </span>
@@ -100,15 +87,6 @@
                                 </li>
                             }
                             case default => {
-                                @loginState.userType match {
-                                    case constants.User.ZONE => {
-                                        <li><a href="@controllers.routes.ViewController.zoneRequest()" class="navItemRippleEffect">@Messages(constants.View.REQUEST)</a></li>
-                                    }
-                                    case constants.User.GENESIS => {
-                                        <li><a href="@controllers.routes.ViewController.genesisRequest()" class="navItemRippleEffect">@Messages(constants.View.REQUEST)</a></li>
-                                    }
-                                    case _ => {}
-                                }
                                 <script type="text/javascript">
                                         var cometMessage = function (message) {
                                             cometMessageHandler(message);
