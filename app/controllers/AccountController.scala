@@ -1,11 +1,9 @@
 package controllers
 
 import controllers.actions.{LoginState, WithLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
-import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.ACL
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
 import models.{blockchain, master, masterTransaction}
@@ -26,8 +24,6 @@ class AccountController @Inject()(
                                    withUserLoginAction: WithUserLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
-                                   blockchainAclHashes: blockchain.ACLHashes,
-                                   blockchainAclAccounts: blockchain.ACLAccounts,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,

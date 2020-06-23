@@ -3,7 +3,6 @@ package controllers.actions
 import controllers.logging.WithActionAsyncLoggingFilter
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.ACL
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -12,7 +11,13 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WithLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents,withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter, blockchainAccounts: blockchain.Accounts, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithLoginAction @Inject()(
+                                 messagesControllerComponents: MessagesControllerComponents,
+                                 withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
+                                 blockchainAccounts: blockchain.Accounts, masterAccounts:
+                                 master.Accounts,
+                                 masterTransactionSessionTokens: masterTransaction.SessionTokens
+                               )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 

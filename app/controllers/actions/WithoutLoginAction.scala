@@ -3,8 +3,6 @@ package controllers.actions
 import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.ACL
-import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}

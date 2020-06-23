@@ -20,17 +20,13 @@ import scala.xml.NodeSeq
 class WesternUnionController @Inject()(
                                         blockchainAccounts: blockchain.Accounts,
                                         messagesControllerComponents: MessagesControllerComponents,
-                                        blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
                                         masterOrganizations: master.Organizations,
                                         masterTraders: master.Traders,
                                         masterZones: master.Zones,
                                         masterEmails: master.Emails,
                                         masterFiats: master.Fiats,
-                                        sftpScheduler: SFTPScheduler,
                                         westernUnionFiatRequests: westernUnion.FiatRequests,
                                         westernUnionRTCBs: westernUnion.RTCBs,
-                                        transactionsIssueFiat: transactions.IssueFiat,
-                                        transaction: utilities.Transaction,
                                         withLoginAction: WithLoginAction,
                                         keyStore: KeyStore
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {

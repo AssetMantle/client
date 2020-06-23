@@ -4,18 +4,19 @@ import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain
-import models.blockchain.{ACLAccount, ACLAccounts}
 import models.master._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import queries.GetAccount
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                withLoginAction: WithLoginAction,
+                                masterAccounts: Accounts,
+                                withUsernameToken: WithUsernameToken
+                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
