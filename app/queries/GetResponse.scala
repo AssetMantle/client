@@ -2,6 +2,7 @@ package queries
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -23,8 +24,9 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
   private val path = "response"
 
   private val url = ip + ":" + port + "/" + path + "/"
+  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getResponse("")
 
-  private def action(request: String): Future[WSResponse] = wsClient.url(url + request).get
+  private def action(request: String): Future[WSResponse] = wsClient.url(testURL + request).get
 
   object Service {
 

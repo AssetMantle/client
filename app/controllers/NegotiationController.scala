@@ -807,7 +807,7 @@ class NegotiationController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
+      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.buyerTraderID) {
         withUsernameToken.Ok(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = termType, status = false))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)

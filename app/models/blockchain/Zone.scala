@@ -148,7 +148,9 @@ class Zones @Inject()(
           dirtyZones.map { dirtyZone =>
             val response = getZone.Service.get(dirtyZone.id)
 
-            def refreshDirty(response: queries.responses.ZoneResponse.Response): Future[Int] = Service.refreshDirty(dirtyZone.id, response.body)
+            def refreshDirty(response: queries.responses.ZoneResponse.Response): Future[Int] = {
+              Service.refreshDirty(dirtyZone.id, response.body)
+            }
 
             (for {
               response <- response

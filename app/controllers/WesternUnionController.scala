@@ -111,7 +111,6 @@ class WesternUnionController @Inject()(
 
           def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
-
           def organizationDetails(organizationID: String): Future[master.Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           (for {

@@ -2,6 +2,7 @@ package queries
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
@@ -25,7 +26,9 @@ class GetMnemonic @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
+  private val testUrl= constants.Test.BASE_URL+routes.LoopBackController.mnemonic
+
+  private def action(): Future[Response] = wsClient.url(testUrl).get.map { response => new Response(response) }
 
   object Service {
     def get(): Future[Response] = action().recover {

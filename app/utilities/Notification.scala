@@ -4,6 +4,7 @@ import com.twilio.Twilio
 import com.twilio.`type`.PhoneNumber
 import com.twilio.exception.{ApiConnectionException, ApiException}
 import com.twilio.rest.api.v2010.account.Message
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -13,7 +14,8 @@ import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class Notification @Inject()(masterTransactionNotifications: masterTransaction.Notifications,
@@ -62,18 +64,16 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-
-    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+   // val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    val send = wsClient.url(constants.Test.BASE_URL + routes.LoopBackController.sendSMS).get()
 
     (for {
       _ <- send
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
-      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
-        throw new BaseException(constants.Response.SMS_SEND_FAILED)
-      case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
-        throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE)
+      case apiException: ApiException => throw new BaseException(constants.Response.SMS_SEND_FAILED, apiException)
+      case apiConnectionException: ApiConnectionException => throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE, apiConnectionException)
     }
   }
 
@@ -98,15 +98,17 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   }
 
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
-    mailerClient.send(Email(
-      subject = messagesApi(email.subject),
-      from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
-      to = Seq(emailAddress),
-      bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-      charset = Option(emailCharset),
-      replyTo = Seq(emailReplyTo),
-      bounceAddress = Option(emailBounceAddress),
-    ))
+   /*   mailerClient.send(Email(
+        subject = messagesApi(email.subject),
+        from = emailFromAddress,
+        to = Seq(emailAddress),
+        bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
+        charset = Option(emailCharset),
+        replyTo = Seq(emailReplyTo),
+        bounceAddress = Option(emailBounceAddress),
+      ))*/
+
+    Await.result(wsClient.url(constants.Test.BASE_URL + routes.LoopBackController.sendEmail).get().map(response => response.toString), Duration.Inf)
   }
 
   def sendEmailToEmailAddress(fromAccountID: String, emailAddress: String, email: constants.Notification.Email, messageParameters: String*): Future[String] = {
@@ -114,11 +116,10 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     (for {
       language <- language
     } yield sendEmail(emailAddress = emailAddress, email = email, messageParameters = messageParameters: _*)(Lang(language))
-      ).recover {
+    ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
-
   }
 
   private def sendEmailByAccountID(accountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Future[String] = {

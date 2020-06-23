@@ -620,3 +620,37 @@ POST        /blockchain/setBuyerFeedback                                        
 
 GET         /blockchain/setSellerFeedback                                                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
+
+#LoopBackControllers
+GET         /loopBack/memberCheckCorporateScan                                                    controllers.LoopBackController.memberCheckCorporateScanInfo(request:String)
+POST        /loopBack/memberCheckCorporateScan                                                    controllers.LoopBackController.memberCheckCorporateScan
+GET         /loopBack/sendEmail                                                                   controllers.LoopBackController.sendEmail
+GET         /loopBack/sendSMS                                                                     controllers.LoopBackController.sendSMS
+GET         /loopback/keys/mnemonic                                                               controllers.LoopBackController.mnemonic
+GET         /loopback/zone                                                                        controllers.LoopBackController.getZone(zoneID:String)
+GET         /loopback/organization                                                                controllers.LoopBackController.getOrganization(organizationID :String)
+GET         /loopback/response                                                                    controllers.LoopBackController.getResponse(ticketID:String)
+GET         /loopback/txs                                                                         controllers.LoopBackController.getTxHashResponse(txHash:String)
+GET         /loopback/auth/accounts                                                               controllers.LoopBackController.getAccount(address:String)
+GET         /loopback/negotiation                                                                 controllers.LoopBackController.getNegotiation(negotiationID: String)
+GET         /loopback/negotiationID                                                               controllers.LoopBackController.getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String)
+GET         /loopback/order                                                                       controllers.LoopBackController.getOrder(orderID: String)
+GET         /loopback/reputation                                                                  controllers.LoopBackController.getTraderReputation(address: String)
+GET         /loopback/acl                                                                         controllers.LoopBackController.getACL(address: String)
+
+POST        /loopback/addKey                                                                      controllers.LoopBackController.addKey
+POST        /loopback/bank/accounts/transfers                                                     controllers.LoopBackController.sendCoin
+POST        /loopback/defineZone                                                                  controllers.LoopBackController.addZone
+POST        /loopback/defineOrganization                                                          controllers.LoopBackController.addOrganization
+POST        /loopback/defineACL                                                                   controllers.LoopBackController.setACL
+POST        /loopback/issueAsset                                                                  controllers.LoopBackController.issueAsset
+POST         /loopback/issueFiat                                                                  controllers.LoopBackController.issueFiat
+POST        /loopback/changeBuyerBid                                                              controllers.LoopBackController.changeBuyerBid
+POST        /loopback/changeSellerBid                                                             controllers.LoopBackController.changeSellerBid
+POST        /loopback/confirmBuyerBid                                                             controllers.LoopBackController.confirmBuyerBid
+POST        /loopback/confirmSellerBid                                                            controllers.LoopBackController.confirmSellerBid
+POST        /loopback/sendAsset                                                                   controllers.LoopBackController.sendAsset
+POST        /loopback/sendFiat                                                                    controllers.LoopBackController.sendFiat
+POST        /loopback/buyerExecuteOrder                                                           controllers.LoopBackController.buyerExecuteOrder
+POST        /loopback/sellerExecuteOrder                                                          controllers.LoopBackController.sellerExecuteOrder
+POST        /loopback/redeemAsset                                                                 controllers.LoopBackController.redeemAsset
