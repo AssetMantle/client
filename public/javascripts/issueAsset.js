@@ -1,3 +1,0 @@
-function showHideGasAndPassword() {
-    $('#issueAssetPasswordField').toggle();
-}

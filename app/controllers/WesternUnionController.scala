@@ -72,7 +72,7 @@ class WesternUnionController @Inject()(
         } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else Future(utilities.XMLRestResponse.INVALID_REQUEST_SIGNATURE.result)
         ).recover {
-        case _: Exception => utilities.XMLRestResponse.COMDEX_VALIDATION_FAILURE.result
+        case _: Exception => utilities.XMLRestResponse.VALIDATION_FAILURE.result
       }
   }
 

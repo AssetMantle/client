@@ -4,43 +4,35 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-    @common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
+@common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
 
-    @left = {
-        <div class="leftContainer">
-            <div id="financials" class="financial"></div>
+@left = {
+
+}
+
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom">
+        <div class="tradeList switcherCard">
+            <div id="componentID"></div>
+        </div>
+        <div>
+            <div id="componentID" class="switcherCard"></div>
         </div>
         <script>
+                componentResource('componentID', jsRoutes.controllers.ComponentViewController.componentMethod());
+                componentResource('componentID', jsRoutes.controllers.ComponentViewController.componentMethod());
         </script>
-    }
+    </div>
+}
 
-    @center = {
-        <div class="cmuk-container cmuk-margin-bottom">
-            <div class="tradeList switcherCard">
-                <div id="organizationViewAcceptedNegotiationList"></div>
-            </div>
-            <div>
-                <div id="organizationViewAcceptedNegotiationList" class="switcherCard"></div>
-            </div>
-            <div>
-                <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
-            </div>
-            <script>
-                    componentResource('organizationViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationList());
-                    componentResource('organizationViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.organizationViewSentReceivedIncompleteRejectedFailedNegotiationList());
-                    componentResource('organizationTradeStatistics', jsRoutes.controllers.ComponentViewController.organizationTradeStatistics());
-            </script>
+@right = {
+    <div class="rightContainer">
+        <div class="recentActivityContainer">
+            <div id="recentActivities"></div>
         </div>
-    }
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+    </script>
 
-    @right = {
-        <div class="rightContainer">
-            <div class="recentActivityContainer">
-                <div id="recentActivities"></div>
-            </div>
-        </div>
-        <script>
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
-        </script>
-
-    }
+}

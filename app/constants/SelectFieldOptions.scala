@@ -1,9 +1,6 @@
 package constants
 
 object SelectFieldOptions {
-  val ASSET_TYPES: Seq[String] = Seq("OIL", "COAL", "GOLD", "WHEAT", "COPPER", "CORN", "IRON", "PALM_OIL", "RICE",
-    "SOYBEAN", "STEEL", "OTHER")
-  val DELIVERY_TERMS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val CURRENCIES: Seq[String] = Seq("USD")
   val COUNTRIES: Seq[String] = Seq("Afghanistan", "Albania", "Algeria",
     "Andorra",
@@ -199,11 +196,7 @@ object SelectFieldOptions {
     "Yemen",
     "Zambia",
     "Zimbabwe")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq("BANK", "TRUST", "COURIER")
-  val PAYMENT_TERMS: Seq[String] = Seq(constants.View.ONLY_SUPPLIER, constants.View.ONLY_BUYER, constants.View.BOTH_PARTIES)
   val MODE: Seq[String] = Seq("async", "sync", "block")
-  val REFERENCE_DATES: Seq[String] = Seq("INVOICE_DATE", "SHIPPING_DATE")
-
 
   //memberCheck
   val MATCH_TYPE: Seq[String] = Seq("Exact", "Close")

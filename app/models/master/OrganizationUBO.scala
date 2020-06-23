@@ -24,7 +24,7 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_ORGANIZATION
+  private implicit val module: String = constants.Module.MASTER_ORGANIZATION_UBO
 
   import databaseConfig.profile.api._
 
