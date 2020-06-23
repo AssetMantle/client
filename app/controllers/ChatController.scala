@@ -7,12 +7,9 @@ import controllers.actions.{WithLoginAction, WithoutLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.Negotiation
-import models.masterTransaction.{Chat, Chats, Message, MessageRead}
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.http.ContentTypes
+import models.masterTransaction.{Chat, Message, MessageRead}
+import models.{master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.libs.Comet
 import play.api.libs.json.{JsString, JsValue, Json, OWrites, Writes}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
@@ -23,9 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChatController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
                                 withLoginAction: WithLoginAction,
-                                masterTraders: master.Traders,
                                 withUsernameToken: WithUsernameToken,
-                                masterNegotiations: master.Negotiations,
                                 masterTransactionChats: masterTransaction.Chats,
                                 masterTransactionMessages: masterTransaction.Messages,
                                 masterTransactionMessageReads: masterTransaction.MessageReads,
@@ -47,21 +42,19 @@ class ChatController @Inject()(
   // gets all chatWindows in chatRoom, position - right bottom
   def chatRoom(negotiationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username)
-      val negotiation = masterNegotiations.Service.tryGet(negotiationID)
+      val verifyChatRoomParticipants = true
+      val chatID = "chatID"
 
-      def getChats(traderID: String, negotiation: Negotiation): Future[Seq[Chat]] = if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
-        masterTransactionChats.Service.getAllChats(negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)))
+      def getChats: Future[Seq[Chat]] = if (verifyChatRoomParticipants) {
+        masterTransactionChats.Service.getAllChats(chatID)
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
 
       (
         for {
-          traderID <- traderID
-          negotiation <- negotiation
-          chats <- getChats(traderID, negotiation)
-        } yield Ok(views.html.component.master.chatRoom(chatID = negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)), chats = chats))
+          chats <- getChats
+        } yield Ok(views.html.component.master.chatRoom(chatID = chatID, chats = chats))
         ).recover {
         case baseException: BaseException => InternalServerError
       }

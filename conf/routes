@@ -1,136 +1,136 @@
-GET         /                                                                                     controllers.IndexController.index
+GET         /                                                    controllers.IndexController.index
 
-GET         /assets/*file                                                                         controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /javascriptRoutes                                                                     controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /javascriptRoutes                                    controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET         /firebase-messaging-sw.js                                                             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+GET         /firebase-messaging-sw.js                            controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
-GET         /docusign/send                                                                        controllers.DocusignController.send(id:String, documentType: String)
-GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
-GET         /docusign/authorization                                                               controllers.DocusignController.authorization
+GET         /docusign/send                                       controllers.DocusignController.send(id:String, documentType: String)
+GET         /docusign/sign                                       controllers.DocusignController.sign(id:String, documentType: String)
+GET         /docusign/authorization                              controllers.DocusignController.authorization
 
 #DO NOT CHANGE /Docusign CallBack ENDPOINT
-GET         /docusign/callBack                                                                    controllers.DocusignController.callBack(envelopeId:String, event:String)
-GET         /docusign/authorizationCallBack                                                       controllers.DocusignController.authorizationCallBack(code:String)
+GET         /docusign/callBack                                   controllers.DocusignController.callBack(envelopeId:String, event:String)
+GET         /docusign/authorizationCallBack                      controllers.DocusignController.authorizationCallBack(code:String)
 
-GET         /blockExplorer/lastBlockHeight                                                        controllers.BlockExplorerController.lastBlockHeight
-GET         /blockExplorer/blockDetails                                                           controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
-GET         /blockExplorer/stakingValidators                                                      controllers.BlockExplorerController.stakingValidators
-GET         /blockExplorer/transactionHash                                                        controllers.BlockExplorerController.transactionHash(txHash: String)
+GET         /blockExplorer/lastBlockHeight                       controllers.BlockExplorerController.lastBlockHeight
+GET         /blockExplorer/blockDetails                          controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
+GET         /blockExplorer/stakingValidators                     controllers.BlockExplorerController.stakingValidators
+GET         /blockExplorer/transactionHash                       controllers.BlockExplorerController.transactionHash(txHash: String)
 
-GET         /profile                                                                              controllers.ViewController.profile
-GET         /account                                                                              controllers.ViewController.account
-GET         /dashboard                                                                            controllers.ViewController.dashboard
+GET         /profile                                             controllers.ViewController.profile
+GET         /account                                             controllers.ViewController.account
+GET         /dashboard                                           controllers.ViewController.dashboard
 
-GET         /profilePicture                                                                       controllers.ComponentViewController.profilePicture
+GET         /profilePicture                                      controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                                                                       controllers.AccountController.signUpForm
-POST        /account/signUp                                                                       controllers.AccountController.signUp
+GET         /account/signUp                                      controllers.AccountController.signUpForm
+POST        /account/signUp                                      controllers.AccountController.signUp
 
-GET         /account/createWallet                                                                 controllers.AccountController.createWalletForm(username: String)
-POST        /account/createWallet                                                                 controllers.AccountController.createWallet
+GET         /account/createWallet                                controllers.AccountController.createWalletForm(username: String)
+POST        /account/createWallet                                controllers.AccountController.createWallet
 
-GET         /account/login                                                                        controllers.AccountController.loginForm
-POST        /account/login                                                                        controllers.AccountController.login
+GET         /account/login                                       controllers.AccountController.loginForm
+POST        /account/login                                       controllers.AccountController.login
 
-GET         /account/logout                                                                       controllers.AccountController.logoutForm
-POST        /account/logout                                                                       controllers.AccountController.logout
+GET         /account/logout                                      controllers.AccountController.logoutForm
+POST        /account/logout                                      controllers.AccountController.logout
 
-GET         /account/changePassword                                                               controllers.AccountController.changePasswordForm
-POST        /account/changePassword                                                               controllers.AccountController.changePassword
+GET         /account/changePassword                              controllers.AccountController.changePasswordForm
+POST        /account/changePassword                              controllers.AccountController.changePassword
 
-GET         /account/forgotPasswordUsername                                                       controllers.AccountController.emailOTPForgotPasswordForm
-POST        /account/forgotPasswordUsername                                                       controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPasswordUsername                      controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                      controllers.AccountController.emailOTPForgotPassword
 
-GET         /account/forgotPassword                                                               controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                                                               controllers.AccountController.forgotPassword
+GET         /account/forgotPassword                              controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                              controllers.AccountController.forgotPassword
 
-GET         /account/checkUsernameAvailable                                                       controllers.AccountController.checkUsernameAvailable(username: String)
+GET         /account/checkUsernameAvailable                      controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /account/addIdentification                                                            controllers.AccountController.addIdentificationForm
-POST        /account/addIdentification                                                            controllers.AccountController.addIdentification
-GET         /account/userViewUploadOrUpdateIdentification                                         controllers.AccountController.userViewUploadOrUpdateIdentification
-GET         /account/userReviewIdentification                                                     controllers.AccountController.userReviewIdentificationForm
-POST        /account/userReviewIdentification                                                     controllers.AccountController.userReviewIdentification
+GET         /account/addIdentification                           controllers.AccountController.addIdentificationForm
+POST        /account/addIdentification                           controllers.AccountController.addIdentification
+GET         /account/userViewUploadOrUpdateIdentification        controllers.AccountController.userViewUploadOrUpdateIdentification
+GET         /account/userReviewIdentification                    controllers.AccountController.userReviewIdentificationForm
+POST        /account/userReviewIdentification                    controllers.AccountController.userReviewIdentification
 
-GET         /contact                                                                              controllers.ContactController.contact
+GET         /contact                                             controllers.ContactController.contact
 
-GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
-POST        /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddress
+GET         /contact/addOrUpdateEmailAddress                     controllers.ContactController.addOrUpdateEmailAddressForm
+POST        /contact/addOrUpdateEmailAddress                     controllers.ContactController.addOrUpdateEmailAddress
 
-GET         /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumberForm
-POST        /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumber
+GET         /contact/addOrUpdateMobileNumber                     controllers.ContactController.addOrUpdateMobileNumberForm
+POST        /contact/addOrUpdateMobileNumber                     controllers.ContactController.addOrUpdateMobileNumber
 
-GET         /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddressForm
-POST        /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddress
+GET         /contact/verifyEmailAddress                          controllers.ContactController.verifyEmailAddressForm
+POST        /contact/verifyEmailAddress                          controllers.ContactController.verifyEmailAddress
 
-GET         /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumberForm
-POST        /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumber
+GET         /contact/verifyMobileNumber                          controllers.ContactController.verifyMobileNumberForm
+POST        /contact/verifyMobileNumber                          controllers.ContactController.verifyMobileNumber
 
-GET         /notification/recentActivityMessages                                                  controllers.NotificationController.recentActivityMessages(pageNumber: Int)
-GET         /notification/unreadNotificationCount                                                 controllers.NotificationController.unreadNotificationCount
-GET         /notification/markNotificationAsRead                                                  controllers.NotificationController.markNotificationRead(notificationID: String)
+GET         /notification/recentActivityMessages                 controllers.NotificationController.recentActivityMessages(pageNumber: Int)
+GET         /notification/unreadNotificationCount                controllers.NotificationController.unreadNotificationCount
+GET         /notification/markNotificationAsRead                 controllers.NotificationController.markNotificationRead(notificationID: String)
 
-GET         /component/identification                                                             controllers.ComponentViewController.identification
+GET         /component/identification                            controllers.ComponentViewController.identification
 
-GET         /component/commonHome                                                                 controllers.ComponentViewController.commonHome
+GET         /component/commonHome                                controllers.ComponentViewController.commonHome
 
-GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
+GET         /component/recentActivities                          controllers.ComponentViewController.recentActivities
 
-GET         /master/file                                                                          controllers.FileController.file(fileName: String, documentType: String)
+GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 
-GET         /accountUpload                                                                        controllers.FileController.uploadAccountFileForm(documentType: String)
-POST        /accountUpload/file                                                                   controllers.FileController.uploadAccountFile(documentType: String)
-GET         /accountUpload/storeFile                                                              controllers.FileController.storeAccountFile(name: String, documentType: String)
-GET         /accountUpdate                                                                        controllers.FileController.updateAccountFileForm(documentType: String)
-GET         /accountUpdate/updateFile                                                             controllers.FileController.updateAccountFile(name: String, documentType: String)
+GET         /accountUpload                                       controllers.FileController.uploadAccountFileForm(documentType: String)
+POST        /accountUpload/file                                  controllers.FileController.uploadAccountFile(documentType: String)
+GET         /accountUpload/storeFile                             controllers.FileController.storeAccountFile(name: String, documentType: String)
+GET         /accountUpdate                                       controllers.FileController.updateAccountFileForm(documentType: String)
+GET         /accountUpdate/updateFile                            controllers.FileController.updateAccountFile(name: String, documentType: String)
 
-GET         /userUpload                                                                           controllers.FileController.uploadAccountKYCForm(documentType: String)
-POST        /userUpload/file                                                                      controllers.FileController.uploadAccountKYC(documentType: String)
-GET         /userUpload/storeFile                                                                 controllers.FileController.storeAccountKYC(name: String, documentType: String)
-GET         /userUpdate                                                                           controllers.FileController.updateAccountKYCForm(documentType: String)
-GET         /userUpdate/updateFile                                                                controllers.FileController.updateAccountKYC(name: String, documentType: String)
-GET         /userUpload/getFile                                                                   controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
+GET         /userUpload                                          controllers.FileController.uploadAccountKYCForm(documentType: String)
+POST        /userUpload/file                                     controllers.FileController.uploadAccountKYC(documentType: String)
+GET         /userUpload/storeFile                                controllers.FileController.storeAccountKYC(name: String, documentType: String)
+GET         /userUpdate                                          controllers.FileController.updateAccountKYCForm(documentType: String)
+GET         /userUpdate/updateFile                               controllers.FileController.updateAccountKYC(name: String, documentType: String)
+GET         /userUpload/getFile                                  controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
 
-GET         /background/memberScan                                                                controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
-POST        /background/memberScan                                                                controllers.BackgroundCheckController.memberScan
-GET         /background/memberScanResult                                                          controllers.BackgroundCheckController.memberScanResult(resultID: Int)
-GET         /background/memberScanResultDecision                                                  controllers.BackgroundCheckController.memberScanResultDecisionForm(resultID: Int)
-POST        /background/memberScanResultDecision                                                  controllers.BackgroundCheckController.memberScanResultDecision
-GET         /background/addUBO                                                                    controllers.BackgroundCheckController.addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addUBO                                                                    controllers.BackgroundCheckController.addUBOMemberCheck
-GET         /background/corporateScan                                                             controllers.BackgroundCheckController.corporateScanForm(organizationID: String, companyName: String)
-POST        /background/corporateScan                                                             controllers.BackgroundCheckController.corporateScan
-GET         /background/corporateScanResult                                                       controllers.BackgroundCheckController.corporateScanResult(resultID: Int)
-GET         /background/corporateScanResultDecision                                               controllers.BackgroundCheckController.corporateScanResultDecisionForm(resultID: Int)
-POST        /background/corporateScanResultDecision                                               controllers.BackgroundCheckController.corporateScanResultDecision
-GET         /background/addOrganization                                                           controllers.BackgroundCheckController.addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addOrganization                                                           controllers.BackgroundCheckController.addOrganizationMemberCheck
-GET         /background/vesselScan                                                                controllers.BackgroundCheckController.vesselScanForm(assetID: String, vesselName: String)
-POST        /background/vesselScan                                                                controllers.BackgroundCheckController.vesselScan
-GET         /background/vesselScanResult                                                          controllers.BackgroundCheckController.vesselScanResult(resultID: Int)
-GET         /background/vesselScanResultDecision                                                  controllers.BackgroundCheckController.vesselScanResultDecisionForm(resultID: Int)
-POST        /background/vesselScanResultDecision                                                  controllers.BackgroundCheckController.vesselScanResultDecision
-GET         /background/addAsset                                                                  controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addAsset                                                                  controllers.BackgroundCheckController.addAssetMemberCheck
+GET         /background/memberScan                               controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
+POST        /background/memberScan                               controllers.BackgroundCheckController.memberScan
+GET         /background/memberScanResult                         controllers.BackgroundCheckController.memberScanResult(resultID: Int)
+GET         /background/memberScanResultDecision                 controllers.BackgroundCheckController.memberScanResultDecisionForm(resultID: Int)
+POST        /background/memberScanResultDecision                 controllers.BackgroundCheckController.memberScanResultDecision
+GET         /background/addUBO                                   controllers.BackgroundCheckController.addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addUBO                                   controllers.BackgroundCheckController.addUBOMemberCheck
+GET         /background/corporateScan                            controllers.BackgroundCheckController.corporateScanForm(organizationID: String, companyName: String)
+POST        /background/corporateScan                            controllers.BackgroundCheckController.corporateScan
+GET         /background/corporateScanResult                      controllers.BackgroundCheckController.corporateScanResult(resultID: Int)
+GET         /background/corporateScanResultDecision              controllers.BackgroundCheckController.corporateScanResultDecisionForm(resultID: Int)
+POST        /background/corporateScanResultDecision              controllers.BackgroundCheckController.corporateScanResultDecision
+GET         /background/addOrganization                          controllers.BackgroundCheckController.addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addOrganization                          controllers.BackgroundCheckController.addOrganizationMemberCheck
+GET         /background/vesselScan                               controllers.BackgroundCheckController.vesselScanForm(assetID: String, vesselName: String)
+POST        /background/vesselScan                               controllers.BackgroundCheckController.vesselScan
+GET         /background/vesselScanResult                         controllers.BackgroundCheckController.vesselScanResult(resultID: Int)
+GET         /background/vesselScanResultDecision                 controllers.BackgroundCheckController.vesselScanResultDecisionForm(resultID: Int)
+POST        /background/vesselScanResultDecision                 controllers.BackgroundCheckController.vesselScanResultDecision
+GET         /background/addAsset                                 controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
+POST        /background/addAsset                                 controllers.BackgroundCheckController.addAssetMemberCheck
 
-GET         /component/comet                                                                      controllers.ComponentViewController.comet
+GET         /component/comet                                     controllers.ComponentViewController.comet
 
-GET         /master/sendCoin                                                                      controllers.SendCoinController.sendCoinForm
-POST        /master/sendCoin                                                                      controllers.SendCoinController.sendCoin
+GET         /master/sendCoin                                     controllers.SendCoinController.sendCoinForm
+POST        /master/sendCoin                                     controllers.SendCoinController.sendCoin
 
-GET         /chat/room                                                                            controllers.ChatController.chatRoom(negotiationID: String)
-GET         /chat/window                                                                          controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
-GET         /chat/loadMoreChats                                                                   controllers.ChatController.loadMoreChats(chatID: String ,pageNumber: Int)
-GET         /chat/sendMessage                                                                     controllers.ChatController.sendMessageForm
-POST        /chat/sendMessage                                                                     controllers.ChatController.sendMessage
-GET         /chat/markChatAsRead                                                                  controllers.ChatController.markChatAsRead(chatID: String)
-GET         /chat/replyToMessage                                                                  controllers.ChatController.replyToMessage(chatID: String, messageID: String)
+GET         /chat/room                                           controllers.ChatController.chatRoom(negotiationID: String)
+GET         /chat/window                                         controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
+GET         /chat/loadMoreChats                                  controllers.ChatController.loadMoreChats(chatID: String ,pageNumber: Int)
+GET         /chat/sendMessage                                    controllers.ChatController.sendMessageForm
+POST        /chat/sendMessage                                    controllers.ChatController.sendMessage
+GET         /chat/markChatAsRead                                 controllers.ChatController.markChatAsRead(chatID: String)
+GET         /chat/replyToMessage                                 controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 #DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB
-POST        /wu/portalRedirect                                                                    controllers.WesternUnionController.westernUnionPortalRedirect
+POST        /wurtcb                                              controllers.WesternUnionController.westernUnionRTCB
+POST        /wu/portalRedirect                                   controllers.WesternUnionController.westernUnionPortalRedirect
 
-GET         /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoinForm
-POST        /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoin
+GET         /blockchain/sendCoin                                 controllers.SendCoinController.blockchainSendCoinForm
+POST        /blockchain/sendCoin                                 controllers.SendCoinController.blockchainSendCoin

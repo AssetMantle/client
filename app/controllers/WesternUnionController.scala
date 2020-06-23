@@ -3,9 +3,9 @@ package controllers
 
 import constants.Form
 import controllers.actions.WithLoginAction
-import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain.Account
 import models.{blockchain, blockchainTransaction, master, westernUnion}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -20,11 +20,7 @@ import scala.xml.NodeSeq
 class WesternUnionController @Inject()(
                                         blockchainAccounts: blockchain.Accounts,
                                         messagesControllerComponents: MessagesControllerComponents,
-                                        masterOrganizations: master.Organizations,
-                                        masterTraders: master.Traders,
-                                        masterZones: master.Zones,
                                         masterEmails: master.Emails,
-                                        masterFiats: master.Fiats,
                                         westernUnionFiatRequests: westernUnion.FiatRequests,
                                         westernUnionRTCBs: westernUnion.RTCBs,
                                         withLoginAction: WithLoginAction,
@@ -65,29 +61,14 @@ class WesternUnionController @Inject()(
 
         def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = westernUnionFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
 
-        def traderDetails(traderID: String) = masterTraders.Service.tryGet(traderID)
-
-        def traderAddress(traderAccountID: String) = blockchainAccounts.Service.tryGetAddress(traderAccountID)
-
-        def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
-
-        def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
-
-        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = Future("ISSUE_FIAT_TRANSACTION")
-
-        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, requestBody.paidOutAmount.toInt, 0)
+        def issueFiat = Future("ISSUE_FIAT_TRANSACTION")
 
         for {
           _ <- createRTCB
           fiatRequest <- fiatRequest
           totalRTCBAmountReceived <- totalRTCBAmountReceived
           _ <- updateIssueFiatRequestRTCBStatus(fiatRequest.transactionAmount, totalRTCBAmountReceived)
-          traderDetails <- traderDetails(fiatRequest.traderID)
-          traderAddress <- traderAddress(traderDetails.accountID)
-          zoneAccountID <- zoneAccountID(traderDetails.zoneID)
-          zoneAddress <- zoneAddress(zoneAccountID)
-          _ <- createFiat(traderDetails.id)
-          _ <- zoneAutomatedIssueFiat(traderAddress = traderAddress, zoneID = traderDetails.zoneID, zoneAddress = zoneAddress)
+          _ <- issueFiat
         } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else Future(utilities.XMLRestResponse.INVALID_REQUEST_SIGNATURE.result)
         ).recover {
@@ -103,23 +84,19 @@ class WesternUnionController @Inject()(
         },
         issueFiatRequestData => {
           val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
-          val traderDetails = masterTraders.Service.tryGetByAccountID(loginState.username)
+          val account = blockchainAccounts.Service.get(loginState.address)
 
-          def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
-
-
-          def organizationDetails(organizationID: String): Future[master.Organization] = masterOrganizations.Service.tryGet(organizationID)
+          def create(account: Account): Future[String] = westernUnionFiatRequests.Service.create(traderID = account.username, transactionAmount = issueFiatRequestData.transactionAmount)
 
           (for {
             emailAddress <- emailAddress
-            traderDetails <- traderDetails
-            transactionID <- create(traderDetails.id)
-            organizationDetails <- organizationDetails(traderDetails.organizationID)
+            account <- account
+            transactionID <- create(account)
           } yield {
             val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(transactionID),
-              Form.WU_SFTP_BUYER_ID -> Seq(traderDetails.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(organizationDetails.name), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(organizationDetails.name),
-              Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
-              Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
+              Form.WU_SFTP_BUYER_ID -> Seq(account.username), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(account.username), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(account.username),
+              Form.WU_SFTP_BUYER_ADDRESS -> Seq(account.address),
+              Form.BUYER_CITY -> Seq(account.address), Form.BUYER_ZIP -> Seq(account.address),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
               Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
             val fullURL = utilities.String.queryURLGenerator(wuURL, queryString)

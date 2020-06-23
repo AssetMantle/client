@@ -4,9 +4,8 @@ import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.Trader
 import models.{master, masterTransaction}
-import models.masterTransaction.{Notification, Notifications, TradeActivity}
+import models.masterTransaction.{Notification, Notifications}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}

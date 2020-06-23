@@ -8,8 +8,9 @@ import com.sun.jersey.core.util.{Base64 => Base64Docusign}
 import com.docusign.esign.client.ApiException
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.{Email, Trader}
+import models.master.Email
 import models.master
+import models.blockchain.Account
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
 import java.io.{BufferedOutputStream, FileOutputStream}
@@ -46,7 +47,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
   private val apiClient = new ApiClient(basePath)
   private val envelopesApi = new EnvelopesApi(apiClient)
 
-  private def createDocusignEnvelope(emailList: Seq[Email], fileList: Seq[Document[_]], traderList: Seq[Trader]): Future[String] = {
+  private def createDocusignEnvelope(emailList: Seq[Email], fileList: Seq[Document[_]], accountList: Seq[Account]): Future[String] = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
@@ -62,11 +63,11 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
         document
       }
 
-      val signerList = traderList.zipWithIndex.map { case (trader, index) =>
+      val signerList = accountList.zipWithIndex.map { case (account, index) =>
         val signer = new Signer()
-        signer.setEmail(emailList.find(_.id == trader.accountID).map(_.emailAddress).getOrElse(""))
-        signer.setName(trader.accountID)
-        signer.clientUserId(trader.id)
+        signer.setEmail(emailList.find(_.id == account.username).map(_.emailAddress).getOrElse(""))
+        signer.setName(account.username)
+        signer.clientUserId(account.address)
         signer.recipientId((index + 1).toString)
         signer
       }
@@ -93,7 +94,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     }
   }
 
-  def createEnvelope(emailList: Seq[Email], fileList: Seq[Document[_]], traderList: Seq[Trader]): Future[String] = createDocusignEnvelope(emailList, fileList, traderList)
+  def createEnvelope(emailList: Seq[Email], fileList: Seq[Document[_]], accountList: Seq[Account]): Future[String] = createDocusignEnvelope(emailList, fileList, accountList)
 
   def createSenderViewURL(envelopeID: String): Future[String] = generateSenderViewURL(envelopeID)
 
@@ -116,7 +117,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     }
   }
 
-  private def createRecipientViewAndGetUrl(envelopeID: String, emailAddress: String, trader: Trader): Future[String] = {
+  private def createRecipientViewAndGetUrl(envelopeID: String, emailAddress: String, account: Account): Future[String] = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
@@ -126,8 +127,8 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       viewRequest.setReturnUrl(webAppURL + routes.DocusignController.callBack(envelopeID, "").url.split("""&""")(0))
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
-      viewRequest.setUserName(trader.accountID)
-      viewRequest.setClientUserId(trader.id)
+      viewRequest.setUserName(account.username)
+      viewRequest.setClientUserId(account.address)
 
       envelopesApi.createRecipientView(accountID, envelopeID, viewRequest).getUrl
     }).recover {
@@ -140,7 +141,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     }
   }
 
-  def createRecipientView(envelopeID: String, emailAddress: String, trader: Trader): Future[String] = createRecipientViewAndGetUrl(envelopeID, emailAddress, trader)
+  def createRecipientView(envelopeID: String, emailAddress: String, account: Account): Future[String] = createRecipientViewAndGetUrl(envelopeID, emailAddress, account)
 
   def updateSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentTypeList)
 

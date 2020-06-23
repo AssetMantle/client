@@ -6,13 +6,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
-import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
-import models.master.{AccountFile, AccountKYC, Negotiation, Negotiations, Organization, Trader}
-import models.{master, masterTransaction}
-import models.common.Serializable
-import models.common.Serializable.{BillOfLading, Contract, Invoice}
-import models.docusign
-import models.masterTransaction.{AssetFile, NegotiationFile}
+import models.master.{AccountFile, AccountKYC}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient

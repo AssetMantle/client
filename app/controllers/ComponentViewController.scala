@@ -3,15 +3,12 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models._
-import models.master._
-import models.masterTransaction.{SendFiatRequest, _}
+import models.master
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import play.twirl.api.Html
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}

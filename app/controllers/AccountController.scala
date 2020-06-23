@@ -37,7 +37,6 @@ class AccountController @Inject()(
                                    masterMobiles: master.Mobiles,
                                    masterIdentifications: master.Identifications,
                                    masterAccountKYCs: master.AccountKYCs,
-                                   masterZones: master.Zones,
                                    withoutLoginAction: WithoutLoginAction,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                    keyStore: KeyStore
