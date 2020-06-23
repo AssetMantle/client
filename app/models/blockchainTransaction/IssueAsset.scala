@@ -86,6 +86,8 @@ class IssueAssets @Inject()(
     }
   }
 
+  private def findIncompleteTransactionByOwnerAddress(ownerAddress: String, status: Option[Boolean]): Future[Option[IssueAsset]] = db.run(issueAssetTable.filter(_.to === ownerAddress).filter(_.status === status).result.headOption)
+
   private def findModeByTicketID(ticketID: String): Future[String] = db.run(issueAssetTable.filter(_.ticketID === ticketID).map(_.mode).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -202,6 +204,7 @@ class IssueAssets @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getIncompleteTransactionByOwnerAddress(address:String)= findIncompleteTransactionByOwnerAddress(address, None)
   }
 
   object Utility {

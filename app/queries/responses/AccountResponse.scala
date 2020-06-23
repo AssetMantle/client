@@ -1,6 +1,6 @@
 package queries.responses
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 import transactions.Abstract.BaseResponse
 
 object AccountResponse {
@@ -8,25 +8,31 @@ object AccountResponse {
   case class Coins(denom: String, amount: String)
 
   implicit val coinsReads: Reads[Coins] = Json.reads[Coins]
+  implicit val coinsWrites: OWrites[Coins] = Json.writes[Coins]
 
   implicit val assetReads: Reads[Asset] = Json.reads[Asset]
+  implicit val assetWrites: OWrites[Asset] = Json.writes[Asset]
 
   case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String)
 
   case class Owners(ownerAddress: String, amount: String)
 
   implicit val ownersReads: Reads[Owners] = Json.reads[Owners]
+  implicit val ownersWrites: OWrites[Owners] = Json.writes[Owners]
 
   implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
+  implicit val fiatWrites: OWrites[Fiat] = Json.writes[Fiat]
 
   case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]])
 
   case class Value(address: String, coins: Option[Seq[Coins]], asset_peg_wallet: Option[Seq[Asset]], fiat_peg_wallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
+  implicit val valueWrites: OWrites[Value] = Json.writes[Value]
 
   case class Response(value: Value) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
+  implicit val responseWrites: OWrites[Response] = Json.writes[Response]
 
 }

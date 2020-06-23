@@ -86,6 +86,7 @@ object negotiationControllerTest {
     .pause(3)
 
   val acceptNegotiationRequest: ScenarioBuilder = scenario("AcceptNegotiationRequest")
+    .feed(GasFeeder.gasFeed)
     .exec(http("AcceptNegotiationRequestForm_GET")
       .get(session => routes.NegotiationController.acceptRequestForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("legend:contains(Accept Sales Quote)").exists)

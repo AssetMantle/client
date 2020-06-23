@@ -13,7 +13,7 @@ object contactControllerTest {
     .feed(MobileNumberFeeder.mobileNumberFeed)
     .exec(http("AddMobileNumberForm_GET")
       .get(routes.ContactController.addOrUpdateMobileNumberForm().url)
-      .check(css("legend:contains(%s)".format("Mobile Number")).exists)
+      .check(css("legend:contains(%s)".format("Add Mobile Number")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(2)

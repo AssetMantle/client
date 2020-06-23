@@ -4,6 +4,8 @@ import constants.Test
 import controllersTest._
 import controllersTest.addOrganizationControllerTest.getOrganizationID
 import controllersTest.addZoneControllerTest._
+import javax.inject.Inject
+import play.api.i18n.MessagesApi
 
 //import controllersTest.changeBuyerBidControllerTest.getBuyerAddress
 import feeders._
@@ -13,13 +15,13 @@ import io.gatling.http.Predef._
 class OneCompleteTransactionModerated extends Simulation {
 
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
-    .exec(CreateZone.createZone)
+    /*.exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
     .exec(CreateBuyer.createBuyer)
     .exec(AddCounterParty.addCounterParty)
-    .exec(IssueFiat.issueFiat)
+    */.exec(IssueFiat.issueFiat)
     .exec(IssueAssetModerated.issueAssetModerated)
     .exec(CreateSalesQuote.createSalesQuote)
     .exec(AcceptSalesQuoteAndAllTradeTerms.acceptSalesQuoteAndAllTradeTerms)
@@ -206,16 +208,32 @@ object AddCounterParty {
     .exec(accountControllerTest.logoutScenario)
 }
 
+object IssueFiat {
+
+  val issueFiat = scenario("IssueFiat")
+    .exec(session => session.set(Test.TEST_ZONE_USERNAME, "ZONE10FrJY13NN").set(Test.TEST_ZONE_PASSWORD,"123123123"))
+    .exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10fpP9SWuY").set(Test.TEST_SELLER_PASSWORD,"SELL10fpP9SWuY"))
+    .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10Xj7T7YR0").set(Test.TEST_BUYER_PASSWORD, "BUY10Xj7T7YR0"))
+    .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
+    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+    .exec(accountControllerTest.loginScenario)
+    .exec { session => session.set(Test.TEST_TRADER_ID, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
+    .exec(issueFiatControllerTest.issueFiatRequestScenario)
+    .exec(accountControllerTest.logoutScenario)
+    .pause(5)
+    .exec(issueFiatControllerTest.westernUnionRTCB)
+    .pause(10)
+}
+
 object IssueAssetModerated {
 
   val issueAssetModerated = scenario("IssueAssetModerated")
-    .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, setACLControllerTest.getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.moderatedIssueAssetRequestScenario)
     .exec(accountControllerTest.logoutScenario)
-    .pause(30)
+    .pause(20)
     .exec { session => session.set(Test.TEST_ASSET_ID, assetControllerTest.getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_DESCRIPTION).as[String], session(Test.TEST_QUANTITY_UNIT).as[String], session(Test.TEST_ASSET_QUANTITY).as[String], session(Test.TEST_ASSET_PRICE).as[String])) }
 }
 
@@ -226,7 +244,6 @@ object CreateSalesQuote {
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.negotiationRequestScenario)
     .exec(accountControllerTest.logoutScenario)
-
 }
 
 object AcceptSalesQuoteAndAllTradeTerms {
@@ -234,7 +251,7 @@ object AcceptSalesQuoteAndAllTradeTerms {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.acceptNegotiationRequest)
-    .pause(50)
+    .pause(20)
     /* .exec { session => session.set(Test.TEST_NEGOTIATION_STATUS, negotiationControllerTest.getNegotiationStatus(session(Test.TEST_NEGOTIATION_ID).as[String])) }
      .doIf(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED) {
        asLongAsDuring(session => session(Test.TEST_NEGOTIATION_STATUS).as[String] != constants.Status.Negotiation.STARTED, Duration.create(80, "seconds")) {
@@ -269,17 +286,6 @@ object AcceptBillOfLading {
     .exec(accountControllerTest.logoutScenario)
 }
 
-object IssueFiat {
-
-  val issueFiat = scenario("IssueFiat")
-    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(accountControllerTest.loginScenario)
-    .exec { session => session.set(Test.TEST_TRADER_ID, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
-    .exec(issueFiatControllerTest.issueFiatRequestScenario)
-    .exec(accountControllerTest.logoutScenario)
-    .pause(50)
-    .exec(issueFiatControllerTest.westernUnionRTCB)
-}
 
 object BuyerConfirmNegotiation {
 

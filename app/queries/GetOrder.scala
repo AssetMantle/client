@@ -2,6 +2,7 @@ package queries
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
@@ -24,8 +25,9 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
   private val path = "order"
 
   private val url = ip + ":" + port + "/" + path + "/"
+  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getOrder("")
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).get)
 
   object Service {
 

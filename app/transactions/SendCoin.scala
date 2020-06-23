@@ -2,6 +2,7 @@ package transactions
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites, Reads}
@@ -30,7 +31,9 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val url = ip + ":" + port + "/" + path1
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
+  private val testURL = constants.Test.BASE_URL+"/loopback"+ "/" + "bank/accounts"
+
+  private def action(request: Request): Future[WSResponse] = wsClient.url(testURL +  path2).post(Json.toJson(request))
 
   case class Amount(denom: String, amount: String)
 

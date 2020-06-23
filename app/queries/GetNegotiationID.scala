@@ -2,6 +2,7 @@ package queries
 
 import java.net.ConnectException
 
+import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
@@ -25,12 +26,14 @@ class GetNegotiationID @Inject()()(implicit wsClient: WSClient, configuration: C
   private val path = "negotiationID"
 
   private val url = ip + ":" + port + "/" + path + "/"
+  private val testURL = constants.Test.BASE_URL
+  private def Request(buyerAddress: String, sellerAddress: String, pegHash: String)=routes.LoopBackController.getNegotiationID(buyerAddress,sellerAddress,pegHash).url
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).get)
 
   object Service {
 
-    def get(buyerAddress: String, sellerAddress: String, pegHash: String): Future[Response] =action(buyerAddress + "/" + sellerAddress + "/" + pegHash).recover{
+    def get(buyerAddress: String, sellerAddress: String, pegHash: String): Future[Response] =action(Request(buyerAddress,sellerAddress,pegHash)).recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

@@ -25,8 +25,12 @@ object JSON {
           val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](response.json) match {
             case JsSuccess(value: ErrorResponse, _: JsPath) => value
             case error: JsError => logger.info(response.body)
+              println(response)
+              logger.info(response.body)
               throw new BaseException(new Failure(error.toString, null))
           }
+          println(response)
+          logger.info(response.body)
           logger.info(errorResponse.error)
           throw new BaseException(new Failure(errorResponse.error, null))
       }
@@ -40,10 +44,10 @@ object JSON {
 
   def convertJsonStringToObject[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {
-      println("convertJsonStringToObject----"+jsonString)
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
         case errors: JsError => logger.error(errors.toString)
+          println(jsonString)
           throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       }
     }
