@@ -6,11 +6,13 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+
 import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooDataSourcesResponse.Response
+import utilities.KeyStore
 
 @Singleton
-class GetTruliooDataSources @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetTruliooDataSources @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.QUERIES_GET_TRULIOO_DATA_SOURCES
 
@@ -18,9 +20,9 @@ class GetTruliooDataSources @Inject()(wsClient: WSClient)(implicit configuration
 
   private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
 
-  private val apiKeyValue = configuration.get[String]("trulioo.apiKeyValue")
+  private val apiKeyValue = keyStore.getPassphrase(constants.KeyStore.TRULIOO_API_KEY_VALUE)
 
-  private val headers = Tuple2(apiKeyName,apiKeyValue)
+  private val headers = Tuple2(apiKeyName, apiKeyValue)
 
   private val baseURL = configuration.get[String]("trulioo.url")
 
@@ -32,9 +34,10 @@ class GetTruliooDataSources @Inject()(wsClient: WSClient)(implicit configuration
 
   object Service {
 
-    def get(configurationName: String = "Identity Verification", countryCode: String): Future[Seq[Response]] = action(configurationName+"/"+countryCode).recover {
+    def get(configurationName: String = "Identity Verification", countryCode: String): Future[Seq[Response]] = action(configurationName + "/" + countryCode).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
+
 }

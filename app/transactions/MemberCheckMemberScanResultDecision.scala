@@ -9,11 +9,12 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import transactions.responses.MemberCheckMemberScanResponse.Response
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION
 
@@ -25,7 +26,7 @@ class MemberCheckMemberScanResultDecision @Inject()(wsClient: WSClient)(implicit
 
   private val apiKeyHeaderName = configuration.get[String]("memberCheck.apiKeyHeaderName")
 
-  private val apiHeaderValue = configuration.get[String]("memberCheck.apiHeaderValue")
+  private val apiHeaderValue = keyStore.getPassphrase(constants.KeyStore.MEMBER_CHECK_API_HEADER_VALUE)
 
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
 

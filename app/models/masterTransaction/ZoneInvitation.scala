@@ -44,6 +44,13 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
+  private def getStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(zoneInvitationTable.filter(_.accountID === accountID).map(_.status.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def updateStatusAndAccountIDByID(id: String, accountID: Option[String], status: Option[Boolean]): Future[Int] = db.run(zoneInvitationTable.filter(_.id === id).map(x => (x.accountID.?, x.status.?)).update((accountID, status)).asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(constants.Response.ZONE_INVITATION_NOT_FOUND)
@@ -85,6 +92,8 @@ class ZoneInvitations @Inject()(protected val databaseConfigProvider: DatabaseCo
     def create(emailAddress: String): Future[String] = add(ZoneInvitation(id = utilities.IDGenerator.requestID(), emailAddress = emailAddress))
 
     def tryGet(id: String): Future[ZoneInvitation] = findByID(id)
+
+    def getStatus(accountID: String): Future[Option[Boolean]] = getStatusByAccountID(accountID)
 
     def markInvitationAccepted(id: String, accountID: String): Future[Int] = updateStatusAndAccountIDByID(id = id, accountID = Option(accountID), status = Option(true))
 

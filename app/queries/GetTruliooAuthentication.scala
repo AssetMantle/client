@@ -9,9 +9,10 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooAuthenticationResponse.Response
+import utilities.KeyStore
 
 @Singleton
-class GetTruliooAuthentication @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetTruliooAuthentication @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.QUERIES_GET_TRULIOO_AUTHENTICATION
 
@@ -19,9 +20,9 @@ class GetTruliooAuthentication @Inject()(wsClient: WSClient)(implicit configurat
 
   private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
 
-  private val apiKeyValue = configuration.get[String]("trulioo.apiKeyValue")
+  private val apiKeyValue = keyStore.getPassphrase(constants.KeyStore.TRULIOO_API_KEY_VALUE)
 
-  private val headers = Tuple2(apiKeyName,apiKeyValue)
+  private val headers = Tuple2(apiKeyName, apiKeyValue)
 
   private val baseURL = configuration.get[String]("trulioo.url")
 

@@ -13,6 +13,7 @@ import play.api.{Configuration, Logger}
 import queries.responses.DocusignRegenerateTokenResponse.Response
 import slick.jdbc.JdbcProfile
 import transactions.DocusignRegenerateToken
+import utilities.KeyStore
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,7 +22,7 @@ import scala.util.{Failure, Success}
 case class OAuthToken(id: String, accessToken: String, expiresAt: Long, refreshToken: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, docusignRegenerateToken: DocusignRegenerateToken, utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, docusignRegenerateToken: DocusignRegenerateToken, utilitiesNotification: utilities.Notification, keyStore: KeyStore)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.DOCUSIGN_OAUTH_TOKEN
 
@@ -31,7 +32,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
-  private val accountID = configuration.get[String]("docusign.accountID")
+  private val accountID = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_ACCOUNT_ID)
 
   private val docusignOAuthTokenInitialDelay = configuration.get[Int]("docusign.scheduler.initialDelay").seconds
   private val docusignOAuthTokenIntervalTime = configuration.get[Int]("docusign.scheduler.intervalTime").minutes

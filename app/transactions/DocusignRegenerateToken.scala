@@ -9,10 +9,13 @@ import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import java.util.Base64
+
+import utilities.KeyStore
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DocusignRegenerateToken @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class DocusignRegenerateToken @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_DOCUSIGN_REGENERATE_TOKEN
 
@@ -20,9 +23,9 @@ class DocusignRegenerateToken @Inject()(wsClient: WSClient)(implicit configurati
 
   private val oauthBasePath = configuration.get[String]("docusign.oauthBasePath")
 
-  private val integrationKey = configuration.get[String]("docusign.integrationKey")
+  private val integrationKey = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_INTEGRATION_KEY)
 
-  private val clientSecret = configuration.get[String]("docusign.clientSecret")
+  private val clientSecret = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_CLIENT_SECRET)
 
   private val headers = Tuple2("Authorization", "Basic " + Base64.getEncoder.encodeToString((integrationKey + ":" + clientSecret).getBytes))
 

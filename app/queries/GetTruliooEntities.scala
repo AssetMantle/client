@@ -6,11 +6,13 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+
 import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooEntitiesResponse.Response
+import utilities.KeyStore
 
 @Singleton
-class GetTruliooEntities @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetTruliooEntities @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.QUERIES_GET_TRULIOO_ENTITIES
 
@@ -18,7 +20,7 @@ class GetTruliooEntities @Inject()(wsClient: WSClient)(implicit configuration: C
 
   private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
 
-  private val apiKeyValue = configuration.get[String]("trulioo.apiKeyValue")
+  private val apiKeyValue = keyStore.getPassphrase(constants.KeyStore.TRULIOO_API_KEY_VALUE)
 
   private val headers = Tuple2(apiKeyName, apiKeyValue)
 

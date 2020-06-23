@@ -19,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class OrderController @Inject()(
                                  blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders,
+                                 blockchainTransactionSendFiats: blockchainTransaction.SendFiats,
                                  blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
                                  blockchainAccounts: blockchain.Accounts,
                                  blockchainACLAccounts: blockchain.ACLAccounts,
@@ -75,8 +76,16 @@ class OrderController @Inject()(
 
           def getACL(aclHash: String) = blockchainACLHashes.Service.tryGetACL(aclHash)
 
-          //TODO: Integrate with WesterUnion
-          def fiatProofHash: Future[String] = Future("fiatProofHash")
+          def getFiatProofHash(buyerAddress: String, sellerAddress: String, asset: Asset): Future[String] = {
+            asset.pegHash match {
+              case Some(pegHash) =>
+                val fiatProofs = blockchainTransactionSendFiats.Service.getFiatProofs(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash)
+                for {
+                  fiatProofs <- fiatProofs
+                } yield utilities.String.sha256Sum(fiatProofs.mkString(""))
+              case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+            }
+          }
 
           def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyerAccountID: String, sellerAccountID: String, buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String, buyerACL: ACL, negotiation: Negotiation): Future[Result] = {
             if (validateUsernamePassword) {
@@ -116,7 +125,7 @@ class OrderController @Inject()(
             buyerACLHash <- getACLHash(buyerAddress)
             buyerACL <- getACL(buyerACLHash)
             sellerAddress <- getAddress(sellerAccountID)
-            fiatProofHash <- fiatProofHash
+            fiatProofHash <- getFiatProofHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, asset = asset)
             result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, buyerAddress = buyerAddress, sellerAccountID = sellerAccountID, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = fiatProofHash, buyerACL = buyerACL, negotiation = negotiation)
           } yield result
             ).recover {
