@@ -25,9 +25,10 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
   private val path = "order"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getOrder("")
+  //testURL
+  //private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getOrder("")
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).get)
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 

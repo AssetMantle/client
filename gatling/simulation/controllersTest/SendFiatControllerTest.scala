@@ -14,7 +14,7 @@ object sendFiatControllerTest {
       .get(session=>routes.SendFiatController.sendFiatForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("legend:contains(Release Funds)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Send_Fiat_POST")
       .post(routes.SendFiatController.sendFiat().url)
       .formParamMap(Map(

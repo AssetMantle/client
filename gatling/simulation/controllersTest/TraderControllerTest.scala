@@ -14,7 +14,7 @@ object traderControllerTest {
       .check(css("legend:contains(Add Counterparty)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("TraderRelationRequest_POST")
       .post(routes.TraderController.traderRelationRequest().url)
       .formParamMap(Map(
@@ -22,7 +22,7 @@ object traderControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Counterparty Request Sent").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 
   val acceptTraderRelation: ScenarioBuilder = scenario("AcceptTraderRelation")
     .exec(http("AcceptOrRejectTraderRelationForm_GET")
@@ -31,7 +31,7 @@ object traderControllerTest {
       .check(css("button:contains(Reject)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("AcceptOrRejectTraderRelation_POST")
       .post(routes.TraderController.acceptOrRejectTraderRelation().url)
       .formParamMap(Map(
@@ -42,7 +42,7 @@ object traderControllerTest {
       .check(css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("true"))
       .check(css("button:contains(Reject)").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 
   val rejectTraderRelation: ScenarioBuilder = scenario("RejectTraderRelation")
     .exec(http("AcceptOrRejectTraderRelationForm_GET")
@@ -51,7 +51,7 @@ object traderControllerTest {
       .check(css("button:contains(Reject)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("AcceptOrRejectTraderRelation_POST")
       .post(routes.TraderController.traderRelationRequest().url)
       .formParamMap(Map(
@@ -62,5 +62,5 @@ object traderControllerTest {
       .check(css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("false"))
       .check(css("button:contains(Approve)").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 }

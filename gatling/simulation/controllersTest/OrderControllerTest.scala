@@ -16,7 +16,7 @@ object orderControllerTest {
       .check(css("legend:contains(Moderated Buyer Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("ModeratedBuyerExecuteOrder_POST")
       .post(routes.OrderController.moderatedBuyerExecute().url)
       .formParamMap(Map(
@@ -26,7 +26,7 @@ object orderControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Buyer Order Executed").exists)
     )
-    .pause(4)
+    .pause(Test.REQUEST_DELAY)
 
   val moderatedSellerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedSellerExecuteOrder")
     .exec(http("ModeratedSellerExecuteOrderForm_GET")
@@ -34,7 +34,7 @@ object orderControllerTest {
       .check(css("legend:contains(Moderated Seller Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("ModeratedSellerExecuteOrder_POST")
       .post(routes.OrderController.moderatedSellerExecute().url)
       .formParamMap(Map(
@@ -44,7 +44,7 @@ object orderControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Seller Order Executed").exists)
     )
-    .pause(4)
+    .pause(Test.REQUEST_DELAY)
 
   val unmoderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("UnmoderatedBuyerExecuteOrder")
     .feed(FiatProofHashFeeder.fiatProofHashFeed)
@@ -53,7 +53,7 @@ object orderControllerTest {
       .check(css("legend:contains(Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("UnmoderatedBuyerExecuteOrder_POST")
       .post(routes.OrderController.buyerExecute().url)
       .formParamMap(Map(
@@ -64,7 +64,7 @@ object orderControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Buyer Order Executed").exists)
     )
-    .pause(4)
+    .pause(Test.REQUEST_DELAY)
 
   val unmoderatedSellerExecuteOrderScenario: ScenarioBuilder = scenario("UnmoderatedSellerExecuteOrder")
     .exec(http("UnmoderatedSellerExecuteOrderForm_GET")
@@ -72,7 +72,7 @@ object orderControllerTest {
       .check(css("legend:contains(Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("UnmoderatedSellerExecuteOrder_POST")
       .post(routes.OrderController.sellerExecute().url)
       .formParamMap(Map(
@@ -82,11 +82,7 @@ object orderControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Seller Order Executed").exists)
     )
-    .pause(4)
+    .pause(Test.REQUEST_DELAY)
 
-  def getOrderStatus(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "status" FROM master."Order" WHERE "id" = '$query'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("status").toString
-  }
+
 }

@@ -24,9 +24,10 @@ class GetTransactionHashResponse @Inject()()(implicit wsClient: WSClient, config
   private val path = "txs"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  private val testURL = constants.Test.BASE_URL+ "/" + path + "/"
+  //testURL
+  //private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.getTxHashResponse("")
 
-  private def action(request: String): Future[WSResponse] = wsClient.url(testURL + request).get
+  private def action(request: String): Future[WSResponse] = wsClient.url(url + request).get
 
   object Service {
 

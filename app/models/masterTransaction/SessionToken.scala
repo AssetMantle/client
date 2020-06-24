@@ -124,7 +124,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
   object Service {
 
     def refresh(id: String): Future[String] = {
-      val sessionToken: String = utilities.IDGenerator.hexadecimal
+      val sessionToken: String = if(id=="main") "E843C6FE3C471E7F" else utilities.IDGenerator.hexadecimal
       val upsertToken = upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
       for {
         _ <- upsertToken

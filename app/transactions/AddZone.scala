@@ -26,7 +26,6 @@ class AddZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
   private val path = "defineZone"
 
   private val url = ip + ":" + port + "/" + path
-  private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.addZone
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
@@ -34,7 +33,7 @@ class AddZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(testURL).post(Json.toJson(request))
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
   case class BaseReq(from: String, chain_id: String = chainID, gas: String)
 

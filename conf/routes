@@ -638,7 +638,7 @@ GET         /loopback/order                                                     
 GET         /loopback/reputation                                                                  controllers.LoopBackController.getTraderReputation(address: String)
 GET         /loopback/acl                                                                         controllers.LoopBackController.getACL(address: String)
 
-POST        /loopback/addKey                                                                      controllers.LoopBackController.addKey
+POST        /loopback/keys                                                                        controllers.LoopBackController.addKey
 POST        /loopback/bank/accounts/transfers                                                     controllers.LoopBackController.sendCoin
 POST        /loopback/defineZone                                                                  controllers.LoopBackController.addZone
 POST        /loopback/defineOrganization                                                          controllers.LoopBackController.addOrganization
@@ -649,6 +649,7 @@ POST        /loopback/changeBuyerBid                                            
 POST        /loopback/changeSellerBid                                                             controllers.LoopBackController.changeSellerBid
 POST        /loopback/confirmBuyerBid                                                             controllers.LoopBackController.confirmBuyerBid
 POST        /loopback/confirmSellerBid                                                            controllers.LoopBackController.confirmSellerBid
+POST        /loopback/releaseAsset                                                                controllers.LoopBackController.releaseAsset
 POST        /loopback/sendAsset                                                                   controllers.LoopBackController.sendAsset
 POST        /loopback/sendFiat                                                                    controllers.LoopBackController.sendFiat
 POST        /loopback/buyerExecuteOrder                                                           controllers.LoopBackController.buyerExecuteOrder

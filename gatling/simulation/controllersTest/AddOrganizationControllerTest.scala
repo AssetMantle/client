@@ -20,7 +20,7 @@ object addOrganizationControllerTest {
       .get(routes.AddOrganizationController.addOrganizationForm().url)
       .check(css("legend:contains(Register Organization)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Add_Organization_POST")
       .post(routes.AddOrganizationController.addOrganization().url)
       .formParamMap(Map(
@@ -49,7 +49,7 @@ object addOrganizationControllerTest {
       .check(css("button:contains(Upload ACRA)").exists)
       .check(css("button:contains(Upload Board Resolution)").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .foreach(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES,Test.TEST_DOCUMENT_TYPE){
       feed(ImageFeeder.imageFeed)
         .exec(http("Organization_KYC_Upload_"+"${%s}".format(Test.TEST_DOCUMENT_TYPE)+"_FORM")
@@ -57,7 +57,7 @@ object addOrganizationControllerTest {
           .check(css("button:contains(Browse)").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
-        .pause(2)
+        .pause(Test.REQUEST_DELAY)
         .exec(http("Organization_KYC_Upload_"+"${%s}".format(Test.TEST_DOCUMENT_TYPE))
           .post(session=> routes.AddOrganizationController.userUploadOrganizationKYC(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
           .formParamMap(Map(
@@ -74,14 +74,14 @@ object addOrganizationControllerTest {
             .get(session=>routes.AddOrganizationController.userStoreOrganizationKYC(session(Test.TEST_FILE_NAME).as[String],session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
             .check(substring("Organization KYC").exists)
         )
-        .pause(2)
+        .pause(Test.REQUEST_DELAY)
     }
     .exec(http("User_Review_Add_Organization_Request_Form_GET")
       .get(routes.AddOrganizationController.userReviewAddOrganizationRequestForm().url)
       .check(css("legend:contains(Review & Submit Organization Details)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(1)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("User_Review_Add_Organization_Request_POST")
       .post(routes.AddOrganizationController.userReviewAddOrganizationRequest().url)
       .formParamMap(Map(
@@ -90,7 +90,7 @@ object addOrganizationControllerTest {
       ))
       .check(substring("Organization details submitted for verification.").exists)
     )
-    .pause(3)
+    .pause(Test.REQUEST_DELAY)
 
   val verifyOrganizationScenario: ScenarioBuilder = scenario("VerifyOrganization")
     .foreach(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES,Test.TEST_DOCUMENT_TYPE){
@@ -101,7 +101,7 @@ object addOrganizationControllerTest {
         .check(css("button:contains(Reject)").exists)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
-        .pause(2)
+        .pause(Test.REQUEST_DELAY)
         .exec(http("Organization_KYC_Update_Status"+"${%s}".format(Test.TEST_DOCUMENT_TYPE))
         .post(routes.AddOrganizationController.updateOrganizationKYCDocumentStatus().url)
         .formParamMap(Map(
@@ -113,14 +113,14 @@ object addOrganizationControllerTest {
           .check(css("[id=%s]".format(constants.FormField.ORGANIZATION_ID.name), "value").is("${%s}".format(Test.TEST_ORGANIZATION_ID)))
           .check(css("button:contains(Reject)").exists)
       )
-        .pause(1)
+        .pause(Test.REQUEST_DELAY)
     }
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .feed(GasFeeder.gasFeed)
     .exec(http("Verify_Organization_Form_GET")
       .get(session=>routes.AddOrganizationController.acceptRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Verify_Organization_POST")
       .post(routes.AddOrganizationController.acceptRequest().url)
       .formParamMap(Map(
@@ -131,14 +131,14 @@ object addOrganizationControllerTest {
       ))
       .check(substring("Organization Approved").exists)
     )
-    .pause(3)
+    .pause(Test.REQUEST_DELAY)
 
   val rejectVerifyOrganizationScenario: ScenarioBuilder = scenario("RejectVerifyOrganization")
     .exec(http("RejectVerifyOrganization_GET")
       .get(session=>routes.AddOrganizationController.rejectRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(css("legend:contains(%s)".format(constants.Form.REJECT_ORGANIZATION_REQUEST.legend)).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("RejectVerifyOrganization_POST")
       .post(routes.AddOrganizationController.rejectRequest().url)
       .formParamMap(Map(
@@ -147,9 +147,4 @@ object addOrganizationControllerTest {
       .check(substring("SUCCESS VERIFY_ORGANIZATION_REQUEST_REJECTED").exists)
     )
 
-  def getOrganizationID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Organization" WHERE "accountID" = '$query'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
-  }
 }

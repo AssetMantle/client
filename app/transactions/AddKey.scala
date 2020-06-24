@@ -27,9 +27,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
-  private val testUrl = constants.Test.BASE_URL+routes.LoopBackController.addKey
-
-  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testUrl).post(Json.toJson(request)))
+  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
   implicit val requestReads: Reads[Request] = Json.reads[Request]

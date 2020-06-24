@@ -20,7 +20,7 @@ object assetControllerTest {
       .check(css("legend:contains(Add Commodity)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("ModeratedIssueAssetRequest_POST")
       .post(routes.AssetController.issue().url)
       .formParamMap(Map(
@@ -38,7 +38,7 @@ object assetControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(css("legend:contains(Create Sales Quote)").exists)
     )
-    .pause(3)
+    .pause(Test.REQUEST_DELAY)
 
   val unmoderatedIssueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
     .feed(AssetDetailFeeder.assetDetailFeed)
@@ -49,7 +49,7 @@ object assetControllerTest {
       .check(css("legend:contains(Add Commodity)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("UnmoderatedIssueAssetRequest_POST")
       .post(routes.AssetController.issue().url)
       .formParamMap(Map(
@@ -67,7 +67,7 @@ object assetControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(css("legend:contains(Create Sales Quote)").exists)
     )
-    .pause(3)
+    .pause(Test.REQUEST_DELAY)
 
   val sendAsset: ScenarioBuilder = scenario("SendAsset")
     .exec(http("SendAssetForm_GET")
@@ -75,7 +75,7 @@ object assetControllerTest {
       .check(css("legend:contains(Confirm Trade)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("SendAsset_POST")
       .post(routes.AssetController.send().url)
       .formParamMap(Map(
@@ -85,7 +85,7 @@ object assetControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Trade Confirmed").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 
   val releaseAsset: ScenarioBuilder = scenario("ReleaseAsset")
     .exec(http("ReleaseAssetForm_GET")
@@ -93,7 +93,7 @@ object assetControllerTest {
       .check(css("legend:contains(Release Asset)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("ReleaseAsset_POST")
       .post(routes.AssetController.release().url)
       .formParamMap(Map(
@@ -103,7 +103,7 @@ object assetControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Asset Released").exists)
     )
-    .pause(4)
+    .pause(Test.REQUEST_DELAY)
 
   val redeemAsset: ScenarioBuilder = scenario("RedeemAsset")
     .exec(http("RedeemAssetForm_GET")
@@ -111,7 +111,7 @@ object assetControllerTest {
       .check(css("legend:contains(Redeem Asset)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("RedeemAsset_POST")
       .post(routes.AssetController.redeem().url)
       .formParamMap(Map(
@@ -122,9 +122,5 @@ object assetControllerTest {
       .check(substring("Trade Complete").exists)
     )
 
-  def getAssetID(traderID:String, assetType:String, assetDescription: String, quantityUnit:String, quantity:String, assetPrice:String)={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Asset" WHERE "ownerID" = '$traderID' AND "assetType" = '$assetType' AND "description" = '$assetDescription' AND "quantity" = '$quantity' AND "quantityUnit" = '$quantityUnit' AND "price" = '$assetPrice'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
-  }
+
 }

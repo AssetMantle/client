@@ -6,7 +6,7 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
-import io.gatling.jdbc.Predef.jdbcFeeder
+import feeders.JDBCFeeder._
 
 object issueFiatControllerTest {
 
@@ -15,7 +15,7 @@ object issueFiatControllerTest {
     .exec(http("Issue_Fiat_Request_Form_GET")
       .get(routes.IssueFiatController.issueFiatRequestForm().url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("westernUnionPortalRedirect_POST")
       .post(routes.WesternUnionController.westernUnionPortalRedirect().url)
       .formParamMap(Map(
@@ -24,7 +24,7 @@ object issueFiatControllerTest {
       .disableFollowRedirect
       .check(status.is(302))
     )
-    .pause(3)
+    .pause(Test.REQUEST_DELAY)
 
   val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
     .feed(wurtcbFeeder.wurtcbFeed)
@@ -67,10 +67,5 @@ object issueFiatControllerTest {
                          |</request>""")).asXml
     )
 
-  def getRequestIDForIssueFiatRequest(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM western_union."FiatRequest" WHERE "traderID" = '$query'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
-  }
 
 }

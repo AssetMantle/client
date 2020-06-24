@@ -16,7 +16,7 @@ object accountControllerTest {
       .check(css("legend:contains(Register)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("SignUp_POST")
       .post(routes.AccountController.signUp().url)
       .formParamMap(Map(
@@ -27,14 +27,14 @@ object accountControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(css("legend:contains(Blockchain Passphrase)").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("CreateWallet_GET")
       .get(session => routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
       .check(css("legend:contains(Blockchain Passphrase)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.MNEMONICS), "value").saveAs(Test.MNEMONICS))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("CreateWallet_POST")
       .post(routes.AccountController.createWallet().url)
       .formParamMap(Map(
@@ -44,14 +44,14 @@ object accountControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Signed Up Successfully!").exists)
     )
-    .pause(5)
+    .pause(Test.REQUEST_DELAY)
 
   val loginScenario: ScenarioBuilder = scenario("Login")
     .exec(http("LoginForm_GET")
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(Login)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(1)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
@@ -65,7 +65,7 @@ object accountControllerTest {
       .check(substring("Transactions").exists)
       .check(substring("Account").exists)
     )
-    .pause(3)
+    .pause(Test.REQUEST_DELAY)
 
   val loginMain: ScenarioBuilder = scenario("LoginMain")
     .feed(GenesisFeeder.genesisFeed)
@@ -73,7 +73,7 @@ object accountControllerTest {
       .get(routes.AccountController.loginForm().url)
       .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(1)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Login_POST")
       .post(routes.AccountController.login().url)
       .formParamMap(Map(
@@ -87,14 +87,14 @@ object accountControllerTest {
       .check(substring("Transactions").exists)
       .check(substring("Account").exists)
     )
-    .pause(5)
+    .pause(Test.REQUEST_DELAY)
 
   val logoutScenario: ScenarioBuilder = scenario("Logout")
     .exec(http("Logout_Form_GET")
       .get(routes.AccountController.logoutForm().url)
       .check(css("legend:contains(Logout)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Logout_POST")
       .post(routes.AccountController.logout().url)
       .formParamMap(Map(
@@ -102,7 +102,7 @@ object accountControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Logged Out Successfully").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Form")
@@ -114,7 +114,7 @@ object accountControllerTest {
     .feed(IdentificationFeeder.identificationFeed)
     .feed(AddressDataFeeder.addressDataFeed)
     .feed(DateFeeder.dateFeed)
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("AddIdentification_Post")
       .post(routes.AccountController.addIdentification().url)
       .formParamMap(Map(
@@ -135,13 +135,13 @@ object accountControllerTest {
       .check(substring("Provide proof of identity").exists)
       .check(css("button:contains(Upload Identification)").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("UploadIdentificationForm")
       .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
       .check(css("button:contains(Browse)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .feed(ImageFeeder.imageFeed)
     .exec(http("IdentificationUpload")
       .post(routes.FileController.uploadAccountKYC("IDENTIFICATION").url)
@@ -160,13 +160,13 @@ object accountControllerTest {
         .check(substring("Provide proof of identity").exists)
         .check(css("button:contains(Update Identification)").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("ReviewIdentificationForm_GET")
       .get(routes.AccountController.userReviewIdentificationForm().url)
       .check(css("legend:contains(User Review Identification)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("ReviewIdentification_POST")
       .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
@@ -175,11 +175,5 @@ object accountControllerTest {
       ))
       .check(substring("Identity Details updated successfully").exists)
     )
-    .pause(2)
-
-  def getUserType(query: String):String={
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://"+Test.TEST_IP+":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "userType" FROM master."Account" WHERE id = '$query'),'0') AS "userType";""")
-    sqlQueryFeeder.apply().next()("userType").toString
-  }
+    .pause(Test.REQUEST_DELAY)
 }

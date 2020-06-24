@@ -34,7 +34,7 @@ object setACLControllerTest {
       .check(css("legend:contains(Register Trader)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Add_Trader_POST")
       .post(routes.SetACLController.addTrader().url)
       .formParamMap(Map(
@@ -43,14 +43,14 @@ object setACLControllerTest {
       ))
       .check(substring("Details submitted for organization approval").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 
   val organizationVerifyTrader = scenario("organizationVerifyTrader")
     .exec(http("Organization_Verify_Trader_GET")
       .get(session => routes.SetACLController.organizationVerifyTraderForm(session(Test.TEST_TRADER_ID).as[String]).url)
       .check(css("legend:contains(Set Trader Controls)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .feed(GasFeeder.gasFeed)
     .exec(http("Organization_Verify_Trader_POST")
       .post(routes.SetACLController.organizationVerifyTrader().url)
@@ -77,11 +77,6 @@ object setACLControllerTest {
       ))
       .check(substring("Trader Controls set successfully").exists)
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
 
-  def getTraderID(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."Trader" WHERE "accountID" = '$query'),'0') AS "id";""")
-    sqlQueryFeeder.apply().next()("id").toString
-  }
 }

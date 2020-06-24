@@ -98,7 +98,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   }
 
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
-    mailerClient.send(Email(
+   /* mailerClient.send(Email(
       subject = messagesApi(email.subject),
       from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
       to = Seq(emailAddress),
@@ -107,16 +107,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       replyTo = Seq(emailReplyTo),
       bounceAddress = Option(emailBounceAddress),
     ))
-   /*   mailerClient.send(Email(
-        subject = messagesApi(email.subject),
-        from = emailFromAddress,
-        to = Seq(emailAddress),
-        bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-        charset = Option(emailCharset),
-        replyTo = Seq(emailReplyTo),
-        bounceAddress = Option(emailBounceAddress),
-      ))*/
-
+*/
     Await.result(wsClient.url(constants.Test.BASE_URL + routes.LoopBackController.sendEmail).get().map(response => response.toString), Duration.Inf)
   }
 

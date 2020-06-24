@@ -16,7 +16,7 @@ object contactControllerTest {
       .check(css("legend:contains(%s)".format("Add Mobile Number")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("AddMobileNumber_POST")
       .post(routes.ContactController.addOrUpdateMobileNumber().url)
       .formParamMap(Map(
@@ -33,7 +33,7 @@ object contactControllerTest {
       .get(routes.ContactController.verifyMobileNumberForm().url)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("VerifyMobileNumber_POST")
       .post(routes.ContactController.verifyMobileNumber().url)
       .formParamMap(Map(
@@ -50,7 +50,7 @@ object contactControllerTest {
       .check(css("legend:contains(%s)".format("Add Email Address")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("AddEmailAddress_POST")
       .post(routes.ContactController.addOrUpdateEmailAddress().url)
       .formParamMap(Map(
@@ -67,7 +67,7 @@ object contactControllerTest {
       .check(css("legend:contains(%s)".format("Verify Email Address")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("VerifyEmailAddress_POST")
       .post(routes.ContactController.verifyEmailAddress().url)
       .formParamMap(Map(

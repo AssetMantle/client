@@ -26,9 +26,7 @@ class GetMnemonic @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val url = ip + ":" + port + "/" + path
 
-  private val testUrl= constants.Test.BASE_URL+routes.LoopBackController.mnemonic
-
-  private def action(): Future[Response] = wsClient.url(testUrl).get.map { response => new Response(response) }
+  private def action(): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
 
   object Service {
     def get(): Future[Response] = action().recover {

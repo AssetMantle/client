@@ -25,9 +25,10 @@ class GetTraderReputation @Inject()(wsClient: WSClient)(implicit configuration: 
   private val path = "reputation"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getTraderReputation("")
+  //testURL
+  //private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getTraderReputation("")
 
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).get)
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 

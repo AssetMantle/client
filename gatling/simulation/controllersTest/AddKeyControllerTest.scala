@@ -17,7 +17,7 @@ object addKeyControllerTest {
       .get(routes.AddKeyController.blockchainAddKeyForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.BLOCKCHAIN_ADD_KEY.legend)).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-    .pause(2)
+    .pause(Test.REQUEST_DELAY)
     .exec(http("AddKey_POST")
       .post(routes.AddKeyController.blockchainAddKey().url)
       .formParamMap(Map(
