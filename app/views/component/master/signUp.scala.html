@@ -1,53 +1,45 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.companion.master.SignUp
+@import views.html.base._
 
-@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-@form(action = routes.AccountController.signUp, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SIGNUP)</h4>
+@(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<div class="signUpForm">
+@commonForm(constants.Form.SIGN_UP, signUpForm) {
+    <div class="inputField">
+        <div class="inputFieldBody">
+            <div class="usernameAvailability">
+                @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#USERNAME_AVAILABLE")""")
+                <div id="checkUsernameAvailableResult" class="result failureIcon">
+                    @commonIcon("failRounded")
+                </div>
+                <div class="checkIcon" id="checkIcon">
+                    @commonIcon("success")
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fa fa-user"></i>
-                </span>
+    <div class="inputField">
+        <div class="inputFieldBody">
+            <div class="usernameAvailability">
+                @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD, 'id -> "signUpPassword")
+                <div id="matchPasswordsResult" class="result"></div>
             </div>
-            @inputText(signUpForm(constants.FormField.USERNAME.name), 'placeholder -> Messages(constants.FormField.USERNAME.name), 'id -> "username", 'class -> "cmuk-input", 'required -> true, 'onkeyup -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#usernameAvailable")""")
-            <div id="checkUsernameAvailableResult" class="result"></div>
         </div>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fa fa-lock" aria-hidden="true"></i>
-                </span>
-            </div>
-            @inputPassword(signUpForm(constants.FormField.SIGNUP_PASSWORD.name), 'id -> "password", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_PASSWORD.name), 'required -> true)
-        </div>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fa fa-lock" aria-hidden="true"></i>
-                </span>
-            </div>
-            @inputPassword(signUpForm(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'id -> "confirmPassword", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'required -> true)
-            <span id="matchPasswordsResult">
-                <span id="matchPasswordsImageResult" class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
-            </span>
-        </div>
-        @checkbox(signUpForm(constants.Form.USERNAME_AVAILABLE), 'id -> "usernameAvailable", 'class -> "hidden", 'required -> true)
-        @if(signUpForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- signUpForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SIGNUP)</button>
     </div>
+    <div class="inputField">
+        <div class="inputFieldBody">
+            <div class="usernameAvailability">
+                @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, 'oninput -> "checkPasswords()", 'id -> "signUpConfirmPassword")
+                <div id="matchConfirmPasswordsResult" class="result">
+                    <span class="passwordNotMatched error">@Messages(constants.View.REPEAT_PASSWORD_MISMATCH)</span>
+                </div>
+                <div class="showPassword" id="showPassword" onclick="showPassword()"><span class="eyeIcon">
+                    @commonIcon("eye")
+                </span></div>
+            </div>
+        </div>
+    </div>
+    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, 'containerDivClass -> "hidden")
 }
-<script src="@routes.Assets.versioned("javascripts/checkUsernameAvailable.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/checkPasswords.js")" type="text/javascript"></script>
+</div>
+<script src="@routes.Assets.versioned("javascripts/signUp.js")" type="text/javascript"></script>

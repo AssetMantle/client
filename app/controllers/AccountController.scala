@@ -1,44 +1,45 @@
 package controllers
 
-import actors.ShutdownActor
-import controllers.actions.{LoginState, WithLoginAction}
+import controllers.actions.{LoginState, WithLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.common.Serializable.Address
+import models.master.{Account, Identification}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import views.companion.master.{Login, Logout, NoteNewKeyDetails, SignUp}
+import utilities.KeyStore
+import views.companion.master.AddIdentification.AddressData
+import views.companion.master.{Login, Logout, SignUp}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AccountController @Inject()(
                                    utilitiesNotification: utilities.Notification,
-                                   shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
+                                   withUserLoginAction: WithUserLoginAction,
                                    withUsernameToken: WithUsernameToken,
-                                   queryGetAccount: queries.GetAccount,
-                                   blockchainFiats: blockchain.Fiats,
-                                   blockchainZones: blockchain.Zones,
-                                   blockchainOrders: blockchain.Orders,
-                                   blockchainAssets: blockchain.Assets,
                                    blockchainAccounts: blockchain.Accounts,
-                                   blockchainAclHashes: blockchain.ACLHashes,
-                                   blockchainAclAccounts: blockchain.ACLAccounts,
-                                   blockchainNegotiations: blockchain.Negotiations,
-                                   blockchainOrganizations: blockchain.Organizations,
-                                   masterOrganizations: master.Organizations,
-                                   masterZones: master.Zones,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
-                                   masterTransactionAccountTokens: masterTransaction.AccountTokens,
+                                   masterTransactionSessionTokens: masterTransaction.SessionTokens,
+                                   masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
+                                   queriesMnemonic: queries.GetMnemonic,
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
                                    messagesControllerComponents: MessagesControllerComponents,
+                                   masterEmails: master.Emails,
+                                   masterMobiles: master.Mobiles,
+                                   masterIdentifications: master.Identifications,
+                                   masterAccountKYCs: master.AccountKYCs,
+                                   withoutLoginAction: WithoutLoginAction,
+                                   withoutLoginActionAsync: WithoutLoginActionAsync,
+                                   keyStore: KeyStore
                                  )
                                  (implicit
                                   executionContext: ExecutionContext,
@@ -46,206 +47,427 @@ class AccountController @Inject()(
                                   wsClient: WSClient,
                                  ) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.CONTROLLER_ACCOUNT
+  private implicit val module: String = constants.Module.CONTROLLERS_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-
-  def signUpForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp(SignUp.form))
+  def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.signUp())
   }
 
-  def signUp: Action[AnyContent] = Action { implicit request =>
+  def signUp: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.signUp(formWithErrors))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
       },
       signUpData => {
-        try {
-          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
-          masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
-          PartialContent(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, addKeyResponse.name, addKeyResponse.address, addKeyResponse.pubkey, addKeyResponse.mnemonic))
-        } catch {
+        val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
+
+        def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
+
+        (for {
+          mnemonics <- mnemonics
+          _ <- addLogin(mnemonics)
+        } yield {
+          PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+        }
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
   }
 
+  def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+    val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
-  def loginForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.login(Login.form))
+    def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) queriesMnemonic.Service.get().map(_.body.split(" ")) else throw new BaseException(constants.Response.UNAUTHORIZED)
+
+    def updatePartialMnemonic(mnemonics: Seq[String], bcAccountExists: Boolean) = if (!bcAccountExists) {
+      masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
+    } else throw new BaseException(constants.Response.UNAUTHORIZED)
+
+    (for {
+      bcAccountExists <- bcAccountExists
+      mnemonics <- getMnemonics(bcAccountExists)
+      - <- updatePartialMnemonic(mnemonics, bcAccountExists)
+    } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+      ).recover {
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
   }
 
-  def login: Action[AnyContent] = Action { implicit request =>
+  def createWallet(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+    views.companion.master.CreateWallet.form.bindFromRequest().fold(
+      formWithErrors => {
+        Future(BadRequest(views.html.component.master.createWallet(formWithErrors, formWithErrors.data(constants.FormField.USERNAME.name), formWithErrors.data(constants.FormField.MNEMONICS.name).split(" "))))
+      },
+      createWalletData => {
+        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = createWalletData.username, password = createWalletData.password)
+        val masterAccount = masterAccounts.Service.tryGet(createWalletData.username)
+
+        def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
+          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, password = createWalletData.password, seed = Seq(masterAccount.partialMnemonic.mkString(" "), createWalletData.mnemonics).mkString(" ")))
+
+          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createWalletData.username, pubkey = addKeyResponse.pubkey)
+
+          for {
+            addKeyResponse <- addKeyResponse
+            _ <- createAccount(addKeyResponse)
+          } yield Ok(views.html.index(successes = Seq(constants.Response.ACCOUNT_CREATED)))
+        } else Future(BadRequest(views.html.component.master.createWallet(views.companion.master.CreateWallet.form.withGlobalError(constants.Response.INCORRECT_PASSWORD.message), username = createWalletData.username, mnemonics = createWalletData.mnemonics.split(" "))))
+
+        (for {
+          validateUsernamePassword <- validateUsernamePassword
+          masterAccount <- masterAccount
+          result <- createAccountAndGetResult(validateUsernamePassword, masterAccount)
+        } yield result)
+          .recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+      }
+    )
+  }
+
+  def loginForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.login())
+  }
+
+  def login: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.login(formWithErrors))
+        Future(BadRequest(views.html.component.master.login(formWithErrors)))
       },
       loginData => {
-        try {
-          val userType = masterAccounts.Service.getUserType(loginData.username)
-          val address = masterAccounts.Service.getAddress(loginData.username)
-          implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
-          val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
-          utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
+        val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
+        val bcAccountExists = blockchainAccounts.Service.checkAccountExists(loginData.username)
+
+        def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
+
+        def getAddress: Future[String] = blockchainAccounts.Service.tryGetAddress(loginData.username)
+
+        def firstLoginUserTypeUpdate(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
+          val markUserTypeUser = masterAccounts.Service.markUserTypeUser(id = loginData.username)
+          for {
+            _ <- markUserTypeUser
+          } yield constants.User.USER
+        } else Future(oldUserType)
+
+        def sendNotification(username: String): Future[Unit] = {
+          val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = username, token = loginData.pushNotificationToken)
+          for {
+            _ <- pushNotificationTokenUpdate
+            _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
+          } yield Unit
+        }
+
+        def getContactWarnings: Future[Seq[constants.Response.Warning]] = {
+          val email = masterEmails.Service.get(loginData.username)
+          val mobile = masterMobiles.Service.get(loginData.username)
+          for {
+            email <- email
+            mobile <- mobile
+          } yield utilities.Contact.getWarnings(mobile, email)
+        }
+
+        def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = {
           loginState.userType match {
-            case constants.User.GENESIS =>
-              withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
-            case constants.User.ZONE =>
-              withUsernameToken.Ok(views.html.zoneIndex(zone = masterZones.Service.get(blockchainZones.Service.getID(loginState.address)), warnings = contactWarnings))
-            case constants.User.ORGANIZATION =>
-              withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address)), warnings = contactWarnings))
-            case constants.User.TRADER =>
-              val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
-              withUsernameToken.Ok(views.html.traderIndex(totalFiat = blockchainFiats.Service.getFiatPegWallet(loginState.address).map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), warnings = contactWarnings))
-            case constants.User.USER =>
-              withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
-            case constants.User.UNKNOWN =>
-              withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
-            case constants.User.WITHOUT_LOGIN =>
-              masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
-              withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = warnings))
+            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = warnings))
           }
         }
-        catch {
+
+        def checkLoginAndGetResult(validateUsernamePassword: Boolean, bcAccountExists: Boolean): Future[Result] = {
+          if (validateUsernamePassword) {
+            if (bcAccountExists) {
+              for {
+                account <- getAccount
+                address <- getAddress
+                userType <- firstLoginUserTypeUpdate(account.userType)
+                _ <- sendNotification(loginData.username)
+                contactWarnings <- getContactWarnings
+                result <- getResult(contactWarnings)(LoginState(username = loginData.username, userType = userType, address = address))
+              } yield result
+            } else {
+              val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
+
+              def updatePartialMnemonic(mnemonics: Seq[String]) = masterAccounts.Service.updatePartialMnemonic(id = loginData.username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
+
+              for {
+                mnemonics <- mnemonics
+                _ <- updatePartialMnemonic(mnemonics)
+              } yield PartialContent(views.html.component.master.createWallet(username = loginData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+            }
+          } else {
+            Future(BadRequest(views.html.component.master.login(views.companion.master.Login.form.fill(loginData).withGlobalError(constants.Response.USERNAME_OR_PASSWORD_INCORRECT.message))))
+          }
+        }
+
+        (for {
+          validateUsernamePassword <- validateUsernamePassword
+          bcAccountExists <- bcAccountExists
+          result <- checkLoginAndGetResult(validateUsernamePassword = validateUsernamePassword, bcAccountExists = bcAccountExists)
+        } yield result
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
   }
 
-
-  def logoutForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.logout(Logout.form))
+  def logoutForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.logout())
   }
 
   def logout: Action[AnyContent] = withLoginAction.authenticated { loginState =>
     implicit request =>
       Logout.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.logout(formWithErrors))
+          Future(BadRequest(views.html.component.master.logout(formWithErrors)))
         },
         loginData => {
-          try {
-            if (!loginData.receiveNotifications) {
-              masterTransactionAccountTokens.Service.deleteToken(loginState.username)
-            } else {
-              masterTransactionAccountTokens.Service.resetSessionTokenTime(loginState.username)
-            }
-            shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
-            if (masterAccounts.Service.getUserType(loginState.username) == constants.User.TRADER) {
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ASSET, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_FIAT, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
-              shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
-            }
+          val pushNotificationTokenDelete = if (!loginData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future(Unit)
+
+          def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
+
+          def shutdownActorsAndGetResult = {
+            actors.Service.Comet.shutdownUserActor(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
-          catch {
+
+          (for {
+            _ <- pushNotificationTokenDelete
+            _ <- transactionSessionTokensDelete
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)
+          } yield {
+            shutdownActorsAndGetResult
+          }).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
   }
 
-
-  def changePasswordForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changePassword(views.companion.master.ChangePassword.form))
+  def changePasswordForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.changePassword())
   }
 
   def changePassword: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ChangePassword.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changePassword(formWithErrors))
+          Future(BadRequest(views.html.component.master.changePassword(formWithErrors)))
         },
         changePasswordData => {
-          try {
-            if (masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)) {
-              transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
-              masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
-              Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
-            } else {
-              BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
-            }
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(loginState.username, changePasswordData.oldPassword)
+
+          def updateAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+            val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
+
+            def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
+
+            for {
+              _ <- postRequest
+              _ <- updatePassword()
+              result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+            } yield result
+          } else {
+            Future(BadRequest(views.html.component.master.changePassword(views.companion.master.ChangePassword.form.fill(value = views.companion.master.ChangePassword.Data(changePasswordData.oldPassword, changePasswordData.newPassword, changePasswordData.confirmNewPassword)).withError(constants.FormField.OLD_PASSWORD.name, constants.Response.INVALID_PASSWORD.message))))
           }
-          catch {
+
+          (for {
+            validateUsernamePassword <- validateUsernamePassword
+            result <- updateAndGetResult(validateUsernamePassword)
+          } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
   }
 
-
-  def emailOTPForgotPasswordForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.emailOTPForgotPassword(views.companion.master.EmailOTPForgotPassword.form))
+  def emailOTPForgotPasswordForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.emailOTPForgotPassword())
   }
 
-  def emailOTPForgotPassword: Action[AnyContent] = Action { implicit request =>
+  def emailOTPForgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.master.EmailOTPForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.emailOTPForgotPassword(formWithErrors))
+        Future(BadRequest(views.html.component.master.emailOTPForgotPassword(formWithErrors)))
       },
       emailOTPForgotPasswordData => {
-        try {
-          val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
-          utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
+        val otp = masterTransactionEmailOTP.Service.get(emailOTPForgotPasswordData.username)
+        (for {
+          otp <- otp
+          _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
+        } yield {
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
-        }
-        catch {
+        }).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
   }
 
-
-  def forgotPasswordForm(username: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, username))
+  def forgotPasswordForm(username: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.forgotPassword(username = username))
   }
 
-  def forgotPassword(username: String): Action[AnyContent] = Action { implicit request =>
+  def forgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     views.companion.master.ForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.forgotPassword(formWithErrors, username))
+        Future(BadRequest(views.html.component.master.forgotPassword(formWithErrors, formWithErrors(constants.FormField.USERNAME.name).value.getOrElse(""))))
       },
       forgotPasswordData => {
-        try {
-          if (masterTransactionEmailOTP.Service.verifyOTP(username, forgotPasswordData.otp)) {
-            transactionForgotPassword.Service.post(username = username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
-            masterAccounts.Service.updatePassword(username = username, newPassword = forgotPasswordData.newPassword)
-            Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+        val validOTP = masterTransactionEmailOTP.Service.verifyOTP(forgotPasswordData.username, forgotPasswordData.otp)
+
+        def updateAndGetResult(validOTP: Boolean): Future[Result] = {
+          if (validOTP) {
+            val account = masterAccounts.Service.tryGet(forgotPasswordData.username)
+
+            def post(partialMnemonic: Seq[String]) = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = Seq(partialMnemonic.mkString(" "), forgotPasswordData.mnemonic).mkString(" "), newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
+
+            def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
+
+            for {
+              account <- account
+              _ <- post(account.partialMnemonic)
+              _ <- updatePassword()
+            } yield Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
           } else {
-            BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
+            Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))
           }
         }
-        catch {
+
+        (for {
+          validOTP <- validOTP
+          result <- updateAndGetResult(validOTP)
+        } yield result).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
   }
 
-
-  def checkUsernameAvailable(username: String): Action[AnyContent] = Action { implicit request =>
-    if (masterAccounts.Service.checkUsernameAvailable(username)) Ok else NoContent
+  def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+    val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
+    for {
+      checkUsernameAvailable <- checkUsernameAvailable
+    } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
-  def noteNewKeyDetails(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
-    views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors, name, blockchainAddress, publicKey, seed))
-      },
-      noteNewKeyDetailsData => {
-        if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
-        }
-        else {
-          BadRequest(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, name, blockchainAddress, publicKey, seed))
-        }
+  def addIdentificationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val identification = masterIdentifications.Service.get(loginState.username)
+
+      def getResult(identification: Option[Identification]): Future[Result] = identification match {
+        case Some(identity) => withUsernameToken.Ok(views.html.component.master.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType, address = AddressData(identity.address.addressLine1, identity.address.addressLine2, identity.address.landmark, identity.address.city, identity.address.country, identity.address.zipCode, identity.address.phone)))))
+        case None => withUsernameToken.Ok(views.html.component.master.addIdentification())
       }
-    )
+
+      (for {
+        identification <- identification
+        result <- getResult(identification)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def addIdentification(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.AddIdentification.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.addIdentification(formWithErrors)))
+        },
+        addIdentificationData => {
+          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType, Address(addressLine1 = addIdentificationData.address.addressLine1, addressLine2 = addIdentificationData.address.addressLine2, landmark = addIdentificationData.address.landmark, city = addIdentificationData.address.city, country = addIdentificationData.address.country, zipCode = addIdentificationData.address.zipCode, phone = addIdentificationData.address.phone))
+
+          def getAccountKYC: Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
+
+          (for {
+            _ <- add
+            accountKYC <- getAccountKYC
+            result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
+      for {
+        accountKYC <- accountKYC
+        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
+      } yield result
+  }
+
+  def userReviewIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val identification = masterIdentifications.Service.get(loginState.username)
+      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
+      (for {
+        identification <- identification
+        accountKYC <- accountKYC
+        result <- withUsernameToken.Ok(views.html.component.master.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def userReviewIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.UserReviewIdentification.form.bindFromRequest().fold(
+        formWithErrors => {
+          val identification = masterIdentifications.Service.get(loginState.username)
+          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
+          (for {
+            identification <- identification
+            accountKYC <- accountKYC
+          } yield BadRequest(views.html.component.master.userReviewIdentification(formWithErrors, identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        },
+        userReviewAddZoneRequestData => {
+          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.AccountKYC.IDENTIFICATION)
+
+          def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
+            if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
+              val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
+
+              def getResult: Future[Result] = {
+                withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
+              }
+
+              for {
+                _ <- updateCompletionStatus
+                //TODO: Remove this when Trulioo is integrated
+                _ <- masterIdentifications.Service.markVerified(loginState.username)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)
+                result <- getResult
+              } yield result
+            } else {
+              val identification = masterIdentifications.Service.get(loginState.username)
+              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
+              for {
+                identification <- identification
+                accountKYC <- accountKYC
+              } yield BadRequest(views.html.component.master.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
+            }
+          }
+
+          (for {
+            identificationFileExists <- identificationFileExists
+            result <- markIdentificationFormCompletedAndGetResult(identificationFileExists)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 }

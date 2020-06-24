@@ -8,11 +8,11 @@ object SendCoin {
     mapping(
       constants.FormField.TO.name -> constants.FormField.TO.field,
       constants.FormField.AMOUNT.name -> constants.FormField.AMOUNT.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field
+      constants.FormField.GAS.name -> constants.FormField.GAS.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(to: String, amount: Int, password: String, gas: Int)
+  case class Data(to: String, amount: Int, gas: Int, password: String)
 
 }

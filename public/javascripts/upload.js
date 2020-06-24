@@ -2,10 +2,13 @@ function getFileTypes(documentType) {
     let fileTypes = [];
     switch (documentType) {
         case "PROFILE_PICTURE":
-            fileTypes = ['jpg', 'png', 'jpeg'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG'];
+            break;
+        case "CONTRACT":
+            fileTypes = ['pdf'];
             break;
         default:
-            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG', 'pdf', 'doc', 'docx'];
             break;
     }
     return fileTypes
@@ -33,12 +36,21 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
     });
 
     let uploadCompletionMessage = document.getElementById('uploadCompletionMessage');
+
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
         let storeDbRoute = storeRoute(file.fileName, documentType, id);
+        let loadingSpinner = $('#commonSpinner');
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,
+            global: showSpinner('fileUpload'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 200: function (data) {
                     $("#uploadCompletionMessage").show();
@@ -59,7 +71,7 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
             }
         });
     });
-    
+
     $("#uploadButton").click(function () {
         rFile.upload();
     });
@@ -91,9 +103,17 @@ function updateFile(uploadRoute, updateRoute, documentType, id) {
     rFile.on('fileSuccess', function (file) {
         $("#updateControls").delay(1000).fadeOut(1000);
         let updateDbRoute = updateRoute(file.fileName, documentType, id);
+        let loadingSpinner = $('#commonSpinner');
         $.ajax({
             url: updateDbRoute.url,
             type: updateDbRoute.type,
+            global: showSpinner('fileUpload'),
+            beforeSend: function () {
+                loadingSpinner.show();
+            },
+            complete: function () {
+                loadingSpinner.hide();
+            },
             statusCode: {
                 200: function (data) {
                     $("#updateCompletionMessage").show();

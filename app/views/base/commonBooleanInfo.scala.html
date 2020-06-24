@@ -1,0 +1,21 @@
+@(key: String, status: Option[Boolean], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div class="cmuk-flex infoRow">
+    <div class="infoRowLabel">
+    @Messages(key)
+    </div>
+    <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
+    @status match {
+        case Some(status) => {
+            @if(status) {
+                <span cmuk-icon="check" class="check"></span>
+            } else {
+                <span cmuk-icon="close" class="close"></span>
+            }
+        }
+        case _ => {
+            <span class="cmuk-badge pending">@Messages(constants.View.PENDING)</span>
+        }
+    }
+    </div>
+</div>

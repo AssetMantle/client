@@ -1,0 +1,37 @@
+@import "variables.scss";
+input, select {
+  width: 100%;
+}
+
+input:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+input:hover {
+  cursor: pointer;
+}
+
+button {
+  background-color:#EEF9FF;
+  color: #1B7FBD;
+  padding: 10px 15px;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  word-break: break-all;
+}
+
+dl{
+  text-align: left;
+}
+
+label{
+  font-style: normal;
+  font-size:$paragraphFontSizeLarge;
+  line-height: 2.6;
+  letter-spacing: 0.01em;
+  color: #272829;
+  font-family: $fontFamilySecondary;
+  font-weight: normal;
+}

@@ -1,8 +1,13 @@
 $(document).mouseup(function (e) {
     $('.modal').each(function () {
         const modal = $(this);
-        if (modal.is(e.target)) {
-            modal.fadeOut(400);
+        const modalConnectionError = $('#connectionError');
+        if (modalConnectionError.is(e.target)) {
+            modalConnectionError.fadeOut(200)
         }
+        $('#modalClose').click(function() {
+            modal.fadeOut(200);
+            $('.modalContent').removeClass('fadeInEffect');
+        })
     })
 });

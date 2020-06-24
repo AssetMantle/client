@@ -1,0 +1,236 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>@title | @Messages(constants.View.PERSISTENCE)</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/Favicon.png")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/fonts.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
+        <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
+        <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/comet.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/activitiesBox.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/getForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/replaceDocument.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/submitFormOnEnter.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/submitForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/rippleEffect.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/validateForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/js-uk/uikit.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
+    </head>
+    <body class="comdex">
+        <div class="bodyContainer">
+            @* Header *@
+        <div class="header"
+        cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
+            <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
+                <div class="mobileNavigationHeader cmuk-hidden@@m">
+                    <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
+                        <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
+                    </a>
+                    <a class="cmuk-navbar-toggle cmuk-margin-auto-left" onclick="mobileNavigation()" cmuk-navbar-toggle-icon></a>
+                </div>
+                <div id="mobileNavigation" class="mobileNavigation">
+                    <div class="cmuk-navbar-left">
+                        <a class="cmuk-navbar-item cmuk-logo cmuk-visible@@m" href="@controllers.routes.IndexController.index()">
+                            <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
+                        </a>
+                        <ul class="cmuk-navbar-nav">
+                        @loginState match {
+                            case null => {}
+                            case default => {
+                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                                @commonIcon("dashboard")
+                                </span>
+                                    @Messages(constants.View.DASHBOARD)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect"><span class="accountIcon">
+                                @commonIcon("account")
+                                </span>
+                                    @Messages(constants.View.ACCOUNT)
+                                </a>
+                                </li>
+                            }
+                        }
+                        </ul>
+                    </div>
+                    <div class="cmuk-navbar-right">
+                        <ul class="cmuk-navbar-nav">
+                        @loginState match {
+                            case null => {
+                                <li>
+                                    <a>
+                                    @commonModalButton(constants.View.SIGN_UP, routes.javascript.AccountController.signUpForm, 'class -> "buttonRegister")
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
+                                    @Messages(constants.Form.LOGIN.legend)
+                                    </a>
+                                </li>
+                            }
+                            case default => {
+                                <script type="text/javascript">
+                                        var cometMessage = function (message) {
+                                            cometMessageHandler(message);
+                                        }
+                                    </script>
+                                <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
+
+                                <li class="login-nav-item">
+                                    <a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
+                                        @loginState.username
+                                    <span cmuk-icon="user" class="loginIcon"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
+                                        <span class="logoutIcon">@commonIcon("logout")</span>
+                                    </a>
+                                </li>
+
+                            }
+                        }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+            @* End of Header *@
+
+            @* Main Container *@
+        <div class="mainContainer">
+            @* Data container *@
+        <div class="dataContainer">
+            <div class="cmuk-text-center">
+                @for(failure <- failures) {
+                    <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
+                        <a class="cmuk-alert-close" cmuk-close></a>
+                        <p><span class="failureIcon">@commonIcon("fail")</span>
+                            <span class="alertName">@Messages(constants.View.FAILURE):</span>
+                            @Messages(failure.message)</p>
+                    </div>
+                }
+                @for(warning <- warnings) {
+                    <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
+                        <a class="cmuk-alert-close" cmuk-close></a>
+                        <p><span class="warningIcon">@commonIcon("warning")</span>
+                            <span class="alertName">@Messages(constants.View.WARNING):</span>
+                            @Messages(warning.message)</p>
+                    </div>
+                }
+                @for(success <- successes) {
+                    <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
+                        <a class="cmuk-alert-close" cmuk-close></a>
+                        <p><span class="successIcon">@commonIcon("success")</span>
+                            @Messages(success.message)</p>
+                    </div>
+                }
+                @for(info <- infos) {
+                    <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
+                        <a class="cmuk-alert-close" cmuk-close></a>
+                        <p><span class="infoIcon">@commonIcon("info")</span>
+                            <span class="alertName">@Messages(constants.View.INFORMATION):</span>
+                            @Messages(info.message)</p>
+                    </div>
+
+                }
+            </div>
+
+            <div class="pageContainer">
+            @loginState match {
+                case null => {
+                    <div class="pageContent cmuk-container">
+                        <div class="leftSide sticky">
+                        @left
+                        </div>
+                        <div class="middle" id="centerContent">
+                        @center
+                        </div>
+                        <div class="rightSide sticky">
+                        @right
+                        </div>
+                    </div>
+                }
+                case default => {
+                    <div class="pageContent cmuk-container">
+                        <div class="leftSide sticky">
+                        @left
+                        </div>
+                        <div class="middle" id="centerContent">
+                        @center
+                        </div>
+                        <div class="rightSide sticky">
+                        @right
+                        </div>
+                    </div>
+                }
+            }
+            </div>
+
+            <div class="modal" id="commonModal">
+                <div class="modalContent">
+                    <button class="cmuk-modal-close-default" id="modalClose" type="button" cmuk-close></button>
+                    <div class="modalBody" id="commonModalContent">
+                    </div>
+                </div>
+            </div>
+
+            @commonSpinner(id = "commonSpinner", spinnerClass = "modal", spinnerPosition = "centerScreen", ratio = 2.5)
+
+        </div>
+            @* End of Data container *@
+
+        <div class = "modal centerScreen hidden" id="connectionError">
+            <div class="connectionError">
+                <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.CONNECTION_ERROR)"/>
+                <div>@Messages(constants.View.CONNECTION_ERROR)</div>
+            </div>
+        </div>
+        </div>
+            @* Footer *@
+        <div class="footer">
+            <div class="cmuk-container">
+                <div>
+                    <div class="footerLogo">
+                        <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
+                    </div>
+                </div>
+                <div class="copyRight">
+                            &copy;
+                    <script>document.write(new Date().getFullYear())</script>
+                    <a href="" target="_blank">@Messages(constants.View.FOOTER_TEXT)</a>
+                </div>
+            </div>
+        </div>
+            @* End of Footer *@
+            @* End of MainContainer *@
+        </div>
+        <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/activeLink.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/stickyCard.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/copyToClipboard.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/navigationBar.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/cardTable.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/delete.js")" type="text/javascript"></script>
+    </body>
+</html>

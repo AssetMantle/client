@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.Chat
+
+@(url:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+<div class="iframeModal">
+<iframe src="@url" width="1000" height="700"></iframe>
+</div>

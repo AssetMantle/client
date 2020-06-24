@@ -1,0 +1,34 @@
+@import controllers.actions.LoginState
+@import models.master.AccountKYC
+@import play.api.Logger
+@import models.master.Identification
+@import views.companion.master.UserReviewIdentification
+@import views.html.base._
+
+@import views.html.component.master.streetAddress
+@(userReviewIdentificationForm: Form[UserReviewIdentification.Data] = UserReviewIdentification.form, identification: Identification, accountKYC: AccountKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+
+@commonForm(constants.Form.USER_REVIEW_IDENTIFICATION, userReviewIdentificationForm) {
+        @commonTextInfo(constants.View.FIRST_NAME, identification.firstName)
+        @commonTextInfo(constants.View.LAST_NAME, identification.lastName)
+        @commonTextInfo(constants.View.DATE_OF_BIRTH, identification.dateOfBirth.toString)
+        @commonTextInfo(constants.View.ID_NUMBER, identification.idNumber)
+        @commonTextInfo(constants.View.ID_TYPE, identification.idType)
+        @commonBooleanInfo(constants.View.STATUS, identification.verificationStatus)
+        <div class="cmuk-text-left title">@Messages(constants.View.ADDRESS)</div>
+        @streetAddress(identification.address)
+        <br>
+        <div class="title cmuk-text-left">@Messages(constants.View.ID_PROOF)</div>
+        @component.master.commonDocumentViewer(accountKYC) {
+            @routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)
+        } {
+            <a href="@routes.FileController.getAccountKYCFile(accountKYC.fileName, accountKYC.documentType)" target="_blank">@Messages(accountKYC.documentType)</a>
+        } {
+
+        }
+        <div class="identificationCheckbox">
+        @commonCheckbox(userReviewIdentificationForm, constants.FormField.COMPLETION)
+        <p>@Messages(constants.View.REVIEW_FORM_DECLARATION)</p>
+        </div>
+        @commonModalButton(constants.View.BACK,routes.javascript.AccountController.userViewUploadOrUpdateIdentification)
+}

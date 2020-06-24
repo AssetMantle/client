@@ -1,0 +1,38 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+
+}
+
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom profileContainer">
+        <div class="cmuk-grid-small" cmuk-grid>
+            <div class="cmuk-width-1-2@@m profileDetails">
+                <div id="commonHome"></div>
+            </div>
+            <div class="cmuk-width-1-2@@m">
+                <div id="contact" class="contactDetails"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+            componentResource('contact', jsRoutes.controllers.ContactController.contact());
+    </script>
+}
+
+@right = {
+    <div class="rightContainer">
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
+    </div>
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+    </script>
+}

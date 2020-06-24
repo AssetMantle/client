@@ -16,10 +16,8 @@ object indexControllerTest {
 
   val indexScenario: ScenarioBuilder = scenario("Index")
     .exec(controllersTest.loginControllerTest.loginAfterSignUpScenario)
-
     .exec(http("Index_GET")
-      .get(routes.IndexController.index().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .get(routes.IndexController.index().url))
     .pause(2)
 
 }

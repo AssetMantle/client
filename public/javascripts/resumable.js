@@ -830,6 +830,7 @@
                         input.click();
                         input.style.display='none';
                     }, false);
+                    console.log(input);
                     domNode.appendChild(input);
                 }
                 var maxFiles = $.getOpt('maxFiles');

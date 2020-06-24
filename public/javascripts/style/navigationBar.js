@@ -1,11 +1,11 @@
 $(document).ready(function () {
-    $("#NavigationBarMenuButton").click(function () {
-        $("#navigationBarLinks").slideToggle("slow");
+    $(window).resize(function() {
+        if ($(window).width() > 960) {
+            $(".mobileNavigation").removeAttr("style");
+        }
     });
-    if ($(window).width() < 500) {
-        $('.cmuk-navbar-container').addClass('mobileNavigationBar').removeClass('cmuk-navbar-container');
-        $('.cmuk-navbar').removeClass('cmuk-navbar');
-        $('.cmuk-navbar-right').removeClass('cmuk-navbar-right');
-        $('.cmuk-navbar-nav').removeClass('cmuk-navbar-nav');
-    }
 });
+function  mobileNavigation() {
+    $('#mobileNavigation').slideToggle();
+
+}

@@ -1,0 +1,500 @@
+@import "variables.scss";
+
+@media (max-width: 640px) {
+  .pageContent {
+    margin: 20px;
+  }
+  .MnemonicQuiz{
+    max-width: 500px;
+  }
+  .banner {
+    background-size: contain;
+    background-position: center bottom;
+    .bannerText {
+      width: 100%;
+      h3 {
+        font-size: 30px;
+      }
+    }
+  }
+  .mobile .cmuk-offcanvas-bar{
+    padding: 30px;
+  }
+  .mobile .cmuk-button{
+    background-color: $colorPrimary;
+  }
+  .switcherCard{
+    .cmuk-subnav{
+      flex-wrap: nowrap;
+      justify-content: start;
+      overflow: auto;
+      overflow: -moz-scrollbars-none;
+      li{
+        flex: none;
+      }
+      &::-webkit-scrollbar {
+        height: 0 !important
+      }
+    }
+    .cmuk-subnav-pill>*>:first-child{
+      padding: 5px 20px;
+    }
+  }
+  .commonList{
+    display: block;
+    padding: 20px;
+    .listItemChild {
+      display: flex;
+      padding: 5px 0px;
+      .listItemChildTitle{
+        width: 100px;
+      }
+      .listItemChildValue {
+        margin: 0px;
+        white-space: normal;
+      }
+    }
+  }
+  .modal{
+    padding: 30px 15px;
+    .modalContent{
+      padding: 15px;
+      min-height: 150px;
+      max-height: calc(100% - 20px);
+      top:auto;
+      transform: translateY(0);
+      margin: 0 auto;
+      width: 600px;
+      transition: .3s linear;
+      transition-property: opacity,transform;
+      form{
+        text-align: center;
+      }
+    }
+  }
+  .MnemonicQuiz {
+    text-align: center;
+    .verifyMnemonic .verifyMnemonicButton {
+      width: 95px;
+    }
+  }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm{
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 640px) {
+  .modalBody{
+    form{
+      width:620px;
+      text-align: center;
+    }
+  }
+  form{
+    hr{
+      margin: 0px;
+    }
+  }
+  .MnemonicQuiz {
+    text-align: center;
+    max-width: 750px;
+  }
+  .kycDocumentsView{
+    display: flex;
+  }
+  .cmuk-card-body {
+    .cmuk-subnav {
+      li a {
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1080px) {
+  .header .cmuk-navbar-nav > li > a{
+    padding: 0px 15px;
+  }
+  .header .cmuk-navbar-right .cmuk-navbar-nav > li > a{
+    padding: 0px 15px;
+  }
+}
+
+@media (min-width: 960px) {
+  .verticalDataTabsData {
+    display: flex;
+  }
+  .comdex{
+    .mobileNavigation{
+      display: flex;
+      flex:auto;
+    }
+  }
+}
+
+@media (min-width:1200px) {
+  .pageContainer {
+    .leftSide {
+      height: 100%;
+      float: left;
+      left: 0;
+      margin-right: 0.5%;
+      width: 24.5%;
+      margin-bottom: 5px;
+    }
+    .middle {
+      width: 50%;
+      height: calc(100% - 128px);
+      float: left;
+    }
+    .rightSide {
+      height: 100%;
+      width: 24.5%;
+      float: left;
+      margin-left: 0.5%;
+      right: 0;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+@media (max-width:1200px ) {
+  .pageContainer {
+    .middle{
+      margin-bottom: 20px;
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .MnemonicQuiz .mnemonicNote{
+    background-image: none;
+    .mnemonicNoteText{
+      width: 100%;
+    }
+  }
+  .modal .modalContent{
+    .modalBody {
+      .infoBlock {
+       flex-direction: column;
+        max-width: 500px;
+        max-height: 410px;
+        .infoBlockItem{
+          flex: none;
+          .infoBlockItemRight{
+            padding: 0;
+            border: none;
+
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width:992px) and (max-width:1600px){
+  .modal .modalContent{
+    top:10%;
+    max-height: 530px;
+    .modalBody {
+      form .formBody {
+        max-height: 409px;
+      }
+      .modalInfoBlock{
+        max-height: 409px;
+      }
+      .infoBlockHeight{
+        max-height: 399px;
+      }
+      .infoBlock {
+        width: 800px;
+      }
+    }
+  }
+  .leftContainer{
+    .financial{
+      margin-bottom: 15px;
+      .cmuk-card{
+        height: 265px;
+        .cmuk-switcher{
+          height: 210px;
+          overflow: auto;
+        }
+      }
+    }
+    .financial {
+      .cmuk-switcher{
+        ul li {
+          padding: 10px 0;
+      }
+      }
+    }
+    .addBalanceButton{
+      text-transform: capitalize;
+      font-family: $fontFamilyPrimary;
+      padding: 8px 8px;
+      line-height:normal;
+      background: rgba(8, 98, 190, 0.1);
+      border-radius: 103px;
+      color: #0862BE;
+      border: 0;
+    }
+    .documentView{
+      .cmuk-card-body, .documentList{
+        padding:0px;
+      }
+      .documentList{
+        height: 150px;
+      }
+      .cmuk-card{
+        height: 265px;
+        .cmuk-card-body{
+          height: 265px;
+        }
+      }
+    }
+    .zoneTradeFinancial{
+      .cmuk-card-body {
+        height: auto;
+        .cmuk-switcher{
+        height: 210px;
+        }
+      }
+    }
+  }
+  .rightContainer{
+    .recentActivityContainer{
+      margin-bottom: 15px;
+      .cmuk-card-body{
+        height: 210px;
+        .recentActivityMessages{
+          height: 210px;
+        }
+      }
+    }
+    .chatRoom{
+      .cmuk-card-body{
+        height: 215px;
+        .chatMessagesContainer {
+          height: 140px;
+        }
+      }
+    }
+  }
+  .switcherViewCard {
+    .cmuk-subnav li a {
+      padding: 11px;
+    }
+  }
+  .comdex {
+    .cmuk-height-medium{
+      height: 210px;
+    }
+    .cmuk-card-header .cmuk-button
+    {
+      line-height: 26px;
+    }
+    .updateDocumentField button {
+      position: absolute;
+      top: 12px;
+      left: 115px;
+      font-weight: bold;
+    }
+  }
+  .switcherCard{
+    .cmuk-switcher{
+      height: 170px;
+    }
+  }
+  .timeline {
+    &:before{
+      left: 19px;
+    }
+    .timeline-item .timeline-icon {
+      left: 0px;
+    }
+  }
+  .salesQuoteCard{
+    .salesQuoteCardLeft{
+      flex: 32%;
+    }
+    .salesQuoteCardMiddle{
+      flex: 41%;
+    }
+    .salesQuoteCardRight{
+      flex: 27%;
+    }
+  }
+}
+
+@media (max-width: 1599px){
+  :root {
+    font-size: 13px;
+  }
+  .checkboxSection {
+    .warningIcon {
+      top: 45px;
+      left: 50px;
+    }
+  }
+  .comdex{
+    .cmuk-input, .cmuk-select:not([multiple]):not([size]){
+      height: 40px;
+    }
+  }
+  .signUpForm .usernameAvailability .checkIcon,
+  .signUpForm .usernameAvailability .failureIcon,
+  .signUpForm .showPassword{
+    top:45px
+  }
+  .profileContainer{
+    .identificationDetails{
+      .documentItem{
+        padding: 10px;
+        .documentContentTop{
+          margin:0px 7px 0px 0px
+        }
+        .documentThumbnail{
+          margin:0px 7px 0px 0px
+        }
+        .documentContentBottom{
+          margin:0px;
+          .infoRowLabel{
+            width: auto;
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+  .cmuk-card-body{
+    .cmuk-subnav {
+      li a {
+        text-transform: capitalize;
+      }
+    }
+  }
+  .tabSection{
+    .cmuk-grid-divider{
+      display: block;
+    }
+    .cmuk-grid-divider.cmuk-grid-stack>.cmuk-grid-margin{
+      margin:10px 0px 0px 0px;
+    }
+    .cmuk-grid-divider>:not(.cmuk-first-column)::before,
+    .cmuk-grid-divider.cmuk-grid-stack>.cmuk-grid-margin::before{
+      border: none;
+    }
+  }
+  .mobileNumberUpdate .countryCode{
+    margin-top:38px;
+  }
+  .infoIcon {
+    left: 175px;
+    top: 109px;
+  }
+  .infoText {
+    .infoIcon.organizationInfoIcon {
+      left: 340px;
+      top: 0;
+    }
+  }
+  .iframeModal{
+    height: 530px;
+  }
+  .leftContainer .financial .financialCard.cardPaddingRemove ul li{
+    &:first-child{
+      padding-top: 10px;
+    }
+    padding: 15px 0px;
+  }
+  .walletButtons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    font-size: 16px;
+  }
+  .checkboxSection {
+    .commonCheckBox dt{
+      width: auto;
+      margin-right: 40px;
+  }
+  }
+  .showPassword, .checkIcon{
+    top:37px;
+  }
+  .modal .modalContent .modalBody {
+    .modalInfoBlock, form .formBody{
+      .infoRowLabel {
+        width: 300px;
+      }
+      .infoRowValue {
+        text-align: left;
+      }
+      .documentItem{
+        .infoRowLabel{
+          width: auto;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width:1920px){
+  .comdex .cmuk-container {
+    max-width: 100%;
+  }
+}
+@media (min-width:1921px){
+  .comdex .cmuk-container{
+    max-width:1920px;
+  }
+}
+
+@media (max-width: 959px){
+  .comdex {
+    .mobileNavigationHeader{
+      display: flex;
+    }
+    .mobileNavigation{
+      display: none;
+      li{
+        a{
+          justify-content: left;
+          padding: 0px;
+        }
+      }
+    }
+    .header {
+      .cmuk-logo {
+        border: none;
+      }
+      .buttonRegister {
+        background-color: #FE4350;
+        font-family:$fontFamilyPrimary;
+        color: #FFFFFF;
+        line-height: inherit;
+        padding: 5px 30px;
+        border-radius: 3px;
+      }
+      .cmuk-navbar{
+        display: block;
+      }
+      .cmuk-navbar-nav{
+        display: block;
+      }
+      .cmuk-navbar-right {
+        .cmuk-navbar-nav > li > a
+        {
+          border:none;
+          padding: 0px;
+        }
+      }
+    }
+  }
+}

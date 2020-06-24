@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.MemberCheckCorporateScan
+
+@(memberCheckCorporateScanForm: Form[MemberCheckCorporateScan.Data] = MemberCheckCorporateScan.form, organizationID: String, companyName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.MEMBER_CHECK_CORPORATE_SCAN, memberCheckCorporateScanForm) {
+  @commonInputText(memberCheckCorporateScanForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID)
+  @commonInputText(memberCheckCorporateScanForm, constants.FormField.COMPANY_NAME, 'value -> companyName)
+}

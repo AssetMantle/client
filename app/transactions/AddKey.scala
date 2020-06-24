@@ -9,8 +9,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseResponse
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -27,11 +26,11 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Request(name: String, password: String)
+  case class Request(name: String, password: String, seed:String)
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
@@ -39,12 +38,13 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   object Service {
 
-    def post(request: Request): Response = try {
-      Await.result(action(request), Duration.Inf)
-    } catch {
+    def post(request: Request): Future[Response] = action(request).recover {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      case e:Exception=>
+        logger.error(e.getMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 

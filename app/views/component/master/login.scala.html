@@ -1,34 +1,27 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.companion.master.Login
+@import views.html.base._
 
-@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-<div class="">
-    <h4 class="">@Messages(constants.Form.LOGIN)</h4>
-</div>
-@form(action = routes.AccountController.login, 'onkeypress -> "submitFormOnEnter(event,this)") {
-
-    @CSRF.formField
-
-    <div class="input-group">
-    @inputText(loginForm(constants.FormField.USERNAME.name), '_label -> Messages(constants.FormField.USERNAME.name), 'class -> "cmuk-input", 'placeholder -> "Username", 'required -> true)
+@(loginForm: Form[Login.Data] = Login.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<div class="loginForm cmuk-text-center">
+@commonForm(constants.Form.LOGIN, loginForm) {
+    <div class="inputField">
+        <div class="inputFieldBody">
+        @commonInputText(loginForm, constants.FormField.USERNAME)
+        </div>
     </div>
-    <div class="input-group">
-        @inputPassword(loginForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> "Password", 'required -> true)
+    <div class="inputField">
+        <div class="inputFieldBody">
+            @commonInputPassword(loginForm, constants.FormField.PASSWORD)
+        </div>
+        @commonFormButton(constants.Form.EMAIL_OTP_FORGOT_PASSWORD, 'class -> "cmuk-button-link forgotPassword")
     </div>
-    <div class = "hidden">@inputText(loginForm(constants.FormField.NOTIFICATION_TOKEN.name), 'id -> constants.FormField.NOTIFICATION_TOKEN.name, 'readonly -> true)</div>
-
-    @if(loginForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- loginForm.globalErrors) {
-            <li>@error.format</li>
-        }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary " onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
-    <button type="button" class="btn btn-primary" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD)</button>
+    <div class="pushNotification hiddenLabel">
+    @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'containerDivClass -> "hidden", 'readonly -> true)
+    </div>
 }
+</div>
+<script src="@routes.Assets.versioned("javascripts/pushNotification.js")" type="text/javascript"></script>
 
 
 

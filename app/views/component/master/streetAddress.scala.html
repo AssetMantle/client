@@ -1,0 +1,12 @@
+@import models.common.Serializable.Address
+@import views.html.base._
+
+@(address: Address)(implicit messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.ADDRESS_LINE_1, address.addressLine1)
+@commonTextInfo(constants.View.ADDRESS_LINE_2, address.addressLine2)
+@commonTextInfo(constants.View.LANDMARK, address.landmark.getOrElse(""))
+@commonTextInfo(constants.View.CITY, address.city)
+@commonTextInfo(constants.View.COUNTRY, address.country)
+@commonTextInfo(constants.View.ZIP_CODE, address.zipCode)
+@commonTextInfo(constants.View.MOBILE_NUMBER, address.phone)

@@ -1,0 +1,2980 @@
+
+@import "variables.scss";
+
+:root{
+  font-family: Oxygen, sans-serif !important;
+  box-sizing: border-box;
+}
+
+*,
+::after,
+::before{
+  box-sizing: border-box;
+}
+
+html, body{
+  height: 100%;
+  position: relative;
+  background: #F0F0F0;
+  @extend %scroller;
+}
+
+%scroller{
+  scrollbar-color: #E2E4E6 #FFFFFF;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar,
+::-webkit-scrollbar-thumb {
+  overflow:visible;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E2E4E6;
+  border-right: 1px solid white;
+}
+
+%iconBackground{
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin-right: 15px;
+  position: relative;
+}
+
+%iconLetter{
+  height: 26px;
+  display: inline-flex;
+  width: 26px;
+  line-height: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  text-align: center;
+  font-size: $paragraphFontSizeSmall;
+  align-items: center;
+  justify-content: center;
+}
+
+%cmuk-comment-meta{
+  color: #061728;
+  font-size: $paragraphFontSizeMedium;
+}
+
+%cmuk-card-default{
+  background: #FAFAFA;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: $buttonBorderRadius;
+}
+
+%cmuk-button-link {
+  font-weight: bold;
+  font-size: $paragraphFontSizeSmall;
+  text-decoration: none;
+}
+
+%verifiedLabel{
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 10px;
+}
+
+%justifyAlignCenter{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+%positionCenter{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+}
+
+%buttonSmall{
+  padding: 0 15px;
+  line-height: 28px;
+}
+
+.centerScreen {
+  @extend %justifyAlignCenter;
+  flex-direction: column;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.bodyContainer{
+  min-height: 100vh;
+  display: block;
+  position: relative;
+  background: #F0F0F0;
+  padding-bottom: 115px;
+}
+
+.toolTip:hover .toolTipText {
+  visibility: visible;
+  opacity: 1;
+}
+
+.headerFontSize{
+  font-size:$paragraphFontSizeMedium;
+}
+
+.title{
+  font-size: $paragraphFontSizeSmall;
+  color: #848A91;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.MnemonicQuiz .hidden,
+.hidden{
+  display: none;
+}
+
+.flexContainer {
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.flexItem {
+  text-align: center;
+  padding-top: 15px;
+}
+
+.flexBox {
+  padding: 5px;
+  margin: 10px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexGraph {
+  width: 95%;
+}
+
+.flexGrowth {
+  flex-grow: 1;
+}
+
+.firstBox {
+  width: 30%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+
+.secondBox {
+  width: 100%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+
+.thirdBox {
+  width: 200px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+
+.toggleElement {
+  text-align: center;
+  background-color:$colorPrimary;
+  color:#FFFFFF;
+}
+
+.showToggleElement {
+  background-color: $colorPrimary;
+  cursor: pointer;
+  color: #10292e;
+}
+
+.toggleElement:hover {
+  cursor: pointer;
+  color: #FFFFFF;
+}
+
+.leftText {
+  text-align: left;
+  word-break: break-all;
+}
+
+.rightText {
+  text-align: right;
+}
+
+.centerText {
+  text-align: center;
+}
+
+.scrollableFirst {
+  min-height: min-content;
+  max-height: 85vh;
+  overflow-y: scroll;
+}
+
+.scrollableSecond {
+  min-height: min-content;
+  max-height: 50vh;
+  overflow-y: scroll;
+}
+
+.scrollableThird {
+  min-height: min-content;
+  max-height: 20vh;
+  overflow-y: scroll;
+}
+
+.profilePictureContainer{
+  border-radius: 50%;
+  .profilePicture {
+    height: 100px;
+    width: 100px;
+  }
+}
+
+.progressContainer {
+  width: 100%;
+  border-radius: $buttonBorderRadius;
+  background-color: #ddd;
+  height: 13px;
+  margin-bottom: 5px;
+}
+.progressBar {
+  width: 0;
+  border-radius: $buttonBorderRadius;
+  height: 13px;
+  background-color: #5eaf50;
+}
+.uploadIcon svg {
+  width: 70px;
+  height: 70px;
+}
+
+.uploadForm {
+   .modalInfoBlock{
+     padding: 50px;
+   }
+  .uploadBox {
+    .dropBox {
+      p {
+        font-size: $paragraphFontSizeMedium;
+      }
+    }
+    p {
+      margin: 10px 0;
+    }
+  }
+}
+
+.approve {
+  background-color: #4CAF50;
+}
+
+.reject {
+  background-color: #f44336;
+}
+
+.lightBlue {
+  background-color: #a8b1ff !important;
+}
+
+.red {
+  color: rgba(131, 0, 4, 0.71);
+}
+
+.hashCode {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  width:120px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 30px 0;
+  font-size: $paragraphFontSizeSmall;
+  background: #031221;
+  .copyRight{
+    margin: 10px 0;
+    font-weight: bold;
+    color:$colorSecondary;
+    a{
+      text-decoration: none;
+      color:$colorSecondary;
+    }
+  }
+}
+
+.iframeModal{
+  height: 700px;
+  overflow: auto;
+  padding: 50px;
+}
+
+.copyIcon{
+  cursor: pointer;
+}
+
+.tableName{
+  background:#d2edef;
+}
+
+.backButton{
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.cmuk-accordion li{
+  margin:0 5px 5px 0;
+  background: #F9F9F9;
+  flex-grow: 1;
+  padding: 0;
+  color: #Fff;
+  border-radius: 3px;
+  box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+
+.cmuk-accordion-buttons{
+  background: #fff;
+  padding:10px;
+}
+
+.passphraseMessage{
+  color : red;
+}
+
+.dataContainer .cmuk-alert{
+  margin:0;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 37.76px;
+  height: 21.13px;
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.signUpErrorList{
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  li{
+    text-align: left;
+  }
+}
+
+.hiddenLabel label{
+  display: none;
+}
+
+.fileName{
+  font-size: $paragraphFontSizeSmall;
+  color: $colorPrimary;
+  margin-bottom: 5px;
+}
+
+.checkboxSection {
+  position: relative;
+  .warningIcon {
+    position: absolute;
+    top: 10px;
+    left: 255px;
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+.mobileNumberUpdate {
+  .countryCode {
+    margin-top: 46px;
+    width: 80px;
+    margin-right: 10px;
+  }
+  .mobileNumber{
+    width:100%;
+  }
+  .mobileNumber label{
+    margin-left: -77px;
+  }
+}
+
+.connectionError{
+  height: 140px;
+  position: relative;
+  top:25%;
+  margin: auto;
+  padding: 40px;
+  border-radius: $buttonBorderRadius;
+  font-size: $paragraphFontSizeSmall;
+  background: #e6e6e6;
+  width: 220px;
+  color: red;
+}
+
+.commonCheckBox{
+  dt{
+    width:200px;
+    word-break: break-word;
+  }
+}
+
+.unRead{
+  color: #1e87f0;
+  background: lightblue;
+  text-align: center;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+.graphCard{
+  margin-bottom: 20px;
+}
+
+.textLineOverflow{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.forgotPasswordNote{
+  font-size: $headingFontSizeSmall;
+}
+
+.comdex {
+  .cmuk-overflow-auto{
+    @extend %scroller;
+  }
+  .cmuk-sticky-fixed{
+    width: 100% !important;
+  }
+  .buttonPrimary {
+    border-radius: 0.25rem;
+    background:$colorPrimary;
+    color: #FFFFFF;
+    font-size: $paragraphFontSizeSmall;
+    font-weight: bold;
+  }
+  .buttonPrimary:active, .buttonPrimary.cmuk-active{
+    background-color: $colorSecondary;
+  }
+  .cmuk-input {
+    background: #FFFFFF;
+    cursor: auto;
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1px solid rgba(5, 60, 117, 0.22);
+    font-size: $paragraphFontSizeMedium;
+    &::placeholder {
+      font-style: normal;
+      font-weight: 300;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+    }
+    &:focus {
+      color: #272829;
+      border: 1px solid  $colorPrimary;
+    }
+  }
+  input[type=date] {
+    padding: 12px 15px;
+  }
+  .cmuk-input, .cmuk-select:not([multiple]):not([size]){
+    height: 50px;
+  }
+  .cmuk-input, .cmuk-select, .cmuk-textarea{
+    padding:0 15px
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+  }
+  .error {
+    font-size: $paragraphFontSizeSmall;
+    color: #f0506e;
+  }
+  .cmuk-badge.verified{
+    @extend  %verifiedLabel;
+    background-color: #49A948;
+  }
+  .cmuk-badge.rejected{
+    @extend  %verifiedLabel;
+    background-color: #FE4350;
+  }
+  .cmuk-badge.pending{
+    @extend %verifiedLabel;
+    background-color: #faa05a;
+  }
+  .cmuk-button-primary{
+    border: none;
+  }
+  .primaryFont{
+    font-family:$fontFamilyPrimary;
+  }
+  .secondaryFont{
+    font-family:$fontFamilySecondary;
+  }
+  .cmuk-alert-warning p{
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .cmuk-alert{
+    .failureIcon,
+    .warningIcon,
+    .successIcon,
+    .infoIcon{
+      width: 20px;
+      height: 20px;
+      .icon{
+        width:20px;
+        height: 20px;
+        margin-bottom: 5px;
+      }
+    }
+    p{
+      font-size: $paragraphFontSizeSmall;
+    }
+    .alertName{
+      font-weight: bold;
+      font-size: $paragraphFontSizeSmall;
+    }
+  }
+  .cmuk-alert-success{
+    background-color: #32d296;
+    color: #FFFFFF;
+    .successIcon .icon{
+      fill: #FFFFFF;
+    }
+  }
+  .cmuk-card-header{
+    color:#061728;
+    padding: 15px 20px;
+    .cmuk-button{
+      @extend %buttonSmall;
+      margin-left: 15px;
+      position: absolute;
+      right: 20px;
+
+    }
+  }
+  .cmuk-button {
+    overflow: hidden;
+    position: relative;
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+  .cmuk-button-link{
+    color: $colorPrimary;
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+  }
+  .cmuk-button-primary{
+    background-color: $colorPrimary;
+  }
+  .cmuk-legend{
+    font-weight: bold;
+    text-align: center;
+    padding: 20px 25px;
+    color: #061728;
+    font-size: $paragraphFontSizeLarge;
+  }
+  .cmuk-spinner>*>*{
+    stroke-width:2 !important;
+    stroke:$colorPrimary !important;
+  }
+  .cmuk-accordion-title::before{
+    background-image:url('../../images/chevron-up.svg');
+  }
+  .cmuk-open>.cmuk-accordion-title::before{
+    background-image:url("../../images/chevron-down.svg");
+  }
+  .cmuk-table th, .cmuk-button{
+    text-transform: capitalize;
+  }
+  .modalBody{
+    .cmuk-button{
+      margin-bottom: 5px;
+    }
+    .infoRowValue{
+      text-align: left;
+      margin-left: 30px;
+    }
+  }
+  .cmuk-accordion>:nth-child(n+2){
+    margin-top:0;
+  }
+  .cmuk-accordion-title{
+    padding: 15px;
+    color:#373E46;
+  }
+  .cmuk-accordion-content{
+    margin-top: 0;
+    background: #fff;
+    color: #272829;
+    padding: 8px;
+  }
+  .cmuk-accordion-title:focus,
+  .cmuk-accordion-title:hover{
+    color:#373E46;
+  }
+  .errorInput{
+    border: 1px solid red;
+  }
+  .cmuk-panel-scrollable{
+    resize: none;
+    max-height:100px;
+    padding: 0;
+  }
+  .panelHeader{
+    font-size: $paragraphFontSizeLarge;
+    font-weight: normal;
+    color: #272829;
+    line-height: 2;
+  }
+  .check svg{
+    border-radius: 50%;
+    background: #49A948;
+    padding: 2px;
+  }
+  .close svg{
+    border-radius: 50%;
+    padding: 2px;
+    background: #FE4350;
+  }
+  .close svg >*{
+    stroke-width:2 !important;
+    stroke:#ffffff !important;
+  }
+  .check>*>*{
+    stroke-width:2 !important;
+    stroke:#ffffff !important;
+  }
+  [class*=cmuk-modal-close-]{
+    top:20px;
+    right: 20px;
+  }
+  .updateDocumentField{
+    position: relative;
+    button{
+      position: absolute;
+      top: 13px;
+      left: 160px;
+      font-weight: bold;
+    }
+  }
+}
+
+.formNote{
+  font-size: 1.15rem;
+}
+.infoText {
+  position: relative;
+
+  .infoIcon.organizationInfoIcon {
+    left:360px;
+    top: 0;
+  }
+}
+  .infoIcon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 195px;
+    top: 116px;
+
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+}
+.header{
+  background: $colorSecondary;
+  .cmuk-navbar-container:not(.cmuk-navbar-transparent){
+    background: $colorSecondary;
+    padding: 0 0 0 35px;
+  }
+  .navItemRippleEffect {
+    position: relative;
+    overflow: hidden;
+  }
+  .cmuk-navbar-item,
+  .cmuk-navbar-nav>li>a,
+  .cmuk-navbar-toggle{
+    min-height:60px;
+    text-transform: none;
+  }
+  .cmuk-logo{
+    padding: 0 40px 0 0;
+    border-right: 1px solid #1C5998;
+    img{
+      width: 120px;
+    }
+  }
+  .cmuk-navbar-right{
+    .cmuk-navbar-nav>li>a{
+      padding:0 25px;
+      border-left: 1px solid #1C5998;
+    }
+    .cmuk-navbar-nav {
+      .buttonRegister{
+        background-color: #FE4350;
+        font-size: $paragraphFontSizeSmall;
+        font-family: $fontFamilyPrimary;
+        color: #FFFFFF;
+        line-height: inherit;
+        padding: 5px 30px;
+        border-radius: $buttonBorderRadius;
+      }
+      .login-nav-item a{
+        padding: 3px 40px 0 40px;
+      }
+      li .loginLink{
+        padding: 0 45px 0 45px;
+      }
+    }
+    .loginIcon{
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      margin: 0 10px 0;
+      padding: 3px;
+      border: 2px solid #1e60a5;
+    }
+  }
+  .cmuk-navbar-nav>li>a{
+    padding:0 25px;
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size:$paragraphFontSizeSmall;
+    letter-spacing: 0.4px;
+  }
+  .dashboardIcon .icon{
+    width: 20px;
+    height: 16px;
+    margin-bottom: 3px;
+  }
+  .dashboardIcon, .traderIcon, .accountIcon, .transactionIcon{
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+  }
+  .icon {
+    width: 20px;
+    height: 20px;
+    fill:#FFFFFF;
+  }
+  .cmuk-navbar-nav>li:hover>a, .cmuk-navbar-nav>li>a.cmuk-open, .cmuk-navbar-nav>li>a:focus{
+    color: #FFFFFF;
+  }
+  .cmuk-navbar-nav>li>a.active{
+    color: #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    padding-top: 3px;
+    .icon {
+      fill: #FE4350;
+    }
+  }
+  .logoutIcon{
+    .icon{
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.modal .modalContent.fadeInEffect{
+  transform: translateY(0);
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1010;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 30px 30px;
+  text-align: center;
+  .modalContent {
+    transform: translateY(-100px);
+    transition: .3s linear;
+    transition-property: opacity,transform;
+    -webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -ms-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    -o-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    word-break: break-all;
+    top: 15%;
+    border-radius:$buttonBorderRadius;
+    margin: auto;
+    background-color: #FAFAFA;
+    box-sizing: border-box;
+    position: relative;
+    max-width: 100%;
+    width: auto;
+    max-height:750px;
+    display: inline-block;
+    .modalBody {
+      text-align:center;
+      .infoRowLabel{
+        text-align: left;
+        font-weight: bold;
+      }
+      .infoRowValue{
+        text-align: right;
+      }
+      .title{
+        margin: 10px 0;
+      }
+      hr{
+        margin:0;
+      }
+      form{
+        .cmuk-card-default{
+          background: none;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+        }
+        .formBody{
+          max-height:600px;
+          overflow: auto;
+          @extend %scroller;
+          .inputField{
+            margin-top: 10px;
+          }
+          .modalInfoBlock{
+            padding: 0;
+          }
+          .cmuk-card .cmuk-card-body{
+            padding: 0;
+          }
+        }
+      }
+      .documentItem{
+        form{
+          width: auto;
+        }
+        .infoRowLabel{
+          width: auto;
+        }
+      }
+    }
+  }
+}
+
+form{
+  .formBody{
+    padding: 20px 60px 60px 60px;
+  }
+}
+
+.termAccept{
+  margin: 0px 0px 30px 30px;
+}
+.modalInfoBlock{
+  width: 620px;
+  max-height: 600px;
+  overflow: auto;
+  padding: 20px 60px 60px 60px;
+  @extend %scroller;
+  .traderCommodity{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+  }
+}
+
+.loginForm {
+  .formBody {
+    .inputField {
+      position: relative;
+      display: flex;
+      margin-top: 10px;
+
+      .inputFieldIcon {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        background: #ebebeb;
+        margin-top: 19px;
+        padding: 0 10px;
+      }
+      .inputFieldBody {
+        width: 100%;
+      }
+    }
+    .cmuk-button-link {
+      font-size: $paragraphFontSizeMedium;
+      font-weight: normal;
+      margin: 5px;
+      text-decoration: none;
+    }
+
+    .forgotPassword {
+      position: absolute;
+      right: 0;
+      top: 12px;
+    }
+
+    .buttonPrimary {
+      width: 100%;
+      margin-top: 20px;
+      padding: 5px 0;
+    }
+  }
+}
+
+.signUpForm{
+  form .formBody {
+    .buttonPrimary {
+      width: 100%;
+      margin-top: 20px;
+      padding: 5px 0;
+    }
+  }
+  .usernameAvailability {
+    position: relative;
+    .result {
+      position: absolute;
+      top: 100px;
+      right: 0;
+    }
+    .failureIcon, .checkIcon{
+      display: none;
+      position: absolute;
+      right: 15px;
+      top: 58px;
+      width: 20px;
+      height: 20px;
+      .icon{
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .failureIcon{
+      .icon{
+        fill:#f0506e;
+      }
+    }
+    .checkIcon{
+      .icon{
+        fill:#32d296;
+      }
+    }
+    .userNameNotAvailable,
+    .passwordNotMatched{
+      display: none;
+    }
+  }
+  .showPassword{
+    position: absolute;
+    right: 15px;
+    top: 57px;
+    .eyeIcon{
+      cursor: pointer;
+      width: 25px;
+      height: 25px;
+      .icon{
+        fill:#ccc;
+        width:25px;
+        height: 25px;
+      }
+    }
+    .eyeIcon.active .icon{
+      fill: #FE4350;
+    }
+  }
+}
+
+.logoutContainer {
+  form {
+    .formBody {
+      padding: 25px 60px 60px 60px;
+      p{
+        margin-bottom: 30px;
+        font-size: $headingFontSizeSmall;
+      }
+      .commonCheckBox {
+        justify-content: center;
+        dl {
+          flex-direction: row-reverse;
+          border: 1px solid #e7eaf3;
+          padding: 5px 15px;
+          dt{
+            width: auto;
+          }
+          label{
+            font-size: $paragraphFontSizeMedium;
+          }
+          dd {
+            margin-top: 10px;
+            margin-right: 15px;
+          }
+        }
+      }
+      .buttonPrimary{
+        width: 250px;
+        margin-top: 20px;
+        padding: 5px 0;
+      }
+    }
+  }
+}
+
+.MnemonicQuiz {
+  form{
+    .formBody{
+      .commonInputPassword{
+        @extend  %justifyAlignCenter;
+        dd input{
+          width: 450px;
+        }
+      }
+      .buttonPrimary{
+        width: 450px;
+        margin-top: 20px;
+        padding: 5px 0;
+      }
+    }
+  }
+  .titleMnemonic {
+    font-weight: bold;
+  }
+  .errorMnemonicInput {
+    display: none;
+    color: red;
+    padding: 10px;
+    font-size: $paragraphFontSizeSmall;
+  }
+  .verifyMnemonic {
+    flex-wrap: wrap;
+    justify-content: center;
+    .verifyMnemonicButton {
+      width: 114px;
+      height: 38px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      border-radius: $buttonBorderRadius;
+      input{
+        color:#061728;
+        text-align: center;
+      }
+      .mnemonicField{
+        background-color: #FFffff;
+      }
+    }
+  }
+  .buttonPrimary{
+    font-size: $paragraphFontSizeSmall;
+  }
+  .mnemonicNote{
+    font-size: $paragraphFontSizeSmall;
+    text-align: justify;
+    word-break: break-word;
+    letter-spacing: 0.01em;
+    color: #FFFFFF;
+    font-weight: bold;
+    padding: 15px;
+    margin: 20px 0;
+    background: url("../../images/note.svg") 112%/125px no-repeat #FF2938;
+    display: flex;
+    align-items: center;
+    .mnemonicNoteText{
+      width: 73%;
+    }
+    .mnemonicInfoIcon{
+      padding:10px 20px 10px 10px;
+      width: 20px;
+      height: 20px;
+      .icon{
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  .infoSuccess{
+    padding: 10px 0;
+    .icon-success{
+      .icon{
+        width: 25px;
+        height: 25px;
+        fill: #0F9C0C;
+        margin-bottom: 5px;
+      }
+    }
+    p{
+      margin: 0;
+      font-size:$headingFontSizeSmall;
+      color: #0F9C0C;
+    }
+  }
+}
+
+.banner {
+  @extend %justifyAlignCenter;
+  background: #031221 url("../../images/bannerImage.svg") no-repeat 80% 8%;
+  height: 363px;
+  position: relative;
+  flex-direction: column;
+  text-align: center;
+  .bannerText {
+    max-width: 600px;
+    padding: 50px 0;
+    h3 {
+      margin: 0;
+      font-size: 45px;
+      font-weight: normal;
+      color: #FFFFFF;
+    }
+    p {
+      font-size: $headingFontSizeSmall;
+      line-height: 172%;
+      letter-spacing: 0.01em;
+      color: #627F9F;
+    }
+  }
+  .cmuk-slider {
+    position: absolute;
+    bottom: 0;
+    .cmuk-slider-items {
+      height: 37.63px;
+      align-items: center;
+      li{
+        &:before{
+          content: ' ';
+          position: absolute;
+          width:0;
+          height: 0;
+          left:  -20px;
+          top: 7px;
+          border: 3px solid red;
+          transform: rotate(-45deg);
+        }
+      }
+      li span {
+        font-size: $paragraphFontSizeSmall;
+        line-height: 172%;
+        letter-spacing: 0.01em;
+      }
+      li .sliderItemName {
+        font-weight: bold;
+        color: #6C7883;
+      }
+      li .sliderItemValue {
+        font-weight: bold;
+        color: #FFFFFF;
+        font-family: $fontFamilyPrimary;
+      }
+      li .sliderItemPercentage {
+        color: #5EB55C;
+      }
+    }
+  }
+}
+
+
+.tabSection {
+  p {
+    font-size:$headingFontSizeLarge;
+    letter-spacing: 0.01em;
+    color: #000000;
+    margin-bottom: 40px;
+  }
+  .cmuk-subnav-pill{
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    li {
+      &:first-child a{
+        border-radius: 5px 5px 0 0;
+      }
+      &:nth-child(2){
+        border-top: 1px solid #e7eaf3;
+        border-bottom: 1px solid #e7eaf3;
+      }
+      &:last-child a{
+        border-radius: 0 0 5px 5px;
+      }
+      a{
+        background-color: #FAFBFD;
+        padding: 15px 20px;
+        font-size:  $paragraphFontSizeLarge;
+        text-transform: capitalize;
+        color:$colorPrimary;
+        font-weight: bold;
+        &:before{
+          content: "";
+          width: 1.4em;
+          height: 1.4em;
+          padding-right: 0;
+          margin-left: 25px;
+          float: right;
+          background:url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
+          padding-left: 25px;
+        }
+      }
+    }
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    background: $colorSecondary;
+    color:#FFFFFF;
+    &:before{
+      background-image: url(../../images/chevron-right.svg);
+    }
+  }
+  .cmuk-switcher{
+    li{
+      font-size: $paragraphFontSizeLarge;
+      color: #365575;
+      letter-spacing: 0.01em;
+      line-height: 1.8;
+      div >div{
+        text-align: justify;
+      }
+    }
+  }
+}
+
+.left{
+  height: 30px;
+  align-items: center;
+  padding:0 0 15px 0;
+  word-break: break-all;
+  justify-content: space-between;
+  .backIcon{
+    width: 31px;
+    height: 31px;
+    background: #E4E4E4;
+    display:flex;
+    justify-content: center;
+    border-radius: 50%;
+    color: $colorSecondary;
+    font-weight: bold;
+  }
+  .quoteIdTitle{
+    color: #6C7883;
+    font-weight: bold;
+    font-size: $paragraphFontSizeSmall;
+  }
+  .quoteId{
+    font-size: $paragraphFontSizeSmall ;
+  }
+}
+
+.userIcons  {
+  .userIcon {
+    margin-right: -5px;
+  }
+  .buyerIcon {
+    background: #FFD5D7;
+    color: #061728;
+    @extend %iconLetter;
+  }
+  .sellerIcon {
+    background: #9ECCFB;
+    @extend %iconLetter;
+  }
+  .financierIcon {
+    background: #A7FFC0;
+    @extend %iconLetter;
+  }
+}
+
+.notifications{
+  width: 600px;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  .cmuk-alert{
+    width: 250px;
+    padding: 10px 25px 10px 10px;
+    margin: 0;
+    font-size: $paragraphFontSizeMedium;
+  }
+  .cmuk-alert-close{
+    top: 15px;
+  }
+}
+
+.right{
+  padding:0 0  15px 0;
+  justify-content: flex-end;
+  .refresh {
+    padding: 5px 10px;
+    font-size: 10px;
+    background: #FFFFFF;
+    border: 0.908233px solid #EDEDED;
+    box-sizing: border-box;
+    border-radius: 37.2375px;
+    margin-right: 10px;
+    color: #061728;
+    cursor: pointer;
+    transition: .1s ease-in-out;
+    transition-property: color,background-color,border-color;
+    outline: none;
+    span{
+      padding:0 5px;
+    }
+    .icon {
+      width: 13px;
+      height: 13px;
+    }
+  }
+  .live {
+    align-items: center;
+  }
+  .liveText {
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: $paragraphFontSizeSmall;
+    color: #272829;
+  }
+  .liveIcon {
+    width: 6px;
+    height: 6px;
+    background-color: #5EB55C;
+    border-radius: 50%;
+    box-shadow: 0 0 0 5px #A1ED9F;
+  }
+}
+
+.commodityImage{
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  background: #F2F2F2;
+  border: 1.51312px solid #E3E3E3;
+  position: relative;
+  text-align: center;
+  border-radius: 50%;
+  align-items: center;
+  margin-right: 15px;
+  justify-content: center;
+  img{
+  @extend %positionCenter;
+  }
+}
+
+.pageContainer{
+  .pageContent{
+    padding-top: 10px;
+  }
+  .middle{
+    margin-bottom: 10px;
+    .cmuk-card-default{
+      @extend %cmuk-card-default
+    }
+    .mainTabs{
+      .cmuk-card-body{
+        min-height: 820px;
+        padding: 0;
+        .cmuk-switcher{
+          padding: 15px 30px;
+        }
+      }
+      .tradeTerms{
+        .traderCommodity{
+          display: flex;
+          align-items: center;
+          margin: 15px 0;
+          .tradeName{
+            color: #4B4B4B;
+            font-weight: bold;
+            font-size: $paragraphFontSizeMedium;
+          }
+        }
+        .sellerTerm.documentTerms{
+          .termIcon{
+            margin-bottom: 5px;
+          }
+          .documentTermName{
+            margin: auto;
+          }
+        }
+        .tradeTermsData{
+          justify-content: space-between;
+          border-bottom: 1px solid #E8E8E8;
+          padding: 25px 0 15px 0;
+          margin-bottom: 25px;
+          color: #848A91;
+          font-size: $paragraphFontSizeSmall;
+          font-weight: bold;
+
+        }
+        .terms{
+          .term{
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #F8F9FC;
+            border: 1px solid #E2E4E6;
+            box-sizing: border-box;
+            border-radius: 3px;
+            margin: 10px 0;
+            align-items: center;
+            .serialNumber{
+              color: #859EB9;
+              font-family: "Oxygen", sans-serif;
+              font-size: $paragraphFontSizeMedium;
+              margin-right: 10px;
+            }
+            .termIcon{
+              margin-right: 10px;
+              .icon{
+                width: 16px;
+                height: 16px;
+                margin-bottom: 3px;
+              }
+            }
+            .termName{
+              color: $colorPrimary;
+              font-size: $paragraphFontSizeSmall;
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 0.01em;
+              font-style: normal;
+            }
+            .termValue{
+              color: #061728;
+              font-size: $paragraphFontSizeMedium;
+              margin-right: 10px;
+            }
+            .creditTerms{
+              text-indent: 30px;
+              margin-top: 5px;
+              p{
+                font-size: $paragraphFontSizeSmall;
+                color: #061728;
+                font-weight: normal;
+                margin:0 0 5px 0;
+              }
+              .infoRowLabel{
+                width: 250px;
+                color: #061728;
+                font-size: $paragraphFontSizeSmall;
+                font-weight: normal;
+                text-transform: uppercase;
+                margin:2px 0 3px 0;
+              }
+              .infoRowValue{
+                color: #061728;
+                font-weight: bold;
+                font-size: $paragraphFontSizeSmall;
+                margin-left: 20px;
+              }
+            }
+            .termStatus{
+              display: flex;
+              align-items: center;
+              font-family: $fontFamilyPrimary;
+              color:#061728;
+              .commonCheckBox dt{
+                width: auto;
+                display: none;
+              }
+              .commonCheckBox dl{
+                margin-bottom: 0;
+                dd{
+                  margin: 0;
+                }
+              }
+              .cmuk-checkbox{
+                height: 22px;
+                width: 22px;
+                border:1px solid #5EB55C;
+                margin-top: 0;
+              }
+              .cmuk-checkbox:focus, .cmuk-radio:focus{
+                border-color: #5EB55C;
+              }
+              .cmuk-checkbox:checked, .cmuk-checkbox:indeterminate, .cmuk-radio:checked{
+                background-color: #5EB55C;
+              }
+            }
+            .subTerms{
+              text-indent:30px;
+              margin-top: 10px;
+              .infoRowLabel{
+                color: #061728;
+                font-weight: normal;
+                width: auto;
+                margin:2px 0 3px 0;
+              }
+              .infoRowValue{
+                color: #061728;
+                font-weight: bold;
+              }
+            }
+            .modalInfoBlock{
+              min-width: auto;
+              padding: 0;
+              .commonCheckBox dl dd{
+                margin: 0;
+              }
+            }
+          }
+          hr{
+            margin: 15px 0;
+          }
+          .termIdent{
+            margin-left: 25px;
+          }
+        }
+        .sellerTerm{
+          display: flex;
+          justify-content: space-between;
+          padding: 15px 20px;
+          background: #F8F9FC;
+          border: 1px solid #E2E4E6;
+          border-radius:$buttonBorderRadius;
+          text-transform: uppercase;
+          margin: 10px 0;
+          align-items: center;
+          .infoRowLabel{
+            width: 250px;;
+            color: $colorPrimary;
+            font-size: $paragraphFontSizeSmall;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin:2px 0 3px 0;
+            .creditTerms .infoRowValue{
+              position: absolute;
+              left: 328px;
+            }
+          }
+          .infoRowValue{
+            color: #061728;
+            font-size: $paragraphFontSizeSmall;
+            margin-left: 20px;
+          }
+          .sellerTermStatus{
+            font-family: $fontFamilyPrimary;
+            color:#061728;
+          }
+          .documentTitle{
+            color: #061728;
+            font-size: $paragraphFontSizeSmall;
+            margin:0 0 5px 0;
+          }
+          .termIcon {
+            margin-right: 10px;
+            .icon {
+              width: 16px;
+              height: 16px;
+            }
+          }
+          .subTerms{
+            text-indent:20px;
+            margin-top: 10px;
+            p{
+              margin: 0;
+              color: #061728;
+              font-size: $paragraphFontSizeSmall;
+            }
+            .infoRowLabel{
+              color: #061728;
+              font-weight: normal;
+              width: 250px;
+              margin:2px 0 3px 0;
+            }
+            .infoRowValue{
+              color: #061728;
+              font-weight: bold;
+            }
+          }
+          p{
+            font-size: 0.875rem;
+            color: #061728;
+            font-weight: normal;
+            margin: 0 0 5px 0;
+          }
+          .termStatus{
+            display: flex;
+            align-items: center;
+            font-family: $fontFamilyPrimary;
+            color:#061728;
+            .commonCheckBox dt{
+              width: auto;
+              display: none;
+            }
+            .commonCheckBox dl{
+              margin-bottom: 0;
+              dd{
+                margin: 0;
+              }
+            }
+            .cmuk-checkbox{
+              height: 22px;
+              width: 22px;
+              border:1px solid #5EB55C;
+              margin-top: 0;
+            }
+            .cmuk-checkbox:focus, .cmuk-radio:focus{
+              border-color: #5EB55C;
+            }
+            .cmuk-checkbox:checked, .cmuk-checkbox:indeterminate, .cmuk-radio:checked{
+              background-color: #5EB55C;
+            }
+          }
+        }
+        button{
+         @extend %buttonSmall;
+          font-size: $paragraphFontSizeSmall;
+        }
+      }
+    }
+  }
+}
+
+.leftContainer{
+  .financial{
+    margin-bottom: 20px;
+  }
+  .cmuk-card-default{
+    @extend %cmuk-card-default;
+  }
+  .cmuk-card-header{
+    color: #061728;
+    font-size: $paragraphFontSizeMedium;
+    .icon{
+      margin-bottom: 2px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+  .cmuk-card-body{
+    padding:0;
+    overflow-y: auto;
+    @extend %scroller;
+    ul{
+      padding: 0;
+      margin: 0;
+    }
+    .refresh{
+      padding: 10px 0 10px 0;
+      margin: 0 20px;
+      font-size: $paragraphFontSizeSmall;
+      button{
+        text-decoration: none;
+        color: #848A91;
+        font-weight: bold;
+      }
+      .refreshIcon{
+        .icon{
+          width: 14px;
+          height: 14px;
+          margin-right: 3px;
+        }
+      }
+    }
+  }
+  .financial {
+    .cmuk-card{
+      height: 357px;
+      .cmuk-switcher{
+        height: 300px;
+        overflow: auto;
+      }
+    }
+    .financialCard.cardPaddingRemove {
+      ul li {
+        padding: 20px 0;
+        margin: 0 20px;
+
+        &:first-child {
+          padding-top: 25px;
+        }
+      }
+    }
+    .cmuk-switcher, .financialCard{
+      ul li {
+        justify-content: space-between;
+        padding: 20px 0;
+        margin: 0 20px;
+        &:first-child {
+          padding-top: 25px;
+        }
+        &:last-child {
+          border: 0;
+        }
+        .wallet {
+          align-items: center;
+          .walletIcon {
+            @extend %iconBackground;
+            background: #053C75;
+            box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
+          }
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
+        }
+
+        .ctitle {
+          color: #5C6166;
+          line-height: 2;
+          font-size: $paragraphFontSizeSmall;
+        }
+
+        .payable {
+          align-items: center;
+
+          .payableIcon {
+            @extend %iconBackground;
+            background: #A23BBB;
+            box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
+            .icon{
+              left:3px;
+            }
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
+        }
+
+        .receivable {
+          align-items: center;
+
+          .receivableIcon {
+            @extend %iconBackground;
+            background: #49A948;
+            box-shadow: 0 0 0 3px rgba(83, 217, 81, 0.25);
+            .icon{
+              left:3px;
+            }
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
+        }
+
+        .leftDays {
+          align-items: center;
+
+          .leftDaysIcon {
+            @extend %iconBackground;
+            background: rgba(94, 181, 92, 0.27);
+          }
+
+          .cmuk-comment-meta {
+            @extend %cmuk-comment-meta;
+          }
+        }
+      }
+    }
+  }
+  .addBalanceButton{
+    text-transform: capitalize;
+    font-family: $fontFamilyPrimary;
+    padding: 8px 8px;
+    font-size: $paragraphFontSizeSmall;
+    line-height:normal;
+    background: rgba(8, 98, 190, 0.1);
+    border-radius: 103px;
+    color: $colorPrimary;
+    margin:5px;
+    border: 0;
+    .plusIcon .icon{
+      width: 10px;
+      height: 10px;
+      fill:$colorPrimary;
+    }
+  }
+  .walletIcon .icon, .receivableIcon .icon, .payableIcon .icon{
+    @extend %positionCenter;
+    bottom: 2px;
+  }
+  .icon{
+    width: 20px;
+    height: 20px;
+  }
+  .zoneTradeFinancial{
+    .cmuk-card-body {
+      padding: 0;
+      .cmuk-subnav {
+        border-bottom: 1px solid #e5e5e5;
+        li{
+        &:first-child {
+          border-right: 1px solid #cccccc;
+        }
+        padding: 0;
+        flex: 1;
+        text-align: center;
+        margin: 0;
+        a {
+          padding: 15px 0;
+          text-transform: capitalize;
+          font-size: $paragraphFontSizeMedium;
+        }
+      }
+      }
+      .cmuk-subnav>.cmuk-active>a{
+        color: #061728;
+        background: none;
+        font-weight: bold;
+        border-bottom: 2px solid $colorPrimary;
+      }
+      .cmuk-switcher{
+        height: 300px;
+        overflow: auto;
+        .cmuk-comment-meta{
+          color: #061728;
+          font-size:$paragraphFontSizeMedium;
+        }
+      }
+      .cmuk-switcher>li{
+        padding: 0;
+        margin: 0;
+        li {
+          margin:0 30px;
+        }
+      }
+    }
+  }
+}
+
+.rightContainer{
+  .recentActivityContainer{
+    margin-bottom: 20px;
+    .cmuk-card-header{
+      padding:15px 20px;
+      .icon{
+        width: 18px;
+        height: 18px;
+        margin-bottom: 2px;
+      }
+    }
+    .cmuk-card-body{
+      overflow-y: auto;
+      padding: 0;
+      .recentActivityMessages{
+        height: 300px;
+        padding: 0 15px;
+        overflow:auto;
+        @extend %scroller;
+      }
+    }
+  }
+  .cmuk-card-default{
+    background: #FAFAFA;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+  .cmuk-card-header{
+    font-size: $paragraphFontSizeMedium;
+  }
+  .cmuk-card-body{
+    padding: 0 13px;
+  }
+  .chatRoom {
+    .cmuk-card-header{
+      .icon{
+        width: 18px;
+        height: 18px;
+      }
+    }
+    .cmuk-card-body {
+      height: 305px;
+
+      .chatList {
+        padding: 5px 0;
+
+        button {
+          padding: 5px 10px;
+          margin: 0 5px;
+          line-height: 10px;
+        }
+      }
+
+      .chatMessagesContainer {
+        height: 225px;
+        overflow: auto;
+        @extend %scroller;
+      }
+
+      .chatForm {
+        .sendFormField {
+          position: relative;
+          dl{
+            margin: 0;
+          }
+          input {
+          outline: none;
+          border-color: #e5e5e5;
+          height: 40px;
+          padding-right: 30px;
+
+          &::placeholder {
+            font-size: $paragraphFontSizeSmall;
+          }
+        }
+      }
+
+        .sendIconButton {
+          background: none;
+          padding: 0 10px;
+          margin: 0;
+          position: absolute;
+          top: 0;
+          right: 0;
+
+          .icon {
+            width: 17px;
+            height: 17px;
+          }
+        }
+
+        .replyBox {
+          background-color: #FFffff;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: -65px;
+          padding: 10px 10px;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .replyAccount {
+          font-size: 12px;
+          font-weight: bold;
+          color: #3f7fc9;
+        }
+
+        .replyMessage {
+          width: 100px;
+          overflow: hidden;
+          display: inline-block;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 14px;
+        }
+      }
+
+      .chatMoveTop {
+        position: relative;
+        bottom: 50px;
+      }
+    }
+  }
+  .orderInfoCard{
+    button{
+      margin: 5px;
+    }
+  }
+}
+
+.documentItem{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  flex-wrap: wrap;
+  border: 1px solid #EDEDED;
+  border-radius: 5px;
+  padding: 0 15px;
+  background: #ffffff;
+  .documentContentTop{
+    font-size: $paragraphFontSizeMedium;
+    margin: 10px;
+    a{
+      color:$colorSecondary;
+      text-decoration: none;
+    }
+  }
+  .documentThumbnail {
+    margin: 10px;
+    img{
+      width: 20px;
+      height: 20px;
+    }
+    .documentIcon {
+      width: 20px;
+      height: 20px;
+      .icon {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+  .documentContentBottom{
+    margin: 10px;
+    font-size: $paragraphFontSizeSmall;
+    text-align: left;
+  }
+}
+.identificationDetails{
+  .documentContentBottom{
+    .infoRowLabel{
+      display: none;
+    }
+  }
+}
+.timeline .timeline-item:after,
+header:before,
+.timeline .timeline-item:before {
+  content: '';
+  display: block;
+  width: 100%;
+  clear: both;
+}
+
+.timeline {
+  line-height: 1.5em;
+  position: relative;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  margin: 10px 0;
+  transition: all 0.4s ease;
+  &:before {
+    content: "";
+    width: 0;
+    height: 100%;
+    border-right:2px dashed #CECECE;
+    left: 29px;
+    top: 0;
+    position: absolute; }
+  .timeline-item {
+    margin-bottom: 20px;
+    height: 55px;
+    position: relative;
+    .timeline-icon {
+      background: #E4EBF2;
+      width: 40px;
+      height: 40px;
+      position: relative;
+      top: 0;
+      display: inline-block;
+      left: 10px;
+      overflow: hidden;
+      border-radius: 50%; }
+    .timeline-icon .icon {
+      fill:$colorPrimary;
+      @extend %positionCenter;
+      width: 15px;
+      height: 15px;}
+    .timeline-content {
+      width: 80%;
+      padding: 0;
+      position: relative;
+      -webkit-transition: all 0.3s ease;
+      -moz-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+      .activityContent{
+        color: #000000;
+        font-size: $paragraphFontSizeSmall;
+      }
+    }
+    .timeline-content.right {
+      float: right; }
+    .timeline-content.right:before {
+      left: -5px;
+      right: inherit;
+    }
+  }
+  .notification > div{
+    padding: 0;
+  }
+}
+
+.documentView.switcherCardSecond {
+  .cmuk-subnav-pill > .cmuk-active > a {
+    border-bottom: none;
+  }
+  .cmuk-subnav {
+    li {
+      &:first-child {
+        border: none;
+      }
+      a {
+        text-align: left;
+        padding: 15px 20px;
+      }
+      &:last-child {
+        display: none;
+      }
+    }
+  }
+}
+
+.documentView{
+  .cmuk-card-body, .documentList{
+    padding:0;
+  }
+  .documentList{
+    height: 250px;
+    overflow: auto;
+    @extend %scroller;
+  }
+
+  .documentList{
+    .cmuk-table td {
+      padding: 16px 5px;
+      vertical-align: top;
+      font-size: $paragraphFontSizeSmall;
+    }
+    .docIcon {
+      background: #FFFFFF;
+      border: 0.411524px solid #EAEAEA;
+      box-sizing: border-box;
+      padding: 5px;
+      border-radius: 1.6461px;
+      margin-right: 5px;
+      .icon{
+        width: 12px;
+        height: 15px;
+      }
+    }
+    .moreIcon span{
+      width: 15px;
+    }
+    .seenIcon{
+      padding: 5px;
+      background: #DDE8F3;
+      border-radius: 2px;
+      .icon{
+        width: 20px;
+        height: 16px;
+      }
+    }
+    .table-scroll tbody{
+      height: 200px;
+      tr{
+        padding: 6px 0;
+        border-bottom: 1px solid #E0E0E0;
+        td:first-child{
+          padding-left: 15px;
+          color: #262525;
+          font-size: $paragraphFontSizeSmall;
+        }
+        td:last-child{
+          padding-right: 10px;
+        }
+      }
+    }
+    .contractBox{
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .cmuk-button{
+      line-height: 28px;
+      padding: 0 12px;
+    }
+  }
+  .cmuk-card{
+    height: 360px;
+  }
+  .cmuk-card-body .cmuk-tab{
+    width: 100%;
+    margin: 0;
+    border-bottom: 1px solid #e5e5e5;
+    &::before{
+      border: none;
+    }
+    .first{
+      border-right: 1px solid #cccccc;
+    }
+    li{
+      width: 49%;
+      padding:0;
+      margin: 0;
+      a{
+        padding:15px 0;
+        font-size: $paragraphFontSizeSmall;
+        text-transform: capitalize;
+      }
+    }
+  }
+  .cmuk-card-body{
+    height: 360px;
+    overflow-y: auto;
+    .uploadDoc{
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      padding: 10px;
+      background: #fff;
+      width: 100%;
+      border-top: 1px solid #E0E0E0;
+      .cmuk-button{
+        background:#EDEDED;
+        color: #000000;
+        font-weight: normal;
+        border: 1px dashed #848A91;
+        border-radius: 10px;
+        width: 100%;
+        text-transform: capitalize;
+        font-size: $paragraphFontSizeSmall;
+        font-family: $fontFamilyPrimary;
+      }
+    }
+  }
+}
+
+.infoRow {
+  line-height: 1.8;
+  align-items: flex-start;
+  word-break: break-all;
+  font-size: $paragraphFontSizeMedium;
+  .infoRowLabel {
+    color: #4B4B4B;
+    width: 125px;
+    height: min-content;
+    word-break: break-word;
+  }
+  .infoRowValue {
+    flex: 1 1;
+    color: #767f8d;
+    font-weight: 400;
+    height: min-content;
+  }
+}
+
+.chat{
+  .chatMessage{
+    font-size:$paragraphFontSizeSmall;
+  }
+  .chatName{
+    color:#FFFFFF;
+    background: #193759;
+    display: inline-flex;
+    height: 26px;
+    width: 26px;
+    -moz-border-radius: 30px;
+    border-radius:50%;
+    text-align: center;
+    font-size: $paragraphFontSizeSmall;
+    align-items: center;
+    justify-content: center;
+  }
+  li{
+    list-style: none;
+  }
+  .sender{
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+  .receiver{
+    align-items: flex-end;
+  }
+  padding: 0 10px 0 0;
+  li{
+    display: flex;
+    list-style: none;
+  }
+  .partner{
+    word-break: break-all;
+    padding: 10px;
+    border-radius: 10px 10px 10px 0;
+    margin:10px;
+    background: #E8E8E8;
+    position: relative;
+    &::after {
+      position: absolute;
+      left: -8px;
+      bottom:  0;
+      content: "";
+      border-top: .5rem solid transparent;
+      border-bottom: .5rem solid #E8E8E8;
+      border-left: .5rem solid transparent;
+      border-right: .5rem solid #E8E8E8;
+    }
+    .messageInfo{
+      color: #848A91;
+      font-size: $paragraphFontSizeSmall;
+    }
+    .replytoMessage p{
+      border-left: 2px solid $colorPrimary;
+      padding: 0 10px;
+    }
+    .messageContent{
+      color: #061728;
+      font-size: $paragraphFontSizeSmall;
+      p{
+        margin:0;
+        color: $colorPrimary;
+        text-align: left;
+      }
+    }
+    p{
+      word-break: break-word;
+      margin: 0;
+    }
+  }
+  .you{
+    word-break: break-all;
+    padding: 10px;
+    border-radius: 10px 10px 0 10px;
+    margin:10px;
+    background: $colorPrimary;
+    color:#fff;
+    position: relative;
+    &::after {
+      position: absolute;
+      right: -8px;
+      bottom: 0;
+      content: "";
+      border-top: .5rem solid transparent;
+      border-bottom: .5rem solid $colorPrimary;
+      border-left: .5rem solid $colorPrimary;
+      border-right: .5rem solid transparent;
+    }
+    .messageInfo{
+      color: #6CA8E7;
+      font-size: $paragraphFontSizeSmall;
+    }
+    .replytoMessage p{
+      border-left: 2px solid #6CA8E7;
+      padding: 0 10px;
+    }
+    .messageContent{
+      color: #FFFFFF;
+      font-size: $paragraphFontSizeSmall;
+      p{
+        margin:0;
+        color: #6CA8E7;
+        text-align: left;
+      }
+    }
+    p{
+      word-break: break-word;
+      margin: 0;
+    }
+  }
+  .chatSubmit{
+    width: 92%;
+    margin: auto;
+    padding: 10px 0;
+    display: block;
+  }
+}
+
+.commonList{
+  padding: 0 20px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid rgba(5, 60, 117, 0.12);
+  border-radius: 2px;
+  margin-bottom: 5px;
+  overflow:auto;
+  flex-wrap: wrap;
+  .listItemChild{
+    margin: 0;
+    padding: 20px 0;
+    font-size: $paragraphFontSizeSmall;
+    font-weight: bold;
+    &:last-child .listItemChildValue{
+      max-width: 100%;
+    }
+    .listItemChildTitle
+    {
+      margin: 0;
+      color: #061728;
+    }
+    .listItemChildValue{
+      margin:20px 0 0 0;
+      color: #272829;
+      font-weight: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width:120px;
+    }
+    .listItemButton{
+      margin-bottom: 0;
+    }
+    button{
+      a, a:hover{
+        text-decoration: none;
+        color:#fff;
+      }
+    }
+    .cmuk-button{
+      line-height: 28px;
+      &:hover{
+        color: #FFFFFF;
+        background: $colorPrimary;
+      }
+    }
+  }
+}
+
+.accountName{
+  position:absolute;
+  top: 0;
+  left: 0;
+  color: #FFFFFF;
+  margin: 0;
+  width: 0;
+  height: 0;
+  border: 20px solid;
+  span {
+    position:absolute;
+    top: -18px;
+    left: -18px;
+    text-align: center;
+    font-size:$paragraphFontSizeSmall;
+    font-weight: bold;
+    transform: rotate(-45deg);
+    display:block;
+  }
+}
+.accountName.buy{
+  background: linear-gradient(180deg, $colorPrimary 0%, #05488C 100%);
+}
+.accountName.sell{
+  background: linear-gradient(180deg, $colorPrimary 0%, #520E63 100%);
+}
+
+.salesQuoteList{
+  .cmuk-card-header{
+    .cmuk-button{
+      @extend %buttonSmall;
+    }
+  }
+  .cmuk-card-body {
+    .commonList .cmuk-button {
+      @extend %buttonSmall;
+      margin-bottom: 5px;
+    }
+    .cmuk-card{
+      margin-bottom: 10px;
+    }
+    .cmuk-switcher li .title{
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.profileContainer{
+  .infoRow{
+    font-size: $paragraphFontSizeSmall;
+    line-height: 2.2;
+  }
+  .infoRowLabel{
+    color:#061728;
+  }
+  .infoRowValue{
+    text-align: right;
+  }
+  .cmuk-card-body {
+    .cmuk-card {
+      box-shadow: none;
+      background-color: #FFFFFF;
+      border: 1px solid rgba(5, 60, 117, 0.12);
+      margin-bottom: 5px
+    }
+  }
+  .icon{
+    width: 18px;
+    height: 20px;
+    margin-right: 5px;
+    margin-bottom: 3px;
+  }
+  .plusIcon .icon{
+    width: 11px;
+    height: 11px;
+    fill: $colorPrimary;
+  }
+}
+
+.profileDetails{
+  .cmuk-button-link{
+    @extend %cmuk-button-link;
+    margin-bottom: 5px;
+  }
+  .cmuk-badge{
+    @extend  %verifiedLabel;
+  }
+  .editIcon,
+  .editIcon .icon, .icon{
+      height: 18px;
+      width: 18px;
+      margin-right: 5px;
+      margin-bottom: 2px;
+    }
+}
+
+.contactDetails {
+  .contactInfoItem{
+    display: flex;
+    justify-content: space-between;
+    .cmuk-card{
+      flex: 1;
+      .infoRow{
+        flex-direction: column;
+        .infoRowValue{
+          text-align: left;
+        }
+      }
+      .cmuk-button{
+        line-height: 28px;
+        padding: 0 20px;
+        word-break: inherit;
+      }
+    }
+    .contactUpdateButton{
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      text-align: right;
+      button{
+        line-height: 28px;
+        padding: 0 20px;
+        margin-left: 20px;
+      }
+    }
+  }
+  .infoRowBox{
+    justify-content: space-between;
+    .infoRowLabel{
+      width: auto;
+      margin-right: 5px;
+    }
+    .contactInfoItemStatus{
+      display: flex;
+      align-items: center;
+    }
+  }
+  .cmuk-button-link{
+    @extend %cmuk-button-link;
+  }
+  .cmuk-badge{
+    margin-left: 10px;
+  }
+  .cmuk-card-body{
+    position: relative;
+    .cmuk-card {
+      border: 1px solid #EDEDED;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      box-shadow: none;
+      .cmuk-card-body {
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: #FFFFFF;
+      }
+    }
+  }
+}
+
+.toolTip {
+  position: relative;
+  display: inline-block;
+  .toolTipText {
+    visibility: hidden;
+    width: 140px;
+    background-color: $colorPrimary;
+    color: #fff;
+    text-align: center;
+    border-radius: $buttonBorderRadius;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: $colorPrimary transparent transparent transparent;
+    }
+  }
+}
+
+.toolTip:hover .toolTipText {
+  visibility: visible;
+  opacity: 1;
+}
+
+.notification {
+  word-break: break-all;
+  transition: all 1s ease-in-out;
+  list-style: none;
+  margin-bottom: 1px;
+  .read{
+    background-color: #fff2e8;
+  }
+  .notificationTime{
+    font-size: 10px;
+  }
+}
+
+.notification > div, .NotificationButton {
+  padding: 15px 25px;
+}
+
+.NotificationButton{
+  border-bottom: none;
+}
+
+dl .info {
+  background-color: #dadada;
+  color: #838383;
+  text-align: center;
+  border-radius: 6px;
+  position: relative;
+  top: 5px;
+  float: right;
+  font-size: smaller;
+  padding: 0;
+  display: none;
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 17px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #dadada transparent;
+  }
+}
+
+.commonCheckBox {
+  display: flex;
+  input {
+    margin-left: 10px;
+  }
+  dl{
+    display: flex;
+    dd{
+    margin-top: 15px;
+    }
+  }
+}
+
+.tradeList{
+  .cmuk-card-body{
+    .cmuk-card{
+      margin-bottom: 10px;
+      .cmuk-card-body{
+        padding: 20px ;
+      }
+    }
+    button a{
+      color:#FFFFFF;
+    }
+  }
+}
+
+.switcherCard{
+  margin-bottom: 20px;
+  .cmuk-card-body{
+    padding:0;
+    .cmuk-card {
+      margin-bottom: 5px;
+      .cmuk-card-body {
+        padding: 20px;
+      }
+    }
+  }
+  .cmuk-subnav{
+    margin:0;
+    justify-content:center;
+    border-bottom: 1px solid #e7eaf3;
+    li{
+      text-align: center;
+      padding: 0;
+      flex: 1;
+      a{
+        font-size: $paragraphFontSizeSmall;
+      }
+    }
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    background:none;
+    color: #061728;
+    font-weight: bold;
+    border-bottom: 2px solid $colorPrimary;
+  }
+  .cmuk-subnav-pill li:not(:last-child){
+    border-right: 1px solid #e7eaf3;
+  }
+  .cmuk-subnav-pill>*>:first-child{
+    padding: 10px 10px;
+    color:#999;
+    text-transform: capitalize;
+  }
+  .cmuk-switcher{
+    height: 256px;
+    overflow: auto;
+    padding: 20px;
+    @extend %scroller;
+    .cmuk-button{
+    @extend %buttonSmall;
+    }
+  }
+}
+
+.switcherCardSecond{
+  .cmuk-subnav{
+    margin: 0;
+    border-bottom: 1px solid #e5e5e5;
+    li{
+      text-align: center;
+      padding: 0;
+      &:first-child{
+        border-right: 1px solid #cccccc;
+      }
+      a{
+        padding: 15px 0;
+      }
+    }
+  }
+  .cmuk-subnav>*{
+    flex: 1;
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    color: #636363;
+    font-weight: bold;
+    font-size: $paragraphFontSizeSmall;
+    border-bottom: 2px solid $colorPrimary;
+    background: none;
+  }
+}
+
+.traderRelationList{
+  .cmuk-card-header{
+    padding: 13px 20px;
+  }
+}
+
+.cmuk-panel{
+  padding: 0;
+  margin-bottom: 10px;
+  background: #FFFFFF;
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 1px solid rgba(5, 60, 117, 0.22);
+  font-size: $paragraphFontSizeSmall;
+  ul{
+    li{
+      font-size:$paragraphFontSizeSmall;
+      color: #272829;
+      text-align: left;
+      cursor: pointer;
+      padding: 10px;
+      background: #e7eaf3;
+    }
+  }
+}
+
+
+figure.zoom {
+  & img:hover {
+    opacity: 0;
+  }
+  img {
+    transition: opacity .5s;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  background-position: 50% 50%;
+  position: relative;
+  width: 100%;
+  height: 800px;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.salesQuoteCard{
+  .commonList{
+    flex:1;
+    padding: 0;
+    flex-wrap: nowrap;
+  }
+  .salesQuoteCardLeft{
+    position: relative;
+    flex: 30%;
+    display: flex;
+    .content{
+      display: flex;
+      flex: 1;
+      padding:20px 10px 20px 20px;
+      align-items: center;
+    }
+    .assetIcon{
+      flex: 20%;
+      text-align: center;
+      @extend %justifyAlignCenter;
+    }
+    .assetInitialData{
+      flex:80%;
+      p{
+        margin: 0;
+        color: #848A90;
+        font-weight: bold;
+        line-height: 2;
+      }
+      .assetTitle{
+        text-transform: uppercase;
+      }
+      .assetQuantity{
+        font-family: $fontFamilyPrimary;
+      }
+      .assetPrice{
+        font-family: $fontFamilyPrimary;
+        color: #254364;
+      }
+    }
+    .salesQuoteCategory{
+      width: 30px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      border-radius:2px;
+      justify-content: space-around;
+      span{
+        transform: rotate(-90deg);
+        position: absolute;
+        font-weight: bold;
+        font-size: $paragraphFontSizeSmall;
+      }
+    }
+    .salesQuoteCategory.buy{
+      border: 1px solid #B004DB;
+      color: #B004DB;
+    }
+    .salesQuoteCategory.sell{
+      border: 1px solid #5EB55C;
+      color: #5EB55C;
+    }
+  }
+  .salesQuoteCardMiddle{
+    border-radius: 2px;
+    padding:20px 10px 20px 0;
+    flex: 45%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    p{
+      margin: 0;
+      line-height: 2;
+      span{
+        color: #848A91;
+        font-weight: bold;
+        font-size:$paragraphFontSizeSmall;
+        word-break: break-all;
+      }
+      .arrowIcon{
+        width:30px;
+        height: 30px;
+        .icon{
+          width: 25px;
+          height: 25px;
+        }
+      }
+      .lines{
+        letter-spacing: 1px;
+        color:#D0D0D0;
+      }
+    }
+    .organizationName{
+      color: #4B4B4B;
+      font-weight: bold;
+      font-size:$paragraphFontSizeSmall;
+    }
+  }
+  .salesQuoteCardRight{
+    padding: 20px 20px 20px 0;
+    flex: 25%;
+    @extend %justifyAlignCenter;
+    flex-direction: column;
+    p{
+      margin: 0;
+      color: #4B4B4B;
+      font-weight: bold;
+    }
+    .cmuk-button{
+      line-height: 38px;
+      &:hover{
+        color: #FFFFFF;
+        background: $colorPrimary;
+      }
+    }
+  }
+}
+
+.rippleEffect {
+  position: absolute;
+  border-radius: 50%;
+  animation: ripple-animation 2s;
+}
+
+@keyframes ripple-animation {
+  from {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  to {
+    transform: scale(100);
+    opacity: 0;
+  }
+}
+
+.identificationCheckbox{
+  display: flex;
+  padding: 10px 0;
+  p{
+    margin:0;
+    word-break:break-word;
+  }
+  .commonCheckBox{
+    dl{
+      dt{
+        display: none;
+      }
+      dd{
+        margin: 0 5px 0 0;
+      }
+    }
+  }
+}

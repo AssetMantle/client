@@ -1,22 +1,31 @@
 @import controllers.actions.LoginState
 @import models.Trait.Document
+@import views.html.base._
 
 @(document: Document[_])(documentLink: Html = Html(""))(documentContentTop: Html = Html(""))(documentContentBottom: Html = Html(""))(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="centerText">
-    <div id="documentContentTop">
+<div class="centerText documentItem">
+    <div class="cmuk-flex">
+        <div class="documentThumbnail">
+            @if(document.documentType != constants.File.Account.PROFILE_PICTURE) {
+                @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
+                    case constants.File.PNG | constants.File.JPEG | constants.File.JPG | constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE => {
+                        <a href="@documentLink" target="_blank"><img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType" ></a>
+                    }
+                    case _ => {
+                        <a href="@documentLink" target="_blank">
+                            <span class="documentIcon">
+                                @commonIcon("doc2")
+                            </span>
+                        </a>
+                    }
+                }
+            }
+        </div>
+        <div id="documentContentTop" class="documentContentTop">
         @documentContentTop
+        </div>
     </div>
-    @if(document.documentType != constants.File.PROFILE_PICTURE) {
-        @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
-            case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-                <a href="@documentLink"><img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType"></a>
-            }
-            case _ => {
-                <a href="@documentLink"><img src="@routes.Assets.versioned("images/document.png")" alt="@document.documentType"></a>
-            }
-        }
-    }
-    <div id="documentContentBottom">
+    <div id="documentContentBottom" class="documentContentBottom">
     @documentContentBottom
     </div>
 </div>

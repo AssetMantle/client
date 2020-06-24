@@ -1,0 +1,9 @@
+@import play.api.routing.JavaScriptReverseRoute
+
+@(divID: String, name: String, route: JavaScriptReverseRoute, loadingSpinnerID: String, event: String, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("buttonPrimary")).mkString(" ")'  onclick="componentResource('@divID', @utilities.String.getJsRouteString(route, arguments.toMap.get('parameters).map(_.toString).getOrElse("")), '@loadingSpinnerID', '@event')">
+@Messages(name)
+</button>
+
+@*Example Usage: @commonComponentButton("identificationDetails", constants.View.IDENTIFICATION_DETAILS, routes.javascript.ComponentViewController.identificationDetails, 'parameters -> "'Abhinav', 'Kumar', 1996") *@

@@ -1,0 +1,7 @@
+@(key: String, value: String, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+<div class="listItemChild">
+    <p class="listItemChildTitle">@Messages(key)</p>
+    <p id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("listItemChildValue")' title="@Messages(value)">
+    @Messages(value)
+    </p>
+</div>

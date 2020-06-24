@@ -1,23 +1,9 @@
 @import controllers.actions.LoginState
-@import helper._
+@import views.html.base._
 @import views.companion.master.VerifyEmailAddress
 
-@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.VerifyEmailAddressController.verifyEmailAddress, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(verifyEmailAddressForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
-
-        @if(verifyEmailAddressForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- verifyEmailAddressForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</button>
-    </div>
+@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data] = VerifyEmailAddress.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.VERIFY_EMAIL_ADDRESS, verifyEmailAddressForm) {
+    <p class="formNote">@Messages(constants.View.EMAIL_OTP_NOTE)</p>
+    @commonInputText(verifyEmailAddressForm, constants.FormField.OTP)
 }

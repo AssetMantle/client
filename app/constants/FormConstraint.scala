@@ -1,12 +1,11 @@
 package constants
 
 import play.api.data.validation._
-import views.companion.master.SignUp
-import views.companion.master.ConfirmTransaction
+import views.companion.master.{SignUp, ChangePassword}
 
 object FormConstraint {
   //TODO: Error Response through Messages
-  val signUpCheckConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUpCheck")({ signUpData: SignUp.Data =>
+  val signUpConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUp")({ signUpData: SignUp.Data =>
     val errors = {
       if (signUpData.password != signUpData.confirmPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
       else if (!signUpData.usernameAvailable) Seq(ValidationError(constants.Response.USERNAME_UNAVAILABLE.message))
@@ -15,15 +14,13 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val issueAssetRequestCheckConstraint: Constraint[ConfirmTransaction.Data] = Constraint("constraints.issueAssetRequestCheck")({ confirmTransactionData: ConfirmTransaction.Data =>
+  val changePasswordConstraint: Constraint[ChangePassword.Data] = Constraint("constraints.changePassword")({ changePasswordData: ChangePassword.Data =>
     val errors = {
-      if (confirmTransactionData.password.isEmpty && confirmTransactionData.gas.isDefined) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
-      else if (confirmTransactionData.password.isDefined && confirmTransactionData.gas.isEmpty) Seq(ValidationError(constants.Response.GAS_NOT_GIVEN.message))
+      if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))
+      else if (changePasswordData.newPassword != changePasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
   })
-
-
 
 }

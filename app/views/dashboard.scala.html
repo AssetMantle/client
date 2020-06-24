@@ -1,0 +1,38 @@
+@import controllers.actions.LoginState
+@import views.html.base.common
+@import views.html.base._
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+
+}
+
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom">
+        <div class="tradeList switcherCard">
+            <div id="componentID"></div>
+        </div>
+        <div>
+            <div id="componentID" class="switcherCard"></div>
+        </div>
+        <script>
+                componentResource('componentID', jsRoutes.controllers.ComponentViewController.componentMethod());
+                componentResource('componentID', jsRoutes.controllers.ComponentViewController.componentMethod());
+        </script>
+    </div>
+}
+
+@right = {
+    <div class="rightContainer">
+        <div class="recentActivityContainer">
+            <div id="recentActivities"></div>
+        </div>
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+    </script>
+
+}

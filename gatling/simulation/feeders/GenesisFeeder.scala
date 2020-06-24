@@ -8,7 +8,7 @@ object GenesisFeeder {
 
   def arrayConstructor(users: Int): Array[Map[String, String]] = {
     val feed = new Array[Map[String, String]](users)
-    for (id <- 0 until users) feed(id) = Map(Test.TEST_MAIN_USERNAME -> "main", Test.TEST_MAIN_PASSWORD -> "1234567890")
+    for (id <- 0 until users) feed(id) = Map(Test.TEST_MAIN_USERNAME -> "main", Test.TEST_MAIN_PASSWORD -> "123123123")
     feed
   }
 }
