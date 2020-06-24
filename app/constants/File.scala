@@ -28,40 +28,14 @@ object File {
     val IDENTIFICATION = "IDENTIFICATION"
   }
 
-  object Asset {
-    val BILL_OF_LADING = "BILL_OF_LADING"
-    val COO = "COO"
-    val COA = "COA"
-  }
-
-  object Negotiation {
-    val BILL_OF_EXCHANGE = "BILL_OF_EXCHANGE"
-    val INVOICE = "INVOICE"
-    val INSURANCE = "INSURANCE"
-    val CONTRACT = "CONTRACT"
-    val OTHERS = "OTHERS"
-  }
-
-  object OrganizationKYC {
-    val ACRA = "ACRA"
-    val BOARD_RESOLUTION = "BOARD_RESOLUTION"
-  }
-
   object WorldCheck {
     val TRADER_WORLD_CHECK = "TRADER_WORLD_CHECK"
     val ORGANIZATION_WORLD_CHECK = "ORGANIZATION_WORLD_CHECK"
   }
 
-  object ZoneKYC {
-    val BANK_ACCOUNT_DETAIL = "BANK_ACCOUNT_DETAIL"
-    val IDENTIFICATION = "IDENTIFICATION"
-  }
+
 
   //Seq
-  val ZONE_KYC_DOCUMENT_TYPES: Seq[String] = Seq(ZoneKYC.IDENTIFICATION, ZoneKYC.BANK_ACCOUNT_DETAIL)
-  val ORGANIZATION_KYC_DOCUMENT_TYPES: Seq[String] = Seq(OrganizationKYC.ACRA, OrganizationKYC.BOARD_RESOLUTION)
   val TRADER_BACKGROUND_CHECK_DOCUMENT_TYPES: Seq[String] = Seq(WorldCheck.TRADER_WORLD_CHECK)
   val ORGANIZATION_BACKGROUND_CHECK_DOCUMENT_TYPES: Seq[String] = Seq(WorldCheck.ORGANIZATION_WORLD_CHECK)
-  val ASSET_DOCUMENTS: Seq[String] = Seq(Asset.BILL_OF_LADING, Asset.COO, Asset.COA)
-  val NEGOTIATION_DOCUMENTS: Seq[String] = Seq(Negotiation.BILL_OF_EXCHANGE, Negotiation.INVOICE, Negotiation.CONTRACT)
 }
