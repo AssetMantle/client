@@ -243,7 +243,6 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
       //TODO If in future BC provides quantity and assetDescription in Negotiation, modify this to update them as well.
       def updateMasterNegotiation(negotiation: masterNegotiation, negotiationID: String, price: Int, time: Int): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
-        println("updateMasterNegotiation----BlockchainNegotiationID--"+negotiationID)
         masterNegotiations.Service.update(negotiation.copy(negotiationID = Option(negotiationID), price = price, time = Option(time), status = constants.Status.Negotiation.STARTED))
       } else {
         masterNegotiations.Service.update(negotiation.copy(price = price, time = Option(time)))

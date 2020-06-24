@@ -111,9 +111,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             result <- getResult(fiatsInOrder, negotiation, validateUsernamePassword)
           } yield result
             ).recover {
-            case baseException: BaseException =>
-              logger.error(baseException.failure.message,baseException)
-              InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

@@ -176,7 +176,6 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      println("AddZone Successful")
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addZone = Service.getTransaction(ticketID)
 
