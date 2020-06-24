@@ -21,70 +21,9 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
   private val uploadAccountProfilePicturePath = rootFilePath + configuration.get[String]("upload.account.profilePicturePath")
 
-  private val uploadZoneKYCBankAccountDetailPath = rootFilePath + configuration.get[String]("upload.zone.bankAccountDetailPath")
-
-  private val uploadZoneKYCIdentificationPath = rootFilePath + configuration.get[String]("upload.zone.identificationPath")
-
-  private val uploadOrganizationKYCACRAPath = rootFilePath + configuration.get[String]("upload.organization.acraPath")
-
-  private val uploadOrganizationKYCBoardResolutionPath = rootFilePath + configuration.get[String]("upload.organization.boardResolutionPath")
-
-  private val uploadAssetBillOfLadingPath: String = rootFilePath + configuration.get[String]("upload.asset.billOfLading")
-
-  private val uploadAssetCOOPath: String = rootFilePath + configuration.get[String]("upload.asset.coo")
-
-  private val uploadAssetCOAPath: String = rootFilePath + configuration.get[String]("upload.asset.coa")
-
-  private val uploadNegotiationInvoicePath: String = rootFilePath + configuration.get[String]("upload.negotiation.invoice")
-
-  private val uploadNegotiationBillOfExchangePath: String = rootFilePath + configuration.get[String]("upload.negotiation.billOfExchange")
-
-  private val uploadNegotiationContractPath: String = rootFilePath + configuration.get[String]("upload.negotiation.contract")
-
-  private val uploadNegotiationInsurancePath: String = rootFilePath + configuration.get[String]("upload.negotiation.insurance")
-
-  private val uploadNegotiationOthersPath: String = rootFilePath + configuration.get[String]("upload.negotiation.others")
-
-
   def getAccountKYCFilePath(documentType: String): String = {
     documentType match {
       case constants.File.AccountKYC.IDENTIFICATION => uploadAccountKYCIdentificationPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
-    }
-  }
-
-  def getZoneKYCFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.ZoneKYC.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
-      case constants.File.ZoneKYC.IDENTIFICATION => uploadZoneKYCIdentificationPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
-    }
-  }
-
-  def getOrganizationKYCFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.OrganizationKYC.ACRA => uploadOrganizationKYCACRAPath
-      case constants.File.OrganizationKYC.BOARD_RESOLUTION => uploadOrganizationKYCBoardResolutionPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
-    }
-  }
-
-  def getAssetFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.Asset.BILL_OF_LADING => uploadAssetBillOfLadingPath
-      case constants.File.Asset.COO => uploadAssetCOOPath
-      case constants.File.Asset.COA => uploadAssetCOAPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
-    }
-  }
-
-  def getNegotiationFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.Negotiation.INVOICE => uploadNegotiationInvoicePath
-      case constants.File.Negotiation.BILL_OF_EXCHANGE => uploadNegotiationBillOfExchangePath
-      case constants.File.Negotiation.CONTRACT => uploadNegotiationContractPath
-      case constants.File.Negotiation.INSURANCE => uploadNegotiationInsurancePath
-      case constants.File.Negotiation.OTHERS => uploadNegotiationOthersPath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
   }

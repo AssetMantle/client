@@ -56,7 +56,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
       val documentList = fileList.zipWithIndex.map { case (file, index) =>
         val document = new DocusignDocument()
-        document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(file.documentType), file.fileName)))))
+        document.setDocumentBase64(new String(Base64Docusign.encode(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(fileResourceManager.getAccountKYCFilePath(file.documentType), file.fileName)))))
         document.setName(file.fileName.split("""\.""")(0))
         document.setFileExtension(utilities.FileOperations.fileExtensionFromName(file.fileName))
         document.setDocumentId((index + 1).toString)
@@ -154,7 +154,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       documentTypeList.zipWithIndex.map { case (documentType, index) =>
         val fileByteArray = envelopesApi.getDocument(accountID, envelopeID, (index + 1).toString)
         val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileByteArray)).toString, constants.File.PDF).mkString(".")
-        val file = utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(documentType), newFileName)
+        val file = utilities.FileOperations.newFile(fileResourceManager.getAccountKYCFilePath(documentType), newFileName)
         val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
         bufferedOutputStream.write(fileByteArray)
         bufferedOutputStream.close()
