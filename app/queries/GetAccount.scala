@@ -25,8 +25,9 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
   private val path = "auth/accounts"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getAccount("")
-  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(testURL + request).get)
+  //testURL
+  //private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getAccount("")
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 

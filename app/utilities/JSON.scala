@@ -21,8 +21,10 @@ object JSON {
         case _: JsError =>
           val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](response.json) match {
             case JsSuccess(value: ErrorResponse, _: JsPath) => value
-            case error: JsError => throw new BaseException(new Failure(error.toString, null))
+            case error: JsError => logger.info(response.body)
+              throw new BaseException(new Failure(error.toString, null))
           }
+          logger.info(errorResponse.error)
           throw new BaseException(new Failure(errorResponse.error, null))
       }
     }.recover {
