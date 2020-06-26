@@ -2354,17 +2354,17 @@ EXECUTE PROCEDURE MEMBER_CHECK.VESSEL_SCAN_DECISION_HISTORY();
 
 INSERT INTO MASTER."Account" ("id", "secretHash", "partialMnemonic", "language", "userType")
 VALUES ('main',
-        '-1906237473',
+        '711213004',
         '["fluid","cereal","trash","miracle","casino","menu","true","method","exhaust","pen","fiber","rural","grape","purchase","rather","table","omit","youth","gain","cage","erase"]',
         'en',
         'GENESIS');
 
 INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
                                      "dirtyBit")
-VALUES ('commit12xkpqeak63yctaqjeg4sx7hxt44rznz806mtx5',
+VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
         '1000',
-        'commitpub1addwnpepqwdzk3rzxthc9uvl2nvmtmpj4jc3d9jwmpv4c0pvag24qy4yhcmvvgr2sv9',
+        'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
         true);
