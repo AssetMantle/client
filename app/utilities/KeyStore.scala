@@ -20,9 +20,9 @@ class KeyStore @Inject()(configuration: Configuration) {
 
   private val keyStorePassword = configuration.get[String]("keyStore.password")
 
-  private val keyStoreType = "PKCS12"
+  private val keyStoreType = "JCEKS"
 
-  private val secretKeyFactoryAlgorithm = "PBE"
+  private val secretKeyFactoryAlgorithm = "PBEWithHmacSHA512AndAES_256"
 
   def getPassphrase(alias: String): String = try {
     val ks = KeyStore.getInstance(keyStoreType)
