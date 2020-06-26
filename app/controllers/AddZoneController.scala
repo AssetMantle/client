@@ -289,10 +289,13 @@ class AddZoneController @Inject()(
 
             def markZoneFormCompletedAndGetResult(id: String, allKYCFileTypesExists: Boolean): Future[Result] =
               if (allKYCFileTypesExists) {
-                val setPassphrase = Future(keyStore.setPassphrase(alias = id, aliasValue = userReviewAddZoneRequestData.password))
+                try {
+                  keyStore.setPassphrase(alias = id, aliasValue = userReviewAddZoneRequestData.password)
+                } catch {
+                  case baseException: BaseException => throw baseException
+                }
                 def markZoneFormCompleted = masterZones.Service.markZoneFormCompleted(id)
                 for {
-                  _ <- setPassphrase
                   _ <- markZoneFormCompleted
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
                 } yield result
