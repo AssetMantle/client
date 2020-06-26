@@ -2,10 +2,10 @@
 @import views.html.base._
 @import views.companion.master.SendFiat
 
-@(sendFiatForm: Form[SendFiat.Data] = SendFiat.form, negotiationID: String, amount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(sendFiatForm: Form[SendFiat.Data] = SendFiat.form, negotiationID: String, amount: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_FIAT, sendFiatForm) {
     @commonInputText(sendFiatForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID)
-    @commonInputInt(sendFiatForm, constants.FormField.AMOUNT, 'value -> amount.toString)
+    @commonInputDouble(sendFiatForm, constants.FormField.SEND_AMOUNT, 'value -> amount.toString)
     @commonInputInt(sendFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD)
 }

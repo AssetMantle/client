@@ -18,6 +18,7 @@ import queries.responses.NegotiationResponse
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroInt
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -219,8 +220,8 @@ class ChangeSellerBids @Inject()(
 
       def createOrUpdate(negotiation: Option[Negotiation], negotiationResponse: NegotiationResponse.Response) = {
         if (negotiation.isDefined) {
-          blockchainNegotiations.Service.update(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
-        } else blockchainNegotiations.Service.create(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
+          blockchainNegotiations.Service.update(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = new MicroInt(negotiationResponse.value.bid.toLong).string, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
+        } else blockchainNegotiations.Service.create(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = new MicroInt(negotiationResponse.value.bid.toLong).string, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
       }
 
       def markDirty(changeSellerBid: ChangeSellerBid): Future[Unit] = {
@@ -280,7 +281,7 @@ class ChangeSellerBids @Inject()(
         seller <- getTrader(sellerAccountID)
         assetID <- getAssetID(negotiationResponse.value.pegHash)
         masterNegotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
-        _ <- updateMasterNegotiation(negotiation = masterNegotiation, negotiationID = negotiationResponse.value.negotiationID, price = negotiationResponse.value.bid.toInt, time = negotiationResponse.value.time.toInt)
+        _ <- updateMasterNegotiation(negotiation = masterNegotiation, negotiationID = negotiationResponse.value.negotiationID, price = new MicroInt(negotiationResponse.value.bid.toLong).double.toInt, time = negotiationResponse.value.time.toInt)
         _ <- sendNotifications(buyer = buyer, seller = seller, negotiation = masterNegotiation)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

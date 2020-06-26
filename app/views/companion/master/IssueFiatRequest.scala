@@ -10,6 +10,6 @@ object IssueFiatRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(transactionAmount: Int)
+  case class Data(transactionAmount: Double)
 
 }

@@ -15,6 +15,6 @@ object RedeemFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, redeemAmount: Int, gas: Int, mode: String, password: String)
+  case class Data(from: String, to: String, redeemAmount: Double, gas: Int, mode: String, password: String)
 
 }

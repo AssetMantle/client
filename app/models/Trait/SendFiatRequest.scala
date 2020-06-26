@@ -1,13 +1,14 @@
 package models.Trait
 
 import java.sql.Timestamp
+import utilities.MicroInt
 
 trait SendFiatRequest {
   val id: String
   val traderID: String
   val ticketID: String
   val negotiationID: String
-  val amount: Int
+  val amount: MicroInt
   val status: String
   val createdOn: Option[Timestamp]
   val createdBy: Option[String]

@@ -13,6 +13,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.responses.NegotiationResponse.Response
 import slick.jdbc.JdbcProfile
+import utilities.MicroInt
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -234,7 +235,7 @@ class Negotiations @Inject()(
           dirtyNegotiations.map { dirtyNegotiation =>
             val negotiationResponse = getNegotiation.Service.get(dirtyNegotiation.id)
 
-            def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
+            def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = new MicroInt(negotiationResponse.value.bid.toLong).string, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
 
             def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
@@ -245,10 +246,10 @@ class Negotiations @Inject()(
             def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
             def updateMasterNegotiationStatus(negotiation: masterNegotiation, negotiationResponse: Response): Future[Int] = {
-              if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, buyerAcceptedPrice = if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedPrice, time = Option(negotiationResponse.value.time.toInt)))
-              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
-              else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
-              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
+              if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price =new MicroInt(negotiationResponse.value.bid.toLong).double.toInt , buyerAcceptedPrice = if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedPrice, time = Option(negotiationResponse.value.time.toInt)))
+              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = new MicroInt(negotiationResponse.value.bid.toLong).double.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
+              else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = new MicroInt(negotiationResponse.value.bid.toLong).double.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
+              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = new MicroInt(negotiationResponse.value.bid.toLong).double.toInt, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
               else Future(0)
             }
 

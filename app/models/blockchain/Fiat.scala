@@ -13,12 +13,13 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
+import utilities.MicroInt
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: MicroInt, redeemedAmount: MicroInt, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Fiats @Inject()(
@@ -28,6 +29,12 @@ class Fiats @Inject()(
                        blockchainAccounts: blockchain.Accounts,
                        masterTraders: master.Traders,
                        masterFiats: master.Fiats)(implicit executionContext: ExecutionContext) {
+
+  def serialize(fiat: Fiat): FiatSerialized = FiatSerialized(pegHash = fiat.pegHash, ownerAddress = fiat.ownerAddress, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount.value, redeemedAmount = fiat.redeemedAmount.value, dirtyBit = fiat.dirtyBit, createdBy = fiat.createdBy, createdOn = fiat.createdOn, createdOnTimeZone = fiat.createdOnTimeZone, updatedBy = fiat.updatedBy, updatedOn = fiat.updatedOn, updatedOnTimeZone = fiat.updatedOnTimeZone)
+
+  case class FiatSerialized(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: Long, redeemedAmount: Long, dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Fiat = Fiat(pegHash = pegHash, ownerAddress = ownerAddress, transactionID = transactionID, transactionAmount = new MicroInt(transactionAmount), redeemedAmount = new MicroInt(redeemedAmount), dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -49,23 +56,23 @@ class Fiats @Inject()(
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(fiat: Fiat): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
+  private def add(fiatSerialized: FiatSerialized): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiatSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def insertMultiple(fiats: Seq[Fiat]): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
+  private def insertMultiple(fiatsSerialized: Seq[FiatSerialized]): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiatsSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def updateByPegHashAndOwnerAddress(fiat: Fiat): Future[Int] = db.run(fiatTable.filter(_.pegHash === fiat.pegHash).filter(_.ownerAddress === fiat.ownerAddress).update(fiat).asTry).map {
+  private def updateByPegHashAndOwnerAddress(fiatSerialized: FiatSerialized): Future[Int] = db.run(fiatTable.filter(_.pegHash === fiatSerialized.pegHash).filter(_.ownerAddress === fiatSerialized.ownerAddress).update(fiatSerialized).asTry).map {
     case Success(result) => if (result > 0) result else {
-      val create = add(fiat)
+      val create = add(fiatSerialized)
       for {
         _ <- create
       } yield 1
@@ -78,24 +85,24 @@ class Fiats @Inject()(
     }
   }
 
-  private def upsert(fiat: Fiat): Future[Int] = db.run(fiatTable.insertOrUpdate(fiat).asTry).map {
+  private def upsert(fiatSerialized: FiatSerialized): Future[Int] = db.run(fiatTable.insertOrUpdate(fiatSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String): Future[Option[Fiat]] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.headOption)
+  private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String): Future[Option[FiatSerialized]] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.headOption)
 
-  private def getFiatPegWalletByAddress(address: String): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerAddress === address).result)
+  private def getFiatPegWalletByAddress(address: String): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerAddress === address).result)
 
-  private def getFiatPegWalletByAddresses(addresses: Seq[String]): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerAddress inSet addresses).result)
+  private def getFiatPegWalletByAddresses(addresses: Seq[String]): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerAddress inSet addresses).result)
 
-  private def getFiatsByDirtyBit(dirtyBit: Boolean): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.dirtyBit === dirtyBit).result)
+  private def getFiatsByDirtyBit(dirtyBit: Boolean): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.dirtyBit === dirtyBit).result)
 
   private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(fiatTable.filter(_.ownerAddress === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => if (result > 0) result else {
-      val create = add(Fiat(pegHash = utilities.IDGenerator.hexadecimal, address, "", "", "", true))
+      val create = add(serialize(Fiat(pegHash = utilities.IDGenerator.hexadecimal, address, "", new MicroInt(0), new MicroInt(0), true)))
       for {
         _ <- create
       } yield 1
@@ -131,9 +138,9 @@ class Fiats @Inject()(
     }
   }
 
-  private[models] class FiatTable(tag: Tag) extends Table[Fiat](tag, "Fiat_BC") {
+  private[models] class FiatTable(tag: Tag) extends Table[FiatSerialized](tag, "Fiat_BC") {
 
-    def * = (pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Fiat.tupled, Fiat.unapply)
+    def * = (pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (FiatSerialized.tupled, FiatSerialized.unapply)
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
@@ -141,9 +148,9 @@ class Fiats @Inject()(
 
     def transactionID = column[String]("transactionID")
 
-    def transactionAmount = column[String]("transactionAmount")
+    def transactionAmount = column[Long]("transactionAmount")
 
-    def redeemedAmount = column[String]("redeemedAmount")
+    def redeemedAmount = column[Long]("redeemedAmount")
 
     def dirtyBit = column[Boolean]("dirtyBit")
 
@@ -162,15 +169,15 @@ class Fiats @Inject()(
 
   object Service {
 
-    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[String] = add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit))
+    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: MicroInt, redeemedAmount: MicroInt, dirtyBit: Boolean): Future[String] = add(serialize(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)))
 
-    def insertList(fiats: Seq[Fiat]): Future[Seq[String]] = insertMultiple(fiats)
+    def insertList(fiats: Seq[Fiat]): Future[Seq[String]] = insertMultiple(fiats.map(serialize(_)))
 
-    def update(fiat: Fiat): Future[Int] = updateByPegHashAndOwnerAddress(fiat)
+    def update(fiat: Fiat): Future[Int] = updateByPegHashAndOwnerAddress(serialize(fiat))
 
-    def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address)
+    def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address).map(_.map(_.deserialize()))
 
-    def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[Int] = upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit))
+    def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: MicroInt, redeemedAmount: MicroInt, dirtyBit: Boolean): Future[Int] = upsert(serialize(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit)))
 
     def updateOwnerAddresses(pegHashes: Seq[String], ownerAddress: String): Future[Int] = updateOwnerAddressesByPegHashes(pegHashes, ownerAddress)
 
@@ -178,7 +185,7 @@ class Fiats @Inject()(
 
     def deleteFiatPegWallet(address: String): Future[Int] = deleteByAddress(address)
 
-    def getDirtyFiats: Future[Seq[Fiat]] = getFiatsByDirtyBit(dirtyBit = true)
+    def getDirtyFiats: Future[Seq[Fiat]] = getFiatsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize()))
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
@@ -202,10 +209,10 @@ class Fiats @Inject()(
                   Service.deleteFiat(pegHash = pegHash, address = dirtyFiat.ownerAddress)
                 })
                 val updateFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).intersect(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                  Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false))
+                  Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = new MicroInt(fiatPeg.transactionAmount.toLong), redeemedAmount = new MicroInt(fiatPeg.redeemedAmount.toLong), dirtyBit = false))
                 })
                 val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)
+                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount =new MicroInt(fiatPeg.transactionAmount.toLong), redeemedAmount =new MicroInt(fiatPeg.redeemedAmount.toLong), dirtyBit = false)
                 })
                 for {
                   _ <- deleteFiats
@@ -233,13 +240,13 @@ class Fiats @Inject()(
                     accountOwnerAddress.value.fiat_peg_wallet match {
                       case Some(updatedFiatPegWallet) => {
                         val updateTransactionAmountToZero = Future.traverse(oldFiatPegWallet.map(_.pegHash).diff(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => oldFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                          masterFiats.Service.updateTransactionAmount(traderID, fiatPeg.transactionID, 0)
+                          masterFiats.Service.updateTransactionAmount(traderID, fiatPeg.transactionID, new MicroInt(0))
                         })
                         val updateFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).intersect(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                          masterFiats.Service.updateFiat(traderID, fiatPeg.transactionID, fiatPeg.transactionAmount.toInt, fiatPeg.redeemedAmount.toInt)
+                          masterFiats.Service.updateFiat(traderID, fiatPeg.transactionID, new MicroInt(fiatPeg.transactionAmount.toLong), new MicroInt(fiatPeg.redeemedAmount.toLong))
                         })
                         val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                          masterFiats.Service.insertOrUpdate(traderID, fiatPeg.transactionID, fiatPeg.transactionAmount.toInt, fiatPeg.redeemedAmount.toInt)
+                          masterFiats.Service.insertOrUpdate(traderID, fiatPeg.transactionID, new MicroInt(fiatPeg.transactionAmount.toLong), new MicroInt(fiatPeg.redeemedAmount.toLong))
                         })
                         for {
                           _ <- updateTransactionAmountToZero

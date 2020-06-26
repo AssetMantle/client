@@ -13,6 +13,7 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
+import utilities.MicroInt
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -196,7 +197,7 @@ class Assets @Inject()(
             def updateOrDelete(ownerAccount: Response): Future[Int] = {
               ownerAccount.value.asset_peg_wallet match {
                 case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
-                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
+                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = new MicroInt(assetPeg.assetPrice.toLong).string, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
                   case None => Service.deleteAsset(dirtyAsset.pegHash)
                 }
                 case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
