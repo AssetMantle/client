@@ -42,7 +42,7 @@ class WesternUnionController @Inject()(
 
   private val wuServiceID = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SERVICE_ID)
 
-  private val wuURL = configuration.get[String]("westernUnion.url")
+  private val wuURL = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_URL)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
