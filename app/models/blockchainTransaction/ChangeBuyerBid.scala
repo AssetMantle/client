@@ -24,7 +24,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] with Logged {
+case class ChangeBuyerBid(from: String, to: String, bid: MicroInt, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] with Logged {
   def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -45,6 +45,13 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
                                 blockchainAccounts: blockchain.Accounts,
                                 masterTransactionTradeActivities: masterTransaction.TradeActivities
                                )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+
+
+  def serialize(changeBuyerBid: ChangeBuyerBid): ChangeBuyerBidSerialized = ChangeBuyerBidSerialized(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid.value, time = changeBuyerBid.time,pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code, createdBy = changeBuyerBid.createdBy, createdOn = changeBuyerBid.createdOn, createdOnTimeZone = changeBuyerBid.createdOnTimeZone, updatedBy = changeBuyerBid.updatedBy, updatedOn = changeBuyerBid.updatedOn, updatedOnTimeZone = changeBuyerBid.updatedOnTimeZone)
+
+  case class ChangeBuyerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = new MicroInt(bid), time =time,pegHash=pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
@@ -68,14 +75,14 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(changeBuyerBid: ChangeBuyerBid): Future[String] = db.run((changeBuyerBidTable returning changeBuyerBidTable.map(_.ticketID) += changeBuyerBid).asTry).map {
+  private def add(changeBuyerBidSerialized: ChangeBuyerBidSerialized): Future[String] = db.run((changeBuyerBidTable returning changeBuyerBidTable.map(_.ticketID) += changeBuyerBidSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[ChangeBuyerBid] = db.run(changeBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[ChangeBuyerBidSerialized] = db.run(changeBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -138,15 +145,15 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
     }
   }
 
-  private[models] class ChangeBuyerBidTable(tag: Tag) extends Table[ChangeBuyerBid](tag, "ChangeBuyerBid") {
+  private[models] class ChangeBuyerBidTable(tag: Tag) extends Table[ChangeBuyerBidSerialized](tag, "ChangeBuyerBid") {
 
-    def * = (from, to, bid, time, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ChangeBuyerBid.tupled, ChangeBuyerBid.unapply)
+    def * = (from, to, bid, time, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ChangeBuyerBidSerialized.tupled, ChangeBuyerBidSerialized.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
-    def bid = column[Int]("bid")
+    def bid = column[Long]("bid")
 
     def time = column[Int]("time")
 
@@ -179,7 +186,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
   object Service {
 
-    def create(changeBuyerBid: ChangeBuyerBid): Future[String] = add(ChangeBuyerBid(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid, time = changeBuyerBid.time, pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code))
+    def create(changeBuyerBid: ChangeBuyerBid): Future[String] = add(serialize(ChangeBuyerBid(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid, time = changeBuyerBid.time, pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code)))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -189,7 +196,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[ChangeBuyerBid] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[ChangeBuyerBid] = findByTicketID(ticketID).map(_.deserialize())
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -221,8 +228,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
       def createOrUpdate(negotiation: Option[Negotiation], negotiationResponse: NegotiationResponse.Response) = {
         if (negotiation.isDefined) {
-          blockchainNegotiations.Service.update(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = new MicroInt(negotiationResponse.value.bid.toLong).string, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
-        } else blockchainNegotiations.Service.create(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = new MicroInt(negotiationResponse.value.bid.toLong).string, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
+          blockchainNegotiations.Service.update(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = new MicroInt(negotiationResponse.value.bid.toLong), time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
+        } else blockchainNegotiations.Service.create(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = new MicroInt(negotiationResponse.value.bid.toLong), time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = false)
       }
 
       def markDirty(changeBuyerBid: ChangeBuyerBid): Future[Unit] = {
@@ -243,7 +250,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
       def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
       //TODO If in future BC provides quantity and assetDescription in Negotiation, modify this to update them as well.
-      def updateMasterNegotiation(negotiation: masterNegotiation, negotiationID: String, price: Int, time: Int): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
+      def updateMasterNegotiation(negotiation: masterNegotiation, negotiationID: String, price: MicroInt, time: Int): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
         masterNegotiations.Service.update(negotiation.copy(negotiationID = Option(negotiationID), price = price, time = Option(time), status = constants.Status.Negotiation.STARTED))
       } else {
         masterNegotiations.Service.update(negotiation.copy(price = price, time = Option(time)))
@@ -283,7 +290,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
         seller <- getTrader(sellerAccountID)
         assetID <- getAssetID(negotiationResponse.value.pegHash)
         masterNegotiation <- getMasterNegotiation(buyerTraderID = buyer.id, sellerTraderID = seller.id, assetID = assetID)
-        _ <- updateMasterNegotiation(negotiation = masterNegotiation, negotiationID = negotiationResponse.value.negotiationID, price = new MicroInt(negotiationResponse.value.bid.toLong).double.toInt, time = negotiationResponse.value.time.toInt)
+        _ <- updateMasterNegotiation(negotiation = masterNegotiation, negotiationID = negotiationResponse.value.negotiationID, price = new MicroInt(negotiationResponse.value.bid.toLong), time = negotiationResponse.value.time.toInt)
         _ <- sendNotifications(buyer = buyer, seller = seller, negotiation = masterNegotiation)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

@@ -28,6 +28,6 @@ object AddBillOfLading {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Int, quantityUnit: String, assetPricePerUnit: Int)
+  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Int, quantityUnit: String, assetPricePerUnit: Double)
 
 }

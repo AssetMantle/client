@@ -20,6 +20,6 @@ object IssueAsset {
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.issueAssetConstraint)
   )
 
-  case class Data(assetType: String, description: String, quantity: Int, quantityUnit: String, pricePerUnit: Int, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, moderated: Boolean, gas: Option[Int], password: Option[String])
+  case class Data(assetType: String, description: String, quantity: Int, quantityUnit: String, pricePerUnit: Double, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, moderated: Boolean, gas: Option[Int], password: Option[String])
 
 }

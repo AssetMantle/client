@@ -60,8 +60,6 @@ class SendAssets @Inject()(
 
   private[models] val sendAssetTable = TableQuery[SendAssetTable]
 
-  private implicit val assetWrites: OWrites[blockchain.Asset] = Json.writes[blockchain.Asset]
-
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
@@ -229,7 +227,7 @@ class SendAssets @Inject()(
         val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
 
         def status(fiatsInOrder: MicroInt): String = {
-          if (fiatsInOrder.double >= negotiation.price.toDouble) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+          if (fiatsInOrder.value >= negotiation.price.value) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
           else constants.Status.Order.ASSET_SENT_FIAT_PENDING
         }
 

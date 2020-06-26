@@ -14,12 +14,13 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroInt
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] with Logged {
+case class ConfirmBuyerBid(from: String, to: String, bid: MicroInt, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] with Logged {
   def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -36,6 +37,12 @@ class ConfirmBuyerBids @Inject()(
                                   masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                   masterNegotiations: master.Negotiations,
                                 )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+
+  def serialize(confirmBuyerBid: ConfirmBuyerBid): ConfirmBuyerBidSerialized = ConfirmBuyerBidSerialized(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid.value, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, buyerContractHash = confirmBuyerBid.buyerContractHash, gas = confirmBuyerBid.gas, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code, createdBy = confirmBuyerBid.createdBy, createdOn = confirmBuyerBid.createdOn, createdOnTimeZone = confirmBuyerBid.createdOnTimeZone, updatedBy = confirmBuyerBid.updatedBy, updatedOn = confirmBuyerBid.updatedOn, updatedOnTimeZone = confirmBuyerBid.updatedOnTimeZone)
+
+  case class ConfirmBuyerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = new MicroInt(bid), time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_BUYER_BID
 
@@ -59,14 +66,14 @@ class ConfirmBuyerBids @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(confirmBuyerBid: ConfirmBuyerBid): Future[String] = db.run((confirmBuyerBidTable returning confirmBuyerBidTable.map(_.ticketID) += confirmBuyerBid).asTry).map {
+  private def add(confirmBuyerBidSerialized: ConfirmBuyerBidSerialized): Future[String] = db.run((confirmBuyerBidTable returning confirmBuyerBidTable.map(_.ticketID) += confirmBuyerBidSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[ConfirmBuyerBid] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[ConfirmBuyerBidSerialized] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -129,15 +136,15 @@ class ConfirmBuyerBids @Inject()(
     }
   }
 
-  private[models] class ConfirmBuyerBidTable(tag: Tag) extends Table[ConfirmBuyerBid](tag, "ConfirmBuyerBid") {
+  private[models] class ConfirmBuyerBidTable(tag: Tag) extends Table[ConfirmBuyerBidSerialized](tag, "ConfirmBuyerBid") {
 
-    def * = (from, to, bid, time, pegHash, buyerContractHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ConfirmBuyerBid.tupled, ConfirmBuyerBid.unapply)
+    def * = (from, to, bid, time, pegHash, buyerContractHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ConfirmBuyerBidSerialized.tupled, ConfirmBuyerBidSerialized.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
-    def bid = column[Int]("bid")
+    def bid = column[Long]("bid")
 
     def time = column[Int]("time")
 
@@ -172,7 +179,7 @@ class ConfirmBuyerBids @Inject()(
 
   object Service {
 
-    def create(confirmBuyerBid: ConfirmBuyerBid): Future[String] = add(ConfirmBuyerBid(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, gas = confirmBuyerBid.gas, buyerContractHash = confirmBuyerBid.buyerContractHash, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code))
+    def create(confirmBuyerBid: ConfirmBuyerBid): Future[String] = add(serialize(ConfirmBuyerBid(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, gas = confirmBuyerBid.gas, buyerContractHash = confirmBuyerBid.buyerContractHash, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code)))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -182,7 +189,7 @@ class ConfirmBuyerBids @Inject()(
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[ConfirmBuyerBid] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[ConfirmBuyerBid] = findByTicketID(ticketID).map(_.deserialize())
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 

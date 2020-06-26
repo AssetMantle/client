@@ -8,8 +8,8 @@
     @commonInputText(buyerConfirmNegotiationForm, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET_DETAILS)</div>
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price.double/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.string, Messages(constants.View.USD)).mkString(" "))
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(""))
     @commonInputInt(buyerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(buyerConfirmNegotiationForm, constants.FormField.PASSWORD)

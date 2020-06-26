@@ -413,7 +413,7 @@ class NegotiationController @Inject()(
                   transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
                     entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime), pegHash = pegHash, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionChangeBuyerBids.Service.create,
-                    request = transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = sellerAddress, password = acceptRequestData.password, bid = new MicroInt(negotiation.price).value.toString, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, mode = transactionMode),
+                    request = transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = sellerAddress, password = acceptRequestData.password, bid = negotiation.price.value.toString, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, mode = transactionMode),
                     action = transactionsChangeBuyerBid.Service.post,
                     onSuccess = blockchainTransactionChangeBuyerBids.Utility.onSuccess,
                     onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
@@ -540,7 +540,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = negotiation.price / negotiation.quantity, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = ""))))
+        withUsernameToken.Ok(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = negotiation.price.double / negotiation.quantity, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = ""))))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -572,11 +572,11 @@ class NegotiationController @Inject()(
 
           def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def sendTransaction(buyerAddress: String, pegHash: String, price: Int): Future[String] = {
+          def sendTransaction(buyerAddress: String, pegHash: String, price: MicroInt): Future[String] = {
             transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
               entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = buyerAddress, bid = price, time = constants.Blockchain.NegotiationDefaultTime, pegHash = pegHash, gas = updateAssetTermsData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
-              request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = loginState.address, gas = updateAssetTermsData.gas.toString), to = buyerAddress, password = updateAssetTermsData.password, bid =new MicroInt(price).value.toString, time = constants.Blockchain.NegotiationDefaultTime.toString, pegHash = pegHash, mode = transactionMode),
+              request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = loginState.address, gas = updateAssetTermsData.gas.toString), to = buyerAddress, password = updateAssetTermsData.password, bid = price.value.toString, time = constants.Blockchain.NegotiationDefaultTime.toString, pegHash = pegHash, mode = transactionMode),
               action = transactionsChangeSellerBid.Service.post,
               onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
               onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
@@ -588,11 +588,11 @@ class NegotiationController @Inject()(
             if (traderID == negotiation.sellerTraderID) {
               if (validateUsernamePassword) {
                 val updateDescription = if (updateAssetTermsData.description != negotiation.assetDescription) masterNegotiations.Service.updateAssetDescription(id = updateAssetTermsData.id, assetDescription = updateAssetTermsData.description, if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedAssetDescription) else Future(0)
-                val updatePrice = if (updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity != negotiation.price) {
+                val updatePrice = if (new MicroInt(updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity) != negotiation.price) {
                   for {
                     pegHash <- getPegHash(negotiation.assetID)
                     buyerAddress <- getAddress(buyerAccountID)
-                    ticketID <- sendTransaction(buyerAddress = buyerAddress, pegHash = pegHash, price = updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity)
+                    ticketID <- sendTransaction(buyerAddress = buyerAddress, pegHash = pegHash, price = new MicroInt(updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity))
                   } yield 0
                 } else Future(0)
                 val updateQuantity = if (updateAssetTermsData.quantity != negotiation.quantity || updateAssetTermsData.quantityUnit != negotiation.quantityUnit) masterNegotiations.Service.updateQuantity(id = updateAssetTermsData.id, quantity = updateAssetTermsData.quantity, quantityUnit = updateAssetTermsData.quantityUnit, if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedQuantity) else Future(0)
@@ -605,7 +605,7 @@ class NegotiationController @Inject()(
                   _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, negotiation.sellerTraderID)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateAssetTermsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
                 } yield result
-              } else Future(BadRequest(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = negotiation.price / negotiation.quantity, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = "")).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+              } else Future(BadRequest(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = negotiation.price.double / negotiation.quantity, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = "")).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
             } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
@@ -1080,7 +1080,7 @@ class NegotiationController @Inject()(
                     val ticketID = transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
                       entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime), pegHash = pegHash, buyerContractHash = contractHash, gas = buyerConfirmData.gas, ticketID = "", mode = transactionMode),
                       blockchainTransactionCreate = blockchainTransactionConfirmBuyerBids.Service.create,
-                      request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = loginState.address, gas = buyerConfirmData.gas.toString), to = sellerAddress, password = buyerConfirmData.password, bid =new MicroInt(negotiation.price).value.toString, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, buyerContractHash = contractHash, mode = transactionMode),
+                      request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = loginState.address, gas = buyerConfirmData.gas.toString), to = sellerAddress, password = buyerConfirmData.password, bid = negotiation.price.value.toString, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, buyerContractHash = contractHash, mode = transactionMode),
                       action = transactionsConfirmBuyerBid.Service.post,
                       onSuccess = blockchainTransactionConfirmBuyerBids.Utility.onSuccess,
                       onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure,
@@ -1185,7 +1185,7 @@ class NegotiationController @Inject()(
                     val ticketID = transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
                       entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime), pegHash = pegHash, sellerContractHash = contractHash, gas = sellerConfirmData.gas, ticketID = "", mode = transactionMode),
                       blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
-                      request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = sellerConfirmData.gas.toString), to = buyerAddress, password = sellerConfirmData.password, bid =new MicroInt(negotiation.price).value.toString, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, sellerContractHash = contractHash, mode = transactionMode),
+                      request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = sellerConfirmData.gas.toString), to = buyerAddress, password = sellerConfirmData.password, bid =negotiation.price.value.toString, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, sellerContractHash = contractHash, mode = transactionMode),
                       action = transactionsConfirmSellerBid.Service.post,
                       onSuccess = blockchainTransactionConfirmSellerBids.Utility.onSuccess,
                       onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,

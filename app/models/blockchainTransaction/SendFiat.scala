@@ -244,9 +244,9 @@ class SendFiats @Inject()(
 
       def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation, amountSent: MicroInt): Future[Unit] = {
         def status(fiatsInOrder: MicroInt, assetSent: Boolean): String = {
-          if (fiatsInOrder.double >= negotiation.price.toDouble && assetSent) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
-          else if (fiatsInOrder.double >= negotiation.price.toDouble && !assetSent) constants.Status.Order.FIAT_SENT_ASSET_PENDING
-          else if (fiatsInOrder.double < negotiation.price.toDouble && assetSent) constants.Status.Order.ASSET_SENT_FIAT_PENDING
+          if (fiatsInOrder.value >= negotiation.price.value && assetSent) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+          else if (fiatsInOrder.value >= negotiation.price.value && !assetSent) constants.Status.Order.FIAT_SENT_ASSET_PENDING
+          else if (fiatsInOrder.value < negotiation.price.value && assetSent) constants.Status.Order.ASSET_SENT_FIAT_PENDING
           else constants.Status.Order.ASSET_AND_FIAT_PENDING
         }
 

@@ -43,7 +43,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = negotiation.price.toDouble - fiatsInOrder.double))
+      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = negotiation.price.double - fiatsInOrder.double))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
@@ -93,7 +93,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           }
 
           def getResult(fiatsInOrder: MicroInt, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
-            if (fiatsInOrder.double + sendFiatData.sendAmount <= negotiation.price.toDouble) {
+            if (fiatsInOrder.double + sendFiatData.sendAmount <= negotiation.price.double) {
               for {
                 sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
                 sellerAddress <- getAddress(sellerAccountID)
@@ -101,7 +101,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.toDouble - fiatsInOrder.double), sendFiatData.negotiationID, sendFiatData.sendAmount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.double - fiatsInOrder.double), sendFiatData.negotiationID, sendFiatData.sendAmount)))
             }
           }
 
