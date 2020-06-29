@@ -124,7 +124,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def generateDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: MicroLong, moderated: Boolean): String = utilities.String.sha256Sum(Seq(assetID, ownerID, assetType, description, quantity.toString(), quantity, price.value.toString, moderated.toString()).mkString(""))
+  private def generateDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: Int, quantityUnit: String, price: MicroLong, moderated: Boolean): String = utilities.String.sha256Sum(Seq(assetID, ownerID, assetType, description, quantity.toString(), quantity, price.microString, moderated.toString()).mkString(""))
 
   private[models] class AssetTable(tag: Tag) extends Table[AssetSerializable](tag, "Asset") {
 
