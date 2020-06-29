@@ -136,6 +136,7 @@ object FormField {
   val GAS = new IntFormField("GAS", 20000, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
+  val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
   val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
@@ -144,7 +145,6 @@ object FormField {
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
   val INVOICE_AMOUNT = new IntFormField("INVOICE_AMOUNT", 0, Int.MaxValue)
-  val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
@@ -156,9 +156,6 @@ object FormField {
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
-  val TRANSACTION_AMOUNT = new DoubleFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
-  val SEND_AMOUNT= new DoubleFormField("SEND_AMOUNT", 0, Double.MaxValue)
-  val REDEEM_AMOUNT = new DoubleFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -206,6 +203,9 @@ object FormField {
 
   //MicroLongFormField
   val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
+  val TRANSACTION_AMOUNT = new MicroLongFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
+  val SEND_AMOUNT= new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
+  val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

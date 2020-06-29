@@ -80,7 +80,7 @@ class WesternUnionController @Inject()(
 
         def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroLong(requestBody.paidOutAmount))
 
-        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroLong( requestBody.paidOutAmount), new MicroLong(0))
+        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroLong(requestBody.paidOutAmount), new MicroLong(0))
 
         for {
           _ <- createRTCB
@@ -110,7 +110,7 @@ class WesternUnionController @Inject()(
           val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
           val traderDetails = masterTraders.Service.tryGetByAccountID(loginState.username)
 
-          def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = new MicroLong(issueFiatRequestData.transactionAmount))
+          def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
 
           def organizationDetails(organizationID: String): Future[master.Organization] = masterOrganizations.Service.tryGet(organizationID)

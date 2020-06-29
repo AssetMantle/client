@@ -5,7 +5,7 @@
 @commonForm(constants.Form.BLOCKCHAIN_SEND_FIAT, sendFiatForm) {
     @commonInputText(sendFiatForm, constants.FormField.FROM)
     @commonInputText(sendFiatForm, constants.FormField.TO)
-    @commonInputDouble(sendFiatForm, constants.FormField.SEND_AMOUNT)
+    @commonInputMicroLong(sendFiatForm, constants.FormField.SEND_AMOUNT)
     @commonInputText(sendFiatForm, constants.FormField.PEG_HASH)
     @commonInputInt(sendFiatForm, constants.FormField.GAS)
     @commonSelect(sendFiatForm, constants.FormField.MODE)

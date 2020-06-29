@@ -2,6 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroLong
 
 object IssueFiatRequest {
   val form = Form(
@@ -10,6 +11,6 @@ object IssueFiatRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(transactionAmount: Double)
+  case class Data(transactionAmount: MicroLong)
 
 }
