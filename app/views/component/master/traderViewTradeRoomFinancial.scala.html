@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.Negotiation
-@(walletBalance: Int, amountPaid: Int, amountPending: Int, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(walletBalance: Double, amountPaid: Double, amountPending: Double, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <ul class="">
     <li class="cmuk-flex">
         <div class="cmuk-flex wallet">

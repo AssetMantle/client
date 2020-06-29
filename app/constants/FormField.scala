@@ -6,7 +6,7 @@ import play.api.data.Forms.{boolean, date, number, of, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
-
+import utilities.MicroLong
 import scala.util.matching.Regex
 
 object FormField {
@@ -138,11 +138,8 @@ object FormField {
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
-  val ASSET_PRICE_PER_UNIT = new IntFormField("ASSET_PRICE_PER_UNIT", 0, Int.MaxValue)
-  val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
-  val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
-  val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
+  val SCAN_ID = new IntFormField("SCAN_ID", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
@@ -204,6 +201,12 @@ object FormField {
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
 
+  //MicroLongFormField
+  val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
+  val TRANSACTION_AMOUNT = new MicroLongFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
+  val SEND_AMOUNT = new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
+  val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
+
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
@@ -239,4 +242,8 @@ object FormField {
     val name: String = fieldName
   }
 
+  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
+    val name: String = fieldName
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
+  }
 }

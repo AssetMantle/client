@@ -14,14 +14,14 @@
         @fiatRequestList.map{fiatRequest=>
             @commonVerticalInfoBox() {
                 @commonVerticalTextInfo(constants.View.REQUEST_ID,fiatRequest.id)
-                @commonVerticalIntInfo(constants.View.AMOUNT_REQUESTED,fiatRequest.transactionAmount)
+                @commonVerticalMicroLongInfo(constants.View.AMOUNT_REQUESTED,fiatRequest.transactionAmount)
                 @if(fiatRequest.status == constants.Status.IssueFiat.REQUEST_INITIATED){
                     @commonVerticalTextInfo(constants.View.STATUS,fiatRequest.status)
                 }else{
                     @rtcbList.find(_.externalReference ==fiatRequest.id) match {
                         case Some(rtcb) => {
                             @commonVerticalTextInfo(constants.View.STATUS,fiatRequest.status)
-                            @commonVerticalIntInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
+                            @commonVerticalMicroLongInfo(constants.View.AMOUNT_RECEIVED, rtcb.paidOutAmount)
                         }
                         case None=>{}
 

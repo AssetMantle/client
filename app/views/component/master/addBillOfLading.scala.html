@@ -19,7 +19,7 @@
     @commonInputText(addBillOfLadingForm, constants.FormField.ASSET_DESCRIPTION)
     @commonInputInt(addBillOfLadingForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(addBillOfLadingForm, constants.FormField.QUANTITY_UNIT)
-    @commonInputInt(addBillOfLadingForm, constants.FormField.ASSET_PRICE_PER_UNIT)
+    @commonInputMicroLong(addBillOfLadingForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${negotiationID}'")
 }
 

@@ -9,6 +9,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import utilities.MicroLong
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,7 +62,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
                 val ticketID = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
                   entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
-                  request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
+                  request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.microString, mode = transactionMode),
                   action = transactionsRedeemFiat.Service.post,
                   onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
                   onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
@@ -124,7 +125,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
         Future(BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors)))
       },
       redeemFiatData => {
-        val post = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = redeemFiatData.from, gas = redeemFiatData.gas.toString), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = redeemFiatData.mode))
+        val post = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = redeemFiatData.from, gas = redeemFiatData.gas.toString), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.microString, mode = redeemFiatData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))

@@ -15,18 +15,24 @@ import play.api.{Configuration, Logger}
 import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueFiat] with Logged {
+case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: MicroLong, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueFiat] with Logged {
   def mutateTicketID(newTicketID: String): IssueFiat = IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = transactionAmount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
 class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterFiats: master.Fiats, masterTraders: master.Traders, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, getAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+
+  def serialize(issueFiat: IssueFiat): IssueFiatSerialized = IssueFiatSerialized(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount.value, gas = issueFiat.gas, status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code, createdBy = issueFiat.createdBy, createdOn = issueFiat.createdOn, createdOnTimeZone = issueFiat.createdOnTimeZone, updatedBy = issueFiat.updatedBy, updatedOn = issueFiat.updatedOn, updatedOnTimeZone = issueFiat.updatedOnTimeZone)
+
+  case class IssueFiatSerialized(from: String, to: String, transactionID: String, transactionAmount: Long, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): IssueFiat = IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = new MicroLong(transactionAmount), gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
@@ -52,14 +58,14 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(issueFiat: IssueFiat): Future[String] = db.run((issueFiatTable returning issueFiatTable.map(_.ticketID) += issueFiat).asTry).map {
+  private def add(issueFiatSerialized: IssueFiatSerialized): Future[String] = db.run((issueFiatTable returning issueFiatTable.map(_.ticketID) += issueFiatSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[IssueFiat] = db.run(issueFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[IssueFiatSerialized] = db.run(issueFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -122,9 +128,9 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
   }
 
-  private[models] class IssueFiatTable(tag: Tag) extends Table[IssueFiat](tag, "IssueFiat") {
+  private[models] class IssueFiatTable(tag: Tag) extends Table[IssueFiatSerialized](tag, "IssueFiat") {
 
-    def * = (from, to, transactionID, transactionAmount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IssueFiat.tupled, IssueFiat.unapply)
+    def * = (from, to, transactionID, transactionAmount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IssueFiatSerialized.tupled, IssueFiatSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -132,7 +138,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
     def transactionID = column[String]("transactionID")
 
-    def transactionAmount = column[Int]("transactionAmount")
+    def transactionAmount = column[Long]("transactionAmount")
 
     def gas = column[Int]("gas")
 
@@ -161,7 +167,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(issueFiat: IssueFiat): Future[String] = add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, gas = issueFiat.gas, status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code))
+    def create(issueFiat: IssueFiat): Future[String] = add(serialize(issueFiat))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -171,7 +177,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[IssueFiat] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[IssueFiat] = findByTicketID(ticketID).map(_.deserialize())
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -193,7 +199,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
           case Some(fiatPegWallet) => fiatPegWallet.find(_.transactionID == issueFiat.transactionID).getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
           case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
         }
-        blockchainFiats.Service.create(pegHash = fiat.pegHash, ownerAddress = issueFiat.to, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)
+        blockchainFiats.Service.create(pegHash = fiat.pegHash, ownerAddress = issueFiat.to, transactionID = fiat.transactionID, transactionAmount = new MicroLong(fiat.transactionAmount.toLong), redeemedAmount = new MicroLong(fiat.redeemedAmount.toLong), dirtyBit = false)
       }
 
       def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)

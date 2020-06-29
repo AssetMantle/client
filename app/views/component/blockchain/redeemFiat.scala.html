@@ -5,7 +5,7 @@
 @commonForm(constants.Form.BLOCKCHAIN_REDEEM_FIAT, redeemFiatForm) {
     @commonInputText(redeemFiatForm, constants.FormField.FROM)
     @commonInputText(redeemFiatForm, constants.FormField.TO)
-    @commonInputInt(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
+    @commonInputMicroLong(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
     @commonInputInt(redeemFiatForm, constants.FormField.GAS)
     @commonSelect(redeemFiatForm, constants.FormField.MODE)
     @commonInputPassword(redeemFiatForm, constants.FormField.PASSWORD)

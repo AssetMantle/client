@@ -1,0 +1,9 @@
+- name: copy 0.sql file
+  copy: 
+    src: commit/commit-1.0/conf/evolutions/default/0.sql
+    dest: var/lib/postgresql/
+    remote_src: yes
+- name: Run sql file
+  become: yes
+  become_user: postgres
+  command: psql -f /root/commit/commit-1.0/conf/evolutions/default/0.sql

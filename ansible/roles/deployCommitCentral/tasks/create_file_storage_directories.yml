@@ -1,0 +1,13 @@
+- name: Create various directories for storing commit files	
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - commit/commitFiles/account/KYC/bankDetails
+    - commit/commitFiles/account/KYC/identification  
+    - commit/commitFiles/account/profilePicture
+    - commit/commitFiles/zone/KYC/bankDetails
+    - commit/commitFiles/zone/KYC/identification
+    - commit/commitFiles/organization/KYC/bankDetails  
+    - commit/commitFiles/organization/KYC/identification/
+    - commit/commitFiles/trader/KYC/identification/

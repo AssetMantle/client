@@ -1,0 +1,22 @@
+- name: Edit the config file
+  blockinfile:
+    path: commit/commit-1.0/conf/application.conf
+    block: | 
+            upload {
+             account {
+               bankDetailsPath = """{{ansible_ssh_user}}/commit/commitFiles/account/KYC/bankDetails/"""
+               identificationPath = """{{ansible_ssh_user}}/commit/commitFiles/account/KYC/identification/"""
+               profilePicturePath = """{{ansible_ssh_user}}/commit/commitFiles/account/profilePicture/"""
+                     }
+                 zone {
+                   bankDetailsPath = """{{ansible_ssh_user}}/commit/commitFiles/zone/KYC/bankDetails/"""
+                   identificationPath = """{{ansible_ssh_user}}/commit/commitFiles/zone/KYC/identification/"""
+                     }
+                 organization {
+                   bankDetailsPath = """{{ansible_ssh_user}}/commit/commitFiles/organization/KYC/bankDetails/"""
+                   identificationPath = """{{ansible_ssh_user}}/commit/commitFiles/organization/KYC/identification/"""
+                     }
+                 trader {
+                 identificationPath = """{{ansible_ssh_user}}/commit/commitFiles/trader/KYC/identification/"""
+                   }
+                 }
