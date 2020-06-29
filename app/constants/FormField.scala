@@ -139,7 +139,7 @@ object FormField {
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
-  val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
+  val SCAN_ID = new IntFormField("SCAN_ID", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
@@ -204,7 +204,7 @@ object FormField {
   //MicroLongFormField
   val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
   val TRANSACTION_AMOUNT = new MicroLongFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
-  val SEND_AMOUNT= new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
+  val SEND_AMOUNT = new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
   val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
 
   //TODO: Error Response through Messages
@@ -245,11 +245,12 @@ object FormField {
   class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
 
-    def f1(a:Double)= new MicroLong(a)
-    def f2(m:MicroLong)=m.realDouble
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](f1,f2)
-  }
+    def f1(a: Double) = new MicroLong(a)
 
+    def f2(m: MicroLong) = m.realDouble
+
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](f1, f2)
+  }
 
 
 }
