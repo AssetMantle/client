@@ -14,7 +14,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.responses._
 import slick.jdbc.JdbcProfile
-import utilities.MicroInt
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -179,7 +179,7 @@ class Orders @Inject()(actorSystem: ActorSystem,
                   val deleteOrderFiats = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
                   val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash, masterNegotiation.buyerTraderID)
                   val markMasterOrderStatusCompleted = masterOrders.Service.markStatusCompletedByBCOrderID(dirtyOrder.id)
-                  val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.sellerTraderID, masterOrder.id, new MicroInt(fiatsInOrder), constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT)
+                  val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.sellerTraderID, masterOrder.id, new MicroLong(fiatsInOrder), constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT)
                   for {
                     _ <- updateAsset
                     _ <- sellerMarkDirty
@@ -196,7 +196,7 @@ class Orders @Inject()(actorSystem: ActorSystem,
                 val deleteOrderFiats = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id) else Future(0)
                 val resetMasterAssetStatus = if (assetPegWallet.nonEmpty) masterAssets.Service.resetStatusByPegHash(assetPegWallet.head.pegHash, masterNegotiation.sellerTraderID) else Future(0)
                 val markMasterOrderStatusReversed = masterOrders.Service.markStatusReversedByBCOrderID(dirtyOrder.id)
-                val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.buyerTraderID, masterOrder.id, new MicroInt(fiatsInOrder), constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)
+                val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.buyerTraderID, masterOrder.id, new MicroLong(fiatsInOrder), constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)
                 for {
                   _ <- updateAsset
                   _ <- buyerMarkDirty

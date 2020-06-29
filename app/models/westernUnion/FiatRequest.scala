@@ -9,12 +9,12 @@ import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import utilities.MicroInt
+import utilities.MicroLong
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class FiatRequest(id: String, traderID: String, transactionAmount: MicroInt, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class FiatRequest(id: String, traderID: String, transactionAmount: MicroLong, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -22,7 +22,7 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
   def serialize(fiatRequest: FiatRequest): FiatRequestSerialized = FiatRequestSerialized(id = fiatRequest.id, traderID = fiatRequest.traderID, transactionAmount = fiatRequest.transactionAmount.value, status = fiatRequest.status, createdBy = fiatRequest.createdBy, createdOn = fiatRequest.createdOn, createdOnTimeZone = fiatRequest.createdOnTimeZone, updatedBy = fiatRequest.updatedBy, updatedOn = fiatRequest.updatedOn, updatedOnTimeZone = fiatRequest.updatedOnTimeZone)
 
   case class FiatRequestSerialized(id: String, traderID: String, transactionAmount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): FiatRequest = FiatRequest(id = id, traderID = traderID, transactionAmount = new MicroInt(transactionAmount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize(): FiatRequest = FiatRequest(id = id, traderID = traderID, transactionAmount = new MicroLong(transactionAmount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -110,7 +110,7 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(traderID: String, transactionAmount: MicroInt): Future[String] = add(serialize(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.IssueFiat.REQUEST_INITIATED)))
+    def create(traderID: String, transactionAmount: MicroLong): Future[String] = add(serialize(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.IssueFiat.REQUEST_INITIATED)))
 
     def tryGetByID(id: String): Future[FiatRequest] = findByID(id).map(_.deserialize())
 

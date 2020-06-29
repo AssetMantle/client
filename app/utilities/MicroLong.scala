@@ -1,6 +1,6 @@
 package utilities
 
-class MicroInt(val value: Long) {
+class MicroLong(val value: Long) {
 
   def this(value: String) = this((value.toDouble * 1000000).toLong)
 
@@ -8,8 +8,12 @@ class MicroInt(val value: Long) {
 
   def this(value: Double) = this((value * 1000000).toLong)
 
-  def string = (value.toDouble / 1000000).toString
+  def realString = (value.toDouble / 1000000).toString
 
-  def double = value.toDouble / 1000000
+  def microString=value.toString
+
+  def realDouble = value.toDouble / 1000000
+
+  def microDouble=value.toDouble
 
 }

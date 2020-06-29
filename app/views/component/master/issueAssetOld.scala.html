@@ -8,7 +8,7 @@
     @commonInputText(issueAssetForm, constants.FormField.TRADER_ID)
     @commonInputText(issueAssetForm, constants.FormField.DOCUMENT_HASH)
     @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)
-    @commonInputDouble(issueAssetForm, constants.FormField.ASSET_PRICE_PER_UNIT)
+    @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
     @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
     @commonInputInt(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")

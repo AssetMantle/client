@@ -2,6 +2,8 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import utilities.MicroLong
+
 
 object UpdateNegotiationAssetTerms {
   val form = Form(
@@ -16,6 +18,6 @@ object UpdateNegotiationAssetTerms {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, description: String, pricePerUnit: Double, quantity: Int, quantityUnit: String, gas: Int, password: String)
+  case class Data(id: String, description: String, pricePerUnit: MicroLong, quantity: Int, quantityUnit: String, gas: Int, password: String)
 
 }

@@ -11,7 +11,7 @@
     @sendFiatRequestList.map { sendFiatRequest =>
         @commonVerticalInfoBox() {
             @commonVerticalTextInfo(constants.View.ID, sendFiatRequest.id)
-            @commonVerticalMicroIntInfo(constants.View.AMOUNT, sendFiatRequest.amount)
+            @commonVerticalMicroLongInfo(constants.View.AMOUNT, sendFiatRequest.amount)
             @commonVerticalTextInfo(constants.View.STATUS, sendFiatRequest.status)
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
                 @if(history){

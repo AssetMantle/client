@@ -17,7 +17,7 @@ import play.api.{Configuration, Logger}
 import queries.GetOrder
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.MicroInt
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -226,7 +226,7 @@ class SendAssets @Inject()(
       } else {
         val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
 
-        def status(fiatsInOrder: MicroInt): String = {
+        def status(fiatsInOrder: MicroLong): String = {
           if (fiatsInOrder.value >= negotiation.price.value) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
           else constants.Status.Order.ASSET_SENT_FIAT_PENDING
         }

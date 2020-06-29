@@ -6,7 +6,7 @@ import play.api.data.Forms.{boolean, date, number, of, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
-
+import utilities.MicroLong
 import scala.util.matching.Regex
 
 object FormField {
@@ -136,7 +136,6 @@ object FormField {
   val GAS = new IntFormField("GAS", 20000, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
-  val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
   val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
@@ -145,6 +144,7 @@ object FormField {
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
   val INVOICE_AMOUNT = new IntFormField("INVOICE_AMOUNT", 0, Int.MaxValue)
+  val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
@@ -159,7 +159,6 @@ object FormField {
   val TRANSACTION_AMOUNT = new DoubleFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
   val SEND_AMOUNT= new DoubleFormField("SEND_AMOUNT", 0, Double.MaxValue)
   val REDEEM_AMOUNT = new DoubleFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
-  val ASSET_PRICE_PER_UNIT = new DoubleFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -205,6 +204,9 @@ object FormField {
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
 
+  //MicroLongFormField
+  val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
+
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
@@ -239,5 +241,15 @@ object FormField {
   class NestedFormField(fieldName: String) {
     val name: String = fieldName
   }
+
+  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
+    val name: String = fieldName
+
+    def f1(a:Double)= new MicroLong(a)
+    def f2(m:MicroLong)=m.realDouble
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](f1,f2)
+  }
+
+
 
 }

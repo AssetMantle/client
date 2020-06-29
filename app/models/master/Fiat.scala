@@ -9,12 +9,12 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import utilities.MicroInt
+import utilities.MicroLong
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Fiat(ownerID: String, transactionID: String, transactionAmount: MicroInt, amountRedeemed: MicroInt, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Fiat(ownerID: String, transactionID: String, transactionAmount: MicroLong, amountRedeemed: MicroLong, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -22,7 +22,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   def serialize(fiat: Fiat): FiatSerialized = FiatSerialized(ownerID = fiat.ownerID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount.value, amountRedeemed =fiat.amountRedeemed.value, status = fiat.status, createdBy = fiat.createdBy, createdOn = fiat.createdOn, createdOnTimeZone = fiat.createdOnTimeZone, updatedBy = fiat.updatedBy, updatedOn = fiat.updatedOn, updatedOnTimeZone = fiat.updatedOnTimeZone)
 
   case class FiatSerialized(ownerID: String, transactionID: String, transactionAmount: Long, amountRedeemed: Long, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) {
-    def deserialize(): Fiat = Fiat(ownerID = ownerID, transactionID = transactionID, transactionAmount = new MicroInt(transactionAmount), amountRedeemed = new MicroInt(amountRedeemed), status = status,createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize(): Fiat = Fiat(ownerID = ownerID, transactionID = transactionID, transactionAmount = new MicroLong(transactionAmount), amountRedeemed = new MicroLong(amountRedeemed), status = status,createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -126,15 +126,15 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(ownerID: String, transactionID: String, transactionAmount: MicroInt, amountRedeemed: MicroInt): Future[String] = add(FiatSerialized(ownerID, transactionID, transactionAmount.value, amountRedeemed.value, status = None))
+    def create(ownerID: String, transactionID: String, transactionAmount: MicroLong, amountRedeemed: MicroLong): Future[String] = add(FiatSerialized(ownerID, transactionID, transactionAmount.value, amountRedeemed.value, status = None))
 
-    def updateFiat(ownerID: String, transactionID: String, transactionAmount: MicroInt, amountRedeemed: MicroInt): Future[Int] = update(FiatSerialized(ownerID, transactionID, transactionAmount.value, amountRedeemed.value, status = Some(true)))
+    def updateFiat(ownerID: String, transactionID: String, transactionAmount: MicroLong, amountRedeemed: MicroLong): Future[Int] = update(FiatSerialized(ownerID, transactionID, transactionAmount.value, amountRedeemed.value, status = Some(true)))
 
-    def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: MicroInt, amountRedeemed: MicroInt): Future[Int] = upsert(FiatSerialized(ownerID, transactionID, transactionAmount.value, amountRedeemed.value, status = Some(true)))
+    def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: MicroLong, amountRedeemed: MicroLong): Future[Int] = upsert(FiatSerialized(ownerID, transactionID, transactionAmount.value, amountRedeemed.value, status = Some(true)))
 
     def updateAllTransactionAmountsToZero(ownerID: String): Future[Int] = updateTransactionAmountByOwnerID(ownerID, 0)
 
-    def getRTCBAmountsByTransactionID(transactionID: String): Future[Option[MicroInt]] = getTransactionAmountsByTransactionID(transactionID).map(_.map(new MicroInt(_)))
+    def getRTCBAmountsByTransactionID(transactionID: String): Future[Option[MicroLong]] = getTransactionAmountsByTransactionID(transactionID).map(_.map(new MicroLong(_)))
 
     def getFiatPegWallet(ownerID: String): Future[Seq[Fiat]] = getFiatPegWalletByOwnerID(ownerID).map(_.map(_.deserialize()))
 
@@ -144,9 +144,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def markFailure(ownerID: String, transactionID: String): Future[Int] = updateStatus(ownerID, transactionID, status = false)
 
-    def updateTransactionAmount(ownerID: String, transactionID: String, transactionAmount: MicroInt): Future[Int] = updateAmountByOwnerIDAndTransactionID(ownerID = ownerID, transactionID = transactionID, transactionAmount = transactionAmount.value)
+    def updateTransactionAmount(ownerID: String, transactionID: String, transactionAmount: MicroLong): Future[Int] = updateAmountByOwnerIDAndTransactionID(ownerID = ownerID, transactionID = transactionID, transactionAmount = transactionAmount.value)
 
-    def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: MicroInt, amountRedeemed: MicroInt, status: Option[Boolean]): Future[Int] = upsert(FiatSerialized(ownerID, transactionID = transactionID, transactionAmount = transactionAmount.value, amountRedeemed = amountRedeemed.value, status = status))
+    def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: MicroLong, amountRedeemed: MicroLong, status: Option[Boolean]): Future[Int] = upsert(FiatSerialized(ownerID, transactionID = transactionID, transactionAmount = transactionAmount.value, amountRedeemed = amountRedeemed.value, status = status))
 
   }
 

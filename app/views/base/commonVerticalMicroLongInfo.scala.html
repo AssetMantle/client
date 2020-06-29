@@ -1,9 +1,9 @@
-@import utilities.MicroInt
+@import utilities.MicroLong
 
-@(key: String, value: MicroInt, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+@(key: String, value: MicroLong, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 <div class="listItemChild">
     <p class="listItemChildTitle">@Messages(key)</p>
     <p id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("listItemChildValue")' title="@value">
-    @value.string
+    @value.realString
     </p>
 </div>

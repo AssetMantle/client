@@ -9,7 +9,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroInt
+import utilities.MicroLong
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +43,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = negotiation.price.double - fiatsInOrder.double))
+      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = negotiation.price.realDouble - fiatsInOrder.realDouble))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
@@ -66,7 +66,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
           def assetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
 
-          def createFiatRequest(traderID: String, ticketID: String, negotiationID: String): Future[String] = masterTransactionSendFiatRequests.Service.create(traderID, ticketID, negotiationID, new MicroInt(sendFiatData.sendAmount))
+          def createFiatRequest(traderID: String, ticketID: String, negotiationID: String): Future[String] = masterTransactionSendFiatRequests.Service.create(traderID, ticketID, negotiationID, new MicroLong(sendFiatData.sendAmount))
 
           def sendTransactionAndGetResult(validateUsernamePassword: Boolean, sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[Result] = {
             if (!loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendFiat) throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -74,9 +74,9 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             else {
               if (validateUsernamePassword) {
                 val ticketID = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
-                  entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = new MicroInt(sendFiatData.sendAmount), pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = new MicroLong(sendFiatData.sendAmount), pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = new MicroInt(sendFiatData.sendAmount).value.toString, pegHash = pegHash, mode = transactionMode),
+                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = new MicroLong(sendFiatData.sendAmount).value.toString, pegHash = pegHash, mode = transactionMode),
                   action = transactionsSendFiat.Service.post,
                   onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
                   onFailure = blockchainTransactionSendFiats.Utility.onFailure,
@@ -92,8 +92,8 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             }
           }
 
-          def getResult(fiatsInOrder: MicroInt, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
-            if (fiatsInOrder.double + sendFiatData.sendAmount <= negotiation.price.double) {
+          def getResult(fiatsInOrder: MicroLong, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
+            if (fiatsInOrder.realDouble + sendFiatData.sendAmount <= negotiation.price.realDouble) {
               for {
                 sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
                 sellerAddress <- getAddress(sellerAccountID)
@@ -101,7 +101,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.double - fiatsInOrder.double), sendFiatData.negotiationID, sendFiatData.sendAmount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.realDouble - fiatsInOrder.realDouble), sendFiatData.negotiationID, sendFiatData.sendAmount)))
             }
           }
 
@@ -150,7 +150,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         Future(BadRequest(views.html.component.blockchain.sendFiat(formWithErrors)))
       },
       sendFiatData => {
-        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = new MicroInt(sendFiatData.sendAmount).value.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
+        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = new MicroLong(sendFiatData.sendAmount).value.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))

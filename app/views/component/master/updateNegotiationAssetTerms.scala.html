@@ -6,7 +6,7 @@
 @commonForm(constants.Form.UPDATE_ASSET_TERMS, updateNegotiationAssetTermsForm) {
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.ID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.ASSET_DESCRIPTION)
-    @commonInputDouble(updateNegotiationAssetTermsForm, constants.FormField.ASSET_PRICE_PER_UNIT)
+    @commonInputMicroLong(updateNegotiationAssetTermsForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(updateNegotiationAssetTermsForm, constants.FormField.QUANTITY_UNIT)
     @commonInputInt(updateNegotiationAssetTermsForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
