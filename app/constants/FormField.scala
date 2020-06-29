@@ -244,13 +244,6 @@ object FormField {
 
   class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
-
-    def f1(a: Double) = new MicroLong(a)
-
-    def f2(m: MicroLong) = m.realDouble
-
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](f1, f2)
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
   }
-
-
 }

@@ -121,7 +121,7 @@ class IssueAssetController @Inject()(
         Future(BadRequest(views.html.component.blockchain.issueAsset(formWithErrors)))
       },
       issueAssetData => {
-        val post = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = issueAssetData.from, gas = issueAssetData.gas.toString), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = (issueAssetData.assetPricePerUnit.realDouble * issueAssetData.assetQuantity).toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
+        val post = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = issueAssetData.from, gas = issueAssetData.gas.toString), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = new MicroLong(issueAssetData.assetPricePerUnit.realDouble * issueAssetData.assetQuantity).microString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
