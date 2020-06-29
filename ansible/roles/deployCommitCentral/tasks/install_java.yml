@@ -1,0 +1,33 @@
+---
+- name: debian | ensure the apt repository key is present
+  apt_key:
+        id="ppa:linuxuprising/java"
+        keyserver=keyserver.ubuntu.com
+        state=present
+  when: oracle_java_apt_repository_key is defined
+  become: yes
+  become_method: sudo
+- name: debian | ensure the apt repository is present
+  apt_repository:
+        repo="ppa:linuxuprising/java"
+        update_cache=yes
+        state=present
+  become: yes
+  become_method: sudo
+- name: debian | set license as accepted
+  debconf:
+        name="oracle-java12-installer"
+        question="shared/accepted-oracle-license-v1-2"
+        value='true'
+        vtype='select'
+  become: yes
+  become_method: sudo
+- name: debian | ensure Java is installed
+  apt:
+        name="oracle-java12-installer"
+        state=latest
+        cache_valid_time=3600
+        update_cache=yes
+  register: oracle_java_task_apt_install
+  become: yes
+  become_method: sudo
