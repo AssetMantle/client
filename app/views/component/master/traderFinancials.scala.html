@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@(walletBalance: Int, payable: Int, receivable: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(walletBalance: Double, payable: Double, receivable: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="financialCard cardPaddingRemove">
 @commonCard(constants.View.FINANCIALS, 'cardIconPath -> "images/icons/icons.svg#tradeFinance") {
 } {

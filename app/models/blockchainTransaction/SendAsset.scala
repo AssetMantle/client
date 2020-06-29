@@ -7,7 +7,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.master.{Negotiation => masterNegotiation, Order => masterOrder, Asset}
+import models.master.{Asset, Negotiation => masterNegotiation, Order => masterOrder}
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -17,6 +17,7 @@ import play.api.{Configuration, Logger}
 import queries.GetOrder
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,8 +59,6 @@ class SendAssets @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val sendAssetTable = TableQuery[SendAssetTable]
-
-  private implicit val assetWrites: OWrites[blockchain.Asset] = Json.writes[blockchain.Asset]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
@@ -227,8 +226,8 @@ class SendAssets @Inject()(
       } else {
         val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
 
-        def status(fiatsInOrder: Int): String = {
-          if (fiatsInOrder >= negotiation.price) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+        def status(fiatsInOrder: MicroLong): String = {
+          if (fiatsInOrder.value >= negotiation.price.value) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
           else constants.Status.Order.ASSET_SENT_FIAT_PENDING
         }
 
