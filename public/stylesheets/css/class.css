@@ -318,6 +318,16 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #0862BE;
   margin-bottom: 5px; }
 
+.checkboxSection {
+  position: relative; }
+  .checkboxSection .warningIcon {
+    position: absolute;
+    top: 10px;
+    left: 255px; }
+    .checkboxSection .warningIcon .icon {
+      width: 20px;
+      height: 20px; }
+
 .mobileNumberUpdate .countryCode {
   margin-top: 46px;
   width: 100px;
@@ -1883,10 +1893,7 @@ header:before,
         text-align: left; }
     .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
       line-height: 28px;
-      word-break: inherit;
-      position: absolute;
-      top: 5px;
-      right: 0; }
+      word-break: inherit; }
   .contactDetails .contactInfoItem .contactUpdateButton {
     display: flex;
     flex-direction: row-reverse;
@@ -1905,10 +1912,7 @@ header:before,
   .contactDetails .infoRowBox .contactInfoItemStatus {
     display: flex;
     align-items: center;
-    width: 55px;
-    position: absolute;
-    top: 5px;
-    right: 0; }
+    width: 55px; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }
 .contactDetails .cmuk-card-body {

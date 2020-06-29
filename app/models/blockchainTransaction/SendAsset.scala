@@ -7,7 +7,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.master.{Negotiation => masterNegotiation, Order => masterOrder}
+import models.master.{Negotiation => masterNegotiation, Order => masterOrder, Asset}
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -205,6 +205,8 @@ class SendAssets @Inject()(
 
       def getMasterNegotiation(negotiationID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBCNegotiationID(negotiationID)
 
+      def getMasterAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
+
       def markBCAssetSentToOrder(pegHash: String, negotiationID: String): Future[Int] = blockchainAssets.Service.markAssetSentToOrder(pegHash = pegHash, address = negotiationID)
 
       def markMasterAssetSendToOrder(pegHash: String, ownerID: String): Future[Int] = masterAssets.Service.markAssetSendToOrderByPegHash(pegHash = pegHash, ownerID = ownerID)
@@ -214,11 +216,12 @@ class SendAssets @Inject()(
       def createOrder(orderExists: Boolean, negotiationID: String, negotiation: masterNegotiation): Future[Unit] = if (!orderExists) {
         val bcOrderCreate = blockchainOrders.Service.create(id = negotiationID, awbProofHash = None, fiatProofHash = None)
 
-        def masterOrderCreate: Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = constants.Status.Order.ASSET_SENT_FIAT_PENDING))
+        def masterOrderCreate(asset: Asset): Future[String] = masterOrders.Service.create(masterOrder(id = negotiation.id, orderID = negotiationID, status = if (asset.moderated) constants.Status.Order.ASSET_SENT_FIAT_PENDING else constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING))
 
         for {
           _ <- bcOrderCreate
-          _ <- masterOrderCreate
+          asset <- getMasterAsset(negotiation.assetID)
+          _ <- masterOrderCreate(asset)
         } yield ()
 
       } else {

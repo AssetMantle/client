@@ -24,7 +24,7 @@
                                         <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                                     </div>
                                     <div class="assetInitialData">
-                                        <p class="assetTitle">@asset.assetType</p>
+                                        <p class="assetTitle">@Messages(asset.assetType)</p>
                                         <p class="assetQuantity">@Seq(completedNegotiation.quantity.toString, completedNegotiation.quantityUnit).mkString(" ")</p>
                                         <p class="assetPrice">@Seq(completedNegotiation.price/completedNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
                                     </div>
@@ -59,7 +59,7 @@
                                     <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                                 </div>
                                 <div class="assetInitialData">
-                                    <p class="assetTitle">@asset.assetType</p>
+                                    <p class="assetTitle">@Messages(asset.assetType)</p>
                                     <p class="assetQuantity">@Seq(completedNegotiation.quantity.toString, completedNegotiation.quantityUnit).mkString(" ")</p>
                                     <p class="assetPrice">@Seq(completedNegotiation.price/completedNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>

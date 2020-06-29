@@ -171,24 +171,24 @@ class Orders @Inject()( actorSystem: ActorSystem,
             def completeOrReverseOrder(masterOrder: masterOrder, masterNegotiation: masterNegotiation, negotiation: Negotiation, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], orderResponse: OrderResponse.Response): Future[Unit] = {
               val fiatsInOrder = if (fiatPegWallet.nonEmpty) fiatPegWallet.map(_.transactionAmount.toInt).sum else 0
               if (orderResponse.value.awb_proof_hash != "" && orderResponse.value.fiat_proof_hash != "") {
-                if (assetPegWallet.isEmpty) throw new BaseException(constants.Response.ASSET_NOT_FOUND)
-                if (fiatPegWallet.isEmpty) throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
-                val updateAsset = blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.buyerAddress))
-                val sellerMarkDirty = blockchainFiats.Service.markDirty(negotiation.sellerAddress)
-                val buyerMarkDirty = blockchainFiats.Service.markDirty(negotiation.buyerAddress)
-                val deleteOrderFiats = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
-                val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash, masterNegotiation.buyerTraderID)
-                val markMasterOrderStatusCompleted = masterOrders.Service.markStatusCompletedByBCOrderID(dirtyOrder.id)
-                val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.sellerTraderID, masterOrder.id, fiatsInOrder, constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT)
-                for {
-                  _ <- updateAsset
-                  _ <- sellerMarkDirty
-                  _ <- buyerMarkDirty
-                  _ <- deleteOrderFiats
-                  _ <- updateMasterAssetStatus
-                  _ <- markMasterOrderStatusCompleted
-                  _ <- createReceiveFiat
-                } yield ()
+                if (assetPegWallet.nonEmpty && (fiatPegWallet.nonEmpty || !assetPegWallet.head.moderated)) {
+                  val updateAsset = blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.buyerAddress))
+                  val sellerMarkDirty = blockchainFiats.Service.markDirty(negotiation.sellerAddress)
+                  val buyerMarkDirty = blockchainFiats.Service.markDirty(negotiation.buyerAddress)
+                  val deleteOrderFiats = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
+                  val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash, masterNegotiation.buyerTraderID)
+                  val markMasterOrderStatusCompleted = masterOrders.Service.markStatusCompletedByBCOrderID(dirtyOrder.id)
+                  val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.sellerTraderID, masterOrder.id, fiatsInOrder, constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT)
+                  for {
+                    _ <- updateAsset
+                    _ <- sellerMarkDirty
+                    _ <- buyerMarkDirty
+                    _ <- deleteOrderFiats
+                    _ <- updateMasterAssetStatus
+                    _ <- markMasterOrderStatusCompleted
+                    _ <- createReceiveFiat
+                  } yield ()
+                } else Future(Unit)
               } else if (orderResponse.value.awb_proof_hash == "" && orderResponse.value.fiat_proof_hash == "") {
                 val updateAsset = if (assetPegWallet.nonEmpty) blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.sellerAddress)) else Future(0)
                 val buyerMarkDirty = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.markDirty(negotiation.buyerAddress) else Future(0)

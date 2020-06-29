@@ -186,8 +186,6 @@ GET         /notification/recentActivityMessages                                
 GET         /notification/unreadNotificationCount                                                 controllers.NotificationController.unreadNotificationCount
 GET         /notification/markNotificationAsRead                                                  controllers.NotificationController.markNotificationRead(notificationID: String)
 
-GET         /master/queryConfigurationVariable:query                                              controllers.ConfigurationController.queryConfigurationVariable(query: String)
-
 GET         /component/traderViewAcceptedNegotiationList                                          controllers.ComponentViewController.traderViewAcceptedNegotiationList
 GET         /component/traderViewAcceptedBuyNegotiationList                                       controllers.ComponentViewController.traderViewAcceptedBuyNegotiationList
 GET         /component/traderViewAcceptedSellNegotiationList                                      controllers.ComponentViewController.traderViewAcceptedSellNegotiationList

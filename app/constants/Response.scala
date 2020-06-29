@@ -147,6 +147,7 @@ object Response {
   val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
   val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
   val ALL_KYC_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
+  val ALL_KYC_FILES_NOT_FOUND = new Failure("ALL_KYC_FILES_NOT_FOUND")
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_ASSET_FILES_NOT_VERIFIED")
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
@@ -208,6 +209,8 @@ object Response {
   val BLOCKCHAIN_ACCOUNT_NOT_FOUND = new Failure("BLOCKCHAIN_ACCOUNT_NOT_FOUND")
   val FIAT_PEG_NOT_FOUND = new Failure("FIAT_PEG_NOT_FOUND")
   val ALL_TRADE_DOCUMENTS_NOT_UPLOADED = new Failure("ALL_TRADE_DOCUMENTS_NOT_UPLOADED")
+  val TRANSACTION_HASH_NOT_FOUND = new Failure("TRANSACTION_HASH_NOT_FOUND")
+  val KEY_STORE_ERROR = new Failure("KEY_STORE_ERROR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

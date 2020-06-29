@@ -267,8 +267,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,
 
-        routes.javascript.ConfigurationController.queryConfigurationVariable,
-
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,

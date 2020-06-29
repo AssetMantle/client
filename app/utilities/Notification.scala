@@ -23,7 +23,8 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
                              masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
                              masterAccounts: master.Accounts,
-                             messagesApi: MessagesApi
+                             messagesApi: MessagesApi,
+                             keyStore: KeyStore
                             )
                             (implicit
                              executionContext: ExecutionContext,
@@ -34,25 +35,23 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val emailFromAddress = configuration.get[String]("play.mailer.user")
-
   private val emailBounceAddress = configuration.get[String]("play.mailer.bounceAddress")
 
   private val emailReplyTo = configuration.get[String]("play.mailer.replyTo")
 
   private val emailCharset = configuration.get[String]("play.mailer.charset")
 
-  private val smsAccountSID = configuration.get[String]("twilio.accountSID")
+  private val smsAccountSID = keyStore.getPassphrase(constants.KeyStore.TWILIO_SMS_ACCOUNT_SID)
 
-  private val smsAuthToken = configuration.get[String]("twilio.authToken")
+  private val smsFromNumber = new PhoneNumber(keyStore.getPassphrase(constants.KeyStore.TWILIO_SMS_FROM_NUMBER))
+
+  private val smsAuthToken = keyStore.getPassphrase(constants.KeyStore.TWILIO_SMS_AUTH_TOKEN)
 
   Twilio.init(smsAccountSID, smsAuthToken)
 
-  private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
-
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
 
-  private val pushNotificationAuthorizationKey = configuration.get[String]("pushNotification.authorizationKey")
+  private val pushNotificationAuthorizationKey = keyStore.getPassphrase(constants.KeyStore.PUSH_NOTIFICATION_AUTHORIZATION_KEY)
 
   private case class Notification(title: String, body: String)
 
@@ -63,13 +62,14 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
+
     val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+
     (for {
       _ <- send
     } yield ()
       ).recover {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
+      case baseException: BaseException => throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.SMS_SEND_FAILED)
       case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
@@ -83,7 +83,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     val message = Future(messagesApi(pushNotification.message, messageParameters: _*))
     val pushNotificationToken = masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID)
 
-    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
+    def post(title: String, message: String, pushNotificationToken: String) = wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> ("key=" + pushNotificationAuthorizationKey)).post(Json.toJson(Data(pushNotificationToken, Notification(title, message))))
 
     (for {
       title <- title
@@ -100,7 +100,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
     mailerClient.send(Email(
       subject = messagesApi(email.subject),
-      from = emailFromAddress,
+      from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
       to = Seq(emailAddress),
       bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
       charset = Option(emailCharset),

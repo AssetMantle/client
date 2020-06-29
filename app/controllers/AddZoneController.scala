@@ -7,12 +7,13 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
-import models.master.{Email, Mobile, ZoneKYC}
+import models.master.{Email, Mobile, Zone, ZoneKYC}
 import models.masterTransaction.ZoneInvitation
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import utilities.KeyStore
 import views.companion.master.FileUpload
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,17 +27,21 @@ class AddZoneController @Inject()(
                                    utilitiesNotification: utilities.Notification,
                                    masterZoneKYCs: master.ZoneKYCs,
                                    transactionsAddZone: transactions.AddZone,
+                                   transactionsSendCoin: transactions.SendCoin,
                                    blockchainTransactionAddZones: blockchainTransaction.AddZones,
+                                   blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
                                    blockchainAccounts: blockchain.Accounts,
                                    masterZones: master.Zones,
                                    masterEmails: master.Emails,
                                    masterMobiles: master.Mobiles,
+                                   masterAccounts: master.Accounts,
                                    withUserLoginAction: WithUserLoginAction,
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    masterTransactionZoneInvitations: masterTransaction.ZoneInvitations,
                                    withoutLoginAction: WithoutLoginAction,
-                                   withoutLoginActionAsync: WithoutLoginActionAsync
+                                   withoutLoginActionAsync: WithoutLoginActionAsync,
+                                   keyStore: KeyStore
                                  )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -44,6 +49,8 @@ class AddZoneController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
+
+  private val denom = configuration.get[String]("blockchain.denom")
 
   private val comdexURL: String = configuration.get[String]("comdex.url")
 
@@ -105,10 +112,9 @@ class AddZoneController @Inject()(
       val zone = masterZones.Service.getByAccountID(loginState.username)
       (for {
         zone <- zone
-        result <- withUsernameToken.Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
-      } yield result
+      } yield Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
         ).recoverWith {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addZone())
+        case _: BaseException => Future(Ok(views.html.component.master.addZone()))
       }
   }
 
@@ -119,19 +125,22 @@ class AddZoneController @Inject()(
           Future(BadRequest(views.html.component.master.addZone(formWithErrors)))
         },
         addZoneData => {
+          val invitationStatus = masterTransactionZoneInvitations.Service.getStatus(loginState.username)
           val email = masterEmails.Service.tryGet(loginState.username)
           val mobile = masterMobiles.Service.tryGet(loginState.username)
 
-          def insertOrUpdate(email: Email, mobile: Mobile) =
+          def insertOrUpdate(invitationStatus: Option[Boolean], email: Email, mobile: Mobile) = if (invitationStatus.contains(true)) {
             if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
             else masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+          } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
+            invitationStatus <- invitationStatus
             email <- email
             mobile <- mobile
-            id <- insertOrUpdate(email, mobile)
+            id <- insertOrUpdate(invitationStatus, email, mobile)
             zoneKYCs <- zoneKYCs(id)
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result
@@ -270,38 +279,38 @@ class AddZoneController @Inject()(
           }
         },
         userReviewAddZoneRequestData => {
-          val id = masterZones.Service.tryGetID(loginState.username)
+          val validateUser = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = userReviewAddZoneRequestData.password)
+          val zone = masterZones.Service.getByAccountID(loginState.username)
 
-          def allKYCFileTypesExists(id: String): Future[Boolean] = masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)
+          def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
-          def markZoneFormCompletedAndGetResult(id: String, allKYCFileTypesExists: Boolean): Future[Result] = {
-            if (userReviewAddZoneRequestData.completion && allKYCFileTypesExists) {
-              val markZoneFormCompleted = masterZones.Service.markZoneFormCompleted(id)
-              for {
-                _ <- markZoneFormCompleted
-                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
-              } yield result
-            } else {
-              val zone = masterZones.Service.getByAccountID(loginState.username)
+          def completeAddZoneRequest(validateUser: Boolean, zone: Zone, zoneKYCs: Seq[ZoneKYC]): Future[Result] = if (validateUser) {
+            def allKYCFileTypesExists(id: String): Future[Boolean] = masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)
 
-              def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
+            def markZoneFormCompletedAndGetResult(id: String, allKYCFileTypesExists: Boolean): Future[Result] =
+              if (allKYCFileTypesExists) {
+                val setPassphrase = Future(keyStore.setPassphrase(alias = id, aliasValue = userReviewAddZoneRequestData.password))
+                def markZoneFormCompleted = masterZones.Service.markZoneFormCompleted(id)
+                for {
+                  _ <- setPassphrase
+                  _ <- markZoneFormCompleted
+                  result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
+                } yield result
+              } else throw new BaseException(constants.Response.ALL_KYC_FILES_NOT_FOUND)
 
-              for {
-                zone <- zone
-                zoneKYCs <- zoneKYCs(zone.id)
-              } yield BadRequest(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = zoneKYCs))
-            }
-          }
+            for {
+              allKYCFileTypesExists <- allKYCFileTypesExists(zone.id)
+              result <- markZoneFormCompletedAndGetResult(zone.id, allKYCFileTypesExists)
+              _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_REQUESTED, loginState.username)
+            } yield result
+          } else Future(BadRequest(views.html.component.master.userReviewAddZoneRequest(views.companion.master.ReviewAddZoneRequest.form.fill(userReviewAddZoneRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), zone = zone, zoneKYCs = zoneKYCs)))
 
           (for {
-            id <- id
-            allKYCFileTypesExists <- allKYCFileTypesExists(id)
-            result <- markZoneFormCompletedAndGetResult(id, allKYCFileTypesExists)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_REQUESTED, loginState.username)
-
-          } yield {
-            result
-          }
+            validateUser <- validateUser
+            zone <- zone
+            zoneKYCs <- zoneKYCs(zone.id)
+            result <- completeAddZoneRequest(validateUser, zone, zoneKYCs)
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
@@ -322,13 +331,23 @@ class AddZoneController @Inject()(
         verifyZoneData => {
           val allKYCFilesVerified = masterZoneKYCs.Service.checkAllKYCFilesVerified(verifyZoneData.zoneID)
 
-          def processTransactionAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
+          def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
               val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
 
               def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-              def transactionProcess(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+              def sendCoinTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount = constants.Blockchain.DefaultZoneFaucetTokenAmount, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetTokenAmount.toString)), password = verifyZoneData.password, mode = transactionMode),
+                action = transactionsSendCoin.Service.post,
+                onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+              )
+
+              def addZoneTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
                 entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
                 request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
@@ -341,7 +360,8 @@ class AddZoneController @Inject()(
               for {
                 accountID <- accountID
                 zoneAccountAddress <- zoneAccountAddress(accountID)
-                _ <- transactionProcess(zoneAccountAddress)
+                _ <- sendCoinTransaction(zoneAccountAddress)
+                _ <- addZoneTransaction(zoneAccountAddress)
                 result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
                 _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
               } yield {
@@ -352,7 +372,7 @@ class AddZoneController @Inject()(
 
           (for {
             allKYCFilesVerified <- allKYCFilesVerified
-            result <- processTransactionAndGetResult(allKYCFilesVerified)
+            result <- sendTransactionsAndGetResult(allKYCFilesVerified)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
           } yield {
             result

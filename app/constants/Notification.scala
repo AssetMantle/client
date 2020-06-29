@@ -20,6 +20,7 @@ object Notification {
   val SUBJECT_SUFFIX = "SUBJECT"
   val MESSAGE_SUFFIX = "MESSAGE"
   val TITLE_SUFFIX = "TITLE"
+  val FROM_EMAIL_ADDRESS = "FROM_EMAIL_ADDRESS"
 
   class SMS(private val notificationType: String) {
     val message: String = Seq(SMS_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")

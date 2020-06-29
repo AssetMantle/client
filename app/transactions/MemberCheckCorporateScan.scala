@@ -9,11 +9,12 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import transactions.responses.MemberCheckCorporateScanResponse.Response
+import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class MemberCheckCorporateScan @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_MEMBER_CHECK_CORPORATE_SCAN
 
@@ -25,7 +26,7 @@ class MemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configurat
 
   private val apiKeyHeaderName = configuration.get[String]("memberCheck.apiKeyHeaderName")
 
-  private val apiHeaderValue = configuration.get[String]("memberCheck.apiHeaderValue")
+  private val apiHeaderValue = keyStore.getPassphrase(constants.KeyStore.MEMBER_CHECK_API_HEADER_VALUE)
 
   private val organizationHeader = Tuple2(organizationHeaderName, organizationHeaderValue)
 
@@ -40,6 +41,7 @@ class MemberCheckCorporateScan @Inject()(wsClient: WSClient)(implicit configurat
   private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+
   case class Request(matchType: String = "Exact", whitelist: String = "Apply", companyName: String, idNumber: Option[String] = None, entityNumber: String, address: Option[String] = None, updateMonitoringList: Boolean = true) extends BaseRequest
 
   object Service {

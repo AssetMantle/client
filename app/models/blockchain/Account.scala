@@ -47,7 +47,7 @@ class Accounts @Inject()(
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
+  private val denom = configuration.get[String]("blockchain.denom")
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
     case Success(result) => result
@@ -179,7 +179,7 @@ class Accounts @Inject()(
             val responseAccount = getAccount.Service.get(dirtyAddress)
             val accountID = Service.tryGetUsername(dirtyAddress)
 
-            def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.account_number, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).headOption.getOrElse(""))
+            def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.account_number, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denom).map(_.amount).headOption.getOrElse(""))
 
             for {
               responseAccount <- responseAccount

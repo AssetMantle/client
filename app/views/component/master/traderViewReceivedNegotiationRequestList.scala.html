@@ -21,7 +21,7 @@
                             <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@asset.assetType</p>
+                            <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@Seq(receivedNegotiationRequest.price/receivedNegotiationRequest.quantity, Messages(constants.View.USD), Messages(constants.View.PER), receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
                         </div>
