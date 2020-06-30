@@ -128,7 +128,11 @@
             </div>
             <div class="sellerTerm">
                 <div>
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                    <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("advancePayment")</span>
+                        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                    </div>
+                    <div class="termIdent">
                 @negotiation.paymentTerms.credit match {
                     case Some(credit) => {
                         @Messages(constants.View.CREDIT_TERMS):
@@ -144,6 +148,7 @@
                     }
                     case None => {}
                 }
+                    </div>
                 </div>
                 <div>
                 @negotiation.buyerAcceptedPaymentTerms

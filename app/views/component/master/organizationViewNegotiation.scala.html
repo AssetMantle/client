@@ -61,13 +61,13 @@
     </div>
 
 <div class="cmuk-text-left">
-    <span class="title">@Messages(constants.View.ASSET_DOCUMENTS):</span>
+    <span class="title cmuk-inline">@Messages(constants.View.ASSET_DOCUMENTS):</span>
     @negotiation.documentList.assetDocuments.map { assetDocument =>
         <li>@Messages(assetDocument)</li>
     }
 </div>
 <div class="cmuk-text-left">
-    <span class="title">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
+    <span class="title cmuk-inline">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
     @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
         <li>
             @Messages(negotiationDocument)
