@@ -143,7 +143,6 @@ object FormField {
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
-  val INVOICE_AMOUNT = new IntFormField("INVOICE_AMOUNT", 0, Int.MaxValue)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
@@ -155,6 +154,7 @@ object FormField {
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
+  val INVOICE_AMOUNT = new DoubleFormField("INVOICE_AMOUNT", 0, Double.MaxValue)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")

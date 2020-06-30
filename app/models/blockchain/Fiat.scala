@@ -212,7 +212,7 @@ class Fiats @Inject()(
                   Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = new MicroLong(fiatPeg.transactionAmount), redeemedAmount = new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false))
                 })
                 val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount =new MicroLong(fiatPeg.transactionAmount), redeemedAmount =new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false)
+                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = new MicroLong(fiatPeg.transactionAmount), redeemedAmount = new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false)
                 })
                 for {
                   _ <- deleteFiats

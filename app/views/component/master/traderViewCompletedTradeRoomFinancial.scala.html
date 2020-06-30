@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
+@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(walletBalance: Double, amountPaid: Double, amountPending: Double, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <ul class="">
@@ -8,7 +9,7 @@
             <span class="walletIcon">@commonIcon("wallet")</span>
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
-                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAtTwoDecimal(walletBalance)</p>
             </div>
         </div>
         <div class="walletButtons">
@@ -22,7 +23,7 @@
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
                 <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
-                    @amountPaid
+                    @roundAtTwoDecimal(amountPaid)
                 } else {
                     0
                 }</p>
@@ -34,7 +35,7 @@
             <span class="payableIcon">@commonIcon("payable")</span>
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
-                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@amountPending</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">@roundAtTwoDecimal(amountPending)</p>
             </div>
         </div>
 

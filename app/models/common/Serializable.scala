@@ -73,7 +73,7 @@ object Serializable {
     Json.format[BillOfLading].map(x => x: AssetDocumentContent)
   }
 
-  case class Invoice(invoiceNumber: String, invoiceAmount: Int, invoiceDate: Date) extends NegotiationDocumentContent
+  case class Invoice(invoiceNumber: String, invoiceAmount: Double, invoiceDate: Date) extends NegotiationDocumentContent
 
   case class Contract(contractNumber: String) extends NegotiationDocumentContent
 
