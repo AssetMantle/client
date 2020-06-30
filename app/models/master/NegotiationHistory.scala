@@ -15,7 +15,7 @@ import utilities.MicroLong
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class NegotiationHistory(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: MicroLong, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, physicalDocumentsHandledVia: Option[String] = None, chatID: Option[String] = None, status: String, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
+case class NegotiationHistory(id: String, negotiationID: Option[String] = None, buyerTraderID: String, sellerTraderID: String, assetID: String, assetDescription: String, price: MicroLong, quantity: MicroLong, quantityUnit: String, buyerAcceptedAssetDescription: Boolean = false, buyerAcceptedPrice: Boolean = false, buyerAcceptedQuantity: Boolean = false, assetOtherDetails: AssetOtherDetails, buyerAcceptedAssetOtherDetails: Boolean = false, time: Option[Int] = None, paymentTerms: PaymentTerms, buyerAcceptedPaymentTerms: Boolean = false, documentList: DocumentList, buyerAcceptedDocumentList: Boolean = false, physicalDocumentsHandledVia: Option[String] = None, chatID: Option[String] = None, status: String, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
 
 @Singleton
 class NegotiationHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -34,7 +34,7 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
 
   case class BuyerSellerAndAssetID(buyerTraderID: String, sellerTraderID: String, assetID: String)
 
-  case class AssetAndBuyerAcceptedSerialize(assetDescription: String, price: Long, quantity: Int, quantityUnit: String, buyerAcceptedAssetDescription: Boolean, buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean)
+  case class AssetAndBuyerAcceptedSerialize(assetDescription: String, price: Long, quantity: Long, quantityUnit: String, buyerAcceptedAssetDescription: Boolean, buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean)
 
   case class AssetOtherDetailsAndBuyerAcceptedSerialize(assetOtherDetails: String, buyerAccepted: Boolean)
 
@@ -45,7 +45,7 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
   case class NegotiationHistorySerializable(id: String, negotiationID: Option[String], buyerSellerAndAssetID: BuyerSellerAndAssetID, assetAndBuyerAcceptedSerialize: AssetAndBuyerAcceptedSerialize, assetOtherDetailsAndBuyerAcceptedSerialize: AssetOtherDetailsAndBuyerAcceptedSerialize, time: Option[Int], paymentTermsAndBuyerAcceptedSerialize: PaymentTermsAndBuyerAcceptedSerialize, documentListAndBuyerAcceptedSerialize: DocumentListAndBuyerAcceptedSerialize, physicalDocumentsHandledVia: Option[String], chatID: Option[String], status: String, comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
     def deserialize: NegotiationHistory = NegotiationHistory(id = id, negotiationID = negotiationID,
       buyerTraderID = buyerSellerAndAssetID.buyerTraderID, sellerTraderID = buyerSellerAndAssetID.sellerTraderID, assetID = buyerSellerAndAssetID.assetID,
-      assetDescription = assetAndBuyerAcceptedSerialize.assetDescription, price =new MicroLong( assetAndBuyerAcceptedSerialize.price), quantity = assetAndBuyerAcceptedSerialize.quantity, quantityUnit = assetAndBuyerAcceptedSerialize.quantityUnit,
+      assetDescription = assetAndBuyerAcceptedSerialize.assetDescription, price = new MicroLong(assetAndBuyerAcceptedSerialize.price), quantity = new MicroLong(assetAndBuyerAcceptedSerialize.quantity), quantityUnit = assetAndBuyerAcceptedSerialize.quantityUnit,
       buyerAcceptedAssetDescription = assetAndBuyerAcceptedSerialize.buyerAcceptedAssetDescription, buyerAcceptedPrice = assetAndBuyerAcceptedSerialize.buyerAcceptedPrice, buyerAcceptedQuantity = assetAndBuyerAcceptedSerialize.buyerAcceptedQuantity,
       assetOtherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](assetOtherDetailsAndBuyerAcceptedSerialize.assetOtherDetails),
       buyerAcceptedAssetOtherDetails = assetOtherDetailsAndBuyerAcceptedSerialize.buyerAccepted,
@@ -62,7 +62,7 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
 
   def serialize(negotiationHistory: NegotiationHistory): NegotiationHistorySerializable = NegotiationHistorySerializable(id = negotiationHistory.id, negotiationID = negotiationHistory.negotiationID,
     buyerSellerAndAssetID = BuyerSellerAndAssetID(buyerTraderID = negotiationHistory.buyerTraderID, sellerTraderID = negotiationHistory.sellerTraderID, assetID = negotiationHistory.assetID),
-    assetAndBuyerAcceptedSerialize = AssetAndBuyerAcceptedSerialize(assetDescription = negotiationHistory.assetDescription, price = negotiationHistory.price.value, quantity = negotiationHistory.quantity, quantityUnit = negotiationHistory.quantityUnit,
+    assetAndBuyerAcceptedSerialize = AssetAndBuyerAcceptedSerialize(assetDescription = negotiationHistory.assetDescription, price = negotiationHistory.price.value, quantity = negotiationHistory.quantity.value, quantityUnit = negotiationHistory.quantityUnit,
       buyerAcceptedAssetDescription = negotiationHistory.buyerAcceptedAssetDescription, buyerAcceptedPrice = negotiationHistory.buyerAcceptedPrice, buyerAcceptedQuantity = negotiationHistory.buyerAcceptedQuantity),
     assetOtherDetailsAndBuyerAcceptedSerialize = AssetOtherDetailsAndBuyerAcceptedSerialize(assetOtherDetails = Json.toJson(negotiationHistory.assetOtherDetails).toString(), buyerAccepted = negotiationHistory.buyerAcceptedPaymentTerms),
     time = negotiationHistory.time,
@@ -222,7 +222,7 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
 
     def price = column[Long]("price")
 
-    def quantity = column[Int]("quantity")
+    def quantity = column[Long]("quantity")
 
     def quantityUnit = column[String]("quantityUnit")
 

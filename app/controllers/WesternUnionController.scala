@@ -62,7 +62,7 @@ class WesternUnionController @Inject()(
         val createRTCB = westernUnionRTCBs.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
           requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
           utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
-          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, new MicroLong(requestBody.paidOutAmount), requestBody.requestSignature)
+          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, new MicroLong(requestBody.paidOutAmount.toDouble), requestBody.requestSignature)
 
         def totalRTCBAmountReceived: Future[Long] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
@@ -78,9 +78,9 @@ class WesternUnionController @Inject()(
 
         def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
-        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroLong(requestBody.paidOutAmount))
+        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroLong(requestBody.paidOutAmount.toDouble))
 
-        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroLong(requestBody.paidOutAmount), new MicroLong(0))
+        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroLong(requestBody.paidOutAmount.toDouble), new MicroLong(0))
 
         for {
           _ <- createRTCB
@@ -112,7 +112,6 @@ class WesternUnionController @Inject()(
 
           def create(traderID: String): Future[String] = westernUnionFiatRequests.Service.create(traderID = traderID, transactionAmount = issueFiatRequestData.transactionAmount)
 
-
           def organizationDetails(organizationID: String): Future[master.Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           (for {
@@ -126,7 +125,7 @@ class WesternUnionController @Inject()(
               Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
               Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
-              Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
+              Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.realString))
             val fullURL = utilities.String.queryURLGenerator(wuURL, queryString)
             Status(302)(fullURL)
           }

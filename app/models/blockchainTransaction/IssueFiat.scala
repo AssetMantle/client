@@ -199,7 +199,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
           case Some(fiatPegWallet) => fiatPegWallet.find(_.transactionID == issueFiat.transactionID).getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
           case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
         }
-        blockchainFiats.Service.create(pegHash = fiat.pegHash, ownerAddress = issueFiat.to, transactionID = fiat.transactionID, transactionAmount = new MicroLong(fiat.transactionAmount.toLong), redeemedAmount = new MicroLong(fiat.redeemedAmount.toLong), dirtyBit = false)
+        blockchainFiats.Service.create(pegHash = fiat.pegHash, ownerAddress = issueFiat.to, transactionID = fiat.transactionID, transactionAmount = new MicroLong(fiat.transactionAmount), redeemedAmount = new MicroLong(fiat.redeemedAmount), dirtyBit = false)
       }
 
       def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
