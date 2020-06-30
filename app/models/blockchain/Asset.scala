@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroLong, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Assets @Inject()(
@@ -30,10 +30,10 @@ class Assets @Inject()(
                         configuration: Configuration,
                       )(implicit executionContext: ExecutionContext) {
 
-  def serialize(asset: Asset): AssetSerialized = AssetSerialized(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, assetPrice = asset.assetPrice.value, quantityUnit = asset.quantityUnit, ownerAddress = asset.ownerAddress, locked = asset.locked, moderated = asset.moderated, takerAddress = asset.takerAddress, dirtyBit = asset.dirtyBit, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
+  def serialize(asset: Asset): AssetSerialized = AssetSerialized(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity.value, assetPrice = asset.assetPrice.value, quantityUnit = asset.quantityUnit, ownerAddress = asset.ownerAddress, locked = asset.locked, moderated = asset.moderated, takerAddress = asset.takerAddress, dirtyBit = asset.dirtyBit, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
 
-  case class AssetSerialized(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: Long, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Asset = Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderated = moderated, takerAddress = takerAddress, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AssetSerialized(pegHash: String, documentHash: String, assetType: String, assetQuantity: Long, assetPrice: Long, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Asset = Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity =new MicroLong(assetQuantity) , assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderated = moderated, takerAddress = takerAddress, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -135,7 +135,7 @@ class Assets @Inject()(
 
     def assetType = column[String]("assetType")
 
-    def assetQuantity = column[String]("assetQuantity")
+    def assetQuantity = column[Long]("assetQuantity")
 
     def assetPrice = column[Long]("assetPrice")
 
@@ -167,7 +167,7 @@ class Assets @Inject()(
 
   object Service {
 
-    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(serialize(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)))
+    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroLong, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(serialize(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)))
 
     def tryGet(pegHash: String): Future[Asset] = findByPegHash(pegHash).map(_.deserialize())
 
@@ -203,7 +203,7 @@ class Assets @Inject()(
             def updateOrDelete(ownerAccount: Response): Future[Int] = {
               ownerAccount.value.asset_peg_wallet match {
                 case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
-                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = new MicroLong(assetPeg.assetPrice.toLong), assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
+                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = new MicroLong(assetPeg.assetPrice), assetQuantity = new MicroLong(assetPeg.assetQuantity), quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
                   case None => Service.deleteAsset(dirtyAsset.pegHash)
                 }
                 case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)

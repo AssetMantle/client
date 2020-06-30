@@ -6,7 +6,7 @@
 @commonForm(constants.Form.ISSUE_ASSET, issueAssetForm) {
     @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)
     @commonInputText(issueAssetForm, constants.FormField.ASSET_DESCRIPTION)
-    @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
     @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonInputInt(issueAssetForm, constants.FormField.SHIPPING_PERIOD)

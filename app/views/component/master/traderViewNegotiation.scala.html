@@ -18,8 +18,8 @@
 </div>
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price.realDouble/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price.realDouble/negotiation.quantity.realDouble, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
     @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
     @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.accountID)
     @commonTextInfo(constants.View.ORGANIZATION, counterPartyOrganization.name)

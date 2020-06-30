@@ -21,8 +21,8 @@
                         </div>
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
-                            <p class="assetQuantity">@Seq(sellNegotiation.quantity.toString, sellNegotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(sellNegotiation.price.realDouble/sellNegotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), sellNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetQuantity">@Seq(sellNegotiation.quantity.realString, sellNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq(sellNegotiation.price.realDouble/sellNegotiation.quantity.realDouble, Messages(constants.View.USD), Messages(constants.View.PER), sellNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}
