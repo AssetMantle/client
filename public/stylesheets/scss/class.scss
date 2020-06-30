@@ -2453,6 +2453,18 @@ header:before,
         background: $colorPrimary;
       }
     }
+    .cmuk-button-success{
+      &:hover{
+        background-color: #5cb85c;
+        color: #fff;
+      }
+    }
+    .cmuk-button-danger{
+      &:hover{
+        background-color: #ec2147;
+        color: #fff;
+      }
+    }
   }
 }
 

@@ -1817,6 +1817,12 @@ header:before,
       .commonList .listItemChild .cmuk-button:hover {
         color: #FFFFFF;
         background: #0862BE; }
+    .commonList .listItemChild .cmuk-button-success:hover {
+      background-color: #5cb85c;
+      color: #fff; }
+    .commonList .listItemChild .cmuk-button-danger:hover {
+      background-color: #ec2147;
+      color: #fff; }
 
 .accountName {
   position: absolute;
