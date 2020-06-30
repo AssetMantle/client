@@ -6,6 +6,6 @@
 @commonForm(constants.Form.SEND_FIAT, sendFiatForm) {
     @commonInputText(sendFiatForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID)
     @commonInputMicroLong(sendFiatForm, constants.FormField.SEND_AMOUNT, 'value -> amount.toString)
-    @commonInputInt(sendFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputLong(sendFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD)
 }

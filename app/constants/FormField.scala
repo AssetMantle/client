@@ -2,7 +2,7 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{boolean, date, number, of, text}
+import play.api.data.Forms.{boolean, date, number, of, text, longNumber}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
@@ -133,7 +133,6 @@ object FormField {
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
@@ -207,6 +206,9 @@ object FormField {
   val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
   val ASSET_QUANTITY = new MicroLongFormField("ASSET_QUANTITY", 1, Double.MaxValue)
 
+  //LongFormField
+  val GAS = new LongFormField("GAS", 20000L, 1000000L)
+
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
@@ -221,6 +223,11 @@ object FormField {
   class IntFormField(fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
+  }
+
+  class LongFormField(fieldName: String, val minimumValue: Long, val maximumValue: Long) {
+    val name: String = fieldName
+    val field: Mapping[Long] = longNumber(min = minimumValue, max = maximumValue)
   }
 
   class DateFormField(fieldName: String) {

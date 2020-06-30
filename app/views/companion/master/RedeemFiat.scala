@@ -13,6 +13,6 @@ object RedeemFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(redeemAmount: MicroLong, gas: Int, password: String)
+  case class Data(redeemAmount: MicroLong, gas: Long, password: String)
 
 }

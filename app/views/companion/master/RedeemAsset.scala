@@ -12,6 +12,6 @@ object RedeemAsset {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(assetID: String, gas: Int, password: String)
+  case class Data(assetID: String, gas: Long, password: String)
 
 }

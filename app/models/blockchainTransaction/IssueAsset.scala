@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: MicroLong, quantityUnit: String, assetQuantity: MicroLong, moderated: Boolean, gas: Int, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueAsset] with Logged {
+case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: MicroLong, quantityUnit: String, assetQuantity: MicroLong, moderated: Boolean, gas: Long, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueAsset] with Logged {
   def mutateTicketID(newTicketID: String): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, gas = gas, takerAddress = takerAddress, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -45,7 +45,7 @@ class IssueAssets @Inject()(
 
   def serialize(issueAsset: IssueAsset): IssueAssetSerialized = IssueAssetSerialized(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice.value, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity.value, moderated = issueAsset.moderated, gas = issueAsset.gas, takerAddress = issueAsset.takerAddress, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, createdBy = issueAsset.createdBy, createdOn = issueAsset.createdOn, createdOnTimeZone = issueAsset.createdOnTimeZone, updatedBy = issueAsset.updatedBy, updatedOn = issueAsset.updatedOn, updatedOnTimeZone = issueAsset.updatedOnTimeZone)
 
-  case class IssueAssetSerialized(from: String, to: String, documentHash: String, assetType: String, assetPrice: Long, quantityUnit: String, assetQuantity: Long, moderated: Boolean, gas: Int, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class IssueAssetSerialized(from: String, to: String, documentHash: String, assetType: String, assetPrice: Long, quantityUnit: String, assetQuantity: Long, moderated: Boolean, gas: Long, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize(): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, assetQuantity = new MicroLong(assetQuantity), moderated = moderated, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -162,7 +162,7 @@ class IssueAssets @Inject()(
 
     def moderated = column[Boolean]("moderated")
 
-    def gas = column[Int]("gas")
+    def gas = column[Long]("gas")
 
     def takerAddress = column[String]("takerAddress")
 

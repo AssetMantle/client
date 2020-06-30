@@ -27,6 +27,6 @@ object VerifyTrader {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(accountID: String, organizationID: String, issueAsset: Boolean = false, issueFiat: Boolean = false, sendAsset: Boolean = false, sendFiat: Boolean = false, redeemAsset: Boolean = false, redeemFiat: Boolean = false, sellerExecuteOrder: Boolean = false, buyerExecuteOrder: Boolean = false, changeBuyerBid: Boolean = false, changeSellerBid: Boolean = false, confirmBuyerBid: Boolean = false, confirmSellerBid: Boolean = false, negotiation: Boolean = false, releaseAsset: Boolean = false, gas: Int, password: String)
+  case class Data(accountID: String, organizationID: String, issueAsset: Boolean = false, issueFiat: Boolean = false, sendAsset: Boolean = false, sendFiat: Boolean = false, redeemAsset: Boolean = false, redeemFiat: Boolean = false, sellerExecuteOrder: Boolean = false, buyerExecuteOrder: Boolean = false, changeBuyerBid: Boolean = false, changeSellerBid: Boolean = false, confirmBuyerBid: Boolean = false, confirmSellerBid: Boolean = false, negotiation: Boolean = false, releaseAsset: Boolean = false, gas: Long, password: String)
 
 }

@@ -16,7 +16,7 @@
         <span class="warningIcon" cmuk-tooltip="title:@Messages(constants.View.MODERATED_WARNING);pos:bottom">@commonIcon("warning")</span>
         @commonCheckbox(issueAssetForm, constants.FormField.MODERATED, 'checked -> true, 'oninput -> """showHideGasAndPassword()""")
     </div>
-    @commonInputInt(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'required -> false, 'containerDivID -> "issueAssetGasField", 'containerDivClass -> "hidden")
+    @commonInputLong(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'required -> false, 'containerDivID -> "issueAssetGasField", 'containerDivClass -> "hidden")
     @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD, 'required -> false, 'containerDivID -> "issueAssetPasswordField", 'containerDivClass -> "hidden")
 }
 <script src="@routes.Assets.versioned("javascripts/issueAsset.js")" type="text/javascript"></script>

@@ -13,6 +13,6 @@ object ConfirmNegotiation {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, gas: Int, password: String)
+  case class Data(id: String, gas: Long, password: String)
 
 }

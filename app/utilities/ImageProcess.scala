@@ -18,14 +18,6 @@ object ImageProcess {
 
   def convertToThumbnail(name: String, uploadPath: String)(implicit executionContext: ExecutionContext): (String, Option[Array[Byte]]) = {
     try {
-      val x= math.round(2.345*100)/100
-      val value = 1.4142135623730951
-
-      //3 decimal places
-      val y=((value * 1000).round / 1000.toDouble)
-
-      //4 decimal places
-      println((value * 10000).round / 10000.toDouble)
       val imageRes = ImageIO.read(FileOperations.newFile(uploadPath, name))
       implicit val writer: JpegWriter = JpegWriter().withCompression(100)
       val bytes = FileOperations.convertToByteArray(scrimage.Image.fromFile(FileOperations.newFile(uploadPath, name)).fit(180, (180 * imageRes.getHeight) / imageRes.getWidth).output(FileOperations.newFile(uploadPath, '~' + name)))

@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemFiat(from: String, to: String, redeemAmount: MicroLong, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemFiat] with Logged {
+case class RedeemFiat(from: String, to: String, redeemAmount: MicroLong, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemFiat] with Logged {
   def mutateTicketID(newTicketID: String): RedeemFiat = RedeemFiat(from = from, to = to, redeemAmount = redeemAmount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -36,7 +36,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
   
   def serialize(redeemFiat: RedeemFiat): RedeemFiatSerialized = RedeemFiatSerialized(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount.value, gas = redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code, createdBy = redeemFiat.createdBy, createdOn = redeemFiat.createdOn, createdOnTimeZone = redeemFiat.createdOnTimeZone, updatedBy = redeemFiat.updatedBy, updatedOn = redeemFiat.updatedOn, updatedOnTimeZone = redeemFiat.updatedOnTimeZone)
 
-  case class RedeemFiatSerialized(from: String, to: String, redeemAmount: Long, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class RedeemFiatSerialized(from: String, to: String, redeemAmount: Long, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize(): RedeemFiat = RedeemFiat(from = from, to = to, redeemAmount = new MicroLong(redeemAmount), gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
   
@@ -142,7 +142,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
 
     def redeemAmount = column[Long]("redeemAmount")
 
-    def gas = column[Int]("gas")
+    def gas = column[Long]("gas")
 
     def status = column[Boolean]("status")
 

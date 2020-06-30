@@ -13,5 +13,5 @@ object ConfirmBid {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, time: Int, gas: Int, password: String)
+  case class Data(requestID: String, time: Int, gas: Long, password: String)
 }
