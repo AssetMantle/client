@@ -3,7 +3,7 @@
 
 @(createWalletForm: Form[CreateWallet.Data] = CreateWallet.form, username: String, mnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div class="MnemonicQuiz">
+<div class="mnemonicQuiz">
     @commonForm(constants.Form.CREATE_WALLET, createWalletForm) {
         @commonInputText(createWalletForm, constants.FormField.USERNAME, 'containerDivClass -> "hidden", 'value -> username, 'readonly -> true)
         @commonInputText(createWalletForm, constants.FormField.MNEMONICS, 'value -> mnemonics.mkString(" "), 'containerDivClass -> "hidden", 'readonly -> true)
