@@ -2,15 +2,15 @@ package types
 
 object Type {
 
-  type microLong = MicroLong
+  type Micro = MicroLong
 
   class MicroLong(val value: Long) {
 
-    def this(value: String) = this(value.toLong)
+    def this(realString: String) = this(realString.toLong)
 
-    def this(value: Int) = this((value * 1000000).toLong)
+    def this(realInt: Int) = this((realInt * 1000000).toLong)
 
-    def this(value: Double) = this((value * 1000000).toLong)
+    def this(realDouble: Double) = this((realDouble * 1000000).toLong)
 
     def realString = (value.toDouble / 1000000).toString
 
@@ -20,13 +20,13 @@ object Type {
 
     def microDouble = value.toDouble
 
-    def +(microLong: MicroLong) = new microLong(this.value + microLong.value)
+    def +(microLong: MicroLong) = new Micro(this.value + microLong.)
 
-    def -(microLong: MicroLong) = new microLong(this.value - microLong.value)
+    def -(microLong: MicroLong) = new Micro(this.value - microLong.value)
 
-    def *(microLong: MicroLong) = new microLong(this.value * microLong.value)
+    def *(microLong: MicroLong) = new Micro(this.value * microLong.value)
 
-    def /(microLong: MicroLong) = new microLong(this.value / microLong.value)
+    def /(microLong: MicroLong) = new Micro(this.value / microLong.value)
 
     def realDoubleWithPrecision(p: Int) = utilities.NumericOperation.roundAt(p)(this.realDouble)
 
