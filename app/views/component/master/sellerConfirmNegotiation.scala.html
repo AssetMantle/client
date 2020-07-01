@@ -10,8 +10,8 @@
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET_DETAILS)</div>
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
     @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiation.price.realDouble/negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(roundAtTwoDecimal(negotiation.price.realString), Messages(constants.View.USD)).mkString(" "))
-    @commonTextInfo(constants.View.QUANTITY, Seq(roundAtTwoDecimal(negotiation.quantity.realString), negotiation.quantityUnit).mkString(""))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(""))
     @commonInputLong(sellerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sellerConfirmNegotiationForm, constants.FormField.PASSWORD)
 }

@@ -56,7 +56,7 @@ object FormField {
   val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 3, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("BILL_OF_LADING_NUMBER", 2, 500, RegularExpression.BILL_OF_LADING_NUMBER)
   val CONSIGNEE_TO = new StringFormField("CONSIGNEE_TO", 2, 100)
-  val VESSEL_NAME = new StringFormField("VESSEL_NAME", 2, 100,RegularExpression.NAME)
+  val VESSEL_NAME = new StringFormField("VESSEL_NAME", 2, 100, RegularExpression.NAME)
   val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.NAME)
   val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ADDRESS)
   val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.NAME)
@@ -235,9 +235,9 @@ object FormField {
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, decimalPlaces: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
+    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => if ((x * math.pow(10, decimalPlaces)) % 1 == 0) true else false)
   }
 
   class BooleanFormField(fieldName: String) {
@@ -249,8 +249,8 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
+  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, decimalPlaces: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => if ((x * math.pow(10, decimalPlaces)) % 1 == 0) true else false).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
   }
 }

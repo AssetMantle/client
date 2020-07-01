@@ -26,7 +26,7 @@
                                     </div>
                                     <div class="assetInitialData">
                                         <p class="assetTitle">@Messages(asset.assetType)</p>
-                                        <p class="assetQuantity">@Seq(roundAtTwoDecimal(completedNegotiation.quantity.realString), completedNegotiation.quantityUnit).mkString(" ")</p>
+                                        <p class="assetQuantity">@Seq(completedNegotiation.quantity.realString, completedNegotiation.quantityUnit).mkString(" ")</p>
                                         <p class="assetPrice">@Seq(roundAtTwoDecimal(completedNegotiation.price.realDouble/completedNegotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
                                     </div>
                                 }
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="assetInitialData">
                                     <p class="assetTitle">@Messages(asset.assetType)</p>
-                                    <p class="assetQuantity">@Seq(roundAtTwoDecimal(completedNegotiation.quantity.realString), completedNegotiation.quantityUnit).mkString(" ")</p>
+                                    <p class="assetQuantity">@Seq(completedNegotiation.quantity.realString, completedNegotiation.quantityUnit).mkString(" ")</p>
                                     <p class="assetPrice">@Seq(roundAtTwoDecimal(completedNegotiation.price.realDouble/completedNegotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }

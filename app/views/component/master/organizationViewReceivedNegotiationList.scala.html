@@ -23,7 +23,7 @@
                         </div>
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
-                            <p class="assetQuantity">@Seq(roundAtTwoDecimal(receivedNegotiation.quantity.realString), receivedNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetQuantity">@Seq(receivedNegotiation.quantity.realString, receivedNegotiation.quantityUnit).mkString(" ")</p>
                             <p class="assetPrice">@Seq(roundAtTwoDecimal(receivedNegotiation.price.realDouble/receivedNegotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), receivedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
