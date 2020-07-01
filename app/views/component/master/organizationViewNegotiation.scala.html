@@ -4,6 +4,8 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
+@import utilities.NumericOperation.roundAtTwoDecimal
+
 @(negotiation: Negotiation, asset: Asset, trader: Option[Trader], counterPartyTrader: Option[Trader], counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <legend class="cmuk-legend">
     @Messages(constants.View.NEGOTIATION_ID): @negotiation.id
@@ -17,9 +19,9 @@
     </div>
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price.realDouble/negotiation.quantity.realDouble, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realDouble, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.QUANTITY, Seq(roundAtTwoDecimal(roundAtTwoDecimal(negotiation.quantity.realString)), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiation.price.realDouble/negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(roundAtTwoDecimal(negotiation.price.realDouble), Messages(constants.View.USD)).mkString(" "))
     @trader match {
         case Some(trader) => {
             @commonTextInfo(constants.View.TRADER, trader.accountID)

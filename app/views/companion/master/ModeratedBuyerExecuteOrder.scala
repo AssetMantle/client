@@ -13,6 +13,6 @@ object ModeratedBuyerExecuteOrder {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(orderID: String, gas: Int, password: String)
+  case class Data(orderID: String, gas: Long, password: String)
 
 }

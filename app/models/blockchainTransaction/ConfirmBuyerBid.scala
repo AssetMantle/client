@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmBuyerBid(from: String, to: String, bid: MicroLong, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] with Logged {
+case class ConfirmBuyerBid(from: String, to: String, bid: MicroLong, time: Int, pegHash: String, buyerContractHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] with Logged {
   def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -40,7 +40,7 @@ class ConfirmBuyerBids @Inject()(
 
   def serialize(confirmBuyerBid: ConfirmBuyerBid): ConfirmBuyerBidSerialized = ConfirmBuyerBidSerialized(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid.value, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, buyerContractHash = confirmBuyerBid.buyerContractHash, gas = confirmBuyerBid.gas, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code, createdBy = confirmBuyerBid.createdBy, createdOn = confirmBuyerBid.createdOn, createdOnTimeZone = confirmBuyerBid.createdOnTimeZone, updatedBy = confirmBuyerBid.updatedBy, updatedOn = confirmBuyerBid.updatedOn, updatedOnTimeZone = confirmBuyerBid.updatedOnTimeZone)
 
-  case class ConfirmBuyerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class ConfirmBuyerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, buyerContractHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize(): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = new MicroLong(bid), time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -152,7 +152,7 @@ class ConfirmBuyerBids @Inject()(
 
     def buyerContractHash = column[String]("buyerContractHash")
 
-    def gas = column[Int]("gas")
+    def gas = column[Long]("gas")
 
     def status = column[Boolean]("status")
 

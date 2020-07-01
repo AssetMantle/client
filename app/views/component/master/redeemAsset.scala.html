@@ -4,6 +4,6 @@
 @(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.REDEEM_ASSET, redeemAssetForm) {
     @commonInputText(redeemAssetForm, constants.FormField.ASSET_ID, 'value -> assetID, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonInputInt(redeemAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputLong(redeemAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(redeemAssetForm, constants.FormField.PASSWORD)
 }

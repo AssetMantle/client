@@ -18,6 +18,6 @@ object ConfirmSellerBid {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String, gas: Int, mode: String, password: String)
+  case class Data(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String, gas: Long, mode: String, password: String)
 
 }

@@ -3,6 +3,7 @@
 @import models.master.{Asset, Negotiation}
 @import models.master.Trader
 @import models.master.Organization
+@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(traderList:Seq[Trader], counterPartyOrganization:Organization, negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -63,11 +64,11 @@
                 <div>
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price.realDouble/negotiation.quantity.realDouble, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiation.price.realDouble/negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                 </div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(roundAtTwoDecimal(negotiation.price.realString), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 </div>
                 <div>
@@ -81,7 +82,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("quantity")</span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(roundAtTwoDecimal(negotiation.quantity.realString), negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @if(negotiation.buyerAcceptedQuantity) {

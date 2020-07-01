@@ -17,6 +17,6 @@ object IssueFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, transactionID: String, transactionAmount: MicroLong, gas: Int, mode: String, password: String)
+  case class Data(from: String, to: String, transactionID: String, transactionAmount: MicroLong, gas: Long, mode: String, password: String)
 
 }

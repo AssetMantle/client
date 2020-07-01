@@ -24,7 +24,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ChangeBuyerBid(from: String, to: String, bid: MicroLong, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] with Logged {
+case class ChangeBuyerBid(from: String, to: String, bid: MicroLong, time: Int, pegHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] with Logged {
   def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -49,7 +49,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
   def serialize(changeBuyerBid: ChangeBuyerBid): ChangeBuyerBidSerialized = ChangeBuyerBidSerialized(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid.value, time = changeBuyerBid.time,pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code, createdBy = changeBuyerBid.createdBy, createdOn = changeBuyerBid.createdOn, createdOnTimeZone = changeBuyerBid.createdOnTimeZone, updatedBy = changeBuyerBid.updatedBy, updatedOn = changeBuyerBid.updatedOn, updatedOnTimeZone = changeBuyerBid.updatedOnTimeZone)
 
-  case class ChangeBuyerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class ChangeBuyerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize(): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = new MicroLong(bid), time =time,pegHash=pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -159,7 +159,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
     def pegHash = column[String]("pegHash")
 
-    def gas = column[Int]("gas")
+    def gas = column[Long]("gas")
 
     def status = column[Boolean]("status")
 

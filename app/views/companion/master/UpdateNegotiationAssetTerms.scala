@@ -18,6 +18,6 @@ object UpdateNegotiationAssetTerms {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, description: String, pricePerUnit: MicroLong, quantity: MicroLong, quantityUnit: String, gas: Int, password: String)
+  case class Data(id: String, description: String, pricePerUnit: MicroLong, quantity: MicroLong, quantityUnit: String, gas: Long, password: String)
 
 }

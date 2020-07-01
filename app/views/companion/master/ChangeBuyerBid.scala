@@ -16,6 +16,6 @@ object  ChangeBuyerBid {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: Option[String], sellerAddress: String, bid: Int, time: Int, pegHash: String, gas: Int, password: String)
+  case class Data(requestID: Option[String], sellerAddress: String, bid: Int, time: Int, pegHash: String, gas: Long, password: String)
 
 }

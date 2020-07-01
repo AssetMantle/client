@@ -20,6 +20,6 @@ object IssueAssetOld {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, tarderID: String, documentHash: String, assetType: String, assetPricePerUnit: MicroLong, quantityUnit: String, assetQuantity: MicroLong, takerAddress: Option[String], gas: Int, password: String)
+  case class Data(id: String, tarderID: String, documentHash: String, assetType: String, assetPricePerUnit: MicroLong, quantityUnit: String, assetQuantity: MicroLong, takerAddress: Option[String], gas: Long, password: String)
 
 }

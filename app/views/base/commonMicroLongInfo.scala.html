@@ -1,4 +1,5 @@
 @import utilities.MicroLong
+@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(key: String, value: MicroLong, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 <div class="cmuk-flex infoRow">
@@ -6,6 +7,6 @@
         @Messages(key)
     </div>
     <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
-    @value.realString
+    @roundAtTwoDecimal(value.realString)
     </div>
 </div>

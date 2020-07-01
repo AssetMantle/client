@@ -4,6 +4,8 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
+@import utilities.NumericOperation.roundAtTwoDecimal
+
 @(negotiation: Negotiation, asset: Asset, counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
@@ -18,9 +20,9 @@
 </div>
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price.realDouble/negotiation.quantity.realDouble, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.QUANTITY, Seq(roundAtTwoDecimal(negotiation.quantity.realString), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiation.price.realDouble/negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(roundAtTwoDecimal(negotiation.price.realString), Messages(constants.View.USD)).mkString(" "))
     @commonTextInfo(constants.View.COUNTER_PARTY, counterPartyTrader.accountID)
     @commonTextInfo(constants.View.ORGANIZATION, counterPartyOrganization.name)
 <div class="cmuk-text-left title">@Messages(constants.View.SHIPPING_DETAILS):</div>

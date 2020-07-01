@@ -14,6 +14,6 @@ object SetBuyerFeedback {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(sellerAddress: String, pegHash: String, rating: Int, gas: Int, password: String)
+  case class Data(sellerAddress: String, pegHash: String, rating: Int, gas: Long, password: String)
 
 }
