@@ -20,13 +20,13 @@ object Type {
 
     def microDouble = value.toDouble
 
-    def +(microLong: MicroLong) = new Micro(this.value + microLong.)
+    def +(micro: Micro) = new Micro(this.value + micro.value)
 
-    def -(microLong: MicroLong) = new Micro(this.value - microLong.value)
+    def -(micro: Micro) = new Micro(this.value - micro.value)
 
-    def *(microLong: MicroLong) = new Micro(this.value * microLong.value)
+    def *(micro: Micro) = new Micro(this.value * micro.value)
 
-    def /(microLong: MicroLong) = new Micro(this.value / microLong.value)
+    def /(micro: Micro) = new Micro(this.value / micro.value)
 
     def realDoubleWithPrecision(p: Int) = utilities.NumericOperation.roundAt(p)(this.realDouble)
 
