@@ -24,11 +24,11 @@ class MicroLong(val value: Long) {
 
   def /(microLong: MicroLong) = new MicroLong(this.realDouble / microLong.realDouble)
 
-  def realDoubleWithPrecision(p: Int = 2) = utilities.NumericOperation.roundAt(this.realDouble, p)
+  def realDoubleWithPrecision(precision: Int = 2) = utilities.NumericOperation.roundOff(this.realDouble, precision)
 
-  def realStringWithPrecision(p: Int = 2) = realDoubleWithPrecision(p).toString
+  def realStringWithPrecision(precision: Int = 2) = realDoubleWithPrecision(precision).toString
 
-  def roundUpDoubleWithPrecision(p: Int = 2) = utilities.NumericOperation.roundUp(this.realDouble, p)
+  def roundUpDoubleWithPrecision(precision: Int = 2) = utilities.NumericOperation.roundUp(this.realDouble, precision)
 
-  def roundDownDoubleWithPrecision(p: Int = 2) = utilities.NumericOperation.roundDown(this.realDouble, p)
+  def roundDownDoubleWithPrecision(precision: Int = 2) = utilities.NumericOperation.roundDown(this.realDouble, precision)
 }

@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.Negotiation
-@import utilities.NumericOperation.roundAt
+@import utilities.NumericOperation.roundOff
 
 @(walletBalance: Double, amountPaid: Double, amountPending: Double, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <ul class="">
@@ -10,7 +10,7 @@
             <span class="walletIcon">@commonIcon("wallet")</span>
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
-                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAt(walletBalance)</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundOff(walletBalance)</p>
             </div>
         </div>
         <div>
@@ -24,7 +24,7 @@
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
                 <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
-                    @roundAt(amountPaid)
+                    @roundOff(amountPaid)
                 } else {
                     0
                 }</p>
@@ -37,7 +37,7 @@
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
                 <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
-                    @roundAt(amountPending)
+                    @roundOff(amountPending)
                 } else {
                     0
                 }</p>
