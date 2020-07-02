@@ -92,9 +92,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private def getTransactionAmountsByTransactionID(transactionID: String): Future[Option[Long]] = db.run(fiatTable.filter(_.transactionID === transactionID).map(_.transactionAmount).sum.result)
 
-  private def getFiatPegWalletByOwnerID(ownerID: String): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID === ownerID).result)
+  private def getFiatPegWalletByOwnerID(ownerID: String): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID === ownerID).filter(_.status === true).result)
 
-  private def getFiatPegWalletByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID inSet ownerIDs).result)
+  private def getFiatPegWalletByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID inSet ownerIDs).filter(_.status === true).result)
 
   private[models] class FiatTable(tag: Tag) extends Table[FiatSerialized](tag, "Fiat") {
 
