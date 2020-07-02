@@ -238,7 +238,7 @@ object FormField {
 
   class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => checkPrecision(precision, x))
+    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x))
   }
 
   class BooleanFormField(fieldName: String) {
@@ -252,7 +252,7 @@ object FormField {
 
   class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => checkPrecision(precision, x)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
   }
 
 }

@@ -2,7 +2,7 @@ package utilities
 
 class MicroLong(val value: Long) {
 
-  def this(realString: String) = this(realString.toLong)
+  def this(microString: String) = this(microString.toLong)
 
   def this(realInt: Int) = this((realInt * 1000000).toLong)
 
