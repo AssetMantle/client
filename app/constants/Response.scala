@@ -211,6 +211,7 @@ object Response {
   val ALL_TRADE_DOCUMENTS_NOT_UPLOADED = new Failure("ALL_TRADE_DOCUMENTS_NOT_UPLOADED")
   val TRANSACTION_HASH_NOT_FOUND = new Failure("TRANSACTION_HASH_NOT_FOUND")
   val KEY_STORE_ERROR = new Failure("KEY_STORE_ERROR")
+  val PRECISION_MORE_THAN_REQUIRED = new Failure("PRECISION_MORE_THAN_REQUIRED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

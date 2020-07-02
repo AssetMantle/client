@@ -2,12 +2,21 @@ package utilities
 
 object NumericOperation {
 
-  def roundAt(p: Int)(n: Double): Double = {
-    val s = math.pow(10, p)
-    math.round(n * s) / s
+  def roundOff(value: Double, precision: Int = 2): Double = {
+    val s = math.pow(10, precision)
+    math.round(value * s) / s
   }
 
-  def roundAtTwoDecimal(n: Double): Double = roundAt(2)(n)
+  def roundUp(value: Double, precision: Int = 2): Double = {
+    val s = math.pow(10, precision)
+    math.ceil(value * s) / s
+  }
 
-  def roundAtTwoDecimal(n: String): String = roundAt(2)(n.toDouble).toString
+  def roundDown(value: Double, precision: Int = 2): Double = {
+    val s = math.pow(10, precision)
+    math.floor(value * s) / s
+  }
+
+  def checkPrecision(precision: Int, value: String): Boolean = if (value.split("""\.""")(1).length <= precision) true else false
+
 }

@@ -43,7 +43,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = negotiation.price.realDouble - fiatsInOrder.realDouble))
+      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = (negotiation.price - fiatsInOrder)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
@@ -53,7 +53,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt)))
+          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), amount = new MicroLong(formWithErrors.data(constants.FormField.SEND_AMOUNT.name).toDouble))))
         },
         sendFiatData => {
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
@@ -88,12 +88,12 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                   _ <- createFiatRequest(negotiation.buyerTraderID, ticketID, negotiation.id)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(sendFiatData.negotiationID, successes = Seq(constants.Response.FIAT_SENT)))
                 } yield result
-              } else Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiationID = sendFiatData.negotiationID, amount = sendFiatData.sendAmount.realDouble)))
+              } else Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiationID = sendFiatData.negotiationID, amount = sendFiatData.sendAmount)))
             }
           }
 
           def getResult(fiatsInOrder: MicroLong, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
-            if (fiatsInOrder.realDouble + sendFiatData.sendAmount.realDouble <= negotiation.price.realDouble) {
+            if (fiatsInOrder.realDouble + sendFiatData.sendAmount.realDouble <= negotiation.price.realDouble + constants.Precision.SEND_FIAT_PRECISION_MARGIN) {
               for {
                 sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
                 sellerAddress <- getAddress(sellerAccountID)
@@ -101,7 +101,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.realDouble - fiatsInOrder.realDouble), sendFiatData.negotiationID, sendFiatData.sendAmount.realDouble)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.realDouble - fiatsInOrder.realDouble), sendFiatData.negotiationID, sendFiatData.sendAmount)))
             }
           }
 
