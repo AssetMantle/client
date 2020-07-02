@@ -21,6 +21,8 @@ case class NegotiationFileHistory(id: String, documentType: String, fileName: St
 
   def updateFile(newFile: Option[Array[Byte]]): NegotiationFileHistory = copy(file = newFile)
 
+  def updateStatus(status: Option[Boolean]): NegotiationFileHistory = copy(status = status)
+
 }
 
 @Singleton
