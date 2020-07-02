@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import utilities.NumericOperation.roundAtTwoDecimal
+@import utilities.NumericOperation.roundAt
 @(walletBalance: Double, payable: Double, receivable: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="financialCard">
 @commonCard(constants.View.FINANCIALS, 'cardIconPath -> "images/icons/icons.svg#tradeFinance") {
@@ -11,7 +11,7 @@
                 <span class="walletIcon"><svg class="icon"><use xlink:href="@routes.Assets.versioned("images/icons/icons.svg#wallet")"/></svg></span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAtTwoDecimal(walletBalance)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAt(walletBalance)</p>
                 </div>
             </div>
         </li>
@@ -20,7 +20,7 @@
                 <span class="receivableIcon">@commonIcon("receivable")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.RECEIVABLE)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAtTwoDecimal(receivable)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAt(receivable)</p>
                 </div>
             </div>
         </li>
@@ -30,7 +30,7 @@
                 <span class="payableIcon">@commonIcon("payable")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.PAYABLE)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAtTwoDecimal(payable)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundAt(payable)</p>
                 </div>
             </div>
         </li>

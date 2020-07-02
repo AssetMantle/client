@@ -1,4 +1,4 @@
-@import utilities.NumericOperation.roundAtTwoDecimal
+@import utilities.NumericOperation.roundAt
 @(key: String, value: Double, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
 <div class="cmuk-flex infoRow">
@@ -6,6 +6,6 @@
         @Messages(key)
     </div>
     <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
-        @roundAtTwoDecimal(value)
+        @roundAt(value)
     </div>
 </div>

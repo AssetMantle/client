@@ -5,7 +5,6 @@
 @import models.master.Order
 @import models.master.Trader
 @import models.master.Organization
-@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -113,10 +112,10 @@
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.PRICE, status = negotiation.buyerAcceptedPrice, iconPath = "contractPrice") {
                     @Messages(constants.View.PRICE)
                     <div class="creditTerms">
-                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
+                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 } {
-                    @Seq(roundAtTwoDecimal(negotiation.price.realDouble / negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
+                    @Seq((negotiation.price / negotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
                 }
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "quantity") {
                     @Messages(constants.View.QUANTITY)
@@ -199,10 +198,10 @@
                     <div>
                         <div class="cmuk-flex">
                             <span class="termIcon">@commonIcon("contractPrice")</span>
-                            @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiation.price.realDouble / negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                            @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price / negotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                         </div>
                         <div class="cmuk-flex termIdent">
-                            @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
+                            @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                         </div>
                     </div>
                     <div>

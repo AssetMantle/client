@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
 @import models.master.Asset
 @import views.html.base._
-@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(assetRequests: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
@@ -16,8 +15,8 @@
                     @commonTextInfo(constants.View.ASSET_ID, assetRequest.id)
                     @commonTextInfo(constants.View.ASSET_TYPE, assetRequest.assetType)
                     @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetRequest.quantity.realString, assetRequest.quantityUnit).mkString(" "))
-                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(assetRequest.price.realDouble/assetRequest.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), assetRequest.quantityUnit).mkString(" "))
-                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(assetRequest.price.realString, Messages(constants.View.USD)).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((assetRequest.price/assetRequest.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), assetRequest.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(assetRequest.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                     @commonBooleanInfo(constants.View.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)
                     @commonFormButton(constants.Form.ZONE_ISSUE_ASSET,'parameters -> s"'${assetRequest.id}'", 'class -> "cmuk-button-success cmuk-button-small")

@@ -3,7 +3,6 @@
 @import models.master.{AssetHistory, NegotiationHistory, OrderHistory}
 @import models.master.Organization
 @import models.master.Trader
-@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiationHistory: NegotiationHistory, orderHistory: OrderHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -56,11 +55,11 @@
                 <div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiationHistory.price.realDouble/negotiationHistory.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiationHistory.price/negotiationHistory.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
                     </div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.realString, Messages(constants.View.USD)).mkString(" "))
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 </div>
                 <div>

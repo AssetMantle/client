@@ -3,7 +3,6 @@
 @import models.master.NegotiationHistory
 @import models.master.AssetHistory
 @import models.master.Trader
-@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(negotiationList: Seq[NegotiationHistory], counterPartyTraderList: Seq[Trader], assetList: Seq[AssetHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -20,7 +19,7 @@
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(roundAtTwoDecimal(negotiation.price.realDouble/negotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq((negotiation.price/negotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}

@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.{AssetHistory, NegotiationHistory}
-@import utilities.NumericOperation.roundAtTwoDecimal
 @import models.master.Trader
 @import models.master.Organization
 
@@ -80,11 +79,11 @@
                 <div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(roundAtTwoDecimal(negotiationHistory.price.realDouble/negotiationHistory.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiationHistory.price/negotiationHistory.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
                     </div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.realString, Messages(constants.View.USD)).mkString(" "))
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 </div>
                 <div>

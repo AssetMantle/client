@@ -4,7 +4,6 @@
 @import models.master.Negotiation
 @import models.master.Trader
 @import views.companion.master.ReviewNegotiationRequest
-@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_NEGOTIATION_REQUEST, traderReviewNegotiationRequest) {
@@ -14,8 +13,8 @@
     @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
     @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(asset.quantity.realString, asset.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.ASSET_PRICE_PER_UNIT, Seq(roundAtTwoDecimal(asset.price.realDouble/asset.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realString, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.ASSET_PRICE_PER_UNIT, Seq((asset.price/asset.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
     @commonBooleanInfo(constants.View.MODERATED, Option(asset.moderated))
     @commonIntInfo(constants.View.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
     @commonTextInfo(constants.View.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)

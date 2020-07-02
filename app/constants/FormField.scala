@@ -8,6 +8,7 @@ import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
 import utilities.MicroLong
 import scala.util.matching.Regex
+import utilities.NumericOperation.checkPrecision
 
 object FormField {
   //StringFormField
@@ -235,9 +236,9 @@ object FormField {
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, decimalPlaces: Int = 2) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => if ((x * math.pow(10, decimalPlaces)) % 1 == 0) true else false)
+    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => checkPrecision(precision, x))
   }
 
   class BooleanFormField(fieldName: String) {
@@ -249,8 +250,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, decimalPlaces: Int = 2) {
+  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => if ((x * math.pow(10, decimalPlaces)) % 1 == 0) true else false).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.EXCESS_DECIMALS_FOUND.message, x => checkPrecision(precision, x)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
   }
+
 }

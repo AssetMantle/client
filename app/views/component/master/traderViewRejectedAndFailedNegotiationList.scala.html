@@ -2,7 +2,6 @@
 @import views.html.base._
 @import models.master.Negotiation
 @import models.master.Trader
-@import utilities.NumericOperation.roundAtTwoDecimal
 @import models.master.Organization
 @import models.master.Asset
 
@@ -26,7 +25,7 @@
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(rejectedReceivedNegotiation.quantity.realString, rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(roundAtTwoDecimal(rejectedReceivedNegotiation.price.realDouble/rejectedReceivedNegotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq((rejectedReceivedNegotiation.price/rejectedReceivedNegotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}
@@ -77,7 +76,7 @@
                                 <div class="assetInitialData">
                                     <p class="assetTitle">@Messages(asset.assetType)</p>
                                     <p class="assetQuantity">@Seq(rejectedSentNegotiation.quantity.realString, rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
-                                    <p class="assetPrice">@Seq(roundAtTwoDecimal(rejectedSentNegotiation.price.realDouble/rejectedSentNegotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
+                                    <p class="assetPrice">@Seq((rejectedSentNegotiation.price/rejectedSentNegotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }
                             case None => {}
@@ -128,7 +127,7 @@
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(failedNegotiation.quantity.realString, failedNegotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(roundAtTwoDecimal(failedNegotiation.price.realDouble/failedNegotiation.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), failedNegotiation.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq((failedNegotiation.price/failedNegotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), failedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}

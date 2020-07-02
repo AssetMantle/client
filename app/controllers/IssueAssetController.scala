@@ -9,8 +9,6 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroLong
-import utilities.NumericOperation.roundAtTwoDecimal
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -58,7 +56,7 @@ class IssueAssetController @Inject()(
       val asset = masterAssets.Service.tryGet(assetID)
       (for {
         asset <- asset
-      } yield Ok(views.html.component.master.issueAssetOld(views.companion.master.IssueAssetOld.form.fill(views.companion.master.IssueAssetOld.Data(id = assetID, tarderID = asset.ownerID, documentHash = asset.documentHash, assetType = asset.assetType, assetPricePerUnit = new MicroLong(roundAtTwoDecimal(asset.price.realDouble / asset.quantity.realDouble)), quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, takerAddress = None, gas = constants.FormField.GAS.minimumValue, password = ""))))
+      } yield Ok(views.html.component.master.issueAssetOld(views.companion.master.IssueAssetOld.form.fill(views.companion.master.IssueAssetOld.Data(id = assetID, tarderID = asset.ownerID, documentHash = asset.documentHash, assetType = asset.assetType, assetPricePerUnit = asset.price / asset.quantity, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, takerAddress = None, gas = constants.FormField.GAS.minimumValue, password = ""))))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -80,9 +78,9 @@ class IssueAssetController @Inject()(
           def getResult(toAddress: String, verifyRequestedStatus: Boolean): Future[Result] = {
             if (verifyRequestedStatus) {
               val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = new MicroLong(roundAtTwoDecimal(issueAssetData.assetPricePerUnit.realDouble * issueAssetData.assetQuantity.realDouble)), quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPricePerUnit * issueAssetData.assetQuantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = new MicroLong(roundAtTwoDecimal(issueAssetData.assetPricePerUnit.realDouble * issueAssetData.assetQuantity.realDouble)).microString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.microString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),
+                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = (issueAssetData.assetPricePerUnit * issueAssetData.assetQuantity).microString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.microString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),
                 action = transactionsIssueAsset.Service.post,
                 onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                 onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -121,7 +119,7 @@ class IssueAssetController @Inject()(
         Future(BadRequest(views.html.component.blockchain.issueAsset(formWithErrors)))
       },
       issueAssetData => {
-        val post = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = issueAssetData.from, gas = issueAssetData.gas.toString), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = new MicroLong(roundAtTwoDecimal(issueAssetData.assetPricePerUnit.realDouble * issueAssetData.assetQuantity.realDouble)).microString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
+        val post = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = issueAssetData.from, gas = issueAssetData.gas.toString), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = (issueAssetData.assetPricePerUnit * issueAssetData.assetQuantity).microString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.microString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
