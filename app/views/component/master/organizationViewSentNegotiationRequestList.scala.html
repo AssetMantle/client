@@ -3,7 +3,6 @@
 @import models.master.Negotiation
 @import models.master.Asset
 @import models.master.Trader
-@import utilities.NumericOperation.roundAtTwoDecimal
 @import models.master.Organization
 
 @(sentNegotiationRequestList: Seq[Negotiation], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
@@ -23,8 +22,8 @@
                         </div>
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
-                            <p class="assetQuantity">@Seq(roundAtTwoDecimal(sentNegotiationRequest.quantity.realString), sentNegotiationRequest.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(roundAtTwoDecimal(sentNegotiationRequest.price.realDouble/sentNegotiationRequest.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), sentNegotiationRequest.quantityUnit).mkString(" ")</p>
+                            <p class="assetQuantity">@Seq(sentNegotiationRequest.quantity.realString, sentNegotiationRequest.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq((sentNegotiationRequest.price/sentNegotiationRequest.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), sentNegotiationRequest.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}

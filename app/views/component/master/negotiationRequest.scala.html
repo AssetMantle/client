@@ -4,7 +4,6 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
-@import utilities.NumericOperation.roundAtTwoDecimal
 
 @(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -14,7 +13,7 @@
         <div class="cmuk-panel cmuk-panel-scrollable">
             <ul class="cmuk-list">
             @tradableAssetList.map { asset =>
-                <li onclick="selectAsset('@asset.id', '@asset.description', '@Messages(asset.assetType)', '@Seq(roundAtTwoDecimal(asset.price.realDouble/asset.quantity.realDouble), Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" ")', '@Seq(roundAtTwoDecimal(asset.price.realString), Messages(constants.View.USD)).mkString(" ")', '@Seq(roundAtTwoDecimal(asset.quantity.realString), asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
+                <li onclick="selectAsset('@asset.id', '@asset.description', '@Messages(asset.assetType)', '@Seq((asset.price/asset.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" ")', '@Seq(asset.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" ")', '@Seq(asset.quantity.realString, asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
                     @asset.description | @Messages(constants.View.STATUS): @Messages(asset.status)
                 </li>
             }
