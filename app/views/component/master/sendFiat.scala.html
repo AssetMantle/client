@@ -6,7 +6,7 @@
 @(sendFiatForm: Form[SendFiat.Data] = SendFiat.form, negotiationID: String, amount: MicroLong)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_FIAT, sendFiatForm) {
     @commonInputText(sendFiatForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID)
-    @commonInputMicroLong(sendFiatForm, constants.FormField.SEND_AMOUNT, 'value -> amount.roundUpDoubleWithPrecision())
+    @commonInputMicroLong(sendFiatForm, constants.FormField.SEND_AMOUNT, 'value -> amount.toRoundedUpString())
     @commonInputLong(sendFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD)
 }

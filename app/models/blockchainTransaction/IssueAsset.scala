@@ -229,7 +229,7 @@ class IssueAssets @Inject()(
           case Some(bcAssets) => bcAssets.find(_.documentHash == masterAsset.documentHash).getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
           case None => throw new BaseException(constants.Response.ASSET_PEG_WALLET_NOT_FOUND)
         }
-        blockchainAssets.Service.create(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = new MicroLong(asset.assetPrice), assetQuantity = new MicroLong(asset.assetQuantity), quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = ownerAddress, dirtyBit = false)
+        blockchainAssets.Service.create(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.microLongAssetPrice, assetQuantity = asset.microLongAssetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = ownerAddress, dirtyBit = false)
       }
 
       def markAssetIssued(assetID: String, pegHash: String): Future[Int] = masterAssets.Service.markIssuedByID(id = assetID, pegHash = pegHash)
@@ -246,8 +246,8 @@ class IssueAssets @Inject()(
             for {
               _ <- markStatusRequestSent
               buyerAccountID <- getIDByTraderID(negotiation.buyerTraderID)
-              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.realString, masterAsset.quantityUnit, masterAsset.price.realString)
-              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.realString, masterAsset.quantityUnit, masterAsset.price.realString)
+              _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+              _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_REQUEST_SENT, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
             } yield ()
           } else Future()
         })
@@ -271,9 +271,9 @@ class IssueAssets @Inject()(
         _ <- markAccountDirty(issueAsset.from)
         fromAccountID <- getAccountIDByAddress(issueAsset.from)
         traderOrganization <- getOrganization(seller.organizationID)
-        _ <- utilitiesNotification.send(ownerAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, masterAsset.description, masterAsset.assetType, masterAsset.quantity.realString, masterAsset.quantityUnit, masterAsset.price.realString)
-        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ASSET_ISSUED, blockResponse.txhash, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.realString, masterAsset.quantityUnit, masterAsset.price.realString)
-        _ <- if (fromAccountID != ownerAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ASSET_ISSUED, blockResponse.txhash, traderOrganization.name, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.realString, masterAsset.quantityUnit, masterAsset.price.realString) else Future(None)
+        _ <- utilitiesNotification.send(ownerAccountID, constants.Notification.ASSET_ISSUED, blockResponse.txhash, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+        _ <- utilitiesNotification.send(traderOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_ASSET_ISSUED, blockResponse.txhash, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString)
+        _ <- if (fromAccountID != ownerAccountID) utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_NOTIFY_ASSET_ISSUED, blockResponse.txhash, traderOrganization.name, seller.accountID, masterAsset.description, masterAsset.assetType, masterAsset.quantity.toString, masterAsset.quantityUnit, masterAsset.price.toString) else Future(None)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

@@ -209,10 +209,10 @@ class Fiats @Inject()(
                   Service.deleteFiat(pegHash = pegHash, address = dirtyFiat.ownerAddress)
                 })
                 val updateFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).intersect(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                  Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = new MicroLong(fiatPeg.transactionAmount), redeemedAmount = new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false))
+                  Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.microLongTransactionAmount, redeemedAmount = fiatPeg.microLongRedeemedAmount, dirtyBit = false))
                 })
                 val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = new MicroLong(fiatPeg.transactionAmount), redeemedAmount = new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false)
+                  Service.create(pegHash = fiatPeg.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.microLongTransactionAmount, redeemedAmount = fiatPeg.microLongRedeemedAmount, dirtyBit = false)
                 })
                 for {
                   _ <- deleteFiats
@@ -243,10 +243,10 @@ class Fiats @Inject()(
                           masterFiats.Service.updateTransactionAmount(traderID, fiatPeg.transactionID, new MicroLong(0))
                         })
                         val updateFiats = Future.traverse(oldFiatPegWallet.map(_.pegHash).intersect(updatedFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                          masterFiats.Service.updateFiat(traderID, fiatPeg.transactionID, new MicroLong(fiatPeg.transactionAmount), new MicroLong(fiatPeg.redeemedAmount))
+                          masterFiats.Service.updateFiat(traderID, fiatPeg.transactionID, fiatPeg.microLongTransactionAmount, fiatPeg.microLongRedeemedAmount)
                         })
                         val insertFiats = Future.traverse(updatedFiatPegWallet.map(_.pegHash).diff(oldFiatPegWallet.map(_.pegHash)).flatMap(pegHash => updatedFiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-                          masterFiats.Service.insertOrUpdate(traderID, fiatPeg.transactionID, new MicroLong(fiatPeg.transactionAmount), new MicroLong(fiatPeg.redeemedAmount))
+                          masterFiats.Service.insertOrUpdate(traderID, fiatPeg.transactionID, fiatPeg.microLongTransactionAmount, fiatPeg.microLongRedeemedAmount)
                         })
                         for {
                           _ <- updateTransactionAmountToZero

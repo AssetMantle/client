@@ -92,9 +92,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private def getTransactionAmountsByTransactionID(transactionID: String): Future[Option[Long]] = db.run(fiatTable.filter(_.transactionID === transactionID).map(_.transactionAmount).sum.result)
 
-  private def getFiatPegWalletByOwnerID(ownerID: String): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID === ownerID).result)
+  private def getFiatsByOwnerIDAndStatus(ownerID: String, status: Option[Boolean]): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID === ownerID).filter(_.status.? === status).result)
 
-  private def getFiatPegWalletByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID inSet ownerIDs).result)
+  private def getFiatsByOwnerIDsAndStatus(ownerIDs: Seq[String], status: Option[Boolean]): Future[Seq[FiatSerialized]] = db.run(fiatTable.filter(_.ownerID inSet ownerIDs).filter(_.status.? === status).result)
 
   private[models] class FiatTable(tag: Tag) extends Table[FiatSerialized](tag, "Fiat") {
 
@@ -136,9 +136,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getRTCBAmountsByTransactionID(transactionID: String): Future[Option[MicroLong]] = getTransactionAmountsByTransactionID(transactionID).map(_.map(new MicroLong(_)))
 
-    def getFiatPegWallet(ownerID: String): Future[Seq[Fiat]] = getFiatPegWalletByOwnerID(ownerID).map(_.map(_.deserialize()))
+    def getFiatPegWallet(ownerID: String): Future[Seq[Fiat]] = getFiatsByOwnerIDAndStatus(ownerID, Option(true)).map(_.map(_.deserialize()))
 
-    def getFiatPegWallet(ownerIDs: Seq[String]): Future[Seq[Fiat]] = getFiatPegWalletByOwnerIDs(ownerIDs).map(_.map(_.deserialize()))
+    def getFiatPegWallet(ownerIDs: Seq[String]): Future[Seq[Fiat]] = getFiatsByOwnerIDsAndStatus(ownerIDs, Option(true)).map(_.map(_.deserialize()))
 
     def markSuccess(ownerID: String, transactionID: String): Future[Int] = updateStatus(ownerID, transactionID, status = true)
 

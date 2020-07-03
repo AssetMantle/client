@@ -2,6 +2,7 @@ package queries.responses
 
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
+import utilities.MicroLong
 
 object AccountResponse {
 
@@ -11,7 +12,11 @@ object AccountResponse {
 
   implicit val assetReads: Reads[Asset] = Json.reads[Asset]
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String)
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String) {
+    val microLongAssetPrice = new MicroLong(assetPrice.toLong)
+
+    val microLongAssetQuantity = new MicroLong(assetQuantity.toLong)
+  }
 
   case class Owners(ownerAddress: String, amount: String)
 
@@ -19,7 +24,11 @@ object AccountResponse {
 
   implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
 
-  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]])
+  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]]) {
+    val microLongTransactionAmount = new MicroLong(transactionAmount.toLong)
+
+    val microLongRedeemedAmount = new MicroLong(redeemedAmount.toLong)
+  }
 
   case class Value(address: String, coins: Option[Seq[Coins]], asset_peg_wallet: Option[Seq[Asset]], fiat_peg_wallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 

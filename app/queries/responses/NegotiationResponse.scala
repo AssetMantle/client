@@ -2,10 +2,13 @@ package queries.responses
 
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
+import utilities.MicroLong
 
 object NegotiationResponse {
 
-  case class Value(negotiationID: String, buyerAddress: String, sellerAddress: String, pegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String])
+  case class Value(negotiationID: String, buyerAddress: String, sellerAddress: String, pegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]) {
+    val microLongBid = new MicroLong(bid.toLong)
+  }
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

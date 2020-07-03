@@ -227,10 +227,10 @@ class SendFiats @Inject()(
       def updateBCFiat(bcFiatsInOrder: Seq[Fiat], negotiationID: String, orderResponse: OrderResponse.Response): Future[Unit] = orderResponse.value.fiat_peg_wallet match {
         case Some(fiatPegWallet) => {
           val updateFiats = Future.traverse(bcFiatsInOrder.map(_.pegHash).intersect(fiatPegWallet.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-            blockchainFiats.Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = new MicroLong(fiatPeg.transactionAmount), redeemedAmount = new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false))
+            blockchainFiats.Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.microLongTransactionAmount, redeemedAmount = fiatPeg.microLongRedeemedAmount, dirtyBit = false))
           })
           val insertFiats = Future.traverse(fiatPegWallet.map(_.pegHash).diff(bcFiatsInOrder.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-            blockchainFiats.Service.create(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = new MicroLong(fiatPeg.transactionAmount), redeemedAmount = new MicroLong(fiatPeg.redeemedAmount), dirtyBit = false)
+            blockchainFiats.Service.create(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.microLongTransactionAmount, redeemedAmount = fiatPeg.microLongRedeemedAmount, dirtyBit = false)
           })
           for {
             _ <- updateFiats

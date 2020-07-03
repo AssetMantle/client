@@ -76,7 +76,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 val ticketID = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
                   entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.sendAmount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.sendAmount.microString, pegHash = pegHash, mode = transactionMode),
+                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.sendAmount.toMicroString, pegHash = pegHash, mode = transactionMode),
                   action = transactionsSendFiat.Service.post,
                   onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
                   onFailure = blockchainTransactionSendFiats.Utility.onFailure,
@@ -93,7 +93,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           }
 
           def getResult(fiatsInOrder: MicroLong, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
-            if (fiatsInOrder.realDouble + sendFiatData.sendAmount.realDouble <= negotiation.price.realDouble + constants.Precision.SEND_FIAT_PRECISION_MARGIN) {
+            if (fiatsInOrder.toDouble + sendFiatData.sendAmount.toDouble <= negotiation.price.toDouble + constants.Precision.SEND_FIAT_PRECISION_MARGIN) {
               for {
                 sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
                 sellerAddress <- getAddress(sellerAccountID)
@@ -101,7 +101,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.realDouble - fiatsInOrder.realDouble), sendFiatData.negotiationID, sendFiatData.sendAmount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.toDouble - fiatsInOrder.toDouble), sendFiatData.negotiationID, sendFiatData.sendAmount)))
             }
           }
 
@@ -150,7 +150,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         Future(BadRequest(views.html.component.blockchain.sendFiat(formWithErrors)))
       },
       sendFiatData => {
-        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.sendAmount.microString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
+        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.sendAmount.toMicroString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
