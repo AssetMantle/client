@@ -2,15 +2,16 @@
 @import views.companion.master.ConfirmNegotiation
 @import views.html.base._
 @import models.master.Negotiation
+@import utilities.NumericOperation._
 
 @(buyerConfirmNegotiationForm: Form[ConfirmNegotiation.Data] = ConfirmNegotiation.form, negotiation: Negotiation)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.BUYER_CONFIRM_NEGOTIATION, buyerConfirmNegotiationForm) {
     @commonInputText(buyerConfirmNegotiationForm, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET_DETAILS)</div>
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
-    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(""))
-    @commonInputInt(buyerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price/negotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(""))
+    @commonInputLong(buyerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(buyerConfirmNegotiationForm, constants.FormField.PASSWORD)
 }

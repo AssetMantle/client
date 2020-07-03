@@ -1,0 +1,2 @@
+- name: Starting server
+  shell: nohup commit/commit-1.0/bin/commit &   

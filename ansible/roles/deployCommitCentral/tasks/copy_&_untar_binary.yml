@@ -1,0 +1,13 @@
+---
+- name: Creating a new directory	
+  file: 
+    path: commit/	
+    state: directory
+- name: Copy commit binary compressed file to remote server
+  copy:
+    src: files/commit-1.0.tar.gz
+    dest: commit/
+- name: Untar the binary tar file
+  command: tar xvzf commit-1.0.tar.gz
+  args:
+    chdir: commit/

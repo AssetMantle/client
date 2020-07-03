@@ -3,8 +3,8 @@
 @import models.master.{AssetHistory, NegotiationHistory}
 @import models.master.Trader
 @import models.master.Organization
-
 @import play.api.i18n.Messages
+
 @(traderList: Seq[Trader], counterPartyOrganization: Organization, negotiationHistory: NegotiationHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiationHistory.id, "TermsView").mkString("")'>
@@ -64,11 +64,11 @@
                 <div>
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiationHistory.price/negotiationHistory.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiationHistory.price/negotiationHistory.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
                 </div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price, Messages(constants.View.USD)).mkString(" "))
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 </div>
                 <div>
@@ -82,7 +82,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("quantity")</span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiationHistory.quantity.toString, negotiationHistory.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiationHistory.quantity.realString, negotiationHistory.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @if(negotiationHistory.buyerAcceptedQuantity) {

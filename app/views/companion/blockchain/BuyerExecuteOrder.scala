@@ -17,6 +17,6 @@ object BuyerExecuteOrder {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Int, mode: String, password: String)
+  case class Data(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Long, mode: String, password: String)
 
 }

@@ -2,7 +2,7 @@
   .pageContent {
     margin: 20px; }
 
-  .MnemonicQuiz {
+  .mnemonicQuiz {
     max-width: 500px; }
 
   .banner {
@@ -58,9 +58,9 @@
       .modal .modalContent form {
         text-align: center; }
 
-  .MnemonicQuiz {
+  .mnemonicQuiz {
     text-align: center; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
+    .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
       width: 95px; }
 
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
@@ -73,7 +73,7 @@
   form hr {
     margin: 0px; }
 
-  .MnemonicQuiz {
+  .mnemonicQuiz {
     text-align: center;
     max-width: 750px; }
 
@@ -118,9 +118,9 @@
   .pageContainer .middle {
     margin-bottom: 20px; } }
 @media (max-width: 992px) {
-  .MnemonicQuiz .mnemonicNote {
+  .mnemonicQuiz .mnemonicNote {
     background-image: none; }
-    .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
+    .mnemonicQuiz .mnemonicNote .mnemonicNoteText {
       width: 100%; }
 
   .modal .modalContent .modalBody .infoBlock {
@@ -136,14 +136,20 @@
   .modal .modalContent {
     top: 10%;
     max-height: 530px; }
-    .modal .modalContent .modalBody form .formBody {
-      max-height: 409px; }
+    .modal .modalContent .modalBody form {
+      width: 550px; }
+      .modal .modalContent .modalBody form .formBody {
+        max-height: 409px; }
     .modal .modalContent .modalBody .modalInfoBlock {
       max-height: 409px; }
     .modal .modalContent .modalBody .infoBlockHeight {
       max-height: 399px; }
     .modal .modalContent .modalBody .infoBlock {
       width: 800px; }
+    .modal .modalContent .modalBody dl {
+      margin-bottom: 10px; }
+    .modal .modalContent .modalBody .signUpForm form .formBody, .modal .modalContent .modalBody .mnemonicQuiz form .formBody {
+      padding: 10px 60px 40px 60px; }
 
   .leftContainer .financial {
     margin-bottom: 15px; }

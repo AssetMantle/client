@@ -13,6 +13,6 @@ object SendCoin {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(to: String, amount: Int, gas: Int, password: String)
+  case class Data(to: String, amount: Int, gas: Long, password: String)
 
 }

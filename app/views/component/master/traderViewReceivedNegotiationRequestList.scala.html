@@ -3,8 +3,8 @@
 @import models.master.Negotiation
 @import models.master.Asset
 @import models.master.Trader
-
 @import models.master.Organization
+
 @(receivedNegotiationRequestList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
  <div class="salesQuoteCard">
@@ -22,8 +22,8 @@
                         </div>
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
-                            <p class="assetQuantity">@Seq(receivedNegotiationRequest.quantity.toString, receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq(receivedNegotiationRequest.price/receivedNegotiationRequest.quantity, Messages(constants.View.USD), Messages(constants.View.PER), receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
+                            <p class="assetQuantity">@Seq(receivedNegotiationRequest.quantity.realString, receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
+                            <p class="assetPrice">@Seq((receivedNegotiationRequest.price/receivedNegotiationRequest.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}
@@ -51,8 +51,8 @@
             </div>
             <div class="salesQuoteCardRight salesChild">
                 @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-                 @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-                @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'")
+                 @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-success")
+                @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-danger")
             </div>
         }
     }

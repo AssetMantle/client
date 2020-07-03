@@ -1,14 +1,16 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import models.master.Negotiation
-@(walletBalance: Int, amountPaid: Int, amountPending: Int, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import utilities.NumericOperation.roundOff
+
+@(walletBalance: Double, amountPaid: Double, amountPending: Double, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <ul class="">
     <li class="cmuk-flex">
         <div class="cmuk-flex wallet">
             <span class="walletIcon">@commonIcon("wallet")</span>
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
-                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundOff(walletBalance)</p>
             </div>
         </div>
         <div>
@@ -22,7 +24,7 @@
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
                 <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
-                    @amountPaid
+                    @roundOff(amountPaid)
                 } else {
                     0
                 }</p>
@@ -35,7 +37,7 @@
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
                 <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
-                    @amountPending
+                    @roundOff(amountPending)
                 } else {
                     0
                 }</p>

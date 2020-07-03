@@ -1,21 +1,27 @@
 package models.masterTransaction
 
 import java.sql.Timestamp
+
 import models.Trait
 import javax.inject.{Inject, Singleton}
 import models.Trait.HistoryLogged
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
+import utilities.MicroLong
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ReceiveFiatHistory(id: String, traderID: String, orderID: String, amount: Int, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends Trait.ReceiveFiat with HistoryLogged {
-  def convertToReceiveFiat = ReceiveFiat(this.id, this.traderID, this.orderID, this.amount, this.status, this.createdBy,this.createdOn, this.createdOnTimeZone, this.updatedBy, this.updatedOn, this.updatedOnTimeZone)
+case class ReceiveFiatHistory(id: String, traderID: String, orderID: String, amount: MicroLong, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends Trait.ReceiveFiat with HistoryLogged {
+  def convertToReceiveFiat = ReceiveFiat(this.id, this.traderID, this.orderID, this.amount, this.status, this.createdBy, this.createdOn, this.createdOnTimeZone, this.updatedBy, this.updatedOn, this.updatedOnTimeZone)
 }
 
 @Singleton
 class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+
+  case class ReceiveFiatHistorySerialized(id: String, traderID: String, orderID: String, amount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
+    def deserialize(): ReceiveFiatHistory = ReceiveFiatHistory(id = id, traderID = traderID, orderID = orderID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
+  }
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_RECEIVE_FIAT_HISTORY
 
@@ -29,13 +35,13 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
 
   private[models] val receiveFiatHistoryTable = TableQuery[ReceiveFiatHistoryTable]
 
-  private def getByTraderIDsAndStatuses(traderIDs: Seq[String], status: Seq[String]): Future[Seq[ReceiveFiatHistory]] = db.run(receiveFiatHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status inSet status).result)
+  private def getByTraderIDsAndStatuses(traderIDs: Seq[String], status: Seq[String]): Future[Seq[ReceiveFiatHistorySerialized]] = db.run(receiveFiatHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status inSet status).result)
 
-  private def getByTraderIDAndStatuses(traderID: String, status: Seq[String]): Future[Seq[ReceiveFiatHistory]] = db.run(receiveFiatHistoryTable.filter(_.traderID === traderID).filter(_.status inSet status).result)
+  private def getByTraderIDAndStatuses(traderID: String, status: Seq[String]): Future[Seq[ReceiveFiatHistorySerialized]] = db.run(receiveFiatHistoryTable.filter(_.traderID === traderID).filter(_.status inSet status).result)
 
-  private[models] class ReceiveFiatHistoryTable(tag: Tag) extends Table[ReceiveFiatHistory](tag, "ReceiveFiat_History") {
+  private[models] class ReceiveFiatHistoryTable(tag: Tag) extends Table[ReceiveFiatHistorySerialized](tag, "ReceiveFiat_History") {
 
-    def * = (id, traderID, orderID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (ReceiveFiatHistory.tupled, ReceiveFiatHistory.unapply)
+    def * = (id, traderID, orderID, amount, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (ReceiveFiatHistorySerialized.tupled, ReceiveFiatHistorySerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -43,7 +49,7 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
 
     def orderID = column[String]("orderID")
 
-    def amount = column[Int]("amount")
+    def amount = column[Long]("amount")
 
     def status = column[String]("status")
 
@@ -67,9 +73,9 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
   }
 
   object Service {
-    def get(traderID: String): Future[Seq[ReceiveFiatHistory]] = getByTraderIDAndStatuses(traderID, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT))
+    def get(traderID: String): Future[Seq[ReceiveFiatHistory]] = getByTraderIDAndStatuses(traderID, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize()))
 
-    def get(traderIDs: Seq[String]): Future[Seq[ReceiveFiatHistory]] = getByTraderIDsAndStatuses(traderIDs, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT))
+    def get(traderIDs: Seq[String]): Future[Seq[ReceiveFiatHistory]] = getByTraderIDsAndStatuses(traderIDs, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize()))
   }
 }
 

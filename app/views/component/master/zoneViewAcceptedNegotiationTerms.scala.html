@@ -3,6 +3,7 @@
 @import models.master.{Asset, Negotiation}
 @import models.master.Trader
 @import models.master.Organization
+@import utilities.NumericOperation.roundOff
 
 @(traderList: Seq[Trader], organizationList: Seq[Organization], negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -76,11 +77,11 @@
                 <div>
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price/negotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("contractPrice")</span>
-                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
+                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
                 </div>
                 </div>
                 <div>
@@ -90,7 +91,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("quantity")</span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @negotiation.buyerAcceptedQuantity
@@ -127,7 +128,11 @@
             </div>
             <div class="sellerTerm">
                 <div>
-                @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                    <div class="cmuk-flex">
+                        <span class="termIcon">@commonIcon("advancePayment")</span>
+                        @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
+                    </div>
+                    <div class="termIdent">
                 @negotiation.paymentTerms.credit match {
                     case Some(credit) => {
                         @Messages(constants.View.CREDIT_TERMS):
@@ -143,6 +148,7 @@
                     }
                     case None => {}
                 }
+                    </div>
                 </div>
                 <div>
                 @negotiation.buyerAcceptedPaymentTerms

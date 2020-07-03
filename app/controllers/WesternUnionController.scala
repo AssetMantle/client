@@ -11,7 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import services.SFTPScheduler
-import utilities.KeyStore
+import utilities.{KeyStore, MicroLong}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -42,7 +42,7 @@ class WesternUnionController @Inject()(
 
   private val wuServiceID = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SERVICE_ID)
 
-  private val wuURL = configuration.get[String]("westernUnion.url")
+  private val wuURL = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_URL)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -62,13 +62,13 @@ class WesternUnionController @Inject()(
         val createRTCB = westernUnionRTCBs.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
           requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
           utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
-          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, requestBody.paidOutAmount.toInt, requestBody.requestSignature)
+          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, new MicroLong(requestBody.paidOutAmount.toDouble), requestBody.requestSignature)
 
-        def totalRTCBAmountReceived: Future[Int] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
+        def totalRTCBAmountReceived: Future[Long] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
         val fiatRequest = westernUnionFiatRequests.Service.tryGetByID(requestBody.externalReference)
 
-        def updateIssueFiatRequestRTCBStatus(amountRequested: Int, totalRTCBAmount: Int): Future[Int] = westernUnionFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
+        def updateIssueFiatRequestRTCBStatus(amountRequested: Long, totalRTCBAmount: Long): Future[Int] = westernUnionFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
 
         def traderDetails(traderID: String) = masterTraders.Service.tryGet(traderID)
 
@@ -78,15 +78,15 @@ class WesternUnionController @Inject()(
 
         def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
-        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = requestBody.paidOutAmount.toInt)
+        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroLong(requestBody.paidOutAmount.toDouble))
 
-        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, requestBody.paidOutAmount.toInt, 0)
+        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroLong(requestBody.paidOutAmount.toDouble), new MicroLong(0))
 
         for {
           _ <- createRTCB
           fiatRequest <- fiatRequest
           totalRTCBAmountReceived <- totalRTCBAmountReceived
-          _ <- updateIssueFiatRequestRTCBStatus(fiatRequest.transactionAmount, totalRTCBAmountReceived)
+          _ <- updateIssueFiatRequestRTCBStatus(fiatRequest.transactionAmount.value, totalRTCBAmountReceived)
           traderDetails <- traderDetails(fiatRequest.traderID)
           traderAddress <- traderAddress(traderDetails.accountID)
           zoneAccountID <- zoneAccountID(traderDetails.zoneID)
@@ -125,7 +125,7 @@ class WesternUnionController @Inject()(
               Form.WU_SFTP_BUYER_ADDRESS -> Seq(organizationDetails.postalAddress.addressLine1, organizationDetails.postalAddress.addressLine2),
               Form.BUYER_CITY -> Seq(organizationDetails.postalAddress.city), Form.BUYER_ZIP -> Seq(organizationDetails.postalAddress.zipCode),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),
-              Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.toString))
+              Form.SERVICE_AMOUNT -> Seq(issueFiatRequestData.transactionAmount.realString))
             val fullURL = utilities.String.queryURLGenerator(wuURL, queryString)
             Status(302)(fullURL)
           }
@@ -135,14 +135,14 @@ class WesternUnionController @Inject()(
         })
   }
 
-  private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: Int): Future[String] = {
+  private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroLong): Future[String] = {
 
     val zonePassword = Future(keyStore.getPassphrase(zoneID))
 
     def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
       entity = blockchainTransaction.IssueFiat(from = zoneWalletAddress, to = traderAddress, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, gas = constants.Blockchain.ZoneIssueFiatGasAmount, ticketID = "", mode = transactionMode),
       blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGasAmount.toString), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount.toString, mode = transactionMode),
+      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGasAmount.toString), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount.microString, mode = transactionMode),
       action = transactionsIssueFiat.Service.post,
       onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
       onFailure = blockchainTransactionIssueFiats.Utility.onFailure,

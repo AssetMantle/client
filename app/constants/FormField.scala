@@ -2,12 +2,13 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{boolean, date, number, of, text}
+import play.api.data.Forms.{boolean, date, number, of, text, longNumber}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
-
+import utilities.MicroLong
 import scala.util.matching.Regex
+import utilities.NumericOperation.checkPrecision
 
 object FormField {
   //StringFormField
@@ -22,8 +23,8 @@ object FormField {
   val SELLER_ADDRESS = new StringFormField("SELLER_ADDRESS", 45, 45)
   val TO = new StringFormField("TO", 45, 45)
   val BUYER_ADDRESS = new StringFormField("BUYER_ADDRESS", 45, 45)
-  val ZONE_ID = new StringFormField("ZONE_ID", 8, 16, RegularExpression.HASH)
-  val ORGANIZATION_ID = new StringFormField("ORGANIZATION_ID", 8, 16, RegularExpression.HASH)
+  val ZONE_ID = new StringFormField("ZONE_ID", 8, 24, RegularExpression.HASH)
+  val ORGANIZATION_ID = new StringFormField("ORGANIZATION_ID", 8, 24, RegularExpression.HASH)
   val TRADER_ID = new StringFormField("TRADER_ID", 8, 16, RegularExpression.HASH)
   val NAME = new StringFormField("NAME", 2, 50)
   val PERSON_FIRST_NAME = new StringFormField("PERSON_FIRST_NAME", 2, 50)
@@ -56,11 +57,11 @@ object FormField {
   val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 3, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("BILL_OF_LADING_NUMBER", 2, 500, RegularExpression.BILL_OF_LADING_NUMBER)
   val CONSIGNEE_TO = new StringFormField("CONSIGNEE_TO", 2, 100)
-  val VESSEL_NAME = new StringFormField("VESSEL_NAME", 2, 100)
-  val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
-  val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
-  val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
-  val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val VESSEL_NAME = new StringFormField("VESSEL_NAME", 2, 100, RegularExpression.NAME)
+  val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.NAME)
+  val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ADDRESS)
+  val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.NAME)
+  val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ADDRESS)
   val INVOICE_NUMBER = new StringFormField("INVOICE_NUMBER", 2, 32)
   val CONTRACT_NUMBER = new StringFormField("CONTRACT_NUMBER", 2, 100)
   val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 45, 45)
@@ -133,21 +134,15 @@ object FormField {
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
-  val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
-  val ASSET_PRICE_PER_UNIT = new IntFormField("ASSET_PRICE_PER_UNIT", 0, Int.MaxValue)
-  val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
-  val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
-  val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
+  val SCAN_ID = new IntFormField("SCAN_ID", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
-  val INVOICE_AMOUNT = new IntFormField("INVOICE_AMOUNT", 0, Int.MaxValue)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
@@ -159,6 +154,7 @@ object FormField {
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
+  val INVOICE_AMOUNT = new DoubleFormField("INVOICE_AMOUNT", 0, Double.MaxValue)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -204,6 +200,16 @@ object FormField {
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
 
+  //MicroLongFormField
+  val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
+  val TRANSACTION_AMOUNT = new MicroLongFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
+  val SEND_AMOUNT = new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
+  val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
+  val ASSET_QUANTITY = new MicroLongFormField("ASSET_QUANTITY", 1, Double.MaxValue)
+
+  //LongFormField
+  val GAS = new LongFormField("GAS", 20000L, 1000000L)
+
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
@@ -220,14 +226,19 @@ object FormField {
     val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
   }
 
+  class LongFormField(fieldName: String, val minimumValue: Long, val maximumValue: Long) {
+    val name: String = fieldName
+    val field: Mapping[Long] = longNumber(min = minimumValue, max = maximumValue)
+  }
+
   class DateFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
+    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString))
   }
 
   class BooleanFormField(fieldName: String) {
@@ -237,6 +248,11 @@ object FormField {
 
   class NestedFormField(fieldName: String) {
     val name: String = fieldName
+  }
+
+  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
+    val name: String = fieldName
+    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
   }
 
 }

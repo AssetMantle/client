@@ -16,7 +16,7 @@ object AddInvoice {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, invoiceNumber: String, invoiceAmount: Int, invoiceDate: Date)
+  case class Data(negotiationID: String, invoiceNumber: String, invoiceAmount: Double, invoiceDate: Date)
 
 }
 

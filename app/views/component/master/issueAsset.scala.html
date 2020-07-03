@@ -6,9 +6,9 @@
 @commonForm(constants.Form.ISSUE_ASSET, issueAssetForm) {
     @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)
     @commonInputText(issueAssetForm, constants.FormField.ASSET_DESCRIPTION)
-    @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
-    @commonInputInt(issueAssetForm, constants.FormField.ASSET_PRICE_PER_UNIT)
+    @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonInputInt(issueAssetForm, constants.FormField.SHIPPING_PERIOD)
     @commonInputText(issueAssetForm, constants.FormField.PORT_OF_LOADING)
     @commonInputText(issueAssetForm, constants.FormField.PORT_OF_DISCHARGE)
@@ -16,7 +16,7 @@
         <span class="warningIcon" cmuk-tooltip="title:@Messages(constants.View.MODERATED_WARNING);pos:bottom">@commonIcon("warning")</span>
         @commonCheckbox(issueAssetForm, constants.FormField.MODERATED, 'checked -> true, 'oninput -> """showHideGasAndPassword()""")
     </div>
-    @commonInputInt(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'required -> false, 'containerDivID -> "issueAssetGasField", 'containerDivClass -> "hidden")
+    @commonInputLong(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'required -> false, 'containerDivID -> "issueAssetGasField", 'containerDivClass -> "hidden")
     @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD, 'required -> false, 'containerDivID -> "issueAssetPasswordField", 'containerDivClass -> "hidden")
 }
 <script src="@routes.Assets.versioned("javascripts/issueAsset.js")" type="text/javascript"></script>

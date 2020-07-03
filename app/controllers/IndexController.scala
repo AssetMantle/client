@@ -11,6 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import utilities.MicroLong
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,6 +24,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+
       (loginState.userType match {
         case constants.User.USER => withUsernameToken.Ok(views.html.profile())
         case constants.User.WITHOUT_LOGIN =>

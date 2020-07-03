@@ -4,6 +4,7 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
+
 @(negotiation: Negotiation, asset: Asset, trader: Option[Trader], counterPartyTrader: Option[Trader], counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <legend class="cmuk-legend">
     @Messages(constants.View.NEGOTIATION_ID): @negotiation.id
@@ -17,9 +18,9 @@
     </div>
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)
-    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq(negotiation.price/negotiation.quantity, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price, Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.realString, negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price/negotiation.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
     @trader match {
         case Some(trader) => {
             @commonTextInfo(constants.View.TRADER, trader.accountID)
@@ -59,13 +60,13 @@
     </div>
 
 <div class="cmuk-text-left">
-    <span class="title">@Messages(constants.View.ASSET_DOCUMENTS):</span>
+    <span class="title cmuk-inline">@Messages(constants.View.ASSET_DOCUMENTS):</span>
     @negotiation.documentList.assetDocuments.map { assetDocument =>
         <li>@Messages(assetDocument)</li>
     }
 </div>
 <div class="cmuk-text-left">
-    <span class="title">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
+    <span class="title cmuk-inline">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span>
     @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
         <li>
             @Messages(negotiationDocument)

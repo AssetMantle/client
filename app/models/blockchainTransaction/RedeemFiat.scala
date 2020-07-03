@@ -14,15 +14,15 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemFiat] with Logged {
+case class RedeemFiat(from: String, to: String, redeemAmount: MicroLong, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemFiat] with Logged {
   def mutateTicketID(newTicketID: String): RedeemFiat = RedeemFiat(from = from, to = to, redeemAmount = redeemAmount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
-
 
 @Singleton
 class RedeemFiats @Inject()(actorSystem: ActorSystem,
@@ -33,7 +33,13 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
                             masterAccounts: master.Accounts,
                             masterTransactionRedeemFiats: masterTransaction.RedeemFiatRequests,
                             utilitiesNotification: utilities.Notification)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+  
+  def serialize(redeemFiat: RedeemFiat): RedeemFiatSerialized = RedeemFiatSerialized(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount.value, gas = redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code, createdBy = redeemFiat.createdBy, createdOn = redeemFiat.createdOn, createdOnTimeZone = redeemFiat.createdOnTimeZone, updatedBy = redeemFiat.updatedBy, updatedOn = redeemFiat.updatedOn, updatedOnTimeZone = redeemFiat.updatedOnTimeZone)
 
+  case class RedeemFiatSerialized(from: String, to: String, redeemAmount: Long, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): RedeemFiat = RedeemFiat(from = from, to = to, redeemAmount = new MicroLong(redeemAmount), gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
+  
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -56,14 +62,14 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(redeemFiat: RedeemFiat): Future[String] = db.run((redeemFiatTable returning redeemFiatTable.map(_.ticketID) += redeemFiat).asTry).map {
+  private def add(redeemFiatSerialized: RedeemFiatSerialized): Future[String] = db.run((redeemFiatTable returning redeemFiatTable.map(_.ticketID) += redeemFiatSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[RedeemFiat] = db.run(redeemFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[RedeemFiatSerialized] = db.run(redeemFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -126,17 +132,17 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
     }
   }
 
-  private[models] class RedeemFiatTable(tag: Tag) extends Table[RedeemFiat](tag, "RedeemFiat") {
+  private[models] class RedeemFiatTable(tag: Tag) extends Table[RedeemFiatSerialized](tag, "RedeemFiat") {
 
-    def * = (from, to, redeemAmount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedeemFiat.tupled, RedeemFiat.unapply)
+    def * = (from, to, redeemAmount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedeemFiatSerialized.tupled, RedeemFiatSerialized.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
-    def redeemAmount = column[Int]("redeemAmount")
+    def redeemAmount = column[Long]("redeemAmount")
 
-    def gas = column[Int]("gas")
+    def gas = column[Long]("gas")
 
     def status = column[Boolean]("status")
 
@@ -163,7 +169,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
 
   object Service {
 
-    def create(redeemFiat: RedeemFiat): Future[String] = add(RedeemFiat(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount, gas = redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code))
+    def create(redeemFiat: RedeemFiat): Future[String] = add(serialize(redeemFiat))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -173,7 +179,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[RedeemFiat] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[RedeemFiat] = findByTicketID(ticketID).map(_.deserialize())
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 

@@ -1,0 +1,8 @@
+---
+- name: deploy Commit
+  hosts: appserver3
+  remote_user: '{{ansible_ssh_user}}'
+  roles:
+  - deployCommitCentral
+
+ 

@@ -13,12 +13,13 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroLong, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Assets @Inject()(
@@ -28,6 +29,12 @@ class Assets @Inject()(
                         blockchainAccounts: blockchain.Accounts,
                         configuration: Configuration,
                       )(implicit executionContext: ExecutionContext) {
+
+  def serialize(asset: Asset): AssetSerialized = AssetSerialized(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity.value, assetPrice = asset.assetPrice.value, quantityUnit = asset.quantityUnit, ownerAddress = asset.ownerAddress, locked = asset.locked, moderated = asset.moderated, takerAddress = asset.takerAddress, dirtyBit = asset.dirtyBit, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
+
+  case class AssetSerialized(pegHash: String, documentHash: String, assetType: String, assetQuantity: Long, assetPrice: Long, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Asset = Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity =new MicroLong(assetQuantity) , assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderated = moderated, takerAddress = takerAddress, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -49,14 +56,14 @@ class Assets @Inject()(
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(asset: Asset): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
+  private def add(assetSerialized: AssetSerialized): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += assetSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def updateByPegHash(asset: Asset): Future[Int] = db.run(assetTable.filter(_.pegHash === asset.pegHash).update(asset).asTry).map {
+  private def updateByPegHash(assetSerialized: AssetSerialized): Future[Int] = db.run(assetTable.filter(_.pegHash === assetSerialized.pegHash).update(assetSerialized).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -72,7 +79,7 @@ class Assets @Inject()(
     }
   }
 
-  private def findByPegHash(pegHash: String): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head.asTry).map {
+  private def findByPegHash(pegHash: String): Future[AssetSerialized] = db.run(assetTable.filter(_.pegHash === pegHash).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -80,7 +87,7 @@ class Assets @Inject()(
     }
   }
 
-  private def getAssetPegWalletByAddress(address: String): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerAddress === address).result)
+  private def getAssetPegWalletByAddress(address: String): Future[Seq[AssetSerialized]] = db.run(assetTable.filter(_.ownerAddress === address).result)
 
   private def getAssetPegHashesByAddress(address: String): Future[Seq[String]] = db.run(assetTable.filter(_.ownerAddress === address).map(_.pegHash).result)
 
@@ -92,7 +99,7 @@ class Assets @Inject()(
     }
   }
 
-  private def getAssetsByDirtyBit(dirtyBit: Boolean): Future[Seq[Asset]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result)
+  private def getAssetsByDirtyBit(dirtyBit: Boolean): Future[Seq[AssetSerialized]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result)
 
   private def tryGetLockedStatusByPegHash(pegHash: String): Future[Boolean] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.locked).result.head.asTry).map {
     case Success(result) => result
@@ -118,9 +125,9 @@ class Assets @Inject()(
     }
   }
 
-  private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, _tableName = "Asset_BC") {
+  private[models] class AssetTable(tag: Tag) extends Table[AssetSerialized](tag, _tableName = "Asset_BC") {
 
-    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, takerAddress.?, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Asset.tupled, Asset.unapply)
+    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, takerAddress.?, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerialized.tupled, AssetSerialized.unapply)
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
@@ -128,9 +135,9 @@ class Assets @Inject()(
 
     def assetType = column[String]("assetType")
 
-    def assetQuantity = column[String]("assetQuantity")
+    def assetQuantity = column[Long]("assetQuantity")
 
-    def assetPrice = column[String]("assetPrice")
+    def assetPrice = column[Long]("assetPrice")
 
     def quantityUnit = column[String]("quantityUnit")
 
@@ -160,15 +167,15 @@ class Assets @Inject()(
 
   object Service {
 
-    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit))
+    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroLong, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(serialize(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)))
 
-    def tryGet(pegHash: String): Future[Asset] = findByPegHash(pegHash)
+    def tryGet(pegHash: String): Future[Asset] = findByPegHash(pegHash).map(_.deserialize())
 
-    def getAssetPegWallet(address: String): Future[Seq[Asset]] = getAssetPegWalletByAddress(address)
+    def getAssetPegWallet(address: String): Future[Seq[Asset]] = getAssetPegWalletByAddress(address).map(_.map(_.deserialize()))
 
     def getAssetPegHashes(address: String): Future[Seq[String]] = getAssetPegHashesByAddress(address)
 
-    def update(asset: Asset): Future[Int] = updateByPegHash(asset)
+    def update(asset: Asset): Future[Int] = updateByPegHash(serialize(asset))
 
     def markAssetSentToOrder(pegHash: String, address: String): Future[Int] = updateOwnerAddressByPegHash(pegHash = pegHash, address = address)
 
@@ -176,7 +183,7 @@ class Assets @Inject()(
 
     def deleteAssetPegWallet(ownerAddress: String): Future[Int] = deleteAssetPegWalletByAddress(ownerAddress)
 
-    def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true)
+    def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize()))
 
     def tryGetLockedStatus(pegHash: String): Future[Boolean] = tryGetLockedStatusByPegHash(pegHash)
 
@@ -196,7 +203,7 @@ class Assets @Inject()(
             def updateOrDelete(ownerAccount: Response): Future[Int] = {
               ownerAccount.value.asset_peg_wallet match {
                 case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
-                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
+                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = new MicroLong(assetPeg.assetPrice), assetQuantity = new MicroLong(assetPeg.assetQuantity), quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
                   case None => Service.deleteAsset(dirtyAsset.pegHash)
                 }
                 case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)

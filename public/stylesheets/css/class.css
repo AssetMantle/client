@@ -67,7 +67,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 5px;
   font-size: 10px; }
 
-.centerScreen, .MnemonicQuiz form .formBody .commonInputPassword, .banner, .salesQuoteCard .salesQuoteCardLeft .assetIcon, .salesQuoteCard .salesQuoteCardRight {
+.centerScreen, .mnemonicQuiz form .formBody .commonInputPassword, .banner, .salesQuoteCard .salesQuoteCardLeft .assetIcon, .salesQuoteCard .salesQuoteCardRight {
   display: flex;
   justify-content: center;
   align-items: center; }
@@ -109,7 +109,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   text-transform: uppercase;
   font-weight: bold; }
 
-.MnemonicQuiz .hidden,
+.mnemonicQuiz .hidden,
 .hidden {
   display: none; }
 
@@ -205,7 +205,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 3px;
   background-color: #ddd;
   height: 13px;
-  margin-bottom: 5px; }
+  margin: 10px 0; }
 
 .progressBar {
   width: 0;
@@ -330,12 +330,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .mobileNumberUpdate .countryCode {
   margin-top: 46px;
-  width: 80px;
+  width: 100px;
   margin-right: 10px; }
 .mobileNumberUpdate .mobileNumber {
   width: 100%; }
 .mobileNumberUpdate .mobileNumber label {
-  margin-left: -77px; }
+  margin-left: -90px; }
 
 .connectionError {
   height: 140px;
@@ -529,7 +529,10 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   stroke: #ffffff !important; }
 .comdex [class*=cmuk-modal-close-] {
   top: 20px;
-  right: 20px; }
+  right: 20px;
+  padding: 12px;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-radius: 50%; }
 .comdex .updateDocumentField {
   position: relative; }
   .comdex .updateDocumentField button {
@@ -669,7 +672,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
       .modal .modalContent .modalBody .infoRowValue {
         text-align: right; }
       .modal .modalContent .modalBody .title {
-        margin: 10px 0; }
+        margin: 10px 0 3px 0; }
       .modal .modalContent .modalBody hr {
         margin: 0; }
       .modal .modalContent .modalBody form .cmuk-card-default {
@@ -690,6 +693,14 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
         width: auto; }
       .modal .modalContent .modalBody .documentItem .infoRowLabel {
         width: auto; }
+    .modal .modalContent .closeButton:hover {
+      border-radius: 50%;
+      background: #e0e0e05c;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; }
+    .modal .modalContent .closeButton:active {
+      border-radius: 50%;
+      background: #e0e0e05c;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; }
 
 form .formBody {
   padding: 20px 60px 60px 60px; }
@@ -703,6 +714,7 @@ form .formBody {
   overflow: auto;
   padding: 20px 60px 60px 60px; }
   .modalInfoBlock .traderCommodity {
+    margin: 10px 0;
     display: flex;
     align-items: center;
     justify-content: start; }
@@ -799,36 +811,36 @@ form .formBody {
     margin-top: 20px;
     padding: 5px 0; }
 
-.MnemonicQuiz form .formBody .commonInputPassword dd input {
+.mnemonicQuiz form .formBody .commonInputPassword dd input {
   width: 450px; }
-.MnemonicQuiz form .formBody .buttonPrimary {
+.mnemonicQuiz form .formBody .buttonPrimary {
   width: 450px;
   margin-top: 20px;
   padding: 5px 0; }
-.MnemonicQuiz .titleMnemonic {
+.mnemonicQuiz .titleMnemonic {
   font-weight: bold; }
-.MnemonicQuiz .errorMnemonicInput {
+.mnemonicQuiz .errorMnemonicInput {
   display: none;
   color: red;
   padding: 10px;
   font-size: 0.875rem; }
-.MnemonicQuiz .verifyMnemonic {
+.mnemonicQuiz .verifyMnemonic {
   flex-wrap: wrap;
   justify-content: center; }
-  .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
+  .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
     width: 114px;
     height: 38px;
     margin-right: 10px;
     margin-bottom: 10px;
     border-radius: 3px; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton input {
+    .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton input {
       color: #061728;
       text-align: center; }
-    .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton .mnemonicField {
+    .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton .mnemonicField {
       background-color: #FFffff; }
-.MnemonicQuiz .buttonPrimary {
+.mnemonicQuiz .buttonPrimary {
   font-size: 0.875rem; }
-.MnemonicQuiz .mnemonicNote {
+.mnemonicQuiz .mnemonicNote {
   font-size: 0.875rem;
   text-align: justify;
   word-break: break-word;
@@ -840,23 +852,23 @@ form .formBody {
   background: url("../../images/note.svg") 112%/125px no-repeat #FF2938;
   display: flex;
   align-items: center; }
-  .MnemonicQuiz .mnemonicNote .mnemonicNoteText {
+  .mnemonicQuiz .mnemonicNote .mnemonicNoteText {
     width: 73%; }
-  .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon {
+  .mnemonicQuiz .mnemonicNote .mnemonicInfoIcon {
     padding: 10px 20px 10px 10px;
     width: 20px;
     height: 20px; }
-    .MnemonicQuiz .mnemonicNote .mnemonicInfoIcon .icon {
+    .mnemonicQuiz .mnemonicNote .mnemonicInfoIcon .icon {
       width: 20px;
       height: 20px; }
-.MnemonicQuiz .infoSuccess {
+.mnemonicQuiz .infoSuccess {
   padding: 10px 0; }
-  .MnemonicQuiz .infoSuccess .icon-success .icon {
+  .mnemonicQuiz .infoSuccess .icon-success .icon {
     width: 25px;
     height: 25px;
     fill: #0F9C0C;
     margin-bottom: 5px; }
-  .MnemonicQuiz .infoSuccess p {
+  .mnemonicQuiz .infoSuccess p {
     margin: 0;
     font-size: 1.25rem;
     color: #0F9C0C; }
@@ -1063,6 +1075,10 @@ form .formBody {
       color: #4B4B4B;
       font-weight: bold;
       font-size: 1rem; }
+  .pageContainer .middle .mainTabs .tradeTerms .commodityTitleSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .termIcon {
     margin-bottom: 5px; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm.documentTerms .documentTermName {
@@ -1801,6 +1817,12 @@ header:before,
       .commonList .listItemChild .cmuk-button:hover {
         color: #FFFFFF;
         background: #0862BE; }
+    .commonList .listItemChild .cmuk-button-success:hover {
+      background-color: #5cb85c;
+      color: #fff; }
+    .commonList .listItemChild .cmuk-button-danger:hover {
+      background-color: #ec2147;
+      color: #fff; }
 
 .accountName {
   position: absolute;
@@ -1871,12 +1893,12 @@ header:before,
   .contactDetails .contactInfoItem .cmuk-card {
     flex: 1; }
     .contactDetails .contactInfoItem .cmuk-card .infoRow {
-      flex-direction: column; }
+      flex-direction: column;
+      flex: 1; }
       .contactDetails .contactInfoItem .cmuk-card .infoRow .infoRowValue {
         text-align: left; }
     .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
       line-height: 28px;
-      padding: 0 20px;
       word-break: inherit; }
   .contactDetails .contactInfoItem .contactUpdateButton {
     display: flex;
@@ -1888,13 +1910,15 @@ header:before,
       padding: 0 20px;
       margin-left: 20px; }
 .contactDetails .infoRowBox {
+  position: relative;
   justify-content: space-between; }
   .contactDetails .infoRowBox .infoRowLabel {
     width: auto;
     margin-right: 5px; }
   .contactDetails .infoRowBox .contactInfoItemStatus {
     display: flex;
-    align-items: center; }
+    align-items: center;
+    width: 55px; }
 .contactDetails .cmuk-badge {
   margin-left: 10px; }
 .contactDetails .cmuk-card-body {
@@ -2087,7 +2111,7 @@ figure.zoom {
   flex-wrap: nowrap; }
 .salesQuoteCard .salesQuoteCardLeft {
   position: relative;
-  flex: 30%;
+  flex: 35%;
   display: flex; }
   .salesQuoteCard .salesQuoteCardLeft .content {
     display: flex;
@@ -2132,7 +2156,7 @@ figure.zoom {
 .salesQuoteCard .salesQuoteCardMiddle {
   border-radius: 2px;
   padding: 20px 10px 20px 0;
-  flex: 45%;
+  flex: 40%;
   justify-content: center;
   display: flex;
   flex-direction: column; }
@@ -2170,6 +2194,12 @@ figure.zoom {
     .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
       color: #FFFFFF;
       background: #0862BE; }
+  .salesQuoteCard .salesQuoteCardRight .cmuk-button-success:hover {
+    background-color: #5cb85c;
+    color: #fff; }
+  .salesQuoteCard .salesQuoteCardRight .cmuk-button-danger:hover {
+    background-color: #ec2147;
+    color: #fff; }
 
 .rippleEffect {
   position: absolute;

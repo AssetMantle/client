@@ -6,7 +6,7 @@
 @commonForm(constants.Form.SEND_COIN, sendCoinForm) {
     @commonInputText(sendCoinForm, constants.FormField.TO)
     @commonInputInt(sendCoinForm, constants.FormField.AMOUNT)
-    @commonInputInt(sendCoinForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputLong(sendCoinForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sendCoinForm, constants.FormField.PASSWORD)
 }
 
