@@ -1,8 +1,10 @@
 package utilities
 
+import exceptions.BaseException
+import play.api.Logger
 import play.api.libs.json.{Json, OFormat}
 
-import scala.math.{Integral, Ordering, ScalaNumber}
+import scala.math.{Integral, Ordering}
 
 class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
@@ -44,13 +46,13 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def toFloat: Float = this.toMicroFloat / MicroNumber.factor
 
-  def toChar: Char = (value / MicroNumber.factor).toChar
+  def toChar: Char = (this.value / MicroNumber.factor).toChar
 
-  def toByte: Byte = (value / MicroNumber.factor).toByte
+  def toByte: Byte = (this.value / MicroNumber.factor).toByte
 
-  def toShort: Short = (value / MicroNumber.factor).toShort
+  def toShort: Short = (this.value / MicroNumber.factor).toShort
 
-  def toByteArray: Array[Byte] = (value / MicroNumber.factor).toByteArray
+  def toByteArray: Array[Byte] = (this.value / MicroNumber.factor).toByteArray
 
   def toRoundedUpString(precision: Int = 2): String = utilities.NumericOperation.roundUp(this.toDouble, precision).toString
 
@@ -89,7 +91,8 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def &~(that: MicroNumber): MicroNumber = new MicroNumber(this.value &~ that.value)
 
-  def gcd(that: MicroNumber): MicroNumber = new MicroNumber(this.value.gcd(that.value))
+  //Throws exception if MicroNumber has non-zero decimal places, example: 2.3, "1.7", works with cases: 23, 17.0, "23"
+  def gcd(that: MicroNumber): MicroNumber = if ((this.value % MicroNumber.factor == 0) && (that.value % MicroNumber.factor == 0)) new MicroNumber(this.value.gcd(that.value)) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
 
   def mod(that: MicroNumber): MicroNumber = new MicroNumber(this.value.mod(that.value))
 
@@ -145,7 +148,8 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def bitCount: Int = this.value.bitCount
 
-  def isProbablePrime(certainty: Int): Boolean = this.value.isProbablePrime(certainty)
+  //Throws exception if MicroNumber has non-zero decimal places, example: 2.3, "1.7", works with cases: 23, 17.0, "23"
+  def isProbablePrime(certainty: Int): Boolean = if (this.value % MicroNumber.factor == 0) BigInt(this.toLong).isProbablePrime(certainty) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
 
   def +(that: String): String = this.toString + that
 }
@@ -153,6 +157,10 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 object MicroNumber {
 
   private val factor = 1000000
+
+  private val module: String = constants.Module.UTILITIES_MICRO_NUMBER
+
+  private val logger: Logger = Logger(this.getClass)
 
   def apply(bi: BigInt): MicroNumber = new MicroNumber(bi)
 
