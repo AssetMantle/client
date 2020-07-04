@@ -2,9 +2,9 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroLong
 
 object VerifyZone {
-
 
   val form = Form(
     mapping(
@@ -14,6 +14,6 @@ object VerifyZone {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(zoneID: String, gas: Long, password: String)
+  case class Data(zoneID: String, gas: MicroLong, password: String)
 
 }

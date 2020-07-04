@@ -21,7 +21,7 @@
     @commonCheckbox(verifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked -> true)
     @commonCheckbox(verifyTraderForm, constants.FormField.NEGOTIATION, 'checked -> true)
     @commonCheckbox(verifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> true)
-    @commonInputLong(verifyTraderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroLong(verifyTraderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(verifyTraderForm, constants.FormField.PASSWORD)
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
 }

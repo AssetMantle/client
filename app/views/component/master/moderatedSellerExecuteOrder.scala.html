@@ -4,7 +4,7 @@
 @(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data] = ModeratedSellerExecuteOrder.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, moderatedSellerExecuteOrderForm) {
     @commonInputText(moderatedSellerExecuteOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonInputLong(moderatedSellerExecuteOrderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroLong(moderatedSellerExecuteOrderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(moderatedSellerExecuteOrderForm, constants.FormField.PASSWORD)
 }
 

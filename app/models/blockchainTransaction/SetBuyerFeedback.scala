@@ -14,15 +14,15 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SetBuyerFeedback] with Logged {
+case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SetBuyerFeedback] with Logged {
   def mutateTicketID(newTicketID: String): SetBuyerFeedback = SetBuyerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
-
 
 @Singleton
 class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -49,14 +49,20 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(setBuyerFeedback: SetBuyerFeedback): Future[String] = db.run((setBuyerFeedbackTable returning setBuyerFeedbackTable.map(_.ticketID) += setBuyerFeedback).asTry).map {
+  case class SetBuyerFeedbackSerialized(from: String, to: String, pegHash: String, rating: Int, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SetBuyerFeedback = SetBuyerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(setBuyerFeedback: SetBuyerFeedback): SetBuyerFeedbackSerialized = SetBuyerFeedbackSerialized(from = setBuyerFeedback.from, to = setBuyerFeedback.to, pegHash = setBuyerFeedback.pegHash, rating = setBuyerFeedback.rating, gas = setBuyerFeedback.gas.toMicroLong, status = setBuyerFeedback.status, txHash = setBuyerFeedback.txHash, ticketID = setBuyerFeedback.ticketID, mode = setBuyerFeedback.mode, code = setBuyerFeedback.code, createdBy = setBuyerFeedback.createdBy, createdOn = setBuyerFeedback.createdOn, createdOnTimeZone = setBuyerFeedback.createdOnTimeZone, updatedBy = setBuyerFeedback.updatedBy, updatedOn = setBuyerFeedback.updatedOn, updatedOnTimeZone = setBuyerFeedback.updatedOnTimeZone)
+
+  private def add(setBuyerFeedback: SetBuyerFeedback): Future[String] = db.run((setBuyerFeedbackTable returning setBuyerFeedbackTable.map(_.ticketID) += serialize(setBuyerFeedback)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[SetBuyerFeedback] = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[SetBuyerFeedbackSerialized] = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -119,9 +125,9 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
     }
   }
 
-  private[models] class SetBuyerFeedbackTable(tag: Tag) extends Table[SetBuyerFeedback](tag, "SetBuyerFeedback") {
+  private[models] class SetBuyerFeedbackTable(tag: Tag) extends Table[SetBuyerFeedbackSerialized](tag, "SetBuyerFeedback") {
 
-    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SetBuyerFeedback.tupled, SetBuyerFeedback.unapply)
+    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SetBuyerFeedbackSerialized.tupled, SetBuyerFeedbackSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -162,7 +168,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[SetBuyerFeedback] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[SetBuyerFeedback] = findByTicketID(ticketID).map(_.deserialize)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 

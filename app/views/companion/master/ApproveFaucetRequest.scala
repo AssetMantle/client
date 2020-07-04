@@ -2,6 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroLong
 
 object ApproveFaucetRequest {
 
@@ -14,6 +15,6 @@ object ApproveFaucetRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, gas: Long, password: String)
+  case class Data(requestID: String, accountID: String, gas: MicroLong, password: String)
 
 }

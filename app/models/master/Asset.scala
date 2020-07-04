@@ -25,7 +25,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   def serialize(asset: Asset): AssetSerializable = AssetSerializable(id = asset.id, ownerID = asset.ownerID, pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity.value, quantityUnit = asset.quantityUnit, price = asset.price.value, moderated = asset.moderated, takerID = asset.takerID, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
 
   case class AssetSerializable(id: String, ownerID: String, pegHash: Option[String], assetType: String, description: String, documentHash: String, quantity: Long, quantityUnit: String, price: Long, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroLong(quantity), quantityUnit = quantityUnit, price = new MicroLong(price), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroLong(quantity), quantityUnit = quantityUnit, price = new MicroLong(price), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -188,7 +188,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markAssetSendToOrderByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDAndStatusByPegHash(pegHash = pegHash, ownerID = ownerID, status = constants.Status.Asset.IN_ORDER)
 
-    def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize())
+    def tryGet(id: String): Future[Asset] = findByID(id).map(serializedAsset => serializedAsset.deserialize)
 
     def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
 
@@ -196,11 +196,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def tryGetIDByPegHash(pegHash: String): Future[String] = findIDByPegHash(pegHash)
 
-    def getAllAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderID(ownerID).map(serializedAssets => serializedAssets.map(_.deserialize()))
+    def getAllAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderID(ownerID).map(serializedAssets => serializedAssets.map(_.deserialize))
 
-    def getAllTradableAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderIDAndStatuses(ownerID = ownerID, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED).map(serializedAssets => serializedAssets.map(_.deserialize()))
+    def getAllTradableAssets(ownerID: String): Future[Seq[Asset]] = findAllByTraderIDAndStatuses(ownerID = ownerID, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED).map(serializedAssets => serializedAssets.map(_.deserialize))
 
-    def getAllAssetsByID(ids: Seq[String]): Future[Seq[Asset]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize()))
+    def getAllAssetsByID(ids: Seq[String]): Future[Seq[Asset]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize))
 
     def tryGetStatus(id: String): Future[String] = findStatusByID(id)
 
@@ -216,7 +216,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def resetStatusByPegHash(pegHash: String, ownerID: String): Future[Int] = updateOwnerIDAndStatusByPegHash(pegHash = pegHash, ownerID = ownerID, status = constants.Status.Asset.ISSUED)
 
-    def getPendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(ownerIDs = traderIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE).map(serializedAssets => serializedAssets.map(_.deserialize()))
+    def getPendingIssueAssetRequests(traderIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(ownerIDs = traderIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE).map(serializedAssets => serializedAssets.map(_.deserialize))
 
     def verifyAssetPendingRequestStatus(id: String): Future[Boolean] = checkByIDAndStatus(id = id, status = constants.Status.Asset.REQUESTED_TO_ZONE)
 

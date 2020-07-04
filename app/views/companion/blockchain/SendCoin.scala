@@ -2,6 +2,7 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroLong
 
 object SendCoin {
   val form = Form(
@@ -15,6 +16,6 @@ object SendCoin {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, amount: Int, gas: Long, mode: String, password: String)
+  case class Data(from: String, to: String, amount: MicroLong, gas: MicroLong, mode: String, password: String)
 
 }

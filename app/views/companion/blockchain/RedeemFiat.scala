@@ -3,6 +3,7 @@ package views.companion.blockchain
 import play.api.data.Form
 import play.api.data.Forms._
 import utilities.MicroLong
+import utilities.MicroLong
 
 object RedeemFiat {
   val form = Form(
@@ -16,6 +17,6 @@ object RedeemFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, redeemAmount: MicroLong, gas: Long, mode: String, password: String)
+  case class Data(from: String, to: String, redeemAmount: MicroLong, gas: MicroLong, mode: String, password: String)
 
 }

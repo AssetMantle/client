@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: MicroLong, quantityUnit: String, assetQuantity: MicroLong, moderated: Boolean, gas: Long, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueAsset] with Logged {
+case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: MicroLong, quantityUnit: String, assetQuantity: MicroLong, moderated: Boolean, gas: MicroLong, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueAsset] with Logged {
   def mutateTicketID(newTicketID: String): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, gas = gas, takerAddress = takerAddress, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -35,7 +35,6 @@ class IssueAssets @Inject()(
                              getAccount: GetAccount,
                              blockchainAssets: blockchain.Assets,
                              utilitiesNotification: utilities.Notification,
-                             masterAccounts: master.Accounts,
                              masterAssets: master.Assets,
                              blockchainAccounts: blockchain.Accounts,
                              masterNegotiations: master.Negotiations,
@@ -43,11 +42,11 @@ class IssueAssets @Inject()(
                              masterOrganizations: master.Organizations
                            )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  def serialize(issueAsset: IssueAsset): IssueAssetSerialized = IssueAssetSerialized(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice.value, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity.value, moderated = issueAsset.moderated, gas = issueAsset.gas, takerAddress = issueAsset.takerAddress, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, createdBy = issueAsset.createdBy, createdOn = issueAsset.createdOn, createdOnTimeZone = issueAsset.createdOnTimeZone, updatedBy = issueAsset.updatedBy, updatedOn = issueAsset.updatedOn, updatedOnTimeZone = issueAsset.updatedOnTimeZone)
-
   case class IssueAssetSerialized(from: String, to: String, documentHash: String, assetType: String, assetPrice: Long, quantityUnit: String, assetQuantity: Long, moderated: Boolean, gas: Long, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, assetQuantity = new MicroLong(assetQuantity), moderated = moderated, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, assetQuantity = new MicroLong(assetQuantity), moderated = moderated, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
+
+  def serialize(issueAsset: IssueAsset): IssueAssetSerialized = IssueAssetSerialized(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice.value, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity.value, moderated = issueAsset.moderated, gas = issueAsset.gas.toMicroLong, takerAddress = issueAsset.takerAddress, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, createdBy = issueAsset.createdBy, createdOn = issueAsset.createdOn, createdOnTimeZone = issueAsset.createdOnTimeZone, updatedBy = issueAsset.updatedBy, updatedOn = issueAsset.updatedOn, updatedOnTimeZone = issueAsset.updatedOnTimeZone)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -201,7 +200,7 @@ class IssueAssets @Inject()(
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[IssueAsset] = findByTicketID(ticketID).map(_.deserialize())
+    def getTransaction(ticketID: String): Future[IssueAsset] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -229,7 +228,7 @@ class IssueAssets @Inject()(
           case Some(bcAssets) => bcAssets.find(_.documentHash == masterAsset.documentHash).getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
           case None => throw new BaseException(constants.Response.ASSET_PEG_WALLET_NOT_FOUND)
         }
-        blockchainAssets.Service.create(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.microLongAssetPrice, assetQuantity = asset.microLongAssetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = ownerAddress, dirtyBit = false)
+        blockchainAssets.Service.create(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = ownerAddress, dirtyBit = false)
       }
 
       def markAssetIssued(assetID: String, pegHash: String): Future[Int] = masterAssets.Service.markIssuedByID(id = assetID, pegHash = pegHash)

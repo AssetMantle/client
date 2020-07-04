@@ -22,7 +22,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   def serialize(fiat: Fiat): FiatSerialized = FiatSerialized(ownerID = fiat.ownerID, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount.value, amountRedeemed =fiat.amountRedeemed.value, status = fiat.status, createdBy = fiat.createdBy, createdOn = fiat.createdOn, createdOnTimeZone = fiat.createdOnTimeZone, updatedBy = fiat.updatedBy, updatedOn = fiat.updatedOn, updatedOnTimeZone = fiat.updatedOnTimeZone)
 
   case class FiatSerialized(ownerID: String, transactionID: String, transactionAmount: Long, amountRedeemed: Long, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) {
-    def deserialize(): Fiat = Fiat(ownerID = ownerID, transactionID = transactionID, transactionAmount = new MicroLong(transactionAmount), amountRedeemed = new MicroLong(amountRedeemed), status = status,createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Fiat = Fiat(ownerID = ownerID, transactionID = transactionID, transactionAmount = new MicroLong(transactionAmount), amountRedeemed = new MicroLong(amountRedeemed), status = status,createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -136,9 +136,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getRTCBAmountsByTransactionID(transactionID: String): Future[Option[MicroLong]] = getTransactionAmountsByTransactionID(transactionID).map(_.map(new MicroLong(_)))
 
-    def getFiatPegWallet(ownerID: String): Future[Seq[Fiat]] = getFiatsByOwnerIDAndStatus(ownerID, Option(true)).map(_.map(_.deserialize()))
+    def getFiatPegWallet(ownerID: String): Future[Seq[Fiat]] = getFiatsByOwnerIDAndStatus(ownerID, Option(true)).map(_.map(_.deserialize))
 
-    def getFiatPegWallet(ownerIDs: Seq[String]): Future[Seq[Fiat]] = getFiatsByOwnerIDsAndStatus(ownerIDs, Option(true)).map(_.map(_.deserialize()))
+    def getFiatPegWallet(ownerIDs: Seq[String]): Future[Seq[Fiat]] = getFiatsByOwnerIDsAndStatus(ownerIDs, Option(true)).map(_.map(_.deserialize))
 
     def markSuccess(ownerID: String, transactionID: String): Future[Int] = updateStatus(ownerID, transactionID, status = true)
 

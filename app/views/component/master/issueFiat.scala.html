@@ -8,6 +8,6 @@
     @commonInputText(issueFiatForm, constants.FormField.ACCOUNT_ID)
     @commonInputText(issueFiatForm, constants.FormField.TRANSACTION_ID)
     @commonInputMicroLong(issueFiatForm, constants.FormField.TRANSACTION_AMOUNT)
-    @commonInputLong(issueFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroLong(issueFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(issueFiatForm, constants.FormField.PASSWORD)
 }

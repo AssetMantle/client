@@ -520,7 +520,7 @@ class AddOrganizationController @Inject()(
                 def sendCoinTransaction(organizationAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
                   entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount = constants.Blockchain.DefaultOrganizationFaucetTokenAmount, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetTokenAmount.toString)), password = acceptRequestData.password, mode = transactionMode),
+                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetTokenAmount)), password = acceptRequestData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
                   onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,
@@ -530,7 +530,7 @@ class AddOrganizationController @Inject()(
                 def sendAddOrganizationTransaction(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
                   entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-                  request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = acceptRequestData.gas.toString), to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, password = acceptRequestData.password, mode = transactionMode),
+                  request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = acceptRequestData.gas), to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, password = acceptRequestData.password, mode = transactionMode),
                   action = transactionsAddOrganization.Service.post,
                   onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
                   onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
@@ -759,7 +759,7 @@ class AddOrganizationController @Inject()(
         Future(BadRequest(views.html.component.blockchain.addOrganization(formWithErrors)))
       },
       addOrganizationData => {
-        val postRequest = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = addOrganizationData.mode))
+        val postRequest = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = addOrganizationData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))

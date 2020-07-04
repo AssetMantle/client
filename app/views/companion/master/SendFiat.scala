@@ -14,6 +14,6 @@ object SendFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, sendAmount: MicroLong, gas: Long, password: String)
+  case class Data(negotiationID: String, sendAmount: MicroLong, gas: MicroLong, password: String)
 
 }

@@ -36,7 +36,7 @@ class RedeemAssetController @Inject()(
         Future(BadRequest(views.html.component.blockchain.redeemAsset(formWithErrors)))
       },
       redeemAssetData => {
-        val post = transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas.toString), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
+        val post = transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))

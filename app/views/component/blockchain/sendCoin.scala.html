@@ -5,8 +5,8 @@
 @commonForm(constants.Form.BLOCKCHAIN_SEND_COIN, sendCoinForm) {
     @commonInputText(sendCoinForm, constants.FormField.FROM)
     @commonInputText(sendCoinForm, constants.FormField.TO)
-    @commonInputInt(sendCoinForm, constants.FormField.AMOUNT)
-    @commonInputLong(sendCoinForm, constants.FormField.GAS)
+    @commonInputMicroLong(sendCoinForm, constants.FormField.AMOUNT)
+    @commonInputMicroLong(sendCoinForm, constants.FormField.GAS)
     @commonSelect(sendCoinForm, constants.FormField.MODE)
     @commonInputPassword(sendCoinForm, constants.FormField.PASSWORD)
 }

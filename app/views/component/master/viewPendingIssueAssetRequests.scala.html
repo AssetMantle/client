@@ -14,8 +14,8 @@
                 } {
                     @commonTextInfo(constants.View.ASSET_ID, assetRequest.id)
                     @commonTextInfo(constants.View.ASSET_TYPE, assetRequest.assetType)
-                    @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetRequest.quantity.toString, assetRequest.quantityUnit).mkString(" "))
-                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((assetRequest.price/assetRequest.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), assetRequest.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetRequest.quantity.toRoundedOffString(), assetRequest.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((assetRequest.price/assetRequest.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), assetRequest.quantityUnit).mkString(" "))
                     @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(assetRequest.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
                     @commonBooleanInfo(constants.View.MODERATED, Option(assetRequest.moderated))
                     @commonTextInfo(constants.View.STATUS, assetRequest.status)

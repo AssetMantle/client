@@ -2,6 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import utilities.MicroLong
 
 object AcceptNegotiationRequest {
   val form = Form(
@@ -12,6 +13,6 @@ object AcceptNegotiationRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, gas: Long, password: String)
+  case class Data(id: String, gas: MicroLong, password: String)
 
 }

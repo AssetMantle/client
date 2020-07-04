@@ -142,7 +142,7 @@ class WesternUnionController @Inject()(
     def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
       entity = blockchainTransaction.IssueFiat(from = zoneWalletAddress, to = traderAddress, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, gas = constants.Blockchain.ZoneIssueFiatGasAmount, ticketID = "", mode = transactionMode),
       blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGasAmount.toString), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount.toMicroString, mode = transactionMode),
+      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGasAmount), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, mode = transactionMode),
       action = transactionsIssueFiat.Service.post,
       onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
       onFailure = blockchainTransactionIssueFiats.Utility.onFailure,

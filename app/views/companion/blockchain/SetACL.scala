@@ -2,6 +2,7 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import utilities.MicroLong
 
 object SetACL {
   val form = Form(
@@ -30,6 +31,6 @@ object SetACL {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, aclAddress: String, organizationID: String, zoneID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean, gas: Long, mode: String, password: String)
+  case class Data(from: String, aclAddress: String, organizationID: String, zoneID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean, gas: MicroLong, mode: String, password: String)
 
 }

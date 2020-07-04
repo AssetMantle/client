@@ -59,7 +59,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                   transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
                     entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-                    request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toMicroString, mode = transactionMode),
+                    request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, mode = transactionMode),
                     action = transactionsIssueFiat.Service.post,
                     onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
                     onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
@@ -104,7 +104,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         Future(BadRequest(views.html.component.blockchain.issueFiat(formWithErrors)))
       },
       issueFiatData => {
-        val post = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toMicroString, mode = issueFiatData.mode))
+        val post = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, mode = issueFiatData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))

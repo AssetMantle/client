@@ -20,7 +20,7 @@ case class SendFiatRequestHistory(id: String, traderID: String, ticketID: String
 class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
   case class SendFiatRequestHistorySerialized(id: String, traderID: String, ticketID: String, negotiationID: String, amount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String],deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
-    def deserialize(): SendFiatRequestHistory = SendFiatRequestHistory(id = id, traderID = traderID, ticketID = ticketID, negotiationID = negotiationID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
+    def deserialize: SendFiatRequestHistory = SendFiatRequestHistory(id = id, traderID = traderID, ticketID = ticketID, negotiationID = negotiationID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
   }
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_SEND_FIAT_REQUEST_HISTORY
@@ -81,19 +81,19 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
   object Service {
     def getFiatsInOrder(negotiationID: String): Future[MicroLong] = getAmountByNegotiationIDAndStatuses(negotiationID, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT)).map(new MicroLong(_))
 
-    def getFiatRequestsInOrders(negotiationIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByNegotiationIDsAndStatuses(negotiationIDs, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT)).map(_.map(_.deserialize()))
+    def getFiatRequestsInOrders(negotiationIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByNegotiationIDsAndStatuses(negotiationIDs, Seq(constants.Status.SendFiat.BLOCKCHAIN_SUCCESS, constants.Status.SendFiat.SENT)).map(_.map(_.deserialize))
 
-    def getPendingSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize()))
+    def getPendingSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize))
 
-    def getCompleteSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.SENT).map(_.map(_.deserialize()))
+    def getCompleteSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.SENT).map(_.map(_.deserialize))
 
-    def getFailedSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize()))
+    def getFailedSendFiatRequests(traderIDs: Seq[String]): Future[Seq[SendFiatRequestHistory]] = getByTraderIDsAndStatus(traderIDs, constants.Status.SendFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize))
 
-    def getPendingSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize()))
+    def getPendingSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize))
 
-    def getCompleteSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.SENT).map(_.map(_.deserialize()))
+    def getCompleteSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.SENT).map(_.map(_.deserialize))
 
-    def getFailedSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize()))
+    def getFailedSendFiatRequests(traderID: String): Future[Seq[SendFiatRequestHistory]] = getByTraderIDAndStatus(traderID, constants.Status.SendFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize))
 
   }
 }

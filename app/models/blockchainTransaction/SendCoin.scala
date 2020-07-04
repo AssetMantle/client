@@ -16,12 +16,13 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: Int, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendCoin] with Logged {
+case class SendCoin(from: String, to: String, amount: MicroLong, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendCoin] with Logged {
   def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -50,7 +51,13 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += sendCoin).asTry).map {
+  case class SendCoinSerialized(from: String, to: String, amount: Long, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SendCoin = SendCoin(from = from, to = to, amount = new MicroLong(amount), gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(sendCoin: SendCoin): SendCoinSerialized = SendCoinSerialized(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount.toMicroLong, gas = sendCoin.gas.toMicroLong, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code, createdBy = sendCoin.createdBy, createdOn = sendCoin.createdOn, createdOnTimeZone = sendCoin.createdOnTimeZone, updatedBy = sendCoin.updatedBy, updatedOn = sendCoin.updatedOn, updatedOnTimeZone = sendCoin.updatedOnTimeZone)
+
+  private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += serialize(sendCoin)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -81,7 +88,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[SendCoin] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[SendCoinSerialized] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -120,15 +127,15 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
   }
 
-  private[models] class SendCoinTable(tag: Tag) extends Table[SendCoin](tag, "SendCoin") {
+  private[models] class SendCoinTable(tag: Tag) extends Table[SendCoinSerialized](tag, "SendCoin") {
 
-    def * = (from, to, amount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendCoin.tupled, SendCoin.unapply)
+    def * = (from, to, amount, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendCoinSerialized.tupled, SendCoinSerialized.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
-    def amount = column[Int]("amount")
+    def amount = column[Long]("amount")
 
     def gas = column[Long]("gas")
 
@@ -169,9 +176,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[SendCoin] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[SendCoin] = findByTicketID(ticketID).map(_.deserialize)
 
-    def getTransactionAsync(ticketID: String): Future[SendCoin] = findByTicketID(ticketID)
+    def getTransactionAsync(ticketID: String): Future[SendCoin] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 

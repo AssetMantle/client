@@ -2,6 +2,7 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroLong
 
 object AddOrganization {
 
@@ -17,6 +18,6 @@ object AddOrganization {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, organizationID: String, zoneID: String, gas: Long, mode: String, password: String)
+  case class Data(from: String, to: String, organizationID: String, zoneID: String, gas: MicroLong, mode: String, password: String)
 
 }

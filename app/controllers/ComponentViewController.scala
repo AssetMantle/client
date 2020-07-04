@@ -2263,7 +2263,7 @@ class ComponentViewController @Inject()(
         fiatsInOrder <- fiatsInOrder
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).map(_.toDouble).sum, amountPaid = 0, amountPending = negotiation.price.toDouble - fiatsInOrder.toDouble, traderID = traderID, moderated = asset.moderated))
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).map(_.toDouble).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder).toDouble, traderID = traderID, moderated = asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }

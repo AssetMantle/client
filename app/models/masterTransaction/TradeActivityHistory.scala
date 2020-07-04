@@ -35,7 +35,7 @@ class TradeActivityHistories @Inject()(protected val databaseConfigProvider: Dat
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class TradeActivityHistorySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
-    def deserialize(): TradeActivityHistory = TradeActivityHistory(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
+    def deserialize: TradeActivityHistory = TradeActivityHistory(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
   }
 
   def serialize(tradeActivityHistory: TradeActivityHistory): TradeActivityHistorySerializable = TradeActivityHistorySerializable(id = tradeActivityHistory.id, negotiationID = tradeActivityHistory.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivityHistory.tradeActivityTemplate).toString, read = tradeActivityHistory.read, createdBy = tradeActivityHistory.createdBy, createdOn = tradeActivityHistory.createdOn, createdOnTimeZone = tradeActivityHistory.createdOnTimeZone, updatedBy = tradeActivityHistory.updatedBy, updatedOn = tradeActivityHistory.updatedOn, updatedOnTimeZone = tradeActivityHistory.updatedOnTimeZone, deletedBy = tradeActivityHistory.deletedBy, deletedOn = tradeActivityHistory.deletedOn, deletedOnTimeZone = tradeActivityHistory.deletedOnTimeZone)
@@ -79,7 +79,7 @@ class TradeActivityHistories @Inject()(protected val databaseConfigProvider: Dat
   }
 
   object Service {
-    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivityHistory]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
+    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivityHistory]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize))
   }
 
 }

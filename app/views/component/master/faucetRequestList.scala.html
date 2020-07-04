@@ -10,7 +10,7 @@
     @commonCard(faucetRequest.id) {
     } {
       @commonTextInfo(constants.View.ACCOUNT_ID, faucetRequest.accountID)
-      @commonIntInfo(constants.View.AMOUNT, faucetRequest.amount)
+      @commonMicroLongInfo(constants.View.AMOUNT, faucetRequest.amount)
       @commonFormButton(constants.Form.APPROVE_FAUCET_REQUEST, 'parameters -> s"'${faucetRequest.id}','${faucetRequest.accountID}'",'class -> "cmuk-button-success cmuk-button-small")
       @commonFormButton(constants.Form.REJECT_FAUCET_REQUEST,'parameters -> s"'${faucetRequest.id}'",'class -> "cmuk-button-success cmuk-button-small")
     }

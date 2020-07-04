@@ -14,15 +14,15 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroLong
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SellerExecuteOrder] with Logged {
+case class SellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SellerExecuteOrder] with Logged {
   def mutateTicketID(newTicketID: String): SellerExecuteOrder = SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
-
 
 @Singleton
 class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionSellerExecuteOrder: transactions.SellerExecuteOrder, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -49,7 +49,13 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(sellerExecuteOrder: SellerExecuteOrder): Future[String] = db.run((sellerExecuteOrderTable returning sellerExecuteOrderTable.map(_.ticketID) += sellerExecuteOrder).asTry).map {
+  case class SellerExecuteOrderSerialized(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SellerExecuteOrder = SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(sellerExecuteOrder: SellerExecuteOrder): SellerExecuteOrderSerialized = SellerExecuteOrderSerialized(from = sellerExecuteOrder.from, buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, awbProofHash = sellerExecuteOrder.awbProofHash, pegHash = sellerExecuteOrder.pegHash, gas = sellerExecuteOrder.gas.toMicroLong, status = sellerExecuteOrder.status, txHash = sellerExecuteOrder.txHash, ticketID = sellerExecuteOrder.ticketID, mode = sellerExecuteOrder.mode, code = sellerExecuteOrder.code, createdBy = sellerExecuteOrder.createdBy, createdOn = sellerExecuteOrder.createdOn, createdOnTimeZone = sellerExecuteOrder.createdOnTimeZone, updatedBy = sellerExecuteOrder.updatedBy, updatedOn = sellerExecuteOrder.updatedOn, updatedOnTimeZone = sellerExecuteOrder.updatedOnTimeZone)
+
+  private def add(sellerExecuteOrder: SellerExecuteOrder): Future[String] = db.run((sellerExecuteOrderTable returning sellerExecuteOrderTable.map(_.ticketID) += serialize(sellerExecuteOrder)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -82,7 +88,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[SellerExecuteOrder] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[SellerExecuteOrderSerialized] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -119,9 +125,9 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
     }
   }
 
-  private[models] class SellerExecuteOrderTable(tag: Tag) extends Table[SellerExecuteOrder](tag, "SellerExecuteOrder") {
+  private[models] class SellerExecuteOrderTable(tag: Tag) extends Table[SellerExecuteOrderSerialized](tag, "SellerExecuteOrder") {
 
-    def * = (from, buyerAddress, sellerAddress, awbProofHash, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SellerExecuteOrder.tupled, SellerExecuteOrder.unapply)
+    def * = (from, buyerAddress, sellerAddress, awbProofHash, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SellerExecuteOrderSerialized.tupled, SellerExecuteOrderSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -170,7 +176,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[SellerExecuteOrder] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[SellerExecuteOrder] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 

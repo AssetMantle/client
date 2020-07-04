@@ -24,7 +24,7 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
   def serialize(assetHistory: AssetHistory): AssetHistorySerializable = AssetHistorySerializable(id = assetHistory.id, ownerID = assetHistory.ownerID, pegHash = assetHistory.pegHash, assetType = assetHistory.assetType, description = assetHistory.description, documentHash = assetHistory.documentHash, quantity = assetHistory.quantity.value, quantityUnit = assetHistory.quantityUnit, price = assetHistory.price.value, moderated = assetHistory.moderated, takerID = assetHistory.takerID, otherDetails = Json.toJson(assetHistory.otherDetails).toString(), status = assetHistory.status, createdBy = assetHistory.createdBy, createdOn = assetHistory.createdOn, createdOnTimeZone = assetHistory.createdOnTimeZone, updatedBy = assetHistory.updatedBy, updatedOn = assetHistory.updatedOn, updatedOnTimeZone = assetHistory.updatedOnTimeZone, deletedBy = assetHistory.deletedBy, deletedOn = assetHistory.deletedOn, deletedOnTimeZone = assetHistory.deletedOnTimeZone)
 
   case class AssetHistorySerializable(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: Long, quantityUnit: String, price: Long, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
-    def deserialize(): AssetHistory = AssetHistory(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroLong(quantity), quantityUnit = quantityUnit, price = new MicroLong(price), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
+    def deserialize: AssetHistory = AssetHistory(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroLong(quantity), quantityUnit = quantityUnit, price = new MicroLong(price), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -114,13 +114,13 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def tryGet(id: String): Future[AssetHistory] = tryGetByID(id).map(_.deserialize())
+    def tryGet(id: String): Future[AssetHistory] = tryGetByID(id).map(_.deserialize)
 
     def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
 
     def tryGetPegHash(id: String): Future[String] = tryGetPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
-    def getAllAssetsByID(ids: Seq[String]): Future[Seq[AssetHistory]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize()))
+    def getAllAssetsByID(ids: Seq[String]): Future[Seq[AssetHistory]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize))
 
   }
 

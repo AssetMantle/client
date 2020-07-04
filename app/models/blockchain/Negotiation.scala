@@ -37,7 +37,7 @@ class Negotiations @Inject()(
   def serialize(negotiation: Negotiation): NegotiationSerialized = NegotiationSerialized(id = negotiation.id, buyerAddress = negotiation.buyerAddress, sellerAddress = negotiation.sellerAddress, assetPegHash = negotiation.assetPegHash, bid = negotiation.bid.value, time = negotiation.time, buyerSignature = negotiation.buyerSignature, sellerSignature = negotiation.sellerSignature, buyerBlockHeight = negotiation.buyerBlockHeight, sellerBlockHeight = negotiation.sellerBlockHeight, buyerContractHash = negotiation.buyerContractHash, sellerContractHash = negotiation.sellerContractHash, dirtyBit = negotiation.dirtyBit, createdBy = negotiation.createdBy, createdOn = negotiation.createdOn, createdOnTimeZone = negotiation.createdOnTimeZone, updatedBy = negotiation.updatedBy, updatedOn = negotiation.updatedOn, updatedOnTimeZone = negotiation.updatedOnTimeZone)
 
   case class NegotiationSerialized(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: Long, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Negotiation = Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = new MicroLong(bid), time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Negotiation = Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = new MicroLong(bid), time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -195,29 +195,29 @@ class Negotiations @Inject()(
 
     def update(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: MicroLong, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean): Future[Int] = updateByID(serialize(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit)))
 
-    def getDirtyNegotiations: Future[Seq[Negotiation]] = getNegotiationsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize()))
+    def getDirtyNegotiations: Future[Seq[Negotiation]] = getNegotiationsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize))
 
-    def tryGet(id: String): Future[Negotiation] = tryGetByID(id).map(_.deserialize())
+    def tryGet(id: String): Future[Negotiation] = tryGetByID(id).map(_.deserialize)
 
     def tryGetID(buyerAddress: String, sellerAddress: String, pegHash: String): Future[String] = tryGetIDByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash)
 
-    def getBuyerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findBuyerOrdersInZone(ids, addresses).map(_.map(_.deserialize()))
+    def getBuyerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findBuyerOrdersInZone(ids, addresses).map(_.map(_.deserialize))
 
-    def getSellerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findSellerOrdersInZone(ids, addresses).map(_.map(_.deserialize()))
+    def getSellerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findSellerOrdersInZone(ids, addresses).map(_.map(_.deserialize))
 
     def markDirty(id: String): Future[Int] = updateDirtyBitById(id, dirtyBit = true)
 
     def refreshDirty(id: String, bid: MicroLong, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Future[Int] = updateNegotiationById(id = id, bid = bid.value, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = false)
 
-    def getNegotiation(buyerAddress: String, sellerAddress: String, pegHash: String): Future[Option[Negotiation]] = getByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash).map(_.map(_.deserialize()))
+    def getNegotiation(buyerAddress: String, sellerAddress: String, pegHash: String): Future[Option[Negotiation]] = getByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash).map(_.map(_.deserialize))
 
     def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String): Future[Option[String]] = getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash)
 
-    def getNegotiationsForAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByAddress(address).map(_.map(_.deserialize()))
+    def getNegotiationsForAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByAddress(address).map(_.map(_.deserialize))
 
-    def getNegotiationsForBuyerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByBuyerAddress(address).map(_.map(_.deserialize()))
+    def getNegotiationsForBuyerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByBuyerAddress(address).map(_.map(_.deserialize))
 
-    def getNegotiationsForSellerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsBySellerAddress(address).map(_.map(_.deserialize()))
+    def getNegotiationsForSellerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsBySellerAddress(address).map(_.map(_.deserialize))
 
     def getNegotiationIDsForBuyerAddress(address: String): Future[Seq[String]] = getNegotiationIDsByBuyerAddress(address)
 
@@ -225,9 +225,9 @@ class Negotiations @Inject()(
 
     def deleteNegotiations(pegHash: String): Future[Int] = deleteNegotiationsByPegHash(pegHash)
 
-    def getNegotiationsForBuyerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsByBuyerAddresses(addresses).map(_.map(_.deserialize()))
+    def getNegotiationsForBuyerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsByBuyerAddresses(addresses).map(_.map(_.deserialize))
 
-    def getNegotiationsForSellerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsBySellerAddresses(addresses).map(_.map(_.deserialize()))
+    def getNegotiationsForSellerAddresses(addresses: Seq[String]): Future[Seq[Negotiation]] = getNegotiationsBySellerAddresses(addresses).map(_.map(_.deserialize))
 
   }
 
@@ -241,7 +241,7 @@ class Negotiations @Inject()(
           dirtyNegotiations.map { dirtyNegotiation =>
             val negotiationResponse = getNegotiation.Service.get(dirtyNegotiation.id)
 
-            def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.microLongBid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
+            def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
 
             def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
@@ -252,10 +252,10 @@ class Negotiations @Inject()(
             def getMasterNegotiation(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[masterNegotiation] = masterNegotiations.Service.tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID)
 
             def updateMasterNegotiationStatus(negotiation: masterNegotiation, negotiationResponse: Response): Future[Int] = {
-              if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.microLongBid, buyerAcceptedPrice = if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedPrice, time = Option(negotiationResponse.value.time.toInt)))
-              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.microLongBid, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
-              else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.microLongBid, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
-              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.microLongBid, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
+              if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid, buyerAcceptedPrice = if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedPrice, time = Option(negotiationResponse.value.time.toInt)))
+              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isEmpty) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
+              else if (negotiationResponse.value.buyerSignature.isEmpty && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING))
+              else if (negotiationResponse.value.buyerSignature.isDefined && negotiationResponse.value.sellerSignature.isDefined) masterNegotiations.Service.update(negotiation.copy(price = negotiationResponse.value.bid, time = Option(negotiationResponse.value.time.toInt), status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
               else Future(0)
             }
 

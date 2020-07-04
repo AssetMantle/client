@@ -76,7 +76,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 val ticketID = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
                   entity = blockchainTransaction.SendFiat(from = loginState.address, to = sellerAddress, amount = sendFiatData.sendAmount, pegHash = pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.sendAmount.toMicroString, pegHash = pegHash, mode = transactionMode),
+                  request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas), to = sellerAddress, password = sendFiatData.password, amount = sendFiatData.sendAmount, pegHash = pegHash, mode = transactionMode),
                   action = transactionsSendFiat.Service.post,
                   onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
                   onFailure = blockchainTransactionSendFiats.Utility.onFailure,
@@ -150,7 +150,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         Future(BadRequest(views.html.component.blockchain.sendFiat(formWithErrors)))
       },
       sendFiatData => {
-        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.sendAmount.toMicroString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
+        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.sendAmount, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))

@@ -115,12 +115,12 @@
                     @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 } {
-                    @Seq((negotiation.price / negotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
+                    @Seq((negotiation.price / negotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")
                 }
                 @buyerViewNegotiationTerm(negotiationID = negotiation.id, termType = constants.View.QUANTITY, status = negotiation.buyerAcceptedQuantity, iconPath = "quantity") {
                     @Messages(constants.View.QUANTITY)
                 } {
-                    @Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")
+                    @Seq(negotiation.quantity.toRoundedOffString(), negotiation.quantityUnit).mkString(" ")
                 }
                 <div class="cmuk-flex cmuk-flex-between">
                     <div class="title">@Messages(constants.View.ASSET_OTHER_DETAILS)</div>
@@ -198,7 +198,7 @@
                     <div>
                         <div class="cmuk-flex">
                             <span class="termIcon">@commonIcon("contractPrice")</span>
-                            @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price / negotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
+                            @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price / negotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                         </div>
                         <div class="cmuk-flex termIdent">
                             @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
@@ -215,7 +215,7 @@
                 <div class="sellerTerm">
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("quantity")</span>
-                        @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" "))
+                        @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toRoundedOffString(), negotiation.quantityUnit).mkString(" "))
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedQuantity) {

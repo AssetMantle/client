@@ -20,7 +20,7 @@ case class ReceiveFiatHistory(id: String, traderID: String, orderID: String, amo
 class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   case class ReceiveFiatHistorySerialized(id: String, traderID: String, orderID: String, amount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
-    def deserialize(): ReceiveFiatHistory = ReceiveFiatHistory(id = id, traderID = traderID, orderID = orderID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
+    def deserialize: ReceiveFiatHistory = ReceiveFiatHistory(id = id, traderID = traderID, orderID = orderID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
   }
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_RECEIVE_FIAT_HISTORY
@@ -73,9 +73,9 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
   }
 
   object Service {
-    def get(traderID: String): Future[Seq[ReceiveFiatHistory]] = getByTraderIDAndStatuses(traderID, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize()))
+    def get(traderID: String): Future[Seq[ReceiveFiatHistory]] = getByTraderIDAndStatuses(traderID, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize))
 
-    def get(traderIDs: Seq[String]): Future[Seq[ReceiveFiatHistory]] = getByTraderIDsAndStatuses(traderIDs, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize()))
+    def get(traderIDs: Seq[String]): Future[Seq[ReceiveFiatHistory]] = getByTraderIDsAndStatuses(traderIDs, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize))
   }
 }
 

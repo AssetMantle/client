@@ -33,7 +33,7 @@ class Assets @Inject()(
   def serialize(asset: Asset): AssetSerialized = AssetSerialized(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity.value, assetPrice = asset.assetPrice.value, quantityUnit = asset.quantityUnit, ownerAddress = asset.ownerAddress, locked = asset.locked, moderated = asset.moderated, takerAddress = asset.takerAddress, dirtyBit = asset.dirtyBit, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
 
   case class AssetSerialized(pegHash: String, documentHash: String, assetType: String, assetQuantity: Long, assetPrice: Long, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Asset = Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity =new MicroLong(assetQuantity) , assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderated = moderated, takerAddress = takerAddress, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Asset = Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity =new MicroLong(assetQuantity) , assetPrice = new MicroLong(assetPrice), quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderated = moderated, takerAddress = takerAddress, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -169,9 +169,9 @@ class Assets @Inject()(
 
     def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroLong, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(serialize(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)))
 
-    def tryGet(pegHash: String): Future[Asset] = findByPegHash(pegHash).map(_.deserialize())
+    def tryGet(pegHash: String): Future[Asset] = findByPegHash(pegHash).map(_.deserialize)
 
-    def getAssetPegWallet(address: String): Future[Seq[Asset]] = getAssetPegWalletByAddress(address).map(_.map(_.deserialize()))
+    def getAssetPegWallet(address: String): Future[Seq[Asset]] = getAssetPegWalletByAddress(address).map(_.map(_.deserialize))
 
     def getAssetPegHashes(address: String): Future[Seq[String]] = getAssetPegHashesByAddress(address)
 
@@ -183,7 +183,7 @@ class Assets @Inject()(
 
     def deleteAssetPegWallet(ownerAddress: String): Future[Int] = deleteAssetPegWalletByAddress(ownerAddress)
 
-    def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize()))
+    def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize))
 
     def tryGetLockedStatus(pegHash: String): Future[Boolean] = tryGetLockedStatusByPegHash(pegHash)
 
@@ -203,7 +203,7 @@ class Assets @Inject()(
             def updateOrDelete(ownerAccount: Response): Future[Int] = {
               ownerAccount.value.asset_peg_wallet match {
                 case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
-                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.microLongAssetPrice, assetQuantity = assetPeg.microLongAssetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
+                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
                   case None => Service.deleteAsset(dirtyAsset.pegHash)
                 }
                 case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)

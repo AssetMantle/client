@@ -139,7 +139,6 @@ object FormField {
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
   val SCAN_ID = new IntFormField("SCAN_ID", 0, Int.MaxValue)
-  val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
@@ -206,9 +205,8 @@ object FormField {
   val SEND_AMOUNT = new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
   val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
   val ASSET_QUANTITY = new MicroLongFormField("ASSET_QUANTITY", 1, Double.MaxValue)
-
-  //LongFormField
-  val GAS = new LongFormField("GAS", 20000L, 1000000L)
+  val GAS = new MicroLongFormField("GAS", 1, 10)
+  val AMOUNT = new MicroLongFormField("AMOUNT", 1, Double.MaxValue)
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

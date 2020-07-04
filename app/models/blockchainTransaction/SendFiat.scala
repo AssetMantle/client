@@ -24,7 +24,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendFiat(from: String, to: String, amount: MicroLong, pegHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendFiat] with Logged {
+case class SendFiat(from: String, to: String, amount: MicroLong, pegHash: String, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendFiat] with Logged {
   def mutateTicketID(newTicketID: String): SendFiat = SendFiat(from = from, to = to, amount = amount, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -40,7 +40,6 @@ class SendFiats @Inject()(
                            blockchainOrders: blockchain.Orders,
                            blockchainNegotiations: blockchain.Negotiations,
                            utilitiesNotification: utilities.Notification,
-                           masterAccounts: master.Accounts,
                            masterAssets: master.Assets,
                            blockchainAccounts: blockchain.Accounts,
                            masterNegotiations: master.Negotiations,
@@ -49,10 +48,10 @@ class SendFiats @Inject()(
                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
 
-  def serialize(sendFiat: SendFiat): SendFiatSerialized = SendFiatSerialized(from = sendFiat.from, to = sendFiat.to, amount = sendFiat.amount.value, pegHash = sendFiat.pegHash, gas = sendFiat.gas, status = sendFiat.status, txHash = sendFiat.txHash, ticketID = sendFiat.ticketID, mode = sendFiat.mode, code = sendFiat.code, createdBy = sendFiat.createdBy, createdOn = sendFiat.createdOn, createdOnTimeZone = sendFiat.createdOnTimeZone, updatedBy = sendFiat.updatedBy, updatedOn = sendFiat.updatedOn, updatedOnTimeZone = sendFiat.updatedOnTimeZone)
+  def serialize(sendFiat: SendFiat): SendFiatSerialized = SendFiatSerialized(from = sendFiat.from, to = sendFiat.to, amount = sendFiat.amount.value, pegHash = sendFiat.pegHash, gas = sendFiat.gas.toMicroLong, status = sendFiat.status, txHash = sendFiat.txHash, ticketID = sendFiat.ticketID, mode = sendFiat.mode, code = sendFiat.code, createdBy = sendFiat.createdBy, createdOn = sendFiat.createdOn, createdOnTimeZone = sendFiat.createdOnTimeZone, updatedBy = sendFiat.updatedBy, updatedOn = sendFiat.updatedOn, updatedOnTimeZone = sendFiat.updatedOnTimeZone)
 
   case class SendFiatSerialized(from: String, to: String, amount: Long, pegHash: String, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): SendFiat = SendFiat(from = from, to = to, amount = new MicroLong(amount), pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: SendFiat = SendFiat(from = from, to = to, amount = new MicroLong(amount), pegHash = pegHash, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
@@ -198,7 +197,7 @@ class SendFiats @Inject()(
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[SendFiat] = findByTicketID(ticketID).map(_.deserialize())
+    def getTransaction(ticketID: String): Future[SendFiat] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -227,10 +226,10 @@ class SendFiats @Inject()(
       def updateBCFiat(bcFiatsInOrder: Seq[Fiat], negotiationID: String, orderResponse: OrderResponse.Response): Future[Unit] = orderResponse.value.fiat_peg_wallet match {
         case Some(fiatPegWallet) => {
           val updateFiats = Future.traverse(bcFiatsInOrder.map(_.pegHash).intersect(fiatPegWallet.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-            blockchainFiats.Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.microLongTransactionAmount, redeemedAmount = fiatPeg.microLongRedeemedAmount, dirtyBit = false))
+            blockchainFiats.Service.update(Fiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false))
           })
           val insertFiats = Future.traverse(fiatPegWallet.map(_.pegHash).diff(bcFiatsInOrder.map(_.pegHash)).flatMap(pegHash => fiatPegWallet.find(_.pegHash == pegHash)))(fiatPeg => {
-            blockchainFiats.Service.create(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.microLongTransactionAmount, redeemedAmount = fiatPeg.microLongRedeemedAmount, dirtyBit = false)
+            blockchainFiats.Service.create(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)
           })
           for {
             _ <- updateFiats

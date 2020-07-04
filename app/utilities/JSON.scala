@@ -18,10 +18,10 @@ object JSON {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case _: JsError =>
+        case error: JsError => logger.error(error.toString)
           val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](response.json) match {
             case JsSuccess(value: ErrorResponse, _: JsPath) => value
-            case error: JsError => logger.info(response.body)
+            case error: JsError => logger.error(response.body)
               throw new BaseException(new Failure(error.toString, null))
           }
           logger.info(errorResponse.error)

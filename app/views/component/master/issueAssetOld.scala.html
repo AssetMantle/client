@@ -11,7 +11,7 @@
     @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT)
     @commonInputMicroLong(issueAssetForm, constants.FormField.ASSET_QUANTITY)
-    @commonInputLong(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroLong(issueAssetForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS, 'required -> false)
     @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD)
 }

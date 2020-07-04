@@ -90,7 +90,7 @@ class AssetController @Inject()(
     def sendTransaction(traderAddress: String, zoneAddress: String, takerAddress: String, asset: Asset, zonePassword: String): Future[String] = utilitiesTransaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
       entity = blockchainTransaction.IssueAsset(from = zoneAddress, to = traderAddress, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, gas = constants.Blockchain.ZoneIssueAssetGasAmount, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
       blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = constants.Blockchain.ZoneIssueAssetGasAmount.toString), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price.toMicroString, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity.toMicroString, moderated = true, takerAddress = takerAddress, mode = transactionMode),
+      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = constants.Blockchain.ZoneIssueAssetGasAmount), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, takerAddress = takerAddress, mode = transactionMode),
       action = transactionsIssueAsset.Service.post,
       onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
       onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -165,7 +165,7 @@ class AssetController @Inject()(
                       def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                         entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
                         blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice =(issueAssetData.pricePerUnit * issueAssetData.quantity).toMicroString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity.toMicroString, moderated = false, takerAddress = "", mode = transactionMode),
+                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = (issueAssetData.pricePerUnit * issueAssetData.quantity), quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = "", mode = transactionMode),
                         action = transactionsIssueAsset.Service.post,
                         onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                         onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -320,7 +320,7 @@ class AssetController @Inject()(
                   val ticketID = transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
                     entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = sellerAddress, pegHash = pegHash, gas = releaseData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-                    request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas.toString), to = sellerAddress, password = releaseData.password, pegHash = pegHash, mode = transactionMode),
+                    request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseData.gas), to = sellerAddress, password = releaseData.password, pegHash = pegHash, mode = transactionMode),
                     action = transactionsReleaseAsset.Service.post,
                     onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
                     onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
@@ -387,7 +387,7 @@ class AssetController @Inject()(
                     val ticketID = transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
                       entity = blockchainTransaction.SendAsset(from = sellerAddress, to = buyerAddress, pegHash = pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
                       blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
-                      request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sellerAddress, gas = sendAssetData.gas.toString), to = buyerAddress, password = sendAssetData.password, pegHash = pegHash, mode = transactionMode),
+                      request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sellerAddress, gas = sendAssetData.gas), to = buyerAddress, password = sendAssetData.password, pegHash = pegHash, mode = transactionMode),
                       action = transactionsSendAsset.Service.post,
                       onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
                       onFailure = blockchainTransactionSendAssets.Utility.onFailure,
@@ -452,7 +452,7 @@ class AssetController @Inject()(
                   val ticketID = transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
                     entity = blockchainTransaction.RedeemAsset(from = ownerAddress, to = zoneAddress, pegHash = pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
-                    request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = ownerAddress, gas = redeemAssetData.gas.toString), to = zoneAddress, password = redeemAssetData.password, pegHash = pegHash, mode = transactionMode),
+                    request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = ownerAddress, gas = redeemAssetData.gas), to = zoneAddress, password = redeemAssetData.password, pegHash = pegHash, mode = transactionMode),
                     action = transactionsRedeemAsset.Service.post,
                     onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
                     onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,

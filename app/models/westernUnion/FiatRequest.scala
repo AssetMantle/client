@@ -22,7 +22,7 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
   def serialize(fiatRequest: FiatRequest): FiatRequestSerialized = FiatRequestSerialized(id = fiatRequest.id, traderID = fiatRequest.traderID, transactionAmount = fiatRequest.transactionAmount.value, status = fiatRequest.status, createdBy = fiatRequest.createdBy, createdOn = fiatRequest.createdOn, createdOnTimeZone = fiatRequest.createdOnTimeZone, updatedBy = fiatRequest.updatedBy, updatedOn = fiatRequest.updatedOn, updatedOnTimeZone = fiatRequest.updatedOnTimeZone)
 
   case class FiatRequestSerialized(id: String, traderID: String, transactionAmount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): FiatRequest = FiatRequest(id = id, traderID = traderID, transactionAmount = new MicroLong(transactionAmount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: FiatRequest = FiatRequest(id = id, traderID = traderID, transactionAmount = new MicroLong(transactionAmount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -112,13 +112,13 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def create(traderID: String, transactionAmount: MicroLong): Future[String] = add(serialize(FiatRequest(id = utilities.IDGenerator.requestID(length = 30), traderID = traderID, transactionAmount = transactionAmount, status = constants.Status.IssueFiat.REQUEST_INITIATED)))
 
-    def tryGetByID(id: String): Future[FiatRequest] = findByID(id).map(_.deserialize())
+    def tryGetByID(id: String): Future[FiatRequest] = findByID(id).map(_.deserialize)
 
     def getStatus(id: String): Future[String] = getStatusByID(id)
 
-    def getAll(traderID: String) = findAllByID(traderID).map(_.map(_.deserialize()))
+    def getAll(traderID: String) = findAllByID(traderID).map(_.map(_.deserialize))
 
-    def getAllByTraderIDs(traderIDs: Seq[String]) = findAllByTraderIDs(traderIDs).map(_.map(_.deserialize()))
+    def getAllByTraderIDs(traderIDs: Seq[String]) = findAllByTraderIDs(traderIDs).map(_.map(_.deserialize))
 
     def markRTCBReceived(id: String, amountRequested: Long, totalRTCBAmount: Long): Future[Int] = {
       if (amountRequested == totalRTCBAmount) {

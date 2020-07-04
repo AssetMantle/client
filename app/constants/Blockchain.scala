@@ -1,12 +1,14 @@
 package constants
 
+import utilities.MicroLong
+
 object Blockchain {
   val MnemonicShown = 3
   val NegotiationDefaultTime = 5000000
-  val DefaultZoneFaucetTokenAmount = 10000000
-  val DefaultOrganizationFaucetTokenAmount = 1000
-  val DefaultTraderFaucetTokenAmount = 1
-  val DefaultFaucetTokenAmount = 1
-  val ZoneIssueFiatGasAmount = 1000000
-  val ZoneIssueAssetGasAmount = 1000000
+  val DefaultZoneFaucetTokenAmount = new MicroLong(100000000.0)
+  val DefaultOrganizationFaucetTokenAmount = new MicroLong(100000.0)
+  val DefaultTraderFaucetTokenAmount = new MicroLong(100.0)
+  val DefaultFaucetTokenAmount = new MicroLong(1.0)
+  val ZoneIssueFiatGasAmount = new MicroLong(10.0)
+  val ZoneIssueAssetGasAmount = new MicroLong(10.0)
 }

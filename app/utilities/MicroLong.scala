@@ -1,5 +1,7 @@
 package utilities
 
+import play.api.libs.json.{Json, OFormat, Reads}
+
 class MicroLong(val value: Long) {
 
   def this(value: String) = this(value.toLong * 1000000)
@@ -289,6 +291,10 @@ object MicroLong {
   def apply(f: Float): MicroLong = new MicroLong(f)
 
   def apply(s: String): MicroLong = new MicroLong(s)
+
+  def unapply(arg: MicroLong): Option[String] = Option(arg.toMicroString)
+
+  implicit val microLongReads: OFormat[MicroLong] = Json.format[MicroLong]
 
   implicit def intToMicroLong(i: Int): MicroLong = MicroLong(i)
 

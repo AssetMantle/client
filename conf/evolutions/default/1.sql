@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
     "address"           VARCHAR NOT NULL,
     "username"          VARCHAR NOT NULL UNIQUE,
-    "coins"             VARCHAR NOT NULL,
+    "coins"             BIGINT  NOT NULL,
     "publicKey"         VARCHAR NOT NULL,
     "accountNumber"     VARCHAR NOT NULL,
     "sequence"          VARCHAR NOT NULL,
@@ -108,8 +108,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
     "pegHash"           VARCHAR NOT NULL,
     "ownerAddress"      VARCHAR NOT NULL,
     "transactionID"     VARCHAR NOT NULL,
-    "transactionAmount" BIGINT NOT NULL,
-    "redeemedAmount"    BIGINT NOT NULL,
+    "transactionAmount" BIGINT  NOT NULL,
+    "redeemedAmount"    BIGINT  NOT NULL,
     "dirtyBit"          BOOLEAN NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -125,9 +125,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
     "pegHash"           VARCHAR NOT NULL,
     "documentHash"      VARCHAR NOT NULL,
     "assetType"         VARCHAR NOT NULL,
-    "assetQuantity"     BIGINT NOT NULL,
+    "assetQuantity"     BIGINT  NOT NULL,
     "assetPrice"        BIGINT  NOT NULL,
-    "quantityUnit"      VARCHAR  NOT NULL,
+    "quantityUnit"      VARCHAR NOT NULL,
     "ownerAddress"      VARCHAR NOT NULL,
     "locked"            BOOLEAN NOT NULL,
     "moderated"         BOOLEAN NOT NULL,
@@ -538,7 +538,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
 (
     "from"              VARCHAR NOT NULL,
     "to"                VARCHAR NOT NULL,
-    "amount"            INT     NOT NULL,
+    "amount"            BIGINT  NOT NULL,
     "gas"               BIGINT  NOT NULL,
     "status"            BOOLEAN,
     "txHash"            VARCHAR,
@@ -1164,7 +1164,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 (
     "id"                VARCHAR NOT NULL,
     "accountID"         VARCHAR NOT NULL,
-    "amount"            INT     NOT NULL,
+    "amount"            BIGINT  NOT NULL,
     "gas"               BIGINT,
     "status"            BOOLEAN,
     "ticketID"          VARCHAR,
@@ -1605,10 +1605,10 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision"
 
 CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision_History"
 (
-    "id"                VARCHAR NOT NULL,
-    "scanID"            INT     NOT NULL,
+    "id"                VARCHAR   NOT NULL,
+    "scanID"            INT       NOT NULL,
     "resultID"          INT,
-    "status"            BOOLEAN NOT NULL,
+    "status"            BOOLEAN   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -2363,7 +2363,7 @@ INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey"
                                      "dirtyBit")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
-        '1000',
+        1000,
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',
