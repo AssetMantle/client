@@ -2,7 +2,7 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms._
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object AddZone {
   val form = Form(
@@ -16,6 +16,6 @@ object AddZone {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, zoneID: String, gas: MicroLong, mode: String, password: String)
+  case class Data(from: String, to: String, zoneID: String, gas: MicroNumber, mode: String, password: String)
 
 }

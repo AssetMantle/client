@@ -7,6 +7,6 @@
     @commonInputText(setBuyerFeedbackForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
     @commonInputText(setBuyerFeedbackForm, constants.FormField.PEG_HASH, 'value -> pegHash)
     @commonInputInt(setBuyerFeedbackForm, constants.FormField.RATING)
-    @commonInputMicroLong(setBuyerFeedbackForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroNumber(setBuyerFeedbackForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(setBuyerFeedbackForm, constants.FormField.PASSWORD)
 }

@@ -8,7 +8,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,11 +29,11 @@ class SetSellerFeedback @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  case class BaseReq(from: String, chain_id: String = chainID, gas: MicroLong)
+  case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
 
   object BaseReq {
 
-    def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroLong(gas.toLong))
+    def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroNumber(BigInt(gas)))
 
     def unapply(arg: BaseReq): Option[(String, String, String)] = Option((arg.from, arg.chain_id, arg.gas.toMicroString))
 

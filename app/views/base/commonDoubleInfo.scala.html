@@ -1,11 +1,12 @@
-@import utilities.NumericOperation.roundOff
-@(key: String, value: Double, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+@import utilities.MicroNumber
+
+@(key: String, value: MicroNumber, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
 <div class="cmuk-flex infoRow">
     <div class="infoRowLabel">
         @Messages(key)
     </div>
     <div id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
-        @roundOff(value)
+        @value.toRoundedOffString()
     </div>
 </div>

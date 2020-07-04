@@ -17,13 +17,13 @@ import play.api.{Configuration, Logger}
 import queries.GetOrder
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendAsset(from: String, to: String, pegHash: String, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendAsset] with Logged {
+case class SendAsset(from: String, to: String, pegHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendAsset] with Logged {
   def mutateTicketID(newTicketID: String): SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -66,11 +66,11 @@ class SendAssets @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  case class SendAssetSerialized(from: String, to: String, pegHash: String, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  case class SendAssetSerialized(from: String, to: String, pegHash: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(sendAsset: SendAsset): SendAssetSerialized = SendAssetSerialized(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas = sendAsset.gas.toMicroLong, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code, createdBy = sendAsset.createdBy, createdOn = sendAsset.createdOn, createdOnTimeZone = sendAsset.createdOnTimeZone, updatedBy = sendAsset.updatedBy, updatedOn = sendAsset.updatedOn, updatedOnTimeZone = sendAsset.updatedOnTimeZone)
+  def serialize(sendAsset: SendAsset): SendAssetSerialized = SendAssetSerialized(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas = sendAsset.gas.toMicroString, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code, createdBy = sendAsset.createdBy, createdOn = sendAsset.createdOn, createdOnTimeZone = sendAsset.createdOnTimeZone, updatedBy = sendAsset.updatedBy, updatedOn = sendAsset.updatedOn, updatedOnTimeZone = sendAsset.updatedOnTimeZone)
 
   private def add(sendAsset: SendAsset): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += serialize(sendAsset)).asTry).map {
     case Success(result) => result
@@ -152,7 +152,7 @@ class SendAssets @Inject()(
 
     def pegHash = column[String]("pegHash")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 
@@ -230,8 +230,8 @@ class SendAssets @Inject()(
       } else {
         val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
 
-        def status(fiatsInOrder: MicroLong): String = {
-          if (fiatsInOrder.value >= negotiation.price.value) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+        def status(fiatsInOrder: MicroNumber): String = {
+          if (fiatsInOrder >= negotiation.price) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
           else constants.Status.Order.ASSET_SENT_FIAT_PENDING
         }
 

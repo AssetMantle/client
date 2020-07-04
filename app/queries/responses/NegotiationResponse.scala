@@ -3,14 +3,14 @@ package queries.responses
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 import transactions.Abstract.BaseResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object NegotiationResponse {
 
-  case class Value(negotiationID: String, buyerAddress: String, sellerAddress: String, pegHash: String, bid: MicroLong, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String])
+  case class Value(negotiationID: String, buyerAddress: String, sellerAddress: String, pegHash: String, bid: MicroNumber, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String])
 
   object Value {
-    def apply(negotiationID: String, buyerAddress: String, sellerAddress: String, pegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Value = new Value(negotiationID, buyerAddress, sellerAddress, pegHash, new MicroLong(bid.toLong), time, buyerSignature, sellerSignature, buyerBlockHeight, sellerBlockHeight, buyerContractHash, sellerContractHash)
+    def apply(negotiationID: String, buyerAddress: String, sellerAddress: String, pegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Value = new Value(negotiationID, buyerAddress, sellerAddress, pegHash, new MicroNumber(BigInt(bid)), time, buyerSignature, sellerSignature, buyerBlockHeight, sellerBlockHeight, buyerContractHash, sellerContractHash)
   }
 
   implicit val valueReads: Reads[Value] = (

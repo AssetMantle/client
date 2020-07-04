@@ -2,7 +2,7 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms._
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object SetSellerFeedback {
   val form = Form(
@@ -17,6 +17,6 @@ object SetSellerFeedback {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, pegHash: String, rating: Int, gas: MicroLong, mode: String, password: String)
+  case class Data(from: String, to: String, pegHash: String, rating: Int, gas: MicroNumber, mode: String, password: String)
 
 }

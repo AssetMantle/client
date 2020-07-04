@@ -14,13 +14,13 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ReleaseAsset(from: String, to: String, pegHash: String, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ReleaseAsset] with Logged {
+case class ReleaseAsset(from: String, to: String, pegHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ReleaseAsset] with Logged {
   def mutateTicketID(newTicketID: String): ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -49,10 +49,10 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def serialize(releaseAsset: ReleaseAsset): ReleaseAssetSerialized = ReleaseAssetSerialized(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, gas = releaseAsset.gas.toMicroLong, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code, createdBy = releaseAsset.createdBy, createdOn = releaseAsset.createdOn, createdOnTimeZone = releaseAsset.createdOnTimeZone, updatedBy = releaseAsset.updatedBy, updatedOn = releaseAsset.updatedOn, updatedOnTimeZone = releaseAsset.updatedOnTimeZone)
+  def serialize(releaseAsset: ReleaseAsset): ReleaseAssetSerialized = ReleaseAssetSerialized(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, gas = releaseAsset.gas.toMicroString, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code, createdBy = releaseAsset.createdBy, createdOn = releaseAsset.createdOn, createdOnTimeZone = releaseAsset.createdOnTimeZone, updatedBy = releaseAsset.updatedBy, updatedOn = releaseAsset.updatedOn, updatedOnTimeZone = releaseAsset.updatedOnTimeZone)
 
-  case class ReleaseAssetSerialized(from: String, to: String, pegHash: String, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ReleaseAssetSerialized(from: String, to: String, pegHash: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   private def add(releaseAsset: ReleaseAsset): Future[String] = db.run((releaseAssetTable returning releaseAssetTable.map(_.ticketID) += serialize(releaseAsset)).asTry).map {
@@ -135,7 +135,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
     def pegHash = column[String]("pegHash")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 

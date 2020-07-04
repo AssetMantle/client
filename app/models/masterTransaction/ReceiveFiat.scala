@@ -9,20 +9,20 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.Logger
 import slick.jdbc.JdbcProfile
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ReceiveFiat(id: String, traderID: String, orderID: String, amount: MicroLong, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ReceiveFiat(id: String, traderID: String, orderID: String, amount: MicroNumber, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class ReceiveFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  def serialize(receiveFiat: ReceiveFiat): ReceiveFiatSerialized = ReceiveFiatSerialized(id = receiveFiat.id, traderID = receiveFiat.traderID, orderID = receiveFiat.orderID, amount = receiveFiat.amount.value, status = receiveFiat.status, createdBy = receiveFiat.createdBy, createdOn = receiveFiat.createdOn, createdOnTimeZone = receiveFiat.createdOnTimeZone, updatedBy = receiveFiat.updatedBy, updatedOn = receiveFiat.updatedOn, updatedOnTimeZone = receiveFiat.updatedOnTimeZone)
+  def serialize(receiveFiat: ReceiveFiat): ReceiveFiatSerialized = ReceiveFiatSerialized(id = receiveFiat.id, traderID = receiveFiat.traderID, orderID = receiveFiat.orderID, amount = receiveFiat.amount.toMicroString, status = receiveFiat.status, createdBy = receiveFiat.createdBy, createdOn = receiveFiat.createdOn, createdOnTimeZone = receiveFiat.createdOnTimeZone, updatedBy = receiveFiat.updatedBy, updatedOn = receiveFiat.updatedOn, updatedOnTimeZone = receiveFiat.updatedOnTimeZone)
 
-  case class ReceiveFiatSerialized(id: String, traderID: String, orderID: String, amount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: ReceiveFiat = ReceiveFiat(id = id, traderID = traderID, orderID = orderID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ReceiveFiatSerialized(id: String, traderID: String, orderID: String, amount: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: ReceiveFiat = ReceiveFiat(id = id, traderID = traderID, orderID = orderID, amount = new MicroNumber(BigInt(amount)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_RECEIVE_FIAT
@@ -81,7 +81,7 @@ class ReceiveFiats @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def orderID = column[String]("orderID")
 
-    def amount = column[Long]("amount")
+    def amount = column[String]("amount")
 
     def status = column[String]("status")
 
@@ -100,7 +100,7 @@ class ReceiveFiats @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   object Service {
-    def create(traderID: String, orderID: String, amount: MicroLong, status: String): Future[String] = add(serialize(ReceiveFiat(utilities.IDGenerator.requestID(), traderID, orderID, amount, status)))
+    def create(traderID: String, orderID: String, amount: MicroNumber, status: String): Future[String] = add(serialize(ReceiveFiat(utilities.IDGenerator.requestID(), traderID, orderID, amount, status)))
 
     def get(traderID: String): Future[Seq[ReceiveFiat]] = getByTraderIDAndStatuses(traderID, Seq(constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT, constants.Status.ReceiveFiat.ORDER_REVERSED_FIAT)).map(_.map(_.deserialize))
 

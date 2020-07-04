@@ -2,7 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import utilities.MicroLong
+import utilities.MicroNumber
 
 
 object UpdateNegotiationAssetTerms {
@@ -18,6 +18,6 @@ object UpdateNegotiationAssetTerms {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, description: String, pricePerUnit: MicroLong, quantity: MicroLong, quantityUnit: String, gas: MicroLong, password: String)
+  case class Data(id: String, description: String, pricePerUnit: MicroNumber, quantity: MicroNumber, quantityUnit: String, gas: MicroNumber, password: String)
 
 }

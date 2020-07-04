@@ -9,7 +9,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,7 +53,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), amount = new MicroLong(formWithErrors.data(constants.FormField.SEND_AMOUNT.name).toDouble))))
+          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), amount = new MicroNumber(formWithErrors.data(constants.FormField.SEND_AMOUNT.name)))))
         },
         sendFiatData => {
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
@@ -92,8 +92,8 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             }
           }
 
-          def getResult(fiatsInOrder: MicroLong, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
-            if (fiatsInOrder.toDouble + sendFiatData.sendAmount.toDouble <= negotiation.price.toDouble + constants.Precision.SEND_FIAT_PRECISION_MARGIN) {
+          def getResult(fiatsInOrder: MicroNumber, negotiation: master.Negotiation, validateUsernamePassword: Boolean): Future[Result] = {
+            if (fiatsInOrder + sendFiatData.sendAmount <= negotiation.price + constants.Precision.SEND_FIAT_PRECISION_MARGIN) {
               for {
                 sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
                 sellerAddress <- getAddress(sellerAccountID)
@@ -101,7 +101,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price.toDouble - fiatsInOrder.toDouble), sendFiatData.negotiationID, sendFiatData.sendAmount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price - fiatsInOrder), sendFiatData.negotiationID, sendFiatData.sendAmount)))
             }
           }
 

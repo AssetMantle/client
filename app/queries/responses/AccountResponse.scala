@@ -3,14 +3,14 @@ package queries.responses
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 import transactions.Abstract.BaseResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object AccountResponse {
 
-  case class Coin(denom: String, amount: MicroLong)
+  case class Coin(denom: String, amount: MicroNumber)
 
   object Coin {
-    def apply(denom: String, amount: String): Coin = new Coin(denom, new MicroLong(amount.toLong))
+    def apply(denom: String, amount: String): Coin = new Coin(denom, new MicroNumber(BigInt(amount)))
   }
 
   implicit val coinReads: Reads[Coin] = (
@@ -18,10 +18,10 @@ object AccountResponse {
       (JsPath \ "amount").read[String]
     ) (Coin.apply _)
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroLong, assetPrice: MicroLong, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String)
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroNumber, assetPrice: MicroNumber, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String)
 
   object Asset {
-    def apply(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String): Asset = new Asset(pegHash, documentHash, assetType, new MicroLong(assetQuantity.toLong), new MicroLong(assetPrice.toLong), quantityUnit, ownerAddress, locked, moderated, takerAddress)
+    def apply(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String): Asset = new Asset(pegHash, documentHash, assetType, new MicroNumber(BigInt(assetQuantity)), new MicroNumber(BigInt(assetPrice)), quantityUnit, ownerAddress, locked, moderated, takerAddress)
   }
 
   implicit val assetReads: Reads[Asset] = (
@@ -39,10 +39,10 @@ object AccountResponse {
 
   case class Owner(ownerAddress: String, amount: String)
 
-  case class Fiat(pegHash: String, transactionID: String, transactionAmount: MicroLong, redeemedAmount: MicroLong, owners: Option[Seq[Owner]])
+  case class Fiat(pegHash: String, transactionID: String, transactionAmount: MicroNumber, redeemedAmount: MicroNumber, owners: Option[Seq[Owner]])
 
   object Fiat {
-    def apply(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owner]]): Fiat = new Fiat(pegHash, transactionID, new MicroLong(transactionAmount.toLong), new MicroLong(redeemedAmount.toLong), owners)
+    def apply(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owner]]): Fiat = new Fiat(pegHash, transactionID, new MicroNumber(BigInt(transactionAmount)), new MicroNumber(BigInt(redeemedAmount)), owners)
   }
 
   implicit val ownerReads: Reads[Owner] = Json.reads[Owner]

@@ -11,6 +11,6 @@
     @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price/negotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
     @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
     @commonTextInfo(constants.View.QUANTITY, Seq(negotiation.quantity.toRoundedOffString(), negotiation.quantityUnit).mkString(""))
-    @commonInputMicroLong(sellerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroNumber(sellerConfirmNegotiationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sellerConfirmNegotiationForm, constants.FormField.PASSWORD)
 }

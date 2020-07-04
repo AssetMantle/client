@@ -11,7 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import services.SFTPScheduler
-import utilities.{KeyStore, MicroLong}
+import utilities.{KeyStore, MicroNumber}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -62,13 +62,13 @@ class WesternUnionController @Inject()(
         val createRTCB = westernUnionRTCBs.Service.create(requestBody.id, requestBody.reference, requestBody.externalReference,
           requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
           utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
-          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, new MicroLong(requestBody.paidOutAmount.toDouble), requestBody.requestSignature)
+          requestBody.status, requestBody.dealType, requestBody.paymentTypeId, new MicroNumber(requestBody.paidOutAmount), requestBody.requestSignature)
 
-        def totalRTCBAmountReceived: Future[Long] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
+        def totalRTCBAmountReceived: Future[MicroNumber] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
         val fiatRequest = westernUnionFiatRequests.Service.tryGetByID(requestBody.externalReference)
 
-        def updateIssueFiatRequestRTCBStatus(amountRequested: Long, totalRTCBAmount: Long): Future[Int] = westernUnionFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
+        def updateIssueFiatRequestRTCBStatus(amountRequested: MicroNumber, totalRTCBAmount: MicroNumber): Future[Int] = westernUnionFiatRequests.Service.markRTCBReceived(requestBody.externalReference, amountRequested, totalRTCBAmount)
 
         def traderDetails(traderID: String) = masterTraders.Service.tryGet(traderID)
 
@@ -78,15 +78,15 @@ class WesternUnionController @Inject()(
 
         def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
-        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroLong(requestBody.paidOutAmount.toDouble))
+        def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroNumber(requestBody.paidOutAmount))
 
-        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroLong(requestBody.paidOutAmount.toDouble), new MicroLong(0))
+        def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroNumber(requestBody.paidOutAmount), new MicroNumber(0))
 
         for {
           _ <- createRTCB
           fiatRequest <- fiatRequest
           totalRTCBAmountReceived <- totalRTCBAmountReceived
-          _ <- updateIssueFiatRequestRTCBStatus(fiatRequest.transactionAmount.value, totalRTCBAmountReceived)
+          _ <- updateIssueFiatRequestRTCBStatus(fiatRequest.transactionAmount, totalRTCBAmountReceived)
           traderDetails <- traderDetails(fiatRequest.traderID)
           traderAddress <- traderAddress(traderDetails.accountID)
           zoneAccountID <- zoneAccountID(traderDetails.zoneID)
@@ -135,7 +135,7 @@ class WesternUnionController @Inject()(
         })
   }
 
-  private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroLong): Future[String] = {
+  private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroNumber): Future[String] = {
 
     val zonePassword = Future(keyStore.getPassphrase(zoneID))
 

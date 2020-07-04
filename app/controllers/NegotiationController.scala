@@ -12,7 +12,7 @@ import models.masterTransaction.{AssetFile, NegotiationFile, TradeActivity, Trad
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroLong
+import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -571,7 +571,7 @@ class NegotiationController @Inject()(
 
           def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-          def sendTransaction(buyerAddress: String, pegHash: String, price: MicroLong): Future[String] = {
+          def sendTransaction(buyerAddress: String, pegHash: String, price: MicroNumber): Future[String] = {
             transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
               entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = buyerAddress, bid = price, time = constants.Blockchain.NegotiationDefaultTime, pegHash = pegHash, gas = updateAssetTermsData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,

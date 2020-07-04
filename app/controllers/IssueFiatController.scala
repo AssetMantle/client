@@ -9,7 +9,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroLong
+import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -37,7 +37,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = new MicroLong(transactionAmount), gas = constants.FormField.GAS.minimumValue, password = ""))))
+    Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = new MicroNumber(transactionAmount), gas = constants.FormField.GAS.minimumValue, password = ""))))
   }
 
   def issueFiat: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -68,7 +68,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 } else throw new BaseException(constants.Response.UNAUTHORIZED)
               }
 
-              def create(traderID: String) = masterFiats.Service.create(traderID, issueFiatData.transactionID, issueFiatData.transactionAmount, new MicroLong(0))
+              def create(traderID: String) = masterFiats.Service.create(traderID, issueFiatData.transactionID, issueFiatData.transactionAmount, new MicroNumber(0))
 
               for {
                 toAddress <- toAddress

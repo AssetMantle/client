@@ -12,13 +12,13 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, username: String, coins: MicroLong = new MicroLong(0.0), publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, coins: MicroNumber = new MicroNumber(0.0), publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -40,11 +40,11 @@ class Accounts @Inject()(
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
-  case class AccountSerialized(address: String, username: String, coins: Long, publicKey: String, accountNumber: String, sequence: String, dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Account = Account(address = address, username = username, coins = new MicroLong(coins), publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(address: String, username: String, coins: String, publicKey: String, accountNumber: String, sequence: String, dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Account = Account(address = address, username = username, coins = new MicroNumber(BigInt(coins)), publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, coins = account.coins.toMicroLong, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, dirtyBit = account.dirtyBit, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, coins = account.coins.toMicroString, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, dirtyBit = account.dirtyBit, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
   private[models] val accountTable = TableQuery[AccountTable]
 
@@ -89,7 +89,7 @@ class Accounts @Inject()(
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
 
-  private def updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address: String, accountNumber: String, sequence: String, coins: MicroLong, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.accountNumber, x.sequence, x.coins, x.dirtyBit)).update((accountNumber, sequence, coins.toMicroLong, dirtyBit)).asTry).map {
+  private def updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address: String, accountNumber: String, sequence: String, coins: MicroNumber, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.accountNumber, x.sequence, x.coins, x.dirtyBit)).update((accountNumber, sequence, coins.toMicroString, dirtyBit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -104,7 +104,7 @@ class Accounts @Inject()(
     }
   }
 
-  private def getCoinsByAddress(address: String): Future[Long] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
+  private def getCoinsByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -129,7 +129,7 @@ class Accounts @Inject()(
 
     def username = column[String]("username")
 
-    def coins = column[Long]("coins")
+    def coins = column[String]("coins")
 
     def publicKey = column[String]("publicKey")
 
@@ -156,11 +156,11 @@ class Accounts @Inject()(
 
     def create(address: String, username: String, pubkey: String): Future[String] = add(Account(address = address, username = username, publicKey = pubkey, dirtyBit = false))
 
-    def refreshDirty(address: String, accountNumber: String, sequence: String, coins: MicroLong): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, coins, dirtyBit = false)
+    def refreshDirty(address: String, accountNumber: String, sequence: String, coins: MicroNumber): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, coins, dirtyBit = false)
 
     def get(address: String): Future[Account] = findByAddress(address).map(_.deserialize)
 
-    def getCoins(address: String): Future[MicroLong] = getCoinsByAddress(address).map(new MicroLong(_))
+    def getCoins(address: String): Future[MicroNumber] = getCoinsByAddress(address).map(new MicroNumber(_))
 
     def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
 

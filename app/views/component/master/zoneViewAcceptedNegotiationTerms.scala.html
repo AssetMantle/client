@@ -3,7 +3,6 @@
 @import models.master.{Asset, Negotiation}
 @import models.master.Trader
 @import models.master.Organization
-@import utilities.NumericOperation.roundOff
 
 @(traderList: Seq[Trader], organizationList: Seq[Organization], negotiation: Negotiation, asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 

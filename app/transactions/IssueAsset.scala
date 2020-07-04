@@ -8,7 +8,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,21 +31,21 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseReq(from: String, chain_id: String = chainID, gas: MicroLong)
+  case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
 
   object BaseReq {
 
-    def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroLong(gas.toLong))
+    def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroNumber(BigInt(gas)))
 
     def unapply(arg: BaseReq): Option[(String, String, String)] = Option((arg.from, arg.chain_id, arg.gas.toMicroString))
 
   }
 
-  case class Request(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: MicroLong, quantityUnit: String, assetQuantity: MicroLong, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequest
+  case class Request(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: MicroNumber, quantityUnit: String, assetQuantity: MicroNumber, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequest
 
   object Request {
 
-    def apply(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean): Request = new Request(base_req, to, documentHash, assetType, new MicroLong(assetPrice.toLong), quantityUnit, new MicroLong(assetQuantity.toLong), takerAddress, mode, password, moderated)
+    def apply(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean): Request = new Request(base_req, to, documentHash, assetType, new MicroNumber(BigInt(assetPrice)), quantityUnit, new MicroNumber(BigInt(assetQuantity)), takerAddress, mode, password, moderated)
 
     def unapply(arg: Request): Option[(BaseReq, String, String, String, String, String, String, String, String, String, Boolean)] = Option(arg.base_req, arg.to, arg.documentHash, arg.assetType, arg.assetPrice.toMicroString, arg.quantityUnit, arg.assetQuantity.toMicroString, arg.takerAddress, arg.mode, arg.password, arg.moderated)
   }

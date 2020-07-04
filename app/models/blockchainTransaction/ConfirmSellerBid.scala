@@ -14,13 +14,13 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmSellerBid(from: String, to: String, bid: MicroLong, time: Int, pegHash: String, sellerContractHash: String, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmSellerBid] with Logged {
+case class ConfirmSellerBid(from: String, to: String, bid: MicroNumber, time: Int, pegHash: String, sellerContractHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmSellerBid] with Logged {
   def mutateTicketID(newTicketID: String): ConfirmSellerBid = ConfirmSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -32,17 +32,16 @@ class ConfirmSellerBids @Inject()(
                                    blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
                                    blockchainNegotiations: blockchain.Negotiations,
                                    utilitiesNotification: utilities.Notification,
-                                   masterAccounts: master.Accounts,
                                    blockchainAccounts: blockchain.Accounts,
                                    masterNegotiations: master.Negotiations,
                                    masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  case class ConfirmSellerBidSerialized(from: String, to: String, bid: Long, time: Int, pegHash: String, sellerContractHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: ConfirmSellerBid = ConfirmSellerBid(from = from, to = to, bid = new MicroLong(bid), time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ConfirmSellerBidSerialized(from: String, to: String, bid: String, time: Int, pegHash: String, sellerContractHash: String, gas: String, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: ConfirmSellerBid = ConfirmSellerBid(from = from, to = to, bid = new MicroNumber(BigInt(bid)), time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(confirmSellerBid: ConfirmSellerBid): ConfirmSellerBidSerialized = ConfirmSellerBidSerialized(from = confirmSellerBid.from, to = confirmSellerBid.to, bid = confirmSellerBid.bid.value, time = confirmSellerBid.time, pegHash = confirmSellerBid.pegHash, sellerContractHash = confirmSellerBid.sellerContractHash, gas = confirmSellerBid.gas.toMicroLong, status = confirmSellerBid.status, txHash = confirmSellerBid.txHash, ticketID = confirmSellerBid.ticketID, mode = confirmSellerBid.mode, code = confirmSellerBid.code, createdBy = confirmSellerBid.createdBy, createdOn = confirmSellerBid.createdOn, createdOnTimeZone = confirmSellerBid.createdOnTimeZone, updatedBy = confirmSellerBid.updatedBy, updatedOn = confirmSellerBid.updatedOn, updatedOnTimeZone = confirmSellerBid.updatedOnTimeZone)
+  def serialize(confirmSellerBid: ConfirmSellerBid): ConfirmSellerBidSerialized = ConfirmSellerBidSerialized(from = confirmSellerBid.from, to = confirmSellerBid.to, bid = confirmSellerBid.bid.toMicroString, time = confirmSellerBid.time, pegHash = confirmSellerBid.pegHash, sellerContractHash = confirmSellerBid.sellerContractHash, gas = confirmSellerBid.gas.toMicroString, status = confirmSellerBid.status, txHash = confirmSellerBid.txHash, ticketID = confirmSellerBid.ticketID, mode = confirmSellerBid.mode, code = confirmSellerBid.code, createdBy = confirmSellerBid.createdBy, createdOn = confirmSellerBid.createdOn, createdOnTimeZone = confirmSellerBid.createdOnTimeZone, updatedBy = confirmSellerBid.updatedBy, updatedOn = confirmSellerBid.updatedOn, updatedOnTimeZone = confirmSellerBid.updatedOnTimeZone)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_SELLER_BID
 
@@ -144,7 +143,7 @@ class ConfirmSellerBids @Inject()(
 
     def to = column[String]("to")
 
-    def bid = column[Long]("bid")
+    def bid = column[String]("bid")
 
     def time = column[Int]("time")
 
@@ -152,7 +151,7 @@ class ConfirmSellerBids @Inject()(
 
     def sellerContractHash = column[String]("sellerContractHash")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 

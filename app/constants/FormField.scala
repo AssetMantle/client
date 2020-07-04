@@ -6,7 +6,7 @@ import play.api.data.Forms.{boolean, date, number, of, text, longNumber}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
-import utilities.MicroLong
+import utilities.MicroNumber
 import scala.util.matching.Regex
 import utilities.NumericOperation.checkPrecision
 
@@ -199,14 +199,14 @@ object FormField {
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
 
-  //MicroLongFormField
-  val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
-  val TRANSACTION_AMOUNT = new MicroLongFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
-  val SEND_AMOUNT = new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
-  val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
-  val ASSET_QUANTITY = new MicroLongFormField("ASSET_QUANTITY", 1, Double.MaxValue)
-  val GAS = new MicroLongFormField("GAS", 1, 10)
-  val AMOUNT = new MicroLongFormField("AMOUNT", 1, Double.MaxValue)
+  //MicroNumberFormField
+  val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
+  val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
+  val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", 0, Double.MaxValue)
+  val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
+  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", 1, Double.MaxValue)
+  val GAS = new MicroNumberFormField("GAS", 1, 10)
+  val AMOUNT = new MicroNumberFormField("AMOUNT", 1, Double.MaxValue)
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -248,9 +248,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
+  class MicroNumberFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroLong](x => new MicroLong(x), y => y.toDouble)
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
 }

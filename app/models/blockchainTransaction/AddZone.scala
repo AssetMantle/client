@@ -13,13 +13,13 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddZone(from: String, to: String, zoneID: String, gas: MicroLong, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AddZone] with Logged {
+case class AddZone(from: String, to: String, zoneID: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AddZone] with Logged {
   def mutateTicketID(newTicketID: String): AddZone = AddZone(from = from, to = to, zoneID = zoneID, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -48,11 +48,11 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  case class AddZoneSerialized(from: String, to: String, zoneID: String, gas: Long, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AddZone = AddZone(from = from, to = to, zoneID = zoneID, gas = new MicroLong(gas), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  case class AddZoneSerialized(from: String, to: String, zoneID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: AddZone = AddZone(from = from, to = to, zoneID = zoneID, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(addZone: AddZone): AddZoneSerialized = AddZoneSerialized(from = addZone.from, to = addZone.to, zoneID = addZone.zoneID, gas = addZone.gas.toMicroLong, status = addZone.status, txHash = addZone.txHash, ticketID = addZone.ticketID, mode = addZone.mode, code = addZone.code, createdBy = addZone.createdBy, createdOn = addZone.createdOn, createdOnTimeZone = addZone.createdOnTimeZone, updatedBy = addZone.updatedBy, updatedOn = addZone.updatedOn, updatedOnTimeZone = addZone.updatedOnTimeZone)
+  def serialize(addZone: AddZone): AddZoneSerialized = AddZoneSerialized(from = addZone.from, to = addZone.to, zoneID = addZone.zoneID, gas = addZone.gas.toMicroString, status = addZone.status, txHash = addZone.txHash, ticketID = addZone.ticketID, mode = addZone.mode, code = addZone.code, createdBy = addZone.createdBy, createdOn = addZone.createdOn, createdOnTimeZone = addZone.createdOnTimeZone, updatedBy = addZone.updatedBy, updatedOn = addZone.updatedOn, updatedOnTimeZone = addZone.updatedOnTimeZone)
 
   private def add(addZone: AddZone): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += serialize(addZone)).asTry).map {
     case Success(result) => result
@@ -134,7 +134,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
     def zoneID = column[String]("zoneID")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 

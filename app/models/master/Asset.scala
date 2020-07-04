@@ -12,20 +12,20 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: MicroLong, quantityUnit: String, price: MicroLong, moderated: Boolean, takerID: Option[String] = None, otherDetails: AssetOtherDetails, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Asset(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: MicroNumber, quantityUnit: String, price: MicroNumber, moderated: Boolean, takerID: Option[String] = None, otherDetails: AssetOtherDetails, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  def serialize(asset: Asset): AssetSerializable = AssetSerializable(id = asset.id, ownerID = asset.ownerID, pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity.value, quantityUnit = asset.quantityUnit, price = asset.price.value, moderated = asset.moderated, takerID = asset.takerID, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
+  def serialize(asset: Asset): AssetSerializable = AssetSerializable(id = asset.id, ownerID = asset.ownerID, pegHash = asset.pegHash, assetType = asset.assetType, description = asset.description, documentHash = asset.documentHash, quantity = asset.quantity.toMicroString, quantityUnit = asset.quantityUnit, price = asset.price.toMicroString, moderated = asset.moderated, takerID = asset.takerID, otherDetails = Json.toJson(asset.otherDetails).toString(), status = asset.status, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
 
-  case class AssetSerializable(id: String, ownerID: String, pegHash: Option[String], assetType: String, description: String, documentHash: String, quantity: Long, quantityUnit: String, price: Long, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroLong(quantity), quantityUnit = quantityUnit, price = new MicroLong(price), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AssetSerializable(id: String, ownerID: String, pegHash: Option[String], assetType: String, description: String, documentHash: String, quantity: String, quantityUnit: String, price: String, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Asset = Asset(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroNumber(BigInt(quantity)), quantityUnit = quantityUnit, price = new MicroNumber(BigInt(price)), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -124,7 +124,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def generateDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: MicroLong, quantityUnit: String, price: MicroLong, moderated: Boolean): String = utilities.String.sha256Sum(Seq(assetID, ownerID, assetType, description, quantity.toMicroString, quantityUnit, price.toMicroString, moderated.toString).mkString(""))
+  private def generateDocumentHash(assetID: String, ownerID: String, assetType: String, description: String, quantity: MicroNumber, quantityUnit: String, price: MicroNumber, moderated: Boolean): String = utilities.String.sha256Sum(Seq(assetID, ownerID, assetType, description, quantity.toMicroString, quantityUnit, price.toMicroString, moderated.toString).mkString(""))
 
   private[models] class AssetTable(tag: Tag) extends Table[AssetSerializable](tag, "Asset") {
 
@@ -142,11 +142,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def documentHash = column[String]("documentHash")
 
-    def quantity = column[Long]("quantity")
+    def quantity = column[String]("quantity")
 
     def quantityUnit = column[String]("quantityUnit")
 
-    def price = column[Long]("price")
+    def price = column[String]("price")
 
     def moderated = column[Boolean]("moderated")
 
@@ -172,13 +172,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def addModerated(ownerID: String, assetType: String, description: String, quantity: MicroLong, quantityUnit: String, price: MicroLong, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
+    def addModerated(ownerID: String, assetType: String, description: String, quantity: MicroNumber, quantityUnit: String, price: MicroNumber, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
       val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true)
       add(serialize(Asset(id = id, ownerID = ownerID, assetType = assetType, description = description, documentHash = documentHash, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = true, otherDetails = AssetOtherDetails(shippingDetails = ShippingDetails(shippingPeriod = shippingPeriod, portOfLoading = portOfLoading, portOfDischarge = portOfDischarge)), status = constants.Status.Asset.REQUESTED_TO_ZONE)))
     }
 
-    def addUnmoderated(ownerID: String, assetType: String, description: String, quantity: MicroLong, quantityUnit: String, price: MicroLong, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
+    def addUnmoderated(ownerID: String, assetType: String, description: String, quantity: MicroNumber, quantityUnit: String, price: MicroNumber, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String): Future[String] = {
       val id = utilities.IDGenerator.requestID()
       val documentHash = generateDocumentHash(assetID = id, ownerID = ownerID, assetType = assetType, description = description, quantity = quantity, quantityUnit = quantityUnit, price = price, moderated = false)
       for {

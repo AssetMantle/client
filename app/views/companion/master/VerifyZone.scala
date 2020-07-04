@@ -2,7 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object VerifyZone {
 
@@ -14,6 +14,6 @@ object VerifyZone {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(zoneID: String, gas: MicroLong, password: String)
+  case class Data(zoneID: String, gas: MicroNumber, password: String)
 
 }
