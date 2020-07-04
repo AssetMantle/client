@@ -4,9 +4,10 @@ import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json.{Json, OFormat}
 
-import scala.math.{Integral, Ordering}
+import scala.language.implicitConversions
+import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
 
-class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
+class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConversions with Ordered[MicroNumber] {
 
   def this(value: String) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
 
@@ -38,21 +39,23 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   override def toString: String = (BigDecimal(this.value) / MicroNumber.factor).toString
 
-  def toInt: Int = this.toMicroInt / MicroNumber.factor
+  def intValue: Int = this.toMicroInt / MicroNumber.factor
 
-  def toLong: Long = this.toMicroLong / MicroNumber.factor
+  def longValue: Long = this.toMicroLong / MicroNumber.factor
 
-  def toDouble: Double = this.toMicroDouble / MicroNumber.factor
+  def floatValue: Float = this.toMicroFloat / MicroNumber.factor
 
-  def toFloat: Float = this.toMicroFloat / MicroNumber.factor
+  def doubleValue: Double = this.toMicroDouble / MicroNumber.factor
 
-  def toChar: Char = (this.value / MicroNumber.factor).toChar
+  override def byteValue: Byte = intValue().toByte
 
-  def toByte: Byte = (this.value / MicroNumber.factor).toByte
-
-  def toShort: Short = (this.value / MicroNumber.factor).toShort
+  override def shortValue: Short = intValue().toShort
 
   def toByteArray: Array[Byte] = (this.value / MicroNumber.factor).toByteArray
+
+  def underlying: AnyRef = value
+
+  def isWhole: Boolean = this.value % MicroNumber.factor == 0
 
   def toRoundedUpString(precision: Int = 2): String = utilities.NumericOperation.roundUp(this.toDouble, precision).toString
 
@@ -79,10 +82,6 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def >>(n: Int): MicroNumber = new MicroNumber(this.value >> n)
 
-  def ==(that: MicroNumber): Boolean = this.value == that.value
-
-  def !=(that: MicroNumber): Boolean = this.value != that.value
-
   def &(that: MicroNumber): MicroNumber = new MicroNumber(this.value & that.value)
 
   def |(that: MicroNumber): MicroNumber = new MicroNumber(this.value | that.value)
@@ -91,8 +90,7 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def &~(that: MicroNumber): MicroNumber = new MicroNumber(this.value &~ that.value)
 
-  //Throws exception if MicroNumber has non-zero decimal places, example: 2.3, "1.7", works with cases: 23, 17.0, "23"
-  def gcd(that: MicroNumber): MicroNumber = if ((this.value % MicroNumber.factor == 0) && (that.value % MicroNumber.factor == 0)) new MicroNumber(this.value.gcd(that.value)) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
+  def gcd(that: MicroNumber): MicroNumber = if (this.isWhole && that.isWhole) new MicroNumber(this.value.gcd(that.value)) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
 
   def mod(that: MicroNumber): MicroNumber = new MicroNumber(this.value.mod(that.value))
 
@@ -114,23 +112,35 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def unary_~ : MicroNumber = new MicroNumber(this.value.unary_~)
 
-  override def equals(that: Any): Boolean = this.value.equals(that)
+  override def equals(that: Any): Boolean = that match {
+    case that: MicroNumber => this equals that
+    case that: BigInt => this.value.equals(that)
+    case that: Int => isValidInt && this.toInt == that
+    case that: Long => isValidLong && this.toLong == that
+    case that: Double => isValidDouble && this.toDouble == that
+    case that: Float => isValidFloat && this.toFloat == that
+    case that: Char => isValidChar && (toInt == that.toInt)
+    case that: Byte => isValidByte && (toByte == that)
+    case that: Short => isValidShort && (toShort == that)
+    case that: String => this.toString == that
+    case _ => false
+  }
 
-  def isValidByte: Boolean = this.value.isValidByte
+  def equals(that: MicroNumber): Boolean = this.value.equals(that.value)
 
-  def isValidShort: Boolean = this.value.isValidShort
+  override def isValidByte: Boolean = this.value.isValidByte
 
-  def isValidChar: Boolean = this.value.isValidChar
+  override def isValidShort: Boolean = this.value.isValidShort
 
-  def isValidInt: Boolean = this.value.isValidInt
+  override def isValidChar: Boolean = this.value.isValidChar
+
+  override def isValidInt: Boolean = this.value.isValidInt
 
   def isValidLong: Boolean = this.value.isValidLong
 
   def isValidFloat: Boolean = this.value.isValidFloat
 
   def isValidDouble: Boolean = this.value.isValidDouble
-
-  def equals(that: MicroNumber): Boolean = this.value.equals(that.value)
 
   def compare(that: MicroNumber): Int = this.value.compare(that.value)
 
@@ -148,8 +158,7 @@ class MicroNumber(val value: BigInt) extends Ordered[MicroNumber] {
 
   def bitCount: Int = this.value.bitCount
 
-  //Throws exception if MicroNumber has non-zero decimal places, example: 2.3, "1.7", works with cases: 23, 17.0, "23"
-  def isProbablePrime(certainty: Int): Boolean = if (this.value % MicroNumber.factor == 0) BigInt(this.toLong).isProbablePrime(certainty) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
+  def isProbablePrime(certainty: Int): Boolean = if (this.isWhole) BigInt(this.toLong).isProbablePrime(certainty) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
 
   def +(that: String): String = this.toString + that
 }
@@ -174,21 +183,27 @@ object MicroNumber {
 
   def apply(f: Float): MicroNumber = new MicroNumber(f)
 
+  def apply(x: Array[Byte]): MicroNumber = new MicroNumber(BigInt(x))
+
+  def apply(signum: Int, magnitude: Array[Byte]): MicroNumber = new MicroNumber(BigInt(signum, magnitude))
+
+  def apply(bitlength: Int, certainty: Int, rnd: scala.util.Random): MicroNumber = new MicroNumber(BigInt(bitlength, certainty, rnd))
+
+  def apply(numbits: Int, rnd: scala.util.Random): MicroNumber = new MicroNumber(BigInt(numbits, rnd))
+
   def unapply(arg: MicroNumber): Option[String] = Option(arg.toMicroString)
 
   implicit val reads: OFormat[MicroNumber] = Json.format[MicroNumber]
 
-  implicit def bigIntToMicroNumber(bi: BigInt): MicroNumber = new MicroNumber(bi)
+  implicit def stringToMicroNumber(s: String): MicroNumber = apply(s)
 
-  implicit def stringToMicroNumber(s: String): MicroNumber = new MicroNumber(s)
+  implicit def intToMicroNumber(i: Int): MicroNumber = apply(i)
 
-  implicit def intToMicroNumber(i: Int): MicroNumber = new MicroNumber(i)
+  implicit def longToMicroNumber(l: Long): MicroNumber = apply(l)
 
-  implicit def intToMicroNumber(l: Long): MicroNumber = new MicroNumber(l)
+  implicit def doubleToMicroNumber(d: Double): MicroNumber = apply(d)
 
-  implicit def doubleToMicroNumber(d: Double): MicroNumber = new MicroNumber(d)
-
-  implicit def floatToMicroNumber(f: Float): MicroNumber = new MicroNumber(f)
+  implicit def floatToMicroNumber(f: Float): MicroNumber = apply(f)
 
   trait MicroNumberIsIntegral extends Integral[MicroNumber] {
     def plus(x: MicroNumber, y: MicroNumber): MicroNumber = x + y
@@ -223,4 +238,3 @@ object MicroNumber {
   implicit object MicroNumberIsIntegral extends MicroNumberIsIntegral with Ordering[MicroNumber]
 
 }
-
