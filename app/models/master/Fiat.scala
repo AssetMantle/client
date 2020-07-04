@@ -130,7 +130,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def insertOrUpdate(ownerID: String, transactionID: String, transactionAmount: MicroNumber, amountRedeemed: MicroNumber): Future[Int] = upsert(serialize(Fiat(ownerID, transactionID, transactionAmount, amountRedeemed, status = Some(true))))
 
-    def updateAllTransactionAmountsToZero(ownerID: String): Future[Int] = updateTransactionAmountByOwnerID(ownerID, 0.0)
+    def updateAllTransactionAmountsToZero(ownerID: String): Future[Int] = updateTransactionAmountByOwnerID(ownerID, 0)
 
     def getFiatPegWallet(ownerID: String): Future[Seq[Fiat]] = getFiatsByOwnerIDAndStatus(ownerID, Option(true)).map(_.map(_.deserialize))
 

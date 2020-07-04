@@ -2114,7 +2114,7 @@ class ComponentViewController @Inject()(
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(fiatsInOrder, 0.0, negotiation.price - fiatsInOrder))
+      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(fiatsInOrder, 0, negotiation.price - fiatsInOrder))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -2141,7 +2141,7 @@ class ComponentViewController @Inject()(
         zoneID <- zoneID
         traderIDList <- getTraderIDList(zoneID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
-      } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0.0, negotiationHistory.price - fiatsInOrderHistory))
+      } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -2203,7 +2203,7 @@ class ComponentViewController @Inject()(
         organizationID <- organizationID
         traderIDList <- getTraderIDList(organizationID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
-      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0.0, negotiation.price - fiatsInOrder))
+      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -2225,7 +2225,7 @@ class ComponentViewController @Inject()(
         organizationID <- organizationID
         traderIDList <- getTraderIDList(organizationID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
-      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0.0, negotiationHistory.price - fiatsInOrderHistory))
+      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -2265,7 +2265,7 @@ class ComponentViewController @Inject()(
         fiatsInOrder <- fiatsInOrder
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0.0, amountPending = (negotiation.price - fiatsInOrder), traderID = traderID, moderated = asset.moderated))
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), traderID = traderID, moderated = asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
@@ -2292,7 +2292,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderHistory <- fiatsInOrderHistory
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0.0, negotiation.price - fiatsInOrderHistory, traderID, asset.moderated))
+      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
