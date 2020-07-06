@@ -218,7 +218,7 @@ class Fiats @Inject()(
                   _ <- deleteFiats
                   _ <- updateFiats
                   _ <- insertFiats
-                } yield utilities.NumericOperation.roundOff(updatedFiatPegWallet.map(_.transactionAmount.toDouble).sum).toString
+                } yield updatedFiatPegWallet.map(_.transactionAmount).sum.toRoundedUpString()
               case None =>
                 for {
                   _ <- Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
