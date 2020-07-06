@@ -136,7 +136,7 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
       }
     }
 
-    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64))
+    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64).updateStatus(None))
 
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64

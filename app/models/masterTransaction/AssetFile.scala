@@ -23,6 +23,8 @@ case class AssetFile(id: String, documentType: String, fileName: String, file: O
 
   def updateFile(newFile: Option[Array[Byte]]): AssetFile = copy(file = newFile)
 
+  def updateStatus(status: Option[Boolean]): AssetFile = copy(status = status)
+
 }
 
 @Singleton
