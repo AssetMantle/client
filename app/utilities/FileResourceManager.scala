@@ -85,7 +85,7 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
       case constants.File.Negotiation.CONTRACT => uploadNegotiationContractPath
       case constants.File.Negotiation.INSURANCE => uploadNegotiationInsurancePath
       case constants.File.Negotiation.OTHERS => uploadNegotiationOthersPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+      case _ => uploadNegotiationOthersPath
     }
   }
 
