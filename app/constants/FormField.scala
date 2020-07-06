@@ -203,7 +203,7 @@ object FormField {
   val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
   val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
   val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(1), new MicroNumber(Double.MaxValue))
+  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
   val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
   val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
   val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(1), new MicroNumber(Double.MaxValue))
