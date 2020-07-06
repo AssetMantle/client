@@ -587,7 +587,7 @@ class NegotiationController @Inject()(
             if (traderID == negotiation.sellerTraderID) {
               if (validateUsernamePassword) {
                 val updateDescription = if (updateAssetTermsData.description != negotiation.assetDescription) masterNegotiations.Service.updateAssetDescription(id = updateAssetTermsData.id, assetDescription = updateAssetTermsData.description, if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedAssetDescription) else Future(0)
-                val updatePrice = if ((updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity).roundedOff() != negotiation.price.roundedOff()) {
+                val updatePrice = if (updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity != negotiation.price) {
                   for {
                     pegHash <- getPegHash(negotiation.assetID)
                     buyerAddress <- getAddress(buyerAccountID)
