@@ -19,6 +19,8 @@ case class AccountKYC(id: String, documentType: String, fileName: String, file: 
 
   def updateFile(newFile: Option[Array[Byte]]): AccountKYC = copy(file = newFile)
 
+  def updateStatus(status: Option[Boolean]): AccountKYC = copy(status = status)
+
 }
 
 @Singleton

@@ -1502,6 +1502,11 @@ class ComponentViewController @Inject()(
                 for {
                   negotiationFile <- negotiationFile
                 } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, negotiationFile))
+              case _ =>
+                val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
+                for {
+                  negotiationFile <- negotiationFile
+                } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, negotiationFile))
             }
           case None =>
             val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)

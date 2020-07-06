@@ -19,6 +19,8 @@ case class OrganizationKYC(id: String, documentType: String, fileName: String, f
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = copy(file = newFile)
 
+  def updateStatus(status: Option[Boolean]): OrganizationKYC = copy(status = status)
+
 }
 
 @Singleton

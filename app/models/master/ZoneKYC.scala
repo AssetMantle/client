@@ -19,6 +19,8 @@ case class ZoneKYC(id: String, documentType: String, fileName: String, file: Opt
 
   def updateFile(newFile: Option[Array[Byte]]): ZoneKYC = copy(file = newFile)
 
+  def updateStatus(status: Option[Boolean]): ZoneKYC = copy(status = status)
+
 }
 
 @Singleton
