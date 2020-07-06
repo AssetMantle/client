@@ -206,7 +206,7 @@ object FormField {
   val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
   val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
   val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
-  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(1), new MicroNumber(Double.MaxValue))
+  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(Double.MaxValue))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
