@@ -250,7 +250,7 @@ object FormField {
 
   class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](roundOff(maximumValue.toDouble, precision)), Constraints.min[Double](roundOff(minimumValue.toDouble, precision))).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
 }
