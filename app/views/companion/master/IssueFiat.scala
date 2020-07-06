@@ -2,7 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object IssueFiat {
   val form = Form(
@@ -16,6 +16,6 @@ object IssueFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, transactionID: String, transactionAmount: MicroLong, gas: Long, password: String)
+  case class Data(requestID: String, accountID: String, transactionID: String, transactionAmount: MicroNumber, gas: MicroNumber, password: String)
 
 }

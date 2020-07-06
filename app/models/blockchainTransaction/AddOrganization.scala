@@ -13,12 +13,13 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AddOrganization] with Logged {
+case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AddOrganization] with Logged {
   def mutateTicketID(newTicketID: String): AddOrganization = AddOrganization(from = from, to = to, organizationID = organizationID, zoneID = zoneID, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -47,14 +48,20 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(addOrganization: AddOrganization): Future[String] = db.run((addOrganizationTable returning addOrganizationTable.map(_.ticketID) += addOrganization).asTry).map {
+  case class AddOrganizationSerialized(from: String, to: String, organizationID: String, zoneID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: AddOrganization = AddOrganization(from = from, to = to, organizationID = organizationID, zoneID = zoneID, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(addOrganization: AddOrganization): AddOrganizationSerialized = AddOrganizationSerialized(from = addOrganization.from, to = addOrganization.to, organizationID = addOrganization.organizationID, zoneID = addOrganization.zoneID, gas = addOrganization.gas.toMicroString, status = addOrganization.status, txHash = addOrganization.txHash, ticketID = addOrganization.ticketID, mode = addOrganization.mode, code = addOrganization.code, createdBy = addOrganization.createdBy, createdOn = addOrganization.createdOn, createdOnTimeZone = addOrganization.createdOnTimeZone, updatedBy = addOrganization.updatedBy, updatedOn = addOrganization.updatedOn, updatedOnTimeZone = addOrganization.updatedOnTimeZone)
+
+  private def add(addOrganization: AddOrganization): Future[String] = db.run((addOrganizationTable returning addOrganizationTable.map(_.ticketID) += serialize(addOrganization)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[AddOrganization] = db.run(addOrganizationTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[AddOrganizationSerialized] = db.run(addOrganizationTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -117,9 +124,9 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
     }
   }
 
-  private[models] class AddOrganizationTable(tag: Tag) extends Table[AddOrganization](tag, "AddOrganization") {
+  private[models] class AddOrganizationTable(tag: Tag) extends Table[AddOrganizationSerialized](tag, "AddOrganization") {
 
-    def * = (from, to, organizationID, zoneID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AddOrganization.tupled, AddOrganization.unapply)
+    def * = (from, to, organizationID, zoneID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AddOrganizationSerialized.tupled, AddOrganizationSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -129,7 +136,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
     def zoneID = column[String]("zoneID")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 
@@ -166,7 +173,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[AddOrganization] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[AddOrganization] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 

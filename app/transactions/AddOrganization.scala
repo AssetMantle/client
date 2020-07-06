@@ -8,6 +8,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,13 +29,21 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private val url = ip + ":" + port + "/" + path
 
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+
+  case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
+
+  object BaseReq {
+
+    def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroNumber(BigInt(gas)))
+
+    def unapply(arg: BaseReq): Option[(String, String, String)] = Option((arg.from, arg.chain_id, arg.gas.toMicroString))
+
+  }
+
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
-
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
-
-  case class BaseReq(from: String, chain_id: String = chainID, gas: String)
 
   case class Request(base_req: BaseReq, to: String, organizationID: String, zoneID: String, password: String, mode: String) extends BaseRequest
 

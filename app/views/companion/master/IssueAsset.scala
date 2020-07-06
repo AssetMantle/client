@@ -2,7 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object IssueAsset {
   val form = Form(
@@ -21,6 +21,6 @@ object IssueAsset {
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.issueAssetConstraint)
   )
 
-  case class Data(assetType: String, description: String, quantity: MicroLong, quantityUnit: String, pricePerUnit: MicroLong, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, moderated: Boolean, gas: Option[Long], password: Option[String])
+  case class Data(assetType: String, description: String, quantity: MicroNumber, quantityUnit: String, pricePerUnit: MicroNumber, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String, moderated: Boolean, gas: Option[MicroNumber], password: Option[String])
 
 }

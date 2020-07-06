@@ -17,13 +17,13 @@ import play.api.{Configuration, Logger}
 import queries.GetOrder
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendAsset(from: String, to: String, pegHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendAsset] with Logged {
+case class SendAsset(from: String, to: String, pegHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendAsset] with Logged {
   def mutateTicketID(newTicketID: String): SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -35,8 +35,6 @@ class SendAssets @Inject()(
                             blockchainOrders: blockchain.Orders,
                             blockchainNegotiations: blockchain.Negotiations,
                             blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks,
-                            getOrder: GetOrder,
-                            masterAccounts: master.Accounts,
                             masterAssets: master.Assets,
                             masterNegotiations: master.Negotiations,
                             masterOrders: master.Orders,
@@ -68,14 +66,20 @@ class SendAssets @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(sendAsset: SendAsset): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += sendAsset).asTry).map {
+  case class SendAssetSerialized(from: String, to: String, pegHash: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(sendAsset: SendAsset): SendAssetSerialized = SendAssetSerialized(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas = sendAsset.gas.toMicroString, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code, createdBy = sendAsset.createdBy, createdOn = sendAsset.createdOn, createdOnTimeZone = sendAsset.createdOnTimeZone, updatedBy = sendAsset.updatedBy, updatedOn = sendAsset.updatedOn, updatedOnTimeZone = sendAsset.updatedOnTimeZone)
+
+  private def add(sendAsset: SendAsset): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += serialize(sendAsset)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[SendAsset] = db.run(sendAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[SendAssetSerialized] = db.run(sendAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -138,9 +142,9 @@ class SendAssets @Inject()(
     }
   }
 
-  private[models] class SendAssetTable(tag: Tag) extends Table[SendAsset](tag, "SendAsset") {
+  private[models] class SendAssetTable(tag: Tag) extends Table[SendAssetSerialized](tag, "SendAsset") {
 
-    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendAsset.tupled, SendAsset.unapply)
+    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SendAssetSerialized.tupled, SendAssetSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -148,7 +152,7 @@ class SendAssets @Inject()(
 
     def pegHash = column[String]("pegHash")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 
@@ -185,7 +189,7 @@ class SendAssets @Inject()(
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[SendAsset] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[SendAsset] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -226,8 +230,8 @@ class SendAssets @Inject()(
       } else {
         val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiation.id)
 
-        def status(fiatsInOrder: MicroLong): String = {
-          if (fiatsInOrder.value >= negotiation.price.value) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
+        def status(fiatsInOrder: MicroNumber): String = {
+          if (fiatsInOrder >= negotiation.price) constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING
           else constants.Status.Order.ASSET_SENT_FIAT_PENDING
         }
 

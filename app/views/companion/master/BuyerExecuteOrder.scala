@@ -2,6 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroNumber
 
 object BuyerExecuteOrder {
   val form = Form(
@@ -13,6 +14,6 @@ object BuyerExecuteOrder {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(orderID: String, fiatProof: String, gas: Long, password: String)
+  case class Data(orderID: String, fiatProof: String, gas: MicroNumber, password: String)
 
 }

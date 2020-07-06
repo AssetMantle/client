@@ -1,13 +1,13 @@
 package models.Trait
 
 import java.sql.Timestamp
-import utilities.MicroLong
+import utilities.MicroNumber
 
 trait ReceiveFiat {
   val id: String
   val traderID: String
   val orderID: String
-  val amount: MicroLong
+  val amount: MicroNumber
   val status: String
   val createdOn: Option[Timestamp]
   val createdBy: Option[String]

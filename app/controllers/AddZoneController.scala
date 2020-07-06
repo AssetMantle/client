@@ -341,9 +341,9 @@ class AddZoneController @Inject()(
               def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
               def sendCoinTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount = constants.Blockchain.DefaultZoneFaucetTokenAmount, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount = constants.Blockchain.DefaultZoneFaucetAmount, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetTokenAmount.toString)), password = verifyZoneData.password, mode = transactionMode),
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetAmount)), password = verifyZoneData.password, mode = transactionMode),
                 action = transactionsSendCoin.Service.post,
                 onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                 onFailure = blockchainTransactionSendCoins.Utility.onFailure,
@@ -353,7 +353,7 @@ class AddZoneController @Inject()(
               def addZoneTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
                 entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
-                request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+                request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
                 action = transactionsAddZone.Service.post,
                 onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
                 onFailure = blockchainTransactionAddZones.Utility.onFailure,
@@ -573,7 +573,7 @@ class AddZoneController @Inject()(
         Future(BadRequest(views.html.component.blockchain.addZone(formWithErrors)))
       },
       addZoneData => {
-        val postRequest = transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
+        val postRequest = transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED)))

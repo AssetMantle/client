@@ -38,7 +38,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class TradeActivitySerializable(id: String, negotiationID: String, tradeActivityTemplateJson: String, read: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: TradeActivity = TradeActivity(id = id, negotiationID = negotiationID, tradeActivityTemplate = utilities.JSON.convertJsonStringToObject[TradeActivityTemplate](tradeActivityTemplateJson), read = read, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(tradeActivity: TradeActivity): TradeActivitySerializable = TradeActivitySerializable(id = tradeActivity.id, negotiationID = tradeActivity.negotiationID, tradeActivityTemplateJson = Json.toJson(tradeActivity.tradeActivityTemplate).toString, read = tradeActivity.read, createdBy = tradeActivity.createdBy, createdOn = tradeActivity.createdOn, createdOnTimeZone = tradeActivity.createdOnTimeZone, updatedBy = tradeActivity.updatedBy, updatedOn = tradeActivity.updatedOn, updatedOnTimeZone = tradeActivity.updatedOnTimeZone)
@@ -91,7 +91,7 @@ class TradeActivities @Inject()(protected val databaseConfigProvider: DatabaseCo
   object Service {
     def create(negotiationID: String, tradeActivity: constants.TradeActivity, parameters: String*): Future[String] = add(TradeActivity(id = utilities.IDGenerator.hexadecimal, negotiationID = negotiationID, tradeActivityTemplate = TradeActivityTemplate(template = tradeActivity.template, parameters = parameters)))
 
-    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize()))
+    def getAllTradeActivities(negotiationID: String, pageNumber: Int): Future[Seq[TradeActivity]] = findAllByNegotiationID(negotiationID = negotiationID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedTradeActivities => serializedTradeActivities.map(_.deserialize))
   }
 
 }

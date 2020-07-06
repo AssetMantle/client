@@ -27,7 +27,7 @@
     }
     @commonInputText(addInvoiceForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
     @commonInputText(addInvoiceForm, constants.FormField.INVOICE_NUMBER)
-    @commonInputDouble(addInvoiceForm, constants.FormField.INVOICE_AMOUNT)
+    @commonInputMicroNumber(addInvoiceForm, constants.FormField.INVOICE_AMOUNT)
     @commonInputDate(addInvoiceForm, constants.FormField.INVOICE_DATE)
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${negotiationID}'")
 }

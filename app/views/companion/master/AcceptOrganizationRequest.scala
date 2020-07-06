@@ -2,6 +2,7 @@ package views.companion.master
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroNumber
 
 object AcceptOrganizationRequest {
 
@@ -13,6 +14,6 @@ object AcceptOrganizationRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(organizationID: String, gas: Long, password: String)
+  case class Data(organizationID: String, gas: MicroNumber, password: String)
 
 }

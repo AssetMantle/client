@@ -55,11 +55,11 @@
                 <div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiationHistory.price/negotiationHistory.quantity).realString, Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
+                        @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiationHistory.price/negotiationHistory.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), negotiationHistory.quantityUnit).mkString(" "))
                     </div>
                     <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("contractPrice")</span>
-                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.realStringWithPrecision(), Messages(constants.View.USD)).mkString(" "))
+                        @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiationHistory.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
                     </div>
                 </div>
                 <div>
@@ -73,7 +73,7 @@
             <div class="sellerTerm">
                 <div class="cmuk-flex">
                     <span class="termIcon">@commonIcon("quantity")</span>
-                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiationHistory.quantity.realString, negotiationHistory.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.QUANTITY, Seq(negotiationHistory.quantity.toRoundedOffString(), negotiationHistory.quantityUnit).mkString(" "))
                 </div>
                 <div>
                 @if(negotiationHistory.buyerAcceptedQuantity) {

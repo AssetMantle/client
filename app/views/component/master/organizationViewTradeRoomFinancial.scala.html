@@ -1,15 +1,15 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import utilities.NumericOperation.roundOff
+@import utilities.MicroNumber
 
-@(walletBalance: Double, amountPaid: Double, amountPending: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(walletBalance: MicroNumber, amountPaid: MicroNumber, amountPending: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
  <ul class="">
         <li class="cmuk-flex">
             <div class="cmuk-flex wallet">
                 <span class="walletIcon">@commonIcon("wallet")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.WALLET_BALANCE)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundOff(walletBalance)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance.toRoundedOffString()</p>
                 </div>
             </div>
         </li>
@@ -18,7 +18,7 @@
                 <span class="receivableIcon">@commonIcon("receivable")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.ADVANCE_PAID)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundOff(amountPaid)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPaid.toRoundedOffString()</p>
                 </div>
             </div>
         </li>
@@ -27,7 +27,7 @@
                 <span class="payableIcon">@commonIcon("payable")</span>
                 <div>
                     <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
-                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @roundOff(amountPending)</p>
+                    <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPending.toRoundedOffString()</p>
                 </div>
             </div>
 

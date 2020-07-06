@@ -6,9 +6,9 @@ import play.api.data.Forms.{boolean, date, number, of, text, longNumber}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
-import utilities.MicroLong
+import utilities.MicroNumber
 import scala.util.matching.Regex
-import utilities.NumericOperation.checkPrecision
+import utilities.NumericOperation._
 
 object FormField {
   //StringFormField
@@ -139,7 +139,6 @@ object FormField {
   val ASSET_PRICE = new IntFormField("ASSET_PRICE", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
   val SCAN_ID = new IntFormField("SCAN_ID", 0, Int.MaxValue)
-  val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
@@ -154,7 +153,6 @@ object FormField {
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
-  val INVOICE_AMOUNT = new DoubleFormField("INVOICE_AMOUNT", 0, Double.MaxValue)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -200,15 +198,15 @@ object FormField {
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
 
-  //MicroLongFormField
-  val ASSET_PRICE_PER_UNIT = new MicroLongFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
-  val TRANSACTION_AMOUNT = new MicroLongFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
-  val SEND_AMOUNT = new MicroLongFormField("SEND_AMOUNT", 0, Double.MaxValue)
-  val REDEEM_AMOUNT = new MicroLongFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
-  val ASSET_QUANTITY = new MicroLongFormField("ASSET_QUANTITY", 1, Double.MaxValue)
-
-  //LongFormField
-  val GAS = new LongFormField("GAS", 20000L, 1000000L)
+  //MicroNumberFormField
+  val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
+  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(Double.MaxValue))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -250,9 +248,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroLongFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroLong] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroLong](x => new MicroLong(x), y => y.realDouble)
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
 }

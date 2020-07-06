@@ -5,8 +5,8 @@
 @(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_COIN, sendCoinForm) {
     @commonInputText(sendCoinForm, constants.FormField.TO)
-    @commonInputInt(sendCoinForm, constants.FormField.AMOUNT)
-    @commonInputLong(sendCoinForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroNumber(sendCoinForm, constants.FormField.AMOUNT)
+    @commonInputMicroNumber(sendCoinForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(sendCoinForm, constants.FormField.PASSWORD)
 }
 

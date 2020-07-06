@@ -113,6 +113,7 @@ object Response {
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
+  val NUMBER_FORMAT_EXCEPTION = new Failure("NUMBER_FORMAT_EXCEPTION")
   val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")
   val PSQL_EXCEPTION = new Failure("PSQL_EXCEPTION")
@@ -212,6 +213,7 @@ object Response {
   val TRANSACTION_HASH_NOT_FOUND = new Failure("TRANSACTION_HASH_NOT_FOUND")
   val KEY_STORE_ERROR = new Failure("KEY_STORE_ERROR")
   val PRECISION_MORE_THAN_REQUIRED = new Failure("PRECISION_MORE_THAN_REQUIRED")
+  val CONTENT_CONVERSION_ERROR = new Failure("CONTENT_CONVERSION_ERROR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

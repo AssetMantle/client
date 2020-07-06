@@ -7,10 +7,8 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
-import models.master.{AccountFile, AccountKYC, Negotiation, Negotiations, Organization, Trader}
-import models.{master, masterTransaction}
-import models.common.Serializable
-import models.common.Serializable.{BillOfLading, Contract, Invoice}
+import models.master.{AccountFile, AccountKYC, Negotiation, Organization, Trader}
+import models.common.Serializable._
 import models.docusign
 import models.masterTransaction.{AssetFile, NegotiationFile}
 import models.{blockchain, master, masterTransaction}
@@ -18,7 +16,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroLong
+import utilities.MicroNumber
 import views.companion.master.FileUpload
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -227,8 +225,11 @@ class FileController @Inject()(
             def getResult(documentContent: Option[AssetDocumentContent]) = {
               documentContent match {
                 case Some(content) => {
-                  val billOfLading = content.asInstanceOf[BillOfLading]
-                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = new MicroLong(billOfLading.assetQuantity), quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = new MicroLong(billOfLading.declaredAssetValue / billOfLading.assetQuantity))), negotiationID = negotiationID))
+                  val billOfLading: BillOfLading = content match {
+                    case x: BillOfLading => x
+                    case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+                  }
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = billOfLading.declaredAssetValue / billOfLading.assetQuantity)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
               }
@@ -288,8 +289,11 @@ class FileController @Inject()(
             def getResult(documentContent: Option[AssetDocumentContent]) = {
               documentContent match {
                 case Some(content) => {
-                  val billOfLading = content.asInstanceOf[BillOfLading]
-                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = new MicroLong(billOfLading.assetQuantity), quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = new MicroLong(billOfLading.declaredAssetValue / billOfLading.assetQuantity))), negotiationID = negotiationID))
+                  val billOfLading: BillOfLading = content match {
+                    case x: BillOfLading => x
+                    case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+                  }
+                  withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = billOfLading.declaredAssetValue / billOfLading.assetQuantity)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
               }
@@ -358,6 +362,7 @@ class FileController @Inject()(
   def storeNegotiation(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val negotiationDocumentList = masterNegotiations.Service.tryGetDocumentList(negotiationID)
+
       def storeFile = fileResourceManager.storeFile[masterTransaction.NegotiationFile](
         name = name,
         path = fileResourceManager.getNegotiationFilePath(documentType),
@@ -373,7 +378,10 @@ class FileController @Inject()(
             def getResult(documentContent: Option[NegotiationDocumentContent]) = {
               documentContent match {
                 case Some(content) => {
-                  val contract = content.asInstanceOf[Contract]
+                  val contract: Contract = content match {
+                    case x: Contract => x
+                    case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+                  }
                   withUsernameToken.PartialContent(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addContract(negotiationID = negotiationID))
@@ -396,7 +404,10 @@ class FileController @Inject()(
             def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
               documentContent match {
                 case Some(content) => {
-                  val invoice = content.asInstanceOf[Invoice]
+                  val invoice: Invoice = content match {
+                    case x: Invoice => x
+                    case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+                  }
                   withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
@@ -468,7 +479,10 @@ class FileController @Inject()(
             def getResult(documentContent: Option[NegotiationDocumentContent]) = {
               documentContent match {
                 case Some(content) => {
-                  val contract = content.asInstanceOf[Contract]
+                  val contract: Contract = content match {
+                    case x: Contract => x
+                    case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+                  }
                   withUsernameToken.PartialContent(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addContract(negotiationID = negotiationID))
@@ -491,7 +505,10 @@ class FileController @Inject()(
             def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
               documentContent match {
                 case Some(content) => {
-                  val invoice = content.asInstanceOf[Invoice]
+                  val invoice: Invoice = content match {
+                    case x: Invoice => x
+                    case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+                  }
                   withUsernameToken.PartialContent(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
                 }
                 case None => withUsernameToken.PartialContent(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
@@ -521,11 +538,8 @@ class FileController @Inject()(
               result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
             } yield result
           }
-
-
         }
       }
-
 
       (for {
         oldDocument <- oldDocument

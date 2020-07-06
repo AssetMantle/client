@@ -35,7 +35,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         Future(BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors)))
       },
       releaseAssetData => {
-        val postRequest = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
+        val postRequest = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
