@@ -2157,11 +2157,11 @@ class ComponentViewController @Inject()(
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def billOfLading(assetID: String): Future[Option[AssetFile]] = masterTransactionAssetFiles.Service.get(assetID, constants.File.Asset.BILL_OF_LADING)
+      def getBillOfLading(assetID: String): Future[Option[AssetFile]] = masterTransactionAssetFiles.Service.get(assetID, constants.File.Asset.BILL_OF_LADING)
 
       (for {
         negotiation <- negotiation
-        billOfLading <- billOfLading(negotiation.assetID)
+        billOfLading <- getBillOfLading(negotiation.assetID)
       } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[BillOfLading].vesselName))))).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }

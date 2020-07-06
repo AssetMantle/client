@@ -213,6 +213,7 @@ object Response {
   val TRANSACTION_HASH_NOT_FOUND = new Failure("TRANSACTION_HASH_NOT_FOUND")
   val KEY_STORE_ERROR = new Failure("KEY_STORE_ERROR")
   val PRECISION_MORE_THAN_REQUIRED = new Failure("PRECISION_MORE_THAN_REQUIRED")
+  val CONTENT_CONVERSION_ERROR = new Failure("CONTENT_CONVERSION_ERROR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

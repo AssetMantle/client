@@ -879,7 +879,10 @@ class NegotiationController @Inject()(
       def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
         documentContent match {
           case Some(content) => {
-            val invoice = content.asInstanceOf[Invoice]
+            val invoice: Invoice = content match {
+              case x: Invoice => x
+              case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+            }
             withUsernameToken.Ok(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
           }
           case None => withUsernameToken.Ok(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
@@ -959,7 +962,10 @@ class NegotiationController @Inject()(
       def getResult(documentContent: Option[NegotiationDocumentContent]) = {
         documentContent match {
           case Some(content) => {
-            val contract = content.asInstanceOf[Contract]
+            val contract: Contract = content match {
+              case x: Contract => x
+              case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
+            }
             withUsernameToken.Ok(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
           }
           case None => withUsernameToken.Ok(views.html.component.master.addContract(negotiationID = negotiationID))
