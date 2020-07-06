@@ -8,7 +8,7 @@ import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
 import utilities.MicroNumber
 import scala.util.matching.Regex
-import utilities.NumericOperation.checkPrecision
+import utilities.NumericOperation._
 
 object FormField {
   //StringFormField
@@ -153,7 +153,6 @@ object FormField {
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
-  val INVOICE_AMOUNT = new DoubleFormField("INVOICE_AMOUNT", 0, Double.MaxValue)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -200,13 +199,14 @@ object FormField {
   val CREDIT = new NestedFormField("CREDIT")
 
   //MicroNumberFormField
-  val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", 0, Double.MaxValue)
-  val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", 0, Double.MaxValue)
-  val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", 0, Double.MaxValue)
-  val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", 0, Double.MaxValue)
-  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", 1, Double.MaxValue)
-  val GAS = new MicroNumberFormField("GAS", 1, 10)
-  val AMOUNT = new MicroNumberFormField("AMOUNT", 1, Double.MaxValue)
+  val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(1), new MicroNumber(Double.MaxValue))
+  val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
+  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(1), new MicroNumber(Double.MaxValue))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -248,9 +248,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroNumberFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](roundOff(maximumValue.toDouble, precision)), Constraints.min[Double](roundOff(minimumValue.toDouble, precision))).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
 }

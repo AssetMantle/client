@@ -4,6 +4,7 @@ import java.util.Date
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroNumber
 
 object AddInvoice {
 
@@ -16,7 +17,7 @@ object AddInvoice {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, invoiceNumber: String, invoiceAmount: Double, invoiceDate: Date)
+  case class Data(negotiationID: String, invoiceNumber: String, invoiceAmount: MicroNumber, invoiceDate: Date)
 
 }
 

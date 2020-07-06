@@ -4,6 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models._
+import models.common.Serializable._
 import models.master._
 import models.masterTransaction.{SendFiatRequest, _}
 import play.api.http.ContentTypes
@@ -1503,6 +1504,11 @@ class ComponentViewController @Inject()(
                 for {
                   negotiationFile <- negotiationFile
                 } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, negotiationFile))
+              case _ =>
+                val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
+                for {
+                  negotiationFile <- negotiationFile
+                } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, negotiationFile))
             }
           case None =>
             val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
@@ -2156,7 +2162,7 @@ class ComponentViewController @Inject()(
       (for {
         negotiation <- negotiation
         billOfLading <- billOfLading(negotiation.assetID)
-      } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[models.common.Serializable.BillOfLading].vesselName))))).recover {
+      } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[BillOfLading].vesselName))))).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
   }
@@ -2170,7 +2176,7 @@ class ComponentViewController @Inject()(
       (for {
         negotiationHistory <- negotiationHistory
         billOfLading <- billOfLading(negotiationHistory.assetID)
-      } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomChecks(negotiationHistory.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[models.common.Serializable.BillOfLading].vesselName))))).recover {
+      } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomChecks(negotiationHistory.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[BillOfLading].vesselName))))).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
       }
   }

@@ -2363,7 +2363,7 @@ INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey"
                                      "dirtyBit")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
-        1000,
+        '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
         '0',

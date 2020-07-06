@@ -36,8 +36,8 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
     Ok(views.html.component.master.issueFiatRequest())
   }
 
-  def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = new MicroNumber(transactionAmount), gas = constants.FormField.GAS.minimumValue, password = ""))))
+  def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Double): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = new MicroNumber(transactionAmount), gas = constants.FormField.GAS.maximumValue, password = ""))))
   }
 
   def issueFiat: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>

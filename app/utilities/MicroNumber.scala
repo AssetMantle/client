@@ -2,8 +2,8 @@ package utilities
 
 import exceptions.BaseException
 import play.api.Logger
-import play.api.libs.json.{Json, OFormat}
-
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
 
@@ -15,9 +15,9 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def this(value: Long) = this(BigInt(value) * MicroNumber.factor)
 
-  def this(value: Double) = this(BigDecimal(value * MicroNumber.factor).toBigInt)
+  def this(value: Double) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
 
-  def this(value: Float) = this(BigDecimal(value * MicroNumber.factor).toBigInt)
+  def this(value: Float) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
 
   def toMicroString: String = this.value.toString
 
@@ -56,6 +56,12 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
   def underlying: AnyRef = value
 
   def isWhole: Boolean = this.value % MicroNumber.factor == 0
+
+  def roundedUp(precision: Int = 2): MicroNumber = new MicroNumber(utilities.NumericOperation.roundUp(this.toDouble, precision))
+
+  def roundedDown(precision: Int = 2): MicroNumber = new MicroNumber(utilities.NumericOperation.roundDown(this.toDouble, precision))
+
+  def roundedOff(precision: Int = 2): MicroNumber = new MicroNumber(utilities.NumericOperation.roundOff(this.toDouble, precision))
 
   def toRoundedUpString(precision: Int = 2): String = utilities.NumericOperation.roundUp(this.toDouble, precision).toString
 
@@ -171,29 +177,27 @@ object MicroNumber {
 
   private val logger: Logger = Logger(this.getClass)
 
-  def apply(bi: BigInt): MicroNumber = new MicroNumber(bi)
+  def apply(value: BigInt): MicroNumber = new MicroNumber(value)
 
-  def apply(s: String): MicroNumber = new MicroNumber(s)
+  def apply(value: Int): MicroNumber = new MicroNumber(value)
 
-  def apply(i: Int): MicroNumber = new MicroNumber(i)
+  def apply(value: Long): MicroNumber = new MicroNumber(value)
 
-  def apply(l: Long): MicroNumber = new MicroNumber(l)
+  def apply(value: Double): MicroNumber = new MicroNumber(value)
 
-  def apply(d: Double): MicroNumber = new MicroNumber(d)
+  def apply(value: Float): MicroNumber = new MicroNumber(value)
 
-  def apply(f: Float): MicroNumber = new MicroNumber(f)
-
-  def apply(x: Array[Byte]): MicroNumber = new MicroNumber(BigInt(x))
-
-  def apply(signum: Int, magnitude: Array[Byte]): MicroNumber = new MicroNumber(BigInt(signum, magnitude))
-
-  def apply(bitlength: Int, certainty: Int, rnd: scala.util.Random): MicroNumber = new MicroNumber(BigInt(bitlength, certainty, rnd))
-
-  def apply(numbits: Int, rnd: scala.util.Random): MicroNumber = new MicroNumber(BigInt(numbits, rnd))
+  def apply(value: String): MicroNumber = new MicroNumber(value)
 
   def unapply(arg: MicroNumber): Option[String] = Option(arg.toMicroString)
 
-  implicit val reads: OFormat[MicroNumber] = Json.format[MicroNumber]
+  //Do not define OWrites and OFormat since it takes a `key` name. Here, MicroNumber(23.5) will serialize to "23.5" and vice versa.
+  // The jsObject will not have a key member. Default OFormat will make it {"value": "23.5"}
+  implicit val reads: Reads[MicroNumber] = JsPath.read[String].map(apply)
+
+  implicit val writes: Writes[MicroNumber] = (o: MicroNumber) => JsString(o.toString)
+
+  implicit val format: Format[MicroNumber] = Format[MicroNumber](reads, writes)
 
   implicit def stringToMicroNumber(s: String): MicroNumber = apply(s)
 

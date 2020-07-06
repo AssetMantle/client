@@ -72,7 +72,7 @@
                 }
             }
             <div class="cmuk-text-left title">@Messages(constants.View.NEGOTIATION_DOCUMENTS)</div>
-            @negotiation.documentList.negotiationDocuments.filter(negotiationDocumentType => constants.File.NEGOTIATION_DOCUMENTS.contains(negotiationDocumentType)).map { negotiationDocumentType =>
+            @negotiation.documentList.negotiationDocuments.map { negotiationDocumentType =>
                 <div id='@Seq("UPLOAD_NEGOTIATION", negotiationDocumentType).mkString("_")' class="cmuk-text-left">
                 @commonModalButton(Seq("UPLOAD", negotiationDocumentType).mkString("_"), routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${negotiationDocumentType}','${negotiation.id}'")
                 </div>

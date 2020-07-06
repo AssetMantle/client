@@ -25,9 +25,9 @@
                     @commonDateInfo(constants.View.SHIPMENT_DATE, billOfLading.dateOfShipping)
                     @commonTextInfo(constants.View.DELIVERY_TERM, billOfLading.deliveryTerm)
                     @commonTextInfo(constants.View.ASSET_DESCRIPTION, billOfLading.assetDescription)
-                    @commonDoubleInfo(constants.View.ASSET_QUANTITY, billOfLading.assetQuantity)
+                    @commonMicroNumberInfo(constants.View.ASSET_QUANTITY, billOfLading.assetQuantity)
                     @commonTextInfo(constants.View.QUANTITY_UNIT, billOfLading.quantityUnit)
-                    @commonDoubleInfo(constants.View.ASSET_PRICE, billOfLading.declaredAssetValue)
+                    @commonMicroNumberInfo(constants.View.ASSET_PRICE, billOfLading.declaredAssetValue)
                 }
             }
             case _ => {}

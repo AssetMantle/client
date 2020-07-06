@@ -43,7 +43,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.sendFiat(negotiationID = negotiationID, amount = (negotiation.price - fiatsInOrder)))
+      } yield Ok(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(views.companion.master.SendFiat.Data(negotiationID = negotiationID, sendAmount = (negotiation.price - fiatsInOrder).roundedUp(), gas = constants.FormField.GAS.maximumValue, password = ""))))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
@@ -53,7 +53,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, negotiationID = formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), amount = new MicroNumber(formWithErrors.data(constants.FormField.SEND_AMOUNT.name)))))
+          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors)))
         },
         sendFiatData => {
           val negotiation = masterNegotiations.Service.tryGet(sendFiatData.negotiationID)
@@ -88,7 +88,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                   _ <- createFiatRequest(negotiation.buyerTraderID, ticketID, negotiation.id)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(sendFiatData.negotiationID, successes = Seq(constants.Response.FIAT_SENT)))
                 } yield result
-              } else Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiationID = sendFiatData.negotiationID, amount = sendFiatData.sendAmount)))
+              } else Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
             }
           }
 
@@ -101,7 +101,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAddress = sellerAddress, pegHash = assetPegHash, negotiation = negotiation)
               } yield result
             } else {
-              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price - fiatsInOrder), sendFiatData.negotiationID, sendFiatData.sendAmount)))
+              Future(BadRequest(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(sendFiatData).withError(constants.FormField.SEND_AMOUNT.name, constants.Response.FIATS_EXCEED_PENDING_AMOUNT.message, negotiation.price - fiatsInOrder))))
             }
           }
 

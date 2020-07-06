@@ -36,7 +36,6 @@ class AssetController @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                  docusignEnvelopes: docusign.Envelopes,
-                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withUsernameToken: WithUsernameToken,
@@ -88,9 +87,9 @@ class AssetController @Inject()(
     def getZonePassword(zoneID: String): Future[String] = Future(keyStore.getPassphrase(zoneID))
 
     def sendTransaction(traderAddress: String, zoneAddress: String, takerAddress: String, asset: Asset, zonePassword: String): Future[String] = utilitiesTransaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-      entity = blockchainTransaction.IssueAsset(from = zoneAddress, to = traderAddress, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, gas = constants.Blockchain.ZoneIssueAssetGasAmount, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
+      entity = blockchainTransaction.IssueAsset(from = zoneAddress, to = traderAddress, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, gas = constants.Blockchain.ZoneIssueAssetGas, takerAddress = Option(takerAddress), ticketID = "", mode = transactionMode),
       blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = constants.Blockchain.ZoneIssueAssetGasAmount), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, takerAddress = takerAddress, mode = transactionMode),
+      request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = zoneAddress, gas = constants.Blockchain.ZoneIssueAssetGas), to = traderAddress, password = zonePassword, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.price, quantityUnit = asset.quantityUnit, assetQuantity = asset.quantity, moderated = true, takerAddress = takerAddress, mode = transactionMode),
       action = transactionsIssueAsset.Service.post,
       onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
       onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -143,7 +142,6 @@ class AssetController @Inject()(
 
                   def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-                  val price = issueAssetData.pricePerUnit * issueAssetData.quantity
                   if (issueAssetData.moderated) {
                     val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.pricePerUnit * issueAssetData.quantity, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
@@ -165,7 +163,7 @@ class AssetController @Inject()(
                       def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                         entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
                         blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = (issueAssetData.pricePerUnit * issueAssetData.quantity), quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = "", mode = transactionMode),
+                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = "", mode = transactionMode),
                         action = transactionsIssueAsset.Service.post,
                         onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                         onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -218,7 +216,7 @@ class AssetController @Inject()(
         documentContent match {
           case Some(content) => {
             val billOfLading = content.asInstanceOf[BillOfLading]
-            withUsernameToken.Ok(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = new MicroNumber(billOfLading.assetQuantity), quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = new MicroNumber(billOfLading.declaredAssetValue / billOfLading.assetQuantity))), negotiationID = negotiationID))
+            withUsernameToken.Ok(views.html.component.master.addBillOfLading(views.companion.master.AddBillOfLading.form.fill(views.companion.master.AddBillOfLading.Data(negotiationID = negotiationID, billOfLadingNumber = billOfLading.id, consigneeTo = billOfLading.consigneeTo, vesselName = billOfLading.vesselName, portOfLoading = billOfLading.portOfLoading, portOfDischarge = billOfLading.portOfDischarge, shipperName = billOfLading.shipperName, shipperAddress = billOfLading.shipperAddress, notifyPartyName = billOfLading.notifyPartyName, notifyPartyAddress = billOfLading.notifyPartyAddress, shipmentDate = utilities.Date.sqlDateToUtilDate(billOfLading.dateOfShipping), deliveryTerm = billOfLading.deliveryTerm, assetDescription = billOfLading.assetDescription, assetQuantity = billOfLading.assetQuantity, quantityUnit = billOfLading.quantityUnit, assetPricePerUnit = billOfLading.declaredAssetValue / billOfLading.assetQuantity)), negotiationID = negotiationID))
           }
           case None => withUsernameToken.Ok(views.html.component.master.addBillOfLading(negotiationID = negotiationID))
         }
@@ -246,7 +244,7 @@ class AssetController @Inject()(
 
           def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
             if (traderID == negotiation.sellerTraderID) {
-              val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.consigneeTo, billOfLadingContentData.vesselName, billOfLadingContentData.portOfLoading, billOfLadingContentData.portOfDischarge, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetDescription, billOfLadingContentData.assetQuantity.toDouble, billOfLadingContentData.quantityUnit, (billOfLadingContentData.assetPricePerUnit * billOfLadingContentData.assetQuantity).toDouble))
+              val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.consigneeTo, billOfLadingContentData.vesselName, billOfLadingContentData.portOfLoading, billOfLadingContentData.portOfDischarge, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetDescription, billOfLadingContentData.assetQuantity, billOfLadingContentData.quantityUnit, (billOfLadingContentData.assetPricePerUnit * billOfLadingContentData.assetQuantity)))
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(billOfLadingContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)

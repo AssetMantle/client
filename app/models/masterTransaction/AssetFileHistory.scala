@@ -21,6 +21,9 @@ case class AssetFileHistory(id: String, documentType: String, fileName: String, 
   def updateFileName(newFileName: String): AssetFileHistory = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): AssetFileHistory = copy(file = newFile)
+
+  def updateStatus(status: Option[Boolean]): AssetFileHistory = copy(status = status)
+
 }
 
 @Singleton
