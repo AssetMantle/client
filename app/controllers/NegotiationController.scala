@@ -915,7 +915,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
             organizationList <- getOrganizationList(traderList.map(_.organizationID))
-          } yield BadRequest(views.html.component.master.addInvoice(formWithErrors, formWithErrors.data(constants.FormField.ID.name), negotiation, traderList, organizationList))
+          } yield BadRequest(views.html.component.master.addInvoice(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name), negotiation, traderList, organizationList))
         },
         updateInvoiceContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
@@ -985,7 +985,7 @@ class NegotiationController @Inject()(
     implicit request =>
       views.companion.master.AddContract.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addContract(formWithErrors, formWithErrors.data(constants.FormField.ID.name))))
+          Future(BadRequest(views.html.component.master.addContract(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
         },
         updateContractContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
