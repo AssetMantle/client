@@ -239,7 +239,7 @@ class AssetController @Inject()(
     implicit request =>
       views.companion.master.AddBillOfLading.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addBillOfLading(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+          Future(BadRequest(views.html.component.master.addBillOfLading(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
         },
         billOfLadingContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
