@@ -1499,11 +1499,6 @@ class ComponentViewController @Inject()(
                 for {
                   assetFile <- assetFile
                 } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, assetFile))
-              case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
-                val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
-                for {
-                  negotiationFile <- negotiationFile
-                } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, negotiationFile))
               case _ =>
                 val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
                 for {
@@ -1550,7 +1545,7 @@ class ComponentViewController @Inject()(
                   for {
                     assetFile <- assetFile
                   } yield Ok(views.html.component.master.organizationViewNegotiationDocument(negotiationID, assetFile))
-                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
+                case _ =>
                   val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
                   for {
                     negotiationFile <- negotiationFile
@@ -1597,7 +1592,7 @@ class ComponentViewController @Inject()(
                   for {
                     assetFile <- assetFile
                   } yield Ok(views.html.component.master.zoneViewNegotiationDocument(negotiationID, assetFile))
-                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
+                case _ =>
                   val negotiationFile = masterTransactionNegotiationFiles.Service.get(negotiationID, documentType)
                   for {
                     negotiationFile <- negotiationFile
@@ -1641,7 +1636,7 @@ class ComponentViewController @Inject()(
                 for {
                   assetFile <- assetFile
                 } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, assetFile))
-              case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
+              case _ =>
                 val negotiationFile = masterTransactionNegotiationFileHistories.Service.get(negotiationID, documentType)
                 for {
                   negotiationFile <- negotiationFile
@@ -1687,7 +1682,7 @@ class ComponentViewController @Inject()(
                   for {
                     assetFile <- assetFile
                   } yield Ok(views.html.component.master.organizationViewNegotiationDocument(negotiationID, assetFile))
-                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
+                case _ =>
                   val negotiationFile = masterTransactionNegotiationFileHistories.Service.get(negotiationID, documentType)
                   for {
                     negotiationFile <- negotiationFile
@@ -1734,7 +1729,7 @@ class ComponentViewController @Inject()(
                   for {
                     assetFile <- assetFile
                   } yield Ok(views.html.component.master.zoneViewNegotiationDocument(negotiationID, assetFile))
-                case constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE | constants.File.Negotiation.CONTRACT =>
+                case _ =>
                   val negotiationFile = masterTransactionNegotiationFileHistories.Service.get(negotiationID, documentType)
                   for {
                     negotiationFile <- negotiationFile
