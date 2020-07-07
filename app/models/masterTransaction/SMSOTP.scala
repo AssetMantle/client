@@ -83,9 +83,9 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   object Service {
 
     def get(id: String): Future[String] = {
-      val otp = (Random.nextInt(899999) + 100000).toString
+      //val otp = (Random.nextInt(899999) + 100000).toString
       //testOTP
-      //val otp = "999999"
+      val otp = "999999"
       val upsertOtp = upsert(SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString))
       for {
         _ <- upsertOtp

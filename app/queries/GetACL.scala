@@ -25,8 +25,6 @@ class GetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
   private val path = "acl"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  //testURL
-  //private val url = constants.Test.BASE_URL+routes.LoopBackController.getACL("")
 
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 

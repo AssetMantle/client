@@ -25,8 +25,6 @@ class GetZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
   private val path = "zone"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  //testURL
-  //private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.getZone("")
 
   private def action(request: String): Future[Response] = wsClient.url(url + request).get.map { response => new Response(response) }
 

@@ -37,9 +37,6 @@ class MemberCheckCorporateScan @Inject()(wsClient: WSClient, keyStore: KeyStore)
 
   private val endpoint = configuration.get[String]("memberCheck.endpoints.singleCorporateScan")
 
-  //testURL
-  //private val testURL = constants.Test.BASE_URL+ routes.LoopBackController.memberCheckCorporateScan
-
   private val url = baseURL + endpoint
 
   private def action(request: Request): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withHttpHeaders(organizationHeader, apiKeyHeader).post(Json.toJson(request)))

@@ -27,8 +27,6 @@ class GetNegotiationID @Inject()()(implicit wsClient: WSClient, configuration: C
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def TestRequest(buyerAddress: String, sellerAddress: String, pegHash: String)=routes.LoopBackController.getNegotiationID(buyerAddress,sellerAddress,pegHash).url
-
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {

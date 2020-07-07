@@ -25,8 +25,6 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
   private val path = "organization"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  //testURL
-  //private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getOrganization("")
 
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 

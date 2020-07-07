@@ -19,11 +19,12 @@ object sendFiatControllerTest {
       .post(routes.SendFiatController.sendFiat().url)
       .formParamMap(Map(
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.AMOUNT.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
+        constants.FormField.SEND_AMOUNT.name -> "${%s}".format(Test.TEST_ASSET_PRICE),
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)
       ))
       .check(substring("Funds Released").exists)
     )
+    .pause(Test.REQUEST_DELAY)
 }

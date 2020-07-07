@@ -72,37 +72,44 @@ class LoopBackController @Inject()(
   private var fiatList = Seq[Fiat]()
   private var negotiationList = Seq[Negotiation]()
   private var orderList = Seq[Order]()
+  val x = util.hashing.MurmurHash3.stringHash("999999")
+  println(x)
 
 
-  val transactionModeBasedResponse = transactionMode match {
+  def index(id: String) = Action {
+    Ok("Found ID---" + id)
+  }
+
+  def transactionModeBasedResponse = transactionMode match {
     case constants.Transactions.BLOCK_MODE => Ok(Json.toJson(BlockResponse(height = Random.nextInt(99999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString, gas_wanted = "999999", gas_used = "888888", code = None)))
     case constants.Transactions.SYNC_MODE => Ok(Json.toJson(SyncResponse(height = Random.nextInt(99999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
     case constants.Transactions.ASYNC_MODE => Ok(Json.toJson(AsyncResponse(height = Random.nextInt(99999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
   }
 
-  def memberCheckCorporateScan = Action {
+  def memberCheckCorporateScan: Action[AnyContent] = Action {
     Ok(Json.toJson(transactions.responses.MemberCheckCorporateScanResponse.Response(Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)).toString())
   }
 
-  def memberCheckCorporateScanInfo(request: String) = Action {
+  def memberCheckCorporateScanInfo(request: String): Action[AnyContent] = Action {
     val scanParam = ScanInputParam(Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, true)
     val scanResult = ScanResult(request.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)
     Ok(Json.toJson(queries.responses.MemberCheckCorporateScanResponse.Response(scanParam, scanResult)).toString())
   }
 
-  def sendEmail = Action {
+  def sendEmail: Action[AnyContent] = Action {
+
     Ok
   }
 
-  def sendSMS = Action {
+  def sendSMS: Action[AnyContent] = Action {
     Ok
   }
 
-  def mnemonic = Action {
+  def mnemonic: Action[AnyContent] = Action {
     Ok(Random.shuffle(mnemonicSampleElements).take(24).mkString(" "))
   }
 
-  def addKey = Action { implicit request =>
+  def addKey: Action[AnyContent] = Action { implicit request =>
 
     implicit val requestReads = transactionsAddKey.requestReads
     implicit val responseWrites = transactionsAddKey.responseWrites
@@ -113,7 +120,7 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(transactionsAddKey.Response(addKeyRequest.name, "commit1" + Random.alphanumeric.filter(c => c.isDigit || c.isLower).take(38).mkString, "commitpub1addwnpepq" + Random.alphanumeric.filter(c => c.isDigit || c.isLower).take(58).mkString, addKeyRequest.seed)))
   }
 
-  def sendCoin = Action { implicit request =>
+  def sendCoin(to: String): Action[AnyContent] = Action { implicit request =>
     if (kafkaEnabled) {
       val response = Json.toJson(KafkaResponse(ticketID = "SECO" + Random.alphanumeric.filter(_.isDigit).take(18).mkString))
       Ok(response)
@@ -122,7 +129,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def addZone = Action {
+  def addZone: Action[AnyContent] = Action {
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "DEZO" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -130,19 +137,19 @@ class LoopBackController @Inject()(
     }
   }
 
-  def getZone(zoneID: String) = Action {
+  def getZone(zoneID: String): Action[AnyContent] = Action {
     Ok("\"commit1" + Random.alphanumeric.filter(c => c.isDigit || c.isLower).take(38).mkString + "\"")
   }
 
-  def getResponse(ticketID: String) = Action {
+  def getResponse(ticketID: String): Action[AnyContent] = Action {
     transactionModeBasedResponse
   }
 
-  def getTxHashResponse(txHash: String) = Action {
+  def getTxHashResponse(txHash: String): Action[AnyContent] = Action {
     Ok(Json.toJson(BlockResponse(height = Random.nextInt(99999).toString, txhash = txHash, gas_wanted = "999999", gas_used = "888888", code = None)))
   }
 
-  def addOrganization = Action {
+  def addOrganization: Action[AnyContent] = Action {
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "DEOR" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -150,7 +157,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def getOrganization(organizationID: String) = Action.async {
+  def getOrganization(organizationID: String): Action[AnyContent] = Action.async {
     val organization = masterOrganizations.Service.tryGet(organizationID)
     (for {
       organization <- organization
@@ -160,7 +167,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def setACL = Action {
+  def setACL: Action[AnyContent] = Action {
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "DEAC" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -168,7 +175,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def issueAsset = Action { implicit request =>
+  def issueAsset: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsIssueAsset.requestReads
 
     val issueAssetRequest = request.body.asJson.map { requestBody =>
@@ -183,7 +190,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def issueFiat = Action { implicit request =>
+  def issueFiat: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsIssueFiat.requestReads
 
     val issueFiatRequest = request.body.asJson.map { requestBody =>
@@ -198,13 +205,13 @@ class LoopBackController @Inject()(
     }
   }
 
-  def getAccount(address: String) = Action {
+  def getAccount(address: String): Action[AnyContent] = Action {
     val assetPegWallet = assetList.filter(_.ownerAddress == address).map(asset => queries.responses.AccountResponse.Asset(asset.pegHash, asset.documentHash, asset.assetType, asset.assetQuantity, asset.assetPrice, asset.quantityUnit, asset.ownerAddress, asset.locked, asset.moderated, asset.takerAddress.getOrElse("")))
     val fiatPegWallet = fiatList.filter(_.ownerAddress == address).map(fiat => queries.responses.AccountResponse.Fiat(fiat.pegHash, fiat.transactionID, fiat.transactionAmount, fiat.redeemedAmount, None))
     Ok(Json.toJson(queries.responses.AccountResponse.Response(value = Value(address = address, coins = Some(Seq(queries.responses.AccountResponse.Coins(denom, "2000"))), asset_peg_wallet = Some(assetPegWallet), fiat_peg_wallet = Some(fiatPegWallet), account_number = Random.alphanumeric.filter(_.isDigit).take(3).mkString, sequence = Random.alphanumeric.filter(_.isDigit).take(3).mkString))))
   }
 
-  def changeBuyerBid = Action { implicit request =>
+  def changeBuyerBid: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsChangeBuyerBid.requestReads
 
     val changeBuyerBidRequest = request.body.asJson.map { requestBody =>
@@ -224,7 +231,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def changeSellerBid = Action { implicit request =>
+  def changeSellerBid: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsChangeSellerBid.requestReads
 
     val changeSellerBidRequest = request.body.asJson.map { requestBody =>
@@ -245,7 +252,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def confirmBuyerBid = Action { implicit request =>
+  def confirmBuyerBid: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsConfirmBuyerBid.requestReads
 
     val confirmBuyerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsConfirmBuyerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -262,7 +269,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def confirmSellerBid = Action { implicit request =>
+  def confirmSellerBid: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsConfirmSellerBid.requestReads
 
     val confirmSellerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsConfirmSellerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -279,7 +286,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def releaseAsset = Action { implicit request =>
+  def releaseAsset: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsReleaseAsset.requestReads
 
     val releaseAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsReleaseAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -295,7 +302,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def sendAsset = Action { implicit request =>
+  def sendAsset: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsSendAsset.requestReads
 
     val sendAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSendAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -314,7 +321,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def sendFiat = Action { implicit request =>
+  def sendFiat: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsSendFiat.requestReads
 
     val sendFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSendFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -334,7 +341,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def buyerExecuteOrder = Action { implicit request =>
+  def buyerExecuteOrder: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsBuyerExecuteOrder.requestReads
 
     val buyerExecuteOrderRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsBuyerExecuteOrder.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -358,7 +365,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def sellerExecuteOrder = Action { implicit request =>
+  def sellerExecuteOrder: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsSellerExecuteOrder.requestReads
 
     val sellerExecuteOrderRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSellerExecuteOrder.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -386,7 +393,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def redeemAsset = Action { implicit request =>
+  def redeemAsset: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsRedeemAsset.requestReads
 
     val redeemAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -400,7 +407,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def getNegotiation(negotiationID: String) = Action {
+  def getNegotiation(negotiationID: String): Action[AnyContent] = Action {
     val response = negotiationList.filter(_.id == negotiationID).map { negotiation =>
       queries.responses.NegotiationResponse.Response(queries.responses.NegotiationResponse.Value(negotiationID, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, negotiation.bid, negotiation.time, Some(negotiation.buyerSignature.getOrElse("")), Some(negotiation.sellerSignature.getOrElse("")), Some(negotiation.buyerBlockHeight.getOrElse("")), Some(negotiation.sellerBlockHeight.getOrElse("")), Some(negotiation.buyerContractHash.getOrElse("")), Some(negotiation.sellerContractHash.getOrElse(""))))
     }.headOption.getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND))
@@ -408,7 +415,7 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(response))
   }
 
-  def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String) = Action {
+  def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action {
     val negotiationID = negotiationList.filter(negotiation => negotiation.buyerAddress == buyerAddress && negotiation.sellerAddress == sellerAddress && negotiation.assetPegHash == pegHash).map {
       _.id
     }.headOption.getOrElse(throw new BaseException(constants.Response.FAILURE))
@@ -416,7 +423,7 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(queries.responses.NegotiationIdResponse.Response(negotiationID)))
   }
 
-  def getOrder(orderID: String) = Action {
+  def getOrder(orderID: String): Action[AnyContent] = Action {
     val assetPegWallet = assetList.filter(_.ownerAddress == orderID).map(asset => queries.responses.AccountResponse.Asset(asset.pegHash, asset.documentHash, asset.assetType, asset.assetQuantity, asset.assetPrice, asset.quantityUnit, asset.ownerAddress, asset.locked, asset.moderated, asset.takerAddress.getOrElse("")))
     val fiatPegWallet = fiatList.filter(_.ownerAddress == orderID).map(fiat => queries.responses.AccountResponse.Fiat(fiat.pegHash, fiat.transactionID, fiat.transactionAmount, fiat.redeemedAmount, None))
 
@@ -427,7 +434,7 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(response))
   }
 
-  def getACL(address: String) = Action.async {
+  def getACL(address: String): Action[AnyContent] = Action.async {
     val aclAccount = blockchainACLAccounts.Service.tryGet(address)
 
     def getACL(hash: String) = blockchainACLHashes.Service.tryGetACL(hash)
@@ -441,7 +448,7 @@ class LoopBackController @Inject()(
     }
   }
 
-  def getTraderReputation(address: String) = Action {
+  def getTraderReputation(address: String): Action[AnyContent] = Action {
     Ok(Json.toJson(queries.responses.TraderReputationResponse.Response(queries.responses.TraderReputationResponse.Value(address, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), None))))
   }
 

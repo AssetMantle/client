@@ -25,8 +25,6 @@ class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Con
   private val path = "negotiation"
 
   private val url = ip + ":" + port + "/" + path + "/"
-  //testURL
-  //private val testURL = constants.Test.BASE_URL+routes.LoopBackController.getNegotiation("")
 
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
