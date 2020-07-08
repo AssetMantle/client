@@ -17,11 +17,4 @@ object NumericOperation {
     math.floor(value * s) / s
   }
 
-  def checkPrecision(precision: Int, value: String): Boolean = {
-    if (value.split("""\.""").length == 1) true else {
-      if (value.split("""\.""")(1).length <= precision) true else false
-    }
-  }
-
-
 }
