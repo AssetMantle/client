@@ -34,7 +34,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
           val transactionProcess = transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
             entity = blockchainTransaction.SetBuyerFeedback(from = loginState.address, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSetBuyerFeedbacks.Service.create,
-            request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = loginState.address, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = transactionMode),
+            request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = loginState.address, gas = setBuyerFeedbackData.gas), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = transactionMode),
             action = transactionsSetBuyerFeedback.Service.post,
             onSuccess = blockchainTransactionSetBuyerFeedbacks.Utility.onSuccess,
             onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
@@ -72,7 +72,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
         Future(BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors)))
       },
       setBuyerFeedbackData => {
-        val postRequest = transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
+        val postRequest = transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))

@@ -38,7 +38,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class NotificationSerializable(id: String, accountID: String, notificationTemplateJson: String, read: Boolean, createdOn: Option[Timestamp], createdBy: Option[String], createdOnTimeZone: Option[String], updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson), read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson), read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimeZone = notification.createdOnTimeZone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
@@ -106,7 +106,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTemplate = NotificationTemplate(template = notification.notificationType, parameters = parameters)))
 
-    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize))
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 

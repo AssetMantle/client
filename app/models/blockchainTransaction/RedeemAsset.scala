@@ -14,12 +14,13 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemAsset(from: String, to: String, pegHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemAsset] with Logged {
+case class RedeemAsset(from: String, to: String, pegHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemAsset] with Logged {
   def mutateTicketID(newTicketID: String): RedeemAsset = RedeemAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -57,14 +58,20 @@ class RedeemAssets @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(redeemAsset: RedeemAsset): Future[String] = db.run((redeemAssetTable returning redeemAssetTable.map(_.ticketID) += redeemAsset).asTry).map {
+  def serialize(redeemAsset: RedeemAsset): RedeemAssetSerialized = RedeemAssetSerialized(from = redeemAsset.from, to = redeemAsset.to, pegHash = redeemAsset.pegHash, gas = redeemAsset.gas.toMicroString, status = redeemAsset.status, txHash = redeemAsset.txHash, ticketID = redeemAsset.ticketID, mode = redeemAsset.mode, code = redeemAsset.code, createdBy = redeemAsset.createdBy, createdOn = redeemAsset.createdOn, createdOnTimeZone = redeemAsset.createdOnTimeZone, updatedBy = redeemAsset.updatedBy, updatedOn = redeemAsset.updatedOn, updatedOnTimeZone = redeemAsset.updatedOnTimeZone)
+
+  case class RedeemAssetSerialized(from: String, to: String, pegHash: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: RedeemAsset = RedeemAsset(from = from, to = to, pegHash = pegHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  private def add(redeemAsset: RedeemAsset): Future[String] = db.run((redeemAssetTable returning redeemAssetTable.map(_.ticketID) += serialize(redeemAsset)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[RedeemAsset] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[RedeemAssetSerialized] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -127,9 +134,9 @@ class RedeemAssets @Inject()(
     }
   }
 
-  private[models] class RedeemAssetTable(tag: Tag) extends Table[RedeemAsset](tag, "RedeemAsset") {
+  private[models] class RedeemAssetTable(tag: Tag) extends Table[RedeemAssetSerialized](tag, "RedeemAsset") {
 
-    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedeemAsset.tupled, RedeemAsset.unapply)
+    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedeemAssetSerialized.tupled, RedeemAssetSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -137,7 +144,7 @@ class RedeemAssets @Inject()(
 
     def pegHash = column[String]("pegHash")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 
@@ -174,7 +181,7 @@ class RedeemAssets @Inject()(
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[RedeemAsset] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[RedeemAsset] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 

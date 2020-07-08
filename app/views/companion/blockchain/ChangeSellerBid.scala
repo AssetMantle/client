@@ -2,6 +2,7 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms._
+import utilities.MicroNumber
 
 object ChangeSellerBid {
   val form = Form(
@@ -17,6 +18,6 @@ object ChangeSellerBid {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Long, mode: String, password: String)
+  case class Data(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: MicroNumber, mode: String, password: String)
 
 }

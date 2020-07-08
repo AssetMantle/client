@@ -17,12 +17,13 @@ import play.api.{Configuration, Logger}
 import queries.responses.TraderReputationResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
+import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: Long, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SetACL] with Logged {
+case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SetACL] with Logged {
   def mutateTicketID(newTicketID: String): SetACL = SetACL(from = from, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = aclHash, status = status, gas = gas, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -57,14 +58,20 @@ class SetACLs @Inject()(
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(setACL: SetACL): Future[String] = db.run((setACLTable returning setACLTable.map(_.ticketID) += setACL).asTry).map {
+  case class SetACLSerialized(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SetACL = SetACL(from = from, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = aclHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(setACL: SetACL): SetACLSerialized = SetACLSerialized(from = setACL.from, aclAddress = setACL.aclAddress, organizationID = setACL.organizationID, zoneID = setACL.zoneID, aclHash = setACL.aclHash, gas = setACL.gas.toMicroString, status = setACL.status, txHash = setACL.txHash, ticketID = setACL.ticketID, mode = setACL.mode, code = setACL.code, createdBy = setACL.createdBy, createdOn = setACL.createdOn, createdOnTimeZone = setACL.createdOnTimeZone, updatedBy = setACL.updatedBy, updatedOn = setACL.updatedOn, updatedOnTimeZone = setACL.updatedOnTimeZone)
+
+  private def add(setACL: SetACL): Future[String] = db.run((setACLTable returning setACLTable.map(_.ticketID) += serialize(setACL)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findByTicketID(ticketID: String): Future[SetACL] = db.run(setACLTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[SetACLSerialized] = db.run(setACLTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -127,9 +134,9 @@ class SetACLs @Inject()(
     }
   }
 
-  private[models] class SetACLTable(tag: Tag) extends Table[SetACL](tag, "SetACL") {
+  private[models] class SetACLTable(tag: Tag) extends Table[SetACLSerialized](tag, "SetACL") {
 
-    def * = (from, aclAddress, organizationID, zoneID, aclHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SetACL.tupled, SetACL.unapply)
+    def * = (from, aclAddress, organizationID, zoneID, aclHash, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SetACLSerialized.tupled, SetACLSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -141,7 +148,7 @@ class SetACLs @Inject()(
 
     def aclHash = column[String]("aclHash")
 
-    def gas = column[Long]("gas")
+    def gas = column[String]("gas")
 
     def status = column[Boolean]("status")
 
@@ -176,7 +183,7 @@ class SetACLs @Inject()(
 
     def resetTransactionStatus(ticketID: String): Future[Int] = updateStatusByTicketID(ticketID, status = null)
 
-    def getTransaction(ticketID: String): Future[SetACL] = findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[SetACL] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 

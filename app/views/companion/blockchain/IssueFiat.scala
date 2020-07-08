@@ -2,7 +2,8 @@ package views.companion.blockchain
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import utilities.MicroLong
+import utilities.MicroNumber
+import utilities.MicroNumber
 
 object IssueFiat {
   val form = Form(
@@ -17,6 +18,6 @@ object IssueFiat {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, transactionID: String, transactionAmount: MicroLong, gas: Long, mode: String, password: String)
+  case class Data(from: String, to: String, transactionID: String, transactionAmount: MicroNumber, gas: MicroNumber, mode: String, password: String)
 
 }

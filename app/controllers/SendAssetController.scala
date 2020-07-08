@@ -35,7 +35,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         Future(BadRequest(views.html.component.blockchain.sendAsset(formWithErrors)))
       },
       sendAssetData => {
-        val post = transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
+        val post = transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))

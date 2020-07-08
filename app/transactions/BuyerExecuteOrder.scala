@@ -8,6 +8,7 @@ import play.api.libs.json.{Json, OWrites, Reads}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,15 +31,23 @@ class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseReq(from: String, chain_id: String = chainID, gas: String)
+  case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
+
+  object BaseReq {
+
+    def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroNumber(BigInt(gas)))
+
+    def unapply(arg: BaseReq): Option[(String, String, String)] = Option((arg.from, arg.chain_id, arg.gas.toMicroString))
+
+  }
+
+  case class Request(base_req: BaseReq, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String, password: String) extends BaseRequest
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
   implicit val baseRequestReads: Reads[BaseReq] = Json.reads[BaseReq]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
   implicit val requestReads: Reads[Request] = Json.reads[Request]
-
-  case class Request(base_req: BaseReq, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String) extends BaseRequest
 
   object Service {
 

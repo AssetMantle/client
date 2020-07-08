@@ -4,7 +4,7 @@ import java.util.Date
 
 import play.api.data.Form
 import play.api.data.Forms._
-import utilities.MicroLong
+import utilities.MicroNumber
 
 object AddBillOfLading {
 
@@ -29,6 +29,6 @@ object AddBillOfLading {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: MicroLong, quantityUnit: String, assetPricePerUnit: MicroLong)
+  case class Data(negotiationID: String, billOfLadingNumber: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, shipmentDate: Date, deliveryTerm: String, assetDescription: String, assetQuantity: MicroNumber, quantityUnit: String, assetPricePerUnit: MicroNumber)
 
 }

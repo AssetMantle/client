@@ -22,6 +22,7 @@ import transactions.AddKey
 import queries.responses.AccountResponse.Response._
 import queries.responses.AccountResponse.Value
 import queries.responses.TraderReputationResponse
+import utilities.MicroNumber
 
 @Singleton
 class LoopBackController @Inject()(
@@ -60,11 +61,11 @@ class LoopBackController @Inject()(
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
   private val denom = configuration.get[String]("blockchain.denom")
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, var ownerAddress: String, var locked: Boolean, moderated: Boolean, takerAddress: Option[String])
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroNumber, assetPrice: MicroNumber, quantityUnit: String, var ownerAddress: String, var locked: Boolean, moderated: Boolean, takerAddress: Option[String])
 
-  case class Fiat(pegHash: String, var ownerAddress: String, transactionID: String, var transactionAmount: String, redeemedAmount: String)
+  case class Fiat(pegHash: String, var ownerAddress: String, transactionID: String, var transactionAmount: MicroNumber, redeemedAmount: MicroNumber)
 
-  case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, var bid: String, time: String, var buyerSignature: Option[String] = None, var sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, var buyerContractHash: Option[String] = None, var sellerContractHash: Option[String] = None)
+  case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, var bid: MicroNumber, time: String, var buyerSignature: Option[String] = None, var sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, var buyerContractHash: Option[String] = None, var sellerContractHash: Option[String] = None)
 
   case class Order(id: String, var fiatProofHash: Option[String], var awbProofHash: Option[String])
 
@@ -208,7 +209,7 @@ class LoopBackController @Inject()(
   def getAccount(address: String): Action[AnyContent] = Action {
     val assetPegWallet = assetList.filter(_.ownerAddress == address).map(asset => queries.responses.AccountResponse.Asset(asset.pegHash, asset.documentHash, asset.assetType, asset.assetQuantity, asset.assetPrice, asset.quantityUnit, asset.ownerAddress, asset.locked, asset.moderated, asset.takerAddress.getOrElse("")))
     val fiatPegWallet = fiatList.filter(_.ownerAddress == address).map(fiat => queries.responses.AccountResponse.Fiat(fiat.pegHash, fiat.transactionID, fiat.transactionAmount, fiat.redeemedAmount, None))
-    Ok(Json.toJson(queries.responses.AccountResponse.Response(value = Value(address = address, coins = Some(Seq(queries.responses.AccountResponse.Coins(denom, "2000"))), asset_peg_wallet = Some(assetPegWallet), fiat_peg_wallet = Some(fiatPegWallet), account_number = Random.alphanumeric.filter(_.isDigit).take(3).mkString, sequence = Random.alphanumeric.filter(_.isDigit).take(3).mkString))))
+    Ok(Json.toJson(queries.responses.AccountResponse.Response(value = Value(address = address, coins = Some(Seq(queries.responses.AccountResponse.Coin(denom, "2000"))), asset_peg_wallet = Some(assetPegWallet), fiat_peg_wallet = Some(fiatPegWallet), account_number = Random.alphanumeric.filter(_.isDigit).take(3).mkString, sequence = Random.alphanumeric.filter(_.isDigit).take(3).mkString))))
   }
 
   def changeBuyerBid: Action[AnyContent] = Action { implicit request =>

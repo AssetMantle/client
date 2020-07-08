@@ -17,9 +17,9 @@
     @commonInputDate(addBillOfLadingForm, constants.FormField.SHIPMENT_DATE)
     @commonSelect(addBillOfLadingForm, constants.FormField.DELIVERY_TERM)
     @commonInputText(addBillOfLadingForm, constants.FormField.ASSET_DESCRIPTION)
-    @commonInputMicroLong(addBillOfLadingForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputMicroNumber(addBillOfLadingForm, constants.FormField.ASSET_QUANTITY)
     @commonInputText(addBillOfLadingForm, constants.FormField.QUANTITY_UNIT)
-    @commonInputMicroLong(addBillOfLadingForm, constants.FormField.ASSET_PRICE_PER_UNIT)
+    @commonInputMicroNumber(addBillOfLadingForm, constants.FormField.ASSET_PRICE_PER_UNIT)
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${negotiationID}'")
 }
 

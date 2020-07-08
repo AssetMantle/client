@@ -94,7 +94,7 @@ class OrderController @Inject()(
                   case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
                     entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = moderatedBuyerExecuteData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
-                    request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedBuyerExecuteData.gas.toString), password = moderatedBuyerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, mode = transactionMode),
+                    request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedBuyerExecuteData.gas), password = moderatedBuyerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, mode = transactionMode),
                     action = transactionsBuyerExecuteOrder.Service.post,
                     onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
                     onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
@@ -170,7 +170,7 @@ class OrderController @Inject()(
                   case Some(pegHash) => transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
                     entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = moderatedSellerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
-                    request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedSellerExecuteOrderData.gas.toString), password = moderatedSellerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, mode = transactionMode),
+                    request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedSellerExecuteOrderData.gas), password = moderatedSellerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, mode = transactionMode),
                     action = transactionsSellerExecuteOrder.Service.post,
                     onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
                     onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
@@ -239,7 +239,7 @@ class OrderController @Inject()(
                 case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
                   entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteData.fiatProof, pegHash = pegHash, gas = buyerExecuteData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
-                  request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = buyerExecuteData.gas.toString), password = buyerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteData.fiatProof, pegHash = pegHash, mode = transactionMode),
+                  request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = buyerExecuteData.gas), password = buyerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteData.fiatProof, pegHash = pegHash, mode = transactionMode),
                   action = transactionsBuyerExecuteOrder.Service.post,
                   onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
                   onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
@@ -298,7 +298,7 @@ class OrderController @Inject()(
                 case Some(pegHash) => transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
                   entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = sellerExecuteData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
-                  request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = loginState.address, gas = sellerExecuteData.gas.toString), password = sellerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, mode = transactionMode),
+                  request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = loginState.address, gas = sellerExecuteData.gas), password = sellerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, mode = transactionMode),
                   action = transactionsSellerExecuteOrder.Service.post,
                   onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
                   onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
@@ -340,7 +340,7 @@ class OrderController @Inject()(
         Future(BadRequest(views.html.component.blockchain.buyerExecuteOrder(formWithErrors)))
       },
       buyerExecuteOrderData => {
-        val postRequest = transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = buyerExecuteOrderData.from, gas = buyerExecuteOrderData.gas.toString), password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, mode = buyerExecuteOrderData.mode))
+        val postRequest = transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = buyerExecuteOrderData.from, gas = buyerExecuteOrderData.gas), password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, mode = buyerExecuteOrderData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
@@ -361,7 +361,7 @@ class OrderController @Inject()(
         Future(BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors)))
       },
       sellerExecuteOrderData => {
-        val post = transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = sellerExecuteOrderData.from, gas = sellerExecuteOrderData.gas.toString), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, mode = sellerExecuteOrderData.mode))
+        val post = transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = sellerExecuteOrderData.from, gas = sellerExecuteOrderData.gas), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, mode = sellerExecuteOrderData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))

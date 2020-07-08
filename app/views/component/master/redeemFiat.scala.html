@@ -4,7 +4,7 @@
 
 @(redeemFiatForm: Form[RedeemFiat.Data] = RedeemFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REDEEM_FIAT, redeemFiatForm) {
-    @commonInputMicroLong(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
-    @commonInputLong(redeemFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputMicroNumber(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
+    @commonInputMicroNumber(redeemFiatForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(redeemFiatForm, constants.FormField.PASSWORD)
 }

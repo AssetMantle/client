@@ -6,7 +6,8 @@ import java.sql.Date
 import exceptions.BaseException
 import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
 import play.api.Logger
-import play.api.libs.json.{JsResult, JsValue, Json, OWrites, Reads, Writes}
+import play.api.libs.json.{Json, OWrites, Reads, Writes}
+import utilities.MicroNumber
 
 object Serializable {
 
@@ -62,7 +63,7 @@ object Serializable {
 
   implicit val tradeActivityTemplateWrites: OWrites[TradeActivityTemplate] = Json.writes[TradeActivityTemplate]
 
-  case class BillOfLading(id: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, assetDescription: String, assetQuantity: Double, quantityUnit: String, declaredAssetValue: Double) extends AssetDocumentContent
+  case class BillOfLading(id: String, consigneeTo: String, vesselName: String, portOfLoading: String, portOfDischarge: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, assetDescription: String, assetQuantity: MicroNumber, quantityUnit: String, declaredAssetValue: MicroNumber) extends AssetDocumentContent
 
   implicit val assetDocumentContentWrites: Writes[AssetDocumentContent] = {
     case billOfLading: BillOfLading => Json.toJson(billOfLading)(Json.writes[BillOfLading])
@@ -73,7 +74,7 @@ object Serializable {
     Json.format[BillOfLading].map(x => x: AssetDocumentContent)
   }
 
-  case class Invoice(invoiceNumber: String, invoiceAmount: Double, invoiceDate: Date) extends NegotiationDocumentContent
+  case class Invoice(invoiceNumber: String, invoiceAmount: MicroNumber, invoiceDate: Date) extends NegotiationDocumentContent
 
   case class Contract(contractNumber: String) extends NegotiationDocumentContent
 

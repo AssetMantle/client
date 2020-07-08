@@ -9,20 +9,20 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import utilities.MicroLong
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: MicroLong, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class RedeemFiatRequest(id: String, traderID: String, ticketID: String, amount: MicroNumber, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
-  
-  def serialize(redeemFiatRequest: RedeemFiatRequest): RedeemFiatRequestSerialized = RedeemFiatRequestSerialized(id = redeemFiatRequest.id, traderID = redeemFiatRequest.traderID, ticketID = redeemFiatRequest.ticketID, amount = redeemFiatRequest.amount.value, status = redeemFiatRequest.status, createdBy = redeemFiatRequest.createdBy, createdOn = redeemFiatRequest.createdOn, createdOnTimeZone = redeemFiatRequest.createdOnTimeZone, updatedBy = redeemFiatRequest.updatedBy, updatedOn = redeemFiatRequest.updatedOn, updatedOnTimeZone = redeemFiatRequest.updatedOnTimeZone)
 
-  case class RedeemFiatRequestSerialized(id: String, traderID: String, ticketID: String, amount: Long, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize(): RedeemFiatRequest = RedeemFiatRequest(id = id, traderID = traderID, ticketID = ticketID, amount = new MicroLong(amount), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  def serialize(redeemFiatRequest: RedeemFiatRequest): RedeemFiatRequestSerialized = RedeemFiatRequestSerialized(id = redeemFiatRequest.id, traderID = redeemFiatRequest.traderID, ticketID = redeemFiatRequest.ticketID, amount = redeemFiatRequest.amount.toMicroString, status = redeemFiatRequest.status, createdBy = redeemFiatRequest.createdBy, createdOn = redeemFiatRequest.createdOn, createdOnTimeZone = redeemFiatRequest.createdOnTimeZone, updatedBy = redeemFiatRequest.updatedBy, updatedOn = redeemFiatRequest.updatedOn, updatedOnTimeZone = redeemFiatRequest.updatedOnTimeZone)
+
+  case class RedeemFiatRequestSerialized(id: String, traderID: String, ticketID: String, amount: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: RedeemFiatRequest = RedeemFiatRequest(id = id, traderID = traderID, ticketID = ticketID, amount = new MicroNumber(BigInt(amount)), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_REDEEM_FIAT_REQUEST
@@ -96,7 +96,7 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def ticketID = column[String]("ticketID", O.Unique)
 
-    def amount = column[Long]("amount")
+    def amount = column[String]("amount")
 
     def status = column[String]("status")
 
@@ -114,19 +114,19 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
   }
 
   object Service {
-    def create(traderID: String, ticketID: String, amount: MicroLong): Future[String] = add(serialize(RedeemFiatRequest(id = utilities.IDGenerator.requestID(), traderID, ticketID, amount, status = constants.Status.RedeemFiat.AWAITING_BLOCKCHAIN_RESPONSE)))
+    def create(traderID: String, ticketID: String, amount: MicroNumber): Future[String] = add(serialize(RedeemFiatRequest(id = utilities.IDGenerator.requestID(), traderID, ticketID, amount, status = constants.Status.RedeemFiat.AWAITING_BLOCKCHAIN_RESPONSE)))
 
-    def getPendingRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize()))
+    def getPendingRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize))
 
-    def getCompleteRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.REDEEMED).map(_.map(_.deserialize()))
+    def getCompleteRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.REDEEMED).map(_.map(_.deserialize))
 
-    def getFailedRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize()))
+    def getFailedRedeemFiatRequests(traderIDs: Seq[String]): Future[Seq[RedeemFiatRequest]] = getByTraderIDsAndStatus(traderIDs, constants.Status.RedeemFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize))
 
-    def getPendingRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize()))
+    def getPendingRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS).map(_.map(_.deserialize))
 
-    def getCompleteRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.REDEEMED).map(_.map(_.deserialize()))
+    def getCompleteRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.REDEEMED).map(_.map(_.deserialize))
 
-    def getFailedRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize()))
+    def getFailedRedeemFiatRequests(traderID: String): Future[Seq[RedeemFiatRequest]] = getByTraderIDAndStatus(traderID, constants.Status.RedeemFiat.BLOCKCHAIN_FAILURE).map(_.map(_.deserialize))
 
     def markBlockchainSuccess(ticketID: String): Future[Int] = updateStatusByTicketIDAndStatus(ticketID, constants.Status.RedeemFiat.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.RedeemFiat.BLOCKCHAIN_SUCCESS)
 
