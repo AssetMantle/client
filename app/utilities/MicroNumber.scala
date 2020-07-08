@@ -39,13 +39,13 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   override def toString: String = (BigDecimal(this.value) / MicroNumber.factor).toString
 
-  def intValue: Int = this.toMicroInt / MicroNumber.factor
+  def intValue: Int = (this.value / MicroNumber.factor).toInt
 
-  def longValue: Long = this.toMicroLong / MicroNumber.factor
+  def longValue: Long = (this.value / MicroNumber.factor).toLong
 
-  def floatValue: Float = this.toMicroFloat / MicroNumber.factor
+  def floatValue: Float = (BigDecimal(this.value) / MicroNumber.factor).toFloat
 
-  def doubleValue: Double = this.toMicroDouble / MicroNumber.factor
+  def doubleValue: Double = (BigDecimal(this.value) / MicroNumber.factor).toDouble
 
   override def byteValue: Byte = intValue().toByte
 
