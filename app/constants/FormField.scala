@@ -234,9 +234,9 @@ object FormField {
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString))
+    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
   }
 
   class BooleanFormField(fieldName: String) {
