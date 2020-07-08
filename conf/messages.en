@@ -1224,4 +1224,4 @@ STEEL=Steel
 OTHER=Other
 FROM_EMAIL_ADDRESS=Comdex <{0}>
 RESPONSE.FAILURE.NUMBER_OUT_OF_RANGE=Range exceeded.
-RESPONSE.FAILURE.INVALID_NUMBER=Not a valid number or precision more than required.
+RESPONSE.FAILURE.INVALID_NUMBER=Not a valid value or precision more than required.

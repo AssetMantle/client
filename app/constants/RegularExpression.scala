@@ -3,6 +3,8 @@ package constants
 import scala.util.matching.Regex
 
 object RegularExpression {
+//  val FIAT: Regex = """^[0-9]{1}[0-9]*(\.{1}[0-9]{1}([0-9]{1})?)?$""".r
+//  val GAS: Regex = """^[0-9]{1}[0-9]*(\.{1}[0-9]{1}([0-9]{1,5})?)?$""".r
   val ANY_STRING: Regex = """.*""".r
   val ALL_NUMBERS_ALL_LETTERS: Regex = """^[A-Za-z0-9]*$""".r
   val ALL_NUMBERS_ALL_CAPITAL_LETTERS = """^[A-Z0-9]*$""".r
@@ -17,6 +19,6 @@ object RegularExpression {
   val HASH: Regex = """^[a-fA-F0-9]*$""".r
   val EMAIL_ADDRESS: Regex = """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r
   val SWIFT_CODE: Regex = """^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$""".r
-  val FIAT: Regex = """^[0]{1}(\.{1}[0-9]{1}([1-9]{1})?)?|[1-9]{1}[0-9]*(\.{1}[0-9]{1}([0-9]{1})?)?$""".r
-  val GAS: Regex = """^[0]{1}(\.{1}[0-9]{1,5}([0-9]{5})?)?|[1-9]{1}[0-9]*(\.{1}[0-9]{1}([0-9]{1,5})?)?$""".r
+  val FIAT: Regex = """^((0{1}\.{1}((0{1}[1-9]{1})|([1-9]{1}([0-9]{1})?)))|([1-9]{1}[0-9]*(\.{1}[0-9]{1}([0-9]{1})?)?))$""".r
+  val GAS: Regex = """^((0{1}\.{1}((0{1,5}[1-9]{1})|([1-9]{1}([0-9]{1,5})?)))|([1-9]{1}[0-9]*(\.{1}[0-9]{1}([0-9]{1,5})?)?))$""".r
 }
