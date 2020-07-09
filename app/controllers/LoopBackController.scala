@@ -3,6 +3,7 @@ package controllers
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.ACLAccounts
+import models.masterTransaction.{EmailOTP, SMSOTP}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{JsError, JsPath, JsSuccess, JsValue, Json, OWrites, Reads}
@@ -50,6 +51,10 @@ class LoopBackController @Inject()(
                                     blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
                                     masterOrganizations: master.Organizations,
                                     masterTraders: master.Traders,
+                                    masterEmails: master.Emails,
+                                    masterMobiles: master.Mobiles,
+                                    masterTransactionEmailOTPs: masterTransaction.EmailOTPs,
+                                    masterTransactionSMSOTPs: masterTransaction.SMSOTPs,
                                   )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -76,11 +81,6 @@ class LoopBackController @Inject()(
   val x = util.hashing.MurmurHash3.stringHash("999999")
   println(x)
 
-
-  def index(id: String) = Action {
-    Ok("Found ID---" + id)
-  }
-
   def transactionModeBasedResponse = transactionMode match {
     case constants.Transactions.BLOCK_MODE => Ok(Json.toJson(BlockResponse(height = Random.nextInt(99999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString, gas_wanted = "999999", gas_used = "888888", code = None)))
     case constants.Transactions.SYNC_MODE => Ok(Json.toJson(SyncResponse(height = Random.nextInt(99999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
@@ -97,13 +97,36 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(queries.responses.MemberCheckCorporateScanResponse.Response(scanParam, scanResult)).toString())
   }
 
-  def sendEmail: Action[AnyContent] = Action {
+  def sendEmail(emailAddress: String): Action[AnyContent] = Action.async {
+    val emailAddressAccount = masterEmails.Service.getEmailAddressAccount(emailAddress)
 
-    Ok
+    def updateOTP(accountID: Option[String]): Future[Int] = {
+      accountID match {
+        case Some(accountID) => masterTransactionEmailOTPs.Service.insertOrUpdate(EmailOTP(accountID, util.hashing.MurmurHash3.stringHash(constants.Test.OTP).toString))
+        case None => throw new BaseException(constants.Response.EMAIL_ADDRESS_NOT_FOUND)
+      }
+    }
+
+    for {
+      emailAddressAccount <- emailAddressAccount
+      _ <- updateOTP(emailAddressAccount)
+    } yield Ok
   }
 
-  def sendSMS: Action[AnyContent] = Action {
-    Ok
+  def sendSMS(mobileNumber: String): Action[AnyContent] = Action.async {
+    val mobileNumberAccount = masterMobiles.Service.getMobileNumberAccount(mobileNumber)
+
+    def updateOTP(accountID: Option[String]): Future[Int] = {
+      accountID match {
+        case Some(accountID) => masterTransactionSMSOTPs.Service.insertOrUpdate(SMSOTP(accountID, util.hashing.MurmurHash3.stringHash(constants.Test.OTP).toString))
+        case None => throw new BaseException(constants.Response.EMAIL_ADDRESS_NOT_FOUND)
+      }
+    }
+
+    for {
+      mobileNumberAccount <- mobileNumberAccount
+      _ <- updateOTP(mobileNumberAccount)
+    } yield Ok
   }
 
   def mnemonic: Action[AnyContent] = Action {

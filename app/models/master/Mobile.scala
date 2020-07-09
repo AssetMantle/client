@@ -68,6 +68,8 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def getAccountIDByMobileNumber(mobileNumber: String): Future[Option[String]] = db.run(mobileTable.filter(_.mobileNumber === mobileNumber).map(_.id).result.headOption)
+
   private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(mobileTable.filter(_.id === id).map(_.status).update(verificationStatus).asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -142,6 +144,8 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def tryGetVerifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = true)
 
     def tryGetUnverifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = false)
+
+    def getMobileNumberAccount(mobileNumber: String): Future[Option[String]] = getAccountIDByMobileNumber(mobileNumber)
 
     def updateMobileNumber(id: String, mobileNumber: String): Future[Int] = updateMobileNumberAndStatusByID(id = id, mobileNumber = mobileNumber, status = false)
   }

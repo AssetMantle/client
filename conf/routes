@@ -622,9 +622,9 @@ GET         /blockchain/setSellerFeedback                                       
 POST        /blockchain/setSellerFeedback                                                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
 
 #LoopBackControllers
-GET         /loopback/api/v1/corp-scans/single/:request                                           controllers.LoopBackController.memberCheckCorporateScanInfo(request:String)
-GET         /loopback/sendEmail                                                                   controllers.LoopBackController.sendEmail
-GET         /loopback/sendSMS                                                                     controllers.LoopBackController.sendSMS
+GET         /loopback/api/v1/corp-scans/single/:request                                           controllers.LoopBackController.memberCheckCorporateScanInfo(request: String)
+GET         /loopback/sendEmail/:emailAddress                                                     controllers.LoopBackController.sendEmail(emailAddress: String)
+GET         /loopback/sendSMS/:mobileNumber                                                       controllers.LoopBackController.sendSMS(mobileNumber: String)
 GET         /loopback/keys/mnemonic                                                               controllers.LoopBackController.mnemonic
 GET         /loopback/zone/:zoneID                                                                controllers.LoopBackController.getZone(zoneID:String)
 GET         /loopback/organization/:organizationID                                                controllers.LoopBackController.getOrganization(organizationID :String)
@@ -636,7 +636,6 @@ GET         /loopback/negotiationID/:buyerAddress/:sellerAddress/:pegHash       
 GET         /loopback/order/:orderID                                                              controllers.LoopBackController.getOrder(orderID: String)
 GET         /loopback/reputation/:address                                                         controllers.LoopBackController.getTraderReputation(address: String)
 GET         /loopback/acl/:address                                                                controllers.LoopBackController.getACL(address: String)
-GET         /loopback/temp/:id                                                                    controllers.LoopBackController.index(id: String)
 
 POST        /loopback/api/v1/corp-scans/single                                                    controllers.LoopBackController.memberCheckCorporateScan
 POST        /loopback/keys                                                                        controllers.LoopBackController.addKey

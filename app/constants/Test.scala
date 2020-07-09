@@ -8,9 +8,12 @@ object Test {
   val BASE_URL = "http://" + TEST_IP + ":9000"
 
   val IMAGE_FILE_FEED = "/home/prashant/testImages/"
-  val REQUEST_DELAY=2
-  val BLOCKCHAIN_TRANSACTION_DELAY=30
-  val LOOP_DELAY=1
+  val REQUEST_DELAY = 2
+  val BLOCKCHAIN_TRANSACTION_DELAY = 30
+  val LOOP_DELAY = 1
+  val OTP = "999999"
+  val GAS = "999999"
+
   val TEST_NAME = "TEST_NAME"
   val TEST_MNEMONIC = "TEST_MNEMONIC"
 
