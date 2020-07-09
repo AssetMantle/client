@@ -15,7 +15,7 @@ import io.gatling.http.Predef._
 class OneCompleteTransactionModerated extends Simulation {
 
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
-    .exec(CreateZone.createZone)
+   .exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
@@ -215,11 +215,11 @@ object IssueFiat {
 
   val issueFiat = scenario("IssueFiat")
     /* .exec(session => session.set(Test.TEST_ZONE_USERNAME, "ZONE10qr6Ecmuq").set(Test.TEST_ZONE_PASSWORD,"123123123"))
-     .exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL103AfTmnz1").set(Test.TEST_SELLER_PASSWORD,"SELL103AfTmnz1"))
-     .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10sYLgeDn4").set(Test.TEST_BUYER_PASSWORD, "BUY10sYLgeDn4"))
+    */ /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10DIkHxyDY").set(Test.TEST_SELLER_PASSWORD,"SELL10DIkHxyDY"))
+     .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10U2EUMEJN").set(Test.TEST_BUYER_PASSWORD, "BUY10U2EUMEJN"))
      .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
-     .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
-    */ .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+     .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
+     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec { session => session.set(Test.TEST_TRADER_ID, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
     .exec(issueFiatControllerTest.issueFiatRequestScenario)
@@ -232,12 +232,18 @@ object IssueFiat {
 object IssueAssetModerated {
 
   val issueAssetModerated = scenario("IssueAssetModerated")
+   //prasasffds .feed(GasFeeder.gasFeed)
+    /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10DIkHxyDY").set(Test.TEST_SELLER_PASSWORD,"SELL10DIkHxyDY"))
+    .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10U2EUMEJN").set(Test.TEST_BUYER_PASSWORD, "BUY10U2EUMEJN"))
+    .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
+    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
+    .exec { session => session.set(Test.TEST_COUNTER_PARTY, session(Test.TEST_BUYER_TRADER_ID).as[String]) }*/
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec(assetControllerTest.moderatedIssueAssetRequestScenario)
     .exec(accountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
-    .exec { session => session.set(Test.TEST_ASSET_ID, getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_DESCRIPTION).as[String], session(Test.TEST_QUANTITY_UNIT).as[String], session(Test.TEST_ASSET_QUANTITY).as[String], session(Test.TEST_ASSET_PRICE).as[String])) }
+    .exec { session => session.set(Test.TEST_ASSET_ID, getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_DESCRIPTION).as[String])) }
 }
 
 object CreateSalesQuote {

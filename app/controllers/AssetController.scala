@@ -124,9 +124,11 @@ class AssetController @Inject()(
     implicit request =>
       views.companion.master.IssueAsset.form.bindFromRequest().fold(
         formWithErrors => {
+          println("issueassetformWithErrorsData--"+formWithErrors.data)
           Future(BadRequest(views.html.component.master.issueAsset(formWithErrors)))
         },
         issueAssetData => {
+          println("issueAssetData--"+issueAssetData)
           (loginState.acl match {
             case Some(acl) => {
               if (acl.issueAsset) {
@@ -239,7 +241,7 @@ class AssetController @Inject()(
     implicit request =>
       views.companion.master.AddBillOfLading.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addBillOfLading(formWithErrors, formWithErrors.data(constants.FormField.TRADE_ID.name))))
+          Future(BadRequest(views.html.component.master.addBillOfLading(formWithErrors, formWithErrors.data(constants.FormField.NEGOTIATION_ID.name))))
         },
         billOfLadingContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)

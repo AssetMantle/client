@@ -745,7 +745,6 @@ class FileController @Inject()(
         if (traderNegotiationExists) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
-            case constants.File.Negotiation.CONTRACT | constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE => fileResourceManager.getNegotiationFilePath(documentType)
             case _ => fileResourceManager.getNegotiationFilePath(documentType)
           }
           Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
@@ -795,8 +794,7 @@ class FileController @Inject()(
         if (traderOrganizationIDs contains organizationID) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
-            case constants.File.Negotiation.CONTRACT | constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE => fileResourceManager.getNegotiationFilePath(documentType)
-            case _ => throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+            case _ => fileResourceManager.getNegotiationFilePath(documentType)
           }
           Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
         } else {
@@ -846,8 +844,7 @@ class FileController @Inject()(
         if (traderZoneIDs contains zoneID) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
-            case constants.File.Negotiation.CONTRACT | constants.File.Negotiation.INVOICE | constants.File.Negotiation.BILL_OF_EXCHANGE => fileResourceManager.getNegotiationFilePath(documentType)
-            case _ => throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+            case _ => fileResourceManager.getNegotiationFilePath(documentType)
           }
           Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
         } else {

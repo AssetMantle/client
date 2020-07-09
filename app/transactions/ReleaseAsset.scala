@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import utilities.MicroNumber
-
+import scala.concurrent.TimeoutException
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

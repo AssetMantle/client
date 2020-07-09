@@ -36,7 +36,7 @@ object assetControllerTest {
         constants.FormField.GAS.name -> "",
         constants.FormField.PASSWORD.name -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(css("legend:contains(Create Sales Quote)").exists)
+     // .check(css("legend:contains(Create Sales Quote)").exists)
     )
     .pause(Test.REQUEST_DELAY)
 

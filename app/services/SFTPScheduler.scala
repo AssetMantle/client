@@ -1,29 +1,22 @@
 package services
 
 import java.io.File
-import java.net.InetAddress
-
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
-import akka.stream.alpakka.ftp.scaladsl.Sftp
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
-
 import scala.concurrent.{Await, ExecutionContext, Future}
-import java.nio.file.{Files, Paths}
-
 import akka.Done
-import akka.stream.scaladsl.Source
-import akka.stream.{IOResult, Materializer}
-import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
-import akka.stream.scaladsl.FileIO
+import akka.stream.Materializer
 import exceptions.BaseException
 import models.westernUnion.{SFTPFileTransaction, SFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
+import net.schmizz.sshj.userauth.method.{AuthPassword, AuthPublickey}
+import net.schmizz.sshj.userauth.password.PasswordUtils
 import utilities.{KeyStore, PGP}
-
+import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile
 import scala.io.BufferedSource
 
 
@@ -53,54 +46,48 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
 
   def scheduler: Unit = {
     try {
-      val sftpSettings = SftpSettings
-        .create(InetAddress.getByName(sftpSite))
-        .withPort(sftpPort)
-        .withCredentials(FtpCredentials.create(wuSFTPUsername, wuSFTPPassword))
-        .withStrictHostKeyChecking(false)
-        .withSftpIdentity(SftpIdentity.createRawSftpIdentity(Files.readAllBytes(Paths.get(sshPrivateKeyPath))))
-
-      val sshClient = new SSHClient(new DefaultConfig)
+      val defaultConfig = new DefaultConfig
+      val sshClient = new SSHClient(defaultConfig)
       sshClient.addHostKeyVerifier(new PromiscuousVerifier())
-      val _ = Sftp(sshClient)
+      sshClient.connect(sftpSite, sftpPort)
+      val keyFile = new PKCS8KeyFile
+      keyFile.init(new File(sshPrivateKeyPath))
+      sshClient.auth(wuSFTPUsername, new AuthPublickey(keyFile), new AuthPassword(PasswordUtils.createOneOff(wuSFTPPassword.toCharArray())))
 
-      val sftpProcess = Sftp
-        .ls(basePathSFTPFiles, sftpSettings)
-        .flatMapConcat(ftpFile => Sftp.fromPath(ftpFile.path, sftpSettings).map((_, ftpFile)))
-        .runForeach { ftpFile =>
-          val newFilePath = storagePathSFTPFiles + ftpFile._2.name
-          val fileCreate = new File(newFilePath)
-          fileCreate.createNewFile()
-          val writeEncryptedData = Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
+      val sftpClient = sshClient.newSFTPClient()
+      sftpClient.ls(basePathSFTPFiles).forEach { ftpFile =>
+        val newFilePath = storagePathSFTPFiles + ftpFile.getName
+        sftpClient.get(ftpFile.getPath, storagePathSFTPFiles)
 
-          def decryptAndReadCSV: Future[BufferedSource] = {
-            PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
-            val csvFileContentBuffer = scala.io.Source.fromFile(storagePathSFTPFiles + tempFileName)
-            val csvFileContentProcessor = Future.sequence {
-              csvFileContentBuffer.getLines.drop(1).map { line =>
-                val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
-                sFTPFileTransactions.Service.create(SFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
-              }
+        def decryptAndReadCSV: Future[BufferedSource] = {
+          PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
+          val csvFileContentBuffer = scala.io.Source.fromFile(storagePathSFTPFiles + tempFileName)
+          val csvFileContentProcessor = Future.sequence {
+            csvFileContentBuffer.getLines.drop(1).map { line =>
+              val Array(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference) = line.split(",").map(_.trim)
+              sFTPFileTransactions.Service.create(SFTPFileTransaction(payerID, invoiceNumber, customerFirstName, customerLastName, customerEmailAddress, settlementDate, clientReceivedAmount, transactionType, productType, transactionReference))
             }
-            for {
-              _ <- csvFileContentProcessor
-            } yield csvFileContentBuffer
           }
-
-          def csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer: BufferedSource): Future[IOResult] = {
-            csvFileContentBuffer.close()
-            Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
-          }
-
-          val complete=for {
-            _ <- writeEncryptedData
-            csvFileContentBuffer <- decryptAndReadCSV
-            _ <- csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer)
-          } yield {}
-          Await.result(complete,Duration.Inf)
+          for {
+            _ <- csvFileContentProcessor
+          } yield csvFileContentBuffer
         }
 
-      Await.result(sftpProcess, Duration.Inf)
+        def csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer: BufferedSource): Future[Unit] = {
+          Future {
+            csvFileContentBuffer.close()
+            sftpClient.rm(ftpFile.getPath)
+          }
+        }
+
+        val complete = for {
+          csvFileContentBuffer <- decryptAndReadCSV
+          _ <- csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer)
+        } yield {}
+        Await.result(complete, Duration.Inf)
+      }
+      sftpClient.close()
+      sshClient.disconnect()
     }
     catch {
       case baseException: BaseException=>

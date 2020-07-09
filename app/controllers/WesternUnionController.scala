@@ -63,7 +63,7 @@ class WesternUnionController @Inject()(
           requestBody.invoiceNumber, requestBody.buyerBusinessId, requestBody.buyerFirstName, requestBody.buyerLastName,
           utilities.Date.stringDateToTimeStamp(requestBody.createdDate), utilities.Date.stringDateToTimeStamp(requestBody.lastUpdatedDate),
           requestBody.status, requestBody.dealType, requestBody.paymentTypeId, new MicroNumber(requestBody.paidOutAmount), requestBody.requestSignature)
-
+        println("reuest signature verfied")
         def totalRTCBAmountReceived: Future[MicroNumber] = westernUnionRTCBs.Service.totalRTCBAmountByTransactionID(requestBody.externalReference)
 
         val fiatRequest = westernUnionFiatRequests.Service.tryGetByID(requestBody.externalReference)
@@ -76,7 +76,10 @@ class WesternUnionController @Inject()(
 
         def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
 
-        def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
+        def zoneAddress(zoneAccountID: String) ={
+          println("get Zone address")
+          blockchainAccounts.Service.tryGetAddress(zoneAccountID)
+        }
 
         def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroNumber(requestBody.paidOutAmount))
 
@@ -136,7 +139,7 @@ class WesternUnionController @Inject()(
   }
 
   private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroNumber): Future[String] = {
-
+    println("issusing Fiat")
     val zonePassword = Future(keyStore.getPassphrase(zoneID))
 
     def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](

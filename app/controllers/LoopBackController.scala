@@ -198,7 +198,7 @@ class LoopBackController @Inject()(
       convertJsonStringToObject[transactionsIssueFiat.Request](requestBody.toString())
     }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, issueFiatRequest.to, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount, "")
+    fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, issueFiatRequest.to, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount, new MicroNumber(0))
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "ISFI" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -330,7 +330,7 @@ class LoopBackController @Inject()(
 
     fiatList.find(fiat => fiat.ownerAddress == sendFiatRequest.base_req.from).map { fiat =>
       fiat.transactionAmount = (fiat.transactionAmount.toInt - sendFiatRequest.amount.toInt).toString
-      fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, negotiation.id, "", sendFiatRequest.amount, "")
+      fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, negotiation.id, "", sendFiatRequest.amount, new MicroNumber(0))
     }.getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
 
     if (!orderList.exists(_.id == negotiation.id)) orderList = orderList :+ Order(negotiation.id, None, None)
@@ -376,12 +376,13 @@ class LoopBackController @Inject()(
         case Some(order) => order.awbProofHash = Some(sellerExecuteOrderRequest.awbProofHash)
           if (order.fiatProofHash.isDefined && order.awbProofHash.isDefined) {
             assetList.find(_.pegHash == sellerExecuteOrderRequest.pegHash).map { asset =>
+              if (asset.moderated) {
+                fiatList.find(_.ownerAddress == order.id).map { fiat =>
+                  fiat.ownerAddress = sellerExecuteOrderRequest.sellerAddress
+                }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+              }
               asset.ownerAddress == sellerExecuteOrderRequest.buyerAddress
             }.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
-
-            fiatList.find(_.ownerAddress == order.id).map { fiat =>
-              fiat.ownerAddress = sellerExecuteOrderRequest.sellerAddress
-            }.getOrElse(throw new BaseException(constants.Response.FAILURE))
           }
         case None => throw new BaseException(constants.Response.FAILURE)
       }

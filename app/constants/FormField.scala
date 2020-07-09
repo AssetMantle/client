@@ -199,14 +199,14 @@ object FormField {
   val CREDIT = new NestedFormField("CREDIT")
 
   //MicroNumberFormField
-  val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val GAS = new MicroNumberFormField("GAS", new MicroNumber(0.01), new MicroNumber(Double.MaxValue))
-  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val GAS = new MicroNumberFormField("GAS", new MicroNumber(0.01), new MicroNumber(100000000000000.0), RegularExpression.GAS)
+  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(100000000000000.0))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -234,9 +234,9 @@ object FormField {
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double, precision: Int = 2) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString))
+    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
   }
 
   class BooleanFormField(fieldName: String) {
@@ -248,9 +248,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, regex: Regex = RegularExpression.FIAT) {
     val name: String = fieldName
-    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+    val field: Mapping[MicroNumber] = text.verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = constants.Response.INVALID_NUMBER.message)).verifying(constants.Response.NUMBER_OUT_OF_RANGE.message, x => new MicroNumber(x) >= minimumValue && new MicroNumber(x) <= maximumValue).transform[MicroNumber](x => new MicroNumber(x), y => y.toRoundedOffString())
   }
 
 }
