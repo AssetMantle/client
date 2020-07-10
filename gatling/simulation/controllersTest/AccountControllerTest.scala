@@ -176,4 +176,54 @@ object accountControllerTest {
       .check(substring("Identity Details updated successfully").exists)
     )
     .pause(Test.REQUEST_DELAY)
+
+  val changePassword: ScenarioBuilder = scenario("ChangePassword")
+    .exec(http("Change_Password_Form_GET")
+      .get(routes.AccountController.changePasswordForm().url)
+      .check(css("legend:contains(Change Password)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(Test.REQUEST_DELAY)
+    .exec(http("Change_Password_POST")
+      .post(routes.AccountController.changePassword().url)
+      .formParamMap(Map(
+        constants.FormField.OLD_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
+        constants.FormField.NEW_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
+        constants.FormField.CONFIRM_NEW_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Password has been updated").exists)
+    )
+    .pause(Test.REQUEST_DELAY)
+
+  def forgotPassword: ScenarioBuilder = scenario("Forgot Passowrd")
+    .exec(http("Email_OTP_Forgot_Password_Form_GET")
+      .get(routes.AccountController.emailOTPForgotPasswordForm().url)
+      .check(css("legend:contains(Forgot Password)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(Test.REQUEST_DELAY)
+    .exec(http("Email_OTP_Forgot_Password_POST")
+      .post(routes.AccountController.changePassword().url)
+      .formParamMap(Map(
+        constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Logged Out Successfully").exists)
+    )
+    .pause(Test.REQUEST_DELAY)
+    .exec(http("Forgot_Password_Form_GET")
+      .get(session=>routes.AccountController.forgotPasswordForm(session(Test.TEST_USERNAME).as[String]).url)
+      .check(css("legend:contains(Forgot Password)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(Test.REQUEST_DELAY)
+    .feed(OTPFeeder.otpFeed)
+    .exec(http("Forgot_Password_POST")
+      .post(routes.AccountController.forgotPassword().url)
+      .formParamMap(Map(
+        constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
+        constants.FormField.MNEMONICS.name -> constants.FormField.MNEMONICS.field,
+        constants.FormField.OTP.name -> "${%s}".format(Test.TEST_OTP),
+        constants.FormField.NEW_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
+        constants.FormField.CONFIRM_NEW_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Logged Out Successfully").exists)
+    )
+    .pause(Test.REQUEST_DELAY)
 }
