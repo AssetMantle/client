@@ -81,6 +81,30 @@ class WesternUnionController @Inject()(
           blockchainAccounts.Service.tryGetAddress(zoneAccountID)
         }
 
+         def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroNumber): Future[String] = {
+          println("issusing Fiat")
+          val zonePassword = Future(keyStore.getPassphrase(zoneID))
+
+          def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
+            entity = blockchainTransaction.IssueFiat(from = zoneWalletAddress, to = traderAddress, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, gas = constants.Blockchain.ZoneIssueFiatGas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
+            request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGas), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, mode = transactionMode),
+            action = transactionsIssueFiat.Service.post,
+            onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
+            onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
+          )
+
+          (for {
+            zonePassword <- zonePassword
+            ticketID <- sendTransaction(zonePassword)
+          } yield ticketID
+            ).recover {
+            case baseException: BaseException => throw baseException
+          }
+
+        }
+
         def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroNumber(requestBody.paidOutAmount))
 
         def createFiat(traderID: String) = masterFiats.Service.create(traderID, requestBody.reference, new MicroNumber(requestBody.paidOutAmount), new MicroNumber(0))
@@ -138,28 +162,6 @@ class WesternUnionController @Inject()(
         })
   }
 
-  private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroNumber): Future[String] = {
-    println("issusing Fiat")
-    val zonePassword = Future(keyStore.getPassphrase(zoneID))
 
-    def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
-      entity = blockchainTransaction.IssueFiat(from = zoneWalletAddress, to = traderAddress, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, gas = constants.Blockchain.ZoneIssueFiatGas, ticketID = "", mode = transactionMode),
-      blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-      request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = zoneWalletAddress, gas = constants.Blockchain.ZoneIssueFiatGas), to = traderAddress, password = zonePassword, transactionID = westernUnionReferenceID, transactionAmount = transactionAmount, mode = transactionMode),
-      action = transactionsIssueFiat.Service.post,
-      onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
-      onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
-      updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
-    )
-
-    (for {
-      zonePassword <- zonePassword
-      ticketID <- sendTransaction(zonePassword)
-    } yield ticketID
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
-
-  }
 
 }

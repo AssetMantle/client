@@ -1,7 +1,7 @@
 package constants
 
 object Test {
-  val NUMBER_OF_USERS = 100
+  val NUMBER_OF_USERS = 500
 
   val TEST_IP = "localhost"
 

@@ -37,7 +37,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(1))
+    oneCompleteModeratedScenario.inject(atOnceUsers(5))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -113,7 +113,6 @@ object CreateSeller {
     .exec(contactControllerTest.verifyMobileNumberScenario)
     .exec(contactControllerTest.addEmailAddressScenario)
     .exec(contactControllerTest.verifyEmailAddressScenario)
-    .exec(accountControllerTest.addIdentification)
     .exec { session => session.set(Test.TEST_ORGANIZATION_ID, session(Test.TEST_SELL_ORGANIZATION_ID).as[String]) }
     .exec(setACLControllerTest.addTraderRequest)
     .exec(accountControllerTest.logoutScenario)
@@ -177,7 +176,6 @@ object CreateBuyer {
     .exec(contactControllerTest.verifyMobileNumberScenario)
     .exec(contactControllerTest.addEmailAddressScenario)
     .exec(contactControllerTest.verifyEmailAddressScenario)
-    .exec(accountControllerTest.addIdentification)
     .exec { session => session.set(Test.TEST_ORGANIZATION_ID, session(Test.TEST_BUY_ORGANIZATION_ID).as[String]) }
     .exec(setACLControllerTest.addTraderRequest)
     .exec(accountControllerTest.logoutScenario)
@@ -215,8 +213,8 @@ object IssueFiat {
 
   val issueFiat = scenario("IssueFiat")
     /* .exec(session => session.set(Test.TEST_ZONE_USERNAME, "ZONE10qr6Ecmuq").set(Test.TEST_ZONE_PASSWORD,"123123123"))
-    */ /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10DIkHxyDY").set(Test.TEST_SELLER_PASSWORD,"SELL10DIkHxyDY"))
-     .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10U2EUMEJN").set(Test.TEST_BUYER_PASSWORD, "BUY10U2EUMEJN"))
+    */ /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10cEUVnPV9").set(Test.TEST_SELLER_PASSWORD,"SELL10cEUVnPV9"))
+     .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY123TFjb7iV").set(Test.TEST_BUYER_PASSWORD, "BUY123TFjb7iV"))
      .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
      .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
      .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))

@@ -103,7 +103,7 @@ class LoopBackController @Inject()(
     def updateOTP(accountID: Option[String]): Future[Int] = {
       accountID match {
         case Some(accountID) => masterTransactionEmailOTPs.Service.insertOrUpdate(EmailOTP(accountID, util.hashing.MurmurHash3.stringHash(constants.Test.OTP).toString))
-        case None => throw new BaseException(constants.Response.EMAIL_ADDRESS_NOT_FOUND)
+        case None => Future(0)
       }
     }
 
@@ -119,7 +119,7 @@ class LoopBackController @Inject()(
     def updateOTP(accountID: Option[String]): Future[Int] = {
       accountID match {
         case Some(accountID) => masterTransactionSMSOTPs.Service.insertOrUpdate(SMSOTP(accountID, util.hashing.MurmurHash3.stringHash(constants.Test.OTP).toString))
-        case None => throw new BaseException(constants.Response.EMAIL_ADDRESS_NOT_FOUND)
+        case None => Future(0)
       }
     }
 
