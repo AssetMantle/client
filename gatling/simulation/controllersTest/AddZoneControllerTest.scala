@@ -155,16 +155,15 @@ object addZoneControllerTest {
   val rejectVerifyZoneScenario: ScenarioBuilder = scenario("RejectVerifyZone")
     .exec(http("RejectVerifyZone_GET")
       .get(session => routes.AddZoneController.rejectVerifyZoneRequestForm(session(Test.TEST_ZONE_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.REJECT_VERIFY_ZONE_REQUEST.legend)).exists)
+      .check(css("legend:contains(Reject Zone Request)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
-
     .pause(Test.REQUEST_DELAY)
     .exec(http("RejectVerifyZone_POST")
       .post(routes.AddZoneController.rejectVerifyZoneRequest().url)
       .formParamMap(Map(
         constants.FormField.ZONE_ID.name -> "${%s}".format(Test.TEST_ZONE_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("SUCCESS VERIFY_ZONE_REJECTED").exists)
+      .check(substring("Verify Zone Rejected").exists)
     )
     .pause(Test.REQUEST_DELAY)
 

@@ -28,7 +28,7 @@ object issueFiatControllerTest {
 
   val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
     .feed(wurtcbFeeder.wurtcbFeed)
-    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiatRequest(session(Test.TEST_TRADER_ID).as[String])) }
+    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiatRequest(session(Test.TEST_TRADER_ID).as[String],(session(Test.TEST_TRANSACTION_AMOUNT).as[String]+"000000"))) }
     .exec(session=>
     session.set(Test.TEST_REQUEST_SIGNATURE,utilities.String.sha256Sum("D3M0r1c8KeyCoMd3X"+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+session(Test.TEST_WU_INVOICE_NUMBER).as[String]+session(Test.TEST_BUYER_BUSINESS_ID).as[String]+session(Test.TEST_BUYER_FIRST_NAME).as[String]+session(Test.TEST_BUYER_LAST_NAME).as[String]+session(Test.TEST_CREATED_DATE).as[String]+session(Test.TEST_LAST_UPDATED_DATE).as[String]+session(Test.TEST_WU_STATUS).as[String]+session(Test.TEST_DEAL_TYPE).as[String]+session(Test.TEST_PAYMENT_TYPE_ID).as[String]+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
     )

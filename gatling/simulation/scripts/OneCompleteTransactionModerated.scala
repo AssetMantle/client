@@ -23,7 +23,7 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(AddCounterParty.addCounterParty)
     .exec(IssueFiat.issueFiat)
     .exec(IssueAssetModerated.issueAssetModerated)
-    .exec(CreateSalesQuote.createSalesQuote)
+    /*.exec(CreateSalesQuote.createSalesQuote)
     .exec(AcceptSalesQuoteAndAllTradeTerms.acceptSalesQuoteAndAllTradeTerms)
     .exec(UploadContractAndOtherTradeDocuments.uploadContractAndOtherTradeDocuments)
     .exec(AcceptBillOfLading.acceptBillOfLading)
@@ -33,7 +33,7 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(SendFiat.sendFiat)
     .exec(SendAsset.sendAsset)
     .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
-    .exec(RedeemAsset.redeemAsset)
+    .exec(RedeemAsset.redeemAsset)*/
 
 
   setUp(
@@ -217,7 +217,9 @@ object IssueFiat {
      .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY123TFjb7iV").set(Test.TEST_BUYER_PASSWORD, "BUY123TFjb7iV"))
      .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
      .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
-     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+   /* .feed(BuyerFeeder.buyerFeed)
+    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
     .exec { session => session.set(Test.TEST_TRADER_ID, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
     .exec(issueFiatControllerTest.issueFiatRequestScenario)
@@ -278,8 +280,8 @@ object UploadContractAndOtherTradeDocuments {
     .exec(accountControllerTest.loginScenario)
     .exec(negotiationControllerTest.uploadContract)
     .exec(negotiationControllerTest.updateContractSigned)
-    .exec(negotiationControllerTest.uploadAssetDocuments)
-    .exec(negotiationControllerTest.addBillOfLading)
+    .exec(assetControllerTest.uploadAssetDocuments)
+    .exec(assetControllerTest.addBillOfLading)
     .exec(negotiationControllerTest.uploadNegotiationDocuments)
     .exec(accountControllerTest.logoutScenario)
 }
@@ -289,7 +291,7 @@ object AcceptBillOfLading {
   val acceptBillOfLading = scenario("AcceptBillOfLading")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(accountControllerTest.loginScenario)
-    .exec(negotiationControllerTest.acceptBillOfLading)
+    .exec(assetControllerTest.acceptBillOfLading)
     .exec(accountControllerTest.logoutScenario)
 }
 

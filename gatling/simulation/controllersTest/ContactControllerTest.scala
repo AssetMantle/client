@@ -9,15 +9,15 @@ import io.gatling.http.Predef._
 
 object contactControllerTest {
 
-  val addMobileNumberScenario: ScenarioBuilder = scenario("addMobileNumber")
+  val addOrUpdateMobileNumberScenario: ScenarioBuilder = scenario("addOrUpdateMobileNumber")
     .feed(MobileNumberFeeder.mobileNumberFeed)
-    .exec(http("AddMobileNumberForm_GET")
+    .exec(http("AddOrUpdateMobileNumberForm_GET")
       .get(routes.ContactController.addOrUpdateMobileNumberForm().url)
       .check(css("legend:contains(%s)".format("Add Mobile Number")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("AddMobileNumber_POST")
+    .exec(http("AddOrUpdateMobileNumber_POST")
       .post(routes.ContactController.addOrUpdateMobileNumber().url)
       .formParamMap(Map(
         constants.FormField.COUNTRY_CODE.name -> "${%s}".format(Test.TEST_COUNTRY_CODE),
@@ -26,11 +26,13 @@ object contactControllerTest {
       )
       .check(substring("Mobile Number Updated").exists)
     )
+    .pause(Test.REQUEST_DELAY)
 
   val verifyMobileNumberScenario: ScenarioBuilder = scenario("VerifyMobileNumber")
     .feed(OTPFeeder.otpFeed)
     .exec(http("VerifyMobileNumberForm_GET")
       .get(routes.ContactController.verifyMobileNumberForm().url)
+      .check(css("legend:contains(%s)".format("Verify Mobile Number")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
@@ -42,16 +44,17 @@ object contactControllerTest {
       )
       .check(substring("Mobile Number verified successfully").exists)
     )
+    .pause(Test.REQUEST_DELAY)
 
-  val addEmailAddressScenario: ScenarioBuilder = scenario("addEmailAddress")
+  val addOrUpdateEmailAddressScenario: ScenarioBuilder = scenario("addOrUpdateEmailAddress")
     .feed(EmailAddressFeeder.emailAddressFeed)
-    .exec(http("AddEmailAddressForm_GET")
+    .exec(http("AddOrUpdateEmailAddressForm_GET")
       .get(routes.ContactController.addOrUpdateEmailAddressForm().url)
       .check(css("legend:contains(%s)".format("Add Email Address")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("AddEmailAddress_POST")
+    .exec(http("AddOrUpdateEmailAddress_POST")
       .post(routes.ContactController.addOrUpdateEmailAddress().url)
       .formParamMap(Map(
         constants.FormField.EMAIL_ADDRESS.name -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
@@ -59,6 +62,7 @@ object contactControllerTest {
       )
       .check(substring("Email Address Updated").exists)
     )
+    .pause(Test.REQUEST_DELAY)
 
   val verifyEmailAddressScenario: ScenarioBuilder = scenario("verifyEmailAddress")
     .feed(OTPFeeder.otpFeed)
@@ -74,5 +78,7 @@ object contactControllerTest {
         constants.FormField.OTP.name -> "${%s}".format(Test.TEST_OTP),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN))
       )
+      .check(substring("Email Address Verified").exists)
     )
+    .pause(Test.REQUEST_DELAY)
 }

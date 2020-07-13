@@ -28,7 +28,6 @@ class OneCompleteTransactionUnmoderated extends Simulation {
     .exec(UnmoderatedSellerExecuteOrder.unmoderatedSellerExecuteOrder)
     .exec(RedeemAsset.redeemAsset)
 
-
   setUp(
     oneCompleteModeratedScenario.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))

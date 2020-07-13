@@ -67,6 +67,7 @@ object accountControllerTest {
     )
     .pause(Test.REQUEST_DELAY)
 
+
   val loginMain: ScenarioBuilder = scenario("LoginMain")
     .feed(GenesisFeeder.genesisFeed)
     .exec(http("LoginForm_GET")
@@ -223,7 +224,29 @@ object accountControllerTest {
         constants.FormField.NEW_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
         constants.FormField.CONFIRM_NEW_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Logged Out Successfully").exists)
+      .check(substring("Password has been updated").exists)
     )
     .pause(Test.REQUEST_DELAY)
+
+  val loginAfterPasswordChangeScenario: ScenarioBuilder = scenario("LoginAfterPasswordChange")
+    .exec(http("Login(AfterPasswordChange)Form_GET")
+      .get(routes.AccountController.loginForm().url)
+      .check(css("legend:contains(Login)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(Test.REQUEST_DELAY)
+    .exec(http("Login(AfterPasswordChange)_POST")
+      .post(routes.AccountController.login().url)
+      .formParamMap(Map(
+        constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
+        constants.FormField.PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)+"_NEW"),
+        constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> "",
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("${%s}".format(Test.TEST_USERNAME)).exists)
+      .check(substring("Dashboard").exists)
+      .check(substring("Trades").exists)
+      .check(substring("Transactions").exists)
+      .check(substring("Account").exists)
+    )
+    .pause(Test.REQUEST_DELAY)
+
 }

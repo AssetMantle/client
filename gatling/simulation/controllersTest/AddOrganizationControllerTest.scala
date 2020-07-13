@@ -133,18 +133,40 @@ object addOrganizationControllerTest {
     )
     .pause(Test.REQUEST_DELAY)
 
-  val rejectVerifyOrganizationScenario: ScenarioBuilder = scenario("RejectVerifyOrganization")
-    .exec(http("RejectVerifyOrganization_GET")
+  val rejectOrganizationRequestScenario: ScenarioBuilder = scenario("RejectOrganizationRequest")
+    .exec(http("RejectOrganizationRequest_GET")
       .get(session=>routes.AddOrganizationController.rejectRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
-      .check(css("legend:contains(%s)".format(constants.Form.REJECT_ORGANIZATION_REQUEST.legend)).exists)
+      .check(css("legend:contains(Reject Request)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("RejectVerifyOrganization_POST")
+    .exec(http("RejectOrganizationRequest_POST")
       .post(routes.AddOrganizationController.rejectRequest().url)
       .formParamMap(Map(
         constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+        constants.FormField.COMMENT.name -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("SUCCESS VERIFY_ORGANIZATION_REQUEST_REJECTED").exists)
+      .check(substring("Organization Rejected").exists)
     )
 
+  val addOrUpdateOrganizationBankAccount: ScenarioBuilder = scenario("AddOrUpdateOrganizationBankAccount")
+    .feed(BankAccountDetailFeeder.bankAccountDetailFeeder)
+    .exec(http("AddOrUpdateOrganizationBankAccountForm_GET")
+      .get(routes.AddOrganizationController.addOrUpdateOrganizationBankAccountForm().url)
+      .check(css("legend:contains(Add/Update Bank Account Details)").exists)
+      .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+    .pause(Test.REQUEST_DELAY)
+    .exec(http("AddOrUpdateOrganizationBankAccount_POST")
+      .post(routes.AddOrganizationController.addOrUpdateOrganizationBankAccount().url)
+      .formParamMap(Map(
+        constants.FormField.ACCOUNT_HOLDER_NAME.name ->  "${%s}".format(Test.TEST_ACCOUNT_HOLDER_NAME),
+        constants.FormField.NICK_NAME.name ->  "${%s}".format(Test.TEST_NICK_NAME),
+        constants.FormField.ACCOUNT_NUMBER.name ->  "${%s}".format(Test.TEST_ACCOUNT_NUMBER),
+        constants.FormField.BANK_NAME.name ->  "${%s}".format(Test.TEST_BANK_NAME),
+        constants.FormField.SWIFT_CODE.name -> "${%s}".format(Test.TEST_SWIFT_CODE),
+        constants.FormField.STREET_ADDRESS.name -> "${%s}".format(Test.TEST_STREET_ADDRESS),
+        constants.FormField.COUNTRY.name -> "${%s}".format(Test.TEST_COUNTRY),
+        constants.FormField.ZIP_CODE.name -> "${%s}".format(Test.TEST_ZIP_CODE),
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(substring("Bank Account Details Updated Successfully").exists)
+    )
 }
