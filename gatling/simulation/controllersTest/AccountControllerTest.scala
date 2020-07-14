@@ -13,6 +13,7 @@ object accountControllerTest {
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
     .exec(http("SignUp_GET")
       .get(routes.AccountController.signUpForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Register)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -25,12 +26,14 @@ object accountControllerTest {
         constants.FormField.SIGNUP_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(206))
       .check(css("legend:contains(Blockchain Passphrase)").exists)
     )
     .pause(Test.REQUEST_DELAY)
     .exec(http("CreateWallet_GET")
       .get(session => routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
       .check(css("legend:contains(Blockchain Passphrase)").exists)
+      .check(status.is(200))
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.MNEMONICS), "value").saveAs(Test.MNEMONICS))
     )
@@ -42,6 +45,7 @@ object accountControllerTest {
         constants.FormField.MNEMONICS.name->"${%s}".format(Test.MNEMONICS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Signed Up Successfully!").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -49,6 +53,7 @@ object accountControllerTest {
   val loginScenario: ScenarioBuilder = scenario("Login")
     .exec(http("LoginForm_GET")
       .get(routes.AccountController.loginForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Login)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -59,6 +64,7 @@ object accountControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("${%s}".format(Test.TEST_USERNAME)).exists)
       .check(substring("Dashboard").exists)
       .check(substring("Trades").exists)
@@ -71,6 +77,7 @@ object accountControllerTest {
     .feed(GenesisFeeder.genesisFeed)
     .exec(http("LoginForm_GET")
       .get(routes.AccountController.loginForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -81,6 +88,7 @@ object accountControllerTest {
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
         constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("${%s}".format(Test.TEST_MAIN_USERNAME)).exists)
       .check(substring("Dashboard").exists)
       .check(substring("Trades").exists)
@@ -92,6 +100,7 @@ object accountControllerTest {
   val logoutScenario: ScenarioBuilder = scenario("Logout")
     .exec(http("Logout_Form_GET")
       .get(routes.AccountController.logoutForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Logout)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -100,6 +109,7 @@ object accountControllerTest {
       .formParamMap(Map(
         Test.RECEIVE_NOTIFICATIONS -> false,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Logged Out Successfully").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -107,6 +117,7 @@ object accountControllerTest {
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_Identification_Form")
       .get(routes.AccountController.addIdentificationForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Provide your details below)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -132,12 +143,14 @@ object accountControllerTest {
         Form.ADDRESS_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
+      .check(status.is(206))
       .check(substring("Provide proof of identity").exists)
       .check(css("button:contains(Upload Identification)").exists)
     )
     .pause(Test.REQUEST_DELAY)
     .exec(http("UploadIdentificationForm")
       .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
+      .check(status.is(200))
       .check(css("button:contains(Browse)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -153,16 +166,20 @@ object accountControllerTest {
         Form.RESUMABLE_IDENTIFIER -> "document",
         Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
       .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED+"${%s}".format(Test.TEST_FILE_NAME))
-        .transferEncoding("binary")).asMultipartForm)
+        .transferEncoding("binary")).asMultipartForm
+      .check(status.is(200))
+    )
     .exec(
       http("Store_Identification")
         .get(session=>routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String],"IDENTIFICATION").url)
+        .check(status.is(206))
         .check(substring("Provide proof of identity").exists)
         .check(css("button:contains(Update Identification)").exists)
     )
     .pause(Test.REQUEST_DELAY)
     .exec(http("ReviewIdentificationForm_GET")
       .get(routes.AccountController.userReviewIdentificationForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(User Review Identification)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -173,6 +190,7 @@ object accountControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.COMPLETION -> true
       ))
+      .check(status.is(200))
       .check(substring("Identity Details updated successfully").exists)
     )
     .pause(Test.REQUEST_DELAY)

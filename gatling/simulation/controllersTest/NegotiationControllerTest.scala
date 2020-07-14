@@ -17,6 +17,7 @@ object negotiationControllerTest {
   val negotiationRequestScenario: ScenarioBuilder = scenario("NegotiationRequest")
     .exec(http("NegotiationRequestForm_GET")
       .get(routes.NegotiationController.requestForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Create Sales Quote)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -26,6 +27,7 @@ object negotiationControllerTest {
         constants.FormField.ASSET_ID.name -> "${%s}".format(Test.TEST_ASSET_ID),
         constants.FormField.COUNTER_PARTY.name -> "${%s}".format(Test.TEST_COUNTER_PARTY),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(206))
       .check(css("legend:contains(Payment Terms)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       .check(css("[name=%s]".format(Test.ID), "value").saveAs(Test.TEST_NEGOTIATION_ID))
@@ -34,6 +36,7 @@ object negotiationControllerTest {
     .feed(PaymentTermsFeeder.paymentTermsFeed)
     .exec(http("Payment_Terms_Form_GET")
       .get(session => routes.NegotiationController.paymentTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Payment Terms)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -46,12 +49,14 @@ object negotiationControllerTest {
         Test.CREDIT_TENURE -> "${%s}".format(Test.TEST_TENURE),
         Test.CREDIT_REFRENCE -> "${%s}".format(Test.TEST_REFRENCE),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(206))
       .check(css("legend:contains(Sales Quote Documents List)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
     .exec(http("Document_List_Form_GET")
       .get(session => routes.NegotiationController.documentListForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Sales Quote Documents List)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -67,12 +72,14 @@ object negotiationControllerTest {
         constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> "BANK",
         constants.FormField.DOCUMENT_LIST_COMPLETED.name -> true,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(206))
       .check(css("legend:contains(Review Sales Quote)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
     .exec(http("Document_List_Form_GET")
       .get(session => routes.NegotiationController.reviewRequestForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Review Sales Quote)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -81,6 +88,7 @@ object negotiationControllerTest {
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Sales Quote Submitted").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -89,6 +97,7 @@ object negotiationControllerTest {
     .feed(GasFeeder.gasFeed)
     .exec(http("AcceptNegotiationRequestForm_GET")
       .get(session => routes.NegotiationController.acceptRequestForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Accept Sales Quote)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -99,6 +108,7 @@ object negotiationControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Sales Quote Accepted").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -106,6 +116,7 @@ object negotiationControllerTest {
   val rejectNegotiationRequest: ScenarioBuilder = scenario("RejectNegotiationRequest")
     .exec(http("RejectNegotiationRequestForm_GET")
       .get(session => routes.NegotiationController.rejectRequestForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Reject Sales Quote)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -115,6 +126,7 @@ object negotiationControllerTest {
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         constants.FormField.COMMENT.name -> "",
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Sales Quote Request Rejected").exists)
     )
 
@@ -122,6 +134,7 @@ object negotiationControllerTest {
     .foreach(negotiationTermList, "termType") {
       exec(http("AcceptOrRejectNegotiationTermForm_GET")
         .get(session => routes.NegotiationController.acceptOrRejectNegotiationTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String], session("termType").as[String]).url)
+        .check(status.is(200))
         .check(css("[id=%s]".format(constants.FormField.ID.name), "value").is("${%s}".format(Test.TEST_NEGOTIATION_ID)))
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
@@ -133,6 +146,7 @@ object negotiationControllerTest {
             constants.FormField.TERM_TYPE.name -> "${termType}",
             constants.FormField.STATUS.name -> true,
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+          .check(status.is(206))
           .check(css("[id=%s]".format(constants.FormField.ID.name), "value").is("${%s}".format(Test.TEST_NEGOTIATION_ID)))
           .check(css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("true"))
         )
@@ -142,6 +156,7 @@ object negotiationControllerTest {
   val confirmAllNegotiationTerms: ScenarioBuilder = scenario("ConfirmAllNegotiationTerms")
     .exec(http("ConfirmAllNegotiationTermsForm_GET")
       .get(session => routes.NegotiationController.confirmAllNegotiationTermsForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Trade Terms)").exists)
       .check(substring("Accept all terms?").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
@@ -152,6 +167,7 @@ object negotiationControllerTest {
       .formParamMap(Map(
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
     )
     .pause(Test.REQUEST_DELAY)
 
@@ -159,6 +175,7 @@ object negotiationControllerTest {
     .feed(ImageFeeder.imageFeed)
     .exec(http("UploadContractForm" + "_GET")
       .get(session => routes.FileController.uploadNegotiationForm(session(Test.TEST_NEGOTIATION_ID).as[String], constants.File.Negotiation.CONTRACT).url)
+      .check(status.is(200))
       .check(css("button:contains(Browse)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -173,10 +190,13 @@ object negotiationControllerTest {
         Form.RESUMABLE_IDENTIFIER -> "document",
         Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
       .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
-        .transferEncoding("binary")).asMultipartForm)
+        .transferEncoding("binary")).asMultipartForm
+      .check(status.is(200))
+    )
     .exec(
       http("Store_Contract")
         .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], constants.File.Negotiation.CONTRACT, session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+        .check(status.is(206))
         .check(css("legend:contains(Add Contract Details)").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -184,6 +204,7 @@ object negotiationControllerTest {
   val updateContractSigned: ScenarioBuilder = scenario("UpdateContractSigned")
     .exec(http("UpdateContractSignedForm_GET")
       .get(session => routes.NegotiationController.updateContractSignedForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Contract Signed)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -193,6 +214,7 @@ object negotiationControllerTest {
       .formParamMap(Map(
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
     )
     .pause(Test.REQUEST_DELAY)
 
@@ -201,6 +223,7 @@ object negotiationControllerTest {
       feed(ImageFeeder.imageFeed)
         .exec(http("Asset_Document_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_FORM")
           .get(session => routes.FileController.uploadAssetForm(session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_ASSET_ID).as[String]).url)
+          .check(status.is(200))
           .check(css("button:contains(Browse)").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
@@ -215,10 +238,13 @@ object negotiationControllerTest {
             Form.RESUMABLE_IDENTIFIER -> "document",
             Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
           .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
-            .transferEncoding("binary")).asMultipartForm)
+            .transferEncoding("binary")).asMultipartForm
+          .check(status.is(200))
+        )
         .exec(
           http("Store_Asset_Document_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
             .get(session => routes.FileController.storeAsset(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+            .check(status.is(206))
         )
         .pause(Test.REQUEST_DELAY)
     }
@@ -229,6 +255,7 @@ object negotiationControllerTest {
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
     .exec(http("AddBillOfLadingForm_GET")
       .get(session => routes.AssetController.addBillOfLadingForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Add Bill Of Lading)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -252,6 +279,7 @@ object negotiationControllerTest {
         constants.FormField.QUANTITY_UNIT.name -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
         constants.FormField.ASSET_PRICE_PER_UNIT.name -> "${%s}".format(Test.TEST_ASSET_PRICE_PER_UNIT),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(206))
       .check(substring("Upload Documents").exists)
       .check(substring("Commodity Documents").exists)
       .check(substring("Trade Documents").exists)
